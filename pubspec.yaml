@@ -1,0 +1,124 @@
+name: hookup4u2
+description: A new Flutter project.
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.1+8
+
+environment:
+  sdk: "^3.4.0"
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  agora_rtc_engine: ^6.3.2       # Upgraded from 6.3.0
+  agora_uikit: ^1.3.10           # Upgraded from 1.3.8
+  cached_network_image: ^3.3.1   # Upgraded from 3.2.3
+  cloud_firestore: ^5.2.1        # Upgraded from 4.15.9
+  cloud_functions: ^5.0.4        # Upgraded from 4.7.4
+  country_code_picker: ^3.0.0    # Kept at 3.0.0
+  crop_image: ^1.0.12            # Kept at 1.0.12
+  cupertino_icons: ^1.0.2        # Kept at 1.0.2
+  easy_localization: ^3.0.5      # Kept at 3.0.5
+  equatable: ^2.0.5              # Kept at 2.0.5
+  firebase_auth: ^5.1.4          # Upgraded from 4.17.9
+  firebase_core: ^3.3.0          # Upgraded from 2.27.1
+  firebase_messaging: ^15.0.4    # Upgraded from 14.7.20
+  firebase_storage: ^12.1.3      # Upgraded from 11.7.4
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.6           # Upgraded from 8.1.5
+  flutter_callkit_incoming: ^2.0.0 # Kept at 2.0.0
+  flutter_facebook_auth: ^6.0.4  # Upgraded from 6.0.4
+  flutter_flushbar: ^0.0.2       # Kept at 0.0.2
+  flutter_google_places: 0.3.0   # Kept at 0.3.0
+  flutter_image_compress: ^2.3.0 # Upgraded from 2.2.0
+  flutter_swiper_null_safety: ^1.0.2 # Kept at 1.0.2
+  fluttertoast: ^8.2.1           # Upgraded from 8.2.1
+  font_awesome_flutter: ^10.4.0  # Kept at 10.4.0
+  google_maps_flutter: ^2.9.0    # Upgraded from 2.6.0
+  google_mobile_ads: ^5.1.0      # Upgraded from 5.0.0
+  http: ^0.13.6                   # Upgraded from 0.13.5
+  image: ^4.2.0                  # Upgraded from 4.0.16
+  image_cropper: ^4.0.1          # Kept at 4.0.1
+  image_picker: ^1.0.7           # Kept at 1.0.7
+  in_app_purchase: ^3.1.13       # Kept at 3.1.13
+  in_app_purchase_storekit: ^0.3.13+1 # Kept at 0.3.13+1
+  in_app_purchase_android: ^0.3.2 # Kept at 0.3.2
+  intl: any                      # Kept as `any`
+  location: ^7.0.0               # Upgraded from 6.0.1
+  rflutter_alert: ^2.0.7         # Kept at 2.0.7
+  otp_autofill: ^3.0.2           # Kept at 3.0.2
+  path_provider: ^2.0.14         # Kept at 2.0.14
+  permission_handler: ^11.3.0    # Kept at 11.3.0
+  pin_code_fields: ^8.0.1        # Kept at 8.0.1
+  provider: ^6.0.5               # Kept at 6.0.5
+  share_plus: ^7.2.2           # Upgraded from 7.2.2
+  shared_preferences: ^2.3.1     # Upgraded from 2.2.0
+  shimmer: ^3.0.0                # Kept at 3.0.0
+  swipable_stack: ^2.0.0         # Kept at 2.0.0
+  uuid: ^4.4.2                   # Upgraded from 4.3.3
+  webview_flutter: ^4.8.0        # Upgraded from 4.4.2
+  google_fonts: ^4.0.0           # Kept at 4.0.0
+
+dev_dependencies:
+  flutter_launcher_icons: "^0.13.0" # Kept at 0.13.0
+  flutter_lints: ^2.0.3           # Upgraded from 2.0.3
+  device_preview: ^1.2.0            # Upgraded from 1.1.0
+  flutter_native_splash: ^2.4.1     # Upgraded from 2.2.19
+
+  flutter_test:
+    sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "asset/Icon/icon.png"
+  min_sdk_android: 21
+
+flutter_native_splash:
+  color: "ff3a5a"
+  image: "asset/splash.png"
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+# The following section is specific to Flutter packages.
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  assets:
+    - asset/auth/
+    - asset/
+    - asset/translation/
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages

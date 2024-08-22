@@ -5,7 +5,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:hookup4u2/config/app_config.dart';
+import 'package:naijasingles/config/app_config.dart';
 
 import '../../../models/user_model.dart';
 import '../../constants/constants.dart';

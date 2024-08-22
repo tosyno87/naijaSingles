@@ -3,8 +3,8 @@ import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/common/providers/theme_provider.dart';
-import 'package:hookup4u2/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/common/providers/theme_provider.dart';
+import 'package:naijasingles/common/widets/custom_snackbar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';

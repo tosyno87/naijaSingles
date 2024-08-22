@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/widets/custom_snackbar.dart';
-import 'package:hookup4u2/models/user_model.dart';
+import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/models/user_model.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../home/bloc/swipebloc_bloc.dart';

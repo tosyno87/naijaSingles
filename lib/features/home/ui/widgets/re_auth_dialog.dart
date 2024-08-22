@@ -3,12 +3,12 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/common/constants/colors.dart';
-import 'package:hookup4u2/common/data/repo/phone_auth_repo.dart';
-import 'package:hookup4u2/common/providers/theme_provider.dart';
-import 'package:hookup4u2/common/providers/user_provider.dart';
-import 'package:hookup4u2/common/routes/route_name.dart';
-import 'package:hookup4u2/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/common/constants/colors.dart';
+import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
+import 'package:naijasingles/common/providers/theme_provider.dart';
+import 'package:naijasingles/common/providers/user_provider.dart';
+import 'package:naijasingles/common/routes/route_name.dart';
+import 'package:naijasingles/common/widets/custom_snackbar.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 

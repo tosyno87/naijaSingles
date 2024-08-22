@@ -8,15 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:hookup4u2/common/providers/user_provider.dart';
-import 'package:hookup4u2/common/routes/route_name.dart';
-import 'package:hookup4u2/common/routes/router.dart';
-import 'package:hookup4u2/features/auth/facebook_login/facebook_login_bloc.dart';
-import 'package:hookup4u2/features/explore/bloc/explore_map_bloc.dart';
-import 'package:hookup4u2/features/home/ui/screens/splash.dart';
-import 'package:hookup4u2/features/payment/ui/in-app%20purcahse/get%20Products/getproducts_bloc.dart';
-import 'package:hookup4u2/features/street_view/bloc/streetviewdata_bloc.dart';
-import 'package:hookup4u2/services/location/bloc/userlocation_bloc.dart';
+import 'package:naijasingles/common/providers/user_provider.dart';
+import 'package:naijasingles/common/routes/route_name.dart';
+import 'package:naijasingles/common/routes/router.dart';
+import 'package:naijasingles/features/auth/facebook_login/facebook_login_bloc.dart';
+import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
+import 'package:naijasingles/features/home/ui/screens/splash.dart';
+import 'package:naijasingles/features/payment/ui/in-app%20purcahse/get%20Products/getproducts_bloc.dart';
+import 'package:naijasingles/features/street_view/bloc/streetviewdata_bloc.dart';
+import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:provider/provider.dart';
 
@@ -35,18 +35,15 @@ import 'features/match/bloc/match_bloc.dart';
 import 'features/payment/ui/in-app purcahse/buy Products/buyproducts_bloc.dart';
 import 'features/report/bloc/report_bloc.dart';
 import 'features/user/bloc/update_user_bloc.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(
-      options: const FirebaseOptions(
-    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
-    appId: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    messagingSenderId: 'xxxxxxxxxx',
-    projectId: 'xxxxxxxxxx',
-  ));
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   Bloc.observer = SimpleBlocObserver();
   SystemChrome.setPreferredOrientations([
@@ -90,13 +87,13 @@ class _MyHomePageState extends State<MyHomePage> {
             BlocProvider(
               create: (context) => AuthstatusBloc(
                   phoneAuthRepository:
-                      RepositoryProvider.of<PhoneAuthRepository>(context))
+                  RepositoryProvider.of<PhoneAuthRepository>(context))
                 ..add(AuthRequestEvent()),
             ),
             BlocProvider<RegistrationBloc>(
                 create: (BuildContext context) => RegistrationBloc(
                     phoneAuthRepository:
-                        RepositoryProvider.of<PhoneAuthRepository>(context))),
+                    RepositoryProvider.of<PhoneAuthRepository>(context))),
             BlocProvider<UserBloc>(
                 create: (BuildContext context) => UserBloc()),
             BlocProvider<GetInAppProductsBloc>(
@@ -123,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
             BlocProvider<UserLocationBloc>(
               create: (context) => UserLocationBloc(
                   userLocationReporistory:
-                      RepositoryProvider.of<UserLocationReporistory>(context)),
+                  RepositoryProvider.of<UserLocationReporistory>(context)),
             ),
             BlocProvider<FacebookLoginBloc>(
               create: (context) => FacebookLoginBloc(),
@@ -146,21 +143,21 @@ class _MyHomePageState extends State<MyHomePage> {
                       listeners: [
                         BlocListener<AuthstatusBloc, AuthstatusState>(
                             listener: (context, state) {
-                          if (state is UnauthenticatedState ||
-                              state is AuthFailed) {
-                            log("failed called ");
-                            Navigator.pushReplacementNamed(
-                                context, RouteName.loginScreen);
-                          } else if (state is AuthenticatedState) {
-                            log("success called ");
+                              if (state is UnauthenticatedState ||
+                                  state is AuthFailed) {
+                                log("failed called ");
+                                Navigator.pushReplacementNamed(
+                                    context, RouteName.loginScreen);
+                              } else if (state is AuthenticatedState) {
+                                log("success called ");
 
-                            state.user.getIdToken().then((value) {
-                              BlocProvider.of<RegistrationBloc>(context)
-                                  .add(CheckRegistration(token: value!));
-                            });
-                            // for registration
-                          }
-                        }),
+                                state.user.getIdToken().then((value) {
+                                  BlocProvider.of<RegistrationBloc>(context)
+                                      .add(CheckRegistration(token: value!));
+                                });
+                                // for registration
+                              }
+                            }),
                       ],
                       child: BlocListener<RegistrationBloc, RegistrationStates>(
                           listener: (context, state) {

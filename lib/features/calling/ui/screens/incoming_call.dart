@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/features/calling/ui/screens/call.dart';
+import 'package:naijasingles/features/calling/ui/screens/call.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../common/constants/colors.dart';

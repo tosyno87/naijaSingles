@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/common/providers/theme_provider.dart';
+import 'package:naijasingles/common/providers/theme_provider.dart';
 import 'package:image/image.dart' as i;
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';

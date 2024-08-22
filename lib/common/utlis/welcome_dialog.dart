@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/common/routes/route_name.dart';
+import 'package:naijasingles/common/routes/route_name.dart';
 import '../constants/colors.dart';
 
 Future showWelcomDialog(context) async {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>888697307756</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.app.naijasingles</string>
+	<key>PROJECT_ID</key>
+	<string>naijasingles-74a75</string>
+	<key>STORAGE_BUCKET</key>
+	<string>naijasingles-74a75.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:888697307756:ios:95ea92b8c7288e31704e49</string>
+</dict>
+</plist>

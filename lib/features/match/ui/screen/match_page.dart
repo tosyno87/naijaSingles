@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/features/blockUser/screen/block_userlist.dart';
+import 'package:naijasingles/features/blockUser/screen/block_userlist.dart';
 
-import 'package:hookup4u2/models/user_model.dart';
+import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 import '../../../../common/constants/colors.dart';
 

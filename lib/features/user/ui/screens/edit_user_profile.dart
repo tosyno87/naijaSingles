@@ -8,8 +8,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/widets/image_widget.dart';
-import 'package:hookup4u2/features/user/bloc/update_user_state.dart';
+import 'package:naijasingles/common/widets/image_widget.dart';
+import 'package:naijasingles/features/user/bloc/update_user_state.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';

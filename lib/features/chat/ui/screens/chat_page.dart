@@ -8,12 +8,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:hookup4u2/common/utlis/custom_toast.dart';
-import 'package:hookup4u2/common/widets/custom_snackbar.dart';
-import 'package:hookup4u2/features/ads/google_ads.dart';
-import 'package:hookup4u2/features/ads/load_ads.dart';
-import 'package:hookup4u2/features/chat/ui/widgets/send_message_box.dart';
-import 'package:hookup4u2/models/user_model.dart';
+import 'package:naijasingles/common/utlis/custom_toast.dart';
+import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/features/ads/google_ads.dart';
+import 'package:naijasingles/features/ads/load_ads.dart';
+import 'package:naijasingles/features/chat/ui/widgets/send_message_box.dart';
+import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';

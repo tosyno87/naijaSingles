@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:hookup4u2/features/auth/phone/ui/screens/phone_number.dart';
-import 'package:hookup4u2/models/user_model.dart';
+import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
+import 'package:naijasingles/models/user_model.dart';
 
 import '../../../../../common/constants/colors.dart';
 

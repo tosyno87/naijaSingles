@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:hookup4u2/config/app_config.dart';
+import 'package:naijasingles/config/app_config.dart';
 
 import '../common/constants/constants.dart';
 import '../models/user_model.dart';

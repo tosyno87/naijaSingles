@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:hookup4u2/common/constants/colors.dart';
+import 'package:naijasingles/common/constants/colors.dart';
 
 class Hookup4uBar extends StatelessWidget {
   const Hookup4uBar({super.key});

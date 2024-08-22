@@ -3,7 +3,7 @@
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
-import 'package:hookup4u2/models/user_model.dart';
+import 'package:naijasingles/models/user_model.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';

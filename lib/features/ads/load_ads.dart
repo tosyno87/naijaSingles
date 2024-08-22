@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:hookup4u2/features/ads/google_ads.dart';
+import 'package:naijasingles/features/ads/google_ads.dart';
 
 class LoadAds {
   static void loadInterstitialAd(

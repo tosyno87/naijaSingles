@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/data/repo/user_messaging_repo.dart';
+import 'package:naijasingles/common/data/repo/user_messaging_repo.dart';
 
 import '../../../models/user_model.dart';
 

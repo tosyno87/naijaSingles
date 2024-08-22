@@ -1,4 +1,4 @@
-import 'package:hookup4u2/common/data/repo/user_repo.dart';
+import 'package:naijasingles/common/data/repo/user_repo.dart';
 
 class StretViewPreferences {
   final String userId;

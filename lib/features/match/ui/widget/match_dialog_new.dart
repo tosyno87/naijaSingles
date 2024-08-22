@@ -3,10 +3,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hookup4u2/features/chat/ui/screens/chat_page.dart';
-import 'package:hookup4u2/features/home/bloc/searchuser_bloc.dart';
-import 'package:hookup4u2/features/match/ui/widget/matches_card.dart';
-import 'package:hookup4u2/models/user_model.dart';
+import 'package:naijasingles/features/chat/ui/screens/chat_page.dart';
+import 'package:naijasingles/features/home/bloc/searchuser_bloc.dart';
+import 'package:naijasingles/features/match/ui/widget/matches_card.dart';
+import 'package:naijasingles/models/user_model.dart';
 
 class MatchDialogPage extends StatefulWidget {
   final UserModel currentUser;

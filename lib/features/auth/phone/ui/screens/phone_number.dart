@@ -5,12 +5,12 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/data/repo/phone_auth_repo.dart';
-import 'package:hookup4u2/common/routes/route_name.dart';
-import 'package:hookup4u2/common/widets/custom_button.dart';
-import 'package:hookup4u2/common/widets/custom_snackbar.dart';
-import 'package:hookup4u2/common/widets/hookup_circularbar.dart';
-import 'package:hookup4u2/features/home/ui/screens/welcome.dart';
+import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
+import 'package:naijasingles/common/routes/route_name.dart';
+import 'package:naijasingles/common/widets/custom_button.dart';
+import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/common/widets/hookup_circularbar.dart';
+import 'package:naijasingles/features/home/ui/screens/welcome.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/constants/colors.dart';

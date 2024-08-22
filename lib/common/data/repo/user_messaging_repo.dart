@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/features/match/ui/widget/matches_card.dart';
+import 'package:naijasingles/features/match/ui/widget/matches_card.dart';
 
 import '../../../models/block_user_model.dart';
 import '../../../models/user_model.dart';

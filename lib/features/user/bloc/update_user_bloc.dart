@@ -2,10 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/data/repo/user_repo.dart';
-import 'package:hookup4u2/features/user/bloc/update_user_state.dart';
-import 'package:hookup4u2/features/user/bloc/user_event.dart';
-import 'package:hookup4u2/services/firestore_database.dart';
+import 'package:naijasingles/common/data/repo/user_repo.dart';
+import 'package:naijasingles/features/user/bloc/update_user_state.dart';
+import 'package:naijasingles/features/user/bloc/user_event.dart';
+import 'package:naijasingles/services/firestore_database.dart';
 
 class UserBloc extends Bloc<UserEvents, UserStates> {
   UserBloc() : super(UpdateUserInitial()) {

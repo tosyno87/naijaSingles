@@ -8,10 +8,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/routes/route_name.dart';
-import 'package:hookup4u2/common/widets/custom_snackbar.dart';
-import 'package:hookup4u2/services/firestore_database.dart';
-import 'package:hookup4u2/services/location/bloc/userlocation_bloc.dart';
+import 'package:naijasingles/common/routes/route_name.dart';
+import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/services/firestore_database.dart';
+import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';

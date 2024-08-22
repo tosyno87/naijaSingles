@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/common/constants/colors.dart';
+import 'package:naijasingles/common/constants/colors.dart';
 
 import '../../../../models/user_model.dart';
 import '../../../payment/ui/products.dart';

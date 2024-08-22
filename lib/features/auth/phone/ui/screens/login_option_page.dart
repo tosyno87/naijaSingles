@@ -4,9 +4,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/providers/theme_provider.dart';
-import 'package:hookup4u2/common/routes/route_name.dart';
-import 'package:hookup4u2/features/auth/phone/ui/widgets/facebook_button.dart';
+import 'package:naijasingles/common/providers/theme_provider.dart';
+import 'package:naijasingles/common/routes/route_name.dart';
+import 'package:naijasingles/features/auth/phone/ui/widgets/facebook_button.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 

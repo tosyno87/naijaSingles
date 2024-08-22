@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/models/user_model.dart';
+import 'package:naijasingles/models/user_model.dart';
 
 import '../../../common/data/repo/explore_map_repo.dart';
 

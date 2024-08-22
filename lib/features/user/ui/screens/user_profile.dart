@@ -4,10 +4,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hookup4u2/common/routes/route_name.dart';
-import 'package:hookup4u2/common/utlis/crousle_slider.dart';
-import 'package:hookup4u2/common/widets/custom_button.dart';
-import 'package:hookup4u2/features/user/ui/widgets/user_info.dart';
+import 'package:naijasingles/common/routes/route_name.dart';
+import 'package:naijasingles/common/utlis/crousle_slider.dart';
+import 'package:naijasingles/common/widets/custom_button.dart';
+import 'package:naijasingles/features/user/ui/widgets/user_info.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 

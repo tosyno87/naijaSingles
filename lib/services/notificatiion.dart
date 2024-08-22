@@ -24,7 +24,7 @@ class NotificationData {
     final params = CallKitParams(
       id: uuid,
       nameCaller: name,
-      appName: 'Hookup4u2',
+      appName: 'naijasingles',
       avatar: avatar,
       handle: callType,
       type: callType == 'VideoCall' ? 1 : 0,

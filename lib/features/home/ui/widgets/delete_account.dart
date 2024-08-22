@@ -4,8 +4,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:hookup4u2/common/widets/custom_snackbar.dart';
-import 'package:hookup4u2/features/home/ui/widgets/re_auth_dialog.dart';
+import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/features/home/ui/widgets/re_auth_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';

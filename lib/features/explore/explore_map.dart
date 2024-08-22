@@ -5,11 +5,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hookup4u2/common/constants/colors.dart';
-import 'package:hookup4u2/features/explore/bloc/explore_map_bloc.dart';
-import 'package:hookup4u2/features/explore/no_user.dart';
-// import 'package:hookup4u2/features/explore/premium_map.dart';
-import 'package:hookup4u2/features/street_view/street_view.dart';
+import 'package:naijasingles/common/constants/colors.dart';
+import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
+import 'package:naijasingles/features/explore/no_user.dart';
+// import 'package:naijasingles/features/explore/premium_map.dart';
+import 'package:naijasingles/features/street_view/street_view.dart';
 import 'package:provider/provider.dart';
 
 import '../../common/data/repo/user_location_repo.dart';

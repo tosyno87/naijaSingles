@@ -566,14 +566,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.2"
-  flutter_google_places:
+  flutter_google_places_hoc081098:
     dependency: "direct main"
     description:
-      name: flutter_google_places
-      sha256: e9fb23ceacdc7359aa759627550146f7fd3ae6c067d16f39f3c50d8feebf4809
+      name: flutter_google_places_hoc081098
+      sha256: 75492cf112eac0d6dc08181e2601d7c6ea867cc05077c6c1604b5d527e0f92c7
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "2.0.0"
   flutter_image_compress:
     dependency: "direct main"
     description:

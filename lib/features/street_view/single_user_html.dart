@@ -54,7 +54,8 @@ class SingleUser {
 </body>
 
 <script>
-    
+
+    /** @type {google.maps.StreetViewPanorama} */
     let panorama;
 var currentUserDetails =
   JSON.parse(JSON.stringify($currentUserLocation));
@@ -158,7 +159,7 @@ var currentUserDetails =
         // We get the map's default panorama and set up some defaults.
         // Note that we don't yet set it visible.
 
-        panorama = map.getStreetView(); // TODO fix type
+        panorama = map.getStreetView();
          panorama.setOptions({
           addressControl: false
         });

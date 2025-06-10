@@ -330,20 +330,24 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     }
   }
 
-  /// check if user has pruchased
-  PurchaseDetails _hasPurchased(String productId) {
+  /// check if user has purchased
+  PurchaseDetails? _hasPurchased(String productId) {
     debugPrint('======**************');
-    return purchases.firstWhere(
-      (purchase) => purchase.productID == productId,
-      // orElse: () => null
-    );
+    try {
+      return purchases.firstWhere(
+        (purchase) => purchase.productID == productId,
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   ///verifying pourchase of user
   Future<void> _verifyPuchase(String id) async {
-    PurchaseDetails purchase = _hasPurchased(id);
-    if (purchase.status == PurchaseStatus.purchased ||
-        purchase.status == PurchaseStatus.restored) {
+    PurchaseDetails? purchase = _hasPurchased(id);
+    if (purchase != null &&
+        (purchase.status == PurchaseStatus.purchased ||
+            purchase.status == PurchaseStatus.restored)) {
       debugPrint(purchase.productID);
       if (Platform.isIOS) {
         await iap.completePurchase(purchase);

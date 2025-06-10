@@ -12,8 +12,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/constants/colors.dart';
 import '../../../../../common/providers/user_provider.dart';
-import '../../../../../common/utlis/app_exit.dart';
-import '../../../../../common/widets/custom_snackbar.dart';
+import '../../../../../common/utils/app_exit.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../../auth_status/bloc/registration/bloc/registration_bloc.dart';
 import '../../../facebook_login/facebook_login_bloc.dart';
 import '../../../facebook_login/facebook_login_events.dart';

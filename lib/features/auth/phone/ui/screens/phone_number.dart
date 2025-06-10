@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widets/custom_button.dart';
-import 'package:naijasingles/common/widets/custom_snackbar.dart';
-import 'package:naijasingles/common/widets/hookup_circularbar.dart';
+import 'package:naijasingles/common/widgets/custom_button.dart';
+import 'package:naijasingles/common/widgets/custom_snackbar.dart';
+import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 import 'package:naijasingles/features/home/ui/screens/welcome.dart';
 import 'package:provider/provider.dart';
 

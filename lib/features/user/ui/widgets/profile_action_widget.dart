@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 

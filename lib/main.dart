@@ -24,7 +24,7 @@ import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/data/repo/user_location_repo.dart';
 import 'common/providers/theme_provider.dart';
-import 'common/utlis/observer.dart';
+import 'common/utils/observer.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
 import 'features/auth/auth_status/bloc/registration/bloc/registration_bloc.dart';
 import 'features/blockUser/bloc/bloc_user_list_bloc.dart';

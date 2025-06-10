@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/widets/custom_button.dart';
-import '../../../../common/widets/custom_snackbar.dart';
+import '../../../../common/widgets/custom_button.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 
 class SexualOrientation extends StatefulWidget {
   const SexualOrientation({super.key});

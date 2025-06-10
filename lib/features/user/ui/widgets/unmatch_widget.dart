@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/user_repo.dart';
-import '../../../../common/widets/custom_snackbar.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
 import '../../../match/bloc/match_bloc.dart';

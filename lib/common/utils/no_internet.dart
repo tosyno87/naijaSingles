@@ -1,7 +1,7 @@
 // ignore_for_file: sort_child_properties_last
 
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/utlis/custom_toast.dart';
+import 'package:naijasingles/common/utils/custom_toast.dart';
 
 import '../constants/colors.dart';
 

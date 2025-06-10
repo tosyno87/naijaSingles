@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/utlis/custom_toast.dart';
-import '../../../../common/widets/image_widget.dart';
+import '../../../../common/utils/custom_toast.dart';
+import '../../../../common/widgets/image_widget.dart';
 
 class Layout extends StatelessWidget {
   final DocumentSnapshot documentSnapshot;

@@ -14,7 +14,7 @@ import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/widets/hookup_circularbar.dart';
+import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../../../../models/chat_model.dart';
 import '../../../match/bloc/match_bloc.dart';

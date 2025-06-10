@@ -8,7 +8,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import '../../../common/constants/colors.dart';
-import '../../../common/widets/hookup_circularbar.dart';
+import '../../../common/widgets/hookup_circularbar.dart';
 
 class PaymentDetails extends StatelessWidget {
   final List<PurchaseDetails> purchases;

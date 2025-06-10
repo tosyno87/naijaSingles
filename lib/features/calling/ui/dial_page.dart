@@ -9,7 +9,7 @@ import 'package:naijasingles/features/calling/ui/screens/call.dart';
 import '../../../common/constants/colors.dart';
 import '../../../common/constants/constants.dart';
 import '../../../common/data/repo/calling_repo.dart';
-import '../../../common/widets/image_widget.dart';
+import '../../../common/widgets/image_widget.dart';
 import '../../../models/user_model.dart';
 
 class DialCall extends StatefulWidget {

@@ -17,7 +17,7 @@ import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/user_search_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
-import '../../../../common/utlis/swiper_stack.dart';
+import '../../../../common/utils/swiper_stack.dart';
 import '../../bloc/searchuser_bloc.dart';
 import '../../bloc/swipebloc_bloc.dart';
 import 'swipe_card.dart';

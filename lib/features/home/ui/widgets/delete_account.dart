@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:naijasingles/features/home/ui/widgets/re_auth_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +14,7 @@ import '../../../../common/data/repo/facebooklogin_repo.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/widets/text_button.dart';
+import '../../../../common/widgets/text_button.dart';
 
 class DeleteAccountWidget extends StatefulWidget {
   const DeleteAccountWidget({super.key});

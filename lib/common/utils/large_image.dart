@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
-import '../widets/image_widget.dart';
+import '../widgets/image_widget.dart';
 
 class LargeImage extends StatelessWidget {
   final String largeImage;

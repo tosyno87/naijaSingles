@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/config/app_config.dart';
-import '../../../../../common/utlis/privacy_page.dart';
+import '../../../../../common/utils/privacy_page.dart';
 
 class PrivacyPolicy extends StatelessWidget {
   const PrivacyPolicy({super.key});

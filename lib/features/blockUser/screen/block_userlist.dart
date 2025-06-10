@@ -11,9 +11,9 @@ import 'package:provider/provider.dart';
 
 import '../../../common/constants/constants.dart';
 import '../../../common/providers/theme_provider.dart';
-import '../../../common/utlis/custom_toast.dart';
-import '../../../common/widets/hookup_circularbar.dart';
-import '../../../common/widets/image_widget.dart';
+import '../../../common/utils/custom_toast.dart';
+import '../../../common/widgets/hookup_circularbar.dart';
+import '../../../common/widgets/image_widget.dart';
 import '../../../models/block_user_model.dart';
 
 class BlockedUser extends StatefulWidget {

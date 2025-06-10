@@ -6,12 +6,12 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/widets/custom_button.dart';
+import 'package:naijasingles/common/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/widets/hookup_circularbar.dart';
+import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../widgets/location_savedailog.dart';
 

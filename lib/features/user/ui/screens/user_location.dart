@@ -9,7 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widets/custom_snackbar.dart';
+import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:naijasingles/services/firestore_database.dart';
 import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +20,9 @@ import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
-import '../../../../common/utlis/welcome_dialog.dart';
-import '../../../../common/widets/custom_button.dart';
-import '../../../../common/widets/hookup_circularbar.dart';
+import '../../../../common/utils/welcome_dialog.dart';
+import '../../../../common/widgets/custom_button.dart';
+import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../auth/auth_status/bloc/registration/bloc/registration_bloc.dart';
 
 class AllowLocation extends StatelessWidget {

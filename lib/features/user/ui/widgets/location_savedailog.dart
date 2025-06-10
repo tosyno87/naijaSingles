@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widets/hookup_circularbar.dart';
+import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';

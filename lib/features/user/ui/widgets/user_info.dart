@@ -17,7 +17,7 @@ import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/widets/image_widget.dart';
+import '../../../../common/widgets/image_widget.dart';
 import '../../../chat/ui/screens/chat_page.dart';
 import '../../../match/ui/widget/matches_card.dart';
 import '../../../report/report_user.dart';

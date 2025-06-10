@@ -1,14 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:naijasingles/common/widets/image_widget.dart';
+import 'package:naijasingles/common/widgets/image_widget.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/utlis/custom_toast.dart';
+import '../../../../common/utils/custom_toast.dart';
 import '../../../user/ui/widgets/user_info.dart';
 
 class ChatMessageRead {

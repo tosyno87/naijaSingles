@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../features/calling/ui/dial_page.dart';
 import '../../../models/user_model.dart';
 import '../../constants/constants.dart';
-import '../../widets/custom_snackbar.dart';
+import '../../widgets/custom_snackbar.dart';
 
 class CallingRepo {
   static final db = firebaseFireStoreInstance;

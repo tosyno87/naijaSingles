@@ -4,8 +4,8 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widets/custom_snackbar.dart';
-import 'package:naijasingles/common/widets/hookup_circularbar.dart';
+import 'package:naijasingles/common/widgets/custom_snackbar.dart';
+import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +15,7 @@ import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
 import '../../common/providers/theme_provider.dart';
 import '../../common/providers/user_provider.dart';
-import '../../common/widets/image_widget.dart';
+import '../../common/widgets/image_widget.dart';
 import '../../config/app_config.dart';
 import '../user/ui/widgets/user_info.dart';
 

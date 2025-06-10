@@ -11,8 +11,8 @@ import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/utlis/upload_media.dart';
-import '../../../../common/widets/custom_button.dart';
+import '../../../../common/utils/upload_media.dart';
+import '../../../../common/widgets/custom_button.dart';
 
 class UserProfilePic extends StatefulWidget {
   const UserProfilePic({super.key});

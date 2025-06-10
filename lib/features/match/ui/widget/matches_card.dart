@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/widets/hookup_circularbar.dart';
+import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/widets/image_widget.dart';
+import '../../../../common/widgets/image_widget.dart';
 import '../../../chat/ui/screens/chat_page.dart';
 import '../../bloc/match_bloc.dart';
 

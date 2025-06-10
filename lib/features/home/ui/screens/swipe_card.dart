@@ -9,7 +9,7 @@ import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/widets/image_widget.dart';
+import '../../../../common/widgets/image_widget.dart';
 import '../../../../models/user_model.dart';
 import '../../../ads/google_ads.dart';
 import '../../../ads/load_ads.dart';

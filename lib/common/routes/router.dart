@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/utlis/large_image.dart';
+import 'package:naijasingles/common/utils/large_image.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
 

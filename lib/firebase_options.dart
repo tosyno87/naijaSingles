@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,20 +50,20 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBX7hxCR3XPWOShZu-vundYxocvQj_zH48',
-    appId: '1:888697307756:android:a62a339c4079bebc704e49',
-    messagingSenderId: '888697307756',
-    projectId: 'naijasingles-74a75',
-    storageBucket: 'naijasingles-74a75.appspot.com',
-  );
+  static FirebaseOptions get android => FirebaseOptions(
+        apiKey: dotenv.env['ANDROID_API_KEY'] ?? '',
+        appId: dotenv.env['ANDROID_APP_ID'] ?? '',
+        messagingSenderId: dotenv.env['ANDROID_MESSAGING_SENDER_ID'] ?? '',
+        projectId: dotenv.env['PROJECT_ID'] ?? '',
+        storageBucket: dotenv.env['STORAGE_BUCKET'] ?? '',
+      );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
-    appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
-    messagingSenderId: '888697307756',
-    projectId: 'naijasingles-74a75',
-    storageBucket: 'naijasingles-74a75.appspot.com',
-    iosBundleId: 'com.app.naijasingles',
-  );
+  static FirebaseOptions get ios => FirebaseOptions(
+        apiKey: dotenv.env['IOS_API_KEY'] ?? '',
+        appId: dotenv.env['IOS_APP_ID'] ?? '',
+        messagingSenderId: dotenv.env['IOS_MESSAGING_SENDER_ID'] ?? '',
+        projectId: dotenv.env['PROJECT_ID'] ?? '',
+        storageBucket: dotenv.env['STORAGE_BUCKET'] ?? '',
+        iosBundleId: dotenv.env['IOS_BUNDLE_ID'] ?? '',
+      );
 }

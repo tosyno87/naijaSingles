@@ -19,6 +19,7 @@ import 'package:naijasingles/features/street_view/bloc/streetviewdata_bloc.dart'
 import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
@@ -39,6 +40,7 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
   await EasyLocalization.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(

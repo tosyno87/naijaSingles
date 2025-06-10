@@ -44,9 +44,10 @@ dependencies:
   firebase_storage: ^12.1.3      # Upgraded from 11.7.4
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.6           # Upgraded from 8.1.5
+  flutter_bloc: ^9.1.1           # Upgraded from 8.1.6
   flutter_callkit_incoming: ^2.0.0 # Kept at 2.0.0
-  flutter_facebook_auth: ^6.0.4  # Upgraded from 6.0.4
+  flutter_facebook_auth: ^7.1.2  # Updated to latest version
+  google_api_headers: ^4.5.2     # Explicitly depend on latest headers
   flutter_flushbar: ^0.0.2       # Kept at 0.0.2
   flutter_google_places: 0.3.0   # Kept at 0.3.0
   flutter_image_compress: ^2.3.0 # Upgraded from 2.2.0
@@ -54,23 +55,23 @@ dependencies:
   fluttertoast: ^8.2.1           # Upgraded from 8.2.1
   font_awesome_flutter: ^10.4.0  # Kept at 10.4.0
   google_maps_flutter: ^2.9.0    # Upgraded from 2.6.0
-  google_mobile_ads: ^5.1.0      # Upgraded from 5.0.0
+  google_mobile_ads: ^6.0.0      # Upgraded from 5.1.0
   http: ^0.13.6                   # Upgraded from 0.13.5
   image: ^4.2.0                  # Upgraded from 4.0.16
   image_cropper: ^4.0.1          # Kept at 4.0.1
   image_picker: ^1.0.7           # Kept at 1.0.7
   in_app_purchase: ^3.1.13       # Kept at 3.1.13
-  in_app_purchase_storekit: ^0.3.13+1 # Kept at 0.3.13+1
-  in_app_purchase_android: ^0.3.2 # Kept at 0.3.2
-  intl: ^0.18.0                  # Specify intl version
-  location: ^7.0.0               # Upgraded from 6.0.1
+  in_app_purchase_storekit: ^0.4.1 # Updated for latest iOS IAP
+  in_app_purchase_android: ^0.4.0+2 # Updated for latest Android IAP
+  intl: ^0.19.0                  # Updated intl version
+  location: ^8.0.0               # Updated from 7.0.0
   rflutter_alert: ^2.0.7         # Kept at 2.0.7
-  otp_autofill: ^3.0.2           # Kept at 3.0.2
+  otp_autofill: ^4.1.0           # Updated from 3.0.2
   path_provider: ^2.0.14         # Kept at 2.0.14
   permission_handler: ^11.3.0    # Kept at 11.3.0
   pin_code_fields: ^8.0.1        # Kept at 8.0.1
   provider: ^6.0.5               # Kept at 6.0.5
-  share_plus: ^7.2.2           # Upgraded from 7.2.2
+  share_plus: ^11.0.0           # Updated to latest
   shared_preferences: ^2.3.1     # Upgraded from 2.2.0
   shimmer: ^3.0.0                # Kept at 3.0.0
   swipable_stack: ^2.0.0         # Kept at 2.0.0
@@ -79,8 +80,8 @@ dependencies:
   google_fonts: ^4.0.0           # Kept at 4.0.0
 
 dev_dependencies:
-  flutter_launcher_icons: "^0.13.0" # Kept at 0.13.0
-  flutter_lints: ^2.0.3           # Upgraded from 2.0.3
+  flutter_launcher_icons: "^0.14.4" # Updated launcher icons
+  flutter_lints: ^3.0.2           # Updated lints version
   device_preview: ^1.2.0            # Upgraded from 1.1.0
   flutter_native_splash: ^2.4.1     # Upgraded from 2.2.19
   flutter_test:

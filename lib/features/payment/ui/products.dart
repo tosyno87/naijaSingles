@@ -28,11 +28,11 @@ import '../../../common/utlis/privacy_page.dart';
 import '../../../common/widets/custom_snackbar.dart';
 import '../../../common/widets/hookup_circularbar.dart';
 import '../../../models/user_model.dart';
-import 'in-app purcahse/buy Products/buyproducts_bloc.dart';
-import 'in-app purcahse/buy Products/buyproducts_events.dart';
-import 'in-app purcahse/get Products/getproducts_bloc.dart';
-import 'in-app purcahse/get Products/getproducts_events.dart';
-import 'in-app purcahse/get Products/getproducts_states.dart';
+import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
+import 'in_app_purchase/buy_products/buyproducts_events.dart';
+import 'in_app_purchase/get_products/getproducts_bloc.dart';
+import 'in_app_purchase/get_products/getproducts_events.dart';
+import 'in_app_purchase/get_products/getproducts_states.dart';
 
 class Products extends StatefulWidget {
   final bool? isPaymentSuccess;

@@ -83,6 +83,7 @@ dev_dependencies:
   flutter_lints: ^2.0.3           # Upgraded from 2.0.3
   device_preview: ^1.2.0            # Upgraded from 1.1.0
   flutter_native_splash: ^2.4.1     # Upgraded from 2.2.19
+  bloc_test: ^9.1.7
 
   flutter_test:
     sdk: flutter

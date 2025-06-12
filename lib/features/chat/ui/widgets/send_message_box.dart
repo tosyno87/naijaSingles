@@ -256,16 +256,16 @@ class _MessageBoxState extends State<MessageBox> {
                     onPressed: () async {
                       ImagePicker imagePicker = ImagePicker();
 
-                      final image = await imagePicker.pickImage(
+                      final picked = await imagePicker.pickImage(
                           source: ImageSource.gallery);
-                      if (!shouldUploadImage(image)) return;
+                      if (picked == null) return;
 
                       int timestamp = DateTime.now().millisecondsSinceEpoch;
                       Reference storageReference = FirebaseStorage.instance
                           .ref()
                           .child('chats/${widget.chatId}/img_$timestamp.jpg');
                       UploadTask uploadTask =
-                          storageReference.putFile(File(image.path));
+                          storageReference.putFile(File(picked.path));
                       CustomToast.showToast('sending...'.tr().toString());
                       await uploadTask.then((p0) async {
                         String fileUrl =

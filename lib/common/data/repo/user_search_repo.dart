@@ -8,8 +8,8 @@ import 'package:naijasingles/models/user_model.dart';
 import '../../constants/constants.dart';
 
 class UserSearchRepo {
-  static CollectionReference docRef =
-      firebaseFireStoreInstance.collection('Users');
+  static FirebaseFirestore db = firebaseFireStoreInstance;
+  static CollectionReference get docRef => db.collection('Users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
   static Map items = {};
@@ -22,7 +22,7 @@ class UserSearchRepo {
   static Map likedMap = {};
   static Map disLikedMap = {};
   static getAccessItems() async {
-    firebaseFireStoreInstance
+    db
         .collection("Item_access")
         .snapshots()
         .listen((doc) {
@@ -34,7 +34,7 @@ class UserSearchRepo {
   }
 
   static Future<int> getSwipedCount(UserModel currentUser) async {
-    final querySnapshot = await firebaseFireStoreInstance
+    final querySnapshot = await db
         .collection('/Users/${currentUser.id}/CheckedUser')
         .where(
           'timestamp',
@@ -138,7 +138,7 @@ class UserSearchRepo {
   ) async {
     List<String> checkedUserIds = [];
 
-    final snapshot = await firebaseFireStoreInstance
+    final snapshot = await db
         .collection('/Users/${currentUser.id}/CheckedUser')
         .get();
     if (snapshot.docs.isNotEmpty) {

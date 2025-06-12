@@ -10,12 +10,16 @@ part 'match_event.dart';
 part 'match_state.dart';
 
 class MatchUserBloc extends Bloc<MatchUserEvent, MatchUserState> {
-  MatchUserBloc() : super(MatchUserInitial()) {
+  final Future<List<UserModel>> Function(UserModel currentUser) getMatches;
+
+  MatchUserBloc({
+    Future<List<UserModel>> Function(UserModel currentUser)? getMatches,
+  })  : getMatches = getMatches ?? UserMessagingRepo.getMatches,
+        super(MatchUserInitial()) {
     on<LoadMatchUserEvent>((event, emit) async {
       emit(MatchUserLoadingState());
       try {
-        List<UserModel> matchList =
-            await UserMessagingRepo.getMatches(event.currentUser);
+        final matchList = await this.getMatches(event.currentUser);
         log("matchuser${matchList.toString()}");
         log("matchuser from matchbloc");
         emit(MatchUserLoadedState(matchList));

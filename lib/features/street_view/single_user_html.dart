@@ -174,7 +174,6 @@ var currentUserDetails =
     }
 
 function processSVData({ data }) {
-console.log(data)
   const location = data.location;
   const marker = new google.maps.Marker({
     position: location.latLng,

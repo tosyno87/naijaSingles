@@ -4,13 +4,13 @@ import 'package:naijasingles/models/user_model.dart';
 
 void main() {
   group('UserRepo.chatId1', () {
-    test('orders ids alphabetically when hashCode is lower', () {
+    test('returns ids in ascending order when current id precedes other', () {
       final currentUser = UserModel(id: 'a');
       final chatId = UserRepo.chatId1(currentUser, 'b');
       expect(chatId, 'a-b');
     });
 
-    test('orders ids alphabetically when hashCode is higher', () {
+    test('returns ids in ascending order when current id follows other', () {
       final currentUser = UserModel(id: 'b');
       final chatId = UserRepo.chatId1(currentUser, 'a');
       expect(chatId, 'a-b');

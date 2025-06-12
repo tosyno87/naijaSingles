@@ -75,10 +75,11 @@ class UserRepo {
   }
 
   static String chatId1(UserModel currentUser, String userId) {
-    if (currentUser.id.hashCode <= userId.hashCode) {
-      return '${currentUser.id}-$userId';
+    final currentId = currentUser.id ?? '';
+    if (currentId.compareTo(userId) <= 0) {
+      return '$currentId-$userId';
     } else {
-      return '$userId-${currentUser.id}';
+      return '$userId-$currentId';
     }
   }
 

@@ -11,8 +11,8 @@ import '../../../models/user_model.dart';
 import '../../constants/constants.dart';
 
 class UserMessagingRepo {
-  static final db = firebaseFireStoreInstance;
-  static CollectionReference docRef = db.collection('Users');
+  static FirebaseFirestore db = firebaseFireStoreInstance;
+  static CollectionReference get docRef => db.collection('Users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
 

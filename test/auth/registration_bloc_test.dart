@@ -1,0 +1,71 @@
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:naijasingles/features/auth/auth_status/bloc/registration/bloc/registration_bloc.dart';
+import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
+import 'package:naijasingles/models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+class MockPhoneAuthRepository extends Mock implements PhoneAuthRepository {}
+class MockFirebaseUser extends Mock implements User {}
+
+void main() {
+  group('RegistrationBloc', () {
+    late MockPhoneAuthRepository repo;
+    late RegistrationBloc bloc;
+
+    setUp(() {
+      repo = MockPhoneAuthRepository();
+      bloc = RegistrationBloc(phoneAuthRepository: repo);
+    });
+
+    final userModel = UserModel(id: '1', name: 'test');
+    final firebaseUser = MockFirebaseUser();
+
+    blocTest<RegistrationBloc, RegistrationStates>(
+      'emits [Loading, Success] on RegistrationRequest',
+      build: () {
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => repo.registration(userData: any(named: 'userData')))
+            .thenAnswer((_) async => userModel);
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const RegistrationRequest(userdata: {})),
+      expect: () => [
+        RegistrationLoading(),
+        RegistrationSuccess(user: userModel),
+      ],
+    );
+
+    blocTest<RegistrationBloc, RegistrationStates>(
+      'emits [Loading, AlreadyRegistered] when user already registered',
+      build: () {
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => firebaseUser.displayName).thenReturn('name');
+        when(() => repo.userDetails(any())).thenAnswer((_) async => true);
+        when(() => repo.getRegisterUser()).thenAnswer((_) async => userModel);
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const CheckRegistration(token: 't')),
+      expect: () => [
+        RegistrationLoading(),
+        AlreadyRegistered(user: userModel),
+      ],
+    );
+
+    blocTest<RegistrationBloc, RegistrationStates>(
+      'emits [Loading, NewRegistration] when no data found',
+      build: () {
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => firebaseUser.displayName).thenReturn('name');
+        when(() => repo.userDetails(any())).thenAnswer((_) async => false);
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const CheckRegistration(token: 't')),
+      expect: () => [
+        RegistrationLoading(),
+        NewRegistration(token: 't', user: firebaseUser),
+      ],
+    );
+  });
+}

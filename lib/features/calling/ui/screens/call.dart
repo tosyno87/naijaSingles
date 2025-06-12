@@ -266,7 +266,7 @@ class CallPageState extends State<CallPage> {
             : Center(
                 child: Stack(
                   children: <Widget>[
-                    const Align(
+                    Align(
                       alignment: Alignment.center,
                       child: Icon(
                         Icons.person,

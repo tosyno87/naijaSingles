@@ -29,9 +29,18 @@ class UserMessagingRepo {
             await docRef.doc(documentSnapshot['Matches']).get();
         if (doc.exists) {
           UserModel tempuser = UserModel.fromDocument(doc);
-          tempuser.distanceBW = calculateDistance(currentUser.latitude,
-                  currentUser.longitude, tempuser.latitude, tempuser.longitude)
-              .round();
+          if (currentUser.latitude != null &&
+              currentUser.longitude != null &&
+              tempuser.latitude != null &&
+              tempuser.longitude != null) {
+            tempuser.distanceBW =
+                calculateDistance(
+                        currentUser.latitude!,
+                        currentUser.longitude!,
+                        tempuser.latitude!,
+                        tempuser.longitude!)
+                    .round();
+          }
           matches.add(tempuser);
           // matches.sort((a, b) => b.lastmsg!.compareTo(
           //     a.lastmsg!)); // Sort by lastmessage in descending order

@@ -28,8 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  agora_rtc_engine: ^6.5.2       # Updated to latest
-  agora_uikit: ^1.3.10           # Upgraded from 1.3.8
+  agora_rtc_engine: 5.3.1
+  agora_uikit: 1.0.4
   cached_network_image: ^3.4.1   # Updated to latest
   cloud_firestore: ^5.6.9        # Updated to latest
   cloud_functions: ^5.5.2        # Updated to latest
@@ -80,7 +80,7 @@ dependencies:
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4" # Updated launcher icons
-  flutter_lints: ^3.0.2           # Updated lints version
+  flutter_lints: ^2.0.3
   device_preview: ^1.2.0            # Upgraded from 1.1.0
   flutter_native_splash: ^2.4.6     # Updated to latest
   flutter_test:

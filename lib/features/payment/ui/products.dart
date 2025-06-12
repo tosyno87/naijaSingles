@@ -115,26 +115,28 @@ class ProductsState extends State<Products> {
         }
       }
 
-      _streamSubscription = _iap.purchaseStream.listen((data) {
-        setState(
-          () {
-            purchases.addAll(data);
+      _streamSubscription = _iap.purchaseStream.listen((data) async {
+        setState(() {
+          purchases.addAll(data);
+        });
 
-            for (final purchase in purchases) {
-              await InAppPurchaseRepoImpl.verifyPuchase(purchase.productID,
-                      purchases, widget.currentUser!, widget.items, context)
-                  .whenComplete(() async {
-                await firebaseFireStoreInstance
-                    .collection('Users')
-                    .doc(widget.currentUser!.id)
-                    .update({
-                  'isPremium': true,
-                  'subscriptionDate': FieldValue.serverTimestamp(),
-                });
-              });
-            }
-          },
-        );
+        for (final purchase in purchases) {
+          await InAppPurchaseRepoImpl.verifyPuchase(
+                  purchase.productID,
+                  purchases,
+                  widget.currentUser!,
+                  widget.items,
+                  context)
+              .whenComplete(() async {
+            await firebaseFireStoreInstance
+                .collection('Users')
+                .doc(widget.currentUser!.id)
+                .update({
+              'isPremium': true,
+              'subscriptionDate': FieldValue.serverTimestamp(),
+            });
+          });
+        }
       });
       _streamSubscription!.onError(
         (error) {

@@ -570,10 +570,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_google_places_hoc081098
-      sha256: 75492cf112eac0d6dc08181e2601d7c6ea867cc05077c6c1604b5d527e0f92c7
+      sha256: b416afe9004d61b643d2c6467e6401960fe3102835a5df846683f47875183b0b
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "1.2.0"
   flutter_image_compress:
     dependency: "direct main"
     description:

@@ -47,9 +47,9 @@ dependencies:
   flutter_bloc: ^9.1.1           # Upgraded from 8.1.6
   flutter_callkit_incoming: ^2.0.0 # Kept at 2.0.0
   flutter_facebook_auth: ^7.1.2  # Updated to latest version
-  google_api_headers: ^4.5.2     # Explicitly depend on latest headers
+  google_api_headers: ^1.6.0     # Explicitly depend on compatible headers
   flutter_flushbar: ^0.0.2       # Kept at 0.0.2
-  flutter_google_places_hoc081098: ^2.0.0
+  flutter_google_places_hoc081098: ^1.2.0
   flutter_image_compress: ^2.3.0 # Upgraded from 2.2.0
   flutter_swiper_null_safety: ^1.0.2 # Kept at 1.0.2
   fluttertoast: ^8.2.1           # Upgraded from 8.2.1

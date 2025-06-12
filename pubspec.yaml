@@ -73,10 +73,10 @@ dependencies:
   swipable_stack: ^2.0.0         # Kept at 2.0.0
   uuid: ^4.5.1                   # Updated to latest
   webview_flutter: ^4.13.0       # Updated to latest
-  http: ^0.13.5
+  http: ^1.2.1
   google_maps_webservice_ex: ^0.0.1-dev.8
   google_fonts: ^6.2.1
-  flutter_google_places_hoc081098: ^1.2.0
+  flutter_google_places_hoc081098: ^2.0.0
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4" # Updated launcher icons

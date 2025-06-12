@@ -15,7 +15,7 @@ class UserSearchRepo {
   static Map items = {};
   static List<UserModel> matches = [];
   static List<UserModel> newmatches = [];
-  static List<dynamic> likedByList = [];
+  static List<String> likedByList = [];
   static List userRemoved = [];
   static int swipecount = 0;
   static List<UserModel> users = [];
@@ -61,7 +61,7 @@ class UserSearchRepo {
   }
 
   static rightSwipe(UserModel currentUser, UserModel selectedUser) async {
-    likedByList = getLikedByList(currentUser);
+    likedByList = await getLikedByList(currentUser);
     if ((likedByList.contains(selectedUser.id) ||
         (selectedUser.isBot ?? false))) {
       debugPrint("coming umder searchrepo in if rightswipe");
@@ -188,15 +188,15 @@ class UserSearchRepo {
     return userList;
   }
 
-  static List<dynamic> getLikedByList(UserModel currentUser) {
-    docRef
+  static Future<List<String>> getLikedByList(UserModel currentUser) async {
+    final snapshot = await docRef
         .doc(currentUser.id)
         .collection("LikedBy")
-        .snapshots()
-        .listen((data) async {
-      likedByList.addAll(data.docs.map((f) => f['LikedBy']));
-    });
-    return likedByList;
+        .get();
+
+    return snapshot.docs
+        .map((f) => f['LikedBy'] as String)
+        .toList();
   }
 
   static double calculateDistance(lat1, lon1, lat2, lon2) {

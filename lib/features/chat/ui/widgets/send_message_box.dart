@@ -18,6 +18,8 @@ import '../../../../models/user_model.dart';
 import 'chatmessage_read.dart.dart';
 import 'generate_layout.dart';
 
+bool shouldUploadImage(XFile? image) => image != null;
+
 class MessageBox extends StatefulWidget {
   final UserModel sender;
   final String chatId;
@@ -254,14 +256,16 @@ class _MessageBoxState extends State<MessageBox> {
                     onPressed: () async {
                       ImagePicker imagePicker = ImagePicker();
 
-                      var image = await imagePicker.pickImage(
+                      final image = await imagePicker.pickImage(
                           source: ImageSource.gallery);
+                      if (!shouldUploadImage(image)) return;
+
                       int timestamp = DateTime.now().millisecondsSinceEpoch;
                       Reference storageReference = FirebaseStorage.instance
                           .ref()
                           .child('chats/${widget.chatId}/img_$timestamp.jpg');
                       UploadTask uploadTask =
-                          storageReference.putFile(File(image!.path));
+                          storageReference.putFile(File(image.path));
                       CustomToast.showToast('sending...'.tr().toString());
                       await uploadTask.then((p0) async {
                         String fileUrl =

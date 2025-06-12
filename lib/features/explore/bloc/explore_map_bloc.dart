@@ -21,7 +21,7 @@ class SearchUserForMapBloc
         emit(SearchUserLoadUserForMapState(userList));
       } catch (e) {
         emit(SearchUserFailedForMapState());
-        rethrow;
+        log('Error loading map users: $e');
       }
     });
   }

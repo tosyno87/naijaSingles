@@ -21,7 +21,8 @@ class UserfilterBloc extends Bloc<UserfilterEvent, UserfilterState> {
       } on SocketException {
         emit(const UserFilterUpdationFailed(message: 'No Internet Connection'));
       } catch (e) {
-        rethrow;
+        emit(UserFilterUpdationFailed(message: e.toString()));
+        log('Error updating filter: $e');
       }
     });
   }

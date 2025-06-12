@@ -24,7 +24,7 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
         emit(BlockUserLoadedState(blockList));
       } catch (e) {
         emit(BlockUserFailedState());
-        rethrow;
+        log('Error loading block users: $e');
       }
     });
 
@@ -50,7 +50,7 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
         }
       } catch (e) {
         emit(BlockUserFailedState());
-        rethrow;
+        log('Error loading more block users: $e');
       }
     });
   }

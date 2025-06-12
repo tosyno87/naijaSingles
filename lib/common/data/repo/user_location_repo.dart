@@ -9,9 +9,7 @@ import '../../../models/reverse_geocode.dart';
 
 abstract class UserLocationReporistory {
   const UserLocationReporistory._();
-  Future<Map?> getLocationCoordinates() async {
-    return null;
-  }
+  Future<Map?> getLocationCoordinates();
 }
 
 class UserLocationReporistoryImpl implements UserLocationReporistory {

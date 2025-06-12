@@ -50,7 +50,7 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp,
   ]).then((_) {
-    InAppPurchaseAndroidPlatformAddition.enablePendingPurchases();
+
     runApp(EasyLocalization(
         supportedLocales: const [
           Locale('en', 'US'),

@@ -167,7 +167,7 @@ class ProductsState extends State<Products> {
             body: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Center(
-                child: Text(state.msg),
+                child: Text(state.msg ?? ''),
               ),
             ),
           );

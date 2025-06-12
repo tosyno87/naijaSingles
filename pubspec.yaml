@@ -64,7 +64,7 @@ dependencies:
   rflutter_alert: ^2.0.7         # Kept at 2.0.7
   otp_autofill: ^4.1.0           # Updated from 3.0.2
   path_provider: ^2.1.5          # Updated to latest
-  permission_handler: ^12.0.0+1  # Updated to latest
+  permission_handler: ^11.3.0  # Updated to latest
   pin_code_fields: ^8.0.1        # Kept at 8.0.1
   provider: ^6.1.5               # Updated to latest
   share_plus: ^11.0.0           # Updated to latest
@@ -73,14 +73,14 @@ dependencies:
   swipable_stack: ^2.0.0         # Kept at 2.0.0
   uuid: ^4.5.1                   # Updated to latest
   webview_flutter: ^4.13.0       # Updated to latest
-  http: ^0.13.6
-  google_maps_webservice: ^0.0.20-nullsafety.5
+  http: ^0.13.5
+  google_maps_webservice_ex: ^0.0.1-dev.8
   google_fonts: ^6.2.1
-  flutter_google_places_hoc081098: ^2.0.0
+  flutter_google_places_hoc081098: ^1.2.0
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4" # Updated launcher icons
-  flutter_lints: ^6.0.0           # Updated lints version
+  flutter_lints: ^3.0.2           # Updated lints version
   device_preview: ^1.2.0            # Upgraded from 1.1.0
   flutter_native_splash: ^2.4.6     # Updated to latest
   flutter_test:

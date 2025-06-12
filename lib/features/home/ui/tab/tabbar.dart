@@ -445,7 +445,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     try {
       FlutterCallkitIncoming.onEvent.listen((event) async {
         if (kDebugMode) {
-          print('HOME: $event');
+          debugPrint('HOME: $event');
         }
         switch (event!.event) {
           case Event.actionCallIncoming:

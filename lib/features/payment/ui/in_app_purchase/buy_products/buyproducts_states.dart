@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'package:equatable/equatable.dart';
 
 abstract class BuyConsumableStates extends Equatable {
@@ -12,11 +10,11 @@ class BuyConsumableInitialState extends BuyConsumableStates {}
 class BuyConsumableLoadingState extends BuyConsumableStates {}
 
 class BuyConsumableSuccessState extends BuyConsumableStates {
-  final result;
+  final dynamic result;
   BuyConsumableSuccessState({required this.result});
 }
 
 class BuyConsumableFailedState extends BuyConsumableStates {
-  final msg;
+  final String? msg;
   BuyConsumableFailedState({this.msg});
 }

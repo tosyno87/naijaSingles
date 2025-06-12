@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:developer';
 import 'dart:io';
 
@@ -63,13 +61,14 @@ class _SelectMedia extends StatelessWidget {
             log("filechat is ${file.path}");
             return file;
           } else {
-            var croppedfile = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    CropMedia(title: '', file: file, checktype: checktype),
-              ),
-            );
+              if (!context.mounted) return null;
+              var croppedfile = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      CropMedia(title: '', file: file, checktype: checktype),
+                ),
+              );
 
             log("croppedfile is ${croppedfile.path}");
             return croppedfile;
@@ -89,9 +88,11 @@ class _SelectMedia extends StatelessWidget {
 
   void getContentFromSource(BuildContext context, ImageSource source) async {
     final result = await getContentHandler(source: source, context: context);
+    if (!context.mounted) return;
     if (result != null) {
       if (isImage) {
         var compressedImage = await compressAndGetFile(result);
+        if (!context.mounted) return;
         Navigator.pop(context, compressedImage);
       }
     } else {

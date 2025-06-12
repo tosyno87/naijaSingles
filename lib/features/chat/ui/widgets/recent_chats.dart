@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';

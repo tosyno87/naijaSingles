@@ -18,16 +18,16 @@ import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-import '../../../common/constants/adds.dart';
-import '../../../common/constants/colors.dart';
-import '../../../common/constants/constants.dart';
-import '../../../common/data/repo/in_app_purchase_repo.dart';
-import '../../../common/providers/theme_provider.dart';
-import '../../../common/utils/crousle_slider.dart';
-import '../../../common/utils/privacy_page.dart';
-import '../../../common/widgets/custom_snackbar.dart';
-import '../../../common/widgets/hookup_circularbar.dart';
-import '../../../models/user_model.dart';
+import 'package:naijasingles/common/constants/adds.dart';
+import 'package:naijasingles/common/constants/colors.dart';
+import 'package:naijasingles/common/constants/constants.dart';
+import 'package:naijasingles/common/data/repo/in_app_purchase_repo.dart';
+import 'package:naijasingles/common/providers/theme_provider.dart';
+import 'package:naijasingles/common/utils/crousle_slider.dart';
+import 'package:naijasingles/common/utils/privacy_page.dart';
+import 'package:naijasingles/common/widgets/custom_snackbar.dart';
+import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
+import 'package:naijasingles/models/user_model.dart';
 import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_events.dart';
 import 'in_app_purchase/get_products/getproducts_bloc.dart';
@@ -60,7 +60,6 @@ class ProductsState extends State<Products> {
   ProductDetails? electedPlan;
   ProductDetails? selectedProduct;
 
-  var response;
   bool _isLoading = true;
   final InAppPurchase _iap = InAppPurchase.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -106,14 +105,14 @@ class ProductsState extends State<Products> {
       if (Platform.isIOS) {
         var paymentWrapper = SKPaymentQueueWrapper();
         var transactions = await paymentWrapper.transactions();
-        transactions.forEach((transaction) async {
+        for (final transaction in transactions) {
           debugPrint(transaction.transactionState.toString());
           await paymentWrapper
               .finishTransaction(transaction)
               .catchError((onError) {
             debugPrint('finishTransaction Error $onError');
           });
-        });
+        }
       }
 
       _streamSubscription = _iap.purchaseStream.listen((data) {
@@ -121,21 +120,19 @@ class ProductsState extends State<Products> {
           () {
             purchases.addAll(data);
 
-            purchases.forEach(
-              (purchase) async {
-                await InAppPurchaseRepoImpl.verifyPuchase(purchase.productID,
-                        purchases, widget.currentUser!, widget.items, context)
-                    .whenComplete(() async {
-                  await firebaseFireStoreInstance
-                      .collection('Users')
-                      .doc(widget.currentUser!.id)
-                      .update({
-                    'isPremium': true,
-                    'subscriptionDate': FieldValue.serverTimestamp(),
-                  });
+            for (final purchase in purchases) {
+              await InAppPurchaseRepoImpl.verifyPuchase(purchase.productID,
+                      purchases, widget.currentUser!, widget.items, context)
+                  .whenComplete(() async {
+                await firebaseFireStoreInstance
+                    .collection('Users')
+                    .doc(widget.currentUser!.id)
+                    .update({
+                  'isPremium': true,
+                  'subscriptionDate': FieldValue.serverTimestamp(),
                 });
-              },
-            );
+              });
+            }
           },
         );
       });

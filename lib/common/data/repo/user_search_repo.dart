@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_function_literals_in_foreach_calls
-
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -140,24 +138,22 @@ class UserSearchRepo {
   ) async {
     List<String> checkedUserIds = [];
 
-    await firebaseFireStoreInstance
+    final snapshot = await firebaseFireStoreInstance
         .collection('/Users/${currentUser.id}/CheckedUser')
-        .get()
-        .then((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        snapshot.docs.forEach((doc) {
-          final likedUser = doc.data()['LikedUser'];
-          final dislikedUser = doc.data()['DislikedUser'];
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      for (final doc in snapshot.docs) {
+        final likedUser = doc.data()['LikedUser'];
+        final dislikedUser = doc.data()['DislikedUser'];
 
-          if (likedUser != null) {
-            checkedUserIds.add(likedUser);
-          }
-          if (dislikedUser != null) {
-            checkedUserIds.add(dislikedUser);
-          }
-        });
+        if (likedUser != null) {
+          checkedUserIds.add(likedUser);
+        }
+        if (dislikedUser != null) {
+          checkedUserIds.add(dislikedUser);
+        }
       }
-    });
+    }
 
     final querySnapshot = await query(currentUser).get();
     if (querySnapshot.docs.isEmpty) {

@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -7,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
-import '../../../common/constants/colors.dart';
-import '../../../common/widgets/hookup_circularbar.dart';
+import 'package:naijasingles/common/constants/colors.dart';
+import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 
 class PaymentDetails extends StatelessWidget {
   final List<PurchaseDetails> purchases;

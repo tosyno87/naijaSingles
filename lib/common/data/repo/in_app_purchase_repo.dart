@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
@@ -9,9 +7,9 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 
-import '../../../features/home/ui/tab/tabbar.dart';
-import '../../../features/payment/ui/products.dart';
-import '../../constants/constants.dart';
+import 'package:naijasingles/features/home/ui/tab/tabbar.dart';
+import 'package:naijasingles/features/payment/ui/products.dart';
+import 'package:naijasingles/common/constants/constants.dart';
 
 abstract class InAppPurchaseRepo {
   Future<List<ProductDetails>> getProductsDetailsById();

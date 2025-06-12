@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,13 +8,14 @@ import '../../../../models/user_model.dart';
 
 class DistanceWidget extends StatefulWidget {
   final UserModel currentUser;
-  Map<String, dynamic> changeValues;
-  double max;
-  DistanceWidget(
-      {super.key,
-      required this.currentUser,
-      required this.max,
-      required this.changeValues});
+  final Map<String, dynamic> changeValues;
+  final double max;
+  const DistanceWidget({
+    super.key,
+    required this.currentUser,
+    required this.max,
+    required this.changeValues,
+  });
 
   @override
   State<DistanceWidget> createState() => _DistanceWidgetState();

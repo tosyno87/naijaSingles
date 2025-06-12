@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,9 +8,12 @@ import '../../../../models/user_model.dart';
 
 class ShowmeWidget extends StatefulWidget {
   final UserModel currentUser;
-  Map<String, dynamic> changeValues;
-  ShowmeWidget(
-      {super.key, required this.currentUser, required this.changeValues});
+  final Map<String, dynamic> changeValues;
+  const ShowmeWidget({
+    super.key,
+    required this.currentUser,
+    required this.changeValues,
+  });
 
   @override
   State<ShowmeWidget> createState() => _ShowmeWidgetState();

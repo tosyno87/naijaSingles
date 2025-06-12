@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_null_comparison, sort_child_properties_last
-
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
@@ -99,11 +97,9 @@ class SwipeStackState extends State<SwipeStack>
 
     _animationController.addListener(() {
       if (_animationController.status == AnimationStatus.forward) {
-        if (_animationX != null) _left = _animationX.value;
-
-        if (_animationY != null) _top = _animationY.value;
-
-        if (_animationType != 1 && _animationAngle != null) {
+        _left = _animationX.value;
+        _top = _animationY.value;
+        if (_animationType != 1) {
           _angle = _animationAngle.value;
         }
 
@@ -240,13 +236,6 @@ class SwipeStackState extends State<SwipeStack>
       left: _left,
       top: _top,
       child: GestureDetector(
-          child: Transform.rotate(
-            angle: _angle,
-            child: Container(
-                constraints: constraints,
-                child: widget.children[index]
-                    .builder(_currentItemPosition, _progress)),
-          ),
           onPanStart: (DragStartDetails dragStartDetails) {
             RenderBox getBox = context.findRenderObject() as RenderBox;
             var local = getBox.globalToLocal(dragStartDetails.globalPosition);
@@ -270,7 +259,14 @@ class SwipeStackState extends State<SwipeStack>
                     : SwiperPosition.right;
             setState(() {});
           },
-          onPanEnd: _onPandEnd),
+          onPanEnd: _onPandEnd,
+          child: Transform.rotate(
+            angle: _angle,
+            child: Container(
+                constraints: constraints,
+                child: widget.children[index]
+                    .builder(_currentItemPosition, _progress)),
+          )),
     );
   }
 

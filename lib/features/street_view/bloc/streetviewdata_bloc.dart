@@ -27,7 +27,7 @@ class StreetviewdataBloc
         emit(StreetViewDataLoadedState(stringUserIds, option));
       } catch (e) {
         emit(StreetViewDataFailedState());
-        rethrow;
+        log('Error loading street view data: $e');
       }
     });
   }

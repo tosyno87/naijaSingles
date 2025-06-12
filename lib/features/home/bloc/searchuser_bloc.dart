@@ -20,7 +20,7 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
         emit(SearchUserLoadUserState(userList));
       } catch (e) {
         emit(SearchUserFailedState());
-        rethrow;
+        log('Error loading users: $e');
       }
     });
   }

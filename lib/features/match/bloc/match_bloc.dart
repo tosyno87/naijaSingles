@@ -21,7 +21,7 @@ class MatchUserBloc extends Bloc<MatchUserEvent, MatchUserState> {
         emit(MatchUserLoadedState(matchList));
       } catch (e) {
         emit(MatchUserFailedState());
-        rethrow;
+        log('Error loading matches: $e');
       }
     });
   }

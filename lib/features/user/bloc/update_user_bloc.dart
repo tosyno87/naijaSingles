@@ -17,7 +17,8 @@ class UserBloc extends Bloc<UserEvents, UserStates> {
       } on SocketException {
         emit(const UserUpdationFailed(message: 'No Internet Connection'));
       } catch (e) {
-        rethrow;
+        emit(UserUpdationFailed(message: e.toString()));
+        log('Error updating user: $e');
       }
     });
     on<UpdateUserProfilePictures>((event, emit) async {

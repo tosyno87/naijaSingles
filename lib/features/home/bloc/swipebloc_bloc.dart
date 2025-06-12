@@ -23,7 +23,7 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
         log("cominguser from leftevent");
       } catch (e) {
         emit(SwipeFailedState());
-        rethrow;
+        log('Error while processing left swipe: $e');
       }
     });
     on<RightSwipeEvent>((event, emit) async {
@@ -38,7 +38,7 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
         log("cominguser from rightevent");
       } catch (e) {
         emit(SwipeFailedState());
-        rethrow;
+        log('Error while processing right swipe: $e');
       }
     });
   }

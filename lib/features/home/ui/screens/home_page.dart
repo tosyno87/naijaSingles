@@ -44,7 +44,7 @@ class HomepageState extends State<Homepage>
   SwipableStackController? stackController;
   // List<UserModel> users = [];
   int swipedcount = 0;
-  List likedByList = [];
+  List<String> likedByList = [];
 
   late final UserModel currentUser;
   InterstitialAd? interstitialAd;
@@ -64,8 +64,13 @@ class HomepageState extends State<Homepage>
   void initState() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     currentUser = userProvider.currentUser!;
-    likedByList = UserSearchRepo.getLikedByList(currentUser);
-    log("unmatch list is $likedByList");
+    UserSearchRepo.getLikedByList(currentUser).then((list) {
+      setState(() {
+        likedByList = list;
+      });
+      log("unmatch list is $likedByList");
+      log("likedbylist$likedByList");
+    });
 
     fetchData();
     context.read<SearchUserBloc>().add(LoadUserEvent(

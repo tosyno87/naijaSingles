@@ -8,7 +8,7 @@ void main() {
       final purchase1 = PurchaseDetails(
         productID: 'id1',
         purchaseID: '1',
-        verificationData: const PurchaseVerificationData(
+        verificationData: PurchaseVerificationData(
           localVerificationData: 'local',
           serverVerificationData: 'server',
           source: 'test',
@@ -19,7 +19,7 @@ void main() {
       final purchase2 = PurchaseDetails(
         productID: 'id2',
         purchaseID: '2',
-        verificationData: const PurchaseVerificationData(
+        verificationData: PurchaseVerificationData(
           localVerificationData: 'local',
           serverVerificationData: 'server',
           source: 'test',

@@ -49,7 +49,8 @@ class UserSearchRepo {
     return swipedCount;
   }
 
-  static leftSwipe(UserModel currentUser, UserModel selectedUser) async {
+  static Future<void> leftSwipe(
+      UserModel currentUser, UserModel selectedUser) async {
     await docRef
         .doc(currentUser.id)
         .collection("CheckedUser")
@@ -60,7 +61,8 @@ class UserSearchRepo {
     }, SetOptions(merge: true));
   }
 
-  static rightSwipe(UserModel currentUser, UserModel selectedUser) async {
+  static Future<void> rightSwipe(
+      UserModel currentUser, UserModel selectedUser) async {
     likedByList = await getLikedByList(currentUser);
     if ((likedByList.contains(selectedUser.id) ||
         (selectedUser.isBot ?? false))) {

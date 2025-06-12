@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/models/user_model.dart';
@@ -10,8 +8,8 @@ import '../../../../common/providers/theme_provider.dart';
 
 class AgeRangeWidget extends StatefulWidget {
   final UserModel currentUser;
-  Map<String, dynamic> changeValues;
-  AgeRangeWidget(
+  final Map<String, dynamic> changeValues;
+  const AgeRangeWidget(
       {super.key, required this.currentUser, required this.changeValues});
 
   @override

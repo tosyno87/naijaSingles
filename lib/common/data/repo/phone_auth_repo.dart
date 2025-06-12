@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_function_literals_in_foreach_calls
-
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,55 +56,49 @@ class PhoneAuthRepository {
 
   Future deleteUser(User user) async {
     // user.delete();
-    await firebaseFireStoreInstance
+    final checkedSnapshot = await firebaseFireStoreInstance
         .collection("Users")
         .doc(user.uid)
         .collection('CheckedUser')
-        .get()
-        .then((value) {
-      value.docs.forEach((element) async {
-        await firebaseFireStoreInstance
-            .collection("Users")
-            .doc(user.uid)
-            .collection("CheckedUser")
-            .doc(element.id)
-            .delete()
-            .then((value) => log("success"));
-      });
-    });
-    await firebaseFireStoreInstance
+        .get();
+    for (final element in checkedSnapshot.docs) {
+      await firebaseFireStoreInstance
+          .collection("Users")
+          .doc(user.uid)
+          .collection("CheckedUser")
+          .doc(element.id)
+          .delete()
+          .then((value) => log("success"));
+    }
+    final likedBySnapshot = await firebaseFireStoreInstance
         .collection("Users")
         .doc(user.uid)
         .collection('LikedBy')
-        .get()
-        .then((value) {
-      value.docs.forEach((element) async {
-        await firebaseFireStoreInstance
-            .collection("Users")
-            .doc(user.uid)
-            .collection("LikedBy")
-            .doc(element.id)
-            .delete()
-            .then((value) => log("success"));
-      });
-    });
+        .get();
+    for (final element in likedBySnapshot.docs) {
+      await firebaseFireStoreInstance
+          .collection("Users")
+          .doc(user.uid)
+          .collection("LikedBy")
+          .doc(element.id)
+          .delete()
+          .then((value) => log("success"));
+    }
 
-    await firebaseFireStoreInstance
+    final matchesSnapshot = await firebaseFireStoreInstance
         .collection("Users")
         .doc(user.uid)
         .collection('Matches')
-        .get()
-        .then((value) {
-      value.docs.forEach((element) async {
-        await firebaseFireStoreInstance
-            .collection("Users")
-            .doc(user.uid)
-            .collection("Matches")
-            .doc(element.id)
-            .delete()
-            .then((value) => log("success"));
-      });
-    });
+        .get();
+    for (final element in matchesSnapshot.docs) {
+      await firebaseFireStoreInstance
+          .collection("Users")
+          .doc(user.uid)
+          .collection("Matches")
+          .doc(element.id)
+          .delete()
+          .then((value) => log("success"));
+    }
 
     await firebaseFireStoreInstance.collection("Users").doc(user.uid).delete();
     // Delete user details from Firebase Storage

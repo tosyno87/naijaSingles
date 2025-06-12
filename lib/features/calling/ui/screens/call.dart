@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, use_build_context_synchronously
-
 import 'dart:async';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -175,7 +173,7 @@ class CallPageState extends State<CallPage> {
   }
 
   Widget _audioToolbar() {
-    if (widget.role == ClientRoleType.clientRoleAudience) return Container();
+    if (widget.role == ClientRoleType.clientRoleAudience) return const SizedBox.shrink();
     return Container(
       alignment: Alignment.bottomCenter,
       padding: const EdgeInsets.symmetric(vertical: 48),
@@ -184,7 +182,7 @@ class CallPageState extends State<CallPage> {
         children: <Widget>[
           RawMaterialButton(
             onPressed: _onToggleMute,
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             elevation: 2.0,
             fillColor: muted ? primaryColor : Colors.white,
             padding: const EdgeInsets.all(12.0),
@@ -196,7 +194,7 @@ class CallPageState extends State<CallPage> {
           ),
           RawMaterialButton(
             onPressed: _onSpeaker,
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             elevation: 2.0,
             fillColor: onSpeaker ? primaryColor : Colors.white,
             padding: const EdgeInsets.all(12.0),
@@ -208,7 +206,7 @@ class CallPageState extends State<CallPage> {
           ),
           RawMaterialButton(
             onPressed: () => _onCallEnd(context),
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             elevation: 2.0,
             fillColor: Colors.redAccent,
             padding: const EdgeInsets.all(15.0),
@@ -226,6 +224,7 @@ class CallPageState extends State<CallPage> {
   void _onCallEnd(BuildContext context) async {
     await _engine.leaveChannel();
     await _engine.release();
+    if (!context.mounted) return;
     Navigator.pop(context);
   }
 
@@ -267,7 +266,7 @@ class CallPageState extends State<CallPage> {
             : Center(
                 child: Stack(
                   children: <Widget>[
-                    Container(
+                    const Align(
                       alignment: Alignment.center,
                       child: Icon(
                         Icons.person,

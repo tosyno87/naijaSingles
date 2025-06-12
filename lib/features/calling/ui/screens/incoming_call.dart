@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -15,7 +13,7 @@ import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 
 class Incoming extends StatefulWidget {
-  final callInfo;
+  final Map<String, dynamic> callInfo;
   const Incoming(this.callInfo, {super.key});
 
   @override

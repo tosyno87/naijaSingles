@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,18 +7,20 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 
 class CustomCNImage extends StatelessWidget {
-  String? imageUrl;
-  double? height;
-  double? width;
-  bool main;
-  BoxFit? fit;
-  CustomCNImage(
-      {super.key,
-      required this.imageUrl,
-      this.height,
-      this.fit,
-      this.width,
-      this.main = false});
+  final String? imageUrl;
+  final double? height;
+  final double? width;
+  final bool main;
+  final BoxFit? fit;
+
+  const CustomCNImage({
+    super.key,
+    required this.imageUrl,
+    this.height,
+    this.fit,
+    this.width,
+    this.main = false,
+  });
 
   @override
   Widget build(BuildContext context) {

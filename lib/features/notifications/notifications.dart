@@ -1,4 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -235,6 +234,7 @@ class NotificationsState extends State<Notifications> {
                                     .collection("Users")
                                     .doc(doc.get("Matches"))
                                     .get();
+                                if (!context.mounted) return;
                                 if (userdoc.exists) {
                                   Navigator.pop(context);
                                   UserModel tempuser =

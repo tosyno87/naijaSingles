@@ -1,5 +1,3 @@
-// ignore_for_file: sort_child_properties_last
-
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/utils/custom_toast.dart';
 
@@ -52,7 +50,6 @@ class NoInternetPage extends StatelessWidget {
                 onPressed: () {
                   CustomToast.showToast("No Internet, try again");
                 },
-                child: const Text('Retry'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(primaryColor),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -61,6 +58,7 @@ class NoInternetPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                child: const Text('Retry'),
               ),
             ),
           ],

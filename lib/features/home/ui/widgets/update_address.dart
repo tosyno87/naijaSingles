@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 import 'dart:developer';
 
@@ -96,6 +94,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                       var address = await Navigator.pushNamed(
                           context, RouteName.updateLocationScreen,
                           arguments: selectedLocation);
+                      if (!context.mounted) return;
                       log("after pop address is ${address.toString()}");
                       if (address != null) {
                         _updateAddress(address as Map);

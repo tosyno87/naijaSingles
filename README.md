@@ -4,7 +4,11 @@ NaijaSingles is a Flutter-based mobile dating application created for singles in
 
 ## Setup
 
-1. Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and set up your development environment.
+1. Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and set up your development environment. This project was built using **Flutter 3.24.0** with **Dart 3.5**, so ensure your SDK matches or exceeds these versions. You can verify your installation with:
+
+   ```bash
+   flutter --version
+   ```
 2. Clone this repository and navigate to the project root:
 
    ```bash

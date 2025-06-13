@@ -244,29 +244,30 @@ class _PhoneNumberState extends State<PhoneNumber> {
                       SizedBox(height: screenSize.height * 0.04),
                       
                       // DEV MODE: Test Phone Auth Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context.read<PhoneAuthBloc>().add(UseTestPhoneAuthEvent());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                      if (kDebugMode)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<PhoneAuthBloc>().add(UseTestPhoneAuthEvent());
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            "DEV MODE: Use Test Phone",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                            child: const Text(
+                              "DEV MODE: Use Test Phone",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                       
                       SizedBox(height: screenSize.height * 0.04),
                       

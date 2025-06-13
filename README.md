@@ -29,6 +29,43 @@ NaijaSingles is a Flutter-based mobile dating application created for singles in
    flutter run
    ```
 
+### Using Emulators
+
+To run the app on an emulator:
+
+1. **Android Emulator**:
+   - Launch an Android emulator through Android Studio:
+     ```bash
+     # Open Android Studio and start an emulator from AVD Manager
+     # Or use the command line:
+     cd $ANDROID_HOME/emulator
+     ./emulator -avd <emulator_name>
+     ```
+   - Then run the app:
+     ```bash
+     flutter run
+     ```
+
+2. **iOS Simulator** (macOS only):
+   - Launch the iOS Simulator:
+     ```bash
+     open -a Simulator
+     ```
+   - Then run the app:
+     ```bash
+     flutter run
+     ```
+
+3. **List available devices**:
+   ```bash
+   flutter devices
+   ```
+
+4. **Run on a specific device/emulator**:
+   ```bash
+   flutter run -d <device_id>
+   ```
+
 ### Running tests
 
 The project includes a basic widget test. Execute all tests with:

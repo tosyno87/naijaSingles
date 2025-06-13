@@ -160,12 +160,12 @@ class NotificationsState extends State<Notifications> {
                                   ? themeProvider.isDarkMode
                                       ? Theme.of(context)
                                           .scaffoldBackgroundColor
-                                      : primaryColor.withOpacity(.15)
+                                      : primaryColor.withValues(alpha: (.15 * 255).round())
                                   : themeProvider.isDarkMode
                                       ? Theme.of(context)
                                           .scaffoldBackgroundColor
-                                          .withOpacity(0.70)
-                                      : secondryColor.withOpacity(.15),
+                                          .withValues(alpha: (0.70 * 255).round())
+                                      : secondryColor.withValues(alpha: (.15 * 255).round()),
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(5),

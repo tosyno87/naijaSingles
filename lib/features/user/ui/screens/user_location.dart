@@ -157,7 +157,7 @@ class AllowLocation extends StatelessWidget {
                               child: Center(
                                 child: CircleAvatar(
                                   backgroundColor:
-                                      secondryColor.withOpacity(.2),
+                                      secondryColor.withValues(alpha: (.2 * 255).round()),
                                   radius: 110,
                                   child: const Icon(
                                     Icons.location_on,

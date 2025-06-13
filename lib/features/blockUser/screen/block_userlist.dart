@@ -115,8 +115,8 @@ class _BlockedUserState extends State<BlockedUser> {
                           color: themeProvider.isDarkMode
                               ? Theme.of(context)
                                   .scaffoldBackgroundColor
-                                  .withValues(alpha: (0.60 * 255).round())
-                              : secondryColor.withValues(alpha: (.2 * 255).round()),
+                                  .withValues(alpha: (0.60 * 255).toDouble())
+                              : secondryColor.withValues(alpha: (.2 * 255).toDouble()),
                           borderRadius: const BorderRadius.only(
                             topRight: Radius.circular(20.0),
                             topLeft: Radius.circular(20.0),

@@ -64,7 +64,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5.0),
           side: BorderSide(
-            color: secondryColor.withValues(alpha: (0.2 * 255).round()),
+            color: secondryColor.withValues(alpha: (0.2 * 255).toDouble()),
           ),
         ),
         child: StreamBuilder<DocumentSnapshot>(

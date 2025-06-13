@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/widgets/afropeep_logo.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -20,14 +21,26 @@ class SplashState extends State<Splash> {
       home: Scaffold(
           backgroundColor: Theme.of(context).primaryColor,
           body: Center(
-            child: SizedBox(
-                height: 120,
-                width: 200,
-                child: Image.asset(
-                  "asset/hookup4u-Logo-BP.png",
-                  fit: BoxFit.contain,
-                  color: themeProvider.isDarkMode ? Colors.white : primaryColor,
-                )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo
+                const AfropeepLogo(size: 100),
+                
+                const SizedBox(height: 20),
+                
+                // App name
+                Text(
+                  "Afropeep",
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: themeProvider.isDarkMode ? Colors.white : Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ],
+            ),
           )),
     );
   }

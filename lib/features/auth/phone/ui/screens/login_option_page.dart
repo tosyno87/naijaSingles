@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/common/providers/theme_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
+import 'package:naijasingles/common/widgets/afropeep_logo.dart';
 import 'package:naijasingles/features/auth/phone/ui/widgets/facebook_button.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,6 @@ import '../../../facebook_login/facebook_login_bloc.dart';
 import '../../../facebook_login/facebook_login_events.dart';
 import '../../../facebook_login/facebook_login_states.dart';
 import '../widgets/privacy_policy.dart';
-import '../widgets/wave_clipper.dart';
 
 class LoginOption extends StatefulWidget {
   const LoginOption({super.key});
@@ -28,10 +28,13 @@ class LoginOption extends StatefulWidget {
   State<LoginOption> createState() => _LoginOptionState();
 }
 
+// Removed SingleTickerProviderStateMixin to fix the _ticker error
 class _LoginOptionState extends State<LoginOption> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final screenSize = MediaQuery.of(context).size;
+    
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {
@@ -44,12 +47,7 @@ class _LoginOptionState extends State<LoginOption> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: primaryColor,
-          automaticallyImplyLeading: false,
-          elevation: 0,
-        ),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
         body: MultiBlocListener(
           listeners: [
             BlocListener<FacebookLoginBloc, FacebookLoginStates>(
@@ -82,7 +80,6 @@ class _LoginOptionState extends State<LoginOption> {
                       'Please wait. Loading..'.tr().toString(), context);
                 }
                 if (state is AlreadyRegistered) {
-                  // log("state user ${state.user}");
                   Provider.of<UserProvider>(context, listen: false)
                       .currentUser = state.user;
                   UserProvider().listenAuthChanges();
@@ -100,159 +97,192 @@ class _LoginOptionState extends State<LoginOption> {
           ],
           child: Container(
             decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50)),
-                color: Theme.of(context).primaryColor),
-            child: ListView(
-              children: <Widget>[
-                Stack(
-                  children: <Widget>[
-                    ClipPath(
-                      clipper: WaveClipper2(),
-                      child: Container(
-                        width: double.infinity,
-                        height: 280,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white,
+                  Colors.green[50]!,
+                  Colors.green[100]!,
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: screenSize.height * 0.08),
+                      
+                      // Logo
+                      Container(
+                        width: 120,
+                        height: 120,
                         decoration: BoxDecoration(
-                            gradient: themeProvider.isDarkMode
-                                ? LinearGradient(colors: [
-                                    darkPrimaryColor,
-                                    primaryColor.withValues(alpha: (.6 * 255).round())
-                                  ])
-                                : LinearGradient(colors: [
-                                    darkPrimaryColor,
-                                    primaryColor.withValues(alpha: (.15 * 255).round())
-                                  ])),
-                        child: const Column(),
-                      ),
-                    ),
-                    ClipPath(
-                      clipper: WaveClipper3(),
-                      child: Container(
-                        width: double.infinity,
-                        height: 280,
-                        decoration: BoxDecoration(
-                            gradient: themeProvider.isDarkMode
-                                ? LinearGradient(colors: [
-                                    darkPrimaryColor,
-                                    primaryColor.withValues(alpha: (.5 * 255).round())
-                                  ])
-                                : LinearGradient(colors: [
-                                    darkPrimaryColor,
-                                    primaryColor.withValues(alpha: (.2 * 255).round())
-                                  ])),
-                        child: const Column(),
-                      ),
-                    ),
-                    ClipPath(
-                      clipper: WaveClipper1(),
-                      child: Container(
-                        width: double.infinity,
-                        height: 280,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [primaryColor, primaryColor])),
-                        child: Column(
-                          children: <Widget>[
-                            const SizedBox(
-                              height: 15,
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.green.withOpacity(0.2),
+                              blurRadius: 20,
+                              spreadRadius: 5,
                             ),
-                            Image.asset("asset/hookup4u-Logo-BW.png",
-                                fit: BoxFit.contain, color: Colors.white),
                           ],
                         ),
+                        child: const Center(
+                          child: AfropeepLogo(size: 70),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Column(children: <Widget>[
-                  SizedBox(
-                    //height: MediaQuery.of(context).size.height * .1,
-                    height: MediaQuery.of(context).size.height * .02,
-                  ),
-                  Text(
-                    "By tapping 'Log in', you agree with our \n Terms.Learn how we process your data in \n our Privacy Policy and Cookies Policy."
-                        .tr()
-                        .toString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: themeProvider.isDarkMode
-                            ? Colors.white
-                            : Colors.black54,
-                        fontSize: 15),
-                  ),
-                  FaceBookButton(onTap: () async {
-                    context
-                        .read<FacebookLoginBloc>()
-                        .add(FacebookLoginRequest());
-                  }),
-                  OutlinedButton(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height * .065,
-                      width: MediaQuery.of(context).size.width * .75,
-                      child: Center(
-                          child: Text(
-                              "LOG IN WITH PHONE NUMBER".tr().toString(),
-                              style: TextStyle(
-                                  color: primaryColor,
-                                  fontWeight: FontWeight.bold))),
-                    ),
-                    onPressed: () {
-                      // requestSmsPermission();
-                      Navigator.pushNamed(context, RouteName.phoneNumberScreen);
-                    },
-                  ),
-                ]),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
+                      
+                      const SizedBox(height: 24),
+                      
                       Text(
-                        "Trouble logging in?".tr().toString(),
+                        "Afropeep",
                         style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal),
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green[700],
+                          letterSpacing: 1.2,
+                        ),
                       ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      Text(
+                        "Find your perfect match in the African community",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[700],
+                          height: 1.4,
+                        ),
+                      ),
+                      
+                      SizedBox(height: screenSize.height * 0.08),
+                      
+                      // Login buttons
+                      Column(
+                        children: [
+                          // Facebook login button
+                          _buildSocialButton(
+                            icon: Icons.facebook,
+                            text: "Continue with Facebook",
+                            color: Colors.green[700]!,
+                            onTap: () {
+                              context.read<FacebookLoginBloc>()
+                                  .add(FacebookLoginRequest());
+                            },
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
+                          // Phone login button
+                          _buildSocialButton(
+                            icon: Icons.phone,
+                            text: "Continue with Phone",
+                            color: Colors.white,
+                            textColor: Colors.green[700]!,
+                            borderColor: Colors.green[700]!,
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteName.phoneNumberScreen);
+                            },
+                          ),
+                        ],
+                      ),
+                      
+                      SizedBox(height: screenSize.height * 0.04),
+                      
+                      // Terms text
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          "By continuing, you agree with our Terms of Service and Privacy Policy",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Privacy links
+                      const PrivacyPolicy(),
+                      
+                      SizedBox(height: screenSize.height * 0.04),
+                      
+                      // Help text
+                      TextButton(
+                        onPressed: () {
+                          // Handle trouble logging in
+                        },
+                        child: Text(
+                          "Trouble logging in?",
+                          style: TextStyle(
+                            color: Colors.green[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      
+                      SizedBox(height: screenSize.height * 0.02),
                     ],
                   ),
                 ),
-                const PrivacyPolicy(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * .03,
-                ),
-                // only uncomment for language dropdowm all working
-                // const LanguageSelectionDropdown()
-              ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
-}
-
-Future<void> requestSmsPermission() async {
-  final status = await Permission.sms.request();
-
-  if (status.isGranted) {
-    // Permission has been granted, you can now read SMS
-    // Your code to read SMS goes here
-  } else {
-    // Permission denied
-
-    await Permission.sms.request();
-    // Handle permission denial gracefully
+  
+  Widget _buildSocialButton({
+    required IconData icon,
+    required String text,
+    required Color color,
+    Color textColor = Colors.white,
+    Color? borderColor,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      elevation: borderColor != null ? 0 : 2,
+      shadowColor: color.withOpacity(0.4),
+      borderRadius: BorderRadius.circular(30),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          height: 56,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(30),
+            border: borderColor != null
+                ? Border.all(color: borderColor, width: 1.5)
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: textColor, size: 22),
+              const SizedBox(width: 12),
+              Text(
+                text,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
-
-// Future<void> launchURL(String url) async {
-//   if (!await launchUrl(
-//     Uri.parse(url),
-//   )) {
-//     throw Exception('Could not launch $url');
-//   }
-// }

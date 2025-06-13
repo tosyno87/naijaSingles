@@ -438,7 +438,7 @@ class ProductsState extends State<Products> {
                                     },
                                     child: Container(
                                         decoration: BoxDecoration(
-                                          color: secondryColor.withValues(alpha: (.7 * 255).round()),
+                                          color: secondryColor.withValues(alpha: (.7 * 255).toDouble()),
                                           shape: BoxShape.rectangle,
                                           borderRadius:
                                               BorderRadius.circular(25),
@@ -573,7 +573,7 @@ class ProductsState extends State<Products> {
           ? BoxDecoration(
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context).primaryColor.withValues(alpha: (0.5 * 255).round()),
+              color: Theme.of(context).primaryColor.withValues(alpha: (0.5 * 255).toDouble()),
               border: Border.all(width: 2, color: primaryColor))
           : null,
       duration: const Duration(milliseconds: 500),

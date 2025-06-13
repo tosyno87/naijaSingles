@@ -15,7 +15,7 @@ class PremiumSwipePage extends StatelessWidget {
       alignment: Alignment.center,
       child: InkWell(
           child: Container(
-            color: Colors.white.withValues(alpha: (.3 * 255).round()),
+            color: Colors.white.withValues(alpha: (.3 * 255).toDouble()),
             child: Dialog(
               insetAnimationCurve: Curves.bounceInOut,
               insetAnimationDuration: const Duration(seconds: 2),

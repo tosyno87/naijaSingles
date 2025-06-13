@@ -103,7 +103,7 @@ class ChatMessageRead {
                           margin: const EdgeInsets.only(
                               top: 8.0, bottom: 8.0, right: 10),
                           decoration: BoxDecoration(
-                              color: secondryColor.withValues(alpha: (.3 * 255).round()),
+                              color: secondryColor.withValues(alpha: (.3 * 255).toDouble()),
                               borderRadius: BorderRadius.circular(15)),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

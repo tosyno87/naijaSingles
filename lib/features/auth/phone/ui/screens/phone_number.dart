@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 import 'package:naijasingles/features/home/ui/screens/welcome.dart';
@@ -31,14 +30,17 @@ class PhoneNumber extends StatefulWidget {
 
 class _PhoneNumberState extends State<PhoneNumber> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool cont = false;
+  bool isValidNumber = false;
 
-  String countryCode = '+91';
+  String countryCode = '+1'; // Changed default to USA code
   TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
+  
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final screenSize = MediaQuery.of(context).size;
+    
     return RepositoryProvider(
       create: (context) => PhoneAuthRepository(),
       child: BlocProvider(
@@ -47,7 +49,15 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 RepositoryProvider.of<PhoneAuthRepository>(context)),
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.green[700]),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
               listener: (context, state) {
             if (state is PhoneAuthVerified) {
@@ -60,56 +70,31 @@ class _PhoneNumberState extends State<PhoneNumber> {
             }
 
             if (state is PhoneAuthCodeSentSuccess) {
-              log("phone auth code sent  success listener called");
-              log("phonrrr ${phoneNumberController.text}");
+              log("phone auth code sent success listener called");
+              log("phone ${phoneNumberController.text}");
+              
+              // Show loading indicator
               showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (_) {
-                    Future.delayed(const Duration(seconds: 2), () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, RouteName.otpScreen,
-                          arguments: {
-                            'phoneNumber':
-                                countryCode + phoneNumberController.text,
-                            'codeController': _codeController.text,
-                            'smsVerificationCode': state.verificationId,
-                            "updatenumber": widget.updatePhoneNumber
-                          });
+                barrierDismissible: false,
+                context: context,
+                builder: (_) => const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF2E8B57),
+                  ),
+                ),
+              );
+              
+              // Navigate after delay
+              Future.delayed(const Duration(seconds: 2), () {
+                Navigator.pop(context); // Close loading dialog
+                Navigator.pushNamed(context, RouteName.otpScreen,
+                    arguments: {
+                      'phoneNumber': countryCode + phoneNumberController.text,
+                      'codeController': _codeController.text,
+                      'smsVerificationCode': state.verificationId,
+                      "updatenumber": widget.updatePhoneNumber
                     });
-                    return Center(
-
-                        // Aligns the container to center
-                        child: Container(
-
-                            // A simplified version of dialog.
-                            width: 100.0,
-                            height: 120.0,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Column(
-                              children: <Widget>[
-                                Image.asset(
-                                  "asset/auth/verified.jpg",
-                                  height: 60,
-                                  color: primaryColor,
-                                  colorBlendMode: BlendMode.color,
-                                ),
-                                Text(
-                                  "OTP\nSent".tr().toString(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      decoration: TextDecoration.none,
-                                      color: themeProvider.isDarkMode
-                                          ? Colors.black
-                                          : Colors.black,
-                                      fontSize: 20),
-                                )
-                              ],
-                            )));
-                  });
+              });
             }
 
             //Show error message if any error occurs while verifying phone number and otp code
@@ -118,6 +103,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.error),
+                  backgroundColor: Colors.red,
                 ),
               );
             }
@@ -127,132 +113,185 @@ class _PhoneNumberState extends State<PhoneNumber> {
               log("phone auth loading ui called");
               return const Hookup4uBar();
             }
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 50),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Image.asset(
-                      "asset/auth/MobileNumber.png",
-                      fit: BoxFit.cover,
-                      height: 300,
-                      width: MediaQuery.of(context).size.width,
-                    ),
-                    // Icon(
-                    //   Icons.mobile_screen_share,
-                    //   size: 50,
-                    // ),
-                    ListTile(
-                      title: Text(
-                        "Verify Your Number".tr().toString(),
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: screenSize.height * 0.04),
+                      
+                      // Phone icon
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.green[50],
+                        ),
+                        child: Icon(
+                          Icons.phone_android,
+                          size: 40,
+                          color: Colors.green[700],
+                        ),
+                      ),
+                      
+                      SizedBox(height: screenSize.height * 0.04),
+                      
+                      // Header
+                      Text(
+                        "Verify your number",
+                        style: TextStyle(
+                          color: Colors.green[800],
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // Subtitle
+                      Text(
+                        "We'll text you a code to get started",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : primaryColor,
-                            fontSize: 27,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          color: Colors.grey[700],
+                          height: 1.4,
+                        ),
                       ),
-                      subtitle: Text(
-                        "Please enter Your mobile Number to\n receive a verification code. Message and data\n rates may apply"
-                            .tr()
-                            .toString(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 50, horizontal: 45),
-                        child: ListTile(
-                            leading: Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                      width: 1.0, color: primaryColor),
+                      
+                      SizedBox(height: screenSize.height * 0.06),
+                      
+                      // Phone number input
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                          child: Row(
+                            children: [
+                              // Country code picker
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 1.0, 
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                ),
+                                child: CountryCodePicker(
+                                  onChanged: (value) {
+                                    countryCode = value.dialCode!;
+                                    _validatePhoneNumber(phoneNumberController.text);
+                                  },
+                                  initialSelection: 'US', // USA
+                                  favorite: ['+1', 'US'],
+                                  showCountryOnly: false,
+                                  showOnlyCountryWhenClosed: false,
+                                  alignLeft: false,
+                                  textStyle: TextStyle(
+                                    color: Colors.green[800],
+                                    fontSize: 16,
+                                  ),
+                                  dialogBackgroundColor: Colors.white,
+                                  boxDecoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  dialogTextStyle: TextStyle(
+                                    color: Colors.green[800],
+                                  ),
                                 ),
                               ),
-                              child: CountryCodePicker(
-                                dialogBackgroundColor:
-                                    Theme.of(context).primaryColor,
-
-                                onChanged: (value) {
-                                  countryCode = value.dialCode!;
-                                },
-                                // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                                initialSelection: 'IN',
-                                favorite: [countryCode, 'IN'],
-                                // optional. Shows only country name and flag
-                                showCountryOnly: false,
-                                // optional. Shows only country name and flag when popup is closed.
-                                showOnlyCountryWhenClosed: false,
-                                // optional. aligns the flag and the Text left
-                                alignLeft: false,
-                              ),
-                            ),
-                            // ignore: avoid_unnecessary_containers
-                            title: Container(
-                              child: TextFormField(
-                                keyboardType: TextInputType.phone,
-                                style: const TextStyle(fontSize: 20),
-                                cursorColor: primaryColor,
-                                controller: phoneNumberController,
-                                onChanged: (value) {
-                                  setState(() {
-                                    cont = true;
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  hintText: "Enter your number".tr().toString(),
-                                  hintStyle: const TextStyle(fontSize: 18),
-                                  focusColor: primaryColor,
-                                  focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: primaryColor)),
-                                  enabledBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: primaryColor)),
+                              
+                              // Phone number field
+                              Expanded(
+                                child: TextFormField(
+                                  keyboardType: TextInputType.phone,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.green[800],
+                                  ),
+                                  cursorColor: Colors.green[700],
+                                  controller: phoneNumberController,
+                                  onChanged: _validatePhoneNumber,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your number",
+                                    hintStyle: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[500],
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ))),
-                    cont
-                        ? CustomButton(
-                            text: "CONTINUE".tr().toString(),
-                            onTap: () async {
-                              if (validateMobile(
-                                  phoneNumberController.text.trim())) {
-                                _sendOtp(
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      SizedBox(height: screenSize.height * 0.04),
+                      
+                      // Privacy notice
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          "By continuing, you agree to receive SMS messages for verification and may incur charges from your carrier.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                      
+                      SizedBox(height: screenSize.height * 0.06),
+                      
+                      // Continue button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: isValidNumber
+                              ? () {
+                                  _sendOtp(
                                     phoneNumber: phoneNumberController.text,
-                                    context: context);
-                              } else {
-                                log("coming not verified");
-                                CustomSnackbar.showSnackBarSimple(
-                                    "please enter valid number", context);
-                              }
-                            },
-                            color: textColor,
-                            active: true)
-                        : Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(25),
+                                    context: context,
+                                  );
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[700],
+                            disabledBackgroundColor: Colors.grey[300],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                            height: MediaQuery.of(context).size.height * .065,
-                            width: MediaQuery.of(context).size.width * .75,
-                            child: Center(
-                                child: Text(
-                              "CONTINUE".tr().toString(),
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: themeProvider.isDarkMode
-                                      ? Colors.white70
-                                      : darkPrimaryColor,
-                                  fontWeight: FontWeight.bold),
-                            ))),
-                  ],
+                            elevation: isValidNumber ? 2 : 0,
+                          ),
+                          child: Text(
+                            "Continue",
+                            style: TextStyle(
+                              color: isValidNumber ? Colors.white : Colors.grey[600],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -262,9 +301,16 @@ class _PhoneNumberState extends State<PhoneNumber> {
     );
   }
 
+  void _validatePhoneNumber(String value) {
+    setState(() {
+      isValidNumber = validateMobile(value.trim());
+    });
+  }
+
   void _sendOtp({required String phoneNumber, required BuildContext context}) {
     final phoneNumberWithCode = "$countryCode$phoneNumber";
-
+    log("SendOtpToPhoneEvent($phoneNumberWithCode)");
+    
     context.read<PhoneAuthBloc>().add(
           SendOtpToPhoneEvent(
             phoneNumber: phoneNumberWithCode,
@@ -273,8 +319,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
   }
 
   bool validateMobile(String value) {
-    String patttern = r'(^(?:[+0]9)?[0-9]{9,12}$)';
-    RegExp regExp = RegExp(patttern);
+    String pattern = r'(^(?:[+0]9)?[0-9]{9,12}$)';
+    RegExp regExp = RegExp(pattern);
     if (value.isEmpty) {
       return false;
     } else if (regExp.hasMatch(value.trim())) {

@@ -9,9 +9,15 @@ import 'package:provider/provider.dart';
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../common/providers/user_provider.dart';
 import '../../../models/user_model.dart';
+<<<<<<< codex/remove-unused-imports-and-verify-analysis
+class AdsManager {
+  InterstitialAd? interstitialAd;
+  bool isInterstitialAdReady = false;
+=======
 import '../../../common/constants/constants.dart';
 
 // Ad manager class removed - No longer using ads
+>>>>>>> main
 
 class HomeController {
       request: const AdRequest(),

@@ -321,7 +321,7 @@ class IncomingState extends State<Incoming> with TickerProviderStateMixin {
       height: radius,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.blue.withOpacity(1 - _controller.value),
+        color: Colors.blue.withValues(alpha: ((1 - _controller.value) * 255).round()),
       ),
     );
   }

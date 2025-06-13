@@ -29,8 +29,8 @@ class FaceBookButton extends StatelessWidget {
                               begin: Alignment.topRight,
                               end: Alignment.bottomLeft,
                               colors: [
-                                  primaryColor.withOpacity(.5),
-                                  primaryColor.withOpacity(.8),
+                                  primaryColor.withValues(alpha: (.5 * 255).round()),
+                                  primaryColor.withValues(alpha: (.8 * 255).round()),
                                   primaryColor,
                                   primaryColor
                                 ])

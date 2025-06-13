@@ -64,7 +64,7 @@ class PremiumDialog extends StatelessWidget {
       alignment: Alignment.center,
       child: InkWell(
           child: Container(
-            color: Colors.white.withOpacity(.3),
+            color: Colors.white.withValues(alpha: (.3 * 255).round()),
             child: Dialog(
               insetAnimationCurve: Curves.bounceInOut,
               insetAnimationDuration: const Duration(seconds: 2),
@@ -110,7 +110,7 @@ class PremiumDialog extends StatelessWidget {
                       },
                       style: ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
-                              primaryColor.withOpacity(0.9))),
+                              primaryColor.withValues(alpha: (0.9 * 255).round()))),
                       child: Text(
                         'Upgrade Now'.tr().toString(),
                         style: const TextStyle(

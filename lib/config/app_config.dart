@@ -6,9 +6,8 @@ const String termConditionUrl =
 const String privacyUrl =
     "https://www.deligence.com/apps/hookup4u/Privacy-Policy.html";
 
-const bannerAdUnitIdAndriod = 'ca-app-pub-3215289162629879/8696982432';
-const interstitialAdUnitIdAndriod = "ca-app-pub-3215289162629879/6646104983";
-const rewardedAdUnitIdAndriod = "ca-app-pub-3215289162629879/5333023310";
+// Ad units removed - No longer using ads
+
 // Add google map key for google places search
 const googleMapsKey = '00000000000000000000000000000000000000';
 //for support to user add you mail

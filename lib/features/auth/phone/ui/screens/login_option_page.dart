@@ -117,11 +117,11 @@ class _LoginOptionState extends State<LoginOption> {
                             gradient: themeProvider.isDarkMode
                                 ? LinearGradient(colors: [
                                     darkPrimaryColor,
-                                    primaryColor.withOpacity(.6)
+                                    primaryColor.withValues(alpha: (.6 * 255).round())
                                   ])
                                 : LinearGradient(colors: [
                                     darkPrimaryColor,
-                                    primaryColor.withOpacity(.15)
+                                    primaryColor.withValues(alpha: (.15 * 255).round())
                                   ])),
                         child: const Column(),
                       ),
@@ -135,11 +135,11 @@ class _LoginOptionState extends State<LoginOption> {
                             gradient: themeProvider.isDarkMode
                                 ? LinearGradient(colors: [
                                     darkPrimaryColor,
-                                    primaryColor.withOpacity(.5)
+                                    primaryColor.withValues(alpha: (.5 * 255).round())
                                   ])
                                 : LinearGradient(colors: [
                                     darkPrimaryColor,
-                                    primaryColor.withOpacity(.2)
+                                    primaryColor.withValues(alpha: (.2 * 255).round())
                                   ])),
                         child: const Column(),
                       ),

@@ -38,10 +38,10 @@ class SingleChatTile extends StatelessWidget {
         color: chat.senderId != currentUser.id && !chat.isRead
             ? themeProvider.isDarkMode
                 ? Theme.of(context).scaffoldBackgroundColor
-                : primaryColor.withOpacity(.1)
+                : primaryColor.withValues(alpha: (.1 * 255).round())
             : themeProvider.isDarkMode
-                ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.60)
-                : secondryColor.withOpacity(.2),
+                ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha: (0.60 * 255).round())
+                : secondryColor.withValues(alpha: (.2 * 255).round()),
         borderRadius: const BorderRadius.only(
           topRight: Radius.circular(20.0),
           topLeft: Radius.circular(20.0),

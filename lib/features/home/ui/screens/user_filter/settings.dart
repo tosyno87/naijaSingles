@@ -3,11 +3,10 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/text_button.dart';
-import 'package:naijasingles/features/ads/google_ads.dart';
+// import 'package:naijasingles/features/ads/google_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/features/home/ui/widgets/street_view_enable.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
@@ -43,13 +42,7 @@ class SettingPage extends StatefulWidget {
 
 class SettingPageState extends State<SettingPage> {
   Map<String, dynamic> changeValues = {};
-  final BannerAd myBanner = BannerAd(
-    adUnitId: AdHelper.bannerAdUnitId,
-    size: AdSize.banner,
-    request: const AdRequest(),
-    listener: const BannerAdListener(),
-  );
-  late AdWidget adWidget;
+  // Banner ad removed - No longer using ads
 
   Future<bool> _onWillPop(BuildContext context) async {
     final currentstate = BlocProvider.of<UserfilterBloc>(context).state;
@@ -112,8 +105,7 @@ class SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     super.initState();
-    adWidget = AdWidget(ad: myBanner);
-    myBanner.load();
+    // Ad initialization removed - No longer using ads
     freeR = widget.items['free_radius'] != null
         ? int.parse(widget.items['free_radius'])
         : 400;
@@ -211,14 +203,7 @@ class SettingPageState extends State<SettingPage> {
                             fontWeight: FontWeight.w500),
                       ),
                     ),
-                    Center(
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: myBanner.size.width.toDouble(),
-                        height: myBanner.size.height.toDouble(),
-                        child: adWidget,
-                      ),
-                    ),
+                    // Ad widget removed - No longer using ads
                     ListTile(
                       title: Card(
                           child: Padding(

@@ -1,65 +1,16 @@
-import 'dart:developer';
-
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:naijasingles/features/ads/google_ads.dart';
+// This file is kept as a placeholder but all ad functionality has been removed
+// No ads will be shown in the app
 
 class LoadAds {
-  static void loadInterstitialAd(
-      InterstitialAd? interstitialAd, bool isInterstitialAdReady) {
-    InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          interstitialAd = ad;
-
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              //  _moveToHome();
-            },
-          );
-
-          isInterstitialAdReady = true;
-        },
-        onAdFailedToLoad: (err) {
-          log('Failed to load an interstitial ad: ${err.message}');
-          isInterstitialAdReady = false;
-        },
-      ),
-    );
+  // Stub methods that do nothing to avoid breaking existing code
+  static void loadInterstitialAd(dynamic interstitialAd, bool isInterstitialAdReady) {
+    // No-op - ads have been removed
   }
 
-  static void loadAds(InterstitialAd? interstitialAd) {
-    InterstitialAd.load(
-        adUnitId: AdHelper.interstitialAdUnitId,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (InterstitialAd ad) {
-            // Keep a reference to the ad so you can show it later.
-            interstitialAd = ad;
-          },
-          onAdFailedToLoad: (LoadAdError error) {
-            log('InterstitialAd failed to load: $error');
-          },
-        ));
+  static void loadAds(dynamic interstitialAd) {
+    // No-op - ads have been removed
   }
 
-  final BannerAdListener listener = BannerAdListener(
-    // Called when an ad is successfully received.
-    onAdLoaded: (Ad ad) {
-      log('Ad loaded.');
-    },
-    // Called when an ad request failed.
-    onAdFailedToLoad: (Ad ad, LoadAdError error) {
-      // Dispose the ad here to free resources.
-      ad.dispose();
-      log('Ad failed to load: $error');
-    },
-    // Called when an ad opens an overlay that covers the screen.
-    onAdOpened: (Ad ad) => log('Ad opened.'),
-    // Called when an ad removes an overlay that covers the screen.
-    onAdClosed: (Ad ad) => log('Ad closed.'),
-    // Called when an impression occurs on the ad.
-    onAdImpression: (Ad ad) => log('Ad impression.'),
-  );
+  // Empty listener to avoid breaking existing code
+  final listener = Object();
 }

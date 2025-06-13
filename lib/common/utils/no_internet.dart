@@ -51,8 +51,8 @@ class NoInternetPage extends StatelessWidget {
                   CustomToast.showToast("No Internet, try again");
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(primaryColor),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  backgroundColor: WidgetStateProperty.all(primaryColor),
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),

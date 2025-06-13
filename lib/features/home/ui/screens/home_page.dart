@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
-import 'package:easy_localization/easy_localization.dart';
-
-import '../../../../common/constants/colors.dart';
-import '../../../../common/constants/constants.dart';
-import '../../../../common/utils/swiper_stack.dart';
-import '../../bloc/searchuser_bloc.dart';
-import '../../bloc/swipebloc_bloc.dart';
 import '../widgets/premium_swipe.dart';
 import '../widgets/swipe_card_list.dart';
 import '../widgets/swipe_buttons.dart';
@@ -52,12 +45,10 @@ class _HomepageState extends State<Homepage>
 
   @override
   Future<void> didChangeDependencies() async {
-    if (controller.currentUser != null) {
-      await firebaseFireStoreInstance
-          .collection('Users')
-          .doc(controller.currentUser!.id)
-          .update({'lastvisited': DateTime.now()});
-    }
+    await firebaseFireStoreInstance
+        .collection('Users')
+        .doc(controller.currentUser.id)
+        .update({'lastvisited': DateTime.now()});
     super.didChangeDependencies();
   }
   @override

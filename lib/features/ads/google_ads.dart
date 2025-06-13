@@ -1,35 +1,17 @@
-import 'dart:io';
-
-import '../../config/app_config.dart';
+// This file is kept as a placeholder but all ad functionality has been removed
+// No ads will be shown in the app
 
 class AdHelper {
+  // Stub methods that return empty strings to avoid breaking existing code
   static String get bannerAdUnitId {
-    if (Platform.isAndroid) {
-      return bannerAdUnitIdAndriod;
-    } else if (Platform.isIOS) {
-      return 'ca-app-pub-3215289162629879/3464472099';
-    } else {
-      throw UnsupportedError('Unsupported platform');
-    }
+    return '';
   }
 
   static String get interstitialAdUnitId {
-    if (Platform.isAndroid) {
-      return interstitialAdUnitIdAndriod;
-    } else if (Platform.isIOS) {
-      return "ca-app-pub-3215289162629879/2898431660";
-    } else {
-      throw UnsupportedError("Unsupported platform");
-    }
+    return '';
   }
 
   static String get rewardedAdUnitId {
-    if (Platform.isAndroid) {
-      return rewardedAdUnitIdAndriod;
-    } else if (Platform.isIOS) {
-      return "ca-app-pub-3215289162629879/3284873650";
-    } else {
-      throw UnsupportedError("Unsupported platform");
-    }
+    return '';
   }
 }

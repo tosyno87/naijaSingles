@@ -4,10 +4,10 @@ NaijaSingles is a Flutter-based mobile dating application created for singles in
 
 ## Setup
 
-1. Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and set up your development environment. This project was built using **Flutter 3.32.3** with **Dart 3.5**, so ensure your SDK matches or exceeds these versions. You can verify your installation with:
+1. Install the [Flutter SDK](https://docs.flutter.dev/get-started/install) and set up your development environment. This project was built using **Flutter 3.32.3** with **Dart 3.5**, so ensure your SDK matches or exceeds these versions. After installation, run `flutter doctor` to confirm everything is configured correctly:
 
    ```bash
-   flutter --version
+   flutter doctor
    ```
 2. Clone this repository and navigate to the project root:
 
@@ -15,13 +15,15 @@ NaijaSingles is a Flutter-based mobile dating application created for singles in
    git clone <repo-url>
    cd naijaSingles
    ```
-3. Fetch the project dependencies:
+3. Run the setup script to fetch dependencies and verify your environment:
 
    ```bash
-   flutter pub get
+   ./setup.sh
    ```
+
+   The script requires an existing Flutter installation and internet access to download packages from `flutter.dev`. If these domains are blocked, setup will fail.
 4. Configure Firebase by adding your `google-services.json` file to `android/app/` and `GoogleService-Info.plist` to `ios/Runner/`.
-5. Run the app on a connected device or emulator:
+5. After setup completes, run the app on a connected device or emulator:
 
    ```bash
    flutter run

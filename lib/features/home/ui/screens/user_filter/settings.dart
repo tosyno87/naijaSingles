@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/text_button.dart';
-// import 'package:naijasingles/features/ads/google_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/features/home/ui/widgets/street_view_enable.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
@@ -42,7 +41,6 @@ class SettingPage extends StatefulWidget {
 
 class SettingPageState extends State<SettingPage> {
   Map<String, dynamic> changeValues = {};
-  // Banner ad removed - No longer using ads
 
   Future<bool> _onWillPop(BuildContext context) async {
     final currentstate = BlocProvider.of<UserfilterBloc>(context).state;
@@ -105,7 +103,6 @@ class SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     super.initState();
-    // Ad initialization removed - No longer using ads
     freeR = widget.items['free_radius'] != null
         ? int.parse(widget.items['free_radius'])
         : 400;
@@ -124,7 +121,6 @@ class SettingPageState extends State<SettingPage> {
 
   @override
   void dispose() {
-    myBanner.dispose();
     super.dispose();
   }
 
@@ -203,7 +199,6 @@ class SettingPageState extends State<SettingPage> {
                             fontWeight: FontWeight.w500),
                       ),
                     ),
-                    // Ad widget removed - No longer using ads
                     ListTile(
                       title: Card(
                           child: Padding(
@@ -237,7 +232,6 @@ class SettingPageState extends State<SettingPage> {
                             Navigator.pushNamed(
                                 context, RouteName.updatePhoneScreen,
                                 arguments: widget.currentUser);
-                            //      _ads.disable(_ad);
                           },
                         ),
                       )),

@@ -19,6 +19,24 @@ class PhoneAuthRepository {
     required Function(String, int?) codeSent,
     required Function(String) codeAutoRetrievalTimeout,
   }) async {
+    if (kDebugMode && phoneNumber == '+12179044453') {
+      log("🔥 Using test phone number with Firebase Auth Emulator");
+      // For test phone number in debug mode, simulate the verification flow
+      // This will bypass the actual SMS verification
+      
+      // Simulate verification completed with a test credential
+      final PhoneAuthCredential testCredential = PhoneAuthProvider.credential(
+        verificationId: 'test-verification-id',
+        smsCode: '123456',
+      );
+      
+      // Call the verificationCompleted callback directly
+      verificationCompleted(testCredential);
+      
+      return;
+    }
+    
+    // Normal flow for non-test numbers or production mode
     await auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: verificationCompleted,

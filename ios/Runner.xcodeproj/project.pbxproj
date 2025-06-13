@@ -497,7 +497,7 @@
 				DEVELOPMENT_TEAM = M7HY7333KT;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Afropeep;
+				INFOPLIST_KEY_CFBundleDisplayName = NaijaSingles;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -680,8 +680,8 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = M7HY7333KT;
 				ENABLE_BITCODE = NO;
-                               INFOPLIST_FILE = "$(SRCROOT)/Runner/Info-Debug.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Afropeep;
+				INFOPLIST_FILE = "$(SRCROOT)/Runner/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = NaijaSingles;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -705,7 +705,7 @@
 				DEVELOPMENT_TEAM = M7HY7333KT;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Afropeep;
+				INFOPLIST_KEY_CFBundleDisplayName = NaijaSingles;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

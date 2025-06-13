@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -68,41 +69,49 @@ class PhoneAuthRepository {
     await auth.signOut();
   }
   
-  // Add this method for development testing with Firebase Auth Emulator
+  // Method for development testing with Firebase Auth Emulator
   Future<User?> signInWithTestPhone() async {
     try {
-      if (kDebugMode) {
-        log("Using Firebase Auth Emulator for test phone authentication");
-        
-        // In emulator, we can directly sign in with phone number and code
-        // First create a PhoneAuthCredential
-        final PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: 'test-verification-code',
-          smsCode: '123456',
-        );
-        
-        // Then sign in with the credential
-        final UserCredential userCredential = 
-            await FirebaseAuth.instance.signInWithCredential(credential);
-        
-        log("Test phone auth successful with emulator: ${userCredential.user?.uid}");
-        return userCredential.user;
-      } else {
-        // Fallback for non-debug mode
-        final PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: '123456',
-          smsCode: '123456',
-        );
-        
-        final UserCredential userCredential = 
-            await FirebaseAuth.instance.signInWithCredential(credential);
-        
-        log("Test phone auth successful: ${userCredential.user?.uid}");
-        return userCredential.user;
-      }
+      log("📲 Starting Firebase test phone sign-in using emulator");
+
+      // Step 1: Trigger verification to get a real verificationId
+      final completer = Completer<String>();
+
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: '+12179044453',
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (credential) async {
+          log("✅ Auto verification completed");
+          final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+          completer.complete(credential.verificationId ?? ''); // Fallback
+        },
+        verificationFailed: (e) {
+          log("❌ Verification failed: ${e.message}");
+          completer.completeError(e);
+        },
+        codeSent: (verificationId, _) {
+          log("📩 Code sent. Using test verificationId: $verificationId");
+          completer.complete(verificationId);
+        },
+        codeAutoRetrievalTimeout: (verificationId) {
+          log("⏰ Auto retrieval timeout. ID: $verificationId");
+        },
+      );
+
+      // Step 2: Use the real verificationId with the known test code
+      final verificationId = await completer.future;
+
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: '123456',
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      log("✅ Signed in user: ${userCredential.user?.uid}");
+      return userCredential.user;
     } catch (e) {
-      log("Error with test phone auth: $e");
-      throw e;
+      log("🔥 Error with test phone auth: $e");
+      rethrow;
     }
   }
 

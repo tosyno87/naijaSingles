@@ -16,7 +16,7 @@ class FaceBookLoginRepositoryImpl implements FaceBookLoginRepository {
       final accessToken = result.accessToken;
 
       // Get the token string directly from the accessToken
-      final tokenString = accessToken?.token ?? '';
+      final tokenString = accessToken?.tokenString ?? '';
       final user = await _provideFirebaseUser(accessToken: tokenString);
       return user;
     } else if (status == LoginStatus.cancelled ||

@@ -297,7 +297,6 @@ class _MessageBoxState extends State<MessageBox> {
                         });
                       },
                       decoration: InputDecoration.collapsed(
-                          floatingLabelBehavior: FloatingLabelBehavior.auto,
                           hintStyle: const TextStyle(color: Colors.grey),
                           hintText: "Send a message...".tr().toString()),
                     ),

@@ -49,15 +49,26 @@
 	<false/>
 	<key>FacebookAdvertiserIDCollectionEnabled</key>
 	<true/>
-    <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-3215289162629879~6441989225</string>
-    <key>SKAdNetworkItems</key>
-    <array>
-      <dict>
-        <key>SKAdNetworkIdentifier</key>
-        <string>cstr6suwn9.skadnetwork</string>
-      </dict>
-    </array>
+	<key>FacebookAppID</key>
+	<string>499452678798092</string>
+	<key>FacebookClientToken</key>
+	<string>YOUR_FACEBOOK_CLIENT_TOKEN</string>
+	<key>FacebookDisplayName</key>
+	<string>NaijaSingles</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb499452678798092</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+	</array>
 
 </dict>
 </plist>

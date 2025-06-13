@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/premium_swipe.dart';
 import '../widgets/swipe_card_list.dart';
 import '../widgets/swipe_buttons.dart';
 import '../../../../models/user_model.dart';
 import '../../controllers/home_controller.dart';
+import '../../bloc/searchuser_bloc.dart';
+import '../../../../common/constants/constants.dart';
 
 class Homepage extends StatefulWidget {
   final Map items;

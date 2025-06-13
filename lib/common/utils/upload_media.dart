@@ -158,8 +158,9 @@ class _SelectMedia extends StatelessWidget {
               ),
             ),
             const Divider(),
-            ButtonBar(
-              mainAxisSize: MainAxisSize.min,
+            OverflowBar(
+              alignment: MainAxisAlignment.center,
+              overflowAlignment: OverflowBarAlignment.center,
               children: [
                 TextButton.icon(
                     onPressed: () {

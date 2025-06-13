@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/routes/router.dart';
@@ -17,7 +17,6 @@ import 'package:naijasingles/features/home/ui/screens/splash.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
 import 'package:naijasingles/features/street_view/bloc/streetviewdata_bloc.dart';
 import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
-import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:provider/provider.dart';
 
 import 'common/constants/theme.dart';
@@ -40,7 +39,7 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  MobileAds.instance.initialize();
+  // MobileAds.instance.initialize(); // Removed - No longer using ads
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

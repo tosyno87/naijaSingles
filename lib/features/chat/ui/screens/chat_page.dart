@@ -7,11 +7,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/common/utils/custom_toast.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/features/ads/google_ads.dart';
-import 'package:naijasingles/features/ads/load_ads.dart';
+// import 'package:naijasingles/features/ads/google_ads.dart'; // Removed - No longer using ads
+// import 'package:naijasingles/features/ads/load_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/features/chat/ui/widgets/send_message_box.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
@@ -39,8 +39,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class ChatPageState extends State<ChatPage> {
-  InterstitialAd? interstitialAd;
-  bool isInterstitialAdReady = true;
+  // Ad-related variables removed - No longer using ads
   bool isBlocked = false;
   Timer? debouncer;
   bool isCalling = false; // Flag to track if onJoin is in progress
@@ -48,36 +47,10 @@ class ChatPageState extends State<ChatPage> {
   late CollectionReference chatReference;
   User currentUser = firebaseAuthInstance.currentUser!;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  // Ads _ads = new Ads();
 
   @override
   void initState() {
-    InterstitialAd.load(
-        adUnitId: AdHelper.interstitialAdUnitId,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (InterstitialAd ad) {
-            // Keep a reference to the ad so you can show it later.
-            interstitialAd = ad;
-          },
-          onAdFailedToLoad: (LoadAdError error) {
-            log('InterstitialAd failed to load: $error');
-          },
-        ));
-
-    LoadAds.loadInterstitialAd(interstitialAd, isInterstitialAdReady);
-    Future.delayed(const Duration(milliseconds: 2000), () {
-// Here you can write your code
-
-      if (mounted) {
-        (() {
-          // Here you can write your code for open new view
-          if (isInterstitialAdReady) {
-            interstitialAd?.show();
-          }
-        });
-      }
-    });
+    // Ad loading removed - No longer using ads
 
     super.initState();
 
@@ -88,7 +61,7 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    interstitialAd?.dispose();
+    // Ad disposal removed - No longer using ads
     debouncer?.cancel();
     super.dispose();
   }

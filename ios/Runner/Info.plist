@@ -65,6 +65,14 @@
 				<string>fb499452678798092</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-888697307756-ios-95ea92b8c7288e31704e49</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
@@ -72,18 +80,6 @@
 	<array>
 		<string>fbapi</string>
 		<string>fb-messenger-share-api</string>
-	</array>
-	<key>CFBundleURLTypes
-</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-                                <string>com.googleusercontent.apps.888697307756-abcdefg</string>
-			</array>
-		</dict>
 	</array>
 </dict>
 </plist>

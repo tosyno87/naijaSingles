@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:naijasingles/config/app_config.dart';
 
 import '../../../models/user_model.dart';
@@ -49,21 +50,33 @@ class PhoneAuthRepository {
     await auth.signOut();
   }
   
-  // Add this method for development testing with Firebase test phone numbers
+  // Add this method for development testing with Firebase Auth Emulator
   Future<User?> signInWithTestPhone() async {
     try {
-      // For Firebase test phone numbers, both values should be the same
-      final PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: '123456',
-        smsCode: '123456',
-      );
-      
-      // Use FirebaseAuth.instance directly to avoid any custom configurations
-      final UserCredential userCredential = 
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      
-      log("Test phone auth successful: ${userCredential.user?.uid}");
-      return userCredential.user;
+      if (kDebugMode) {
+        log("Using Firebase Auth Emulator for test phone authentication");
+        
+        // In emulator, we can directly sign in with phone number
+        final UserCredential userCredential = 
+            await FirebaseAuth.instance.signInWithPhoneNumber(
+              '+12179044453',  // Test phone number
+            );
+        
+        log("Test phone auth successful: ${userCredential.user?.uid}");
+        return userCredential.user;
+      } else {
+        // Fallback for non-debug mode
+        final PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: '123456',
+          smsCode: '123456',
+        );
+        
+        final UserCredential userCredential = 
+            await FirebaseAuth.instance.signInWithCredential(credential);
+        
+        log("Test phone auth successful: ${userCredential.user?.uid}");
+        return userCredential.user;
+      }
     } catch (e) {
       log("Error with test phone auth: $e");
       throw e;

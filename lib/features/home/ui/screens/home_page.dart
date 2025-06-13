@@ -45,12 +45,10 @@ class _HomepageState extends State<Homepage>
 
   @override
   Future<void> didChangeDependencies() async {
-    if (controller.currentUser != null) {
-      await firebaseFireStoreInstance
-          .collection('Users')
-          .doc(controller.currentUser!.id)
-          .update({'lastvisited': DateTime.now()});
-    }
+    await firebaseFireStoreInstance
+        .collection('Users')
+        .doc(controller.currentUser.id)
+        .update({'lastvisited': DateTime.now()});
     super.didChangeDependencies();
   }
   @override

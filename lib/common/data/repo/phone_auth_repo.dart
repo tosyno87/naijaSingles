@@ -48,6 +48,27 @@ class PhoneAuthRepository {
   Future<void> signOut() async {
     await auth.signOut();
   }
+  
+  // Add this method for development testing with Firebase test phone numbers
+  Future<User?> signInWithTestPhone() async {
+    try {
+      // Create a PhoneAuthCredential with the test verification code
+      final PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: 'test-verification-id',
+        smsCode: '123456'
+      );
+      
+      // Sign in with the credential
+      final UserCredential userCredential = 
+          await auth.signInWithCredential(credential);
+      
+      log("Test phone auth successful: ${userCredential.user?.uid}");
+      return userCredential.user;
+    } catch (e) {
+      log("Error with test phone auth: $e");
+      throw e;
+    }
+  }
 
   // check signIn
   Future<bool> isSignedIn() async {

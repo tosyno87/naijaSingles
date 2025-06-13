@@ -30,6 +30,12 @@ class VerifySentOtpEvent extends PhoneAuthEvent {
   List<Object> get props => [otpCode, verificationId];
 }
 
+// This event will be used for development to bypass normal phone verification
+class UseTestPhoneAuthEvent extends PhoneAuthEvent {
+  @override
+  List<Object> get props => [];
+}
+
 // This event will be triggered when firebase sends the OTP to the user's phone number.
 class OnPhoneOtpSent extends PhoneAuthEvent {
   final String verificationId;

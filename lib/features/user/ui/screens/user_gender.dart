@@ -195,7 +195,6 @@ class GenderState extends State<Gender> {
                     Navigator.pushNamed(
                         context, RouteName.sexualorientationScreen,
                         arguments: userData);
-                    //      ads.disable(ad1);
                   },
                   color: textColor,
                   active: true,

@@ -1,4 +1,3 @@
-//import 'package:firebase_admob/firebase_admob.dart';
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -18,8 +17,6 @@ class UserName extends StatefulWidget {
   UserNameState createState() => UserNameState();
 }
 
-// late BannerAd ad1;
-// Ads ads = new Ads();
 
 class UserNameState extends State<UserName> {
   Map<String, dynamic> userData = {}; //user personal info
@@ -27,19 +24,11 @@ class UserNameState extends State<UserName> {
 
   @override
   void initState() {
-    //  ad1 = ads.myBanner();
     super.initState();
-    // ad1
-    //   ..load()
-    //   ..show(
-    //     anchorOffset: 180.0,
-    //     anchorType: AnchorType.bottom,
-    //   );
   }
 
   @override
   void dispose() {
-    // ads.disable(ad1);
     super.dispose();
   }
 

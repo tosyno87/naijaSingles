@@ -7,11 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/common/utils/custom_toast.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-// import 'package:naijasingles/features/ads/google_ads.dart'; // Removed - No longer using ads
-// import 'package:naijasingles/features/ads/load_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/features/chat/ui/widgets/send_message_box.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +36,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class ChatPageState extends State<ChatPage> {
-  // Ad-related variables removed - No longer using ads
   bool isBlocked = false;
   Timer? debouncer;
   bool isCalling = false; // Flag to track if onJoin is in progress
@@ -50,8 +46,6 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
-    // Ad loading removed - No longer using ads
-
     super.initState();
 
     chatReference =
@@ -61,7 +55,6 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    // Ad disposal removed - No longer using ads
     debouncer?.cancel();
     super.dispose();
   }

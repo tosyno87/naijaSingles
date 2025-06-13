@@ -7,7 +7,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/routes/router.dart';
@@ -39,7 +38,6 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  // MobileAds.instance.initialize(); // Removed - No longer using ads
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

@@ -23,8 +23,9 @@ class PhoneAuthRepository {
       verificationCompleted: verificationCompleted,
       verificationFailed: verificationFailed,
       codeSent: codeSent,
-      timeout: const Duration(seconds: 0),
+      timeout: const Duration(seconds: 120),
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
+      forceResendingToken: null,
     );
   }
 

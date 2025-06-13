@@ -47,8 +47,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
-	<false/>
+	<true/>
 	<key>FacebookAdvertiserIDCollectionEnabled</key>
 	<true/>
 	<key>FacebookAppID</key>
@@ -76,6 +81,8 @@
 	</array>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app uses the local network for development tools.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>

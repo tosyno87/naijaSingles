@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -66,25 +67,44 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
       SendOtpToPhoneEvent event, Emitter<PhoneAuthState> emit) async {
     emit(PhoneAuthLoading());
     try {
-      await phoneAuthRepository.verifyPhone(
-        phoneNumber: event.phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // On [verificationComplete], we will get the credential from the firebase  and will send it to the [OnPhoneAuthVerificationCompleteEvent] event to be handled by the bloc and then will emit the [PhoneAuthVerified] state after successful login
-          add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          // On [codeSent], we will get the verificationId and the resendToken from the firebase and will send it to the [OnPhoneOtpSent] event to be handled by the bloc and then will emit the [OnPhoneAuthVerificationCompleteEvent] event after receiving the code from the user's phone
-          add(OnPhoneOtpSent(
-              verificationId: verificationId,
-              token: resendToken,
-              phoneNumber: ''));
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          // On [verificationFailed], we will get the exception from the firebase and will send it to the [OnPhoneAuthErrorEvent] event to be handled by the bloc and then will emit the [PhoneAuthError] state in order to display the error to the user's screen
-          add(OnPhoneAuthErrorEvent(error: e.code));
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
+      // For iOS, we need to handle the verification differently
+      if (Platform.isIOS) {
+        // First, get a reCAPTCHA verification ID
+        await phoneAuthRepository.verifyPhone(
+          phoneNumber: event.phoneNumber,
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
+          },
+          codeSent: (String verificationId, int? resendToken) {
+            add(OnPhoneOtpSent(
+                verificationId: verificationId,
+                token: resendToken,
+                phoneNumber: event.phoneNumber));
+          },
+          verificationFailed: (FirebaseAuthException e) {
+            add(OnPhoneAuthErrorEvent(error: e.code));
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {},
+        );
+      } else {
+        // Android flow remains the same
+        await phoneAuthRepository.verifyPhone(
+          phoneNumber: event.phoneNumber,
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
+          },
+          codeSent: (String verificationId, int? resendToken) {
+            add(OnPhoneOtpSent(
+                verificationId: verificationId,
+                token: resendToken,
+                phoneNumber: ''));
+          },
+          verificationFailed: (FirebaseAuthException e) {
+            add(OnPhoneAuthErrorEvent(error: e.code));
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {},
+        );
+      }
     } catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }

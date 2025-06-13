@@ -56,13 +56,18 @@ class PhoneAuthRepository {
       if (kDebugMode) {
         log("Using Firebase Auth Emulator for test phone authentication");
         
-        // In emulator, we can directly sign in with phone number
-        final UserCredential userCredential = 
-            await FirebaseAuth.instance.signInWithPhoneNumber(
-              '+12179044453',  // Test phone number
-            );
+        // In emulator, we can directly sign in with phone number and code
+        // First create a PhoneAuthCredential
+        final PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: 'test-verification-code',
+          smsCode: '123456',
+        );
         
-        log("Test phone auth successful: ${userCredential.user?.uid}");
+        // Then sign in with the credential
+        final UserCredential userCredential = 
+            await FirebaseAuth.instance.signInWithCredential(credential);
+        
+        log("Test phone auth successful with emulator: ${userCredential.user?.uid}");
         return userCredential.user;
       } else {
         // Fallback for non-debug mode

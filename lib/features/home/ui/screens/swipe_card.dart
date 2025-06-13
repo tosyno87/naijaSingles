@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart'; // Removed - No longer using ads
 import 'package:naijasingles/features/user/ui/widgets/user_info.dart';
 import 'package:provider/provider.dart';
 import 'package:swipable_stack/swipable_stack.dart';
@@ -11,8 +10,6 @@ import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/image_widget.dart';
 import '../../../../models/user_model.dart';
-// import '../../../ads/google_ads.dart'; // Removed - No longer using ads
-// import '../../../ads/load_ads.dart'; // Removed - No longer using ads
 import '../../../user/ui/widgets/card_level.dart';
 import '../../../user/ui/widgets/gender_sign.dart';
 
@@ -40,7 +37,6 @@ class UsersList extends StatefulWidget {
 }
 
 class UsersListState extends State<UsersList> with WidgetsBindingObserver {
-  // Ad-related variables removed - No longer using ads
 
   @override
   void initState() {
@@ -51,14 +47,12 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
         debugPrint('this is the last profile');
       }
     });
-    // Ad loading removed - No longer using ads
     
     super.initState();
   }
 
   @override
   void dispose() {
-    // Ad disposal removed - No longer using ads
     super.dispose();
   }
 
@@ -210,10 +204,6 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                               ),
                               trailing: IconButton(
                                   onPressed: () {
-                                    LoadAds.loadInterstitialAd(
-                                        interstitialAd, isInterstitialAdReady);
-
-                                    interstitialAd?.show();
                                     showDialog(
                                       barrierDismissible: false,
                                       context: context,

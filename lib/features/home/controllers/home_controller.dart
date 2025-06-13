@@ -9,8 +9,6 @@ import 'package:naijasingles/features/ads/load_ads.dart';
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../common/providers/user_provider.dart';
 import '../../../models/user_model.dart';
-import '../../../common/constants/constants.dart';
-
 class AdsManager {
   InterstitialAd? interstitialAd;
   bool isInterstitialAdReady = false;

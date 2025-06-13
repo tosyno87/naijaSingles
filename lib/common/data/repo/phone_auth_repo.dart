@@ -52,16 +52,15 @@ class PhoneAuthRepository {
   // Add this method for development testing with Firebase test phone numbers
   Future<User?> signInWithTestPhone() async {
     try {
-      // Create a PhoneAuthCredential with the test verification code
-      // Using '123456' for both verificationId and smsCode as specified
+      // For Firebase test phone numbers, both values should be the same
       final PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: '123456', // This must match the verification code
-        smsCode: '123456',        // This must also match the verification code
+        verificationId: '123456',
+        smsCode: '123456',
       );
       
-      // Sign in directly with the credential - no SMS or verification flow
+      // Use FirebaseAuth.instance directly to avoid any custom configurations
       final UserCredential userCredential = 
-          await auth.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithCredential(credential);
       
       log("Test phone auth successful: ${userCredential.user?.uid}");
       return userCredential.user;

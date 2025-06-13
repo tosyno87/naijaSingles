@@ -55,7 +55,7 @@ class _HomepageState extends State<Homepage>
     if (controller.currentUser != null) {
       await firebaseFireStoreInstance
           .collection('Users')
-          .doc(controller.currentUser.id)
+          .doc(controller.currentUser!.id)
           .update({'lastvisited': DateTime.now()});
     }
     super.didChangeDependencies();

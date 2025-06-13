@@ -25,9 +25,7 @@ class ImageProperties {
     i.Image? imagefile = i.decodeImage(croppedToFileImage.readAsBytesSync());
     final compressedImagefile = File('$path.jpg')
       ..writeAsBytesSync(i.encodeJpg(imagefile!, quality: 80));
-    // setState(() {
     return compressedImagefile;
-    // });
   }
 
   static Future source(
@@ -179,9 +177,13 @@ class ImageProperties {
         }
       }
 
-      Navigator.pop(context);
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
-      Navigator.pop(context);
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -191,8 +193,7 @@ class ImageProperties {
         .ref()
         .child('users/${currentUser.id}/${image.hashCode}.jpg');
     UploadTask uploadTask = storageReference.putFile(image);
-    //if (uploadTask.isInProgress == true) {}
-    //if (await uploadTask.onComplete != null) {
+    
     await uploadTask.whenComplete(() {
       storageReference.getDownloadURL().then((fileURL) async {
         Map<String, dynamic> updateObject = {

@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+// import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -235,7 +235,9 @@ class IncomingState extends State<Incoming> with TickerProviderStateMixin {
                                       Future.delayed(
                                           const Duration(milliseconds: 500),
                                           () {
-                                        Navigator.pop(context);
+                                        if (context.mounted) {
+                                          Navigator.pop(context);
+                                        }
                                       });
                                     })
                               ],
@@ -252,7 +254,7 @@ class IncomingState extends State<Incoming> with TickerProviderStateMixin {
                       log("call is picked up ${widget.callInfo['channel_id']} , callType ${snapshot.data!.docs[0]['callType']}");
                       return CallPage(
                         channelName: widget.callInfo['channel_id'],
-                        role: ClientRoleType.clientRoleBroadcaster,
+                        role: 1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
                         callType: snapshot.data!.docs[0]['callType'],
                       );
                     }
@@ -266,7 +268,9 @@ class IncomingState extends State<Incoming> with TickerProviderStateMixin {
                     {
                       log('call ended ${snapshot.data!.docs[0]['response']}');
                       Future.delayed(const Duration(milliseconds: 500), () {
-                        Navigator.pop(context);
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
                       });
                       return Text("Call Ended...".tr().toString());
                     }
@@ -285,7 +289,9 @@ class IncomingState extends State<Incoming> with TickerProviderStateMixin {
                     } else {
                       log('default is log');
                       Future.delayed(const Duration(milliseconds: 500), () {
-                        Navigator.pop(context);
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
                       });
                       return Text("Call Ended...".tr().toString());
                     }

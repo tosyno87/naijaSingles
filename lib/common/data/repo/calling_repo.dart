@@ -87,13 +87,15 @@ class CallingRepo {
             "callType": callType
           }).then((value) async {
             debugPrint('----sucsessfully called');
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DialCall(
-                    channelName: chatId, receiver: second, callType: callType),
-              ),
-            );
+            if (context.mounted) {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DialCall(
+                      channelName: chatId, receiver: second, callType: callType),
+                ),
+              );
+            }
           });
         } catch (e) {
           debugPrint('-----------$e');

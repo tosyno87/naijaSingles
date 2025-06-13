@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+// import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -415,7 +415,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                 builder: (context) => CallPage(
                       callType: currentCall['extra']['callType'],
                       channelName: currentCall['extra']['channelId'],
-                      role: ClientRoleType.clientRoleBroadcaster,
+                      role: 1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
                     )));
       } else {
         debugPrint('call expired');
@@ -550,7 +550,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                 builder: (context) => CallPage(
                       callType: callType,
                       channelName: channelId,
-                      role: ClientRoleType.clientRoleBroadcaster,
+                      role: 1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
                     )));
       } else {
         debugPrint('call expired');

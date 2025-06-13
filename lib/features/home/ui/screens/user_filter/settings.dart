@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart' as share_plus;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/text_button.dart';
@@ -10,7 +11,6 @@ import 'package:naijasingles/features/ads/google_ads.dart';
 import 'package:naijasingles/features/home/ui/widgets/street_view_enable.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../../common/constants/colors.dart';
 import '../../../../../common/providers/street_view_provider.dart';
@@ -331,7 +331,7 @@ class SettingPageState extends State<SettingPage> {
                     TextButtonWidget(
                       text: "Invite your friends",
                       onTap: () {
-                        Share.share(
+                        share_plus.Share.share(
                             'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
                             subject: 'Look what I made!'.tr().toString());
                       },

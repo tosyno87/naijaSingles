@@ -28,8 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  agora_rtc_engine: ^6.5.2
-  agora_uikit: ^1.3.10
+  # agora_rtc_engine: ^6.5.2
+  # agora_uikit: ^1.3.10
   cached_network_image: ^3.4.1   # Updated to latest
   cloud_firestore: ^5.6.9        # Updated to latest
   cloud_functions: ^5.5.2        # Updated to latest
@@ -56,6 +56,7 @@ dependencies:
   google_mobile_ads: ^6.0.0      # Upgraded from 5.1.0
   image: ^4.5.4                  # Updated to latest
   image_picker: ^1.1.2           # Updated to latest
+  image_cropper: ^5.0.1          # Added image_cropper
   in_app_purchase: ^3.2.3        # Updated to latest
   in_app_purchase_storekit: ^0.4.2 # Updated for latest iOS IAP
   in_app_purchase_android: ^0.4.0+2 # Updated for latest Android IAP

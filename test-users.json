@@ -1,0 +1,14 @@
+[
+  {
+    "localId": "test-user",
+    "phoneNumber": "+12179044453",
+    "passwordHash": "JDJhJDEwJDFSNGlmLzQyVEV5MVBZUzFvUVA3TE9KdmJiRVdPOUxrUy5mOUNjNWxrZVZxdnouWnE3Tldp",
+    "salt": "42xEC",
+    "providerUserInfo": [
+      {
+        "providerId": "phone",
+        "phoneNumber": "+12179044453"
+      }
+    ]
+  }
+]

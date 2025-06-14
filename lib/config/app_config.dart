@@ -8,7 +8,7 @@ const String privacyUrl =
 
 
 // Add google map key for google places search
-const googleMapsKey = '00000000000000000000000000000000000000';
+const googleMapsKey = 'AIzaSyCDhfoQyJeKhBluyuXHV7mvwxbxMQozdx8';
 //for support to user add you mail
 const adminMail = "admin@gmail.com";
 // add bucket id from firebase or google-services-json

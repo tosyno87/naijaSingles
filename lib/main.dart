@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,7 +48,9 @@ Future<void> main() async {
   // Connect to Firebase Auth Emulator in debug mode
   if (kDebugMode) {
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
     log("🔥 Using Firebase Auth Emulator on localhost:9099");
+    log("🔥 Using Firebase Firestore Emulator on localhost:8080");
   }
 
   Bloc.observer = SimpleBlocObserver();

@@ -18,40 +18,38 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 40),
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: InkWell(
-            onTap: onTap,
-            child: Container(
-                decoration: BoxDecoration(
-                  color: primaryColor,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(25),
-                  // gradient: active
-                  //     ? LinearGradient(
-                  //         begin: Alignment.topRight,
-                  //         end: Alignment.bottomLeft,
-                  //         colors: [
-                  //             primaryColor.withOpacity(.5),
-                  //             primaryColor.withOpacity(.7),
-                  //             primaryColor,
-                  //             primaryColor
-                  //           ])
-                  //     : const LinearGradient(
-                  //         begin: Alignment.topRight,
-                  //         end: Alignment.bottomLeft,
-                  //         colors: [Colors.white, Colors.white])
-                ),
-                height: MediaQuery.of(context).size.height * .065,
-                width: MediaQuery.of(context).size.width * .75,
-                child: Center(
-                    child: Text(
-                  text.tr().toString(),
-                  style: TextStyle(
-                      fontSize: 15, color: color, fontWeight: FontWeight.bold),
-                )))),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          // Use the suggested medium sea green color
+          color: active ? const Color(0xFF27AE60) : Colors.grey[300],
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(30),
+          // Add subtle shadow for depth
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        height: 56, // Fixed height for better visibility
+        width: double.infinity, // Full width
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Center(
+          child: Text(
+            text.tr().toString(),
+            style: TextStyle(
+              fontSize: 16,
+              // Keep text white for contrast against green background
+              color: active ? Colors.white : Colors.grey[600],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }

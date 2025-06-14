@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 
 class SexualOrientation extends StatefulWidget {
@@ -18,183 +18,348 @@ class SexualOrientation extends StatefulWidget {
   _SexualOrientationState createState() => _SexualOrientationState();
 }
 
-class _SexualOrientationState extends State<SexualOrientation> {
-  List<Map<String, dynamic>> orientationlist = [
-    {'name': 'Straight'.tr().toString(), 'ontap': false},
-    {'name': 'Gay'.tr().toString(), 'ontap': false},
-    {'name': 'Asexual'.tr().toString(), 'ontap': false},
-    {'name': 'Lesbian'.tr().toString(), 'ontap': false},
-    {'name': 'Bisexual'.tr().toString(), 'ontap': false},
-    {'name': 'Demisexual'.tr().toString(), 'ontap': false},
+class _SexualOrientationState extends State<SexualOrientation> with SingleTickerProviderStateMixin {
+  List<Map<String, dynamic>> orientationList = [
+    {'name': 'Straight', 'selected': false},
+    {'name': 'Gay', 'selected': false},
+    {'name': 'Lesbian', 'selected': false},
+    {'name': 'Bisexual', 'selected': false},
+    {'name': 'Asexual', 'selected': false},
+    {'name': 'Demisexual', 'selected': false},
+    {'name': 'Pansexual', 'selected': false},
+    {'name': 'Queer', 'selected': false},
   ];
-  List selected = [];
-  bool select = false;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  List<String> selectedOrientations = [];
+  bool showOnProfile = true;
+  
+  // Animation controller
+  AnimationController? _animationController;
+  Animation<double>? _fadeAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize animation controller
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    // Initialize animation
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeInOut,
+    );
+    
+    // Start animation after frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _animationController != null) {
+        _animationController!.forward();
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _animationController?.dispose();
+    super.dispose();
+  }
+
+  void _toggleOrientation(int index) {
+    setState(() {
+      // Toggle selection state
+      orientationList[index]['selected'] = !orientationList[index]['selected'];
+      
+      String orientation = orientationList[index]['name'];
+      
+      if (orientationList[index]['selected']) {
+        // Check if we already have 3 selections
+        if (selectedOrientations.length >= 3) {
+          // Show message and revert selection
+          orientationList[index]['selected'] = false;
+          CustomSnackbar.showSnackBarSimple(
+            "You can select up to 3 orientations",
+            context,
+          );
+          return;
+        }
+        
+        // Add to selected list
+        selectedOrientations.add(orientation);
+      } else {
+        // Remove from selected list
+        selectedOrientations.remove(orientation);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    var userData =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    
     return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Theme.of(context).primaryColor,
-      floatingActionButton: SizedBox(
-        height: 45,
-        width: 45,
-        child: AnimatedOpacity(
-          opacity: 1.0,
-          duration: const Duration(milliseconds: 50),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 5.0, left: 0),
-            child: FloatingActionButton(
-              elevation: 1,
-              backgroundColor:
-                  themeProvider.isDarkMode ? Colors.black : Colors.white,
-              onPressed: () {
-                dispose();
-                Navigator.pop(context);
-              },
-              child: IconButton(
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black,
-                iconSize: 20,
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
           ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: SingleChildScrollView(
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 60, top: 100),
-                child: Text(
-                  "My sexual\norientation is".tr().toString(),
-                  style: const TextStyle(fontSize: 40),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 70, vertical: 20),
-                child: ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: orientationlist.length,
-                  itemBuilder: (BuildContext context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: OutlinedButton(
-                        //   highlightedBorderColor: primaryColor,
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * .055,
-                          width: MediaQuery.of(context).size.width * .65,
-                          child: Center(
-                              child: Text("${orientationlist[index]["name"]}",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: orientationlist[index]["ontap"]
-                                          ? primaryColor
-                                          : secondryColor,
-                                      fontWeight: FontWeight.bold))),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      
+                      // Centered title section with softer font
+                      Center(
+                        child: Column(
+                          children: [
+                            const Text(
+                              "My sexual orientation is",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w600, // Softer than bold
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              "Select all that apply (up to 3)",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
                         ),
-
-                        onPressed: () {
+                      ),
+                      
+                      const SizedBox(height: 40),
+                      
+                      // Orientation options with pill-shaped buttons
+                      _fadeAnimation != null
+                        ? FadeTransition(
+                            opacity: _fadeAnimation!,
+                            child: _buildOrientationGrid(),
+                          )
+                        : _buildOrientationGrid(),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // "Prefer not to say" option
+                      GestureDetector(
+                        onTap: () {
                           setState(() {
-                            if (selected.length < 3) {
-                              orientationlist[index]["ontap"] =
-                                  !orientationlist[index]["ontap"];
-                              if (orientationlist[index]["ontap"]) {
-                                selected.add(orientationlist[index]["name"]);
-                                log(orientationlist[index]["name"]);
-                                log(selected.toString());
-                              } else {
-                                selected.remove(orientationlist[index]["name"]);
-                                log(selected.toString());
-                              }
-                            } else {
-                              if (orientationlist[index]["ontap"]) {
-                                orientationlist[index]["ontap"] =
-                                    !orientationlist[index]["ontap"];
-                                selected.remove(orientationlist[index]["name"]);
-                              } else {
-                                CustomSnackbar.showSnackBarSimple(
-                                  "select upto 3",
-                                  context,
-                                );
-                              }
+                            // Clear all other selections
+                            for (var orientation in orientationList) {
+                              orientation['selected'] = false;
                             }
+                            selectedOrientations.clear();
+                            
+                            // Add "Prefer not to say"
+                            selectedOrientations.add("Prefer not to say");
                           });
                         },
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: Checkbox(
-                          activeColor: primaryColor,
-                          value: select,
-                          onChanged: (newValue) {
-                            setState(() {
-                              select = newValue!;
-                            });
-                          },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: selectedOrientations.contains("Prefer not to say") 
+                                  ? const Color(0xFF27AE60) 
+                                  : Colors.grey[300]!,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                            color: selectedOrientations.contains("Prefer not to say")
+                                ? const Color(0xFFE8F5E9)
+                                : Colors.white,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Prefer not to say",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: selectedOrientations.contains("Prefer not to say") 
+                                    ? FontWeight.bold 
+                                    : FontWeight.normal,
+                                color: selectedOrientations.contains("Prefer not to say")
+                                    ? const Color(0xFF27AE60)
+                                    : Colors.black87,
+                              ),
+                            ),
+                          ),
                         ),
-                        title: Text("Show my orientation on my profile"
-                            .tr()
-                            .toString()),
                       ),
-                      selected.isNotEmpty
-                          ? CustomButton(
-                              text: "CONTINUE".tr().toString(),
-                              onTap: () {
-                                userData.addAll({
-                                  "sexualOrientation": {
-                                    'orientation': selected,
-                                    'showOnProfile': select
-                                  },
+                      
+                      const SizedBox(height: 40),
+                      
+                      // iOS-style toggle for "Show my orientation on profile"
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Show my orientation on my profile",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            CupertinoSwitch(
+                              value: showOnProfile,
+                              activeColor: const Color(0xFF27AE60),
+                              onChanged: (value) {
+                                setState(() {
+                                  showOnProfile = value;
                                 });
-                                log(userData.toString());
-                                Navigator.pushNamed(
-                                    context, RouteName.showGenderScreen,
-                                    arguments: userData);
                               },
-                              color: textColor,
-                              active: true)
-                          : CustomButton(
-                              text: "CONTINUE".tr().toString(),
-                              onTap: () {
-                                CustomSnackbar.showSnackBarSimple(
-                                  "please select one".tr().toString(),
-                                  context,
-                                );
-                              },
-                              color: secondryColor,
-                              active: themeProvider.isDarkMode ? true : false,
-                            )
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 100), // Space for the bottom button
                     ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            
+            // Sticky Continue button at the bottom
+            Container(
+              padding: const EdgeInsets.all(24.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: selectedOrientations.isEmpty ? null : () {
+                    userData.addAll({
+                      "sexualOrientation": {
+                        'orientation': selectedOrientations,
+                        'showOnProfile': showOnProfile
+                      },
+                    });
+                    log(userData.toString());
+                    Navigator.pushNamed(
+                      context, 
+                      RouteName.showGenderScreen,
+                      arguments: userData
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF27AE60),
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: Colors.grey[300],
+                    disabledForegroundColor: Colors.grey[500],
+                    elevation: 2,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    "CONTINUE",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+  
+  Widget _buildOrientationGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 2.5,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: orientationList.length,
+      itemBuilder: (context, index) {
+        final orientation = orientationList[index];
+        final isSelected = orientation['selected'];
+        
+        return GestureDetector(
+          onTap: () {
+            // Don't allow selection if "Prefer not to say" is selected
+            if (selectedOrientations.contains("Prefer not to say")) {
+              setState(() {
+                selectedOrientations.clear();
+              });
+            }
+            
+            _toggleOrientation(index);
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF27AE60) : Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: isSelected ? const Color(0xFF27AE60) : Colors.grey[300]!,
+                width: 1,
+              ),
+              boxShadow: [
+                if (isSelected)
+                  BoxShadow(
+                    color: const Color(0xFF27AE60).withOpacity(0.3),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 2),
+                  ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                orientation['name'],
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.white : Colors.black87,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

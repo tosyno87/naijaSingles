@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
@@ -17,112 +16,315 @@ class UniversityPage extends StatefulWidget {
   _UniversityPage createState() => _UniversityPage();
 }
 
-class _UniversityPage extends State<UniversityPage> {
+class _UniversityPage extends State<UniversityPage> with SingleTickerProviderStateMixin {
   String university = '';
+  final TextEditingController _universityController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  bool _isFocused = false;
+  
+  // Popular universities in Africa and diaspora
+  final List<String> _suggestions = [
+    'University of Lagos',
+    'University of Ibadan',
+    'Covenant University',
+    'Howard University',
+    'University of Cape Town',
+    'Ashesi University'
+  ];
+  
+  // Animation controller
+  AnimationController? _animationController;
+  Animation<double>? _fadeAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Listen for focus changes
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
+    
+    // Initialize animation controller
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    // Initialize animation
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeInOut,
+    );
+    
+    // Start animation after frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _animationController != null) {
+        _animationController!.forward();
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _universityController.dispose();
+    _focusNode.dispose();
+    _animationController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // for adding userdetails in this user map from navigation
-    var userData =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    // For adding userdetails in this user map from navigation
+    var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      floatingActionButton: SizedBox(
-        height: 45,
-        width: 45,
-        child: AnimatedOpacity(
-          opacity: 1.0,
-          duration: const Duration(milliseconds: 50),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 5.0),
-            child: FloatingActionButton(
-              elevation: 1,
-              backgroundColor:
-                  themeProvider.isDarkMode ? Colors.black : Colors.white,
-              onPressed: () {
-                dispose();
-                Navigator.pop(context);
-              },
-              child: IconButton(
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black,
-                iconSize: 20,
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
           ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Stack(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 50, top: 120),
-                    child: Text(
-                      "My\nuniversity is".tr().toString(),
-                      style: const TextStyle(fontSize: 40),
-                    ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 40),
+                      
+                      // Headline zone with conversational tone
+                      _fadeAnimation != null
+                        ? FadeTransition(
+                            opacity: _fadeAnimation!,
+                            child: _buildHeadlineSection(),
+                          )
+                        : _buildHeadlineSection(),
+                      
+                      const SizedBox(height: 40),
+                      
+                      // Input zone with card-style design
+                      _fadeAnimation != null
+                        ? FadeTransition(
+                            opacity: _fadeAnimation!,
+                            child: _buildInputSection(),
+                          )
+                        : _buildInputSection(),
+                      
+                      const SizedBox(height: 30),
+                      
+                      // Suggestions zone
+                      _fadeAnimation != null
+                        ? FadeTransition(
+                            opacity: _fadeAnimation!,
+                            child: _buildSuggestionsSection(),
+                          )
+                        : _buildSuggestionsSection(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            
+            // Continue button fixed at the bottom
+            Container(
+              padding: const EdgeInsets.all(24.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: TextFormField(
-                  cursorColor: primaryColor,
-                  style: const TextStyle(fontSize: 23),
-                  decoration: InputDecoration(
-                    hintText: "Enter your university name".tr().toString(),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: primaryColor)),
-                    helperText:
-                        "This is how it will appear in App.".tr().toString(),
-                    helperStyle: TextStyle(color: secondryColor, fontSize: 15),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      university = value;
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: university.isNotEmpty ? () {
+                    userData.addAll({
+                      'editInfo': {
+                        'university': university,
+                        'userGender': userData['userGender'],
+                        'showOnProfile': userData['showOnProfile']
+                      }
                     });
-                  },
+
+                    log(userData.toString());
+                    Navigator.pushNamed(
+                      context, 
+                      RouteName.profilePicSetScreen,
+                      arguments: userData
+                    );
+                  } : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF27AE60),
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: Colors.grey[300],
+                    disabledForegroundColor: Colors.grey[500],
+                    elevation: 2,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    "CONTINUE",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
                 ),
               ),
-              university.isNotEmpty
-                  ? CustomButton(
-                      text: "CONTINUE".tr().toString(),
-                      onTap: () {
-                        userData.addAll({
-                          'editInfo': {
-                            'university': university,
-                            'userGender': userData['userGender'],
-                            'showOnProfile': userData['showOnProfile']
-                          }
-                        });
-
-                        log(userData.toString());
-                        Navigator.pushNamed(
-                            context, RouteName.profilePicSetScreen,
-                            arguments: userData);
-                      },
-                      color: textColor,
-                      active: true)
-                  : CustomButton(
-                      text: "CONTINUE".tr().toString(),
-                      onTap: () {},
-                      color: secondryColor,
-                      active: themeProvider.isDarkMode ? true : false)
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  // Headline section with title and subtitle
+  Widget _buildHeadlineSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Where did you go to school?",
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          "This helps us connect you with alumni or people nearby.",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
+    );
+  }
+  
+  // Input section with card-style design
+  Widget _buildInputSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _universityController,
+        focusNode: _focusNode,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
+        onChanged: (value) {
+          setState(() {
+            university = value;
+          });
+        },
+        decoration: InputDecoration(
+          hintText: "e.g. University of Lagos",
+          hintStyle: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 16,
+          ),
+          prefixIcon: Icon(
+            Icons.school_rounded,
+            color: _isFocused ? const Color(0xFF27AE60) : Colors.grey[400],
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF27AE60), width: 2),
           ),
         ),
       ),
+    );
+  }
+  
+  // Suggestions section with chips
+  Widget _buildSuggestionsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Popular universities",
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 12,
+          children: _suggestions.map((suggestion) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  university = suggestion;
+                  _universityController.text = suggestion;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Text(
+                  suggestion,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

@@ -52,33 +52,33 @@ class _WelcomeState extends State<Welcome> {
               ),
             ),
             
-            // Page Indicator
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  2,
-                  (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 5),
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentPage == index ? Colors.green[700]! : Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            
             // Button
             Padding(
               padding: const EdgeInsets.only(bottom: 40, left: 20, right: 20),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: InkWell(
-                  child: CustomButton(
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Page Indicator moved here for better spacing
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        2,
+                        (index) => Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentPage == index ? Colors.green[700]! : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24), // Space between dots and button
+                    
+                    // Next button with improved visibility
+                    CustomButton(
                       text: _currentPage == 0 ? "NEXT" : "GET STARTED",
                       onTap: () async {
                         if (_currentPage < 1) {
@@ -108,8 +108,11 @@ class _WelcomeState extends State<Welcome> {
                           }
                         }
                       },
+
                       color: Colors.green[700]!,
-                      active: true),
+                      active: true,
+                    ),
+                  ],
                 ),
               ),
             )

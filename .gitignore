@@ -46,4 +46,4 @@ app.*.map.json
 my_key
 my_key.pub
 # Temporarily allowing .env to be committed
-# .env
+ .env

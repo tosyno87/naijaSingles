@@ -1,5 +1,3 @@
-// ignore_for_file: sort_child_properties_last
-
 import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -17,50 +15,24 @@ class UserDOB extends StatefulWidget {
   const UserDOB(this.userData, {super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _UserDOBState createState() => _UserDOBState();
 }
 
-class _UserDOBState extends State<UserDOB> with SingleTickerProviderStateMixin {
+class _UserDOBState extends State<UserDOB> {
   DateTime selecteddate = DateTime(1999, 10, 19);
   DateTime initialDate = DateTime(1999, 10, 19);
   TextEditingController dobctlr = TextEditingController();
   bool isDateSelected = false;
-  
-  // Use nullable types instead of late initialization
-  AnimationController? _animationController;
-  Animation<double>? _animation;
 
   @override
   void initState() {
     super.initState();
     // Initialize text controller
     dobctlr.text = '${initialDate.day}/${initialDate.month}/${initialDate.year}';
-    
-    // Initialize animation controller
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    
-    // Initialize animation
-    _animation = CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.elasticOut,
-    );
-    
-    // Start animation after frame is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _animationController != null) {
-        _animationController!.forward();
-      }
-    });
   }
   
   @override
   void dispose() {
-    // Clean up resources with null checks
-    _animationController?.dispose();
     dobctlr.dispose();
     super.dispose();
   }
@@ -104,11 +76,7 @@ class _UserDOBState extends State<UserDOB> with SingleTickerProviderStateMixin {
                     setState(() {
                       dobctlr.text = '${newdate.day}/${newdate.month}/${newdate.year}';
                       selecteddate = newdate;
-                      if (!isDateSelected && _animationController != null) {
-                        isDateSelected = true;
-                        _animationController!.reset();
-                        _animationController!.forward();
-                      }
+                      isDateSelected = true;
                     });
                   },
                   maximumYear: 2007, // 18 years ago from 2025
@@ -149,6 +117,8 @@ class _UserDOBState extends State<UserDOB> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -168,27 +138,40 @@ class _UserDOBState extends State<UserDOB> with SingleTickerProviderStateMixin {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Spacer(flex: 1),
-              // Title section
+              const SizedBox(height: 20),
+              
+              // Progress indicator
+              Container(
+                height: 4,
+                width: screenSize.width * 0.30, // 30% of screen width (second step)
+                decoration: BoxDecoration(
+                  color: const Color(0xFF27AE60),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Title section - Option 1: Playful & Flirty
               Column(
-                children: const [
-                  Text(
-                    "My birthday is",
-                    textAlign: TextAlign.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "When's your birthday?",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
-                    "This helps us show your age and connect better",
-                    textAlign: TextAlign.center,
+                    "Age is just a number, but it helps us find your perfect match!",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF757575),
+                      color: Colors.grey[600],
                     ),
                   ),
                 ],
@@ -203,12 +186,12 @@ class _UserDOBState extends State<UserDOB> with SingleTickerProviderStateMixin {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(30),
-                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.grey[50],
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
                     ],
@@ -235,11 +218,11 @@ class _UserDOBState extends State<UserDOB> with SingleTickerProviderStateMixin {
                 ),
               ),
               
-              const Spacer(flex: 2),
+              const Spacer(),
               
               // Age requirement note
               const Text(
-                "You must be 18+ to join Afropeep",
+                "You must be 18+ to join NaijaSingles",
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF9E9E9E),
@@ -249,49 +232,26 @@ class _UserDOBState extends State<UserDOB> with SingleTickerProviderStateMixin {
               
               const SizedBox(height: 24),
               
-              // Use conditional widget instead of directly using the animation
-              _animation != null
-                  ? FadeTransition(
-                      opacity: _animation!,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 24.0),
-                        child: CustomButton(
-                          active: true,
-                          color: textColor,
-                          onTap: () {
-                            widget.userData.addAll({
-                              'user_DOB': "$selecteddate",
-                              'age': ((DateTime.now().difference(selecteddate).inDays) /
-                                      365.2425)
-                                  .truncate(),
-                            });
-                            log(widget.userData.toString());
-                            Navigator.pushNamed(context, RouteName.genderScreen,
-                                arguments: widget.userData);
-                          },
-                          text: 'CONTINUE',
-                        ),
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 24.0),
-                      child: CustomButton(
-                        active: true,
-                        color: textColor,
-                        onTap: () {
-                          widget.userData.addAll({
-                            'user_DOB': "$selecteddate",
-                            'age': ((DateTime.now().difference(selecteddate).inDays) /
-                                    365.2425)
-                                .truncate(),
-                          });
-                          log(widget.userData.toString());
-                          Navigator.pushNamed(context, RouteName.genderScreen,
-                              arguments: widget.userData);
-                        },
-                        text: 'CONTINUE',
-                      ),
-                    ),
+              // Continue button
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: CustomButton(
+                  active: true,
+                  color: const Color(0xFF27AE60),
+                  onTap: () {
+                    widget.userData.addAll({
+                      'user_DOB': "$selecteddate",
+                      'age': ((DateTime.now().difference(selecteddate).inDays) /
+                              365.2425)
+                          .truncate(),
+                    });
+                    log(widget.userData.toString());
+                    Navigator.pushNamed(context, RouteName.genderScreen,
+                        arguments: widget.userData);
+                  },
+                  text: 'CONTINUE',
+                ),
+              ),
             ],
           ),
         ),

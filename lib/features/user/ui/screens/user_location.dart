@@ -38,6 +38,73 @@ class AllowLocation extends StatelessWidget {
         as Map<String, dynamic>)['profilePic'] as File;
     final ValueNotifier<bool> isProcessing = ValueNotifier(false);
 
+    // Function to handle registration without location
+    void proceedWithoutLocation() async {
+      if (isProcessing.value) return;
+      
+      isProcessing.value = true;
+      log("Proceeding without location");
+      
+      try {
+        // Get default location
+        final UserLocationReporistoryImpl locationRepo = UserLocationReporistoryImpl();
+        final defaultLocation = await locationRepo.getDefaultLocation();
+        
+        // Add default location to user data
+        userData.addAll({
+          'location': {
+            'latitude': defaultLocation['latitude'],
+            'longitude': defaultLocation['longitude'],
+            'address': defaultLocation['PlaceName'],
+          },
+          'maximum_distance': 20,
+          'age_range': {
+            'min': "20",
+            'max': "50",
+          },
+          'lastvisited': FieldValue.serverTimestamp(),
+          'createdAt': FieldValue.serverTimestamp()
+        });
+        
+        log("Added default location to user data");
+        
+        // Upload profile picture
+        try {
+          UploadTask? task = await FireStoreClass.uploadprofile(
+            currentUserId: auth.currentUser!.uid,
+            file: profilePic
+          );
+          
+          if (task != null) {
+            // Complete registration
+            context.read<RegistrationBloc>().add(
+              RegistrationRequest(userdata: userData)
+            );
+          } else {
+            isProcessing.value = false;
+            CustomSnackbar.showSnackBarSimple(
+              "Failed to upload image. Please try again.",
+              context
+            );
+          }
+        } catch (e) {
+          isProcessing.value = false;
+          log("Error uploading profile: ${e.toString()}");
+          CustomSnackbar.showSnackBarSimple(
+            "Error uploading profile: ${e.toString()}",
+            context
+          );
+        }
+      } catch (e) {
+        isProcessing.value = false;
+        log("Error in proceedWithoutLocation: ${e.toString()}");
+        CustomSnackbar.showSnackBarSimple(
+          "Error completing registration: ${e.toString()}",
+          context
+        );
+      }
+    }
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserLocationReporistory>(
@@ -63,98 +130,99 @@ class AllowLocation extends StatelessWidget {
             builder: (context, bool isInProcess, _) {
               return Scaffold(
                 backgroundColor: Colors.white,
-                body: TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 800),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(0, 20 * (1 - value)),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Spacer(flex: 1),
-                          // Green-themed location illustration
-                          Container(
-                            width: 180,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              color: const Color(0x1527AE60),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.location_on,
-                              color: Color(0xFF27AE60),
-                              size: 90,
-                            ),
+                body: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Spacer(flex: 1),
+                        
+                        // Progress indicator (100% complete)
+                        Container(
+                          height: 4,
+                          width: MediaQuery.of(context).size.width - 48, // Full width minus padding
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF27AE60),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          const SizedBox(height: 40),
-                          
-                          // Title with larger, bolder font
-                          Text(
-                            "Enable Location",
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF222222),
-                            ),
-                            textAlign: TextAlign.center,
+                        ),
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Green-themed location illustration
+                        Container(
+                          width: 180,
+                          height: 180,
+                          decoration: const BoxDecoration(
+                            color: Color(0x1527AE60),
+                            shape: BoxShape.circle,
                           ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Subtitle with muted gray color
-                          Text(
-                            "We'll use your location to help you find people nearby.",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: const Color(0xFF888888),
-                              fontWeight: FontWeight.w400,
-                            ),
-                            textAlign: TextAlign.center,
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Color(0xFF27AE60),
+                            size: 90,
                           ),
-                          
-                          const Spacer(flex: 1),
-                          
-                          // Primary green button
-                          BlocConsumer<RegistrationBloc, RegistrationStates>(
-                            listener: (context, state) {
-                              if (state is RegistrationLoading) {
-                                CustomSnackbar.showSnackBarSimple(
-                                    "Loading...".tr().toString(), context);
-                              }
-                              if (state is RegistrationFailed) {
-                                isProcessing.value = false;
-                                CustomSnackbar.showSnackBarSimple(
-                                    state.message, context);
-                              }
-                              if (state is RegistrationSuccess) {
-                                log("userregistrationsuccess");
-                                Provider.of<UserProvider>(context, listen: false)
-                                    .currentUser = state.user;
-                                isProcessing.value = false;
-                                showWelcomDialog(context);
-                              }
-                            },
-                            builder: (context, state) {
-                              if (state is RegistrationLoading) {
-                                return const Hookup4uBar();
-                              }
-                              return BlocConsumer<UserLocationBloc,
-                                  UserLocationStates>(
-                                listener: (context, state) async {
-                                  if (state is UserLocationSuccess) {
-                                    log("location successfully get");
-
+                        ),
+                        const SizedBox(height: 40),
+                        
+                        // Title with larger, bolder font
+                        const Text(
+                          "Enable Location",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF222222),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Subtitle with muted gray color
+                        const Text(
+                          "We'll use your location to help you find people nearby.",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF888888),
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        
+                        const Spacer(flex: 1),
+                        
+                        // Primary green button
+                        BlocConsumer<RegistrationBloc, RegistrationStates>(
+                          listener: (context, state) {
+                            if (state is RegistrationLoading) {
+                              CustomSnackbar.showSnackBarSimple(
+                                  "Loading...".tr().toString(), context);
+                            }
+                            if (state is RegistrationFailed) {
+                              isProcessing.value = false;
+                              CustomSnackbar.showSnackBarSimple(
+                                  state.message, context);
+                            }
+                            if (state is RegistrationSuccess) {
+                              log("userregistrationsuccess");
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .currentUser = state.user;
+                              isProcessing.value = false;
+                              showWelcomDialog(context);
+                            }
+                          },
+                          builder: (context, state) {
+                            if (state is RegistrationLoading) {
+                              return const Hookup4uBar();
+                            }
+                            return BlocConsumer<UserLocationBloc,
+                                UserLocationStates>(
+                              listener: (context, state) async {
+                                if (state is UserLocationSuccess) {
+                                  log("location successfully get");
+                                  try {
                                     userData.addAll(
                                       {
                                         'location': {
@@ -173,108 +241,145 @@ class AllowLocation extends StatelessWidget {
                                       },
                                     );
                                     log("added user finally $userData.toString()");
-                                    UploadTask? task =
-                                        await FireStoreClass.uploadprofile(
-                                            currentUserId: auth.currentUser!.uid,
-                                            file: profilePic);
-                                    if (task != null) {
-                                      context.read<RegistrationBloc>().add(
-                                          RegistrationRequest(
-                                              userdata: userData));
-                                    } else {
+                                    
+                                    try {
+                                      UploadTask? task =
+                                          await FireStoreClass.uploadprofile(
+                                              currentUserId: auth.currentUser!.uid,
+                                              file: profilePic);
+                                      
+                                      if (task != null) {
+                                        context.read<RegistrationBloc>().add(
+                                            RegistrationRequest(
+                                                userdata: userData));
+                                      } else {
+                                        isProcessing.value = false;
+                                        CustomSnackbar.showSnackBarSimple(
+                                            "Failed to upload image. Please try again.",
+                                            context);
+                                      }
+                                    } catch (e) {
+                                      isProcessing.value = false;
+                                      log("Error uploading profile: ${e.toString()}");
                                       CustomSnackbar.showSnackBarSimple(
-                                          "Failed to upload Image"
-                                              .tr()
-                                              .toString(),
+                                          "Error uploading profile: ${e.toString()}",
                                           context);
                                     }
-                                  }
-                                  if (state is UserLocationFailed) {
+                                  } catch (e) {
                                     isProcessing.value = false;
-                                    log(state.message);
+                                    log("Error adding user data: ${e.toString()}");
                                     CustomSnackbar.showSnackBarSimple(
-                                        state.message, context);
+                                        "Error adding user data: ${e.toString()}",
+                                        context);
                                   }
-                                },
-                                builder: (context, state) {
-                                  if (state is UserLocationLoading || 
-                                      state is UserLocationSuccess) {
-                                    return Container(
-                                      width: double.infinity,
-                                      height: 56,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF27AE60),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 3,
+                                }
+                                if (state is UserLocationFailed) {
+                                  isProcessing.value = false;
+                                  log("Location failed: ${state.message}");
+                                  CustomSnackbar.showSnackBarSimple(
+                                      state.message, context);
+                                  
+                                  // Show dialog to proceed with default location
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text("Location Error"),
+                                        content: const Text(
+                                          "We couldn't access your location. Would you like to continue with a default location?",
                                         ),
-                                      ),
-                                    );
-                                  }
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (!isProcessing.value) {
-                                        isProcessing.value = true;
-                                        context
-                                            .read<UserLocationBloc>()
-                                            .add(const UserLocationRequest());
-                                      }
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 56,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF27AE60),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          "ENABLE LOCATION",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text("Cancel"),
                                           ),
-                                        ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              proceedWithoutLocation();
+                                            },
+                                            child: const Text("Continue"),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is UserLocationLoading || 
+                                    state is UserLocationSuccess) {
+                                  return Container(
+                                    width: double.infinity,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF27AE60),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 3,
                                       ),
                                     ),
                                   );
-                                },
-                              );
-                            },
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Secondary "Skip for now" button
-                          TextButton(
-                            onPressed: () {
-                              if (!isProcessing.value) {
-                                Navigator.pushNamed(
-                                  context,
-                                  RouteName.searchLocationpage,
-                                  arguments: {
-                                    'userData': userData,
-                                    'profilePic': profilePic
+                                }
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (!isProcessing.value) {
+                                      isProcessing.value = true;
+                                      context
+                                          .read<UserLocationBloc>()
+                                          .add(const UserLocationRequest());
+                                    }
                                   },
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF27AE60),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        "ENABLE LOCATION",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 );
-                              }
-                            },
-                            child: Text(
-                              "Skip for now",
-                              style: TextStyle(
-                                color: const Color(0xFF888888),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              },
+                            );
+                          },
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Secondary "Skip for now" button
+                        TextButton(
+                          onPressed: () {
+                            if (!isProcessing.value) {
+                              proceedWithoutLocation();
+                            }
+                          },
+                          child: const Text(
+                            "Skip for now",
+                            style: TextStyle(
+                              color: Color(0xFF888888),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          const SizedBox(height: 32),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
                     ),
                   ),
                 ),

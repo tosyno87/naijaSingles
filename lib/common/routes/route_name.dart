@@ -24,4 +24,5 @@ class RouteName {
   static const String updateLocationScreen = '/updatelocation';
   static const String chatPageScreen = '/chat_page';
   static const String userDobScreen = '/user_dob';
+  static const String nationalityScreen = '/nationality';
 }

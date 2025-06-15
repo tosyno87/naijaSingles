@@ -62,6 +62,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     log(userData.toString());
+    final screenSize = MediaQuery.of(context).size;
     
     return Scaffold(
       backgroundColor: Colors.white,
@@ -82,103 +83,72 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               
-              // Centered title section with softer font
-              Center(
-                child: Column(
-                  children: [
-                    const Text(
-                      "I am a",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600, // Softer than bold
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "This helps us personalize your experience",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
+              // Progress indicator
+              Container(
+                height: 4,
+                width: screenSize.width * 0.45, // 45% of screen width (third step)
+                decoration: BoxDecoration(
+                  color: const Color(0xFF27AE60),
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
               
-              const SizedBox(height: 50),
+              const SizedBox(height: 40),
               
-              // Gender options with card-style layout and animations
-              _fadeAnimation != null
-                ? FadeTransition(
-                    opacity: _fadeAnimation!,
-                    child: Column(
-                      children: [
-                        _buildGenderCard(
-                          "Man",
-                          selectedGender == "men",
-                          () {
-                            _animateCardTap(() {
-                              setState(() => selectedGender = "men");
-                            });
-                          },
-                          Icons.male_rounded,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildGenderCard(
-                          "Woman",
-                          selectedGender == "women",
-                          () {
-                            _animateCardTap(() {
-                              setState(() => selectedGender = "women");
-                            });
-                          },
-                          Icons.female_rounded,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildGenderCard(
-                          "Non-binary",
-                          selectedGender == "other",
-                          () {
-                            _animateCardTap(() {
-                              setState(() => selectedGender = "other");
-                            });
-                          },
-                          Icons.transgender_rounded,
-                        ),
-                      ],
+              // Title section
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "I am a...",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
-                  )
-                : Column(
-                    children: [
-                      _buildGenderCard(
-                        "Man",
-                        selectedGender == "men",
-                        () => setState(() => selectedGender = "men"),
-                        Icons.male_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildGenderCard(
-                        "Woman",
-                        selectedGender == "women",
-                        () => setState(() => selectedGender = "women"),
-                        Icons.female_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildGenderCard(
-                        "Non-binary",
-                        selectedGender == "other",
-                        () => setState(() => selectedGender = "other"),
-                        Icons.transgender_rounded,
-                      ),
-                    ],
                   ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "This helps us find the right matches for you",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Gender options with card-style layout
+              Column(
+                children: [
+                  _buildGenderCard(
+                    "Man",
+                    selectedGender == "men",
+                    () => setState(() => selectedGender = "men"),
+                    Icons.male_rounded,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildGenderCard(
+                    "Woman",
+                    selectedGender == "women",
+                    () => setState(() => selectedGender = "women"),
+                    Icons.female_rounded,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildGenderCard(
+                    "Non-binary",
+                    selectedGender == "other",
+                    () => setState(() => selectedGender = "other"),
+                    Icons.transgender_rounded,
+                  ),
+                ],
+              ),
               
               const Spacer(),
               
@@ -210,7 +180,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
               
               const SizedBox(height: 24),
               
-              // Continue button with contrasting green
+              // Continue button
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),
                 child: SizedBox(
@@ -225,7 +195,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                         userData.addAll(userGender);
                         Navigator.pushNamed(
                           context, 
-                          RouteName.sexualorientationScreen,
+                          RouteName.nationalityScreen,
                           arguments: userData
                         );
                       } else {
@@ -272,15 +242,15 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? const Color(0xFF27AE60) : Colors.transparent,
-            width: isSelected ? 2 : 0,
+            color: isSelected ? const Color(0xFF27AE60) : Colors.grey[200]!,
+            width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(16),
-          color: isSelected ? const Color(0xFFE8F5E9) : Colors.white,
+          color: isSelected ? const Color(0xFFE8F5E9) : Colors.grey[50],
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
               spreadRadius: 0,
               offset: const Offset(0, 2),
             ),
@@ -327,11 +297,5 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
         ),
       ),
     );
-  }
-  
-  // Animation for card tap
-  void _animateCardTap(VoidCallback callback) {
-    callback();
-    // You could add additional tap animations here if desired
   }
 }

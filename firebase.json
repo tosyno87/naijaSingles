@@ -9,6 +9,10 @@
     "ui": {
       "enabled": true,
       "port": 4000
-    }
+    },
+    "hub": {
+      "port": 4400
+    },
+    "singleProjectMode": true
   }
 }

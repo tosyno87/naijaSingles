@@ -16,46 +16,11 @@ class ShowGender extends StatefulWidget {
   const ShowGender({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ShowGenderState createState() => _ShowGenderState();
 }
 
-class _ShowGenderState extends State<ShowGender> with SingleTickerProviderStateMixin {
+class _ShowGenderState extends State<ShowGender> {
   String? selectedPreference;
-  
-  // Use nullable types instead of late initialization
-  AnimationController? _animationController;
-  Animation<double>? _fadeAnimation;
-  
-  @override
-  void initState() {
-    super.initState();
-    
-    // Initialize animation controller
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    
-    // Initialize animation
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeInOut,
-    );
-    
-    // Start animation after frame is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _animationController != null) {
-        _animationController!.forward();
-      }
-    });
-  }
-  
-  @override
-  void dispose() {
-    _animationController?.dispose();
-    super.dispose();
-  }
 
   void _selectOption(String option) {
     setState(() {
@@ -72,6 +37,7 @@ class _ShowGenderState extends State<ShowGender> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     // for adding userdetails in this user map from navigation
     var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final screenSize = MediaQuery.of(context).size;
     
     return Scaffold(
       backgroundColor: Colors.white,
@@ -95,85 +61,69 @@ class _ShowGenderState extends State<ShowGender> with SingleTickerProviderStateM
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 20),
                     
-                    // Centered title section
-                    Center(
-                      child: Column(
-                        children: [
-                          const Text(
-                            "Show me",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            "Select who you want to see and match with",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
+                    // Progress indicator
+                    Container(
+                      height: 4,
+                      width: screenSize.width * 0.90, // 90% of screen width (sixth step)
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF27AE60),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 40),
                     
-                    // Preference options with card-style layout and animations
-                    _fadeAnimation != null
-                      ? FadeTransition(
-                          opacity: _fadeAnimation!,
-                          child: Column(
-                            children: [
-                              _buildPreferenceCard(
-                                "Men",
-                                "men",
-                                Icons.male_rounded,
-                              ),
-                              const SizedBox(height: 20),
-                              _buildPreferenceCard(
-                                "Women",
-                                "women",
-                                Icons.female_rounded,
-                              ),
-                              const SizedBox(height: 20),
-                              _buildPreferenceCard(
-                                "Everyone",
-                                "everyone",
-                                Icons.people_alt_rounded,
-                              ),
-                            ],
+                    // Title section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Show me",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
-                        )
-                      : Column(
-                          children: [
-                            _buildPreferenceCard(
-                              "Men",
-                              "men",
-                              Icons.male_rounded,
-                            ),
-                            const SizedBox(height: 20),
-                            _buildPreferenceCard(
-                              "Women",
-                              "women",
-                              Icons.female_rounded,
-                            ),
-                            const SizedBox(height: 20),
-                            _buildPreferenceCard(
-                              "Everyone",
-                              "everyone",
-                              Icons.people_alt_rounded,
-                            ),
-                          ],
                         ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "Select who you want to see and match with",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 40),
+                    
+                    // Preference options with card-style layout
+                    Column(
+                      children: [
+                        _buildPreferenceCard(
+                          "Men",
+                          "men",
+                          Icons.male_rounded,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildPreferenceCard(
+                          "Women",
+                          "women",
+                          Icons.female_rounded,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildPreferenceCard(
+                          "Everyone",
+                          "everyone",
+                          Icons.people_alt_rounded,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -240,72 +190,63 @@ class _ShowGenderState extends State<ShowGender> with SingleTickerProviderStateM
       onTap: () {
         _selectOption(value);
       },
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 0.95, end: isSelected ? 1.0 : 0.98),
-        duration: const Duration(milliseconds: 200),
-        builder: (context, scale, child) {
-          return Transform.scale(
-            scale: scale,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? const Color(0xFF27AE60) : Colors.grey[200]!,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          color: isSelected ? const Color(0xFFE8F5E9) : Colors.grey[50],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: isSelected ? const Color(0xFF27AE60) : Colors.transparent,
-                  width: isSelected ? 2 : 0,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                color: isSelected ? const Color(0xFFEAF8F1) : Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(isSelected ? 0.05 : 0.08),
-                    blurRadius: isSelected ? 5 : 8,
-                    spreadRadius: isSelected ? 0 : 1,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: isSelected ? const Color(0xFFB7E4C7) : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFDFF5E7) : Colors.grey[100],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: isSelected ? const Color(0xFF27AE60) : Colors.grey[600],
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? const Color(0xFF27AE60) : Colors.black87,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (isSelected)
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF27AE60),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                ],
+              child: Icon(
+                icon,
+                color: isSelected ? const Color(0xFF27AE60) : Colors.grey[600],
+                size: 28,
               ),
             ),
-          );
-        },
+            const SizedBox(width: 20),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? const Color(0xFF27AE60) : Colors.black87,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected)
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF27AE60),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

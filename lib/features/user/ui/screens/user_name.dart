@@ -17,114 +17,144 @@ class UserName extends StatefulWidget {
   UserNameState createState() => UserNameState();
 }
 
-
 class UserNameState extends State<UserName> {
   Map<String, dynamic> userData = {}; //user personal info
   String username = '';
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    // Auto focus the text field after the first frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
   }
 
   @override
   void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final screenSize = MediaQuery.of(context).size;
+    
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      floatingActionButton: SizedBox(
-        height: 45,
-        width: 45,
-        child: AnimatedOpacity(
-          opacity: 1.0,
-          duration: const Duration(milliseconds: 50),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 5.0),
-            child: FloatingActionButton(
-              elevation: 1,
-              backgroundColor:
-                  themeProvider.isDarkMode ? Colors.black : Colors.white,
-              onPressed: () {
-                dispose();
-                Navigator.pop(context);
-              },
-              child: IconButton(
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black,
-                iconSize: 20,
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
           ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Stack(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 50, top: 120),
-                    child: Text(
-                      "My first\nname is".tr().toString(),
-                      style: const TextStyle(fontSize: 40),
+              const SizedBox(height: 20),
+              
+              // Progress indicator
+              Container(
+                height: 4,
+                width: screenSize.width * 0.15, // 15% of screen width
+                decoration: BoxDecoration(
+                  color: const Color(0xFF27AE60),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Title - Option 2: Playful & Flirty
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Let's start with your name...",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "This is the first thing your future match will see!",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
+              
+              const SizedBox(height: 40),
+              
+              // Text field
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: TextFormField(
-                  cursorColor: primaryColor,
-                  style: const TextStyle(fontSize: 23),
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  cursorColor: const Color(0xFF27AE60),
+                  style: const TextStyle(fontSize: 20),
                   decoration: InputDecoration(
-                    hintText: "Enter your first name".tr().toString(),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: primaryColor)),
-                    helperText:
-                        "This is how it will appear in App.".tr().toString(),
-                    helperStyle: TextStyle(color: secondryColor, fontSize: 15),
+                    hintText: "Enter your first name",
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: Colors.grey[400]),
                   ),
                   onChanged: (value) {
                     setState(() {
-                      username = value;
+                      username = value.trim();
                     });
                   },
                 ),
               ),
-              username.isNotEmpty
-                  ? CustomButton(
-                      active: true,
-                      color: Colors.white,
-                      onTap: () {
+              
+              const Spacer(),
+              
+              // Continue button
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: AnimatedOpacity(
+                  opacity: username.isNotEmpty ? 1.0 : 0.7,
+                  duration: const Duration(milliseconds: 200),
+                  child: CustomButton(
+                    active: username.isNotEmpty,
+                    color: const Color(0xFF27AE60),
+                    onTap: () {
+                      if (username.isNotEmpty) {
                         userData.addAll({'UserName': username});
                         log(userData.toString());
                         Navigator.pushNamed(context, RouteName.userDobScreen,
                             arguments: userData);
-                      },
-                      text: 'CONTINUE'.tr().toString(),
-                    )
-                  : CustomButton(
-                      active: themeProvider.isDarkMode ? true : false,
-                      color: secondryColor,
-                      onTap: () {
+                      } else {
                         CustomSnackbar.showSnackBarSimple(
-                            "Please enter name", context);
-                      },
-                      text: 'CONTINUE'.tr().toString(),
-                    )
+                            "Please enter your name", context);
+                      }
+                    },
+                    text: 'CONTINUE',
+                  ),
+                ),
+              ),
             ],
           ),
         ),

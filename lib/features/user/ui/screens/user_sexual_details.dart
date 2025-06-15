@@ -14,11 +14,10 @@ class SexualOrientation extends StatefulWidget {
   const SexualOrientation({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _SexualOrientationState createState() => _SexualOrientationState();
 }
 
-class _SexualOrientationState extends State<SexualOrientation> with SingleTickerProviderStateMixin {
+class _SexualOrientationState extends State<SexualOrientation> {
   List<Map<String, dynamic>> orientationList = [
     {'name': 'Straight', 'selected': false},
     {'name': 'Gay', 'selected': false},
@@ -32,40 +31,6 @@ class _SexualOrientationState extends State<SexualOrientation> with SingleTicker
   
   List<String> selectedOrientations = [];
   bool showOnProfile = true;
-  
-  // Animation controller
-  AnimationController? _animationController;
-  Animation<double>? _fadeAnimation;
-  
-  @override
-  void initState() {
-    super.initState();
-    
-    // Initialize animation controller
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    
-    // Initialize animation
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeInOut,
-    );
-    
-    // Start animation after frame is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _animationController != null) {
-        _animationController!.forward();
-      }
-    });
-  }
-  
-  @override
-  void dispose() {
-    _animationController?.dispose();
-    super.dispose();
-  }
 
   void _toggleOrientation(int index) {
     setState(() {
@@ -98,6 +63,7 @@ class _SexualOrientationState extends State<SexualOrientation> with SingleTicker
   @override
   Widget build(BuildContext context) {
     var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final screenSize = MediaQuery.of(context).size;
     
     return Scaffold(
       backgroundColor: Colors.white,
@@ -122,45 +88,49 @@ class _SexualOrientationState extends State<SexualOrientation> with SingleTicker
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
                       
-                      // Centered title section with softer font
-                      Center(
-                        child: Column(
-                          children: [
-                            const Text(
-                              "My sexual orientation is",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w600, // Softer than bold
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              "Select all that apply (up to 3)",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
+                      // Progress indicator
+                      Container(
+                        height: 4,
+                        width: screenSize.width * 0.75, // 75% of screen width (fifth step)
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF27AE60),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       
                       const SizedBox(height: 40),
                       
+                      // Title section
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "My sexual orientation is",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Select all that apply (up to 3)",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 40),
+                      
                       // Orientation options with pill-shaped buttons
-                      _fadeAnimation != null
-                        ? FadeTransition(
-                            opacity: _fadeAnimation!,
-                            child: _buildOrientationGrid(),
-                          )
-                        : _buildOrientationGrid(),
+                      _buildOrientationGrid(),
                       
                       const SizedBox(height: 20),
                       

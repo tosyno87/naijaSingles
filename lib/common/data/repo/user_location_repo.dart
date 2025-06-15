@@ -52,21 +52,16 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       // Get location with timeout
       loc.LocationData? coordinates;
       try {
-        coordinates = await Future.delayed(const Duration(seconds: 10), () async {
-          try {
-            return await location.getLocation();
-          } catch (e) {
-            log("Error getting location: ${e.toString()}");
-            return null;
-          }
-        });
-        
-        if (coordinates == null) {
-          log("Location request timed out");
-          return getDefaultLocation();
-        }
+        coordinates = await location
+            .getLocation()
+            .timeout(const Duration(seconds: 10));
       } catch (e) {
         log("Error getting location with timeout: ${e.toString()}");
+        return getDefaultLocation();
+      }
+
+      if (coordinates == null) {
+        log("Location request timed out");
         return getDefaultLocation();
       }
       

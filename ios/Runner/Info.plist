@@ -81,9 +81,13 @@
 	</array>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>This app uses the local network for development tools.</string>
-	<key>LSApplicationQueriesSchemes</key>
+        <key>NSLocalNetworkUsageDescription</key>
+        <string>This app uses the local network for development tools.</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>Your location is used to find nearby matches.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>Your location is needed to provide personalized services.</string>
+        <key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
 		<string>fb-messenger-share-api</string>

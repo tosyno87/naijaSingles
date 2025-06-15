@@ -26,8 +26,13 @@ NaijaSingles is a Flutter-based mobile dating application created for singles in
 5. After setup completes, run the app on a connected device or emulator:
 
    ```bash
-   flutter run
-   ```
+    flutter run
+    ```
+
+6. Grant location permissions when prompted. The app depends on precise
+   location access to match nearby users. Android permissions are declared
+   in `android/app/src/main/AndroidManifest.xml`, and iOS requires
+   `NSLocationWhenInUseUsageDescription` in `ios/Runner/Info.plist`.
 
 ### Using Emulators
 

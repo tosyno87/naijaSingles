@@ -19,6 +19,7 @@ import 'package:naijasingles/features/user/ui/screens/user_profile_pic_set.dart'
 import 'package:naijasingles/features/user/ui/screens/user_search_location.dart';
 import 'package:naijasingles/features/user/ui/screens/user_sexual_details.dart';
 import 'package:naijasingles/features/user/ui/screens/user_university.dart';
+import 'package:naijasingles/features/user/ui/screens/user_verification.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
@@ -94,5 +95,6 @@ abstract class AppRouter {
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
+    RouteName.verificationScreen: (context) => const VerificationScreen(),
   };
 }

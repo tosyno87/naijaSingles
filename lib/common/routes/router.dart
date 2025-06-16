@@ -28,7 +28,7 @@ import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
 
-import '../../features/auth/phone/ui/screens/login_option_page.dart';
+import '../../features/auth/dev_login/dev_login_screen.dart';
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 import '../../features/home/ui/screens/splash.dart';
 
@@ -36,7 +36,7 @@ abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
     RouteName.splashScreen: (context) => const Splash(),
-    RouteName.loginScreen: (context) => const LoginOption(),
+    RouteName.loginScreen: (context) => const DevLoginScreen(),
     RouteName.tabScreen: (context) => const Tabbar("active", false),
     RouteName.profileScreen: (context) => ProfilePage(
           isPuchased:

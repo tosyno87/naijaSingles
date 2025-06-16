@@ -28,8 +28,7 @@ class UserModel {
   final Map? editInfo;
   final Map? streetView;
   final bool? isBot;
-  final bool? isVerified;
-  List? verificationImages = [];
+
   List? imageUrl = [];
   // ignore: prefer_typing_uninitialized_variables
   var distanceBW;
@@ -60,12 +59,12 @@ class UserModel {
     this.streetView,
     this.distanceBW,
     this.sexualOrientation,
-    this.verificationImages,
+
   });
 
   @override
   String toString() {
-    return 'User: {id: $id,name:$name, isBlocked: $isBlocked, address: $address, coordinates: $coordinates,currentCoordinates :$currentCoordinates,  sexualOrientation: $sexualOrientation, gender: $userGender, showGender: $showGender, age: $age, phoneNumber: $phoneNumber, maxDistance: $maxDistance, lastmsg: $lastmsg, ageRange: $ageRange, editInfo: $editInfo, streetView: $streetView ,  distanceBW : $distanceBW, isBot:$isBot, isVerified:$isVerified }';
+
   }
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
@@ -131,9 +130,7 @@ class UserModel {
       isBot: doc.data().toString().contains('isBot')
           ? doc.get('isBot') ?? false
           : false,
-      isVerified: doc.data().toString().contains('isVerified')
-          ? doc.get('isVerified') ?? false
-          : false,
+
       imageUrl: doc.get('Pictures') != null
           ? List.generate(doc.get('Pictures').length, (index) {
               return doc.get('Pictures')[index];
@@ -172,8 +169,7 @@ class UserModel {
         imageUrl: json['Pictures'],
         distanceBW: json['distanceBW'] ?? 0,
         isBot: json['isBot'] ?? false,
-        isVerified: json['isVerified'] ?? false,
-        verificationImages: json['verificationImages'] ?? []);
+
   }
 
   static UserModel convertStringToUserModel(String userString) {

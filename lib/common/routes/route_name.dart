@@ -25,5 +25,6 @@ class RouteName {
   static const String chatPageScreen = '/chat_page';
   static const String userDobScreen = '/user_dob';
   static const String nationalityScreen = '/nationality';
+  static const String onboardingFlow = '/onboarding_flow';
 
 }

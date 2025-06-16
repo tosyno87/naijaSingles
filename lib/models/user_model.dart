@@ -40,7 +40,6 @@ class UserModel {
     this.age,
     this.address,
     this.isBot,
-    this.isVerified,
     this.latitude,
     this.longitude,
     this.isBlocked,
@@ -63,7 +62,7 @@ class UserModel {
 
   @override
   String toString() {
-
+    return 'UserModel{id: \$id, name: \$name, age: \$age, phone: \$phoneNumber}';
   }
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
@@ -134,9 +133,6 @@ class UserModel {
           ? List.generate(doc.get('Pictures').length, (index) {
               return doc.get('Pictures')[index];
             })
-          : [],
-      verificationImages: doc.data().toString().contains('verificationImages')
-          ? doc.get('verificationImages')
           : [],
       // distanceBW: doc.get('distanceBW') ?? 0,
     );

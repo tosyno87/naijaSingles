@@ -1,0 +1,77 @@
+name: Flutter CI
+
+# This workflow runs on all PRs to main and any feature branch
+on:
+  pull_request:
+    branches: [ "main", "feature/*" ]
+  push:
+    branches: [ "main", "feature/*" ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      # Step 2: Setup Flutter environment
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0' # Specify Flutter version
+          channel: 'stable'
+          cache: true
+      
+      # Step 3: Verify Flutter installation
+      - name: Verify Flutter installation
+        run: flutter --version
+      
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+      
+      # Step 5: Run static code analysis
+      - name: Run Flutter Analyze
+        run: flutter analyze --no-fatal-infos
+      
+      # Step 6: Run unit and widget tests
+      - name: Run Flutter Tests
+        run: flutter test
+      
+      # Step 7: Build Android APK (debug mode)
+      - name: Build Android APK
+        run: flutter build apk --debug
+      
+      # Step 8: Optional - Run tests with Firebase emulator
+      # This step is commented out by default and can be enabled if Firebase emulators are configured
+      # - name: Run tests with Firebase emulator
+      #   run: |
+      #     npm install -g firebase-tools
+      #     firebase emulators:exec "flutter test" --project naijasingles-74a75
+
+  # Optional job for iOS build verification
+  build-ios:
+    name: Build iOS (Debug)
+    runs-on: macos-latest
+    # This job only runs on pull requests to main branch
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Build iOS
+        run: flutter build ios --debug --no-codesign

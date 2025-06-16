@@ -167,6 +167,7 @@ class UserModel {
             : null,
         isBot: json['isBot'] ?? false,
 
+    );
   }
 
   static UserModel convertStringToUserModel(String userString) {

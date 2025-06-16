@@ -87,6 +87,21 @@ To ensure the code follows lint rules, run:
 flutter analyze
 ```
 
+## Refactoring MVP
+
+The repository was recently restructured into feature-focused modules using the BLoC pattern. Major additions include:
+
+- Onboarding flow for creating and verifying user profiles.
+- Home swipe cards with premium limits and location-based matching.
+- Explore map and street view screens for discovering nearby users.
+- Chat and call features powered by Firebase.
+- Diary posts and notifications.
+- In-app purchases for subscriptions.
+- Multi-language support and updated themes.
+- Updated to Flutter 3.32.3 and Dart 3.5 with the latest package versions.
+
+These changes form the minimum viable product (MVP) after our refactoring effort.
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:

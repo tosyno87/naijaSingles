@@ -140,4 +140,35 @@ class FireStoreClass {
       return null;
     }
   }
+  static Future<String?> uploadVerification({
+    required String userId,
+    required File file,
+  }) async {
+    try {
+      if (!file.existsSync()) {
+        log('Verification file does not exist: ${file.path}');
+        return null;
+      }
+
+      final int timestamp = DateTime.now().millisecondsSinceEpoch;
+      Reference storageReference = FirebaseStorage.instanceFor(bucket: bucketId)
+          .ref()
+          .child('verification/$userId/$timestamp.jpg');
+
+      UploadTask uploadTask = storageReference.putFile(file);
+      await uploadTask;
+
+      final fileURL = await storageReference.getDownloadURL();
+      await firebaseFireStoreInstance.collection('Users').doc(userId).set({
+        'verificationImages': FieldValue.arrayUnion([fileURL]),
+        'isVerified': true,
+      }, SetOptions(merge: true));
+
+      return fileURL;
+    } catch (e) {
+      log('Error uploading verification image: ${e.toString()}');
+      return null;
+    }
+  }
+
 }

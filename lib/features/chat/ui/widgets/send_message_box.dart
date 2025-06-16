@@ -14,6 +14,7 @@ import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
 import '../../../../common/utils/custom_toast.dart';
 import '../../../../config/app_config.dart';
+import '../../../../config/prompt_config.dart';
 import '../../../../models/user_model.dart';
 import 'chatmessage_read.dart.dart';
 import 'generate_layout.dart';
@@ -38,6 +39,7 @@ class _MessageBoxState extends State<MessageBox> {
   bool isBlocked = false;
   final int perpage = perPageData;
   final db = firebaseFireStoreInstance;
+  final List<String> prompts = chatPrompts;
   late CollectionReference chatReference;
   final TextEditingController _textController = TextEditingController();
   bool _isWritting = false;
@@ -191,6 +193,8 @@ class _MessageBoxState extends State<MessageBox> {
                       },
                     ),
                   ),
+                  if (messages.isEmpty && !isBlocked)
+                    _buildPromptSuggestions(),
                   const Divider(height: 1.0),
                   Container(
                     alignment: Alignment.bottomCenter,
@@ -226,6 +230,31 @@ class _MessageBoxState extends State<MessageBox> {
             : snapshot.get('sender_id') != widget.sender.id
                 ? generateReceiverLayout(snapshot)
                 : generateSenderLayout(snapshot),
+      ),
+    );
+  }
+
+  Widget _buildPromptSuggestions() {
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: prompts
+              .map(
+                (p) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: ActionChip(
+                    label: Text(p),
+                    onPressed: () {
+                      _sendText(p);
+                    },
+                  ),
+                ),
+              )
+              .toList(),
+        ),
       ),
     );
   }

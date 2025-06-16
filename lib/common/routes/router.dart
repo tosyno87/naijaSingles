@@ -23,6 +23,7 @@ import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import '../../features/home/ui/screens/welcome.dart';
+import '../../features/diary/ui/screens/diary_feed.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
@@ -94,5 +95,6 @@ abstract class AppRouter {
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
+    RouteName.diaryFeed: (context) => const DiaryFeedPage(),
   };
 }

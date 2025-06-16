@@ -42,9 +42,9 @@ jobs:
       
       # Step 6: Create Firebase config files (if needed)
       - name: Create Firebase config files
-        if: ${{ secrets.FIREBASE_CONFIG != '' }}
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        if: env.FIREBASE_CONFIG != ''
         run: |
           echo "$FIREBASE_CONFIG" > lib/firebase_options.dart
       

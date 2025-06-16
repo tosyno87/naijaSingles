@@ -1,16 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../common/data/repo/phone_auth_repo.dart';
-import '../../../home_page.dart';
+import '../../../common/routes/route_name.dart';
 
-class DevLoginScreen extends StatefulWidget {
-  const DevLoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<DevLoginScreen> createState() => _DevLoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _DevLoginScreenState extends State<DevLoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _loading = false;
@@ -27,8 +27,9 @@ class _DevLoginScreenState extends State<DevLoginScreen> {
         password: _passwordController.text,
       );
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomePage()),
+      Navigator.pushReplacementNamed(
+        context,
+        RouteName.welcomeScreen,
       );
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message);
@@ -46,8 +47,9 @@ class _DevLoginScreenState extends State<DevLoginScreen> {
       final repo = PhoneAuthRepository();
       await repo.signInWithTestPhone();
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomePage()),
+      Navigator.pushReplacementNamed(
+        context,
+        RouteName.welcomeScreen,
       );
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message);
@@ -61,7 +63,7 @@ class _DevLoginScreenState extends State<DevLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dev Login')),
+      appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

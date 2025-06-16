@@ -26,5 +26,6 @@ class RouteName {
   static const String userDobScreen = '/user_dob';
   static const String nationalityScreen = '/nationality';
   static const String onboardingFlow = '/onboarding_flow';
+  static const String mvpOnboarding = '/mvp_onboarding';
 
 }

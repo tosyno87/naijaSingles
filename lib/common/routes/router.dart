@@ -9,6 +9,7 @@ import 'package:naijasingles/features/chat/ui/screens/chat_page.dart';
 
 import 'package:naijasingles/features/home/ui/tab/tabbar.dart';
 import 'package:naijasingles/features/match/ui/screen/match_page.dart';
+import 'package:naijasingles/features/onboarding/onboarding_main.dart';
 import 'package:naijasingles/features/user/ui/screens/edit_user_profile.dart';
 import 'package:naijasingles/features/user/ui/screens/onboarding_flow.dart';
 import 'package:naijasingles/features/user/ui/screens/show_gender.dart';
@@ -98,6 +99,7 @@ abstract class AppRouter {
     RouteName.nationalityScreen: (context) => UserNationality(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
+    RouteName.mvpOnboarding: (context) => const OnboardingMain(),
 
   };
 }

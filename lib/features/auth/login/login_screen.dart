@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
-        RouteName.onboardingFlow,
+        RouteName.mvpOnboarding,
       );
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
-        RouteName.onboardingFlow,
+        RouteName.mvpOnboarding,
       );
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message);

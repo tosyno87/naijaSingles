@@ -5,22 +5,26 @@ import '../constants/colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color color;
   final bool active;
+  final double? width;
 
-  const CustomButton(
-      {super.key,
-      required this.text,
-      required this.onTap,
-      required this.color,
-      required this.active});
+  const CustomButton({
+    super.key,
+    required this.text,
+    required this.onTap,
+    required this.color,
+    required this.active,
+    this.width,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: active ? onTap : null,
       child: Container(
+        width: width,
         decoration: BoxDecoration(
           // Use the suggested medium sea green color
           color: active ? const Color(0xFF27AE60) : Colors.grey[300],
@@ -37,7 +41,6 @@ class CustomButton extends StatelessWidget {
           ],
         ),
         height: 56, // Fixed height for better visibility
-        width: double.infinity, // Full width
         padding: const EdgeInsets.symmetric(horizontal: 48),
         child: Center(
           child: Text(

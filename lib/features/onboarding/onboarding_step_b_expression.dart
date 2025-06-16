@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../user/controllers/onboarding_controller.dart';
-import '../../../common/constants/colors.dart';
-import '../../../common/widgets/custom_button.dart';
+import '../user/controllers/onboarding_controller.dart';
+import '../../common/constants/colors.dart';
+import '../../common/widgets/custom_button.dart';
 
 /// Second step of onboarding focusing on self-expression.
 ///
@@ -205,12 +205,14 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> {
                       ],
                     ),
                   ),
-                  CustomButton(
-                    text: 'Continue',
-                    onTap: _isStepValid(controller) ? widget.onNext : null,
-                    color: primaryColor,
-                    active: _isStepValid(controller),
+                  Container(
                     width: 150,
+                    child: CustomButton(
+                      text: 'Continue',
+                      onTap: _isStepValid(controller) ? widget.onNext : () {},
+                      color: primaryColor,
+                      active: _isStepValid(controller),
+                    ),
                   ),
                 ],
               ),

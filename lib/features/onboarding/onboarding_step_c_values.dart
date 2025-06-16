@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../user/controllers/onboarding_controller.dart';
-import '../../../common/constants/colors.dart';
-import '../../../common/widgets/custom_button.dart';
+import '../user/controllers/onboarding_controller.dart';
+import '../../common/constants/colors.dart';
+import '../../common/widgets/custom_button.dart';
 
 /// Third step of onboarding focusing on personal values.
 ///
@@ -173,12 +173,14 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> {
                       ],
                     ),
                   ),
-                  CustomButton(
-                    text: 'Finish',
-                    onTap: _isStepValid(controller) ? widget.finishOnboarding : null,
-                    color: primaryColor,
-                    active: _isStepValid(controller),
+                  Container(
                     width: 150,
+                    child: CustomButton(
+                      text: 'Finish',
+                      onTap: _isStepValid(controller) ? widget.finishOnboarding : () {},
+                      color: primaryColor,
+                      active: _isStepValid(controller),
+                    ),
                   ),
                 ],
               ),

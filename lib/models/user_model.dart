@@ -30,8 +30,7 @@ class UserModel {
   final bool? isBot;
 
   List? imageUrl = [];
-  // ignore: prefer_typing_uninitialized_variables
-  var distanceBW;
+  int? distanceBW;
   UserModel({
     this.living_in,
     this.job_title,
@@ -167,7 +166,9 @@ class UserModel {
         editInfo: json['editInfo'],
         streetView: json['streetView'],
         imageUrl: json['Pictures'],
-        distanceBW: json['distanceBW'] ?? 0,
+        distanceBW: json['distanceBW'] != null
+            ? (json['distanceBW'] as num).round()
+            : null,
         isBot: json['isBot'] ?? false,
 
   }

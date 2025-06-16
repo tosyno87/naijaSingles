@@ -112,161 +112,245 @@ class _LoginScreenState extends State<LoginScreen> {
     ));
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-              
-              // Logo and headline
-              Center(
-                child: Column(
-                  children: [
-                    Container(
-                      height: 80,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00BCD4),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "NS",
-                          style: GoogleFonts.montserrat(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+      // Rich earthy background with gradient
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF8B4513), // Earthy brown
+              Color(0xFF3D1C02), // Deep brown
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                
+                // Adinkra symbol header
+                Center(
+                  child: Column(
+                    children: [
+                      // Sankofa symbol (represents learning from the past)
+                      Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFFFD700), // Gold
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "♥",
+                            style: TextStyle(
+                              fontSize: 50,
+                              color: const Color(0xFFFFD700), // Gold
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.5),
+                                  blurRadius: 5,
+                                  offset: const Offset(1, 1),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      "Welcome to NaijaSingles",
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      const SizedBox(height: 24),
+                      Text(
+                        "NaijaSingles",
+                        style: GoogleFonts.pacifico(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFD700), // Gold
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.5),
+                              blurRadius: 5,
+                              offset: const Offset(1, 1),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Where Love Meets Culture",
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        color: Colors.grey[400],
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 60),
-              
-              // Email input
-              _buildTextField(
-                controller: _emailController,
-                label: "Email",
-                hint: "Enter your email",
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // Password input
-              _buildTextField(
-                controller: _passwordController,
-                label: "Password",
-                hint: "Enter your password",
-                icon: Icons.lock_outline,
-                isPassword: true,
-                obscureText: _obscurePassword,
-                toggleObscureText: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Login button with simple implementation to avoid animation issues
-              _buildButton(
-                text: "LOGIN",
-                onPressed: _loading ? null : _loginWithEmail,
-                isPrimary: true,
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Test phone login button
-              _buildButton(
-                text: "USE TEST PHONE",
-                onPressed: _loading ? null : _loginWithTestPhone,
-                isPrimary: false,
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Error message
-              if (_error != null)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _error!,
-                          style: GoogleFonts.montserrat(
-                            color: Colors.red,
-                            fontSize: 14,
-                          ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Where Love Meets Heritage",
+                        style: GoogleFonts.lato(
+                          fontSize: 16,
+                          color: Colors.orange[100],
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ],
                   ),
                 ),
-              
-              // Loading indicator
-              if (_loading)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24.0),
-                    child: Column(
+                
+                const SizedBox(height: 40),
+                
+                // Kente pattern divider
+                Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFE57C23), // Orange
+                        Color(0xFFFFD700), // Gold
+                        Color(0xFF006400), // Green
+                        Color(0xFFE57C23), // Orange
+                      ],
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 30),
+                
+                // Email input with African mask icon
+                _buildTextField(
+                  controller: _emailController,
+                  label: "Email",
+                  hint: "Enter your email",
+                  prefixIcon: const Icon(
+                    Icons.email_outlined,
+                    color: Color(0xFFFFD700), // Gold
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Password input with shield icon
+                _buildTextField(
+                  controller: _passwordController,
+                  label: "Password",
+                  hint: "Enter your password",
+                  prefixIcon: const Icon(
+                    Icons.lock_outline,
+                    color: Color(0xFFFFD700), // Gold
+                  ),
+                  isPassword: true,
+                  obscureText: _obscurePassword,
+                  toggleObscureText: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+                
+                const SizedBox(height: 32),
+                
+                // Login button with African pattern
+                _buildButton(
+                  text: "CONNECT",
+                  onPressed: _loading ? null : _loginWithEmail,
+                  isPrimary: true,
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Test phone login button
+                _buildButton(
+                  text: "USE TEST PHONE",
+                  onPressed: _loading ? null : _loginWithTestPhone,
+                  isPrimary: false,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // Error message
+                if (_error != null)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.red.withOpacity(0.5),
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        const CircularProgressIndicator(
-                          color: Color(0xFF00BCD4),
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 20,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          "Logging in...",
-                          style: GoogleFonts.montserrat(
-                            color: Colors.grey[400],
-                            fontSize: 14,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _error!,
+                            style: GoogleFonts.lato(
+                              color: Colors.red[100],
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                
+                // Loading indicator
+                if (_loading)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24.0),
+                      child: Column(
+                        children: [
+                          // Custom loading indicator with African colors
+                          SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                const Color(0xFFFFD700), // Gold
+                              ),
+                              backgroundColor: Colors.orange.withOpacity(0.2),
+                              strokeWidth: 4,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Connecting...",
+                            style: GoogleFonts.lato(
+                              color: Colors.orange[100],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                
+                const SizedBox(height: 40),
+                
+                // African proverb footer
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      "\"If you want to go quickly, go alone. If you want to go far, go together.\"",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.lora(
+                        fontStyle: FontStyle.italic,
+                        color: Colors.orange[100],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 ),
-              
-              const SizedBox(height: 40),
-            ],
+                
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -277,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
     required TextEditingController controller,
     required String label,
     required String hint,
-    required IconData icon,
+    required Widget prefixIcon,
     bool isPassword = false,
     bool obscureText = false,
     VoidCallback? toggleObscureText,
@@ -288,42 +372,42 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           label,
-          style: GoogleFonts.montserrat(
-            color: Colors.grey[400],
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+          style: GoogleFonts.lato(
+            color: Colors.orange[100],
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: Colors.brown.shade900.withOpacity(0.6),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFE57C23).withOpacity(0.5), // Orange border
+              width: 1.5,
+            ),
           ),
           child: TextField(
             controller: controller,
             obscureText: isPassword && obscureText,
             keyboardType: keyboardType,
-            style: GoogleFonts.robotoMono(
+            style: GoogleFonts.lato(
               color: Colors.white,
               fontSize: 16,
             ),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.robotoMono(
-                color: Colors.grey[600],
+              hintStyle: GoogleFonts.lato(
+                color: Colors.orange[100]!.withOpacity(0.5),
                 fontSize: 16,
               ),
-              prefixIcon: Icon(
-                icon,
-                color: const Color(0xFF00BCD4),
-                size: 20,
-              ),
+              prefixIcon: prefixIcon,
               suffixIcon: isPassword
                   ? IconButton(
                       icon: Icon(
                         obscureText ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.grey[600],
+                        color: Colors.orange[100]!.withOpacity(0.7),
                         size: 20,
                       ),
                       onPressed: toggleObscureText,
@@ -346,28 +430,44 @@ class _LoginScreenState extends State<LoginScreen> {
     required VoidCallback? onPressed,
     required bool isPrimary,
   }) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
       height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: isPrimary
+            ? [
+                BoxShadow(
+                  color: const Color(0xFFE57C23).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
+      ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isPrimary ? const Color(0xFF00BCD4) : Colors.transparent,
-          foregroundColor: isPrimary ? Colors.white : const Color(0xFF00BCD4),
-          disabledBackgroundColor: isPrimary ? Colors.grey[700] : Colors.transparent,
-          disabledForegroundColor: Colors.grey[600],
+          backgroundColor: isPrimary
+              ? const Color(0xFFE57C23) // Orange
+              : Colors.transparent,
+          foregroundColor:
+              isPrimary ? Colors.white : const Color(0xFFFFD700), // Gold
+          disabledBackgroundColor:
+              isPrimary ? Colors.brown.withOpacity(0.3) : Colors.transparent,
+          disabledForegroundColor: Colors.grey[500],
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: isPrimary
                 ? BorderSide.none
-                : const BorderSide(color: Color(0xFF00BCD4)),
+                : const BorderSide(color: Color(0xFFFFD700)), // Gold border
           ),
-          elevation: isPrimary ? 4 : 0,
-          shadowColor: isPrimary ? const Color(0xFF00BCD4).withOpacity(0.5) : Colors.transparent,
+          elevation: isPrimary ? 0 : 0,
+          padding: const EdgeInsets.symmetric(vertical: 14),
         ),
         child: Text(
           text,
-          style: GoogleFonts.montserrat(
+          style: GoogleFonts.lato(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,

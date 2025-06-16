@@ -28,6 +28,10 @@ class UserModel {
   final Map? editInfo;
   final Map? streetView;
   final bool? isBot;
+  final String? tribe;
+  final List? languagesSpoken;
+  final bool? isDiaspora;
+  final String? intent;
   List? imageUrl = [];
   // ignore: prefer_typing_uninitialized_variables
   var distanceBW;
@@ -57,11 +61,15 @@ class UserModel {
     this.streetView,
     this.distanceBW,
     this.sexualOrientation,
+    this.tribe,
+    this.languagesSpoken,
+    this.isDiaspora,
+    this.intent,
   });
 
   @override
   String toString() {
-    return 'User: {id: $id,name:$name, isBlocked: $isBlocked, address: $address, coordinates: $coordinates,currentCoordinates :$currentCoordinates,  sexualOrientation: $sexualOrientation, gender: $userGender, showGender: $showGender, age: $age, phoneNumber: $phoneNumber, maxDistance: $maxDistance, lastmsg: $lastmsg, ageRange: $ageRange, editInfo: $editInfo, streetView: $streetView ,  distanceBW : $distanceBW, isBot:$isBot }';
+    return 'User: {id: $id,name:$name, isBlocked: $isBlocked, address: $address, coordinates: $coordinates,currentCoordinates :$currentCoordinates,  sexualOrientation: $sexualOrientation, gender: $userGender, showGender: $showGender, age: $age, phoneNumber: $phoneNumber, maxDistance: $maxDistance, lastmsg: $lastmsg, ageRange: $ageRange, editInfo: $editInfo, streetView: $streetView ,  distanceBW : $distanceBW, tribe:$tribe, languagesSpoken:$languagesSpoken, isDiaspora:$isDiaspora, intent:$intent, isBot:$isBot }';
   }
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
@@ -127,6 +135,14 @@ class UserModel {
       isBot: doc.data().toString().contains('isBot')
           ? doc.get('isBot') ?? false
           : false,
+      tribe: doc.data().toString().contains('tribe') ? doc.get('tribe') ?? '' : '',
+      languagesSpoken: doc.data().toString().contains('languages_spoken')
+          ? doc.get('languages_spoken') ?? []
+          : [],
+      isDiaspora: doc.data().toString().contains('isDiaspora')
+          ? doc.get('isDiaspora') ?? false
+          : false,
+      intent: doc.data().toString().contains('intent') ? doc.get('intent') ?? '' : '',
       imageUrl: doc.get('Pictures') != null
           ? List.generate(doc.get('Pictures').length, (index) {
               return doc.get('Pictures')[index];
@@ -161,7 +177,11 @@ class UserModel {
         streetView: json['streetView'],
         imageUrl: json['Pictures'],
         distanceBW: json['distanceBW'] ?? 0,
-        isBot: json['isBot'] ?? false);
+        isBot: json['isBot'] ?? false,
+        tribe: json['tribe'],
+        languagesSpoken: json['languages_spoken'],
+        isDiaspora: json['isDiaspora'],
+        intent: json['intent']);
   }
 
   static UserModel convertStringToUserModel(String userString) {

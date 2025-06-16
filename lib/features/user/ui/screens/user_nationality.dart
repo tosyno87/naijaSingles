@@ -17,8 +17,10 @@ class UserNationality extends StatefulWidget {
 class _UserNationalityState extends State<UserNationality> {
   String selectedCountry = '';
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _tribeController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
+  bool isDiaspora = false;
   
   // List of countries
   final List<String> countries = [
@@ -64,6 +66,7 @@ class _UserNationalityState extends State<UserNationality> {
   @override
   void dispose() {
     _searchController.dispose();
+    _tribeController.dispose();
     _searchFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -200,7 +203,37 @@ class _UserNationalityState extends State<UserNationality> {
                   ],
                 ),
               ),
-              
+
+              const SizedBox(height: 20),
+
+              TextField(
+                controller: _tribeController,
+                decoration: InputDecoration(
+                  labelText: 'Tribe (optional)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Are you in the diaspora?'),
+                  Switch(
+                    value: isDiaspora,
+                    activeColor: const Color(0xFF27AE60),
+                    onChanged: (val) {
+                      setState(() {
+                        isDiaspora = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 20),
               
               // Countries list
@@ -269,7 +302,11 @@ class _UserNationalityState extends State<UserNationality> {
                     color: const Color(0xFF27AE60),
                     onTap: () {
                       if (selectedCountry.isNotEmpty) {
-                        widget.userData.addAll({'nationality': selectedCountry});
+                        widget.userData.addAll({
+                          'nationality': selectedCountry,
+                          'tribe': _tribeController.text.trim(),
+                          'isDiaspora': isDiaspora,
+                        });
                         log(widget.userData.toString());
                         Navigator.pushNamed(context, RouteName.sexualorientationScreen,
                             arguments: widget.userData);

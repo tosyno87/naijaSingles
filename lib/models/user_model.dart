@@ -28,9 +28,9 @@ class UserModel {
   final Map? editInfo;
   final Map? streetView;
   final bool? isBot;
+
   List? imageUrl = [];
-  // ignore: prefer_typing_uninitialized_variables
-  var distanceBW;
+  int? distanceBW;
   UserModel({
     this.living_in,
     this.job_title,
@@ -57,11 +57,12 @@ class UserModel {
     this.streetView,
     this.distanceBW,
     this.sexualOrientation,
+
   });
 
   @override
   String toString() {
-    return 'User: {id: $id,name:$name, isBlocked: $isBlocked, address: $address, coordinates: $coordinates,currentCoordinates :$currentCoordinates,  sexualOrientation: $sexualOrientation, gender: $userGender, showGender: $showGender, age: $age, phoneNumber: $phoneNumber, maxDistance: $maxDistance, lastmsg: $lastmsg, ageRange: $ageRange, editInfo: $editInfo, streetView: $streetView ,  distanceBW : $distanceBW, isBot:$isBot }';
+    return 'UserModel{id: \$id, name: \$name, age: \$age, phone: \$phoneNumber}';
   }
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
@@ -127,6 +128,7 @@ class UserModel {
       isBot: doc.data().toString().contains('isBot')
           ? doc.get('isBot') ?? false
           : false,
+
       imageUrl: doc.get('Pictures') != null
           ? List.generate(doc.get('Pictures').length, (index) {
               return doc.get('Pictures')[index];
@@ -160,8 +162,11 @@ class UserModel {
         editInfo: json['editInfo'],
         streetView: json['streetView'],
         imageUrl: json['Pictures'],
-        distanceBW: json['distanceBW'] ?? 0,
-        isBot: json['isBot'] ?? false);
+        distanceBW: json['distanceBW'] != null
+            ? (json['distanceBW'] as num).round()
+            : null,
+        isBot: json['isBot'] ?? false,
+
   }
 
   static UserModel convertStringToUserModel(String userString) {

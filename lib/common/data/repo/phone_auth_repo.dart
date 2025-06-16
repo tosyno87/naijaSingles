@@ -35,11 +35,12 @@ class PhoneAuthRepository {
         codeSent: (verificationId, resendToken) {
           log("📩 Test code sent. Verification ID: $verificationId");
           
-          // For test phone numbers in the emulator, we know the code is always '000000'
-          // We can create the credential here and complete the verification
+          // For test phone numbers in the emulator, we know the code is always
+          // '123456'. We can create the credential here and complete the
+          // verification
           final testCredential = PhoneAuthProvider.credential(
             verificationId: verificationId,
-            smsCode: '000000',
+            smsCode: '123456',
           );
           
           // Call the original codeSent callback first
@@ -94,7 +95,7 @@ class PhoneAuthRepository {
       
       // When using Firebase Auth Emulator with test phone numbers:
       // 1. We need to use a specific test phone number format
-      // 2. The verification code is always '000000'
+      // 2. The verification code provided by the emulator is '123456'
       
       // First, sign in directly with the test phone number
       final phoneNumber = '+12179044453'; // This is a test phone number format
@@ -124,11 +125,11 @@ class PhoneAuthRepository {
         codeSent: (String verificationId, int? resendToken) async {
           try {
             log("📩 Code sent for test phone. Using verification ID: $verificationId");
-            
-            // For Firebase Auth Emulator, the verification code is always '000000'
+
+            // For Firebase Auth Emulator, the verification code is always '123456'
             final credential = PhoneAuthProvider.credential(
               verificationId: verificationId,
-              smsCode: '000000',
+              smsCode: '123456',
             );
             
             // Sign in with the credential

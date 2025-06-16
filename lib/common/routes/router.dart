@@ -19,15 +19,17 @@ import 'package:naijasingles/features/user/ui/screens/user_profile_pic_set.dart'
 import 'package:naijasingles/features/user/ui/screens/user_search_location.dart';
 import 'package:naijasingles/features/user/ui/screens/user_sexual_details.dart';
 import 'package:naijasingles/features/user/ui/screens/user_university.dart';
+import 'package:naijasingles/features/user/ui/screens/user_verification.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import '../../features/home/ui/screens/welcome.dart';
+import '../../features/diary/ui/screens/diary_feed.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
 
-import '../../features/auth/phone/ui/screens/login_option_page.dart';
+import '../../features/auth/login/login_screen.dart';
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 import '../../features/home/ui/screens/splash.dart';
 
@@ -35,7 +37,7 @@ abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
     RouteName.splashScreen: (context) => const Splash(),
-    RouteName.loginScreen: (context) => const LoginOption(),
+    RouteName.loginScreen: (context) => const LoginScreen(),
     RouteName.tabScreen: (context) => const Tabbar("active", false),
     RouteName.profileScreen: (context) => ProfilePage(
           isPuchased:
@@ -94,5 +96,6 @@ abstract class AppRouter {
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
+
   };
 }

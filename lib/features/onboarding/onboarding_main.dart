@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../user/controllers/onboarding_controller.dart';
-import '../../../common/routes/route_name.dart';
+import '../user/controllers/onboarding_controller.dart';
+import '../../common/routes/route_name.dart';
 import 'onboarding_step_a_roots.dart';
 import 'onboarding_step_b_expression.dart';
 import 'onboarding_step_c_values.dart';
+import 'onboarding_step_bio.dart';
+import 'shared_styles.dart';
 
-/// Main onboarding flow that manages the three onboarding steps.
+/// Main onboarding flow that manages the onboarding steps.
 ///
 /// This widget provides a container for the onboarding process,
 /// handling navigation between steps and completion of the onboarding flow.
@@ -22,8 +24,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   
-  // Warm Afrocentric background color
-  static const Color afrocentricBackground = Color(0xFFFDF6EC);
+  // Use shared styling
+  static const Color afrocentricBackground = OnboardingStyles.backgroundColor;
   
   @override
   void dispose() {
@@ -32,7 +34,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
   }
   
   void _goToNextPage() {
-    if (_currentPage < 2) {
+    if (_currentPage < 3) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -50,10 +52,10 @@ class _OnboardingMainState extends State<OnboardingMain> {
   }
   
   void _finishOnboarding() {
-    // Complete onboarding and navigate to the next screen
+    // Complete onboarding and navigate to the home screen
     Navigator.pushReplacementNamed(
       context, 
-      RouteName.userNameScreen,
+      RouteName.tabScreen,
     );
   }
   
@@ -69,7 +71,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: Row(
                 children: List.generate(
-                  3,
+                  4,
                   (index) => Expanded(
                     child: Container(
                       height: 4,
@@ -98,20 +100,26 @@ class _OnboardingMainState extends State<OnboardingMain> {
                 });
               },
               children: [
-                // Step 1: Cultural Roots
+                // Step 1: Bio Info
+                OnboardingStepBio(
+                  onNext: _goToNextPage,
+                  backgroundColor: afrocentricBackground,
+                ),
+                
+                // Step 2: Cultural Roots
                 OnboardingStepARoots(
                   onNext: _goToNextPage,
                   backgroundColor: afrocentricBackground,
                 ),
                 
-                // Step 2: Expression
+                // Step 3: Expression
                 OnboardingStepBExpression(
                   onNext: _goToNextPage,
                   onBack: _goToPreviousPage,
                   backgroundColor: afrocentricBackground,
                 ),
                 
-                // Step 3: Values
+                // Step 4: Values
                 OnboardingStepCValues(
                   onBack: _goToPreviousPage,
                   finishOnboarding: _finishOnboarding,

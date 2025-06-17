@@ -40,7 +40,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
   final TextEditingController _weekendController = TextEditingController();
   
   // Animation controller for chip selection
-  late AnimationController _animationController;
+  late final AnimationController _animationController;
   
   // Music genres popular in Nigeria and Africa
   final List<String> _musicGenres = [
@@ -220,7 +220,6 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                                   List<String> updatedGenres = [...controller.genres];
                                   if (selected) {
                                     updatedGenres.add(genre);
-                                    _animationController.forward(from: 0.0);
                                   } else {
                                     updatedGenres.remove(genre);
                                   }
@@ -282,6 +281,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                           controller: _fashionController,
                           textInputAction: TextInputAction.next,
                           style: GoogleFonts.poppins(
+                            color: Colors.black87,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -289,7 +289,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                             labelText: 'Fashion Style',
                             hintText: 'e.g. Urban streetwear, Ankara, Casual',
                             hintStyle: GoogleFonts.poppins(
-                              color: Colors.grey[500],
+                              color: Colors.grey[600],
                               fontSize: 14,
                             ),
                             labelStyle: GoogleFonts.poppins(
@@ -359,6 +359,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                           controller: _weekendController,
                           textInputAction: TextInputAction.done,
                           style: GoogleFonts.poppins(
+                            color: Colors.black87,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -366,7 +367,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                             labelText: 'Weekend Vibe',
                             hintText: 'e.g. Chill at home, beach day, concert',
                             hintStyle: GoogleFonts.poppins(
-                              color: Colors.grey[500],
+                              color: Colors.grey[600],
                               fontSize: 14,
                             ),
                             labelStyle: GoogleFonts.poppins(

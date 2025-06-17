@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_string_interpolations, use_build_context_synchronously, avoid_function_literals_in_foreach_calls
 
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 // import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:naijasingles/common/utils/app_exit.dart';
 import 'package:naijasingles/features/calling/ui/screens/call.dart';
 import 'package:naijasingles/features/explore/explore_map.dart';
+import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/match/ui/screen/match_page.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -605,7 +607,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
         body: userProvider.currentUser!.isBlocked!
             ? const BlockByAdmin()
             : DefaultTabController(
-                length: 5,
+                length: 6,
                 initialIndex: chatdata.contains('notification')
                     ? 4
                     : widget.isPaymentSuccess != null
@@ -632,6 +634,13 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                           dividerColor: Colors.transparent,
                           isScrollable: false,
                           indicatorSize: TabBarIndicatorSize.label,
+                          onTap: (index) {
+                            log("Tab selected: $index");
+                            if (index == 2) {
+                              // If Explore tab is selected, navigate to the standalone page
+                              Navigator.of(context).pushNamed(RouteName.exploreScreen);
+                            }
+                          },
                           tabs: const [
                             Tab(
                               icon: Icon(
@@ -645,6 +654,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                               ),
                             ),
                             Tab(icon: Icon(Icons.explore)),
+                            Tab(icon: Icon(Icons.card_giftcard)),
                             Tab(
                               icon: Icon(
                                 Icons.notifications,
@@ -671,6 +681,11 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                           items: items,
                           isPurchased: isPuchased,
                         )),
+                        Center(
+                            child: Container(
+                              color: Colors.amber.withOpacity(0.3),
+                              child: ExploreScreen(),
+                            )),
                         Center(
                             child: ExploreMapWidget(
                           isPuchased: isPuchased,

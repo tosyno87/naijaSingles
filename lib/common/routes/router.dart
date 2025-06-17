@@ -4,6 +4,10 @@ import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/utils/large_image.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
+import 'package:naijasingles/features/home/dating_homepage.dart';
+import 'package:naijasingles/features/explore/explore_screen.dart';
+import 'package:naijasingles/features/explore/explore_page.dart';
+import 'package:naijasingles/features/home/main_navigation_screen.dart';
 
 import 'package:naijasingles/features/chat/ui/screens/chat_page.dart';
 
@@ -78,6 +82,7 @@ abstract class AppRouter {
     RouteName.matchPage: (context) => const MatchScreen(),
     RouteName.sexualorientationScreen: (context) => const SexualOrientation(),
     RouteName.universityScreen: (context) => const UniversityPage(),
+    RouteName.datingHomePage: (context) => const DatingHomePage(),
     RouteName.profilePicSetScreen: (context) => const UserProfilePic(),
     RouteName.allowLocationScreen: (context) => const AllowLocation(),
     RouteName.otpScreen: (context) => OtpPage(
@@ -100,6 +105,12 @@ abstract class AppRouter {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
     RouteName.mvpOnboarding: (context) => const OnboardingMain(),
+    RouteName.exploreScreen: (context) => const ExplorePage(),
+    RouteName.mainNavigation: (context) => const MainNavigationScreen(),
+    
+    // New main routes
+    RouteName.onboarding: (context) => const OnboardingMain(),
+    RouteName.home: (context) => const Tabbar("active", false),
 
   };
 }

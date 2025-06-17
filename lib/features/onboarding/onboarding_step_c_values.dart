@@ -327,7 +327,8 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                       onPressed: _isStepValid(controller) 
                         ? () {
                             HapticFeedback.mediumImpact();
-                            widget.finishOnboarding();
+                            // Navigate to Dating Homepage instead of calling finishOnboarding
+                            Navigator.pushReplacementNamed(context, '/dating');
                           } 
                         : () {
                             setState(() {

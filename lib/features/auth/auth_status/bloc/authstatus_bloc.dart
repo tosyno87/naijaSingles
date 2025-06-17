@@ -40,6 +40,11 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
       AuthRequestEvent event, Emitter<AuthstatusState> emit) async {
     try {
       emit(AuthLoadingState());
+      // Always emit UnauthenticatedState to force login screen
+      emit(UnauthenticatedState());
+      
+      // Comment out the auto-login logic
+      /*
       var issingedin = await phoneAuthRepository.isSignedIn();
       if (issingedin) {
         var user = auth.currentUser;
@@ -52,8 +57,9 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
           emit(UnauthenticatedState());
         }
       } else {
-        emit(const AuthFailed(message: "Login failed"));
+        emit(UnauthenticatedState());
       }
+      */
     } catch (e) {
       emit(AuthFailed(message: e.toString()));
     }

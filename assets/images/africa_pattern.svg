@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="800px" viewBox="0 0 800 800" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>African Pattern</title>
+    <defs>
+        <pattern id="pattern-1" width="40" height="40" x="-40" y="-40" patternUnits="userSpaceOnUse">
+            <use xlink:href="#path-1"></use>
+        </pattern>
+        <path d="M20,0 C31.0457,0 40,8.9543 40,20 C40,31.0457 31.0457,40 20,40 C8.9543,40 0,31.0457 0,20 C0,8.9543 8.9543,0 20,0 Z M20,10 C14.4772,10 10,14.4772 10,20 C10,25.5228 14.4772,30 20,30 C25.5228,30 30,25.5228 30,20 C30,14.4772 25.5228,10 20,10 Z" id="path-1"></path>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.05">
+        <rect fill="#FFD700" x="0" y="0" width="800" height="800"></rect>
+        <rect fill="url(#pattern-1)" x="0" y="0" width="800" height="800"></rect>
+    </g>
+</svg>

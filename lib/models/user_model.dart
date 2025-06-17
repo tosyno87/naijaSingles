@@ -129,7 +129,7 @@ class UserModel {
           ? doc.get('isBot') ?? false
           : false,
 
-      imageUrl: doc.get('Pictures') != null
+      imageUrl: doc.data().toString().contains('Pictures')
           ? List.generate(doc.get('Pictures').length, (index) {
               return doc.get('Pictures')[index];
             })

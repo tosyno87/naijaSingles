@@ -9,15 +9,19 @@ import '../common/constants/constants.dart';
 import '../models/user_model.dart';
 
 class FireStoreClass {
-  static Future<UploadTask?> uploadFile(
-      {required String checktype,
-      required UserModel currentUser,
+  // Method for uploading profile during registration
+  static Future<UploadTask?> uploadprofile({
+      required String currentUserId,
       required File file}) async {
     try {
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
-      Reference storageReference = FirebaseStorage.instanceFor(bucket: bucketId)
+      
+      // Use default Firebase Storage instance
+      Reference storageReference = FirebaseStorage.instance
           .ref()
-          .child('users/${currentUser.id}/$timestamp.jpg');
+          .child('users/$currentUserId/$timestamp.jpg');
+      
+      log("Uploading profile to: users/$currentUserId/$timestamp.jpg");
       
       // Check if file exists and is readable
       if (!file.existsSync()) {
@@ -30,145 +34,147 @@ class FireStoreClass {
       try {
         await uploadTask.then((p0) {
           storageReference.getDownloadURL().then((fileURL) async {
-            Map<String, dynamic> updateObject = {
-              "Pictures": FieldValue.arrayUnion([
-                fileURL,
-              ])
-            };
+            try {
+              log("Updating profile picture with URL: $fileURL");
+              await firebaseFireStoreInstance
+                  .collection("Users")
+                  .doc(currentUserId)
+                  .set({"Pictures": [fileURL]},
+                      SetOptions(merge: true));
+            } catch (e) {
+              log("Error updating Firestore with image URL: $e");
+            }
+          });
+        });
+      } catch (e) {
+        log("Error in upload task: $e");
+      }
+      return uploadTask;
+    } catch (e) {
+      log("Error in uploadprofile: $e");
+      return null;
+    }
+  }
+
+  // Method for uploading verification images
+  static Future<String?> uploadVerification({
+      required String userId,
+      required File file}) async {
+    try {
+      final int timestamp = DateTime.now().millisecondsSinceEpoch;
+      
+      // Use default Firebase Storage instance
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('verification/$userId/$timestamp.jpg');
+      
+      log("Uploading verification to: verification/$userId/$timestamp.jpg");
+      
+      // Check if file exists and is readable
+      if (!file.existsSync()) {
+        log("File does not exist: ${file.path}");
+        return null;
+      }
+      
+      UploadTask uploadTask = storageReference.putFile(file);
+      
+      try {
+        TaskSnapshot snapshot = await uploadTask;
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+        
+        // Update user document with verification status
+        await firebaseFireStoreInstance
+            .collection("Users")
+            .doc(userId)
+            .set({
+              "verification": {
+                "status": "pending",
+                "imageUrl": downloadUrl,
+                "submittedAt": FieldValue.serverTimestamp()
+              }
+            }, SetOptions(merge: true));
+            
+        log("Verification image uploaded: $downloadUrl");
+        return downloadUrl;
+      } catch (e) {
+        log("Error in verification upload task: $e");
+        return null;
+      }
+    } catch (e) {
+      log("Error in uploadVerification: $e");
+      return null;
+    }
+  }
+
+  static Future<UploadTask?> uploadFile(
+      {required String checktype,
+      required UserModel currentUser,
+      required File file}) async {
+    try {
+      final int timestamp = DateTime.now().millisecondsSinceEpoch;
+      
+      // Use default Firebase Storage instance instead of custom bucket
+      // This will use the storage bucket from your Firebase project
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('users/${currentUser.id}/$timestamp.jpg');
+      
+      log("Uploading profile to: users/${currentUser.id}/$timestamp.jpg");
+      
+      // Check if file exists and is readable
+      if (!file.existsSync()) {
+        log("File does not exist: ${file.path}");
+        return null;
+      }
+      
+      UploadTask uploadTask = storageReference.putFile(file);
+      
+      try {
+        await uploadTask.then((p0) {
+          storageReference.getDownloadURL().then((fileURL) async {
+            // Initialize Pictures array if it doesn't exist
+            DocumentSnapshot userDoc = await firebaseFireStoreInstance
+                .collection("Users")
+                .doc(currentUser.id)
+                .get();
+                
+            List<String> pictures = [];
+            if (userDoc.exists && userDoc.data() is Map<String, dynamic>) {
+              Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+              if (userData.containsKey('Pictures') && userData['Pictures'] is List) {
+                pictures = List<String>.from(userData['Pictures']);
+              }
+            }
+            
+            // Add new image URL
+            pictures.add(fileURL);
+            
             try {
               if (checktype == 'profile') {
-                //currentUser.imageUrl.removeAt(0);
-                currentUser.imageUrl!.insert(0, fileURL);
-                log("Updating profile picture");
+                log("Updating profile picture with URL: $fileURL");
                 await firebaseFireStoreInstance
                     .collection("Users")
                     .doc(currentUser.id)
-                    .set({"Pictures": currentUser.imageUrl},
+                    .set({"Pictures": pictures},
                         SetOptions(merge: true));
               } else {
                 await firebaseFireStoreInstance
                     .collection("Users")
                     .doc(currentUser.id)
-                    .set(updateObject, SetOptions(merge: true));
-                currentUser.imageUrl!.add(fileURL);
+                    .update({"Pictures": pictures});
               }
-            } catch (err) {
-              log("Error updating Firestore: ${err.toString()}");
-              rethrow;
+            } catch (e) {
+              log("Error updating Firestore with image URL: $e");
             }
-          }).catchError((err) {
-            log("Error getting download URL: ${err.toString()}");
-            return null;
           });
-        }).catchError((err) {
-          log("Error in upload task: ${err.toString()}");
-          return null;
         });
-        
-        return uploadTask;
       } catch (e) {
-        log("Error in upload task completion: ${e.toString()}");
-        return null;
+        log("Error in upload task: $e");
       }
-    } on FirebaseException catch (e) {
-      log("Firebase error in upload file: ${e.message}");
-      return null;
+      return uploadTask;
     } catch (e) {
-      log("General error in upload file: ${e.toString()}");
+      log("Error in uploadFile: $e");
       return null;
     }
   }
-
-  // Function to upload file and get download URL
-  static Future<UploadTask?> uploadprofile(
-      {required String currentUserId, required File file}) async {
-    try {
-      // Check if file exists and is readable
-      if (!file.existsSync()) {
-        log("Profile file does not exist: ${file.path}");
-        return null;
-      }
-      
-      final int timestamp = DateTime.now().millisecondsSinceEpoch;
-      Reference storageReference = FirebaseStorage.instanceFor(bucket: bucketId)
-          .ref()
-          .child('users/$currentUserId/$timestamp.jpg');
-      
-      log("Uploading profile to: users/$currentUserId/$timestamp.jpg");
-      UploadTask uploadTask = storageReference.putFile(file);
-
-      try {
-        await uploadTask.then((p0) {
-          storageReference.getDownloadURL().then((fileURL) async {
-            Map<String, dynamic> updateObject = {
-              "Pictures": FieldValue.arrayUnion([
-                fileURL,
-              ])
-            };
-            try {
-              log("Adding profile URL to Firestore");
-              await firebaseFireStoreInstance
-                  .collection("Users")
-                  .doc(currentUserId)
-                  .set(
-                    updateObject,
-                    SetOptions(merge: true),
-                  );
-            } catch (err) {
-              log("Error updating Firestore with profile: ${err.toString()}");
-              return null;
-            }
-          }).catchError((err) {
-            log("Error getting profile download URL: ${err.toString()}");
-            return null;
-          });
-        }).catchError((err) {
-          log("Error in profile upload task: ${err.toString()}");
-          return null;
-        });
-
-        return uploadTask;
-      } catch (e) {
-        log("Error in profile upload task completion: ${e.toString()}");
-        return null;
-      }
-    } on FirebaseException catch (e) {
-      log("Firebase error in profile upload: ${e.message}");
-      return null;
-    } catch (e) {
-      log("General error in profile upload: ${e.toString()}");
-      return null;
-    }
-  }
-  static Future<String?> uploadVerification({
-    required String userId,
-    required File file,
-  }) async {
-    try {
-      if (!file.existsSync()) {
-        log('Verification file does not exist: ${file.path}');
-        return null;
-      }
-
-      final int timestamp = DateTime.now().millisecondsSinceEpoch;
-      Reference storageReference = FirebaseStorage.instanceFor(bucket: bucketId)
-          .ref()
-          .child('verification/$userId/$timestamp.jpg');
-
-      UploadTask uploadTask = storageReference.putFile(file);
-      await uploadTask;
-
-      final fileURL = await storageReference.getDownloadURL();
-      await firebaseFireStoreInstance.collection('Users').doc(userId).set({
-        'verificationImages': FieldValue.arrayUnion([fileURL]),
-        'isVerified': true,
-      }, SetOptions(merge: true));
-
-      return fileURL;
-    } catch (e) {
-      log('Error uploading verification image: ${e.toString()}');
-      return null;
-    }
-  }
-
 }

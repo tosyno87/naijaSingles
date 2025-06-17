@@ -230,7 +230,8 @@ class PhoneAuthRepository {
       'userId': user!.uid,
       "isBlocked": false,
       'isPremium': false,
-      'phoneNumber': user.phoneNumber
+      'phoneNumber': user.phoneNumber,
+      'Pictures': [] // Initialize empty Pictures array
     });
 
     await firebaseFireStoreInstance

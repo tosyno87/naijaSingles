@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
-        RouteName.mvpOnboarding,
+        RouteName.mainNavigation,
       );
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
-        RouteName.mvpOnboarding,
+        RouteName.mainNavigation,
       );
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message);

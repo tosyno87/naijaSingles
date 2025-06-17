@@ -34,16 +34,27 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   
   final TextEditingController _tribeController = TextEditingController();
   
-  // List of Nigerian tribes
-  final List<String> _suggestedTribes = [
-    'Yoruba', 'Igbo', 'Hausa', 'Fulani', 'Ijaw', 'Kanuri', 
-    'Ibibio', 'Tiv', 'Edo', 'Nupe', 'Urhobo', 'Igala'
+  // State for dropdown and custom tribe entry
+  String? _selectedTribe;
+  bool _isCustomTribe = false;
+  
+  // State for language selection
+  String? _selectedLanguage;
+  bool _isCustomLanguage = false;
+  final TextEditingController _customLanguageController = TextEditingController();
+  
+  // List of African tribes for dropdown
+  final List<String> _africanTribes = [
+    'Yoruba', 'Igbo', 'Hausa', 'Amhara', 'Tigray', 'Oromo', 'Fulani',
+    'Zulu', 'Xhosa', 'Shona', 'Twi', 'Ewe', 'Wolof', 'Somali', 'Berber',
+    'Tutsi', 'Akan', 'Baganda', 'Other'
   ];
   
-  // List of languages commonly spoken in Nigeria
+  // List of languages for dropdown
   final List<String> _availableLanguages = [
-    'English', 'Yoruba', 'Igbo', 'Hausa', 'Pidgin', 
-    'French', 'Arabic', 'Efik', 'Ibibio', 'Tiv', 'Urhobo'
+    'English', 'Yoruba', 'Igbo', 'Hausa', 'Pidgin', 'French', 'Arabic', 
+    'Swahili', 'Amharic', 'Zulu', 'Xhosa', 'Twi', 'Wolof', 'Somali', 
+    'Portuguese', 'Spanish', 'Other'
   ];
   
   // Intent options with icons, titles and descriptions
@@ -69,8 +80,43 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    
+    // Add listener to text controller to rebuild UI when text changes
+    _tribeController.addListener(() {
+      print("Tribe text changed: '${_tribeController.text}'");
+      setState(() {});
+    });
+    
+    // Initialize text controller with existing value if any
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<OnboardingController>(context, listen: false);
+      if (controller.tribe != null && controller.tribe!.isNotEmpty) {
+        print("Setting initial tribe: '${controller.tribe}'");
+        _tribeController.text = controller.tribe!;
+        
+        // Check if the tribe is in our dropdown list
+        if (_africanTribes.contains(controller.tribe)) {
+          setState(() {
+            _selectedTribe = controller.tribe;
+            _isCustomTribe = false;
+          });
+        } else if (controller.tribe != null) {
+          // If not in the list, set to "Other" and enable custom entry
+          setState(() {
+            _selectedTribe = 'Other';
+            _isCustomTribe = true;
+          });
+        }
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _tribeController.dispose();
+    _customLanguageController.dispose();
     super.dispose();
   }
 
@@ -158,22 +204,43 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     // Tribe input
                     _buildSectionTitle('What is your tribe or ethnic group?'),
                     const SizedBox(height: 12),
-                    TextField(
+                    
+                    // Dropdown for tribe selection
+                    DropdownButtonFormField<String>(
                       key: _tribeFieldKey,
-                      controller: _tribeController,
-                      autofocus: true,
-                      textInputAction: TextInputAction.next,
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      value: _selectedTribe,
+                      onChanged: (value) {
+                        if (value == 'Other') {
+                          setState(() {
+                            _selectedTribe = value;
+                            _isCustomTribe = true;
+                            // Clear the text field for custom entry
+                            _tribeController.text = '';
+                          });
+                        } else {
+                          setState(() {
+                            _selectedTribe = value!;
+                            _isCustomTribe = false;
+                            _tribeController.text = value;
+                            controller.updateTribe(value);
+                          });
+                        }
+                      },
+                      items: _africanTribes.map((tribe) {
+                        return DropdownMenuItem(
+                          value: tribe,
+                          child: Text(
+                            tribe,
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                       decoration: InputDecoration(
-                        labelText: 'Tribe',
-                        hintText: 'Enter your tribe',
-                        hintStyle: GoogleFonts.poppins(
-                          color: Colors.grey[800],
-                          fontSize: 16,
-                        ),
+                        labelText: 'Tribe or Ethnic Group',
                         labelStyle: GoogleFonts.poppins(
                           color: deepGreen,
                           fontSize: 16,
@@ -197,171 +264,271 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           vertical: 14,
                         ),
                       ),
-                      onChanged: (value) {
-                        controller.updateTribe(value.trim());
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Suggested tribes
-                    Text(
-                      'Suggestions:',
                       style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.grey[700],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
+                      dropdownColor: Colors.white,
+                      icon: Icon(Icons.arrow_drop_down, color: deepGreen),
+                      isExpanded: true,
                     ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        // Hardcoded chip for testing visibility
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              _tribeController.text = "Yoruba";
-                              controller.updateTribe("Yoruba");
-                              HapticFeedback.lightImpact();
-                            },
-                            splashColor: const Color(0xFF008037).withOpacity(0.1),
-                            highlightColor: const Color(0xFF008037).withOpacity(0.05),
-                            child: Ink(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Colors.grey[400]!),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                child: Text(
-                                  "Yoruba",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ),
+                    
+                    // Manual entry field if "Other" is selected
+                    if (_isCustomTribe) ...[
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _tribeController,
+                        decoration: InputDecoration(
+                          labelText: 'Enter your tribe',
+                          labelStyle: GoogleFonts.poppins(
+                            color: deepGreen,
+                            fontSize: 16,
+                          ),
+                          hintText: 'Type your tribe or ethnic group',
+                          hintStyle: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey[400]!),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey[400]!),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: deepGreen, width: 2),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
                           ),
                         ),
-                        
-                        // Dynamic chips from the list
-                        ..._suggestedTribes.where((tribe) => tribe != "Yoruba").map((tribe) {
-                          return Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                _tribeController.text = tribe;
-                                controller.updateTribe(tribe.trim());
-                                HapticFeedback.lightImpact();
-                              },
-                              splashColor: const Color(0xFF008037).withOpacity(0.1),
-                              highlightColor: const Color(0xFF008037).withOpacity(0.05),
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.grey[400]!),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  child: Text(
-                                    tribe,
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.black87,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                        onChanged: (value) {
+                          controller.updateTribe(value.trim());
+                        },
+                      ),
+                    ],
                     const SizedBox(height: 32),
                     
                     // Languages selection
                     _buildSectionTitle('Which languages do you speak?'),
                     const SizedBox(height: 8),
                     Text(
-                      'Select all that apply',
+                      'Select all languages that you speak',
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.grey[700],
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Semantics(
-                      label: 'Language selection',
-                      hint: 'Select one or more languages that you speak',
-                      child: Wrap(
-                        key: _languagesKey,
+                    
+                    // Display selected languages as chips
+                    if (controller.languages.isNotEmpty) ...[
+                      Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: _availableLanguages.map((language) {
-                          final isSelected = controller.languages.contains(language);
-                          return Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                List<String> updatedLanguages = [...controller.languages];
-                                if (!isSelected) {
-                                  updatedLanguages.add(language);
-                                } else {
-                                  updatedLanguages.remove(language);
-                                }
-                                controller.updateLanguages(updatedLanguages);
-                                HapticFeedback.selectionClick();
-                              },
-                              splashColor: deepGreen.withOpacity(0.1),
-                              highlightColor: deepGreen.withOpacity(0.05),
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  color: isSelected ? deepGreen : Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: isSelected ? deepGreen : Colors.grey[400]!,
-                                    width: isSelected ? 1.5 : 1,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        language,
-                                        style: GoogleFonts.poppins(
-                                          color: isSelected ? Colors.white : Colors.black87,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      if (isSelected) ...[
-                                        const SizedBox(width: 4),
-                                        Icon(
-                                          Icons.check,
-                                          size: 16,
-                                          color: Colors.white,
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
+                        children: controller.languages.map((language) {
+                          return Chip(
+                            label: Text(
+                              language,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
+                            backgroundColor: deepGreen,
+                            deleteIconColor: Colors.white,
+                            onDeleted: () {
+                              setState(() {
+                                List<String> updatedLanguages = [...controller.languages];
+                                updatedLanguages.remove(language);
+                                controller.updateLanguages(updatedLanguages);
+                              });
+                            },
                           );
                         }).toList(),
                       ),
+                      const SizedBox(height: 16),
+                    ],
+                    
+                    // Dropdown for language selection
+                    DropdownButtonFormField<String>(
+                      key: _languagesKey,
+                      value: _selectedLanguage,
+                      hint: Text(
+                        'Select a language',
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                      onChanged: (value) {
+                        if (value == 'Other') {
+                          setState(() {
+                            _selectedLanguage = value;
+                            _isCustomLanguage = true;
+                          });
+                        } else if (value != null) {
+                          setState(() {
+                            _selectedLanguage = value;
+                            _isCustomLanguage = false;
+                            
+                            // Add to languages list if not already there
+                            if (!controller.languages.contains(value)) {
+                              List<String> updatedLanguages = [...controller.languages];
+                              updatedLanguages.add(value);
+                              controller.updateLanguages(updatedLanguages);
+                              
+                              // Reset dropdown after selection
+                              _selectedLanguage = null;
+                            }
+                          });
+                        }
+                      },
+                      items: _availableLanguages.map((language) {
+                        return DropdownMenuItem(
+                          value: language,
+                          child: Text(
+                            language,
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Add Language',
+                        labelStyle: GoogleFonts.poppins(
+                          color: deepGreen,
+                          fontSize: 16,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey[400]!),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey[400]!),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: deepGreen, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                      dropdownColor: Colors.white,
+                      icon: Icon(Icons.arrow_drop_down, color: deepGreen),
+                      isExpanded: true,
                     ),
+                    
+                    // Manual entry field if "Other" is selected
+                    if (_isCustomLanguage) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _customLanguageController,
+                              decoration: InputDecoration(
+                                labelText: 'Enter language',
+                                labelStyle: GoogleFonts.poppins(
+                                  color: deepGreen,
+                                  fontSize: 16,
+                                ),
+                                hintText: 'Type a language you speak',
+                                hintStyle: GoogleFonts.poppins(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Colors.grey[400]!),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Colors.grey[400]!),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(color: deepGreen, width: 2),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                              ),
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton(
+                            onPressed: () {
+                              final customLanguage = _customLanguageController.text.trim();
+                              if (customLanguage.isNotEmpty) {
+                                setState(() {
+                                  // Add custom language to the list
+                                  if (!controller.languages.contains(customLanguage)) {
+                                    List<String> updatedLanguages = [...controller.languages];
+                                    updatedLanguages.add(customLanguage);
+                                    controller.updateLanguages(updatedLanguages);
+                                  }
+                                  
+                                  // Reset custom language state
+                                  _customLanguageController.clear();
+                                  _isCustomLanguage = false;
+                                  _selectedLanguage = null;
+                                });
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: deepGreen,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: Text(
+                              'Add',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -537,7 +704,13 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   
   /// Validates if all required fields are filled
   bool _isStepValid(OnboardingController controller) {
-    return (controller.tribe != null && controller.tribe!.isNotEmpty) &&
+    // For tribe, check if a dropdown option is selected or custom tribe is entered
+    bool isTribeValid = _selectedTribe != null;
+    if (_selectedTribe == 'Other') {
+      isTribeValid = _tribeController.text.trim().isNotEmpty;
+    }
+    
+    return isTribeValid &&
            controller.languages.isNotEmpty &&
            controller.intent != null;
   }

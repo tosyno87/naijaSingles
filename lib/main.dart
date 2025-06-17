@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,7 @@ import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
 import 'package:naijasingles/features/home/ui/screens/splash.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
 import 'package:naijasingles/features/street_view/bloc/streetviewdata_bloc.dart';
+import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
 import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
 import 'package:provider/provider.dart';
 
@@ -49,8 +51,10 @@ Future<void> main() async {
   if (kDebugMode) {
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
     log("🔥 Using Firebase Auth Emulator on localhost:9099");
     log("🔥 Using Firebase Firestore Emulator on localhost:8080");
+    log("🔥 Using Firebase Storage Emulator on localhost:9199");
   }
 
   Bloc.observer = SimpleBlocObserver();
@@ -134,9 +138,13 @@ class _MyHomePageState extends State<MyHomePage> {
               create: (context) => FacebookLoginBloc(),
             ),
           ],
-          child: ChangeNotifierProvider(
-            create: (context) => ThemeProvider(),
-            builder: (context, state) {
+          child: MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => ThemeProvider()),
+              ChangeNotifierProvider(create: (context) => UserProvider()),
+              ChangeNotifierProvider(create: (context) => OnboardingController()),
+            ],
+            builder: (context, child) {
               final themeProvider = Provider.of<ThemeProvider>(context);
               return MaterialApp(
                   debugShowCheckedModeBanner: false,
@@ -159,10 +167,23 @@ class _MyHomePageState extends State<MyHomePage> {
                               } else if (state is AuthenticatedState) {
                                 log("success called ");
 
-                                state.user.getIdToken().then((value) {
-                                  BlocProvider.of<RegistrationBloc>(context)
-                                      .add(CheckRegistration(token: value!));
-                                });
+                                try {
+                                  state.user.getIdToken().then((value) {
+                                    if (value != null) {
+                                      BlocProvider.of<RegistrationBloc>(context)
+                                          .add(CheckRegistration(token: value));
+                                    } else {
+                                      print("ID token is null");
+                                      // Handle null token case
+                                    }
+                                  }).catchError((error) {
+                                    print("Error getting ID token: $error");
+                                    // Handle token retrieval error
+                                  });
+                                } catch (e) {
+                                  print("Exception in authentication flow: $e");
+                                  // Handle any exceptions in the authentication flow
+                                }
                                 // for registration
                               }
                             }),
@@ -174,12 +195,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   .currentUser = state.user;
                               log("navigate to already");
                               Navigator.pushReplacementNamed(
-                                  context, RouteName.tabScreen,
-                                  arguments: state.user);
+                                  context, RouteName.mainNavigation);
                             } else if (state is NewRegistration) {
                               log("from new registration");
                               Navigator.pushReplacementNamed(
-                                  context, RouteName.welcomeScreen);
+                                  context, RouteName.onboarding);
                             }
                           },
                           child: const Splash())));

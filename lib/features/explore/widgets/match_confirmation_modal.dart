@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
+
+import '../../messages/services/chat_service.dart';
+import '../../messages/chat_thread_screen.dart';
 
 class MatchConfirmationModal extends StatefulWidget {
   final String currentUserImageUrl;
   final String matchedUserImageUrl;
   final String matchedUserName;
-  final String threadId;
+  final String matchedUserId;
 
   const MatchConfirmationModal({
     Key? key,
     required this.currentUserImageUrl,
     required this.matchedUserImageUrl,
     required this.matchedUserName,
-    required this.threadId,
+    required this.matchedUserId,
   }) : super(key: key);
 
   @override
@@ -25,6 +28,8 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+  final ChatService _chatService = ChatService();
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -55,6 +60,68 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  // Handle sending a message to the matched user
+  Future<void> _handleSendMessage() async {
+    if (_isProcessing) return;
+    
+    setState(() {
+      _isProcessing = true;
+    });
+    
+    try {
+      // Create or get chat thread
+      final threadId = await _chatService.createChatThread(
+        widget.matchedUserId,
+        widget.matchedUserName,
+      );
+      
+      if (threadId != null) {
+        if (!mounted) return;
+        
+        // Close the modal
+        Navigator.pop(context);
+        
+        // Navigate to chat thread
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatThreadScreen(
+              threadId: threadId,
+              userName: widget.matchedUserName,
+              avatarUrl: widget.matchedUserImageUrl,
+              otherUserId: widget.matchedUserId,
+            ),
+          ),
+        );
+      } else {
+        // Show error
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to create chat. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _isProcessing = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error in _handleSendMessage: $e');
+      // Show error
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong. Please try again later.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _isProcessing = false;
+      });
+    }
   }
 
   @override
@@ -99,9 +166,9 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                 Container(
                   height: 60,
                   alignment: Alignment.center,
-                  child: Icon(
+                  child: const Icon(
                     Icons.favorite,
-                    color: const Color(0xFF008037),
+                    color: Color(0xFF008037),
                     size: 50,
                   ),
                 ),
@@ -173,8 +240,8 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                 
                 // Action buttons
                 isWideScreen
-                    ? _buildHorizontalButtons(context)
-                    : _buildVerticalButtons(context),
+                    ? _buildHorizontalButtons()
+                    : _buildVerticalButtons(),
               ],
             ),
           ),
@@ -215,17 +282,20 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
     );
   }
   
-  Widget _buildHorizontalButtons(BuildContext context) {
+  Widget _buildHorizontalButtons() {
     return Row(
       children: [
         // Keep Exploring button
         Expanded(
           child: OutlinedButton(
-            onPressed: () {
+            onPressed: _isProcessing ? null : () {
               Navigator.pop(context);
             },
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFF008037), width: 2),
+              side: BorderSide(
+                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+                width: 2,
+              ),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -236,7 +306,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF008037),
+                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
               ),
             ),
           ),
@@ -247,17 +317,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
         // Send Message button
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Show a snackbar instead of navigating to chat
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Chat with ${widget.matchedUserName} will be available soon!'),
-                  backgroundColor: const Color(0xFF008037),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            },
+            onPressed: _isProcessing ? null : _handleSendMessage,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008037),
               foregroundColor: Colors.white,
@@ -265,47 +325,37 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
+              disabledBackgroundColor: Colors.grey,
             ),
-            child: Text(
-              'Send Message',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: _isProcessing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(
+                    'Send Message',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         ),
       ],
     );
   }
   
-  Widget _buildVerticalButtons(BuildContext context) {
+  Widget _buildVerticalButtons() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Send Message button
         ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-            // Try to navigate to chat, show snackbar if not available
-            try {
-              Navigator.pushNamed(
-                context,
-                RouteName.chatPageScreen,
-                arguments: {
-                  'threadId': widget.threadId,
-                  'userName': widget.matchedUserName,
-                },
-              );
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Chat with ${widget.matchedUserName} will be available soon!'),
-                  backgroundColor: const Color(0xFF008037),
-                ),
-              );
-            }
-          },
+          onPressed: _isProcessing ? null : _handleSendMessage,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF008037),
             foregroundColor: Colors.white,
@@ -313,25 +363,38 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
+            disabledBackgroundColor: Colors.grey,
           ),
-          child: Text(
-            'Send Message',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: _isProcessing
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+              : Text(
+                  'Send Message',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
         ),
         
         const SizedBox(height: 12),
         
         // Keep Exploring button
         OutlinedButton(
-          onPressed: () {
+          onPressed: _isProcessing ? null : () {
             Navigator.pop(context);
           },
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFF008037), width: 2),
+            side: BorderSide(
+              color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+              width: 2,
+            ),
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -342,7 +405,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF008037),
+              color: _isProcessing ? Colors.grey : const Color(0xFF008037),
             ),
           ),
         ),

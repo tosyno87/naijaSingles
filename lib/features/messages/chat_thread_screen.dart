@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'services/chat_service.dart';
+import 'message_model.dart';
 
 class ChatThreadScreen extends StatefulWidget {
   final String threadId;
   final String userName;
+  final String? avatarUrl;
+  final String? otherUserId;
 
   const ChatThreadScreen({
     Key? key,
     required this.threadId,
     required this.userName,
+    this.avatarUrl,
+    this.otherUserId,
   }) : super(key: key);
 
   @override
@@ -19,14 +28,22 @@ class ChatThreadScreen extends StatefulWidget {
 class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final List<ChatMessage> _messages = [];
+  final ChatService _chatService = ChatService();
   bool _isTyping = false;
-
+  String? _currentUserId;
+  
   @override
   void initState() {
     super.initState();
-    // Load dummy messages
-    _loadDummyMessages();
+    _currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    
+    // Mark thread as read when opening
+    _chatService.markThreadAsRead(widget.threadId);
+    
+    // Scroll to bottom when messages load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
   }
 
   @override
@@ -36,95 +53,25 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     super.dispose();
   }
 
-  void _loadDummyMessages() {
-    // Add some dummy messages for demonstration
-    _messages.addAll([
-      ChatMessage(
-        text: 'Hi there! How are you?',
-        isMe: false,
-        timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
-      ),
-      ChatMessage(
-        text: 'I\'m good, thanks for asking! How about you?',
-        isMe: true,
-        timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 1, minutes: 45)),
-      ),
-      ChatMessage(
-        text: 'I\'m doing well. What are your plans for the weekend?',
-        isMe: false,
-        timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 1, minutes: 30)),
-      ),
-      ChatMessage(
-        text: 'I\'m thinking of checking out that new restaurant in town. Would you like to join me?',
-        isMe: true,
-        timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
-      ),
-      ChatMessage(
-        text: 'That sounds great! I\'d love to join you.',
-        isMe: false,
-        timestamp: DateTime.now().subtract(const Duration(minutes: 45)),
-      ),
-      ChatMessage(
-        text: 'Perfect! How about Saturday at 7pm?',
-        isMe: true,
-        timestamp: DateTime.now().subtract(const Duration(minutes: 30)),
-      ),
-      ChatMessage(
-        text: 'Saturday at 7pm works for me. Looking forward to it!',
-        isMe: false,
-        timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
-      ),
-    ]);
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void _sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
 
-    setState(() {
-      _messages.add(
-        ChatMessage(
-          text: _messageController.text.trim(),
-          isMe: true,
-          timestamp: DateTime.now(),
-        ),
-      );
-      _messageController.clear();
-    });
-
+    _chatService.sendMessage(widget.threadId, text);
+    _messageController.clear();
+    
     // Scroll to bottom after sending message
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-
-    // Simulate reply after a delay
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _messages.add(
-            ChatMessage(
-              text: 'Thanks for your message! This is a demo reply.',
-              isMe: false,
-              timestamp: DateTime.now(),
-            ),
-          );
-        });
-
-        // Scroll to bottom after receiving reply
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      }
-    });
+    Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
   }
 
   @override
@@ -140,6 +87,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: deepGreen),
           onPressed: () => Navigator.pop(context),
@@ -150,7 +98,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               tag: 'avatar-${widget.threadId}',
               child: CircleAvatar(
                 radius: 16,
-                backgroundImage: const AssetImage('assets/images/placeholder_profile.jpg'),
+                backgroundImage: widget.avatarUrl != null
+                    ? NetworkImage(widget.avatarUrl!)
+                    : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
+                onBackgroundImageError: (_, __) {},
               ),
             ),
             const SizedBox(width: 8),
@@ -192,13 +143,81 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         children: [
           // Chat messages
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                return _buildMessageBubble(message);
+            child: StreamBuilder<List<Message>>(
+              stream: _chatService.getMessagesStream(widget.threadId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error loading messages',
+                      style: GoogleFonts.poppins(color: Colors.red),
+                    ),
+                  );
+                }
+                
+                final messages = snapshot.data ?? [];
+                
+                if (messages.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No messages yet',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Say hi to ${widget.userName}!',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: deepGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                
+                // Scroll to bottom when new messages arrive
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToBottom();
+                });
+                
+                return ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    final isMe = message.senderId == _currentUserId;
+                    
+                    // Group messages by date
+                    final showDateSeparator = index == 0 || 
+                        !_isSameDay(messages[index].timestamp, messages[index - 1].timestamp);
+                    
+                    return Column(
+                      children: [
+                        if (showDateSeparator)
+                          _buildDateSeparator(message.timestamp),
+                        _buildMessageBubble(message, isMe),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ),
@@ -308,10 +327,35 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     );
   }
   
+  // Date separator
+  Widget _buildDateSeparator(DateTime timestamp) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Divider(color: Colors.grey[300]),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              _formatDate(timestamp),
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Divider(color: Colors.grey[300]),
+          ),
+        ],
+      ),
+    );
+  }
+  
   // Message bubble
-  Widget _buildMessageBubble(ChatMessage message) {
-    final isMe = message.isMe;
-    
+  Widget _buildMessageBubble(Message message, bool isMe) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -321,7 +365,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           if (!isMe) ...[
             CircleAvatar(
               radius: 16,
-              backgroundImage: const AssetImage('assets/images/placeholder_profile.jpg'),
+              backgroundImage: widget.avatarUrl != null
+                  ? NetworkImage(widget.avatarUrl!)
+                  : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
+              onBackgroundImageError: (_, __) {},
             ),
             const SizedBox(width: 8),
           ],
@@ -356,26 +403,30 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    _formatTime(message.timestamp),
-                    style: GoogleFonts.poppins(
-                      fontSize: 10,
-                      color: isMe ? Colors.white.withOpacity(0.7) : Colors.grey[500],
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _formatTime(message.timestamp),
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          color: isMe ? Colors.white.withOpacity(0.7) : Colors.grey[500],
+                        ),
+                      ),
+                      if (isMe) ...[
+                        const SizedBox(width: 4),
+                        Icon(
+                          message.isRead ? Icons.done_all : Icons.done,
+                          size: 12,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
             ),
           ),
-          
-          if (isMe) ...[
-            const SizedBox(width: 8),
-            Icon(
-              Icons.check_circle,
-              size: 16,
-              color: Colors.grey[400],
-            ),
-          ],
         ],
       ),
     );
@@ -383,22 +434,30 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   
   // Format time for message bubbles
   String _formatTime(DateTime timestamp) {
-    final hour = timestamp.hour > 12 ? timestamp.hour - 12 : timestamp.hour;
+    final hour = timestamp.hour > 12 ? timestamp.hour - 12 : timestamp.hour == 0 ? 12 : timestamp.hour;
     final period = timestamp.hour >= 12 ? 'PM' : 'AM';
     final minute = timestamp.minute.toString().padLeft(2, '0');
     return '$hour:$minute $period';
   }
-}
-
-// Model class for chat messages
-class ChatMessage {
-  final String text;
-  final bool isMe;
-  final DateTime timestamp;
-
-  ChatMessage({
-    required this.text,
-    required this.isMe,
-    required this.timestamp,
-  });
+  
+  // Format date for separators
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    
+    if (date.year == now.year && date.month == now.month && date.day == now.day) {
+      return 'Today';
+    } else if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
+      return 'Yesterday';
+    } else {
+      // Format as full date
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${date.day} ${months[date.month - 1]} ${date.year}';
+    }
+  }
+  
+  // Check if two dates are the same day
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+  }
 }

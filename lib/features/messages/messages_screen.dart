@@ -3,9 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/user_model.dart';
-import '../dating/screens/match_profile_screen.dart';
-import 'message_thread_model.dart';
+import 'services/chat_service.dart';
+import 'message_model.dart';
 import 'chat_thread_screen.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -16,72 +15,7 @@ class MessagesScreen extends StatefulWidget {
 }
 
 class _MessagesScreenState extends State<MessagesScreen> {
-  // Sample data for message threads
-  final List<MessageThread> _messageThreads = [
-    MessageThread(
-      matchId: '1',
-      name: 'Amina',
-      avatarUrl: 'assets/images/placeholder_profile.jpg',
-      lastMessage: 'Hey, how are you doing today?',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
-      isOnline: true,
-      unread: true,
-    ),
-    MessageThread(
-      matchId: '2',
-      name: 'Tunde',
-      avatarUrl: 'assets/images/placeholder_profile.jpg',
-      lastMessage: 'I\'ll be there in 10 minutes',
-      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-      isOnline: false,
-      unread: false,
-    ),
-    MessageThread(
-      matchId: '3',
-      name: 'Ngozi',
-      avatarUrl: 'assets/images/placeholder_profile.jpg',
-      lastMessage: 'That sounds great! Looking forward to it.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 3)),
-      isOnline: true,
-      unread: true,
-    ),
-    MessageThread(
-      matchId: '4',
-      name: 'Kwame',
-      avatarUrl: 'assets/images/placeholder_profile.jpg',
-      lastMessage: 'Did you see the new restaurant that opened?',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      isOnline: false,
-      unread: false,
-    ),
-    MessageThread(
-      matchId: '5',
-      name: 'Zainab',
-      avatarUrl: 'assets/images/placeholder_profile.jpg',
-      lastMessage: 'Thanks for the recommendation!',
-      timestamp: DateTime.now().subtract(const Duration(days: 2)),
-      isOnline: true,
-      unread: false,
-    ),
-    MessageThread(
-      matchId: '6',
-      name: 'Chijioke',
-      avatarUrl: 'assets/images/placeholder_profile.jpg',
-      lastMessage: 'Let\'s meet up this weekend',
-      timestamp: DateTime.now().subtract(const Duration(days: 3)),
-      isOnline: false,
-      unread: true,
-    ),
-    MessageThread(
-      matchId: '7',
-      name: 'Fatima',
-      avatarUrl: 'assets/images/placeholder_profile.jpg',
-      lastMessage: 'I enjoyed our conversation yesterday',
-      timestamp: DateTime.now().subtract(const Duration(days: 4)),
-      isOnline: false,
-      unread: false,
-    ),
-  ];
+  final ChatService _chatService = ChatService();
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +30,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: deepGreen),
-          onPressed: () => Navigator.pop(context),
-        ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         title: Text(
           'Messages',
           style: GoogleFonts.poppins(
@@ -117,15 +48,37 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         ],
       ),
-      body: _messageThreads.isEmpty
-          ? _buildEmptyState()
-          : ListView.builder(
-              itemCount: _messageThreads.length,
-              itemBuilder: (context, index) {
-                final thread = _messageThreads[index];
-                return _buildMessageThreadItem(thread);
-              },
-            ),
+      body: StreamBuilder<List<MessageThreadInfo>>(
+        stream: _chatService.getChatThreadsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Error loading messages',
+                style: GoogleFonts.poppins(color: Colors.red),
+              ),
+            );
+          }
+          
+          final threads = snapshot.data ?? [];
+          
+          if (threads.isEmpty) {
+            return _buildEmptyState();
+          }
+          
+          return ListView.builder(
+            itemCount: threads.length,
+            itemBuilder: (context, index) {
+              final thread = threads[index];
+              return _buildMessageThreadItem(thread);
+            },
+          );
+        },
+      ),
     );
   }
   
@@ -164,30 +117,22 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
   
   // Message thread item
-  Widget _buildMessageThreadItem(MessageThread thread) {
+  Widget _buildMessageThreadItem(MessageThreadInfo thread) {
     return InkWell(
       onTap: () {
         // Mark as read when tapped
-        setState(() {
-          final index = _messageThreads.indexWhere((t) => t.matchId == thread.matchId);
-          if (index != -1) {
-            _messageThreads[index] = MessageThread(
-              matchId: thread.matchId,
-              name: thread.name,
-              avatarUrl: thread.avatarUrl,
-              lastMessage: thread.lastMessage,
-              timestamp: thread.timestamp,
-              isOnline: thread.isOnline,
-              unread: false, // Mark as read
-            );
-          }
-        });
+        _chatService.markThreadAsRead(thread.threadId);
         
         // Navigate to chat thread screen
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ChatThreadScreen(threadId: thread.matchId, userName: thread.name),
+            builder: (_) => ChatThreadScreen(
+              threadId: thread.threadId,
+              userName: thread.otherUserName,
+              avatarUrl: thread.avatarUrl,
+              otherUserId: thread.otherUserId,
+            ),
           ),
         );
       },
@@ -208,11 +153,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Stack(
               children: [
                 Hero(
-                  tag: 'avatar-${thread.matchId}',
+                  tag: 'avatar-${thread.threadId}',
                   child: CircleAvatar(
                     radius: 28,
                     backgroundColor: Colors.grey[300],
-                    backgroundImage: AssetImage(thread.avatarUrl),
+                    backgroundImage: thread.avatarUrl != null
+                        ? NetworkImage(thread.avatarUrl!)
+                        : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
                     onBackgroundImageError: (_, __) {},
                   ),
                 ),
@@ -245,7 +192,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        thread.name,
+                        thread.otherUserName,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: thread.unread ? FontWeight.bold : FontWeight.w500,

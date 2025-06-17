@@ -150,7 +150,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
       user.imageUrl,
       user.name,
-      'test_thread_id',
+      user.id,
     );
     
     // The code below would be used in production
@@ -187,7 +187,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   : '',
               user.imageUrl,
               user.name,
-              threadId,
+              likedUserId,
             );
           }
         } else {
@@ -239,7 +239,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     String currentUserImageUrl,
     String matchedUserImageUrl,
     String matchedUserName,
-    String threadId,
+    String? matchedUserId,
   ) {
     // Debug log to confirm this method is being called
     log('Showing match confirmation for: $matchedUserName');
@@ -254,7 +254,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           currentUserImageUrl: currentUserImageUrl,
           matchedUserImageUrl: matchedUserImageUrl,
           matchedUserName: matchedUserName,
-          threadId: threadId,
+          matchedUserId: matchedUserId ?? '',
         );
       },
     );

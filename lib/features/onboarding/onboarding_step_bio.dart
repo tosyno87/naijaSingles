@@ -34,7 +34,6 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   
   // Text controllers
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   
@@ -42,7 +41,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   final _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   
-  // Age range for dropdown
+  // Age range for picker
   final List<int> _ageOptions = List.generate(63, (index) => index + 18); // 18-80
   int? _selectedAge;
   
@@ -66,7 +65,6 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
             (now.month == controller.dateOfBirth!.month && now.day < controller.dateOfBirth!.day) ? 1 : 0);
         
         _selectedAge = age;
-        _ageController.text = age.toString();
       }
       
       if (controller.locationName != null) {
@@ -82,10 +80,156 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   @override
   void dispose() {
     _nameController.dispose();
-    _ageController.dispose();
     _locationController.dispose();
     _bioController.dispose();
     super.dispose();
+  }
+  
+  // Show age picker modal
+  void _showAgePickerModal(BuildContext context) {
+    // Define the cream background color for consistency
+    const Color backgroundColor = Color(0xFFFDF6EC);
+    const Color deepGreen = Color(0xFF008037);
+    
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Select Your Age',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                // Age grid
+                Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.5,
+                  ),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      childAspectRatio: 1.5,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: _ageOptions.length,
+                    itemBuilder: (context, index) {
+                      final age = _ageOptions[index];
+                      final isSelected = _selectedAge == age;
+                      
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedAge = age;
+                          });
+                          Navigator.pop(context);
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isSelected ? deepGreen : Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected ? deepGreen : Colors.grey[300]!,
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              age.toString(),
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Done button
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: deepGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Done',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Validate all fields
+  bool _validateFields() {
+    // Check if form is valid
+    if (!_formKey.currentState!.validate()) {
+      return false;
+    }
+    
+    // Check if age is selected
+    if (_selectedAge == null) {
+      setState(() {
+        _autoValidate = true;
+      });
+      return false;
+    }
+    
+    return true;
   }
 
   @override
@@ -280,66 +424,66 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      DropdownButtonFormField<int>(
-                        key: _ageKey,
-                        value: _selectedAge,
-                        style: GoogleFonts.poppins(
-                          color: Colors.black87,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      // Age field with custom picker
+                      InkWell(
+                        onTap: () => _showAgePickerModal(context),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[400]!),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.cake,
+                                color: deepGreen,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Age',
+                                      style: GoogleFonts.poppins(
+                                        color: deepGreen,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      _selectedAge != null ? _selectedAge.toString() : 'Select your age',
+                                      style: GoogleFonts.poppins(
+                                        color: _selectedAge != null ? Colors.black87 : Colors.grey[600],
+                                        fontSize: 16,
+                                        fontWeight: _selectedAge != null ? FontWeight.w500 : FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
                         ),
-                        decoration: InputDecoration(
-                          labelText: 'Age',
-                          hintText: 'Select your age',
-                          hintStyle: GoogleFonts.poppins(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                          labelStyle: GoogleFonts.poppins(
-                            color: deepGreen,
-                            fontSize: 16,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[400]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[400]!),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: deepGreen, width: 2),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.red[400]!, width: 1),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
-                          ),
-                        ),
-                        items: _ageOptions.map((int age) {
-                          return DropdownMenuItem<int>(
-                            value: age,
-                            child: Text(age.toString()),
-                          );
-                        }).toList(),
-                        onChanged: (int? value) {
-                          setState(() {
-                            _selectedAge = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Please select your age';
-                          }
-                          return null;
-                        },
                       ),
+                      if (_selectedAge == null && _autoValidate)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, left: 16.0),
+                          child: Text(
+                            'Please select your age',
+                            style: GoogleFonts.poppins(
+                              color: Colors.red[700],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -560,7 +704,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                       key: _continueButtonKey,
                       onPressed: () {
                         // Validate form
-                        if (_formKey.currentState!.validate()) {
+                        if (_validateFields()) {
                           // Save data to controller
                           controller.updateUserName(_nameController.text.trim());
                           

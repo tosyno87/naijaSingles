@@ -120,7 +120,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return RepositoryProvider(
         create: (context) => PhoneAuthRepository(),
-        child: MultiBlocProvider(
+        child: MultiProvider(
+          providers: [
+            // Add the OnboardingController provider here
+            ChangeNotifierProvider<OnboardingController>(
+              create: (_) => OnboardingController(),
+            ),
+            // User provider
+            ChangeNotifierProvider<UserProvider>(
+              create: (_) => UserProvider(),
+            ),
+            // Theme provider is already added at the app level
+          ],
+          child: MultiBlocProvider(
           providers: [
             BlocProvider(
               create: (context) => AuthstatusBloc(
@@ -196,6 +208,6 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
-        ));
+        )));
   }
 }

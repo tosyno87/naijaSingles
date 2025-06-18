@@ -63,13 +63,35 @@ class _LoginOptionState extends State<LoginOption> {
 
                 if (state is FacebookLoginSuccess) {
                   log("Success called facebook");
-                  state.user?.getIdToken().then((value) async {
-                    // call registration after facebook_login
-                    log("Success called facebook with $value");
-                    context
-                        .read<RegistrationBloc>()
-                        .add(CheckRegistration(token: value!));
-                  });
+                  try {
+                    if (state.user != null) {
+                      state.user!.getIdToken().then((value) async {
+                        if (value != null) {
+                          // call registration after facebook_login
+                          log("Success called facebook with token");
+                          context
+                              .read<RegistrationBloc>()
+                              .add(CheckRegistration(token: value));
+                        } else {
+                          log("Error: Token is null");
+                          CustomSnackbar.showSnackBarSimple(
+                              'Authentication error: Token is null', context);
+                        }
+                      }).catchError((error) {
+                        log("Error getting token: $error");
+                        CustomSnackbar.showSnackBarSimple(
+                            'Authentication error: $error', context);
+                      });
+                    } else {
+                      log("Error: User is null");
+                      CustomSnackbar.showSnackBarSimple(
+                          'Authentication error: User is null', context);
+                    }
+                  } catch (e) {
+                    log("Exception during token retrieval: $e");
+                    CustomSnackbar.showSnackBarSimple(
+                        'Authentication error: $e', context);
+                  }
                 }
               },
             ),

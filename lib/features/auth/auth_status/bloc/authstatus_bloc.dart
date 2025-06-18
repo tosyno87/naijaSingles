@@ -40,27 +40,44 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
       AuthRequestEvent event, Emitter<AuthstatusState> emit) async {
     try {
       emit(AuthLoadingState());
-      // Always emit UnauthenticatedState to force login screen
-      emit(UnauthenticatedState());
       
-      // Comment out the auto-login logic
-      /*
-      var issingedin = await phoneAuthRepository.isSignedIn();
-      if (issingedin) {
-        var user = auth.currentUser;
-        if (user != null) {
-          log("user singin sucessfully");
-          log(auth.currentUser!.phoneNumber.toString());
-
-          emit(AuthenticatedState(user: user));
+      // Check if user is signed in
+      try {
+        var issingedin = await phoneAuthRepository.isSignedIn();
+        log("Is signed in check: $issingedin");
+        
+        if (issingedin) {
+          var user = auth.currentUser;
+          if (user != null) {
+            log("User signed in successfully: ${user.uid}");
+            log("Phone number: ${user.phoneNumber ?? 'No phone number'}");
+            log("Email: ${user.email ?? 'No email'}");
+            
+            // Verify token can be retrieved
+            try {
+              final token = await user.getIdToken(true);
+              log("Token retrieved successfully: ${token != null}");
+              emit(AuthenticatedState(user: user));
+            } catch (tokenError) {
+              log("Error retrieving token: $tokenError");
+              // Sign out and treat as unauthenticated if token retrieval fails
+              await phoneAuthRepository.signOut();
+              emit(UnauthenticatedState());
+            }
+          } else {
+            log("Current user is null despite isSignedIn returning true");
+            emit(UnauthenticatedState());
+          }
         } else {
+          log("User is not signed in");
           emit(UnauthenticatedState());
         }
-      } else {
-        emit(UnauthenticatedState());
+      } catch (authError) {
+        log("Error checking authentication status: $authError");
+        emit(AuthFailed(message: "Authentication check failed: $authError"));
       }
-      */
     } catch (e) {
+      log("Unexpected error in _isLoggedin: $e");
       emit(AuthFailed(message: e.toString()));
     }
   }

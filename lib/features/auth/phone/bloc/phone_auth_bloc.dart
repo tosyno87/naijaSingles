@@ -150,12 +150,8 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
       UseTestPhoneAuthEvent event, Emitter<PhoneAuthState> emit) async {
     try {
       emit(PhoneAuthLoading());
-      final user = await phoneAuthRepository.signInWithTestPhone();
-      if (user != null) {
-        emit(PhoneAuthVerified(user: user));
-      } else {
-        emit(const PhoneAuthError(error: "Test authentication failed"));
-      }
+      // Test phone authentication is disabled in production
+      emit(const PhoneAuthError(error: "Test authentication is not available in production"));
     } catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }

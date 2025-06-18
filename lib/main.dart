@@ -17,6 +17,7 @@ import 'package:naijasingles/common/routes/router.dart';
 import 'package:naijasingles/features/auth/facebook_login/facebook_login_bloc.dart';
 import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
 import 'package:naijasingles/features/home/ui/screens/splash.dart';
+import 'package:naijasingles/features/payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
 import 'package:naijasingles/features/street_view/bloc/streetviewdata_bloc.dart';
 import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
@@ -26,6 +27,8 @@ import 'package:provider/provider.dart';
 import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/data/repo/user_location_repo.dart';
+import 'common/data/repo/user_messaging_repo.dart';
+import 'common/data/repo/user_search_repo.dart';
 import 'common/providers/theme_provider.dart';
 import 'common/utils/observer.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
@@ -35,7 +38,6 @@ import 'features/home/bloc/searchuser_bloc.dart';
 import 'features/home/bloc/swipebloc_bloc.dart';
 import 'features/home/ui/screens/user_filter/bloc/userfilter_bloc.dart';
 import 'features/match/bloc/match_bloc.dart';
-import 'features/payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'features/report/bloc/report_bloc.dart';
 import 'features/user/bloc/update_user_bloc.dart';
 import 'firebase_options.dart';
@@ -43,42 +45,66 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
   
-  // Connect to Firebase Auth Emulator in debug mode
-  if (kDebugMode) {
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-    FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
-    log("🔥 Using Firebase Auth Emulator on localhost:9099");
-    log("🔥 Using Firebase Firestore Emulator on localhost:8080");
-    log("🔥 Using Firebase Storage Emulator on localhost:9199");
+  // Initialize Firebase with error handling
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    log("🔥 Firebase initialized successfully");
+  } catch (e) {
+    log("❌ Error initializing Firebase: $e");
   }
+  
+  // Reset authentication state for testing
+  try {
+    await FirebaseAuth.instance.signOut();
+    log("🔄 Reset authentication state");
+  } catch (e) {
+    log("⚠️ Error resetting auth state: $e");
+  }
+  
+  // Add debug logging for auth state changes
+  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
+  });
+
+  // Set up error handling for Firebase Auth
+  FirebaseAuth.instance.authStateChanges().listen(
+    (User? user) {
+      log("Auth state changed: ${user?.uid ?? 'No user'}");
+    },
+    onError: (error) {
+      log("Auth state error: $error");
+    },
+  );
 
   Bloc.observer = SimpleBlocObserver();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp,
   ]).then((_) {
-
-    runApp(EasyLocalization(
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('es', 'ES'),
-          Locale('fr', 'FR'),
-          Locale('de', 'DE'),
-          Locale('ru', 'RU'),
-          Locale('hi', 'IN')
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ],
-        saveLocale: true,
-        path: 'asset/translation',
-        child: ChangeNotifierProvider(
-            create: (_) {
-              return UserProvider();
-            },
-            child: const MyHomePage())));
+        child: EasyLocalization(
+          supportedLocales: const [
+            Locale('en', 'US'),
+            Locale('es', 'ES'),
+            Locale('fr', 'FR'),
+            Locale('de', 'DE'),
+            Locale('ru', 'RU'),
+            Locale('hi', 'IN')
+          ],
+          saveLocale: true,
+          path: 'asset/translation',
+          child: const MyHomePage(),
+        ),
+      ),
+    );
   });
 }
 
@@ -99,110 +125,75 @@ class _MyHomePageState extends State<MyHomePage> {
             BlocProvider(
               create: (context) => AuthstatusBloc(
                   phoneAuthRepository:
-                  RepositoryProvider.of<PhoneAuthRepository>(context))
+                      RepositoryProvider.of<PhoneAuthRepository>(context))
                 ..add(AuthRequestEvent()),
             ),
-            BlocProvider<RegistrationBloc>(
-                create: (BuildContext context) => RegistrationBloc(
-                    phoneAuthRepository:
-                    RepositoryProvider.of<PhoneAuthRepository>(context))),
-            BlocProvider<UserBloc>(
-                create: (BuildContext context) => UserBloc()),
-            BlocProvider<GetInAppProductsBloc>(
-                create: (BuildContext context) => GetInAppProductsBloc()),
-            BlocProvider<BuyConsumableInAppProductsBloc>(
-                create: (BuildContext context) =>
-                    BuyConsumableInAppProductsBloc()),
-            BlocProvider<UserfilterBloc>(
-                create: (BuildContext context) => UserfilterBloc()),
-            BlocProvider<SearchUserBloc>(
-                create: (BuildContext context) => SearchUserBloc()),
-            BlocProvider<SearchUserForMapBloc>(
-                create: (BuildContext context) => SearchUserForMapBloc()),
-            BlocProvider<StreetviewdataBloc>(
-                create: (BuildContext context) => StreetviewdataBloc()),
-            BlocProvider<MatchUserBloc>(
-                create: (BuildContext context) => MatchUserBloc()),
-            BlocProvider<ReportBloc>(
-                create: (BuildContext context) => ReportBloc()),
-            BlocProvider<SwipeBloc>(
-                create: (BuildContext context) => SwipeBloc()),
-            BlocProvider<BlocUserListBloc>(
-                create: (BuildContext context) => BlocUserListBloc()),
-            BlocProvider<UserLocationBloc>(
-              create: (context) => UserLocationBloc(
-                  userLocationReporistory:
-                  RepositoryProvider.of<UserLocationReporistory>(context)),
+            BlocProvider(
+              create: (context) => RegistrationBloc(
+                  phoneAuthRepository:
+                      RepositoryProvider.of<PhoneAuthRepository>(context)),
             ),
-            BlocProvider<FacebookLoginBloc>(
+            BlocProvider(
               create: (context) => FacebookLoginBloc(),
             ),
+            BlocProvider(
+              create: (context) => SwipeBloc(
+                leftSwipe: UserSearchRepo.leftSwipe,
+                rightSwipe: UserSearchRepo.rightSwipe,
+                getUserList: UserSearchRepo.getUserList,
+              ),
+            ),
+            BlocProvider(
+              create: (context) => SearchUserBloc(),
+            ),
+            BlocProvider(
+              create: (context) => UserfilterBloc(),
+            ),
+            BlocProvider(
+              create: (context) => MatchUserBloc(
+                getMatches: UserMessagingRepo.getMatches,
+              ),
+            ),
+            BlocProvider(
+              create: (context) => BlocUserListBloc(),
+            ),
+            BlocProvider(
+              create: (context) => ReportBloc(),
+            ),
+            BlocProvider(
+              create: (context) => UserBloc(),
+            ),
+            BlocProvider(
+              create: (context) => UserLocationBloc(
+                  userLocationReporistory: UserLocationReporistoryImpl()),
+            ),
+            BlocProvider(
+              create: (context) => SearchUserForMapBloc(),
+            ),
+            BlocProvider(
+              create: (context) => StreetviewdataBloc(),
+            ),
+            BlocProvider(
+              create: (context) => GetInAppProductsBloc(),
+            ),
+            BlocProvider(
+              create: (context) => BuyConsumableInAppProductsBloc(),
+            ),
           ],
-          child: MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (context) => ThemeProvider()),
-              ChangeNotifierProvider(create: (context) => UserProvider()),
-              ChangeNotifierProvider(create: (context) => OnboardingController()),
-            ],
-            builder: (context, child) {
-              final themeProvider = Provider.of<ThemeProvider>(context);
+          child: Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
               return MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  themeMode: themeProvider.themeMode,
-                  theme: MyThemes.lightTheme,
-                  darkTheme: MyThemes.darkTheme,
-                  routes: AppRouter.allRoutes,
-                  localizationsDelegates: context.localizationDelegates,
-                  supportedLocales: context.supportedLocales,
-                  locale: context.locale,
-                  home: MultiBlocListener(
-                      listeners: [
-                        BlocListener<AuthstatusBloc, AuthstatusState>(
-                            listener: (context, state) {
-                              if (state is UnauthenticatedState ||
-                                  state is AuthFailed) {
-                                log("failed called ");
-                                Navigator.pushReplacementNamed(
-                                    context, RouteName.loginScreen);
-                              } else if (state is AuthenticatedState) {
-                                log("success called ");
-
-                                try {
-                                  state.user.getIdToken().then((value) {
-                                    if (value != null) {
-                                      BlocProvider.of<RegistrationBloc>(context)
-                                          .add(CheckRegistration(token: value));
-                                    } else {
-                                      print("ID token is null");
-                                      // Handle null token case
-                                    }
-                                  }).catchError((error) {
-                                    print("Error getting ID token: $error");
-                                    // Handle token retrieval error
-                                  });
-                                } catch (e) {
-                                  print("Exception in authentication flow: $e");
-                                  // Handle any exceptions in the authentication flow
-                                }
-                                // for registration
-                              }
-                            }),
-                      ],
-                      child: BlocListener<RegistrationBloc, RegistrationStates>(
-                          listener: (context, state) {
-                            if (state is AlreadyRegistered) {
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .currentUser = state.user;
-                              log("navigate to already");
-                              Navigator.pushReplacementNamed(
-                                  context, RouteName.mainNavigation);
-                            } else if (state is NewRegistration) {
-                              log("from new registration");
-                              Navigator.pushReplacementNamed(
-                                  context, RouteName.onboarding);
-                            }
-                          },
-                          child: const Splash())));
+                title: 'NaijaSingles',
+                debugShowCheckedModeBanner: false,
+                theme: themeProvider.isDarkMode
+                    ? MyThemes.darkTheme
+                    : MyThemes.lightTheme,
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                routes: AppRouter.allRoutes,
+                initialRoute: RouteName.splashScreen,
+              );
             },
           ),
         ));

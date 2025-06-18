@@ -239,10 +239,33 @@ class _OtpPageState extends State<OtpPage> {
                       },
                       listener: (context, state) {
                         if (state is PhoneAuthVerified) {
-                          state.user?.getIdToken().then((value) async {
-                            BlocProvider.of<RegistrationBloc>(context)
-                                .add(CheckRegistration(token: value!));
-                          });
+                          try {
+                            if (state.user != null) {
+                              state.user!.getIdToken().then((value) async {
+                                if (value != null) {
+                                  log("Got token after phone verification");
+                                  BlocProvider.of<RegistrationBloc>(context)
+                                      .add(CheckRegistration(token: value));
+                                } else {
+                                  log("Error: Token is null after phone verification");
+                                  CustomSnackbar.showSnackBarSimple(
+                                      'Authentication error: Token is null', context);
+                                }
+                              }).catchError((error) {
+                                log("Error getting token after phone verification: $error");
+                                CustomSnackbar.showSnackBarSimple(
+                                    'Authentication error: $error', context);
+                              });
+                            } else {
+                              log("Error: User is null after phone verification");
+                              CustomSnackbar.showSnackBarSimple(
+                                  'Authentication error: User is null', context);
+                            }
+                          } catch (e) {
+                            log("Exception during token retrieval after phone verification: $e");
+                            CustomSnackbar.showSnackBarSimple(
+                                'Authentication error: $e', context);
+                          }
                         } else if (state is PhoneupdateSuccess) {
                           Navigator.pushReplacementNamed(
                               context, RouteName.tabScreen);

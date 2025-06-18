@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+    show defaultTargetPlatform, kIsWeb, kDebugMode, TargetPlatform, debugPrint;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -81,7 +81,8 @@ class DefaultFirebaseOptions {
 class FirebaseEmulators {
   /// Connect to Firebase emulators if in debug mode
   static void connectToEmulators() {
-    if (kDebugMode) {
+    // Disable emulator connections for production
+    if (false) { // Changed from kDebugMode to false to disable emulators
       try {
         FirebaseFirestore.instance.settings = const Settings(
           host: 'localhost:8080',

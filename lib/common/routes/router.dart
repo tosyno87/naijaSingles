@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/utils/large_image.dart';
+import "package:naijasingles/features/auth/login/login_screen.dart";
 import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
+import 'package:naijasingles/features/auth/welcome/welcome_screen.dart';
 import 'package:naijasingles/features/home/dating_homepage.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/explore/explore_page.dart';
 import 'package:naijasingles/features/home/main_navigation_screen.dart';
+import 'package:naijasingles/features/onboarding/onboarding_main.dart';
 
 import 'package:naijasingles/features/chat/ui/screens/chat_page.dart';
 
@@ -35,7 +38,7 @@ import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
 
-import '../../features/auth/login/login_screen.dart';
+import "package:naijasingles/features/auth/login/login_screen.dart";
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 import '../../features/home/ui/screens/splash.dart';
 
@@ -68,6 +71,9 @@ abstract class AppRouter {
         EditProfile(Provider.of<UserProvider>(context).currentUser!),
     RouteName.largeImageScreen: (context) => LargeImage(
         largeImage: ModalRoute.of(context)!.settings.arguments as String),
+    RouteName.welcomeScreen: (context) => const WelcomeScreen(),
+    RouteName.onboarding: (context) => const OnboardingMain(),
+    RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.updatePhoneScreen: (context) =>
         UpdateNumber(ModalRoute.of(context)!.settings.arguments as UserModel),
     RouteName.genderScreen: (context) => const Gender(),

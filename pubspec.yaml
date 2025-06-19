@@ -48,6 +48,8 @@ dependencies:
   flutter_callkit_incoming: ^2.5.2 # Updated to latest
   google_api_headers: ^4.5.2     # Updated to latest headers
   flutter_flushbar: ^0.0.2       # Kept at 0.0.2
+  google_sign_in: ^6.1.6        # Downgraded for compatibility
+  animated_text_kit: ^4.2.2     # Added for rotating greetings
   swipe_cards: ^2.0.0+1          # Added for Explore screen
   flutter_image_compress: ^2.4.0 # Updated to latest
   flutter_swiper_null_safety: ^1.0.2 # Kept at 1.0.2
@@ -117,8 +119,7 @@ flutter:
     - asset/
     - asset/Icon/
     - asset/translation/
-    - assets/images/
-    - assets/images/
+    - asset/images/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see

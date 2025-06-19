@@ -1,286 +1,301 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:developer';
 
-/// Controller for managing onboarding data across multiple screens.
-/// 
-/// This controller maintains state for all onboarding steps including
-/// personal information, cultural preferences, and lifestyle choices.
 class OnboardingController extends ChangeNotifier {
-  // Singleton instance
-  static final OnboardingController _instance = OnboardingController._internal();
+  // Basic user data
+  String _fullName = '';
+  DateTime? _dateOfBirth;
+  String _gender = '';
+  String _tribe = '';
+  String _bio = '';
+  List<String> _interests = [];
+  File? _profilePhoto;
+  bool _isLoading = false;
   
-  factory OnboardingController() {
-    return _instance;
+  // Additional user data (for compatibility with existing code)
+  String? _userName;
+  String? _locationName;
+  String? _intent;
+  String? _nationality;
+  String? _education;
+  String? _occupation;
+  String? _fashionStyle;
+  String? _weekendVibe;
+  List<String> _languages = [];
+  List<String> _genres = [];
+  List<String> _values = [];
+  List<String> _photos = [];
+
+  // Getters for basic data
+  String get fullName => _fullName;
+  DateTime? get dateOfBirth => _dateOfBirth;
+  String get gender => _gender;
+  String get tribe => _tribe;
+  String get bio => _bio;
+  List<String> get interests => _interests;
+  File? get profilePhoto => _profilePhoto;
+  bool get isLoading => _isLoading;
+  
+  // Getters for additional data
+  String? get userName => _userName;
+  String? get locationName => _locationName;
+  String? get intent => _intent;
+  String? get nationality => _nationality;
+  String? get education => _education;
+  String? get occupation => _occupation;
+  String? get fashionStyle => _fashionStyle;
+  String? get weekendVibe => _weekendVibe;
+  List<String> get languages => _languages;
+  List<String> get genres => _genres;
+  List<String> get values => _values;
+  List<String> get photos => _photos;
+
+  // Age calculation
+  int get age {
+    if (_dateOfBirth == null) return 0;
+    
+    final today = DateTime.now();
+    int age = today.year - _dateOfBirth!.year;
+    
+    if (today.month < _dateOfBirth!.month || 
+        (today.month == _dateOfBirth!.month && today.day < _dateOfBirth!.day)) {
+      age--;
+    }
+    
+    return age;
   }
-  
-  OnboardingController._internal();
-  
-  // Basic user information
-  String? userName;
-  DateTime? dateOfBirth;
-  String? gender;
-  
-  // Cultural information
-  String? tribe;
-  List<String> languages = [];
-  String? nationality;
-  bool isDiaspora = false;
-  
-  // Intent and preferences
-  String? intent; // Dating, Friendship, Community
-  
-  // Lifestyle preferences
-  List<String> genres = []; // Music, movies, etc.
-  String? fashionStyle;
-  String? weekendVibe;
-  
-  // Values and dealbreakers
-  List<String> values = [];
-  List<String> dealbreakers = [];
-  
-  // Location information
-  double? latitude;
-  double? longitude;
-  String? locationName;
-  
-  // Profile information
-  List<String> photos = [];
-  String? bio;
-  String? occupation;
-  String? education;
-  
-  // Validation methods for different steps
-  
-  /// Validates basic information (name, DOB, gender)
-  bool isValidStepBasic() {
-    return userName != null && 
-           userName!.isNotEmpty && 
-           dateOfBirth != null && 
-           gender != null;
+
+  // Basic setters
+  void setFullName(String name) {
+    _fullName = name;
+    _userName = name; // For compatibility
+    notifyListeners();
   }
-  
-  /// Validates cultural information
-  bool isValidStepCultural() {
-    return nationality != null && 
-           nationality!.isNotEmpty;
+
+  void setDateOfBirth(DateTime date) {
+    _dateOfBirth = date;
+    notifyListeners();
   }
-  
-  /// Validates intent and preferences
-  bool isValidStepIntent() {
-    return intent != null && intent!.isNotEmpty;
+
+  void setGender(String gender) {
+    _gender = gender;
+    notifyListeners();
   }
-  
-  /// Validates lifestyle preferences
-  bool isValidStepLifestyle() {
-    return genres.isNotEmpty || 
-           fashionStyle != null || 
-           weekendVibe != null;
+
+  void setTribe(String tribe) {
+    _tribe = tribe;
+    notifyListeners();
   }
-  
-  /// Validates values and dealbreakers
-  bool isValidStepValues() {
-    return values.isNotEmpty;
+
+  void setBio(String bio) {
+    _bio = bio;
+    notifyListeners();
   }
-  
-  /// Validates location information
-  bool isValidStepLocation() {
-    return latitude != null && 
-           longitude != null && 
-           locationName != null;
+
+  void addInterest(String interest) {
+    if (!_interests.contains(interest)) {
+      _interests.add(interest);
+      // For compatibility
+      if (!_genres.contains(interest)) {
+        _genres.add(interest);
+      }
+      notifyListeners();
+    }
   }
-  
-  /// Validates profile information
-  bool isValidStepProfile() {
-    return photos.isNotEmpty;
+
+  void removeInterest(String interest) {
+    _interests.remove(interest);
+    _genres.remove(interest); // For compatibility
+    notifyListeners();
   }
-  
-  /// Checks if all required steps are completed
-  bool isOnboardingComplete() {
-    return isValidStepBasic() && 
-           isValidStepCultural() && 
-           isValidStepIntent() && 
-           isValidStepLocation();
+
+  void setProfilePhoto(File photo) {
+    _profilePhoto = photo;
+    notifyListeners();
   }
-  
-  /// Updates user name and notifies listeners
+
+  // Additional setters for compatibility
   void updateUserName(String name) {
-    userName = name;
+    _userName = name;
+    _fullName = name;
     notifyListeners();
   }
-  
-  /// Updates date of birth and notifies listeners
-  void updateDateOfBirth(DateTime dob) {
-    dateOfBirth = dob;
+
+  void updateDateOfBirth(DateTime date) {
+    _dateOfBirth = date;
     notifyListeners();
   }
-  
-  /// Updates gender and notifies listeners
-  void updateGender(String selectedGender) {
-    gender = selectedGender;
+
+  void updateLocation(double lat, double lng, String locationName) {
+    _locationName = locationName;
     notifyListeners();
   }
-  
-  /// Updates tribe and notifies listeners
-  void updateTribe(String selectedTribe) {
-    tribe = selectedTribe;
+
+  void updateBio(String bio) {
+    _bio = bio;
     notifyListeners();
   }
-  
-  /// Updates nationality and notifies listeners
-  void updateNationality(String selectedNationality, bool diaspora) {
-    nationality = selectedNationality;
-    isDiaspora = diaspora;
+
+  void updateTribe(String tribe) {
+    _tribe = tribe;
     notifyListeners();
   }
-  
-  /// Updates languages and notifies listeners
-  void updateLanguages(List<String> selectedLanguages) {
-    languages = selectedLanguages;
+
+  void updateIntent(String intent) {
+    _intent = intent;
     notifyListeners();
   }
-  
-  /// Updates intent and notifies listeners
-  void updateIntent(String selectedIntent) {
-    intent = selectedIntent;
+
+  void updateGenres(List<String> genres) {
+    _genres = List.from(genres);
+    _interests = List.from(genres); // For compatibility
     notifyListeners();
   }
-  
-  /// Updates genres and notifies listeners
-  void updateGenres(List<String> selectedGenres) {
-    genres = selectedGenres;
+
+  void updateLanguages(List<String> languages) {
+    _languages = List.from(languages);
     notifyListeners();
   }
-  
-  /// Updates fashion style and notifies listeners
+
+  void updateNationality(String nationality, bool isDiaspora) {
+    _nationality = nationality;
+    notifyListeners();
+  }
+
   void updateFashionStyle(String style) {
-    fashionStyle = style;
+    _fashionStyle = style;
     notifyListeners();
   }
-  
-  /// Updates weekend vibe and notifies listeners
+
   void updateWeekendVibe(String vibe) {
-    weekendVibe = vibe;
+    _weekendVibe = vibe;
     notifyListeners();
   }
-  
-  /// Updates values and notifies listeners
-  void updateValues(List<String> selectedValues) {
-    values = selectedValues;
+
+  void updateValues(List<String> values) {
+    _values = List.from(values);
     notifyListeners();
   }
-  
-  /// Updates dealbreakers and notifies listeners
-  void updateDealbreakers(List<String> selectedDealbreakers) {
-    dealbreakers = selectedDealbreakers;
+
+  void updatePhotos(List<String> photos) {
+    _photos = List.from(photos);
     notifyListeners();
   }
-  
-  /// Updates location and notifies listeners
-  void updateLocation(double lat, double lng, String name) {
-    latitude = lat;
-    longitude = lng;
-    locationName = name;
-    notifyListeners();
+
+  // Validation methods
+  bool isBasicInfoComplete() {
+    return _fullName.isNotEmpty && 
+           _dateOfBirth != null && 
+           _gender.isNotEmpty &&
+           age >= 18; // Ensure user is at least 18
   }
-  
-  /// Updates photos and notifies listeners
-  void updatePhotos(List<String> photoUrls) {
-    photos = photoUrls;
-    notifyListeners();
+
+  bool isTribeSelected() {
+    return _tribe.isNotEmpty;
   }
-  
-  /// Updates bio and notifies listeners
-  void updateBio(String userBio) {
-    bio = userBio;
-    notifyListeners();
+
+  bool isBioComplete() {
+    return _bio.length >= 20; // Minimum bio length
   }
-  
-  /// Updates occupation and notifies listeners
-  void updateOccupation(String userOccupation) {
-    occupation = userOccupation;
-    notifyListeners();
+
+  bool areInterestsSelected() {
+    return _interests.isNotEmpty;
   }
-  
-  /// Updates education and notifies listeners
-  void updateEducation(String userEducation) {
-    education = userEducation;
-    notifyListeners();
+
+  bool isPhotoUploaded() {
+    return _profilePhoto != null;
   }
-  
-  /// Converts controller data to a Map for storage or API calls
-  Map<String, dynamic> toMap() {
-    return {
-      'userName': userName,
-      'dateOfBirth': dateOfBirth?.toIso8601String(),
-      'gender': gender,
-      'tribe': tribe,
-      'languages': languages,
-      'nationality': nationality,
-      'isDiaspora': isDiaspora,
-      'intent': intent,
-      'genres': genres,
-      'fashionStyle': fashionStyle,
-      'weekendVibe': weekendVibe,
-      'values': values,
-      'dealbreakers': dealbreakers,
-      'latitude': latitude,
-      'longitude': longitude,
-      'locationName': locationName,
-      'photos': photos,
-      'bio': bio,
-      'occupation': occupation,
-      'education': education,
-    };
+
+  // Photo selection
+  Future<void> pickProfilePhoto(ImageSource source) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1000,
+        maxHeight: 1000,
+        imageQuality: 85,
+      );
+      
+      if (image != null) {
+        _profilePhoto = File(image.path);
+        notifyListeners();
+      }
+    } catch (e) {
+      log("Error picking image: $e");
+    }
   }
-  
-  /// Loads data from a Map into the controller
-  void fromMap(Map<String, dynamic> data) {
-    userName = data['userName'];
-    dateOfBirth = data['dateOfBirth'] != null 
-        ? DateTime.parse(data['dateOfBirth']) 
-        : null;
-    gender = data['gender'];
-    tribe = data['tribe'];
-    languages = List<String>.from(data['languages'] ?? []);
-    nationality = data['nationality'];
-    isDiaspora = data['isDiaspora'] ?? false;
-    intent = data['intent'];
-    genres = List<String>.from(data['genres'] ?? []);
-    fashionStyle = data['fashionStyle'];
-    weekendVibe = data['weekendVibe'];
-    values = List<String>.from(data['values'] ?? []);
-    dealbreakers = List<String>.from(data['dealbreakers'] ?? []);
-    latitude = data['latitude'];
-    longitude = data['longitude'];
-    locationName = data['locationName'];
-    photos = List<String>.from(data['photos'] ?? []);
-    bio = data['bio'];
-    occupation = data['occupation'];
-    education = data['education'];
-    notifyListeners();
-  }
-  
-  /// Resets all controller data
-  void reset() {
-    userName = null;
-    dateOfBirth = null;
-    gender = null;
-    tribe = null;
-    languages = [];
-    nationality = null;
-    isDiaspora = false;
-    intent = null;
-    genres = [];
-    fashionStyle = null;
-    weekendVibe = null;
-    values = [];
-    dealbreakers = [];
-    latitude = null;
-    longitude = null;
-    locationName = null;
-    photos = [];
-    bio = null;
-    occupation = null;
-    education = null;
-    notifyListeners();
+
+  // Save all user data to Firestore
+  Future<void> saveUserData() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("User not authenticated");
+      }
+      
+      // Upload profile photo if available
+      String? photoUrl;
+      if (_profilePhoto != null) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('users/${user.uid}/profile_photo.jpg');
+            
+        await storageRef.putFile(_profilePhoto!);
+        photoUrl = await storageRef.getDownloadURL();
+        
+        // Update photos list for compatibility
+        _photos = [photoUrl];
+      }
+      
+      // Create user data map
+      final userData = {
+        'userId': user.uid,
+        'name': _fullName,
+        'userName': _fullName, // For compatibility
+        'dateOfBirth': _dateOfBirth?.toIso8601String(),
+        'age': age,
+        'gender': _gender,
+        'tribe': _tribe,
+        'bio': _bio,
+        'interests': _interests,
+        'genres': _interests, // For compatibility
+        'lastActive': DateTime.now().toIso8601String(),
+        'isProfileComplete': true,
+        'isBlocked': false,
+        'isPremium': false,
+      };
+      
+      // Add photo URL if available
+      if (photoUrl != null) {
+        userData['profilePicture'] = photoUrl;
+        userData['photos'] = [photoUrl];
+      }
+      
+      // Save to Firestore
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user.uid)
+          .set(userData, SetOptions(merge: true));
+          
+      // Update display name in Firebase Auth
+      await user.updateDisplayName(_fullName);
+      
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      log("Error saving user data: $e");
+      rethrow;
+    }
   }
 }

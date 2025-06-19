@@ -6,14 +6,14 @@ import '../../../common/data/repo/phone_auth_repo.dart';
 import '../../../common/routes/route_name.dart';
 import '../../../services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginScreenNew extends StatefulWidget {
+  const LoginScreenNew({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreenNew> createState() => _LoginScreenNewState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenNewState extends State<LoginScreenNew> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _authService = AuthService();

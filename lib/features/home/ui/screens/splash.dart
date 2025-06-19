@@ -49,8 +49,8 @@ class SplashState extends State<Splash> {
         Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
       } else if (state is UnauthenticatedState) {
         _hasNavigated = true;
-        log("User is not authenticated, navigating to login screen");
-        Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+        log("User is not authenticated, navigating to welcome screen");
+        Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
       } else if (state is AuthFailed) {
         _hasNavigated = true;
         log("Authentication failed: ${state.message}");

@@ -52,6 +52,17 @@
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho</string>
+			</array>
+		</dict>
+	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<true/>
 	<key>FacebookAdvertiserIDCollectionEnabled</key>
@@ -59,45 +70,6 @@
 	<key>FacebookAppID</key>
 	<string>499452678798092</string>
 	<key>FacebookClientToken</key>
-	<string>41e74af9df9bc2033fee8783ea68ef33</string>
-	<key>FacebookDisplayName</key>
-	<string>NaijaSingles</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fb499452678798092</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>app-1-888697307756-ios-95ea92b8c7288e31704e49</string>
-			</array>
-		</dict>
-	</array>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-        <key>NSLocalNetworkUsageDescription</key>
-        <string>This app uses the local network for development tools.</string>
-        <key>NSLocationWhenInUseUsageDescription</key>
-        <string>Your location is used to find nearby matches.</string>
-        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>Your location is needed to provide personalized services.</string>
-        <key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>fbapi</string>
-		<string>fb-messenger-share-api</string>
-		<string>fbauth2</string>
-		<string>fbshareextension</string>
-	</array>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
+	<string>YOUR-FACEBOOK-CLIENT-TOKEN</string>
 </dict>
 </plist>

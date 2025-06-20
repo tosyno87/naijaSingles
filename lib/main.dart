@@ -15,6 +15,7 @@ import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/routes/router.dart';
 import 'package:naijasingles/features/auth/facebook_login/facebook_login_bloc.dart';
+import 'package:naijasingles/features/auth/google_login/google_login_bloc.dart';
 import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
 import 'package:naijasingles/features/home/ui/screens/splash.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
@@ -147,6 +148,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             BlocProvider(
               create: (context) => FacebookLoginBloc(),
+            ),
+            BlocProvider(
+              create: (context) => GoogleLoginBloc(),
             ),
             BlocProvider(
               create: (context) => SwipeBloc(

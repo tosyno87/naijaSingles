@@ -6,6 +6,7 @@ import "package:naijasingles/features/auth/login/login_screen.dart";
 import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
 import 'package:naijasingles/features/auth/welcome/welcome_screen.dart';
+import 'package:naijasingles/features/auth/google_sign_in/google_sign_in_test_screen.dart';
 import 'package:naijasingles/features/home/dating_homepage.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/explore/explore_page.dart';
@@ -48,6 +49,7 @@ abstract class AppRouter {
     RouteName.splashScreen: (context) => const Splash(),
     RouteName.loginScreen: (context) => const LoginScreen(),
     RouteName.tabScreen: (context) => const Tabbar("active", false),
+    RouteName.googleSignInTest: (context) => const GoogleSignInTestScreen(),
     RouteName.profileScreen: (context) => ProfilePage(
           isPuchased:
               (ModalRoute.of(context)!.settings.arguments as Map)['isPuchased'],

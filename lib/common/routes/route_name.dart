@@ -20,6 +20,7 @@ class RouteName {
   static const String datingHomePage = '/dating';
   static const String exploreScreen = '/explore';
   static const String mainNavigation = '/main_navigation';
+  static const String googleSignInTest = '/google_sign_in_test';
   
   // Main navigation routes
   static const String onboarding = '/onboarding';

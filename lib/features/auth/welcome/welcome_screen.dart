@@ -25,64 +25,70 @@ class WelcomeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      body: Stack(
-        children: [
-          // Background texture watermark
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.05,
-              child: Image.asset(
-                'asset/images/african_pattern.png',
-                repeat: ImageRepeat.repeat,
-              ),
-            ),
-          ),
-          
-          // Main content
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Spacer(flex: 1),
                   
-                  // Logo
-                  Container(
-                    height: 120,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withOpacity(0.3),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        "NS",
+                  // Logo - Stylized Afropeep text
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome,
+                        color: const Color(0xFF008037),
+                        size: 32,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Afropeep",
                         style: GoogleFonts.poppins(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          fontSize: 36,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF4E2600), // Deep brown
+                          letterSpacing: 1.2,
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.auto_awesome,
+                        color: const Color(0xFFEF476F), // Coral accent
+                        size: 32,
+                      ),
+                    ],
+                  ),
+                  
+                  // African pattern decorative element
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    width: 180,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF008037).withOpacity(0.3),
+                          const Color(0xFF008037),
+                          const Color(0xFFEF476F),
+                          const Color(0xFFEF476F).withOpacity(0.3),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   
                   const SizedBox(height: 24),
                   
-                  // App name
+                  // Tagline instead of app name
                   Text(
-                    "NaijaSingles",
+                    "Connect Your African Soul",
                     style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.italic,
+                      color: textColor.withOpacity(0.8),
                     ),
                   ),
                   
@@ -139,6 +145,33 @@ class WelcomeScreen extends StatelessWidget {
                   
                   const SizedBox(height: 16),
                   
+                  // Test Google Sign-In Button (for development only)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/google_sign_in_test');
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.amber),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        "Test Google Sign-In",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
                   // Sign In Button
                   SizedBox(
                     width: double.infinity,
@@ -169,8 +202,6 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
     );
   }
 }

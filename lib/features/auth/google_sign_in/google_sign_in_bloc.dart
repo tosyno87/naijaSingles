@@ -44,7 +44,12 @@ class GoogleSignInFailure extends GoogleSignInState {
 // BLoC
 class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    // Explicitly specify scopes (optional)
+    scopes: ['email', 'profile'],
+    // For iOS, specify the client ID explicitly
+    clientId: '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
+  );
 
   GoogleSignInBloc() : super(GoogleSignInInitial()) {
     on<GoogleSignInRequested>(_onGoogleSignInRequested);
@@ -56,17 +61,32 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
   ) async {
     emit(GoogleSignInLoading());
     try {
+      log("Starting Google Sign In process...");
+      
+      // Check if user is already signed in with Google
+      final currentUser = _googleSignIn.currentUser;
+      if (currentUser != null) {
+        log("User already signed in with Google. Signing out first...");
+        await _googleSignIn.signOut();
+      }
+      
       // Trigger the Google Sign In flow
+      log("Triggering Google Sign In UI...");
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      
+      log("Google Sign In result: ${googleUser != null ? 'Success' : 'Canceled/Failed'}");
       
       if (googleUser == null) {
         // User canceled the sign-in flow
+        log("Google Sign In was canceled by user");
         emit(GoogleSignInFailure(error: "Sign in canceled"));
         return;
       }
 
+      log("Getting Google authentication details...");
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      log("Got auth tokens - Access token length: ${googleAuth.accessToken?.length ?? 0}, ID token length: ${googleAuth.idToken?.length ?? 0}");
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -75,6 +95,7 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
       );
 
       // Sign in to Firebase with the Google credential
+      log("Signing in to Firebase with Google credential...");
       final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
 
@@ -89,6 +110,7 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
         
         emit(GoogleSignInSuccess(user: user));
       } else {
+        log("Failed to sign in with Google - user is null");
         emit(GoogleSignInFailure(error: "Failed to sign in with Google"));
       }
     } catch (e) {
@@ -99,38 +121,36 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
 
   Future<void> _updateUserData(User user, bool isNewUser) async {
     try {
-      // Get user data from Google account
-      final displayName = user.displayName ?? '';
-      final email = user.email ?? '';
-      final photoURL = user.photoURL;
+      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
       
-      // Create a map of user data
-      final userData = {
-        'userId': user.uid,
-        'email': email,
-        'name': displayName,
-        'userName': displayName,
-        'isBlocked': false,
-        'isPremium': false,
-        'lastActive': DateTime.now().toIso8601String(),
-      };
-      
-      // If user has a profile picture from Google, add it
-      if (photoURL != null && photoURL.isNotEmpty) {
-        userData['profilePicture'] = photoURL;
-        userData['photos'] = [photoURL];
+      if (isNewUser) {
+        // Create a new user document
+        await userRef.set({
+          'id': user.uid,
+          'email': user.email,
+          'name': user.displayName,
+          'photoUrl': user.photoURL,
+          'createdAt': FieldValue.serverTimestamp(),
+          'lastActive': FieldValue.serverTimestamp(),
+          'signInMethod': 'google',
+          'onboardingCompleted': false,
+        });
+        log("Created new user document for: ${user.uid}");
+      } else {
+        // Update existing user document
+        await userRef.update({
+          'lastActive': FieldValue.serverTimestamp(),
+          'lastSignIn': FieldValue.serverTimestamp(),
+          'email': user.email,
+          'name': user.displayName ?? '',
+          'photoUrl': user.photoURL ?? '',
+        });
+        log("Updated existing user document for: ${user.uid}");
       }
-      
-      // Update or create user document in Firestore
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(user.uid)
-          .set(userData, SetOptions(merge: true));
-          
-      log("User data updated in Firestore");
     } catch (e) {
       log("Error updating user data: $e");
-      // Don't throw here, just log the error
+      // We don't want to fail the sign-in if this fails
+      // Just log the error
     }
   }
 }

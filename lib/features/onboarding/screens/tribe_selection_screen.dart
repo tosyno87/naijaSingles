@@ -11,51 +11,26 @@ class TribeSelectionScreen extends StatefulWidget {
 }
 
 class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
-  String _selectedTribe = '';
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
+  String? _selectedTribe;
+  final TextEditingController _otherTribeController = TextEditingController();
+  bool _showOtherField = false;
 
-  // List of Nigerian tribes
-  final List<String> _tribes = [
+  // Afropeep MVP theme colors
+  static const Color backgroundColor = Color(0xFFFDF0E7);
+  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color cardBackground = Color(0xFFF7E8DA);
+  static const Color textDarkBrown = Color(0xFF3A1D0F);
+  static const Color textLightBrown = Color(0xFF8B6C59);
+
+  // List of main Nigerian tribes for dropdown
+  final List<String> _mainTribes = [
     'Yoruba',
     'Igbo',
     'Hausa',
     'Fulani',
     'Ijaw',
     'Kanuri',
-    'Ibibio',
-    'Tiv',
-    'Edo',
-    'Nupe',
-    'Urhobo',
-    'Igala',
-    'Idoma',
-    'Ebira',
-    'Efik',
-    'Gwari',
-    'Jukun',
-    'Kalabari',
-    'Ogoni',
-    'Isoko',
-    'Ikwerre',
-    'Itsekiri',
-    'Birom',
-    'Angas',
-    'Tarok',
-    'Chamba',
-    'Esan',
-    'Anioma',
-    'Ogoja',
-    'Ishan',
-    'Afemai',
-    'Ekiti',
-    'Ijebu',
-    'Egba',
-    'Awori',
-    'Ijesha',
-    'Ondo',
-    'Oyo',
-    'Ife',
+    'Other',
   ];
 
   @override
@@ -67,175 +42,150 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
       final controller = Provider.of<OnboardingController>(context, listen: false);
       
       if (controller.tribe.isNotEmpty) {
-        setState(() {
-          _selectedTribe = controller.tribe;
-        });
+        if (_mainTribes.contains(controller.tribe)) {
+          setState(() {
+            _selectedTribe = controller.tribe;
+          });
+        } else {
+          setState(() {
+            _selectedTribe = 'Other';
+            _otherTribeController.text = controller.tribe;
+            _showOtherField = true;
+          });
+        }
       }
     });
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _otherTribeController.dispose();
     super.dispose();
   }
 
-  void _selectTribe(String tribe) {
+  void _selectTribe(String? tribe) {
     setState(() {
       _selectedTribe = tribe;
+      _showOtherField = tribe == 'Other';
+      
+      if (tribe != 'Other') {
+        // Save to controller if not "Other"
+        if (tribe != null) {
+          Provider.of<OnboardingController>(context, listen: false)
+              .setTribe(tribe);
+        }
+      }
     });
-    
-    // Save to controller
-    Provider.of<OnboardingController>(context, listen: false)
-        .setTribe(tribe);
-  }
-
-  List<String> get _filteredTribes {
-    if (_searchQuery.isEmpty) {
-      return _tribes;
-    }
-    
-    return _tribes.where((tribe) => 
-      tribe.toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Define colors
-    const Color primaryColor = Color(0xFF008037); // Deep Green
-    const Color textColor = Color(0xFF333333);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header
-        Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Select Your Tribe",
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
-                ),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              Text(
-                "This helps us connect you with people from similar backgrounds",
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Search box
-              TextField(
-                controller: _searchController,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: textColor,
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintText: "Search tribes",
-                  hintStyle: GoogleFonts.poppins(
-                    color: Colors.grey.shade400,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: primaryColor, width: 2),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
-              ),
-            ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Description text
+          Text(
+            "This helps us connect you with people from similar backgrounds",
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: textLightBrown,
+            ),
           ),
-        ),
-        
-        // Tribe list
-        Expanded(
-          child: _filteredTribes.isEmpty
-              ? Center(
-                  child: Text(
-                    "No tribes found",
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+          
+          const SizedBox(height: 32),
+          
+          // Dropdown for tribe selection
+          Container(
+            decoration: BoxDecoration(
+              color: cardBackground,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _selectedTribe != null ? afropeepGreen : Colors.transparent,
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedTribe,
+                hint: Text(
+                  "Select your tribe",
+                  style: GoogleFonts.poppins(
+                    color: textLightBrown,
+                    fontSize: 16,
                   ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  itemCount: _filteredTribes.length,
-                  itemBuilder: (context, index) {
-                    final tribe = _filteredTribes[index];
-                    final isSelected = tribe == _selectedTribe;
-                    
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: isSelected
-                              ? primaryColor
-                              : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      elevation: isSelected ? 2 : 0,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        title: Text(
-                          tribe,
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                            color: isSelected ? primaryColor : textColor,
-                          ),
-                        ),
-                        trailing: isSelected
-                            ? const Icon(
-                                Icons.check_circle,
-                                color: primaryColor,
-                              )
-                            : null,
-                        onTap: () => _selectTribe(tribe),
-                      ),
-                    );
-                  },
                 ),
-        ),
-      ],
+                isExpanded: true,
+                icon: Icon(Icons.arrow_drop_down, color: afropeepGreen),
+                dropdownColor: cardBackground,
+                style: GoogleFonts.poppins(
+                  color: textDarkBrown,
+                  fontSize: 16,
+                ),
+                items: _mainTribes.map((String tribe) {
+                  return DropdownMenuItem<String>(
+                    value: tribe,
+                    child: Text(tribe),
+                  );
+                }).toList(),
+                onChanged: _selectTribe,
+              ),
+            ),
+          ),
+          
+          // Other tribe input field (conditionally shown)
+          if (_showOtherField) ...[
+            const SizedBox(height: 24),
+            
+            Text(
+              "Please specify your tribe",
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: textDarkBrown,
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            
+            TextField(
+              controller: _otherTribeController,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: textDarkBrown,
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: cardBackground,
+                hintText: "Enter your tribe",
+                hintStyle: GoogleFonts.poppins(
+                  color: textLightBrown,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: afropeepGreen, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              onChanged: (value) {
+                if (value.trim().isNotEmpty) {
+                  Provider.of<OnboardingController>(context, listen: false)
+                      .setTribe(value.trim());
+                }
+              },
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

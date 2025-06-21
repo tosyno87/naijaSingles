@@ -13,8 +13,16 @@ class BasicInfoScreen extends StatefulWidget {
 
 class _BasicInfoScreenState extends State<BasicInfoScreen> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
   DateTime? _selectedDate;
   String _selectedGender = '';
+
+  // Afropeep MVP theme colors
+  static const Color backgroundColor = Color(0xFFFDF0E7);
+  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color cardBackground = Color(0xFFF7E8DA);
+  static const Color textDarkBrown = Color(0xFF3A1D0F);
+  static const Color textLightBrown = Color(0xFF8B6C59);
 
   @override
   void initState() {
@@ -30,6 +38,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       
       if (controller.dateOfBirth != null) {
         _selectedDate = controller.dateOfBirth;
+        _formatDateIntoController();
       }
       
       if (controller.gender.isNotEmpty) {
@@ -41,7 +50,14 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _dobController.dispose();
     super.dispose();
+  }
+
+  void _formatDateIntoController() {
+    if (_selectedDate != null) {
+      _dobController.text = "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}";
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -53,11 +69,16 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF008037), // Deep Green
+            colorScheme: ColorScheme.light(
+              primary: afropeepGreen,
               onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
+              surface: cardBackground,
+              onSurface: textDarkBrown,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: afropeepGreen,
+              ),
             ),
           ),
           child: child!,
@@ -68,6 +89,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+        _formatDateIntoController();
       });
       
       // Calculate age
@@ -104,11 +126,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Define colors
-    const Color primaryColor = Color(0xFF008037); // Deep Green
-    const Color accentColor = Color(0xFFE74C3C); // Coral Red
-    const Color textColor = Color(0xFF333333);
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -118,9 +135,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           Text(
             "What's your name?",
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: textColor,
+              color: textDarkBrown,
             ),
           ),
           
@@ -130,14 +147,14 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
             controller: _nameController,
             style: GoogleFonts.poppins(
               fontSize: 16,
-              color: textColor,
+              color: textDarkBrown,
             ),
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.white,
+              fillColor: cardBackground,
               hintText: "Enter your full name",
               hintStyle: GoogleFonts.poppins(
-                color: Colors.grey.shade400,
+                color: textLightBrown,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -145,7 +162,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: primaryColor, width: 2),
+                borderSide: BorderSide(color: afropeepGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -164,48 +181,48 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           Text(
             "When were you born?",
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: textColor,
+              color: textDarkBrown,
             ),
           ),
           
           const SizedBox(height: 12),
           
-          InkWell(
-            onTap: () => _selectDate(context),
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
+          // Date of birth field - Fixed to be read-only with proper icon
+          TextField(
+            controller: _dobController,
+            readOnly: true, // Make it read-only
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              color: textDarkBrown,
+            ),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: cardBackground,
+              hintText: "Select your date of birth",
+              hintStyle: GoogleFonts.poppins(
+                color: textLightBrown,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: afropeepGreen, width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 16,
               ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _selectedDate == null
-                        ? "Select your date of birth"
-                        : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: _selectedDate == null
-                          ? Colors.grey.shade400
-                          : textColor,
-                    ),
-                  ),
-                  const Icon(
-                    Icons.calendar_today,
-                    color: primaryColor,
-                  ),
-                ],
+              suffixIcon: Icon(
+                Icons.calendar_today,
+                color: afropeepGreen, // Ensure icon is visible
+                size: 24,
               ),
             ),
+            onTap: () => _selectDate(context), // Open date picker on tap
           ),
           
           if (_selectedDate != null) ...[
@@ -217,7 +234,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: primaryColor,
+                  color: afropeepGreen,
                 ),
               ),
             ),
@@ -229,9 +246,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           Text(
             "What's your gender?",
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: textColor,
+              color: textDarkBrown,
             ),
           ),
           
@@ -269,8 +286,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    const Color primaryColor = Color(0xFF008037); // Deep Green
-    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -279,11 +294,11 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           vertical: 16,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor : Colors.white,
+          color: isSelected ? afropeepGreen : cardBackground,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? primaryColor : Colors.grey.shade300,
-            width: 2,
+            color: isSelected ? afropeepGreen : Colors.transparent,
+            width: 1,
           ),
         ),
         child: Column(
@@ -291,7 +306,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
             Icon(
               icon,
               size: 32,
-              color: isSelected ? Colors.white : primaryColor,
+              color: isSelected ? Colors.white : afropeepGreen,
             ),
             const SizedBox(height: 8),
             Text(
@@ -299,7 +314,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : Colors.black87,
+                color: isSelected ? Colors.white : textDarkBrown,
               ),
             ),
           ],

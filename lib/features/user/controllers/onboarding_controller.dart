@@ -14,7 +14,7 @@ class OnboardingController extends ChangeNotifier {
   String _tribe = '';
   String _bio = '';
   List<String> _interests = [];
-  File? _profilePhoto;
+  List<File?> _profilePhotos = List.filled(5, null); // Support up to 5 photos
   bool _isLoading = false;
   
   // Additional user data (for compatibility with existing code)
@@ -38,8 +38,11 @@ class OnboardingController extends ChangeNotifier {
   String get tribe => _tribe;
   String get bio => _bio;
   List<String> get interests => _interests;
-  File? get profilePhoto => _profilePhoto;
+  List<File?> get profilePhotos => _profilePhotos;
   bool get isLoading => _isLoading;
+  
+  // Legacy getter for backward compatibility
+  File? get profilePhoto => _profilePhotos.firstWhere((photo) => photo != null, orElse: () => null);
   
   // Getters for additional data
   String? get userName => _userName;
@@ -111,11 +114,6 @@ class OnboardingController extends ChangeNotifier {
   void removeInterest(String interest) {
     _interests.remove(interest);
     _genres.remove(interest); // For compatibility
-    notifyListeners();
-  }
-
-  void setProfilePhoto(File photo) {
-    _profilePhoto = photo;
     notifyListeners();
   }
 
@@ -208,11 +206,13 @@ class OnboardingController extends ChangeNotifier {
   }
 
   bool isPhotoUploaded() {
-    return _profilePhoto != null;
+    // Require at least 3 photos
+    int photoCount = _profilePhotos.where((photo) => photo != null).length;
+    return photoCount >= 3;
   }
 
-  // Photo selection
-  Future<void> pickProfilePhoto(ImageSource source) async {
+  // Photo selection for a specific index
+  Future<void> pickProfilePhoto(ImageSource source, int index) async {
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
@@ -223,11 +223,19 @@ class OnboardingController extends ChangeNotifier {
       );
       
       if (image != null) {
-        _profilePhoto = File(image.path);
+        _profilePhotos[index] = File(image.path);
         notifyListeners();
       }
     } catch (e) {
       log("Error picking image: $e");
+    }
+  }
+  
+  // Remove photo at specific index
+  void removeProfilePhoto(int index) {
+    if (index >= 0 && index < _profilePhotos.length) {
+      _profilePhotos[index] = null;
+      notifyListeners();
     }
   }
 
@@ -242,23 +250,28 @@ class OnboardingController extends ChangeNotifier {
         throw Exception("User not authenticated");
       }
       
-      // Upload profile photo if available
-      String? photoUrl;
-      if (_profilePhoto != null) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('users/${user.uid}/profile_photo.jpg');
-            
-        await storageRef.putFile(_profilePhoto!);
-        photoUrl = await storageRef.getDownloadURL();
+      // Upload profile photos if available
+      List<String> photoUrls = [];
+      List<File> validPhotos = _profilePhotos.whereType<File>().toList();
+      
+      if (validPhotos.isNotEmpty) {
+        for (int i = 0; i < validPhotos.length; i++) {
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('users/${user.uid}/profile_photo_$i.jpg');
+              
+          await storageRef.putFile(validPhotos[i]);
+          String url = await storageRef.getDownloadURL();
+          photoUrls.add(url);
+        }
         
         // Update photos list for compatibility
-        _photos = [photoUrl];
+        _photos = photoUrls;
       }
       
       // Create user data map
       final userData = {
-        'userId': user.uid,
+        // Remove 'userId' field since the document ID already serves this purpose
         'name': _fullName,
         'userName': _fullName, // For compatibility
         'dateOfBirth': _dateOfBirth?.toIso8601String(),
@@ -274,10 +287,10 @@ class OnboardingController extends ChangeNotifier {
         'isPremium': false,
       };
       
-      // Add photo URL if available
-      if (photoUrl != null) {
-        userData['profilePicture'] = photoUrl;
-        userData['photos'] = [photoUrl];
+      // Add photo URLs if available
+      if (photoUrls.isNotEmpty) {
+        userData['profilePicture'] = photoUrls[0]; // First photo as profile picture
+        userData['photos'] = photoUrls;
       }
       
       // Save to Firestore

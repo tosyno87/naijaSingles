@@ -13,34 +13,25 @@ class PhotoUploadScreen extends StatefulWidget {
 }
 
 class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
-  File? _selectedImage;
+  // Afropeep MVP theme colors
+  static const Color backgroundColor = Color(0xFFFDF0E7);
+  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color cardBackground = Color(0xFFF7E8DA);
+  static const Color textDarkBrown = Color(0xFF3A1D0F);
+  static const Color textLightBrown = Color(0xFF8B6C59);
 
   @override
   void initState() {
     super.initState();
-    
-    // Initialize with existing data if available
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
-      if (controller.profilePhoto != null) {
-        setState(() {
-          _selectedImage = controller.profilePhoto;
-        });
-      }
-    });
   }
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _pickImage(ImageSource source, int index) async {
     final controller = Provider.of<OnboardingController>(context, listen: false);
-    await controller.pickProfilePhoto(source);
-    
-    setState(() {
-      _selectedImage = controller.profilePhoto;
-    });
+    await controller.pickProfilePhoto(source, index);
+    setState(() {});
   }
 
-  void _showImageSourceDialog() {
+  void _showImageSourceDialog(int index) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -58,7 +49,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF333333),
+                color: textDarkBrown,
               ),
             ),
             
@@ -70,7 +61,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               subtitle: "Use your camera to take a new photo",
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.camera);
+                _pickImage(ImageSource.camera, index);
               },
             ),
             
@@ -82,7 +73,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               subtitle: "Select a photo from your device",
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.gallery);
+                _pickImage(ImageSource.gallery, index);
               },
             ),
           ],
@@ -104,12 +95,12 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF008037).withOpacity(0.1),
+              color: afropeepGreen.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: const Color(0xFF008037),
+              color: afropeepGreen,
               size: 24,
             ),
           ),
@@ -125,7 +116,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF333333),
+                    color: textDarkBrown,
                   ),
                 ),
                 
@@ -133,16 +124,16 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                   subtitle,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
-                    color: Colors.grey.shade600,
+                    color: textLightBrown,
                   ),
                 ),
               ],
             ),
           ),
           
-          const Icon(
+          Icon(
             Icons.arrow_forward_ios,
-            color: Color(0xFF008037),
+            color: afropeepGreen,
             size: 16,
           ),
         ],
@@ -150,88 +141,165 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     );
   }
 
+  Widget _buildPhotoItem(int index) {
+    final controller = Provider.of<OnboardingController>(context);
+    final photo = controller.profilePhotos[index];
+    final bool isRequired = index < 3; // First 3 photos are required
+    
+    return GestureDetector(
+      onTap: () => _showImageSourceDialog(index),
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 150,
+            decoration: BoxDecoration(
+              color: cardBackground,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isRequired 
+                    ? (photo == null ? Colors.red.withOpacity(0.5) : afropeepGreen)
+                    : Colors.transparent,
+                width: 2,
+              ),
+              image: photo != null
+                  ? DecorationImage(
+                      image: FileImage(photo),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+            child: photo == null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_a_photo,
+                        size: 36,
+                        color: isRequired ? Colors.red.withOpacity(0.7) : Colors.grey,
+                      ),
+                      
+                      const SizedBox(height: 8),
+                      
+                      Text(
+                        isRequired ? "Required" : "Add Photo",
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isRequired ? Colors.red.withOpacity(0.7) : Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
+                  )
+                : null,
+          ),
+          
+          // Remove button if photo exists
+          if (photo != null)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: GestureDetector(
+                onTap: () {
+                  controller.removeProfilePhoto(index);
+                  setState(() {});
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Define colors
-    const Color primaryColor = Color(0xFF008037); // Deep Green
-    const Color textColor = Color(0xFF333333);
-
+    final controller = Provider.of<OnboardingController>(context);
+    final int uploadedCount = controller.profilePhotos.where((photo) => photo != null).length;
+    final bool hasMinimumPhotos = uploadedCount >= 3;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Add Your Profile Photo",
+            "Add Your Profile Photos",
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: textColor,
+              color: textDarkBrown,
             ),
           ),
           
           const SizedBox(height: 8),
           
           Text(
-            "A good profile photo increases your chances of getting matches",
-            textAlign: TextAlign.center,
+            "Upload at least 3 photos to complete your profile",
             style: GoogleFonts.poppins(
               fontSize: 14,
-              color: Colors.black54,
+              color: textLightBrown,
             ),
           ),
           
-          const SizedBox(height: 40),
+          const SizedBox(height: 8),
           
-          // Photo upload area
-          GestureDetector(
-            onTap: _showImageSourceDialog,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: _selectedImage != null
-                      ? primaryColor
-                      : Colors.grey.shade300,
-                  width: 3,
-                ),
-                image: _selectedImage != null
-                    ? DecorationImage(
-                        image: FileImage(_selectedImage!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
+          // Photo count indicator
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: hasMinimumPhotos ? afropeepGreen.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              "$uploadedCount/5 photos uploaded (minimum 3)",
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: hasMinimumPhotos ? afropeepGreen : Colors.red,
               ),
-              child: _selectedImage == null
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.add_a_photo,
-                          size: 48,
-                          color: Colors.grey,
-                        ),
-                        
-                        const SizedBox(height: 12),
-                        
-                        Text(
-                          "Add Photo",
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                      ],
-                    )
-                  : null,
             ),
           ),
           
-          const SizedBox(height: 40),
+          const SizedBox(height: 24),
+          
+          // Photo grid - first row (required photos)
+          Row(
+            children: [
+              Expanded(child: _buildPhotoItem(0)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildPhotoItem(1)),
+            ],
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Photo grid - second row (1 required, 2 optional)
+          Row(
+            children: [
+              Expanded(child: _buildPhotoItem(2)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildPhotoItem(3)),
+            ],
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Photo grid - third row (optional)
+          _buildPhotoItem(4),
+          
+          const SizedBox(height: 32),
           
           // Photo tips
           Container(
@@ -248,7 +316,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Tips for a great profile photo:",
+                  "Tips for great profile photos:",
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -259,13 +327,16 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 const SizedBox(height: 8),
                 
                 _buildTipItem(
-                  "Use a clear, well-lit photo of your face",
+                  "Use clear, well-lit photos that show your face",
                 ),
                 _buildTipItem(
-                  "Choose a recent photo that looks like you",
+                  "Include at least one full-body photo",
                 ),
                 _buildTipItem(
-                  "Avoid group photos - just you in the main profile picture",
+                  "Show your interests and personality",
+                ),
+                _buildTipItem(
+                  "Avoid heavily filtered or edited photos",
                 ),
                 _buildTipItem(
                   "Smile! Profiles with smiling photos get more matches",
@@ -273,26 +344,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               ],
             ),
           ),
-          
-          const SizedBox(height: 24),
-          
-          // Change photo button (if photo is already selected)
-          if (_selectedImage != null)
-            TextButton.icon(
-              onPressed: _showImageSourceDialog,
-              icon: const Icon(
-                Icons.refresh,
-                color: primaryColor,
-              ),
-              label: Text(
-                "Change Photo",
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: primaryColor,
-                ),
-              ),
-            ),
         ],
       ),
     );

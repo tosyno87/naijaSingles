@@ -126,7 +126,7 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
       if (isNewUser) {
         // Create a new user document
         await userRef.set({
-          'id': user.uid,
+          // Remove the redundant 'id' field since the document ID already serves this purpose
           'email': user.email,
           'name': user.displayName,
           'photoUrl': user.photoURL,

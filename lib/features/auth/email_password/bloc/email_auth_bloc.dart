@@ -224,7 +224,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       final userRef = _firestore.collection('users').doc(user.uid);
       
       await userRef.set({
-        'id': user.uid,
+        // Remove the redundant 'id' field since the document ID already serves this purpose
         'email': user.email,
         'name': user.displayName ?? '',
         'photoUrl': user.photoURL ?? '',

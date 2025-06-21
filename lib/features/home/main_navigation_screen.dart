@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/features/home/dating_homepage.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/messages/messages_screen.dart';
 import 'package:naijasingles/features/profile/profile_screen.dart';
@@ -17,12 +16,12 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
   
-  // Define the pages to be shown for each tab
+  // Define the pages to be shown for each tab (removed Dating tab)
+  // Order matches the BottomNavigationBarItems below
   final List<Widget> _pages = [
-    const DatingHomePage(),
-    const ExploreScreen(),
-    const MessagesScreen(),
-    const ProfileScreen(),
+    const ExploreScreen(),   // Tab 0: Explore
+    const MessagesScreen(),  // Tab 1: Messages
+    const ProfileScreen(),   // Tab 2: Profile
   ];
   
   // Deep green color for accents
@@ -54,10 +53,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           fontSize: 12,
         ),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Dating',
-          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
             label: 'Explore',

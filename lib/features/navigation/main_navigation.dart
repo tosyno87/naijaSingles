@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../home/dating_homepage.dart';
 import '../explore/explore_screen.dart';
 import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
@@ -16,12 +15,12 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
   
-  // Define all main screens here
+  // Define all main screens here (removed Dating tab)
+  // Order matches the BottomNavigationBarItems below
   final List<Widget> _screens = [
-    const DatingHomePage(),
-    const ExploreScreen(),
-    const MessagesScreen(),
-    const ProfileScreen(),
+    const ExploreScreen(),   // Tab 0: Explore
+    const MessagesScreen(),  // Tab 1: Messages
+    const ProfileScreen(),   // Tab 2: Profile
   ];
   
   // Deep green color for accents
@@ -52,10 +51,6 @@ class _MainNavigationState extends State<MainNavigation> {
           fontSize: 12,
         ),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Dating',
-          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
             label: 'Explore',

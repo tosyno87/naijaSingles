@@ -145,7 +145,7 @@ class PhoneAuthRepository {
         .doc(user.uid)
         .set(userData, SetOptions(merge: true));
     var result = await firebaseFireStoreInstance
-        .collection('Users')
+        .collection('users')
         .where('userId', isEqualTo: user.uid)
         .get();
     return UserModel.fromDocument(result.docs.first);
@@ -153,7 +153,7 @@ class PhoneAuthRepository {
 
   Future<bool> userDetails(String userId) async {
     var querySnapshot = await firebaseFireStoreInstance
-        .collection('Users')
+        .collection('users')
         .where('userId', isEqualTo: userId)
         .get();
 
@@ -179,7 +179,7 @@ class PhoneAuthRepository {
     User? fbuser = auth.currentUser;
     try {
       var result = await firebaseFireStoreInstance
-          .collection('Users')
+          .collection('users')
           .where('userId', isEqualTo: fbuser!.uid)
           .get();
 

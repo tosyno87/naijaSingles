@@ -22,6 +22,11 @@ class RouteName {
   static const String mainNavigation = '/main_navigation';
   static const String googleSignInTest = '/google_sign_in_test';
   
+  // Email authentication routes
+  static const String emailSignup = '/email_signup';
+  static const String emailLogin = '/email_login';
+  static const String emailPasswordReset = '/email_password_reset';
+  
   // Main navigation routes
   static const String onboarding = '/onboarding';
   static const String home = '/home';

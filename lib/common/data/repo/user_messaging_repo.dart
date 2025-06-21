@@ -12,7 +12,7 @@ import '../../constants/constants.dart';
 
 class UserMessagingRepo {
   static FirebaseFirestore db = firebaseFireStoreInstance;
-  static CollectionReference get docRef => db.collection('Users');
+  static CollectionReference get docRef => db.collection('users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
 
@@ -54,7 +54,7 @@ class UserMessagingRepo {
       UserModel currentUser, int perPage) async {
     User user = firebaseAuth.currentUser!;
     QuerySnapshot querySnapshot = await db
-        .collection('Users')
+        .collection('users')
         .doc(user.uid)
         .collection('blockedlist')
         .orderBy('timestamp', descending: true)
@@ -90,7 +90,7 @@ class UserMessagingRepo {
       {BlockUserModel? lastDocumentData}) async {
     User user = firebaseAuth.currentUser!;
     Query query = db
-        .collection('Users')
+        .collection('users')
         .doc(user.uid)
         .collection('blockedlist')
         .orderBy('timestamp', descending: true)
@@ -143,7 +143,7 @@ class UserMessagingRepo {
   static Future<UserModel> getChatUserDetails({required String userId}) async {
     UserModel? user;
 
-    var result = await db.collection('Users').doc(userId).get();
+    var result = await db.collection('users').doc(userId).get();
 
     if (result.exists) {
       user = UserModel.fromDocument(result);

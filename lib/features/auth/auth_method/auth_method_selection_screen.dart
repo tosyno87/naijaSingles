@@ -48,9 +48,8 @@ class AuthMethodSelectionScreen extends StatelessWidget {
           Positioned.fill(
             child: Opacity(
               opacity: 0.05,
-              child: Image.asset(
-                'asset/images/african_pattern.png',
-                repeat: ImageRepeat.repeat,
+              child: Container(
+                color: Colors.transparent,
               ),
             ),
           ),
@@ -101,6 +100,19 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                           builder: (context) => PhoneNumber(updatePhoneNumber: false),
                         ),
                       );
+                    },
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Email Button
+                  _buildAuthMethodButton(
+                    context: context,
+                    icon: Icons.email_outlined,
+                    text: "Sign in with Email",
+                    color: Colors.deepOrange,
+                    onTap: () {
+                      Navigator.pushNamed(context, '/email_signup');
                     },
                   ),
                   

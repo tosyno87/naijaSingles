@@ -129,7 +129,7 @@ class ProductsState extends State<Products> {
                   context)
               .whenComplete(() async {
             await firebaseFireStoreInstance
-                .collection('Users')
+                .collection('users')
                 .doc(widget.currentUser!.id)
                 .update({
               'isPremium': true,

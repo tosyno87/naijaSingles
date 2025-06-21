@@ -582,12 +582,12 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     FirebaseMessaging.instance.getToken().then((token) async {
       debugPrint('Device Token FCM: $token');
       await firebaseFireStoreInstance
-          .collection('Users')
+          .collection('users')
           .doc(userProvider.currentUser!.id)
           .update({'pushToken': token});
       if (!isPuchased) {
         await firebaseFireStoreInstance
-            .collection('Users')
+            .collection('users')
             .doc(userProvider.currentUser!.id)
             .update({'isPremium': false});
       }

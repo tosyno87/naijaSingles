@@ -90,7 +90,7 @@ class UserRepo {
     try {
       // Create a reference to the user's document in Firestore.
       DocumentReference userDocRef =
-          firebaseFireStoreInstance.collection('Users').doc(userId);
+          firebaseFireStoreInstance.collection('users').doc(userId);
       await userDocRef.update({
         'streetView': {
           'option': option,
@@ -109,7 +109,7 @@ class UserRepo {
       User? user = firebaseAuthInstance.currentUser;
       if (user != null) {
         DocumentSnapshot userSnapshot = await firebaseFireStoreInstance
-            .collection('Users')
+            .collection('users')
             .doc(userId)
             .get();
         Map<String, dynamic>? userData =

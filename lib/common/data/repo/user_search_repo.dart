@@ -9,7 +9,7 @@ import '../../constants/constants.dart';
 
 class UserSearchRepo {
   static FirebaseFirestore db = firebaseFireStoreInstance;
-  static CollectionReference get docRef => db.collection('Users');
+  static CollectionReference get docRef => db.collection('users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
   static Map items = {};

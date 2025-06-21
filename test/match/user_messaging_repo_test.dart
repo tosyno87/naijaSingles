@@ -10,7 +10,7 @@ void main() {
     UserMessagingRepo.db = firebaseFireStoreInstance;
     UserMessagingRepo.firebaseAuth = firebaseAuthInstance;
 
-    await firebaseFireStoreInstance.collection('Users').doc('1').set({
+    await firebaseFireStoreInstance.collection('users').doc('1').set({
       'userId': '1',
       'UserName': 'Test',
       'isBlocked': false,

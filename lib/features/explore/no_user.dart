@@ -69,7 +69,7 @@ class _NoUserFoundWidgetState extends State<NoUserFoundWidget> {
 
           // Create a reference to the user's document in Firestore.
           DocumentReference userDocRef =
-              firebaseFireStoreInstance.collection('Users').doc(userId);
+              firebaseFireStoreInstance.collection('users').doc(userId);
 
           // Update the user's current location.
           await userDocRef.update({

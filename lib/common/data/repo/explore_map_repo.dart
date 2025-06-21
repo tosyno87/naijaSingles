@@ -8,7 +8,7 @@ import '../../constants/constants.dart';
 
 class ExploreMap {
   static CollectionReference docRef =
-      firebaseFireStoreInstance.collection('Users');
+      firebaseFireStoreInstance.collection('users');
 
   static Future<List<QuerySnapshot>> query(UserModel currentUser) async {
     // for users who has streetview option everyone

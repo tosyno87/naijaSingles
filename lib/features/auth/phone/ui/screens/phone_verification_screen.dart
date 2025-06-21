@@ -82,9 +82,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           Positioned.fill(
             child: Opacity(
               opacity: 0.05,
-              child: Image.asset(
-                'asset/images/african_pattern.png',
-                repeat: ImageRepeat.repeat,
+              child: Container(
+                color: Colors.transparent,
               ),
             ),
           ),

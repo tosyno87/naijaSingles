@@ -7,6 +7,9 @@ import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
 import 'package:naijasingles/features/auth/welcome/welcome_screen.dart';
 import 'package:naijasingles/features/auth/google_sign_in/google_sign_in_test_screen.dart';
+import 'package:naijasingles/features/auth/email_password/ui/screens/email_signup_screen.dart';
+import 'package:naijasingles/features/auth/email_password/ui/screens/email_login_screen.dart';
+import 'package:naijasingles/features/auth/email_password/ui/screens/email_password_reset_screen.dart';
 import 'package:naijasingles/features/home/dating_homepage.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/explore/explore_page.dart';
@@ -50,6 +53,10 @@ abstract class AppRouter {
     RouteName.loginScreen: (context) => const LoginScreen(),
     RouteName.tabScreen: (context) => const Tabbar("active", false),
     RouteName.googleSignInTest: (context) => const GoogleSignInTestScreen(),
+    // Email authentication routes
+    RouteName.emailSignup: (context) => const EmailSignupScreen(),
+    RouteName.emailLogin: (context) => const EmailLoginScreen(),
+    RouteName.emailPasswordReset: (context) => const EmailPasswordResetScreen(),
     RouteName.profileScreen: (context) => ProfilePage(
           isPuchased:
               (ModalRoute.of(context)!.settings.arguments as Map)['isPuchased'],
@@ -90,7 +97,8 @@ abstract class AppRouter {
     RouteName.matchPage: (context) => const MatchScreen(),
     RouteName.sexualorientationScreen: (context) => const SexualOrientation(),
     RouteName.universityScreen: (context) => const UniversityPage(),
-    RouteName.datingHomePage: (context) => const DatingHomePage(),
+    // Redirect Dating to Explore since we're removing the Dating tab
+    RouteName.datingHomePage: (context) => const ExploreScreen(),
     RouteName.profilePicSetScreen: (context) => const UserProfilePic(),
     RouteName.allowLocationScreen: (context) => const AllowLocation(),
     RouteName.otpScreen: (context) => OtpPage(

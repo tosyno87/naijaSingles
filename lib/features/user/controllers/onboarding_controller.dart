@@ -282,7 +282,7 @@ class OnboardingController extends ChangeNotifier {
       
       // Save to Firestore
       await FirebaseFirestore.instance
-          .collection('Users')
+          .collection('users')
           .doc(user.uid)
           .set(userData, SetOptions(merge: true));
           
@@ -297,5 +297,12 @@ class OnboardingController extends ChangeNotifier {
       log("Error saving user data: $e");
       rethrow;
     }
+  }
+  
+  // Navigation method for onboarding screens
+  void nextPage() {
+    // This method is called from onboarding screens to signal
+    // that the current page is complete and we can move to the next one
+    notifyListeners();
   }
 }

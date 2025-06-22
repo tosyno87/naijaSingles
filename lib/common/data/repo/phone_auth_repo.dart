@@ -60,13 +60,13 @@ class PhoneAuthRepository {
   Future<void> deleteUser(User user) async {
     // user.delete();
     final checkedSnapshot = await firebaseFireStoreInstance
-        .collection("Users")
+        .collection("users")
         .doc(user.uid)
         .collection('CheckedUser')
         .get();
     for (final element in checkedSnapshot.docs) {
       await firebaseFireStoreInstance
-          .collection("Users")
+          .collection("users")
           .doc(user.uid)
           .collection("CheckedUser")
           .doc(element.id)
@@ -74,13 +74,13 @@ class PhoneAuthRepository {
           .then((value) => log("success"));
     }
     final likedBySnapshot = await firebaseFireStoreInstance
-        .collection("Users")
+        .collection("users")
         .doc(user.uid)
         .collection('LikedBy')
         .get();
     for (final element in likedBySnapshot.docs) {
       await firebaseFireStoreInstance
-          .collection("Users")
+          .collection("users")
           .doc(user.uid)
           .collection("LikedBy")
           .doc(element.id)
@@ -89,13 +89,13 @@ class PhoneAuthRepository {
     }
 
     final matchesSnapshot = await firebaseFireStoreInstance
-        .collection("Users")
+        .collection("users")
         .doc(user.uid)
         .collection('Matches')
         .get();
     for (final element in matchesSnapshot.docs) {
       await firebaseFireStoreInstance
-          .collection("Users")
+          .collection("users")
           .doc(user.uid)
           .collection("Matches")
           .doc(element.id)
@@ -103,7 +103,7 @@ class PhoneAuthRepository {
           .then((value) => log("success"));
     }
 
-    await firebaseFireStoreInstance.collection("Users").doc(user.uid).delete();
+    await firebaseFireStoreInstance.collection("users").doc(user.uid).delete();
     // Delete user details from Firebase Storage
     await deleteUserStorageCollection(user.uid);
   }
@@ -141,7 +141,7 @@ class PhoneAuthRepository {
     });
 
     await firebaseFireStoreInstance
-        .collection("Users")
+        .collection("users")
         .doc(user.uid)
         .set(userData, SetOptions(merge: true));
     var result = await firebaseFireStoreInstance

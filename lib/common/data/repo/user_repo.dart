@@ -13,7 +13,7 @@ class UserRepo {
     // log('editinfo-----------$editInfo');
     try {
       await firebaseFireStoreInstance
-          .collection("Users")
+          .collection("users")
           .doc(userId)
           .set({'editInfo': editInfo}, SetOptions(merge: true));
       log('User data updated successfully');
@@ -27,7 +27,7 @@ class UserRepo {
     log('filterinfo-----------$changeValues');
     try {
       await firebaseFireStoreInstance
-          .collection("Users")
+          .collection("users")
           .doc(userId)
           .set(changeValues, SetOptions(merge: true));
       log('User filter updated successfully');
@@ -39,7 +39,7 @@ class UserRepo {
 
 // For unmatch user after match
   static Future unmatchUser(UserModel currentUser, String userId) async {
-    var collectionRefrence = firebaseFireStoreInstance.collection("Users");
+    var collectionRefrence = firebaseFireStoreInstance.collection("users");
     var chatCollection = firebaseFireStoreInstance.collection("chats");
     await collectionRefrence
         .doc(currentUser.id)

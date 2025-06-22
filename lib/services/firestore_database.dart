@@ -37,7 +37,7 @@ class FireStoreClass {
             try {
               log("Updating profile picture with URL: $fileURL");
               await firebaseFireStoreInstance
-                  .collection("Users")
+                  .collection("users")
                   .doc(currentUserId)
                   .set({"Pictures": [fileURL]},
                       SetOptions(merge: true));
@@ -84,7 +84,7 @@ class FireStoreClass {
         
         // Update user document with verification status
         await firebaseFireStoreInstance
-            .collection("Users")
+            .collection("users")
             .doc(userId)
             .set({
               "verification": {
@@ -134,7 +134,7 @@ class FireStoreClass {
           storageReference.getDownloadURL().then((fileURL) async {
             // Initialize Pictures array if it doesn't exist
             DocumentSnapshot userDoc = await firebaseFireStoreInstance
-                .collection("Users")
+                .collection("users")
                 .doc(currentUser.id)
                 .get();
                 
@@ -153,13 +153,13 @@ class FireStoreClass {
               if (checktype == 'profile') {
                 log("Updating profile picture with URL: $fileURL");
                 await firebaseFireStoreInstance
-                    .collection("Users")
+                    .collection("users")
                     .doc(currentUser.id)
                     .set({"Pictures": pictures},
                         SetOptions(merge: true));
               } else {
                 await firebaseFireStoreInstance
-                    .collection("Users")
+                    .collection("users")
                     .doc(currentUser.id)
                     .update({"Pictures": pictures});
               }

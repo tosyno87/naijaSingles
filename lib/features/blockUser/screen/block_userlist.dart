@@ -205,7 +205,7 @@ class _BlockedUserState extends State<BlockedUser> {
                                           }, SetOptions(merge: true));
                                           // For deleting from   blocklist
                                           await firebaseFireStoreInstance
-                                              .collection("Users")
+                                              .collection("users")
                                               .doc(widget.currentUser.id)
                                               .collection("blockedlist")
                                               .doc(blockUser

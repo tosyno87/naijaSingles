@@ -229,7 +229,7 @@ class ChatPageState extends State<ChatPage> {
                                         }, SetOptions(merge: true));
                                         // For deleting from   blocklist
                                         await firebaseFireStoreInstance
-                                            .collection("Users")
+                                            .collection("users")
                                             .doc(widget.sender.id)
                                             .collection("blockedlist")
                                             .doc(widget.second
@@ -247,7 +247,7 @@ class ChatPageState extends State<ChatPage> {
                                         }, SetOptions(merge: true));
                                         // For adding in   blocklist
                                         await firebaseFireStoreInstance
-                                            .collection("Users")
+                                            .collection("users")
                                             .doc(widget.sender.id)
                                             .collection("blockedlist")
                                             .doc(widget.second

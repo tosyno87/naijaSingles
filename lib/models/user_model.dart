@@ -66,10 +66,12 @@ class UserModel {
   }
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
+    // Get the document ID as the user ID
+    final String userId = doc.id;
+    
     return UserModel(
-      id: doc.get('userId'),
-      name:
-          doc.data().toString().contains('UserName') ? doc.get('UserName') : "",
+      id: userId,
+      name: doc.data().toString().contains('name') ? doc.get('name') : "",
       isBlocked: doc.get('isBlocked') ?? false,
       address: doc.data().toString().contains('location')
           ? doc.get('location')['address'] ?? ""
@@ -90,9 +92,11 @@ class UserModel {
           ? doc.get('sexualOrientation')
           : {},
 
-      userGender: doc.data().toString().contains('editInfo')
-          ? doc.get('editInfo')['userGender'] ?? ''
-          : "",
+      userGender: doc.data().toString().contains('gender')
+          ? doc.get('gender') ?? ''
+          : doc.data().toString().contains('editInfo')
+              ? doc.get('editInfo')['userGender'] ?? ''
+              : "",
       company: doc.data().toString().contains('editInfo')
           ? doc.get('editInfo')['company'] ?? ''
           : "",
@@ -118,7 +122,11 @@ class UserModel {
           : 10,
       ageRange: doc.data().toString().contains('age_range')
           ? doc.get('age_range')
-          : {},
+          : doc.data().toString().contains('preferences') && 
+            doc.get('preferences') is Map && 
+            doc.get('preferences').containsKey('ageRange')
+              ? {'min': doc.get('preferences')['ageRange'][0], 'max': doc.get('preferences')['ageRange'][1]}
+              : {},
       editInfo: doc.data().toString().contains('editInfo')
           ? doc.get('editInfo') ?? {}
           : {},
@@ -129,27 +137,30 @@ class UserModel {
           ? doc.get('isBot') ?? false
           : false,
 
-      imageUrl: doc.data().toString().contains('Pictures')
-          ? List.generate(doc.get('Pictures').length, (index) {
-              return doc.get('Pictures')[index];
-            })
-          : [],
-      // distanceBW: doc.get('distanceBW') ?? 0,
+      // Check for both 'photos' (new field) and 'Pictures' (old field)
+      imageUrl: doc.data().toString().contains('photos')
+          ? doc.get('photos')
+          : doc.data().toString().contains('Pictures')
+              ? List.generate(doc.get('Pictures').length, (index) {
+                  return doc.get('Pictures')[index];
+                })
+              : [],
     );
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-        id: json['userId'] ?? "",
-        name: json['UserName'] ?? "",
+        // Use the document ID as the user ID if available, otherwise fall back to 'userId'
+        id: json['id'] ?? json['userId'] ?? "",
+        name: json['name'] ?? json['UserName'] ?? "",
         isBlocked: json['isBlocked'] ?? false,
-        address: json['location']['address'] ?? "",
-        latitude: json['location']['latitude'] ?? 0,
-        longitude: json['location']['longitude'] ?? 0,
+        address: json['location'] != null ? json['location']['address'] ?? "" : "",
+        latitude: json['location'] != null ? json['location']['latitude'] ?? 0 : 0,
+        longitude: json['location'] != null ? json['location']['longitude'] ?? 0 : 0,
         coordinates: json['coordinates'] ?? {},
         currentCoordinates: json['currentCoordinates'],
         sexualOrientation: json['sexualOrientation'],
-        userGender: json['editInfo']['userGender'],
+        userGender: json['gender'] ?? (json['editInfo'] != null ? json['editInfo']['userGender'] : null),
         living_in: json['living_in'],
         job_title: json['job_title'],
         company: json['company'],
@@ -158,15 +169,15 @@ class UserModel {
         age: json['age'],
         phoneNumber: json['phoneNumber'],
         maxDistance: json['maximum_distance'] ?? 10,
-        ageRange: json['age_range'],
+        ageRange: json['age_range'] ?? (json['preferences'] != null ? 
+            {'min': json['preferences']['ageRange'][0], 'max': json['preferences']['ageRange'][1]} : null),
         editInfo: json['editInfo'],
         streetView: json['streetView'],
-        imageUrl: json['Pictures'],
+        imageUrl: json['photos'] ?? json['Pictures'],
         distanceBW: json['distanceBW'] != null
             ? (json['distanceBW'] as num).round()
             : null,
         isBot: json['isBot'] ?? false,
-
     );
   }
 

@@ -52,7 +52,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
 
       if (user != null) {
         await firebaseFireStoreInstance
-            .collection("Users")
+            .collection("users")
             .doc(user.uid)
             .update({'phoneNumber': event.phoneNumber});
         // add(OnPhoneAuthVerificationCompleteEvent(credential: credential));

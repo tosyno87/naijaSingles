@@ -35,6 +35,19 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
         actions: [
+          TextButton.icon(
+            icon: const Icon(Icons.edit, color: deepGreen),
+            label: Text(
+              'Edit',
+              style: GoogleFonts.poppins(
+                color: deepGreen,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/edit_profile');
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: deepGreen),
             onPressed: () {

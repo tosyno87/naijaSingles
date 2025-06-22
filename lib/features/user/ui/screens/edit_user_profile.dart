@@ -782,7 +782,7 @@ class EditProfileState extends State<EditProfile> {
     widget.currentUser.imageUrl!.removeAt(index);
 
     await firebaseFireStoreInstance
-        .collection("Users")
+        .collection("users")
         .doc(widget.currentUser.id)
         .set({
       "Pictures": widget.currentUser.imageUrl,

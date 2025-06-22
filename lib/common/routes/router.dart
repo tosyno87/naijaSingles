@@ -15,6 +15,7 @@ import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/explore/explore_page.dart';
 import 'package:naijasingles/features/home/main_navigation_screen.dart';
 import 'package:naijasingles/features/onboarding/onboarding_main.dart';
+import 'package:naijasingles/features/profile/edit_profile_screen.dart';
 
 import 'package:naijasingles/features/chat/ui/screens/chat_page.dart';
 
@@ -76,8 +77,7 @@ abstract class AppRouter {
         chatId: (ModalRoute.of(context)!.settings.arguments as Map)['chatID']
             .toString(),
         second: (ModalRoute.of(context)!.settings.arguments as Map)['second']),
-    RouteName.editProfileScreen: (context) =>
-        EditProfile(Provider.of<UserProvider>(context).currentUser!),
+    RouteName.editProfileScreen: (context) => const EditProfileScreen(),
     RouteName.largeImageScreen: (context) => LargeImage(
         largeImage: ModalRoute.of(context)!.settings.arguments as String),
     RouteName.welcomeScreen: (context) => const WelcomeScreen(),

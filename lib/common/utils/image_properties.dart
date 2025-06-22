@@ -207,13 +207,13 @@ class ImageProperties {
             currentUser.imageUrl!.insert(0, fileURL);
             log("object");
             await firebaseFireStoreInstance
-                .collection("Users")
+                .collection("users")
                 .doc(currentUser.id)
                 .set({"Pictures": currentUser.imageUrl},
                     SetOptions(merge: true));
           } else {
             await firebaseFireStoreInstance
-                .collection("Users")
+                .collection("users")
                 .doc(currentUser.id)
                 .set(updateObject, SetOptions(merge: true));
             currentUser.imageUrl!.add(fileURL);

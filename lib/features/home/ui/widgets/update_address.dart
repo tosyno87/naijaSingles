@@ -186,7 +186,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                 onPressed: () async {
                   Navigator.pop(context);
                   await firebaseFireStoreInstance
-                      .collection("Users")
+                      .collection("users")
                       .doc('${widget.currentUser.id}')
                       .update({
                         'location': {

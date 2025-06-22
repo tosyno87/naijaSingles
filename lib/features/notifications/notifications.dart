@@ -41,7 +41,7 @@ class NotificationsState extends State<Notifications> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     currentUser = userProvider.currentUser!;
     notificationReference =
-        db.collection("Users").doc(currentUser!.id).collection('Matches');
+        db.collection("users").doc(currentUser!.id).collection('Matches');
     _loadInitialNotifications();
     _scrollController.addListener(_scrollListener);
     super.initState();
@@ -231,7 +231,7 @@ class NotificationsState extends State<Notifications> {
                                 );
 
                                 DocumentSnapshot userdoc = await db
-                                    .collection("Users")
+                                    .collection("users")
                                     .doc(doc.get("Matches"))
                                     .get();
                                 if (!context.mounted) return;

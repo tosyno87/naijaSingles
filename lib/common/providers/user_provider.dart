@@ -14,10 +14,10 @@ class UserProvider extends ChangeNotifier {
   }
   final FirebaseAuth _auth = firebaseAuthInstance;
   final CollectionReference _userCollection =
-      firebaseFireStoreInstance.collection("Users");
+      firebaseFireStoreInstance.collection("users");
 
   UserModel? _currentUser;
-  StreamSubscription<QuerySnapshot>? _userSubscription;
+  StreamSubscription<DocumentSnapshot>? _userSubscription;
   StreamSubscription<User?>? authStateSubscription;
 
   UserModel? get currentUser => _currentUser;
@@ -31,19 +31,25 @@ class UserProvider extends ChangeNotifier {
   Future<void> listenCurrentUserdetails() async {
     final user = _auth.currentUser;
     if (user != null) {
-      _userSubscription = _userCollection
-          .where("userId", isEqualTo: user.uid)
-          .snapshots()
-          .listen((event) {
-        if (event.docs.isNotEmpty) {
-          // log("listen user1 ${event.docs.first.data().toString()}");
-          final userData = UserModel.fromDocument(event.docs.first);
-          currentUser = userData;
-          notifyListeners();
-        }
-      });
+      try {
+        // Listen to the specific document directly using the user's UID as the document ID
+        _userSubscription = _userCollection
+            .doc(user.uid)
+            .snapshots()
+            .listen((documentSnapshot) {
+          if (documentSnapshot.exists) {
+            final userData = UserModel.fromDocument(documentSnapshot);
+            currentUser = userData;
+            notifyListeners();
+          }
+        }, onError: (error) {
+          print("Error listening to user details: $error");
+        });
+      } catch (e) {
+        print("Exception in listenCurrentUserdetails: $e");
+      }
     } else {
-      throw Exception('No user found');
+      print("No authenticated user found");
     }
   }
 

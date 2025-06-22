@@ -640,7 +640,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_selectedDOB != null) {
       final now = DateTime.now();
       int age = now.year - _selectedDOB!.year;
-      if (now.month < _selectedDOB!.month || 
+      if (now.month < _selectedDOB!.month ||
           (now.month == _selectedDOB!.month && now.day < _selectedDOB!.day)) {
         age--;
       }
@@ -649,6 +649,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(

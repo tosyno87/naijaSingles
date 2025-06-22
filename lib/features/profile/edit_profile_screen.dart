@@ -1,11 +1,13 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-
-import '../user/controllers/onboarding_controller.dart';
+import 'package:intl/intl.dart';
+import 'dart:developer';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -20,35 +22,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   
   // Text controllers
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _otherTribeController = TextEditingController();
   
   // Selected values
+  String _selectedGender = 'Male';
+  DateTime? _selectedDOB;
+  int _age = 0;
   String? _selectedTribe;
-  String? _selectedIntent;
-  List<String> _selectedInterests = [];
-  File? _profileImage;
-  String? _profileImageUrl;
+  
+  // Preference values
+  String _interestedIn = 'Female';
+  RangeValues _ageRange = const RangeValues(18, 35);
+  
+  // Photos
+  List<dynamic> _photos = List.filled(5, null); // Can be File or String (URL)
+  bool _isUploading = false;
+  bool _formValid = false;
   
   // Lists for dropdowns and selections
+  final List<String> _genders = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
+  final List<String> _interestedInOptions = ['Male', 'Female', 'Everyone'];
+  
   final List<String> _tribes = [
     'Yoruba', 'Igbo', 'Hausa', 'Fulani', 'Edo', 'Ijaw', 'Kanuri', 'Ibibio', 
     'Tiv', 'Efik', 'Nupe', 'Urhobo', 'Igala', 'Other'
   ];
   
-  final List<String> _intents = [
-    'Dating', 'Friendship', 'Networking'
-  ];
-  
-  final List<String> _interests = [
-    'Music', 'Movies', 'Travel', 'Food', 'Art', 'Sports', 'Reading', 'Fashion',
-    'Photography', 'Dancing', 'Cooking', 'Fitness', 'Technology', 'Nature',
-    'Politics', 'Gaming', 'Writing', 'Volunteering'
-  ];
-  
   // Image picker
   final ImagePicker _picker = ImagePicker();
+  
+  // Firebase references
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  
+  // Define colors based on Afropeep MVP
+  final Color backgroundColor = const Color(0xFFFDF1E7); // Cream background
+  final Color primaryColor = const Color(0xFF008037); // Afropeep green
+  final Color textColor = Colors.black87;
+  final Color errorColor = Colors.red.shade700;
   
   @override
   void initState() {
@@ -58,103 +71,164 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadUserData();
     });
-  }
-  
-  void _loadUserData() {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
     
-    // Load name
-    if (controller.userName != null) {
-      _nameController.text = controller.userName!;
-    }
-    
-    // Calculate age from date of birth
-    if (controller.dateOfBirth != null) {
-      final now = DateTime.now();
-      final age = now.year - controller.dateOfBirth!.year - 
-          (now.month < controller.dateOfBirth!.month || 
-          (now.month == controller.dateOfBirth!.month && now.day < controller.dateOfBirth!.day) ? 1 : 0);
-      
-      _ageController.text = age.toString();
-    }
-    
-    // Load location
-    if (controller.locationName != null) {
-      _locationController.text = controller.locationName!;
-    }
-    
-    // Load bio
-    if (controller.bio != null) {
-      _bioController.text = controller.bio!;
-    }
-    
-    // Load tribe
-    if (controller.tribe != null) {
-      setState(() {
-        _selectedTribe = controller.tribe;
-      });
-    }
-    
-    // Load intent
-    if (controller.intent != null) {
-      setState(() {
-        _selectedIntent = controller.intent;
-      });
-    }
-    
-    // Load interests (using genres as interests for now)
-    if (controller.genres.isNotEmpty) {
-      setState(() {
-        _selectedInterests = List.from(controller.genres);
-      });
-    }
-    
-    // Load profile image URL (if any)
-    if (controller.photos.isNotEmpty) {
-      setState(() {
-        _profileImageUrl = controller.photos.first;
-      });
-    }
+    // Add listener to bio text field to validate form
+    _bioController.addListener(_validateForm);
   }
   
   @override
   void dispose() {
     _nameController.dispose();
-    _ageController.dispose();
-    _locationController.dispose();
     _bioController.dispose();
+    _otherTribeController.dispose();
     super.dispose();
   }
   
-  // Pick image from gallery or camera
-  Future<void> _pickImage(ImageSource source) async {
+  void _validateForm() {
+    if (!mounted) return;
+    
+    // Count valid photos
+    int photoCount = _photos.where((photo) => photo != null).length;
+    
+    // Check if all required fields are valid
+    bool isValid = _formKey.currentState?.validate() ?? false;
+    
+    // Check if user is 18+
+    bool isAdult = _age >= 18;
+    
+    // Check if bio is between 150-200 characters
+    bool validBioLength = _bioController.text.length >= 150 && _bioController.text.length <= 200;
+    
+    // Check if at least 3 photos are uploaded
+    bool hasEnoughPhotos = photoCount >= 3;
+    
+    setState(() {
+      _formValid = isValid && isAdult && validBioLength && hasEnoughPhotos;
+    });
+  }
+  
+  Future<void> _loadUserData() async {
+    setState(() => _isUploading = true);
+    
     try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not authenticated')),
+        );
+        return;
+      }
+      
+      // Get user data from Firestore
+      final docSnapshot = await _firestore.collection('users').doc(user.uid).get();
+      
+      if (docSnapshot.exists) {
+        final userData = docSnapshot.data()!;
+        
+        // Load basic info
+        _nameController.text = userData['name'] ?? '';
+        _bioController.text = userData['bio'] ?? '';
+        
+        // Load gender
+        if (userData['gender'] != null) {
+          setState(() {
+            _selectedGender = userData['gender'];
+          });
+        }
+        
+        // Load DOB and calculate age
+        if (userData['dob'] != null) {
+          setState(() {
+            _selectedDOB = DateTime.parse(userData['dob']);
+            _calculateAge();
+          });
+        }
+        
+        // Load tribe
+        if (userData['tribe'] != null) {
+          setState(() {
+            _selectedTribe = userData['tribe'];
+            if (!_tribes.contains(_selectedTribe) && _selectedTribe != null) {
+              _otherTribeController.text = _selectedTribe!;
+              _selectedTribe = 'Other';
+            }
+          });
+        }
+        
+        // Load photos
+        if (userData['photos'] != null && userData['photos'] is List) {
+          final photoUrls = List<String>.from(userData['photos']);
+          setState(() {
+            for (int i = 0; i < photoUrls.length && i < _photos.length; i++) {
+              _photos[i] = photoUrls[i];
+            }
+          });
+        }
+        
+        // Load preferences
+        if (userData['preferences'] != null) {
+          final prefs = userData['preferences'];
+          
+          if (prefs['interestedIn'] != null) {
+            setState(() {
+              _interestedIn = prefs['interestedIn'];
+            });
+          }
+          
+          if (prefs['ageRange'] != null && prefs['ageRange'] is List) {
+            final range = List<int>.from(prefs['ageRange']);
+            if (range.length == 2) {
+              setState(() {
+                _ageRange = RangeValues(range[0].toDouble(), range[1].toDouble());
+              });
+            }
+          }
+        }
+      }
+      
+      // Validate form after loading data
+      _validateForm();
+    } catch (e) {
+      log('Error loading user data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading profile: $e')),
+      );
+    } finally {
+      setState(() => _isUploading = false);
+    }
+  }
+  
+  // Pick image for a specific slot
+  Future<void> _pickImage(int index) async {
+    try {
+      // Show image source selection dialog
+      final ImageSource? source = await _showImageSourceDialog();
+      
+      if (source == null) return;
+      
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        maxWidth: 800,
-        maxHeight: 800,
+        maxWidth: 1200,
+        maxHeight: 1200,
         imageQuality: 85,
       );
       
       if (pickedFile != null) {
         setState(() {
-          _profileImage = File(pickedFile.path);
+          _photos[index] = File(pickedFile.path);
+          _validateForm();
         });
       }
     } catch (e) {
-      // Handle any errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error picking image: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error picking image: $e')),
       );
     }
   }
   
-  // Show image source selection dialog
-  void _showImageSourceDialog() {
-    showModalBottomSheet(
+  // Show dialog to choose camera or gallery
+  Future<ImageSource?> _showImageSourceDialog() async {
+    return await showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -170,7 +244,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: textColor,
               ),
             ),
             const SizedBox(height: 20),
@@ -180,18 +254,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 _buildImageSourceOption(
                   icon: Icons.camera_alt,
                   label: 'Camera',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.camera);
-                  },
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
                 ),
                 _buildImageSourceOption(
                   icon: Icons.photo_library,
                   label: 'Gallery',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.gallery);
-                  },
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
                 ),
               ],
             ),
@@ -202,672 +270,847 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
   
-  // Build image source option
+  // Build image source option button
   Widget _buildImageSourceOption({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFF008037).withOpacity(0.1),
-              shape: BoxShape.circle,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: primaryColor.withOpacity(0.3)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 32, color: primaryColor),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFF008037),
-              size: 30,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
   
-  // Save profile data
-  void _saveProfile() {
-    if (_formKey.currentState!.validate()) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
+  // Remove photo from a specific slot
+  void _removePhoto(int index) {
+    setState(() {
+      _photos[index] = null;
       
-      // Update name
-      controller.updateUserName(_nameController.text.trim());
+      // Shift photos to fill the gap
+      final List<dynamic> newPhotos = List.filled(5, null);
+      int newIndex = 0;
       
-      // Update age (convert to date of birth)
-      final age = int.tryParse(_ageController.text.trim());
-      if (age != null) {
-        final now = DateTime.now();
-        final dob = DateTime(now.year - age, now.month, now.day);
-        controller.updateDateOfBirth(dob);
+      for (var photo in _photos) {
+        if (photo != null && newIndex < newPhotos.length) {
+          newPhotos[newIndex] = photo;
+          newIndex++;
+        }
       }
       
-      // Update location
-      // In a real app, we would also update lat/lng from a location picker
-      controller.updateLocation(0.0, 0.0, _locationController.text.trim());
-      
-      // Update bio
-      controller.updateBio(_bioController.text.trim());
-      
-      // Update tribe
-      if (_selectedTribe != null) {
-        controller.updateTribe(_selectedTribe!);
+      _photos = newPhotos;
+      _validateForm();
+    });
+  }
+  
+  Future<void> _showDeleteDialog(int index) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Remove Photo',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to remove this photo?',
+            style: GoogleFonts.poppins(
+              color: textColor,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Remove',
+                style: GoogleFonts.poppins(
+                  color: errorColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onPressed: () {
+                _removePhoto(index);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+    
+    setState(() => _isUploading = true);
+    
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
       }
       
-      // Update intent
-      if (_selectedIntent != null) {
-        controller.updateIntent(_selectedIntent!);
+      // Upload photos if they are File objects
+      List<String> photoUrls = [];
+      
+      for (int i = 0; i < _photos.length; i++) {
+        final photo = _photos[i];
+        
+        if (photo == null) continue;
+        
+        if (photo is File) {
+          // Upload new photo
+          final ref = _storage.ref().child('users/${user.uid}/photos/photo_$i.jpg');
+          await ref.putFile(photo);
+          final url = await ref.getDownloadURL();
+          photoUrls.add(url);
+        } else if (photo is String) {
+          // Keep existing photo URL
+          photoUrls.add(photo);
+        }
       }
       
-      // Update interests (using genres for now)
-      controller.updateGenres(_selectedInterests);
+      // Create user data map
+      final Map<String, dynamic> userData = {
+        'name': _nameController.text.trim(),
+        'bio': _bioController.text.trim(),
+        'gender': _selectedGender,
+        'dob': _selectedDOB?.toIso8601String(),
+        'age': _age,
+        'tribe': _selectedTribe == 'Other' ? _otherTribeController.text.trim() : _selectedTribe,
+        'photos': photoUrls,
+        'preferences': {
+          'interestedIn': _interestedIn,
+          'ageRange': [_ageRange.start.round(), _ageRange.end.round()],
+        },
+        'lastUpdated': DateTime.now().toIso8601String(),
+      };
       
-      // Update profile image
-      // In a real app, we would upload the image to storage and get a URL
-      // For now, we'll just use a placeholder
-      if (_profileImage != null) {
-        // This is a placeholder. In a real app, we would upload the image
-        // and get a URL back
-        controller.updatePhotos(['profile_image_url']);
-      }
+      // Update Firestore
+      await _firestore.collection('users').doc(user.uid).update(userData);
       
-      // Show success message
+      // Update display name in Firebase Auth
+      await user.updateDisplayName(_nameController.text.trim());
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Profile updated successfully!',
-            style: GoogleFonts.poppins(),
-          ),
-          backgroundColor: const Color(0xFF008037),
-          duration: const Duration(seconds: 2),
+          content: Text('Profile updated successfully'),
+          backgroundColor: Colors.green,
         ),
       );
       
       // Navigate back
       Navigator.pop(context);
+    } catch (e) {
+      log('Error saving profile: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error updating profile: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => _isUploading = false);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // Background color for the app
-    const Color backgroundColor = Color(0xFFFDF6EC);
-    
-    // Deep green color for accents
-    const Color deepGreen = Color(0xFF008037);
-    
+  Widget _buildInterestedInSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Interested In',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: textColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _interestedInOptions.map((option) {
+            final isSelected = _interestedIn == option;
+            
+            return ChoiceChip(
+              label: Text(
+                option,
+                style: GoogleFonts.poppins(
+                  color: isSelected ? Colors.white : textColor,
+                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                ),
+              ),
+              selected: isSelected,
+              selectedColor: primaryColor,
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected ? primaryColor : Colors.grey.shade300,
+                ),
+              ),
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() {
+                    _interestedIn = option;
+                  });
+                }
+              },
+              elevation: isSelected ? 2 : 0,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateOfBirthSelector() {
+    return InkWell(
+      onTap: () async {
+        final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: _selectedDOB ?? DateTime.now().subtract(const Duration(days: 365 * 25)),
+          firstDate: DateTime(1950),
+          lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: ColorScheme.light(
+                  primary: primaryColor,
+                  onPrimary: Colors.white,
+                  surface: Colors.white,
+                  onSurface: textColor,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+        
+        if (picked != null && picked != _selectedDOB) {
+          setState(() {
+            _selectedDOB = picked;
+            _calculateAge();
+            _validateForm();
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.calendar_today, color: primaryColor),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _selectedDOB != null
+                    ? DateFormat('MMMM d, yyyy').format(_selectedDOB!)
+                    : 'Select your date of birth',
+                style: GoogleFonts.poppins(
+                  color: _selectedDOB != null ? textColor : Colors.grey.shade600,
+                ),
+              ),
+            ),
+            if (_selectedDOB != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '$_age years',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData prefixIcon,
+    String? helperText,
+    int maxLines = 1,
+    int? maxLength,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      style: GoogleFonts.poppins(color: textColor),
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: GoogleFonts.poppins(color: Colors.grey.shade700),
+        helperText: helperText,
+        helperStyle: GoogleFonts.poppins(fontSize: 12),
+        prefixIcon: Icon(prefixIcon, color: primaryColor),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      validator: validator,
+      onChanged: (_) => _validateForm(),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        title,
+        style: GoogleFonts.poppins(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: primaryColor,
+        ),
+      ),
+    );
+  }
+
+  void _calculateAge() {
+    if (_selectedDOB != null) {
+      final now = DateTime.now();
+      int age = now.year - _selectedDOB!.year;
+      if (now.month < _selectedDOB!.month || 
+          (now.month == _selectedDOB!.month && now.day < _selectedDOB!.day)) {
+        age--;
+      }
+      setState(() {
+        _age = age;
+      });
+    }
+  }
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: deepGreen),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(
           'Edit Profile',
           style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.brown.shade800,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: _saveProfile,
-            child: Text(
-              'Save',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: deepGreen,
-              ),
-            ),
-          ),
-        ],
+        backgroundColor: primaryColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Picture Section
-              Center(
-                child: Stack(
-                  children: [
-                    // Profile Image
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: deepGreen,
-                          width: 3,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(60),
-                        child: _profileImage != null
-                            ? Image.file(
-                                _profileImage!,
-                                fit: BoxFit.cover,
-                              )
-                            : _profileImageUrl != null
-                                ? Image.network(
-                                    _profileImageUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.grey[300],
-                                        child: const Icon(
-                                          Icons.person,
-                                          size: 60,
-                                          color: Colors.grey,
-                                        ),
-                                      );
-                                    },
-                                  )
-                                : Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 60,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                      ),
+      body: _isUploading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: primaryColor),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Updating profile...',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: textColor,
                     ),
-                    
-                    // Edit Icon
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _showImageSourceDialog,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: deepGreen,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 2,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              
-              const SizedBox(height: 32),
-              
-              // Basic Info Section
-              _buildSectionTitle('Basic Information'),
-              const SizedBox(height: 16),
-              _buildInfoCard(
+            )
+          : Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Name Field
+                    // Photos section
+                    _buildSectionTitle('Profile Photos (Min. 3)'),
+                    const SizedBox(height: 8),
+                    _buildPhotoGrid(),
+                    
+                    // Photo count warning if needed
+                    if (_photos.where((p) => p != null).length < 3)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Please upload at least 3 photos',
+                          style: GoogleFonts.poppins(
+                            color: errorColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 24),
+                    
+                    // Basic info section
+                    _buildSectionTitle('Basic Information'),
+                    const SizedBox(height: 16),
+                    
+                    // Name field
                     _buildTextField(
                       controller: _nameController,
-                      label: 'Full Name',
-                      hint: 'Enter your full name',
-                      icon: Icons.person,
+                      labelText: 'Full Name',
+                      prefixIcon: Icons.person,
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return 'Please enter your name';
                         }
                         return null;
                       },
                     ),
-                    
                     const SizedBox(height: 16),
                     
-                    // Age Field
+                    // Bio field
                     _buildTextField(
-                      controller: _ageController,
-                      label: 'Age',
-                      hint: 'Enter your age',
-                      icon: Icons.cake,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(2),
-                      ],
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your age';
-                        }
-                        final age = int.tryParse(value);
-                        if (age == null || age < 18 || age > 100) {
-                          return 'Please enter a valid age (18-100)';
-                        }
-                        return null;
-                      },
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Location Field
-                    _buildTextField(
-                      controller: _locationController,
-                      label: 'Location',
-                      hint: 'City, Country',
-                      icon: Icons.location_on,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your location';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Bio Section
-              _buildSectionTitle('About Me'),
-              const SizedBox(height: 16),
-              _buildInfoCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextFormField(
                       controller: _bioController,
-                      maxLines: 5,
-                      minLines: 3,
-                      maxLength: 300,
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        color: Colors.black87,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Write a short bio about yourself...',
-                        hintStyle: GoogleFonts.poppins(
-                          color: Colors.grey[500],
-                          fontSize: 14,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: deepGreen, width: 2),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.red[400]!, width: 1),
-                        ),
-                        contentPadding: const EdgeInsets.all(16),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please write a short bio';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Cultural Identity Section
-              _buildSectionTitle('Cultural Identity'),
-              const SizedBox(height: 16),
-              _buildInfoCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Tribe Dropdown
-                    DropdownButtonFormField<String>(
-                      value: _selectedTribe,
-                      decoration: InputDecoration(
-                        labelText: 'Tribe / Ethnic Group',
-                        labelStyle: GoogleFonts.poppins(
-                          color: deepGreen,
-                          fontSize: 15,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.people,
-                          color: deepGreen,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: deepGreen, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                      ),
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        color: Colors.black87,
-                      ),
-                      items: _tribes.map((String tribe) {
-                        return DropdownMenuItem<String>(
-                          value: tribe,
-                          child: Text(tribe),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedTribe = newValue;
-                        });
-                      },
+                      labelText: 'Bio',
+                      prefixIcon: Icons.description,
+                      helperText: 'Tell others about yourself (150-200 characters)',
+                      maxLines: 3,
+                      maxLength: 200,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please select your tribe/ethnic group';
+                          return 'Please enter your bio';
+                        }
+                        if (value.length < 150) {
+                          return 'Bio should be at least 150 characters';
                         }
                         return null;
                       },
                     ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Intent Section
-              _buildSectionTitle('What are you looking for?'),
-              const SizedBox(height: 16),
-              _buildInfoCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Intent Selection
-                    DropdownButtonFormField<String>(
-                      value: _selectedIntent,
-                      decoration: InputDecoration(
-                        labelText: 'I\'m here for',
-                        labelStyle: GoogleFonts.poppins(
-                          color: deepGreen,
-                          fontSize: 15,
+                    const SizedBox(height: 16),
+                    
+                    // Gender selection
+                    _buildSectionTitle('Gender'),
+                    const SizedBox(height: 8),
+                    _buildGenderSelector(),
+                    const SizedBox(height: 24),
+                    
+                    // Date of Birth
+                    _buildSectionTitle('Date of Birth'),
+                    const SizedBox(height: 8),
+                    _buildDateOfBirthSelector(),
+                    const SizedBox(height: 24),
+                    
+                    // Tribe selection
+                    _buildSectionTitle('Tribe/Ethnicity'),
+                    const SizedBox(height: 8),
+                    _buildTribeSelector(),
+                    const SizedBox(height: 24),
+                    
+                    // Preferences section
+                    _buildSectionTitle('Preferences'),
+                    const SizedBox(height: 16),
+                    
+                    // Interested in
+                    _buildInterestedInSelector(),
+                    const SizedBox(height: 16),
+                    
+                    // Age range
+                    _buildAgeRangeSelector(),
+                    const SizedBox(height: 32),
+                    
+                    // Save button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _formValid ? _saveProfile : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          disabledBackgroundColor: Colors.grey.shade400,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
                         ),
-                        prefixIcon: const Icon(
-                          Icons.favorite,
-                          color: deepGreen,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: deepGreen, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
+                        child: Text(
+                          'Save Profile',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        color: Colors.black87,
-                      ),
-                      items: _intents.map((String intent) {
-                        return DropdownMenuItem<String>(
-                          value: intent,
-                          child: Text(intent),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedIntent = newValue;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select what you\'re looking for';
-                        }
-                        return null;
-                      },
                     ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
-              
-              const SizedBox(height: 24),
-              
-              // Interests Section
-              _buildSectionTitle('Interests'),
-              const SizedBox(height: 8),
-              Text(
-                'Select your interests (up to 5)',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                ),
+            ),
+    );
+  }
+  
+  Widget _buildPhotoGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: 5, // Maximum 5 photos
+      itemBuilder: (context, index) {
+        final photo = _photos[index];
+        
+        return GestureDetector(
+          onTap: () => _pickImage(index),
+          onLongPress: photo != null ? () => _showDeleteDialog(index) : null,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey.shade300,
+                width: 1,
               ),
-              const SizedBox(height: 16),
-              _buildInfoCard(
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _interests.map((interest) {
-                    final isSelected = _selectedInterests.contains(interest);
-                    return FilterChip(
-                      label: Text(
-                        interest,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: photo == null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_photo_alternate,
+                        size: 32,
+                        color: primaryColor.withOpacity(0.7),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Add Photo',
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: isSelected ? deepGreen : Colors.black87,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          fontSize: 12,
+                          color: primaryColor.withOpacity(0.7),
                         ),
                       ),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        setState(() {
-                          if (selected) {
-                            if (_selectedInterests.length < 5) {
-                              _selectedInterests.add(interest);
-                            } else {
-                              // Show message that max 5 interests are allowed
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'You can select up to 5 interests',
-                                    style: GoogleFonts.poppins(),
-                                  ),
-                                  backgroundColor: Colors.orange,
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          } else {
-                            _selectedInterests.remove(interest);
-                          }
-                        });
-                      },
-                      backgroundColor: Colors.grey[100],
-                      selectedColor: deepGreen.withOpacity(0.1),
-                      checkmarkColor: deepGreen,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: isSelected ? deepGreen : Colors.grey[400]!,
-                          width: isSelected ? 1 : 0.5,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // Save Button
-              Center(
-                child: SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: deepGreen,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
+                    ],
+                  )
+                : Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ClipRRect(
                         borderRadius: BorderRadius.circular(12),
+                        child: photo is File
+                            ? Image.file(
+                                photo,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                photo,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes!
+                                          : null,
+                                      color: primaryColor,
+                                    ),
+                                  );
+                                },
+                              ),
                       ),
-                      elevation: 2,
-                    ),
-                    child: Text(
-                      'Save Profile',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            padding: EdgeInsets.zero,
+                            onPressed: () => _removePhoto(index),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ),
+          ),
+        );
+      },
+    );
+  }
+  
+  Widget _buildGenderSelector() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _genders.map((gender) {
+        final isSelected = _selectedGender == gender;
+        
+        return ChoiceChip(
+          label: Text(
+            gender,
+            style: GoogleFonts.poppins(
+              color: isSelected ? Colors.white : textColor,
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+            ),
+          ),
+          selected: isSelected,
+          selectedColor: primaryColor,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: isSelected ? primaryColor : Colors.grey.shade300,
+            ),
+          ),
+          onSelected: (selected) {
+            if (selected) {
+              setState(() {
+                _selectedGender = gender;
+                _validateForm();
+              });
+            }
+          },
+          elevation: isSelected ? 2 : 0,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        );
+      }).toList(),
+    );
+  }
+  
+  Widget _buildTribeSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-              
-              const SizedBox(height: 40),
             ],
           ),
+          child: DropdownButtonFormField<String>(
+            value: _selectedTribe,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              hintText: 'Select your tribe/ethnicity',
+              hintStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
+              prefixIcon: Icon(Icons.people, color: primaryColor),
+            ),
+            items: _tribes.map((tribe) {
+              return DropdownMenuItem<String>(
+                value: tribe,
+                child: Text(
+                  tribe,
+                  style: GoogleFonts.poppins(color: textColor),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedTribe = value;
+                _validateForm();
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please select your tribe/ethnicity';
+              }
+              return null;
+            },
+            icon: Icon(Icons.arrow_drop_down, color: primaryColor),
+            dropdownColor: Colors.white,
+            style: GoogleFonts.poppins(fontSize: 16, color: textColor),
+          ),
         ),
-      ),
-    );
-  }
-  
-  // Build section title
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.brown.shade800,
-      ),
-    );
-  }
-  
-  // Build info card
-  Widget _buildInfoCard({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        if (_selectedTribe == 'Other') ...[
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _otherTribeController,
+            decoration: InputDecoration(
+              labelText: 'Specify your tribe/ethnicity',
+              labelStyle: GoogleFonts.poppins(color: Colors.grey.shade700),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            style: GoogleFonts.poppins(),
+            validator: (value) {
+              if (_selectedTribe == 'Other' && (value == null || value.isEmpty)) {
+                return 'Please specify your tribe/ethnicity';
+              }
+              return null;
+            },
+            onChanged: (_) => _validateForm(),
           ),
         ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: child,
+      ],
     );
   }
   
-  // Build text field
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    List<TextInputFormatter>? inputFormatters,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
-      style: GoogleFonts.poppins(
-        fontSize: 15,
-        color: Colors.black87,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        hintStyle: GoogleFonts.poppins(
-          color: Colors.grey[500],
-          fontSize: 14,
+  Widget _buildAgeRangeSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Age Range',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: textColor,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+          ],
         ),
-        labelStyle: GoogleFonts.poppins(
-          color: const Color(0xFF008037),
-          fontSize: 15,
+        const SizedBox(height: 16),
+        SliderTheme(
+          data: SliderThemeData(
+            activeTrackColor: primaryColor,
+            inactiveTrackColor: Colors.grey.shade300,
+            thumbColor: Colors.white,
+            thumbShape: const RoundSliderThumbShape(
+              enabledThumbRadius: 8,
+              elevation: 4,
+            ),
+            overlayColor: primaryColor.withOpacity(0.2),
+            trackHeight: 4,
+            rangeThumbShape: const RoundRangeSliderThumbShape(
+              enabledThumbRadius: 8,
+              elevation: 4,
+            ),
+            rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
+            rangeValueIndicatorShape: const PaddleRangeSliderValueIndicatorShape(),
+            valueIndicatorColor: primaryColor,
+            valueIndicatorTextStyle: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 12,
+            ),
+            showValueIndicator: ShowValueIndicator.always,
+          ),
+          child: RangeSlider(
+            values: _ageRange,
+            min: 18,
+            max: 70,
+            divisions: 52,
+            labels: RangeLabels(
+              '${_ageRange.start.round()}',
+              '${_ageRange.end.round()}',
+            ),
+            onChanged: (values) {
+              setState(() {
+                _ageRange = values;
+              });
+            },
+          ),
         ),
-        prefixIcon: Icon(
-          icon,
-          color: const Color(0xFF008037),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey[400]!),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey[400]!),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF008037), width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.red[400]!, width: 1),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
-      ),
-      validator: validator,
+      ],
     );
   }
 }

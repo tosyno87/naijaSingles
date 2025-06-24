@@ -2,8 +2,8 @@ const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
 
-// Service account file name
-const serviceAccountFile = 'naijasingles-74a75-firebase-adminsdk-onph3-80bb03f2f7.json';
+// Service account file name - UPDATED to use the new key
+const serviceAccountFile = 'naijasingles-74a75-firebase-adminsdk-new.json';
 
 // Initialize Firebase Admin SDK
 try {

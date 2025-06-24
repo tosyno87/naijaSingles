@@ -31,6 +31,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   int _age = 0;
   String? _selectedTribe;
   
+  // Track if user has completed onboarding (gender/age locked after first save)
+  bool _hasCompletedOnboarding = false;
+  
   // Preference values
   String _interestedIn = 'Female';
   RangeValues _ageRange = const RangeValues(18, 35);
@@ -144,6 +147,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           });
         }
         
+        // Check if user has completed onboarding (has gender, DOB, and tribe)
+        _hasCompletedOnboarding = userData['gender'] != null && 
+                                 userData['dob'] != null && 
+                                 userData['tribe'] != null;
+        
         // Load tribe
         if (userData['tribe'] != null) {
           setState(() {
@@ -155,14 +163,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           });
         }
         
-        // Load photos
+        // Load photos with better error handling
         if (userData['photos'] != null && userData['photos'] is List) {
           final photoUrls = List<String>.from(userData['photos']);
           setState(() {
+            // Clear existing photos first
+            _photos = List.filled(5, null);
+            // Load photos from URLs
             for (int i = 0; i < photoUrls.length && i < _photos.length; i++) {
-              _photos[i] = photoUrls[i];
+              if (photoUrls[i].isNotEmpty) {
+                _photos[i] = photoUrls[i];
+              }
             }
           });
+          log('Loaded ${photoUrls.length} photos from Firestore');
         }
         
         // Load preferences
@@ -389,6 +403,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         throw Exception('User not authenticated');
       }
       
+      // Verify user is still authenticated
+      await user.reload();
+      if (_auth.currentUser == null) {
+        throw Exception('Authentication expired. Please log in again.');
+      }
+      
       // Upload photos if they are File objects
       List<String> photoUrls = [];
       
@@ -398,11 +418,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (photo == null) continue;
         
         if (photo is File) {
-          // Upload new photo
-          final ref = _storage.ref().child('users/${user.uid}/photos/photo_$i.jpg');
-          await ref.putFile(photo);
-          final url = await ref.getDownloadURL();
-          photoUrls.add(url);
+          // Upload new photo - path must match Firebase Storage rules
+          try {
+            final ref = _storage.ref().child('profile_photos/${user.uid}/photo_$i.jpg');
+            final uploadTask = await ref.putFile(photo);
+            final url = await ref.getDownloadURL();
+            photoUrls.add(url);
+            log('Successfully uploaded photo $i to: profile_photos/${user.uid}/photo_$i.jpg');
+          } catch (storageError) {
+            log('Storage upload error for photo $i: $storageError');
+            throw Exception('Failed to upload photo ${i + 1}: $storageError');
+          }
         } else if (photo is String) {
           // Keep existing photo URL
           photoUrls.add(photo);
@@ -438,8 +464,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       );
       
-      // Navigate back
-      Navigator.pop(context);
+      // Navigate back with success indicator
+      Navigator.pop(context, true);
     } catch (e) {
       log('Error saving profile: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -621,6 +647,64 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       onChanged: (_) => _validateForm(),
     );
   }
+  
+  Widget _buildReadOnlyField(String value, IconData icon) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: primaryColor.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: primaryColor.withOpacity(0.7),
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.lock_outline,
+                  color: primaryColor,
+                  size: 12,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Set',
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSectionTitle(String title) {
     return Padding(
@@ -649,6 +733,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -748,22 +835,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 16),
                     
-                    // Gender selection
+                    // Gender selection - only editable during onboarding
                     _buildSectionTitle('Gender'),
                     const SizedBox(height: 8),
-                    _buildGenderSelector(),
+                    _hasCompletedOnboarding 
+                        ? _buildReadOnlyField(_selectedGender, Icons.person_outline)
+                        : _buildGenderSelector(),
                     const SizedBox(height: 24),
                     
-                    // Date of Birth
+                    // Date of Birth - only editable during onboarding
                     _buildSectionTitle('Date of Birth'),
                     const SizedBox(height: 8),
-                    _buildDateOfBirthSelector(),
+                    _hasCompletedOnboarding
+                        ? _buildReadOnlyField(
+                            _selectedDOB != null 
+                                ? '${_selectedDOB!.day}/${_selectedDOB!.month}/${_selectedDOB!.year} ($_age years old)'
+                                : 'Not set',
+                            Icons.cake_outlined
+                          )
+                        : _buildDateOfBirthSelector(),
                     const SizedBox(height: 24),
                     
-                    // Tribe selection
+                    // Tribe selection - only editable during onboarding
                     _buildSectionTitle('Tribe/Ethnicity'),
                     const SizedBox(height: 8),
-                    _buildTribeSelector(),
+                    _hasCompletedOnboarding 
+                        ? _buildReadOnlyField(
+                            _selectedTribe == 'Other' 
+                                ? _otherTribeController.text.isNotEmpty 
+                                    ? _otherTribeController.text 
+                                    : 'Other'
+                                : _selectedTribe ?? 'Not specified',
+                            Icons.people_outline
+                          )
+                        : _buildTribeSelector(),
                     const SizedBox(height: 24),
                     
                     // Preferences section
@@ -876,13 +981,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 fit: BoxFit.cover,
                                 loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded /
-                                              loadingProgress.expectedTotalBytes!
-                                          : null,
-                                      color: primaryColor,
+                                  return Container(
+                                    color: Colors.grey.shade100,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                        color: primaryColor,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  log('Error loading image: $error');
+                                  return Container(
+                                    color: Colors.grey.shade200,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.error_outline,
+                                          color: Colors.grey.shade500,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Failed to load',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },

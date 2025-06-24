@@ -121,12 +121,13 @@ abstract class AppRouter {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
     RouteName.mvpOnboarding: (context) => const OnboardingMain(),
-    RouteName.exploreScreen: (context) => const ExplorePage(),
-    RouteName.mainNavigation: (context) => const MainNavigationScreen(),
+    RouteName.exploreScreen: (context) => const ExploreScreen(), // Direct to ExploreScreen
     
-    // New main routes
+    // Main navigation routes (consolidated)
+    RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.home: (context) => const Tabbar("active", false),
+    RouteName.discover: (context) => const Tabbar("discover", false),
 
   };
 }

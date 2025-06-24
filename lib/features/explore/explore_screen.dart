@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:provider/provider.dart';
@@ -9,10 +10,13 @@ import 'package:naijasingles/features/explore/services/match_service.dart';
 import 'package:naijasingles/features/explore/services/mock_match_service.dart';
 import 'package:naijasingles/features/explore/widgets/match_confirmation_modal.dart';
 
-// Background color constant
-const Color kBackgroundColor = Color(0xFFFDF6EC);
-const Color kGreenColor = Color(0xFF008037);
-const Color kAccentColor = Color(0xFFFFD700); // Vibrant yellow accent
+// Afropeep MVP Color Scheme
+const Color kBackgroundColor = Color(0xFFFFF6E5); // Light cream
+const Color kPrimaryColor = Color(0xFF008037); // Deep green
+const Color kTextPrimary = Color(0xFF5D4037); // Brown
+const Color kTextSecondary = Color(0xFF444444); // Dark gray
+const Color kBorderColor = Color(0xFFDADADA); // Light gray border
+const Color kRedColor = Color(0xFFFF5A5F); // Red for dislike
 
 // User Model
 class DiscoverUser {
@@ -152,70 +156,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
       user.name,
       user.id,
     );
-    
-    // The code below would be used in production
-    // but is commented out for testing purposes
-    
-    /*
-    // Get current user from provider
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final currentUser = userProvider.currentUser;
-    
-    if (currentUser != null) {
-      final currentUserId = currentUser.id!;
-      final likedUserId = user.id;
-      
-      try {
-        // Save the like to Firestore
-        await _matchService.saveLike(currentUserId, likedUserId);
-        
-        // Check if there's a match (mutual like)
-        final isMatch = await _matchService.checkForMatch(currentUserId, likedUserId);
-        
-        if (isMatch) {
-          // It's a match! Create message thread
-          final threadId = await _matchService.createMessageThread(currentUserId, likedUserId);
-          
-          // Mark users as matched
-          await _matchService.markAsMatched(currentUserId, likedUserId);
-          
-          // Show match confirmation modal
-          if (mounted) {
-            _showMatchConfirmation(
-              currentUser.imageUrl != null && currentUser.imageUrl!.isNotEmpty 
-                  ? currentUser.imageUrl![0] 
-                  : '',
-              user.imageUrl,
-              user.name,
-              likedUserId,
-            );
-          }
-        } else {
-          // Just a like, show regular snackbar
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('You liked ${user.name}!'),
-                backgroundColor: kGreenColor,
-                duration: const Duration(seconds: 1),
-              ),
-            );
-          }
-        }
-      } catch (e) {
-        log('Error handling like: $e');
-        // Show error snackbar
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong. Please try again.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-    */
   }
 
   void handlePass(DiscoverUser user) {
@@ -265,7 +205,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("You and $matchedUserName matched!"),
-            backgroundColor: kGreenColor,
+            backgroundColor: kPrimaryColor,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -277,165 +217,182 @@ class _ExploreScreenState extends State<ExploreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFDF6EC),
-        elevation: 0,
-        title: Row(
+      body: SafeArea(
+        child: Column(
           children: [
-            Text(
-              'Explore',
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.brown[800],
-              ),
-            ),
-            const Spacer(),
-            // Intent dropdown (Dating/Friendship/Networking)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+            // Simpler header layout with Row inside Padding
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios, color: kTextPrimary),
+                    onPressed: () => Navigator.of(context).pushReplacementNamed('/main_navigation'),
+                  ),
+                  Text(
+                    'Explore',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: kTextPrimary,
+                    ),
+                  ),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedIntent,
+                      dropdownColor: kBackgroundColor,
+                      icon: Icon(Icons.keyboard_arrow_down_rounded, color: kPrimaryColor),
+                      style: GoogleFonts.montserrat(
+                        color: kTextPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _selectedIntent = value);
+                        }
+                      },
+                      items: _intentOptions
+                          .map((intent) => DropdownMenuItem(
+                                value: intent,
+                                child: Text(intent),
+                              ))
+                          .toList(),
+                    ),
                   ),
                 ],
               ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedIntent,
-                  isDense: false,
-                  borderRadius: BorderRadius.circular(16),
-                  icon: Icon(Icons.expand_more, color: kGreenColor),
-                  dropdownColor: Colors.white,
-                  menuMaxHeight: 300,
-                  elevation: 8,
-                  style: GoogleFonts.poppins(
-                    color: Colors.brown[800],
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                  ),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _selectedIntent = value);
-                      log('Selected intent: $value');
-                    }
-                  },
-                  items: _intentOptions.map((intent) => DropdownMenuItem<String>(
-                    value: intent,
-                    child: Container(
-                      width: 120, // Set a fixed width to ensure text fits
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: _selectedIntent == intent ? const Color(0xFFFEEFD8) : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        intent, 
-                        style: GoogleFonts.poppins(
-                          color: Colors.brown[800],
-                          fontWeight: _selectedIntent == intent ? FontWeight.w600 : FontWeight.w400,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                  )).toList(),
-                ),
-              ),
             ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          // Swipe cards area
-          Expanded(
-            child: _swipeItems.isEmpty
-                ? Center(
-                    child: Text(
-                      'No more profiles to show',
-                      style: GoogleFonts.poppins(),
+            
+            // Swipe cards area
+            Expanded(
+              child: _swipeItems.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off_rounded,
+                            size: 60,
+                            color: kPrimaryColor.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No more profiles to show',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: kTextPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: SwipeCards(
+                        matchEngine: _matchEngine,
+                        itemBuilder: (BuildContext context, int index) {
+                          final user = _swipeItems[index].content as DiscoverUser;
+                          return ProfileCard(user: user);
+                        },
+                        onStackFinished: () {
+                          log('Stack is finished');
+                          // Handle when all cards are swiped
+                          setState(() {
+                            // Reload cards for demo purposes
+                            _loadSwipeItems();
+                          });
+                        },
+                        itemChanged: (SwipeItem item, int index) {
+                          log('Item changed: ${index}');
+                        },
+                        upSwipeAllowed: true, // Allow down swipe for "save for later"
+                        fillSpace: true,
+                      ),
                     ),
-                  )
-                : SwipeCards(
-                    matchEngine: _matchEngine,
-                    itemBuilder: (BuildContext context, int index) {
-                      final user = _swipeItems[index].content as DiscoverUser;
-                      return ProfileCard(user: user);
-                    },
-                    onStackFinished: () {
-                      log('Stack is finished');
-                      // Handle when all cards are swiped
-                      setState(() {
-                        // Reload cards for demo purposes
-                        _loadSwipeItems();
-                      });
-                    },
-                    itemChanged: (SwipeItem item, int index) {
-                      log('Item changed: ${index}');
-                    },
-                    upSwipeAllowed: false,
-                    fillSpace: true,
-                  ),
-          ),
-          
-          // Action buttons
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.redAccent.shade200,
-                  child: IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.white, size: 28),
+            ),
+            
+            // Action buttons - only two buttons: dislike and like
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 32.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
+                children: [
+                  // Dislike button (❌)
+                  _buildActionButton(
+                    icon: Icons.close_rounded,
+                    color: kRedColor,
+                    tooltip: 'Dislike',
                     onPressed: () {
                       if (_matchEngine.currentItem != null) {
                         _matchEngine.currentItem?.nope();
                       }
                     },
+                    size: 56, // Fixed size
                   ),
-                ),
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: kAccentColor,
-                  child: IconButton(
-                    icon: const Icon(Icons.bookmark, color: Colors.white, size: 28),
-                    onPressed: () {
-                      if (_matchEngine.currentItem != null) {
-                        _matchEngine.currentItem?.superLike();
-                      }
-                    },
-                  ),
-                ),
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: kGreenColor,
-                  child: IconButton(
-                    icon: const Icon(Icons.favorite, color: Colors.white, size: 28),
+                  
+                  const SizedBox(width: 60), // Fixed space between buttons
+                  
+                  // Like button (✅)
+                  _buildActionButton(
+                    icon: Icons.favorite_rounded,
+                    color: kPrimaryColor,
+                    tooltip: 'Like',
                     onPressed: () {
                       if (_matchEngine.currentItem != null) {
                         _matchEngine.currentItem?.like();
                       }
                     },
+                    size: 56, // Fixed size
                   ),
-                ),
-              ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  // Helper method to build consistent action buttons with ripple effect
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+    required VoidCallback onPressed,
+    required double size,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        elevation: 4,
+        shadowColor: color.withOpacity(0.3),
+        shape: const CircleBorder(),
+        color: color,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onPressed,
+          splashColor: Colors.white.withOpacity(0.3),
+          highlightColor: Colors.white.withOpacity(0.1),
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: size * 0.55, // Slightly larger icon size
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-// Profile Card Widget
-class ProfileCard extends StatelessWidget {
+// Profile Card Widget with fade-in animation
+class ProfileCard extends StatefulWidget {
   final DiscoverUser user;
   
   const ProfileCard({
@@ -444,84 +401,186 @@ class ProfileCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ProfileCard> createState() => _ProfileCardState();
+}
+
+class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: Curves.easeIn,
+      ),
+    );
+    
+    // Start the animation
+    _fadeController.forward();
+  }
+  
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile image - Fixed with proper sizing and error handling
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                user.imageUrl,
-                height: 360,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 100),
-              ),
+    final cardPadding = 16.0; // Fixed 16px padding
+    
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 12.0,
+        ),
+        child: Material(
+          elevation: 0, // No default elevation
+          borderRadius: BorderRadius.circular(20),
+          color: kBackgroundColor, // Match background color
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
-            
-            // User info
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${user.name}, ${user.age}",
-                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile image with proper sizing and error handling
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  child: AspectRatio(
+                    aspectRatio: 4/3, // Fixed aspect ratio for consistent sizing
+                    child: Image.network(
+                      widget.user.imageUrl,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[300],
+                        child: Icon(
+                          Icons.person,
+                          size: 80,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
+                ),
+                
+                // User info
+                Padding(
+                  padding: EdgeInsets.all(cardPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                      const SizedBox(width: 4),
+                      // Name and age
                       Text(
-                        user.city, 
-                        style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[700]),
+                        "${widget.user.name}, ${widget.user.age}",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 20, // Fixed size for consistency
+                          fontWeight: FontWeight.bold,
+                          color: kTextPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      
+                      // Location
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: kTextSecondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.user.city, 
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14, 
+                              color: kTextSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Tribe (emphasized) and interests (limited to 3)
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          // Primary tribe (emphasized badge)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: kPrimaryColor, width: 1.5),
+                            ),
+                            child: Text(
+                              widget.user.tribe,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                color: kPrimaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          
+                          // Up to 3 interests
+                          ...widget.user.interests.take(3).map((interest) => Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              interest,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                color: kTextSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          )),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Bio (max 2 lines)
+                      Text(
+                        widget.user.bio,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14, 
+                          color: kTextSecondary,
+                          height: 1.4,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  // Fixed chips with better contrast and readability
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: user.tags.map((tag) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF3F3F3), // Light grey chip background
-                        borderRadius: BorderRadius.circular(20),
-                        border: tag == user.tribe 
-                            ? Border.all(color: kAccentColor, width: 1.5)
-                            : null,
-                      ),
-                      child: Text(
-                        tag,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    )).toList(),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    user.bio,
-                    style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,298 +1,266 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import '../user/controllers/onboarding_controller.dart';
 import 'edit_profile_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
+  Map<String, dynamic>? _userData;
+  bool _isLoading = true;
+
+  // Afrocentric color scheme
+  static const Color backgroundColor = Color(0xFFFDF1E7); // Warm cream
+  static const Color primaryColor = Color(0xFF008037); // Deep green
+  static const Color cardColor = Color(0xFFFFFBF5); // Light cream for cards
+  static final Color textPrimary = Colors.brown.shade800;
+  static final Color textSecondary = Colors.brown.shade600;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        final doc = await _firestore.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          setState(() {
+            _userData = doc.data();
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
-    
-    // Background color for the app - warm cream color
-    const Color backgroundColor = Color(0xFFFDF6EC);
-    
-    // Deep green color for accents
-    const Color deepGreen = Color(0xFF008037);
-    
-    // Warm brown for headers
-    final Color warmBrown = Colors.brown.shade800;
-    
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
+        iconTheme: IconThemeData(color: textPrimary), // This sets the back arrow color
         title: Text(
           'My Profile',
           style: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: warmBrown,
-          ),
-        ),
-        actions: [
-          TextButton.icon(
-            icon: const Icon(Icons.edit, color: deepGreen),
-            label: Text(
-              'Edit',
-              style: GoogleFonts.poppins(
-                color: deepGreen,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/edit_profile');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: deepGreen),
-            onPressed: () {
-              // Settings functionality to be implemented
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings coming soon')),
-              );
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Header with Avatar, Name, Age, Location
-              _buildProfileHeader(context, controller, deepGreen, warmBrown),
-              
-              const SizedBox(height: 24),
-              
-              // About Me Section
-              _buildAboutMeSection(context, controller, deepGreen, warmBrown),
-              
-              const SizedBox(height: 24),
-              
-              // Tribe & Intent Section
-              _buildTribeAndIntentSection(controller, deepGreen, warmBrown),
-              
-              const SizedBox(height: 24),
-              
-              // Languages Section
-              if (controller.languages.isNotEmpty)
-                _buildLanguagesSection(controller, deepGreen, warmBrown),
-              
-              const SizedBox(height: 24),
-              
-              // Interests Section
-              if (controller.genres.isNotEmpty)
-                _buildInterestsSection(controller, deepGreen, warmBrown),
-              
-              const SizedBox(height: 24),
-              
-              // Education & Occupation Section
-              _buildEducationAndOccupationSection(controller, deepGreen, warmBrown),
-              
-              const SizedBox(height: 24),
-              
-              // Values Section
-              if (controller.values.isNotEmpty)
-                _buildValuesSection(controller, deepGreen, warmBrown),
-              
-              const SizedBox(height: 32),
-              
-              // Edit Profile Button
-              Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const EditProfileScreen(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: deepGreen,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: Text(
-                      'Edit Profile',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  
-  // Profile Header with Avatar, Name, Age, Location
-  Widget _buildProfileHeader(BuildContext context, OnboardingController controller, Color deepGreen, Color warmBrown) {
-    return Column(
-      children: [
-        // Profile Image with Edit Button
-        Stack(
-          alignment: Alignment.bottomRight,
-          children: [
-            // Avatar
-            CircleAvatar(
-              radius: 60,
-              backgroundColor: deepGreen,
-              child: CircleAvatar(
-                radius: 57,
-                backgroundColor: Colors.white,
-                backgroundImage: controller.photos.isNotEmpty
-                    ? NetworkImage(controller.photos.first)
-                    : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
-                onBackgroundImageError: (_, __) {},
-              ),
-            ),
-            
-            // Edit Photo Button
-            Container(
-              decoration: BoxDecoration(
-                color: deepGreen,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const EditProfileScreen(),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // Name
-        Text(
-          controller.userName ?? 'Your Name',
-          style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: warmBrown,
+            color: textPrimary,
           ),
         ),
-        
-        const SizedBox(height: 8),
-        
-        // Age and Location
-        if (controller.dateOfBirth != null || controller.locationName != null)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (controller.dateOfBirth != null) ...[
-                Icon(Icons.cake, size: 16, color: deepGreen),
-                const SizedBox(width: 4),
-                Text(
-                  _calculateAge(controller.dateOfBirth!).toString(),
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
+        centerTitle: true,
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: primaryColor))
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Profile Photos Section
+                    _buildPhotoSection(),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Basic Info Card
+                    _buildBasicInfoCard(),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // About Me Card
+                    _buildAboutMeCard(),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Details Card
+                    _buildDetailsCard(),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Single Edit Profile Button
+                    _buildEditProfileButton(),
+                    
+                    const SizedBox(height: 32),
+                  ],
                 ),
-              ],
-              if (controller.dateOfBirth != null && controller.locationName != null)
-                Text(
-                  ' • ',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              if (controller.locationName != null) ...[
-                Icon(Icons.location_on, size: 16, color: deepGreen),
-                const SizedBox(width: 4),
-                Text(
-                  controller.locationName!,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-            ],
-          ),
-      ],
+              ),
+            ),
     );
   }
-  
-  // About Me Section
-  Widget _buildAboutMeSection(BuildContext context, OnboardingController controller, Color deepGreen, Color warmBrown) {
+
+  Widget _buildPhotoSection() {
+    final photos = _userData?['photos'] as List<dynamic>? ?? [];
+    
+    return Container(
+      height: 200,
+      child: photos.isEmpty
+          ? _buildEmptyPhotoPlaceholder()
+          : PageView.builder(
+              itemCount: photos.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      photos[index],
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: Icon(
+                            Icons.person,
+                            size: 80,
+                            color: Colors.grey.shade400,
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey.shade100,
+                          child: const Center(
+                            child: CircularProgressIndicator(color: primaryColor),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildEmptyPhotoPlaceholder() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        border: Border.all(color: primaryColor.withOpacity(0.2)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_a_photo_outlined,
+            size: 48,
+            color: primaryColor.withOpacity(0.6),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Add Photos',
+            style: GoogleFonts.poppins(
+              color: textSecondary,
+              fontSize: 16,
+            ),
           ),
         ],
-        border: Border.all(color: deepGreen.withOpacity(0.2), width: 1),
       ),
+    );
+  }
+
+  Widget _buildBasicInfoCard() {
+    final name = _userData?['name'] ?? 'Your Name';
+    final age = _calculateAge(_userData?['dob']);
+    final gender = _userData?['gender'] ?? 'Not specified';
+    
+    return Card(
+      color: cardColor,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'About Me',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: warmBrown,
+                Expanded(
+                  child: Text(
+                    name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: textPrimary,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.edit, color: deepGreen, size: 20),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const EditProfileScreen(),
-                      ),
-                    );
-                  },
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _buildInfoChip(
+                  icon: Icons.cake_outlined,
+                  label: age != null ? '$age years old' : 'Age not set',
+                ),
+                const SizedBox(width: 12),
+                _buildInfoChip(
+                  icon: Icons.person_outline,
+                  label: gender,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAboutMeCard() {
+    final bio = _userData?['bio'] ?? '';
+    
+    return Card(
+      color: cardColor,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Text(
-              controller.bio ?? "Tell others about yourself...",
+              'About Me',
               style: GoogleFonts.poppins(
-                fontSize: 15,
-                color: controller.bio != null ? Colors.black87 : Colors.grey[400],
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              bio.isEmpty ? 'Tell others about yourself...' : bio,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: bio.isEmpty ? textSecondary : textPrimary,
                 height: 1.5,
               ),
             ),
@@ -301,310 +269,151 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-  
-  // Tribe & Intent Section
-  Widget _buildTribeAndIntentSection(OnboardingController controller, Color deepGreen, Color warmBrown) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: deepGreen.withOpacity(0.2), width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Cultural Roots & Intent',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: warmBrown,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (controller.tribe != null)
-                  _buildChip(Icons.people, controller.tribe!, deepGreen),
-                if (controller.intent != null)
-                  _buildChip(
-                    controller.intent == 'dating' 
-                        ? Icons.favorite 
-                        : controller.intent == 'friendship' 
-                            ? Icons.people 
-                            : Icons.business_center,
-                    controller.intent!.substring(0, 1).toUpperCase() + controller.intent!.substring(1),
-                    deepGreen,
-                  ),
-                if (controller.nationality != null)
-                  _buildChip(Icons.flag, controller.nationality!, deepGreen),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  // Languages Section
-  Widget _buildLanguagesSection(OnboardingController controller, Color deepGreen, Color warmBrown) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: deepGreen.withOpacity(0.2), width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Languages',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: warmBrown,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: controller.languages.map((language) {
-                return _buildChip(Icons.language, language, deepGreen);
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  // Interests Section
-  Widget _buildInterestsSection(OnboardingController controller, Color deepGreen, Color warmBrown) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: deepGreen.withOpacity(0.2), width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Interests',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: warmBrown,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: controller.genres.map((interest) {
-                return Chip(
-                  label: Text(
-                    interest,
-                    style: GoogleFonts.poppins(
-                      color: deepGreen,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  backgroundColor: deepGreen.withOpacity(0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: deepGreen,
-                      width: 0.5,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  // Education & Occupation Section
-  Widget _buildEducationAndOccupationSection(OnboardingController controller, Color deepGreen, Color warmBrown) {
-    if (controller.education == null && controller.occupation == null) {
-      return const SizedBox.shrink();
-    }
+
+  Widget _buildDetailsCard() {
+    final tribe = _userData?['tribe'] ?? 'Not specified';
+    final preferences = _userData?['preferences'] as Map<String, dynamic>? ?? {};
+    final interestedIn = preferences['interestedIn'] ?? 'Not specified';
+    final ageRange = preferences['ageRange'] as List<dynamic>? ?? [];
     
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: deepGreen.withOpacity(0.2), width: 1),
-      ),
+    return Card(
+      color: cardColor,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Education & Work',
+              'Details',
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: warmBrown,
+                color: textPrimary,
               ),
             ),
             const SizedBox(height: 16),
-            if (controller.education != null)
-              _buildInfoRow(Icons.school, 'Education', controller.education!, deepGreen),
-            if (controller.education != null && controller.occupation != null)
+            _buildDetailRow('Tribe/Ethnicity', tribe),
+            const SizedBox(height: 12),
+            _buildDetailRow('Looking for', interestedIn),
+            if (ageRange.length == 2) ...[
               const SizedBox(height: 12),
-            if (controller.occupation != null)
-              _buildInfoRow(Icons.work, 'Occupation', controller.occupation!, deepGreen),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  // Values Section
-  Widget _buildValuesSection(OnboardingController controller, Color deepGreen, Color warmBrown) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: deepGreen.withOpacity(0.2), width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Values',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: warmBrown,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: controller.values.map((value) {
-                return _buildChip(Icons.check_circle, value, deepGreen);
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  // Helper method to build consistent chips
-  Widget _buildChip(IconData icon, String label, Color deepGreen) {
-    return Chip(
-      avatar: Icon(icon, color: deepGreen, size: 18),
-      label: Text(
-        label,
-        style: GoogleFonts.poppins(
-          color: Colors.black87,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      backgroundColor: Colors.white,
-      side: BorderSide(color: deepGreen, width: 0.5),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-    );
-  }
-  
-  // Helper method to build info row
-  Widget _buildInfoRow(IconData icon, String label, String value, Color deepGreen) {
-    return Row(
-      children: [
-        Icon(icon, color: deepGreen, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              ),
-              Text(
-                value,
-                style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
+              _buildDetailRow('Age preference', '${ageRange[0]} - ${ageRange[1]} years'),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 120,
+          child: Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: textPrimary,
+            ),
           ),
         ),
       ],
     );
   }
-  
-  // Calculate age from date of birth
-  int _calculateAge(DateTime birthDate) {
-    final now = DateTime.now();
-    int age = now.year - birthDate.year;
+
+  Widget _buildInfoChip({required IconData icon, required String label}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: primaryColor,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: primaryColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditProfileButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const EditProfileScreen(),
+            ),
+          );
+          
+          // Reload data if profile was updated
+          if (result == true) {
+            _loadUserData();
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 3,
+        ),
+        child: Text(
+          'Edit Profile',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  int? _calculateAge(String? dobString) {
+    if (dobString == null) return null;
     
-    if (now.month < birthDate.month || 
-        (now.month == birthDate.month && now.day < birthDate.day)) {
-      age--;
+    try {
+      final dob = DateTime.parse(dobString);
+      final now = DateTime.now();
+      int age = now.year - dob.year;
+      if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+        age--;
+      }
+      return age;
+    } catch (e) {
+      return null;
     }
-    
-    return age;
   }
 }

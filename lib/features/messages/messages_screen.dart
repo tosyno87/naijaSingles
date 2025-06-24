@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer';
 
 import 'services/chat_service.dart';
 import 'message_model.dart';
 import 'chat_thread_screen.dart';
+import '../explore/explore_screen.dart'; // Import ExploreScreen directly
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({Key? key}) : super(key: key);
@@ -16,52 +19,54 @@ class MessagesScreen extends StatefulWidget {
 
 class _MessagesScreenState extends State<MessagesScreen> {
   final ChatService _chatService = ChatService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  
+  // Afropeep MVP Color Scheme
+  static const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
+  static const Color primaryColor = Color(0xFF008037); // Deep green
+  static const Color cardColor = Color(0xFFFFFFFF); // White for cards
+  static final Color textPrimary = Colors.brown.shade800;
+  static final Color textSecondary = Colors.brown.shade600;
+  static final Color textLight = Colors.grey.shade600;
 
   @override
   Widget build(BuildContext context) {
-    // Background color for the dating screens
-    const Color backgroundColor = Color(0xFFFDF6EC);
-    
-    // Deep green color for accents
-    const Color deepGreen = Color(0xFF008037);
-    
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
+        iconTheme: IconThemeData(color: textPrimary), // Fix back arrow color
         title: Text(
           'Messages',
-          style: GoogleFonts.poppins(
-            fontSize: 22,
+          style: GoogleFonts.montserrat(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.brown.shade800,
+            color: textPrimary,
           ),
         ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search, color: deepGreen),
+            icon: Icon(Icons.search, color: primaryColor, size: 28),
             onPressed: () {
-              // Search functionality to be implemented
+              _showSearchDialog();
             },
           ),
         ],
       ),
       body: StreamBuilder<List<MessageThreadInfo>>(
-        stream: _chatService.getChatThreadsStream(),
+        stream: _getChatThreadsStreamWithUserData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return _buildLoadingState();
           }
           
           if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error loading messages',
-                style: GoogleFonts.poppins(color: Colors.red),
-              ),
-            );
+            log('Error loading messages: ${snapshot.error}');
+            return _buildErrorState(snapshot.error.toString());
           }
           
           final threads = snapshot.data ?? [];
@@ -70,177 +75,441 @@ class _MessagesScreenState extends State<MessagesScreen> {
             return _buildEmptyState();
           }
           
-          return ListView.builder(
-            itemCount: threads.length,
-            itemBuilder: (context, index) {
-              final thread = threads[index];
-              return _buildMessageThreadItem(thread);
-            },
-          );
+          return _buildMessagesList(threads);
         },
       ),
     );
   }
-  
-  // Empty state when there are no messages
-  Widget _buildEmptyState() {
+
+  // Enhanced stream that includes user data (with fallback for missing index)
+  Stream<List<MessageThreadInfo>> _getChatThreadsStreamWithUserData() {
+    final currentUserId = _auth.currentUser?.uid;
+    if (currentUserId == null) {
+      return Stream.value([]);
+    }
+
+    // Use a simpler query that doesn't require a composite index
+    // We'll sort in memory instead of using orderBy
+    return FirebaseFirestore.instance
+        .collection('chatThreads')
+        .where('userIds', arrayContains: currentUserId)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      List<MessageThreadInfo> threads = [];
+      
+      for (var doc in snapshot.docs) {
+        try {
+          final data = doc.data();
+          
+          // Find the other user's ID
+          final userIds = List<String>.from(data['userIds'] ?? []);
+          final otherUserId = userIds.firstWhere(
+            (id) => id != currentUserId,
+            orElse: () => '',
+          );
+          
+          if (otherUserId.isEmpty) continue;
+          
+          // Get other user's data
+          final otherUserDoc = await _firestore.collection('users').doc(otherUserId).get();
+          String otherUserName = 'User';
+          String? avatarUrl;
+          
+          if (otherUserDoc.exists) {
+            final userData = otherUserDoc.data() as Map<String, dynamic>?;
+            otherUserName = userData?['name'] ?? 'User';
+            
+            // Get first photo as avatar
+            final photos = userData?['photos'] as List<dynamic>?;
+            if (photos != null && photos.isNotEmpty) {
+              avatarUrl = photos.first as String?;
+            }
+          }
+          
+          // Get unread count for current user
+          final unreadCount = data['unreadCount'] as Map<String, dynamic>?;
+          final unread = (unreadCount?[currentUserId] ?? 0) > 0;
+          
+          threads.add(MessageThreadInfo(
+            threadId: doc.id,
+            otherUserId: otherUserId,
+            otherUserName: otherUserName,
+            lastMessage: data['lastMessageText'] ?? 'Say hello!',
+            lastMessageSenderId: data['lastMessageSenderId'],
+            timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
+            unread: unread,
+            avatarUrl: avatarUrl,
+            isOnline: false, // TODO: Implement online status
+          ));
+        } catch (e) {
+          log('Error processing thread: $e');
+          continue;
+        }
+      }
+      
+      // Sort by timestamp in memory (since we can't use orderBy without index)
+      threads.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      
+      return threads;
+    }).handleError((error) {
+      log('Error in _getChatThreadsStreamWithUserData: $error');
+      return <MessageThreadInfo>[];
+    });
+  }
+
+  Widget _buildLoadingState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 80,
-            color: Colors.grey[400],
+          CircularProgressIndicator(
+            color: primaryColor,
+            strokeWidth: 3,
           ),
           const SizedBox(height: 16),
           Text(
-            'No messages yet',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Start matching with people to begin conversations',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey[600],
+            'Loading conversations...',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              color: textSecondary,
             ),
           ),
         ],
       ),
     );
   }
-  
-  // Message thread item
-  Widget _buildMessageThreadItem(MessageThreadInfo thread) {
-    return InkWell(
-      onTap: () {
-        // Mark as read when tapped
-        _chatService.markThreadAsRead(thread.threadId);
-        
-        // Navigate to chat thread screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatThreadScreen(
-              threadId: thread.threadId,
-              userName: thread.otherUserName,
-              avatarUrl: thread.avatarUrl,
-              otherUserId: thread.otherUserId,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: thread.unread ? const Color(0xFFF0F8F1) : Colors.white,
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey.withOpacity(0.2),
-              width: 1,
-            ),
-          ),
-        ),
-        child: Row(
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Avatar with online indicator
-            Stack(
-              children: [
-                Hero(
-                  tag: 'avatar-${thread.threadId}',
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage: thread.avatarUrl != null
-                        ? NetworkImage(thread.avatarUrl!)
-                        : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
-                    onBackgroundImageError: (_, __) {},
-                  ),
-                ),
-                if (thread.isOnline)
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red.shade400,
             ),
-            const SizedBox(width: 12),
-            // Message content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        thread.otherUserName,
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: thread.unread ? FontWeight.bold : FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Text(
-                        thread.getRelativeTime(),
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: thread.unread ? const Color(0xFF008037) : Colors.grey[500],
-                          fontWeight: thread.unread ? FontWeight.w600 : FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          thread.lastMessage,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: thread.unread ? Colors.black87 : Colors.grey[600],
-                            fontWeight: thread.unread ? FontWeight.w500 : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                      if (thread.unread)
-                        Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          width: 10,
-                          height: 10,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF008037),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
+            const SizedBox(height: 16),
+            Text(
+              'Error loading messages',
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Please check your connection and try again',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {}); // Trigger rebuild
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: Text(
+                'Retry',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.chat_bubble_outline,
+                size: 64,
+                color: primaryColor,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No messages yet',
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Start matching with people to begin conversations and make meaningful connections.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to the correct Explore screen using named route
+                Navigator.of(context).pushReplacementNamed('/explore');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                elevation: 2,
+              ),
+              child: Text(
+                'Start Matching',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessagesList(List<MessageThreadInfo> threads) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: threads.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 4),
+      itemBuilder: (context, index) {
+        final thread = threads[index];
+        return _buildMessageThreadItem(thread);
+      },
+    );
+  }
+
+  Widget _buildMessageThreadItem(MessageThreadInfo thread) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: thread.unread 
+            ? Border.all(color: primaryColor.withOpacity(0.3), width: 1)
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            _openChatThread(thread);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Avatar with online indicator
+                Stack(
+                  children: [
+                    Hero(
+                      tag: 'avatar-${thread.threadId}',
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: thread.unread ? primaryColor : Colors.grey.shade300,
+                            width: thread.unread ? 2 : 1,
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 26,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: thread.avatarUrl != null
+                              ? NetworkImage(thread.avatarUrl!)
+                              : null,
+                          child: thread.avatarUrl == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: 28,
+                                  color: Colors.grey.shade500,
+                                )
+                              : null,
+                          onBackgroundImageError: (_, __) {},
+                        ),
+                      ),
+                    ),
+                    if (thread.isOnline)
+                      Positioned(
+                        right: 2,
+                        bottom: 2,
+                        child: Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4CAF50),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: cardColor,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+                // Message content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              thread.otherUserName,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 18,
+                                fontWeight: thread.unread ? FontWeight.bold : FontWeight.w600,
+                                color: textPrimary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            thread.getRelativeTime(),
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              color: thread.unread ? primaryColor : textLight,
+                              fontWeight: thread.unread ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              thread.lastMessage,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                color: thread.unread ? textPrimary : textSecondary,
+                                fontWeight: thread.unread ? FontWeight.w500 : FontWeight.normal,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                          if (thread.unread) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openChatThread(MessageThreadInfo thread) {
+    // Mark as read when tapped
+    _chatService.markThreadAsRead(thread.threadId);
+    
+    // Navigate to chat thread screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChatThreadScreen(
+          threadId: thread.threadId,
+          userName: thread.otherUserName,
+          avatarUrl: thread.avatarUrl,
+          otherUserId: thread.otherUserId,
+        ),
+      ),
+    );
+  }
+
+  void _showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Search Messages',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        content: Text(
+          'Search functionality coming soon!',
+          style: GoogleFonts.montserrat(color: textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: GoogleFonts.montserrat(
+                color: primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

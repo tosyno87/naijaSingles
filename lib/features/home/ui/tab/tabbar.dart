@@ -579,19 +579,29 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final userProvider = Provider.of<UserProvider>(context, listen: true);
     // debugPrint("user print ${userProvider.currentUser.toString()}");
-    FirebaseMessaging.instance.getToken().then((token) async {
-      debugPrint('Device Token FCM: $token');
-      await firebaseFireStoreInstance
-          .collection('users')
-          .doc(userProvider.currentUser!.id)
-          .update({'pushToken': token});
-      if (!isPuchased) {
-        await firebaseFireStoreInstance
-            .collection('users')
+    
+    // Handle FCM token with proper error handling
+    try {
+      FirebaseMessaging.instance.getToken().then((token) async {
+        if (token != null && userProvider.currentUser?.id != null) {
+          debugPrint('Device Token FCM: $token');
+          await firebaseFireStoreInstance
+              .collection('users')
+              .doc(userProvider.currentUser!.id)
+              .update({'pushToken': token});
+          if (!isPuchased) {
+            await firebaseFireStoreInstance
+                .collection('users')
             .doc(userProvider.currentUser!.id)
             .update({'isPremium': false});
-      }
-    });
+          }
+        }
+      }).catchError((error) {
+        debugPrint('Error getting FCM token: $error');
+      });
+    } catch (e) {
+      debugPrint('FCM initialization error: $e');
+    }
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {
@@ -604,9 +614,11 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
         }
       },
       child: Scaffold(
-        body: userProvider.currentUser!.isBlocked!
+        body: userProvider.currentUser?.isBlocked == true
             ? const BlockByAdmin()
-            : DefaultTabController(
+            : userProvider.currentUser == null
+                ? const Center(child: CircularProgressIndicator())
+                : DefaultTabController(
                 length: 6,
                 initialIndex: chatdata.contains('notification')
                     ? 4

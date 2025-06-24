@@ -225,7 +225,7 @@ class ChatService {
         });
   }
   
-  // Stream of all chat threads for current user
+  // Stream of all chat threads for current user with enhanced error handling
   Stream<List<MessageThreadInfo>> getChatThreadsStream() {
     if (currentUserId == null) {
       return Stream.value([]);
@@ -235,35 +235,60 @@ class ChatService {
         .where('userIds', arrayContains: currentUserId)
         .orderBy('lastUpdated', descending: true)
         .snapshots()
+        .handleError((error) {
+          debugPrint('Error in getChatThreadsStream: $error');
+          // Return empty list on error to prevent UI crashes
+          return [];
+        })
         .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            
-            // Find the other user's ID
-            final userIds = List<String>.from(data['userIds'] ?? []);
-            final otherUserId = userIds.firstWhere(
-              (id) => id != currentUserId,
-              orElse: () => '',
-            );
-            
-            // Get user names
-            final userNames = data['userNames'] as Map<String, dynamic>?;
-            final otherUserName = userNames?[otherUserId] ?? 'User';
-            
-            // Get unread count for current user
-            final unreadCount = data['unreadCount'] as Map<String, dynamic>?;
-            final unread = (unreadCount?[currentUserId] ?? 0) > 0;
-            
-            return MessageThreadInfo(
-              threadId: doc.id,
-              otherUserId: otherUserId,
-              otherUserName: otherUserName,
-              lastMessage: data['lastMessageText'] ?? '',
-              lastMessageSenderId: data['lastMessageSenderId'],
-              timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
-              unread: unread,
-            );
-          }).toList();
+          try {
+            return snapshot.docs.map((doc) {
+              try {
+                final data = doc.data() as Map<String, dynamic>;
+                
+                // Find the other user's ID
+                final userIds = List<String>.from(data['userIds'] ?? []);
+                final otherUserId = userIds.firstWhere(
+                  (id) => id != currentUserId,
+                  orElse: () => '',
+                );
+                
+                // Get user names
+                final userNames = data['userNames'] as Map<String, dynamic>?;
+                final otherUserName = userNames?[otherUserId] ?? 'User';
+                
+                // Get unread count for current user
+                final unreadCount = data['unreadCount'] as Map<String, dynamic>?;
+                final unread = (unreadCount?[currentUserId] ?? 0) > 0;
+                
+                return MessageThreadInfo(
+                  threadId: doc.id,
+                  otherUserId: otherUserId,
+                  otherUserName: otherUserName,
+                  lastMessage: data['lastMessageText'] ?? 'Say hello!',
+                  lastMessageSenderId: data['lastMessageSenderId'],
+                  timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
+                  unread: unread,
+                  avatarUrl: null, // Will be fetched separately in the UI
+                  isOnline: false, // TODO: Implement online status
+                );
+              } catch (e) {
+                debugPrint('Error processing individual thread: $e');
+                // Return a placeholder thread to avoid breaking the entire list
+                return MessageThreadInfo(
+                  threadId: doc.id,
+                  otherUserId: '',
+                  otherUserName: 'Unknown User',
+                  lastMessage: 'Error loading message',
+                  timestamp: DateTime.now(),
+                  unread: false,
+                );
+              }
+            }).where((thread) => thread.otherUserId.isNotEmpty).toList();
+          } catch (e) {
+            debugPrint('Error mapping chat threads: $e');
+            return <MessageThreadInfo>[];
+          }
         });
   }
   

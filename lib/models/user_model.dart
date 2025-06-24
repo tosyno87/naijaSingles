@@ -76,17 +76,19 @@ class UserModel {
       address: doc.data().toString().contains('location')
           ? doc.get('location')['address'] ?? ""
           : '',
-      latitude: doc.data().toString().contains('location')
-          ? doc.get('location')['latitude'] ?? 0
-          : 0,
-      longitude: doc.data().toString().contains('location')
-          ? doc.get('location')['longitude'] ?? 0
-          : 0,
-      coordinates: doc.get('location') ?? {},
+      latitude: doc.data().toString().contains('location') && doc.get('location') != null
+          ? (doc.get('location')['latitude'] ?? 0.0)
+          : 0.0,
+      longitude: doc.data().toString().contains('location') && doc.get('location') != null
+          ? (doc.get('location')['longitude'] ?? 0.0)
+          : 0.0,
+      coordinates: doc.data().toString().contains('location') 
+          ? (doc.get('location') ?? {})
+          : {},
       currentCoordinates: doc.data().toString().contains('currentLocation')
-          ? doc.get('currentLocation')
-          : doc.data().toString().contains('location')
-              ? doc.get('location') ?? {}
+          ? (doc.get('currentLocation') ?? {})
+          : doc.data().toString().contains('location') && doc.get('location') != null
+              ? (doc.get('location') ?? {})
               : {},
       sexualOrientation: doc.data().toString().contains('sexualOrientation')
           ? doc.get('sexualOrientation')

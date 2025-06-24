@@ -30,6 +30,7 @@ class RouteName {
   // Main navigation routes
   static const String onboarding = '/onboarding';
   static const String home = '/home';
+  static const String discover = '/discover'; // Swipe/matching screen
   
   // Legacy routes - to be migrated to new MVP flow
   static const String genderScreen = '/gender';

@@ -37,10 +37,19 @@ class UserProvider extends ChangeNotifier {
             .doc(user.uid)
             .snapshots()
             .listen((documentSnapshot) {
-          if (documentSnapshot.exists) {
-            final userData = UserModel.fromDocument(documentSnapshot);
-            currentUser = userData;
-            notifyListeners();
+          try {
+            if (documentSnapshot.exists) {
+              final userData = UserModel.fromDocument(documentSnapshot);
+              currentUser = userData;
+              notifyListeners();
+            } else {
+              print("User document does not exist for UID: ${user.uid}");
+              currentUser = null;
+              notifyListeners();
+            }
+          } catch (e) {
+            print("Error parsing user document: $e");
+            // Don't set currentUser to null here, keep existing data
           }
         }, onError: (error) {
           print("Error listening to user details: $error");

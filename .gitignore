@@ -47,3 +47,6 @@ my_key
 my_key.pub
 
 .env
+
+# Firebase service account keys
+*firebase-adminsdk*.json

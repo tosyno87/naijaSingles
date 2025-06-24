@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../common/constants/colors.dart'; // Import MVP colors
 import 'services/chat_service.dart';
 import 'message_model.dart';
 
@@ -76,20 +77,14 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Background color for the dating screens
-    const Color backgroundColor = Color(0xFFFDF6EC);
-    
-    // Deep green color for accents
-    const Color deepGreen = Color(0xFF008037);
-    
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor, // Use MVP background color
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardColor, // Use MVP card color
         elevation: 1,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: deepGreen),
+          icon: Icon(Icons.arrow_back_ios, color: primaryColor), // Use MVP primary color
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -107,32 +102,32 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             const SizedBox(width: 8),
             Text(
               widget.userName,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat( // Use Montserrat for MVP
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: textPrimary, // Use MVP text color
               ),
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.call, color: deepGreen),
+            icon: Icon(Icons.call, color: primaryColor), // Use MVP primary color
             onPressed: () {
               // Call functionality to be implemented
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
                     'Call feature coming soon!',
-                    style: GoogleFonts.poppins(),
+                    style: GoogleFonts.montserrat(), // Use Montserrat
                   ),
-                  backgroundColor: deepGreen,
+                  backgroundColor: primaryColor, // Use MVP primary color
                 ),
               );
             },
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert, color: deepGreen),
+            icon: Icon(Icons.more_vert, color: primaryColor), // Use MVP primary color
             onPressed: () {
               // More options functionality to be implemented
             },
@@ -182,9 +177,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Say hi to ${widget.userName}!',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat( // Use Montserrat for MVP
                             fontSize: 14,
-                            color: deepGreen,
+                            color: primaryColor, // Use MVP primary color
                           ),
                         ),
                       ],
@@ -308,8 +303,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   child: Container(
                     width: 48,
                     height: 48,
-                    decoration: const BoxDecoration(
-                      color: deepGreen,
+                    decoration: BoxDecoration( // Remove const to fix error
+                      color: primaryColor, // Use MVP primary color
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

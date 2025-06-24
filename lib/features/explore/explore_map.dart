@@ -7,9 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:naijasingles/common/constants/colors.dart';
 import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
-import 'package:naijasingles/features/explore/no_user.dart';
+// Removed no_user.dart import - file deleted
 // import 'package:naijasingles/features/explore/premium_map.dart';
-import 'package:naijasingles/features/street_view/street_view.dart';
+// Removed street view import - feature deleted
 import 'package:provider/provider.dart';
 
 import '../../common/data/repo/user_location_repo.dart';
@@ -137,15 +137,61 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
               if (state is SearchUserLoadUserForMapState) {
                 log("users is ${state.users.length}");
                 return state.users.isEmpty
-                    ? NoUserFoundWidget(
-                        currentUser: widget.currentUser,
-                        currentAddressName: currentAddressName,
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.location_off,
+                              size: 64,
+                              color: primaryColor,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No users found in this area',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: textPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Try expanding your search radius',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
                       )
-                    : StreetViewPanoramaInit(
-                        user: state.users,
-                        currentAddressName: currentAddressName,
-                        fromSingleuser: false,
-                        currentUser: widget.currentUser);
+                    : GoogleMap(
+                        // Simple map view instead of street view
+                        onMapCreated: (GoogleMapController controller) {
+                          // Map initialization
+                        },
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(
+                            widget.currentUser.latitude ?? 0.0,
+                            widget.currentUser.longitude ?? 0.0,
+                          ),
+                          zoom: 14.0,
+                        ),
+                        markers: Set<Marker>.from(
+                          state.users.map((user) => Marker(
+                            markerId: MarkerId(user.id ?? ''),
+                            position: LatLng(
+                              user.latitude ?? 0.0,
+                              user.longitude ?? 0.0,
+                            ),
+                            infoWindow: InfoWindow(
+                              title: user.name,
+                              snippet: '${user.age} years old',
+                            ),
+                          )),
+                        ),
+                      );
               }
               return Container();
             },

@@ -20,7 +20,7 @@ import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
 import 'package:naijasingles/features/home/ui/screens/splash.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
-import 'package:naijasingles/features/street_view/bloc/streetviewdata_bloc.dart';
+// Removed street view import - feature deleted
 import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
 import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
 import 'package:provider/provider.dart';
@@ -186,9 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
             BlocProvider(
               create: (context) => SearchUserForMapBloc(),
             ),
-            BlocProvider(
-              create: (context) => StreetviewdataBloc(),
-            ),
+            // Removed StreetviewdataBloc - feature deleted
             BlocProvider(
               create: (context) => GetInAppProductsBloc(),
             ),

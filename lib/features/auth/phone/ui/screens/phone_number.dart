@@ -10,7 +10,7 @@ import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
-import 'package:naijasingles/features/home/ui/screens/welcome.dart';
+// Removed welcome.dart import - file deleted
 import 'package:provider/provider.dart';
 
 import '../../../../../common/constants/colors.dart';
@@ -63,11 +63,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
               listener: (context, state) {
             if (state is PhoneAuthVerified) {
               log("phone auth success listener called");
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => const Welcome(),
-                ),
-              );
+              // Navigate to onboarding instead of deleted Welcome screen
+              Navigator.pushReplacementNamed(context, RouteName.onboarding);
             }
 
             if (state is PhoneAuthCodeSentSuccess) {

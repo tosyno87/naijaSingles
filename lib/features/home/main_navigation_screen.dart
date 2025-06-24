@@ -19,7 +19,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // Define the pages to be shown for each tab (removed Dating tab)
   // Order matches the BottomNavigationBarItems below
   final List<Widget> _pages = [
-    const ExploreScreen(),   // Tab 0: Explore
+    const ExploreScreen(showBackButton: false),   // Tab 0: Explore - no back button
     const MessagesScreen(),  // Tab 1: Messages
     const ProfileScreen(),   // Tab 2: Profile
   ];

@@ -47,13 +47,24 @@ class DiscoverUser {
 }
 
 class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({Key? key}) : super(key: key);
+  // Add a parameter to track if this screen was navigated from Messages
+  final bool showBackButton;
+  
+  const ExploreScreen({
+    Key? key,
+    this.showBackButton = false, // Default to false (no back button)
+  }) : super(key: key);
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class _ExploreScreenState extends State<ExploreScreen> {
+class _ExploreScreenState extends State<ExploreScreen> 
+    with AutomaticKeepAliveClientMixin<ExploreScreen> {
+  
+  @override
+  bool get wantKeepAlive => true; // Keep state alive to prevent rebuilds
+  
   // Intent options
   final List<String> _intentOptions = ['Dating', 'Friendship', 'Networking'];
   String _selectedIntent = 'Dating';
@@ -215,6 +226,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    
     return Scaffold(
       backgroundColor: kBackgroundColor,
       body: SafeArea(
@@ -227,10 +240,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios, color: kTextPrimary),
-                    onPressed: () => Navigator.of(context).pushReplacementNamed('/main_navigation'),
-                  ),
+                  // Only show back button if navigated from Messages
+                  widget.showBackButton 
+                    ? IconButton(
+                        icon: Icon(Icons.arrow_back_ios, color: kTextPrimary),
+                        onPressed: () => Navigator.of(context).pushReplacementNamed('/main_navigation'),
+                      )
+                    : SizedBox(width: 48), // Empty space with same width as button
                   Text(
                     'Explore',
                     style: GoogleFonts.montserrat(

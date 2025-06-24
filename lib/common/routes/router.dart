@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/utils/large_image.dart';
 import "package:naijasingles/features/auth/login/login_screen.dart";
@@ -10,19 +9,14 @@ import 'package:naijasingles/features/auth/google_sign_in/google_sign_in_test_sc
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_signup_screen.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_login_screen.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_password_reset_screen.dart';
-import 'package:naijasingles/features/home/dating_homepage.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/explore/explore_page.dart';
 import 'package:naijasingles/features/home/main_navigation_screen.dart';
 import 'package:naijasingles/features/onboarding/onboarding_main.dart';
 import 'package:naijasingles/features/profile/edit_profile_screen.dart';
-
 import 'package:naijasingles/features/chat/ui/screens/chat_page.dart';
-
 import 'package:naijasingles/features/home/ui/tab/tabbar.dart';
 import 'package:naijasingles/features/match/ui/screen/match_page.dart';
-import 'package:naijasingles/features/onboarding/onboarding_main.dart';
-import 'package:naijasingles/features/user/ui/screens/edit_user_profile.dart';
 import 'package:naijasingles/features/user/ui/screens/onboarding_flow.dart';
 import 'package:naijasingles/features/user/ui/screens/show_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/update_user_location.dart';
@@ -33,16 +27,11 @@ import 'package:naijasingles/features/user/ui/screens/user_profile_pic_set.dart'
 import 'package:naijasingles/features/user/ui/screens/user_search_location.dart';
 import 'package:naijasingles/features/user/ui/screens/user_sexual_details.dart';
 import 'package:naijasingles/features/user/ui/screens/user_university.dart';
-import 'package:naijasingles/features/user/ui/screens/user_verification.dart';
 import 'package:naijasingles/models/user_model.dart';
-import 'package:provider/provider.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
-import '../../features/home/ui/screens/welcome.dart';
-import '../../features/diary/ui/screens/diary_feed.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
-
 import "package:naijasingles/features/auth/login/login_screen.dart";
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 import '../../features/home/ui/screens/splash.dart';
@@ -113,15 +102,13 @@ abstract class AppRouter {
                 .toString(),
         updatePhoneNumber: (ModalRoute.of(context)!.settings.arguments
             as Map)['updatenumber']),
-    RouteName.welcomeScreen: (context) => const Welcome(),
     RouteName.userDobScreen: (context) => UserDOB(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
-    RouteName.mvpOnboarding: (context) => const OnboardingMain(),
-    RouteName.exploreScreen: (context) => const ExploreScreen(), // Direct to ExploreScreen
+    RouteName.exploreScreen: (context) => const ExploreScreen(showBackButton: false), // No back button by default
     
     // Main navigation routes (consolidated)
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),

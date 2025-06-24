@@ -1,15 +1,12 @@
-import 'dart:developer';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/features/user/ui/widgets/gender_sign.dart';
 import 'package:naijasingles/features/user/ui/widgets/profile_action_widget.dart';
 import 'package:naijasingles/features/user/ui/widgets/sexual_orientation_widget.dart';
-import 'package:naijasingles/features/user/ui/widgets/strret_view_icon.dart';
+// Removed street view icon import - feature deleted
 import 'package:naijasingles/features/user/ui/widgets/unmatch_widget.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +18,7 @@ import '../../../../common/widgets/image_widget.dart';
 import '../../../chat/ui/screens/chat_page.dart';
 import '../../../match/ui/widget/matches_card.dart';
 import '../../../report/report_user.dart';
-import '../../../street_view/bloc/streetviewdata_bloc.dart';
+// Removed street view bloc import - feature deleted
 
 // ignore: must_be_immutable
 class Info extends StatefulWidget {
@@ -44,9 +41,7 @@ class Info extends StatefulWidget {
 class _InfoState extends State<Info> {
   @override
   void initState() {
-    context
-        .read<StreetviewdataBloc>()
-        .add(LoadStreetViewDataEvent(user: widget.user));
+    // Removed street view bloc initialization - feature deleted
     super.initState();
   }
 
@@ -89,56 +84,15 @@ class _InfoState extends State<Info> {
                             alignment: Alignment.bottomCenter,
                             builder: DotSwiperPaginationBuilder(
                                 activeSize: 13,
-                                color: secondryColor,
+                                color: textSecondary,
                                 activeColor: primaryColor)),
                         control: SwiperControl(
                           color: primaryColor,
-                          disableColor: secondryColor,
+                          disableColor: textSecondary,
                         ),
                         loop: false,
                       ),
-                      BlocBuilder<StreetviewdataBloc, StreetviewdataState>(
-                        builder: (context, state) {
-                          if (state is StreetViewDataFailedState) {
-                            return const SizedBox.shrink();
-                          }
-                          if (state is StreetViewDataLoadingState) {
-                            return const SizedBox.shrink();
-                          }
-                          if (state is StreetViewDataLoadedState) {
-                            log("option is ${state.option}");
-                            switch (state.option) {
-                              case 'None':
-                                return const SizedBox.shrink();
-
-                              case 'Everyone':
-                                return StreetViewIcon(
-                                    currentUser: widget.currentUser,
-                                    user: widget.user);
-
-                              case 'My Matches':
-                                if (state.userIds
-                                    .contains(widget.currentUser.id)) {
-                                  return StreetViewIcon(
-                                      currentUser: widget.currentUser,
-                                      user: widget.user);
-                                }
-                                break;
-                              case 'Only':
-                                if (state.userIds
-                                    .contains(widget.currentUser.id)) {
-                                  return StreetViewIcon(
-                                      currentUser: widget.currentUser,
-                                      user: widget.user);
-                                }
-                                break;
-                              default:
-                                return const SizedBox.shrink();
-                            }
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      )
+                      // Removed street view BlocBuilder - feature deleted
                     ]),
                   ),
                   Align(
@@ -201,7 +155,7 @@ class _InfoState extends State<Info> {
                                   title: Text(
                                     "${widget.user.editInfo!['job_title'].toString().trim()} ${widget.user.editInfo!['company'] != null ? 'at ${widget.user.editInfo!['company'].toString().trim()}' : ''}",
                                     style: TextStyle(
-                                        color: secondryColor,
+                                        color: textSecondary,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500),
                                   ),
@@ -217,7 +171,7 @@ class _InfoState extends State<Info> {
                                         .toString()
                                         .trim(),
                                     style: TextStyle(
-                                        color: secondryColor,
+                                        color: textSecondary,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500),
                                   ),
@@ -231,7 +185,7 @@ class _InfoState extends State<Info> {
                                   title: Text(
                                     "Living in ",
                                     style: TextStyle(
-                                        color: secondryColor,
+                                        color: textSecondary,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500),
                                   ).tr(args: [
@@ -261,7 +215,7 @@ class _InfoState extends State<Info> {
                                             "${widget.user.distanceBW}"
                                           ]).toString(),
                                     style: TextStyle(
-                                        color: secondryColor,
+                                        color: textSecondary,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500),
                                   ),
@@ -282,7 +236,7 @@ class _InfoState extends State<Info> {
                           child: Text(
                             widget.user.editInfo!['about'].toString().trim(),
                             style: TextStyle(
-                                color: secondryColor,
+                                color: textSecondary,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500),
                           ),
@@ -313,7 +267,7 @@ class _InfoState extends State<Info> {
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
-                                      color: secondryColor),
+                                      color: textSecondary),
                                 ),
                               )),
                         )

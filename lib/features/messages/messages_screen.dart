@@ -277,8 +277,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the correct Explore screen using named route
-                Navigator.of(context).pushReplacementNamed('/explore');
+                // Navigate directly to ExploreScreen with back button
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ExploreScreen(showBackButton: true),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
@@ -364,6 +368,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           backgroundImage: thread.avatarUrl != null
                               ? NetworkImage(thread.avatarUrl!)
                               : null,
+                          onBackgroundImageError: thread.avatarUrl != null 
+                              ? (_, __) {} 
+                              : null, // Only provide error callback when there's an image
                           child: thread.avatarUrl == null
                               ? Icon(
                                   Icons.person,
@@ -371,7 +378,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                   color: Colors.grey.shade500,
                                 )
                               : null,
-                          onBackgroundImageError: (_, __) {},
                         ),
                       ),
                     ),

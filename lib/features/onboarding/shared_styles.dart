@@ -34,7 +34,7 @@ class OnboardingStyles {
     color: Colors.black87,
   );
   
-  static TextStyle get buttonTextStyle => GoogleFonts.montserrat(
+  static TextStyle get labelLargeTextStyle => GoogleFonts.montserrat(
     fontSize: 16,
     fontWeight: FontWeight.bold,
     color: Colors.white,
@@ -48,7 +48,7 @@ class OnboardingStyles {
   );
   
   static BoxDecoration get selectedItemDecoration => BoxDecoration(
-    color: primaryColor.withOpacity(0.1),
+    color: primaryColor.withValues(alpha: 0.1),
     borderRadius: BorderRadius.circular(12),
     border: Border.all(
       color: primaryColor,
@@ -99,8 +99,8 @@ class OnboardingStyles {
   static ChipThemeData get chipTheme => ChipThemeData(
     backgroundColor: Colors.white,
     disabledColor: Colors.grey.shade200,
-    selectedColor: primaryColor.withOpacity(0.2),
-    secondarySelectedColor: primaryColor.withOpacity(0.2),
+    selectedColor: primaryColor.withValues(alpha: 0.2),
+    secondarySelectedColor: primaryColor.withValues(alpha: 0.2),
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),

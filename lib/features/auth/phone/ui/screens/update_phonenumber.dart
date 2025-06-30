@@ -78,7 +78,7 @@ class UpdateNumber extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: secondryColor)),
+                      color: AppColors.secondaryColor)),
             ),
             Padding(
               padding: const EdgeInsets.all(18.0),

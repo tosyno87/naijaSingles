@@ -42,7 +42,7 @@ class _DistanceWidgetState extends State<DistanceWidget> {
           ),
           subtitle: Slider(
               value: widget.currentUser.maxDistance!.toDouble(),
-              inactiveColor: secondryColor,
+              inactiveColor: AppColors.secondaryColor,
               min: 1.0,
               max: widget.max,
               activeColor:

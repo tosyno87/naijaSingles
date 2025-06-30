@@ -102,7 +102,7 @@ class DialCallState extends State<DialCall> {
                                   // color: AppColors.primaryColor,
                                   style: ButtonStyle(
                                       backgroundColor:
-                                          MaterialStateProperty.all<Color>(
+                                          WidgetStateProperty.all<Color>(
                                               primaryColor)),
                                   icon: const Icon(
                                     Icons.call_end,
@@ -143,7 +143,7 @@ class DialCallState extends State<DialCall> {
                                   // color: AppColors.primaryColor,
                                   style: ButtonStyle(
                                       backgroundColor:
-                                          MaterialStateProperty.all<Color>(
+                                          WidgetStateProperty.all<Color>(
                                               primaryColor)),
                                   icon: const Icon(
                                     Icons.arrow_back,
@@ -174,7 +174,7 @@ class DialCallState extends State<DialCall> {
                                   // color: AppColors.primaryColor,
                                   style: ButtonStyle(
                                       backgroundColor:
-                                          MaterialStateProperty.all<Color>(
+                                          WidgetStateProperty.all<Color>(
                                               primaryColor)),
                                   icon: const Icon(
                                     Icons.arrow_back,

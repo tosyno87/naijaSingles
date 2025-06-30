@@ -19,7 +19,7 @@ class UserMessagingRepo {
   static Future<List<UserModel>> getMatches(UserModel currentUser) async {
     User user = firebaseAuth.currentUser!;
     QuerySnapshot querySnapshot = await db
-        .collection('/Users/${user.uid}/Matches')
+        .collection('users/${user.uid}/Matches')
         .orderBy('timestamp', descending: true)
         .get();
     List<UserModel> matches = [];

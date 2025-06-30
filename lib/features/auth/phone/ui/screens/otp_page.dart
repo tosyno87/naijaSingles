@@ -26,13 +26,16 @@ class OtpPage extends StatefulWidget {
   String codeController;
   bool updatePhoneNumber;
   final String phoneNumber;
-  final String smsVerificationCode;
+  final String verificationId;
+  final bool isLogin; // Added to distinguish between login and registration
+  
   OtpPage({
     Key? key,
-    required this.codeController,
-    required this.updatePhoneNumber,
+    this.codeController = '',
+    this.updatePhoneNumber = false,
     required this.phoneNumber,
-    required this.smsVerificationCode,
+    required this.verificationId,
+    this.isLogin = false,
   }) : super(key: key);
 
   @override
@@ -202,13 +205,31 @@ class _OtpPageState extends State<OtpPage> {
                           log("state user ${state.user}");
                           Provider.of<UserProvider>(context, listen: false)
                               .currentUser = state.user;
-                          Navigator.of(context).pushReplacementNamed(
-                              RouteName.tabScreen,
-                              arguments: state.user);
+                          
+                          // If this is a login flow, go to main navigation
+                          if (widget.isLogin) {
+                            Navigator.of(context).pushReplacementNamed(
+                                RouteName.mainNavigation);
+                          } else {
+                            // For registration or phone update
+                            Navigator.of(context).pushReplacementNamed(
+                                RouteName.tabScreen,
+                                arguments: state.user);
+                          }
                         } else if (state is NewRegistration) {
-                          Navigator.pop(context);
-                          Navigator.pushReplacementNamed(
-                              context, RouteName.welcomeScreen);
+                          if (widget.isLogin) {
+                            // If trying to login with a number that doesn't have an account
+                            CustomSnackbar.showSnackBarSimple(
+                              "No account found with this phone number. Please sign up first.",
+                              context,
+                            );
+                            Navigator.pop(context);
+                          } else {
+                            // Normal registration flow
+                            Navigator.pop(context);
+                            Navigator.pushReplacementNamed(
+                                context, RouteName.welcomeScreen);
+                          }
                         } else if (state is RegistrationFailed) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(state.message)));
@@ -224,7 +245,7 @@ class _OtpPageState extends State<OtpPage> {
                         }
                         return CustomButton(
                             text: 'Verify'.tr().toString(),
-                            color: textColor,
+                            color: AppColors.textPrimary,
                             active: true,
                             onTap: () {
                               if (widget.codeController.trim().isEmpty) {
@@ -292,13 +313,13 @@ class _OtpPageState extends State<OtpPage> {
     if (widget.updatePhoneNumber) {
       context.read<PhoneAuthBloc>().add(OnPhoneNumberupdateEvent(
           phoneNumber: widget.phoneNumber,
-          verificationId: widget.smsVerificationCode,
+          verificationId: widget.verificationId,
           token: widget.codeController));
       log("coming under update number");
     } else {
       context.read<PhoneAuthBloc>().add(VerifySentOtpEvent(
           otpCode: widget.codeController,
-          verificationId: widget.smsVerificationCode));
+          verificationId: widget.verificationId));
     }
   }
 }

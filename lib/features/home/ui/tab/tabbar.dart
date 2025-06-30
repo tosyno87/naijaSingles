@@ -604,7 +604,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     }
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) async {
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
         if (didPop) {
           return;
         }
@@ -695,7 +695,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                         )),
                         Center(
                             child: Container(
-                              color: Colors.amber.withOpacity(0.3),
+                              color: Colors.amber.withValues(alpha: 0.3),
                               child: ExploreScreen(),
                             )),
                         Center(

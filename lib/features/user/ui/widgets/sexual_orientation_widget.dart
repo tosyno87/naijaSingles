@@ -16,7 +16,7 @@ class FirebasesexualDataWidget extends StatelessWidget {
       Text(
         commaSeparatedString,
         style: TextStyle(
-            color: secondryColor, fontSize: 16, fontWeight: FontWeight.w500),
+            color: AppColors.secondaryColor, fontSize: 16, fontWeight: FontWeight.w500),
       )
     ]);
   }

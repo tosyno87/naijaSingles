@@ -131,7 +131,7 @@ class NotificationsState extends State<Notifications> {
                 ? Center(
                     child: Text(
                     "No match found".tr().toString(),
-                    style: TextStyle(color: secondryColor, fontSize: 16),
+                    style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
                   ))
                 : ListView.builder(
                     controller: _scrollController,
@@ -165,13 +165,13 @@ class NotificationsState extends State<Notifications> {
                                       ? Theme.of(context)
                                           .scaffoldBackgroundColor
                                           .withValues(alpha: (0.70 * 255).toDouble())
-                                      : secondryColor.withValues(alpha: (.15 * 255).toDouble()),
+                                      : AppColors.secondaryColor.withValues(alpha: (.15 * 255).toDouble()),
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(5),
                               leading: CircleAvatar(
                                 radius: 25,
-                                backgroundColor: secondryColor,
+                                backgroundColor: AppColors.secondaryColor,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
                                   child: CustomCNImage(

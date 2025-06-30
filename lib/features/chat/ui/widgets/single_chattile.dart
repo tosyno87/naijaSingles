@@ -41,7 +41,7 @@ class SingleChatTile extends StatelessWidget {
                 : primaryColor.withValues(alpha: (.1 * 255).toDouble())
             : themeProvider.isDarkMode
                 ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha: (0.60 * 255).toDouble())
-                : secondryColor.withValues(alpha: (.2 * 255).toDouble()),
+                : AppColors.secondaryColor.withValues(alpha: (.2 * 255).toDouble()),
         borderRadius: const BorderRadius.only(
           topRight: Radius.circular(20.0),
           topLeft: Radius.circular(20.0),
@@ -159,7 +159,7 @@ class SingleChatTile extends StatelessWidget {
                             ? !chat.isRead
                                 ? Icon(
                                     Icons.done,
-                                    color: secondryColor,
+                                    color: AppColors.secondaryColor,
                                     size: 15,
                                   )
                                 : Icon(

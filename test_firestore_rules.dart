@@ -313,7 +313,7 @@ class _FirestoreRulesTestScreenState extends State<FirestoreRulesTestScreen> {
                   children: [
                     Text(
                       'Authentication Status',
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -334,7 +334,7 @@ class _FirestoreRulesTestScreenState extends State<FirestoreRulesTestScreen> {
                   children: [
                     Text(
                       'Test Results',
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
                     Container(
@@ -361,7 +361,7 @@ class _FirestoreRulesTestScreenState extends State<FirestoreRulesTestScreen> {
                   children: [
                     Text(
                       'Authentication Tests',
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
@@ -395,7 +395,7 @@ class _FirestoreRulesTestScreenState extends State<FirestoreRulesTestScreen> {
                   children: [
                     Text(
                       'Firestore Rules Tests',
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(

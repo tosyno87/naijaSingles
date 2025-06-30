@@ -227,7 +227,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: primaryColor.withOpacity(0.3),
+                                    color: primaryColor.withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 3),
                                   ),

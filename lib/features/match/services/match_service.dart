@@ -2,9 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import 'likes_service.dart';
+import '../models/match_model.dart';
+
 class MatchService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final LikesService _likesService = LikesService();
   
   // Get current user ID
   String? get currentUserId => _auth.currentUser?.uid;
@@ -12,7 +16,23 @@ class MatchService {
   // Collection references
   CollectionReference get _matchesCollection => _firestore.collection('matches');
   
-  // Create a new match between two users
+  /// Handle like action with mutual like detection
+  /// This is the main method to call when a user likes another user
+  Future<String?> handleLike(String toUserId) async {
+    try {
+      if (currentUserId == null) {
+        debugPrint('No current user logged in');
+        return null;
+      }
+      
+      return await _likesService.handleLike(currentUserId!, toUserId);
+    } catch (e) {
+      debugPrint('Error in handleLike: $e');
+      return null;
+    }
+  }
+  
+  // Create a new match between two users (legacy method - now uses LikesService)
   Future<String?> createMatch({required String otherUserId}) async {
     try {
       if (currentUserId == null) return null;
@@ -23,18 +43,8 @@ class MatchService {
         return existingMatch;
       }
       
-      // Create a new match document
-      final matchRef = _matchesCollection.doc();
-      final matchId = matchRef.id;
-      
-      await matchRef.set({
-        'matchId': matchId,
-        'users': [currentUserId, otherUserId],
-        'timestamp': FieldValue.serverTimestamp(),
-        'matchStatus': 'matched',
-      });
-      
-      return matchId;
+      // Use the new likes service to create match
+      return await _likesService.handleLike(currentUserId!, otherUserId);
     } catch (e) {
       debugPrint('Error creating match: $e');
       return null;
@@ -67,13 +77,25 @@ class MatchService {
   }
   
   // Get all matches for current user
-  Future<List<Map<String, dynamic>>> getUserMatches() async {
+  Future<List<MatchModel>> getUserMatches() async {
+    try {
+      if (currentUserId == null) return [];
+      
+      return await _likesService.getUserMatches(currentUserId!);
+    } catch (e) {
+      debugPrint('Error getting user matches: $e');
+      return [];
+    }
+  }
+  
+  // Get all matches for current user (legacy format for backward compatibility)
+  Future<List<Map<String, dynamic>>> getUserMatchesLegacy() async {
     try {
       if (currentUserId == null) return [];
       
       final querySnapshot = await _matchesCollection
           .where('users', arrayContains: currentUserId!)
-          .orderBy('timestamp', descending: true)
+          .orderBy('matchedAt', descending: true)
           .get();
       
       return querySnapshot.docs
@@ -110,5 +132,35 @@ class MatchService {
       debugPrint('Error deleting match: $e');
       return false;
     }
+  }
+
+  // Check if user has already liked another user
+  Future<bool> hasUserLiked(String toUserId) async {
+    try {
+      if (currentUserId == null) return false;
+      return await _likesService.hasUserLiked(currentUserId!, toUserId);
+    } catch (e) {
+      debugPrint('Error checking if user has liked: $e');
+      return false;
+    }
+  }
+
+  // Get users who liked the current user
+  Future<List<String>> getUsersWhoLikedMe() async {
+    try {
+      if (currentUserId == null) return [];
+      return await _likesService.getUsersWhoLikedMe(currentUserId!);
+    } catch (e) {
+      debugPrint('Error getting users who liked me: $e');
+      return [];
+    }
+  }
+
+  // Stream of matches for real-time updates
+  Stream<List<MatchModel>> getMatchesStream() {
+    if (currentUserId == null) {
+      return Stream.value([]);
+    }
+    return _likesService.getMatchesStream(currentUserId!);
   }
 }

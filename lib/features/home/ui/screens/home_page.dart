@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/premium_swipe.dart';
 import '../widgets/swipe_card_list.dart';
 import '../widgets/swipe_buttons.dart';

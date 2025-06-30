@@ -34,7 +34,7 @@ class SwipeButtons extends StatelessWidget {
                 },
                 child: Icon(
                   hasRemoved ? Icons.replay : Icons.not_interested,
-                  color: hasRemoved ? Colors.amber : secondryColor,
+                  color: hasRemoved ? Colors.amber : AppColors.secondaryColor,
                   size: 20,
                 ),
               )

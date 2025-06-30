@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/onboarding_controller.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/widgets/custom_button.dart';
 
 /// A multi-step onboarding flow with cultural focus for NaijaSingles app.
 ///
@@ -105,13 +103,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               ),
             ),
             
-            // Navigation buttons
+            // Navigation labelLarges
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back button (hidden on first page)
+                  // Back labelLarge (hidden on first page)
                   _currentPage > 0
                       ? TextButton(
                           onPressed: () {
@@ -130,7 +128,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         )
                       : const SizedBox(width: 80),
                   
-                  // Next/Finish button
+                  // Next/Finish labelLarge
                   ElevatedButton(
                     onPressed: _isCurrentPageValid(controller) ? onNext : null,
                     style: ElevatedButton.styleFrom(
@@ -514,7 +512,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       selected: isSelected,
       onSelected: onSelected,
       backgroundColor: Colors.white,
-      selectedColor: primaryColor.withOpacity(0.2),
+      selectedColor: primaryColor.withValues(alpha: 0.2),
       checkmarkColor: primaryColor,
       labelStyle: TextStyle(
         color: isSelected ? primaryColor : Colors.black87,
@@ -543,7 +541,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       child: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor.withOpacity(0.1) : Colors.white,
+          color: isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.white,
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(
             color: isSelected ? primaryColor : Colors.grey.shade300,

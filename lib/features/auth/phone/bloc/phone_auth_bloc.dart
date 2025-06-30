@@ -17,11 +17,11 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   final auth = firebaseAuthInstance;
   PhoneAuthBloc({required this.phoneAuthRepository})
       : super(PhoneAuthInitial()) {
-    // When user clicks on send otp button then this event will be fired
+    // When user clicks on send otp labelLarge then this event will be fired
     on<SendOtpToPhoneEvent>(_onSendOtp);
     on<OnPhoneNumberupdateEvent>(_updatenumber);
 
-    // After receiving the otp, When user clicks on verify otp button then this event will be fired
+    // After receiving the otp, When user clicks on verify otp labelLarge then this event will be fired
     on<VerifySentOtpEvent>(_onVerifyOtp);
 
     // When the firebase sends the code to the user's phone, this event will be fired

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/utils/large_image.dart';
-import "package:naijasingles/features/auth/login/login_screen.dart";
 import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
 import 'package:naijasingles/features/auth/welcome/welcome_screen.dart';
-import 'package:naijasingles/features/auth/google_sign_in/google_sign_in_test_screen.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_signup_screen.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_login_screen.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_password_reset_screen.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
-import 'package:naijasingles/features/explore/explore_page.dart';
 import 'package:naijasingles/features/home/main_navigation_screen.dart';
 import 'package:naijasingles/features/onboarding/onboarding_main.dart';
 import 'package:naijasingles/features/profile/edit_profile_screen.dart';
@@ -27,12 +24,13 @@ import 'package:naijasingles/features/user/ui/screens/user_profile_pic_set.dart'
 import 'package:naijasingles/features/user/ui/screens/user_search_location.dart';
 import 'package:naijasingles/features/user/ui/screens/user_sexual_details.dart';
 import 'package:naijasingles/features/user/ui/screens/user_university.dart';
+import 'package:naijasingles/features/auth/auth_method/auth_method_selection_screen.dart';
+import 'package:naijasingles/features/auth/auth_method/sign_in_method_selection_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
-import "package:naijasingles/features/auth/login/login_screen.dart";
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 import '../../features/home/ui/screens/splash.dart';
 
@@ -40,9 +38,11 @@ abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
     RouteName.splashScreen: (context) => const Splash(),
-    RouteName.loginScreen: (context) => const LoginScreen(),
+    RouteName.loginScreen: (context) => const EmailLoginScreen(), // Redirect to EmailLoginScreen
     RouteName.tabScreen: (context) => const Tabbar("active", false),
-    RouteName.googleSignInTest: (context) => const GoogleSignInTestScreen(),
+    // Auth method selection routes
+    RouteName.authMethodSelection: (context) => const AuthMethodSelectionScreen(),
+    RouteName.signInMethodSelection: (context) => const SignInMethodSelectionScreen(),
     // Email authentication routes
     RouteName.emailSignup: (context) => const EmailSignupScreen(),
     RouteName.emailLogin: (context) => const EmailLoginScreen(),
@@ -94,21 +94,23 @@ abstract class AppRouter {
         codeController: (ModalRoute.of(context)!.settings.arguments
                 as Map)['codeController']
             .toString(),
-        smsVerificationCode: (ModalRoute.of(context)!.settings.arguments
-                as Map)['smsVerificationCode']
+        verificationId: (ModalRoute.of(context)!.settings.arguments
+                as Map)['verificationId']
             .toString(),
         phoneNumber:
             (ModalRoute.of(context)!.settings.arguments as Map)['phoneNumber']
                 .toString(),
         updatePhoneNumber: (ModalRoute.of(context)!.settings.arguments
-            as Map)['updatenumber']),
+            as Map)['updatenumber'],
+        isLogin: (ModalRoute.of(context)!.settings.arguments
+            as Map)['isLogin'] ?? false),
     RouteName.userDobScreen: (context) => UserDOB(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
-    RouteName.exploreScreen: (context) => const ExploreScreen(showBackButton: false), // No back button by default
+    RouteName.exploreScreen: (context) => const ExploreScreen(showBackButton: false), // No back labelLarge by default
     
     // Main navigation routes (consolidated)
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),

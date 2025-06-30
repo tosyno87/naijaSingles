@@ -12,6 +12,45 @@ service cloud.firestore {
       
       // Allow users to update their own profile
       allow update: if request.auth != null && request.auth.uid == userId;
+      
+      // User subcollections
+      match /CheckedUser/{checkedUserId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      match /LikedBy/{likedById} {
+        // Allow the user being liked to read who liked them
+        allow read: if request.auth != null && request.auth.uid == userId;
+        // Allow the liker to write their like
+        allow write: if request.auth != null && request.auth.uid == likedById;
+        // Allow both users to read the like data
+        allow read: if request.auth != null && 
+                     (request.auth.uid == userId || request.auth.uid == likedById);
+      }
+      
+      match /Matches/{matchId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      match /blockedlist/{blockedId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Likes collection - for the new likes service
+    match /likes/{likeId} {
+      // Users can create likes where they are the 'from' user
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.from;
+      
+      // Users can read likes where they are involved (from or to)
+      allow read: if request.auth != null && 
+                   (request.auth.uid == resource.data.from || 
+                    request.auth.uid == resource.data.to);
+      
+      // Users can delete their own likes
+      allow delete: if request.auth != null && 
+                     request.auth.uid == resource.data.from;
     }
 
     // Matches collection - for storing user matches
@@ -62,12 +101,12 @@ service cloud.firestore {
                      resource.data.senderId == request.auth.uid;
     }
 
-    // Likes collection - for tracking user likes/dislikes
-    match /likes/{likeId} {
+    // Chats collection
+    match /chats/{chatId} {
       allow read, write: if request.auth != null && 
-                          request.auth.uid == resource.data.fromUserId;
+                          request.auth.uid in resource.data.users;
       allow create: if request.auth != null && 
-                     request.auth.uid == request.resource.data.fromUserId;
+                     request.auth.uid in request.resource.data.users;
     }
 
     // Reports collection - for user reports
@@ -89,6 +128,11 @@ service cloud.firestore {
     match /userSettings/{userId} {
       allow read, write: if request.auth != null && 
                           request.auth.uid == userId;
+    }
+
+    // Item access collection (for app configuration)
+    match /Item_access/{itemId} {
+      allow read: if request.auth != null;
     }
 
     // Block any other access not explicitly allowed above

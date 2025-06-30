@@ -422,7 +422,7 @@ class ProductsState extends State<Products> {
                                     .add(RequestBuyConsumableProducts(
                                         productDetails: selectedProduct!));
                               },
-                              color: textColor,
+                              color: AppColors.textPrimary,
                               active: true)
                           : Padding(
                               padding: const EdgeInsets.only(bottom: 40),
@@ -438,7 +438,7 @@ class ProductsState extends State<Products> {
                                     },
                                     child: Container(
                                         decoration: BoxDecoration(
-                                          color: secondryColor.withValues(alpha: (.7 * 255).toDouble()),
+                                          color: AppColors.secondaryColor.withValues(alpha: (.7 * 255).toDouble()),
                                           shape: BoxShape.rectangle,
                                           borderRadius:
                                               BorderRadius.circular(25),
@@ -454,7 +454,7 @@ class ProductsState extends State<Products> {
                                           "CONTINUE".tr().toString(),
                                           style: TextStyle(
                                               fontSize: 15,
-                                              color: textColor,
+                                              color: AppColors.textPrimary,
                                               fontWeight: FontWeight.bold),
                                         )))),
                               ),
@@ -469,8 +469,8 @@ class ProductsState extends State<Products> {
                   //                     begin: Alignment.topRight,
                   //                     end: Alignment.bottomLeft,
                   //                     colors: [
-                  //                       primaryColor.withOpacity(.5),
-                  //                       primaryColor.withOpacity(.8),
+                  //                       primaryColor.withValues(alpha: .5),
+                  //                       primaryColor.withValues(alpha: .8),
                   //                       primaryColor,
                   //                       primaryColor
                   // ])),
@@ -481,7 +481,7 @@ class ProductsState extends State<Products> {
                   //               "RESTORE PURCHASE".tr().toString(),
                   //               style: TextStyle(
                   //                   fontSize: 15,
-                  //                   color: textColor,
+                  //                   color: AppColors.textPrimary,
                   //                   fontWeight: FontWeight.bold),
                   //             ))),
                   //         onTap: () async {

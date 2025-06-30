@@ -85,7 +85,7 @@ class MatchService {
       tribe: 'Hausa',
       profession: 'Graphic Designer',
       personality: ['Creative', 'Intuitive'],
-      bio: 'Visual storyteller who loves bringing ideas to life through design. I'm passionate about art, photography, and discovering hidden gems in my city.',
+      bio: 'Visual storyteller who loves bringing ideas to life through design. I am passionate about art, photography, and discovering hidden gems in my city.',
       interests: ['Design', 'Art', 'Photography', 'Music'],
     ),
     MatchedUser(

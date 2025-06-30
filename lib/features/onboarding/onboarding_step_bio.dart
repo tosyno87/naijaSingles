@@ -184,7 +184,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                 
                 const SizedBox(height: 20),
                 
-                // Done button
+                // Done labelLarge
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -256,7 +256,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: deepGreen.withOpacity(0.1),
+                        color: deepGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -300,7 +300,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -395,7 +395,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -497,7 +497,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -601,7 +601,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -695,7 +695,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                 
                 const SizedBox(height: 40),
                 
-                // Continue button
+                // Continue labelLarge
                 Center(
                   child: SizedBox(
                     width: 200,

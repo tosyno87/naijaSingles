@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class UserModel {
   final String? id;
@@ -66,88 +67,146 @@ class UserModel {
   }
 
   factory UserModel.fromDocument(DocumentSnapshot doc) {
-    // Get the document ID as the user ID
-    final String userId = doc.id;
-    
-    return UserModel(
-      id: userId,
-      name: doc.data().toString().contains('name') ? doc.get('name') : "",
-      isBlocked: doc.get('isBlocked') ?? false,
-      address: doc.data().toString().contains('location')
-          ? doc.get('location')['address'] ?? ""
-          : '',
-      latitude: doc.data().toString().contains('location') && doc.get('location') != null
-          ? (doc.get('location')['latitude'] ?? 0.0)
-          : 0.0,
-      longitude: doc.data().toString().contains('location') && doc.get('location') != null
-          ? (doc.get('location')['longitude'] ?? 0.0)
-          : 0.0,
-      coordinates: doc.data().toString().contains('location') 
-          ? (doc.get('location') ?? {})
-          : {},
-      currentCoordinates: doc.data().toString().contains('currentLocation')
-          ? (doc.get('currentLocation') ?? {})
-          : doc.data().toString().contains('location') && doc.get('location') != null
-              ? (doc.get('location') ?? {})
-              : {},
-      sexualOrientation: doc.data().toString().contains('sexualOrientation')
-          ? doc.get('sexualOrientation')
-          : {},
+    try {
+      // Get the document ID as the user ID
+      final String userId = doc.id;
+      final Map<String, dynamic> data = doc.data() as Map<String, dynamic>? ?? {};
+      
+      // Helper function to safely get values
+      T? safeGet<T>(String key, [T? defaultValue]) {
+        try {
+          if (data.containsKey(key)) {
+            final value = data[key];
+            if (value is T) return value;
+            if (T == String && value != null) return value.toString() as T;
+            if (T == int && value is String) return int.tryParse(value) as T?;
+            if (T == double && value is num) return value.toDouble() as T;
+          }
+          return defaultValue;
+        } catch (e) {
+          debugPrint('Error getting $key: $e');
+          return defaultValue;
+        }
+      }
 
-      userGender: doc.data().toString().contains('gender')
-          ? doc.get('gender') ?? ''
-          : doc.data().toString().contains('editInfo')
-              ? doc.get('editInfo')['userGender'] ?? ''
-              : "",
-      company: doc.data().toString().contains('editInfo')
-          ? doc.get('editInfo')['company'] ?? ''
-          : "",
-      job_title: doc.data().toString().contains('editInfo')
-          ? doc.get('editInfo')['job_title'] ?? ''
-          : "",
-      living_in: doc.data().toString().contains('editInfo')
-          ? doc.get('editInfo')['living_in'] ?? ''
-          : "",
-      showMyAge: doc.data().toString().contains('editInfo')
-          ? doc.get('editInfo')['showMyAge'] ?? false
-          : false,
+      // Helper function to safely get nested values
+      T? safeGetNested<T>(String parentKey, String childKey, [T? defaultValue]) {
+        try {
+          if (data.containsKey(parentKey) && data[parentKey] is Map) {
+            final parent = data[parentKey] as Map;
+            if (parent.containsKey(childKey)) {
+              final value = parent[childKey];
+              if (value is T) return value;
+              if (T == String && value != null) return value.toString() as T;
+              if (T == int && value is String) return int.tryParse(value) as T?;
+              if (T == double && value is num) return value.toDouble() as T;
+            }
+          }
+          return defaultValue;
+        } catch (e) {
+          debugPrint('Error getting $parentKey.$childKey: $e');
+          return defaultValue;
+        }
+      }
 
-      showGender: doc.data().toString().contains('showGender')
-          ? doc.get('showGender') ?? ''
-          : "",
-      age: doc.data().toString().contains('age') ? doc.get('age') ?? 18 : 18,
-      phoneNumber: doc.data().toString().contains('phoneNumber')
-          ? doc.get('phoneNumber') ?? ''
-          : "",
-      maxDistance: doc.data().toString().contains('maximum_distance')
-          ? doc.get('maximum_distance') ?? 10
-          : 10,
-      ageRange: doc.data().toString().contains('age_range')
-          ? doc.get('age_range')
-          : doc.data().toString().contains('preferences') && 
-            doc.get('preferences') is Map && 
-            doc.get('preferences').containsKey('ageRange')
-              ? {'min': doc.get('preferences')['ageRange'][0], 'max': doc.get('preferences')['ageRange'][1]}
-              : {},
-      editInfo: doc.data().toString().contains('editInfo')
-          ? doc.get('editInfo') ?? {}
-          : {},
-      streetView: doc.data().toString().contains('streetView')
-          ? doc.get('streetView')
-          : {},
-      isBot: doc.data().toString().contains('isBot')
-          ? doc.get('isBot') ?? false
-          : false,
+      // Handle age range with proper type conversion
+      Map<String, String> getAgeRange() {
+        try {
+          if (data.containsKey('age_range') && data['age_range'] is Map) {
+            final ageRange = data['age_range'] as Map;
+            return {
+              'min': (ageRange['min'] ?? 18).toString(),
+              'max': (ageRange['max'] ?? 50).toString(),
+            };
+          } else if (data.containsKey('preferences') && 
+                     data['preferences'] is Map &&
+                     data['preferences']['ageRange'] is List) {
+            final ageRangeList = data['preferences']['ageRange'] as List;
+            if (ageRangeList.length >= 2) {
+              return {
+                'min': ageRangeList[0].toString(),
+                'max': ageRangeList[1].toString(),
+              };
+            }
+          }
+          return {'min': '18', 'max': '50'};
+        } catch (e) {
+          debugPrint('Error parsing age range: $e');
+          return {'min': '18', 'max': '50'};
+        }
+      }
 
-      // Check for both 'photos' (new field) and 'Pictures' (old field)
-      imageUrl: doc.data().toString().contains('photos')
-          ? doc.get('photos')
-          : doc.data().toString().contains('Pictures')
-              ? List.generate(doc.get('Pictures').length, (index) {
-                  return doc.get('Pictures')[index];
-                })
-              : [],
-    );
+      // Handle location data
+      Map<String, dynamic> getLocationData() {
+        try {
+          if (data.containsKey('location') && data['location'] is Map) {
+            return data['location'] as Map<String, dynamic>;
+          }
+          return {};
+        } catch (e) {
+          debugPrint('Error getting location: $e');
+          return {};
+        }
+      }
+
+      final locationData = getLocationData();
+      
+      return UserModel(
+        id: userId,
+        name: safeGet<String>('name', ''),
+        isBlocked: safeGet<bool>('isBlocked', false),
+        address: locationData['address']?.toString() ?? '',
+        latitude: locationData['latitude'] is num ? (locationData['latitude'] as num).toDouble() : 0.0,
+        longitude: locationData['longitude'] is num ? (locationData['longitude'] as num).toDouble() : 0.0,
+        coordinates: locationData.isNotEmpty ? locationData : {},
+        currentCoordinates: data.containsKey('currentLocation') && data['currentLocation'] is Map
+            ? data['currentLocation'] as Map
+            : locationData.isNotEmpty ? locationData : {},
+        sexualOrientation: data.containsKey('sexualOrientation') && data['sexualOrientation'] is Map
+            ? data['sexualOrientation'] as Map
+            : {},
+        userGender: safeGet<String>('gender') ?? 
+                   safeGetNested<String>('editInfo', 'userGender', ''),
+        company: safeGetNested<String>('editInfo', 'company', ''),
+        job_title: safeGetNested<String>('editInfo', 'job_title', ''),
+        living_in: safeGetNested<String>('editInfo', 'living_in', ''),
+        showMyAge: safeGetNested<bool>('editInfo', 'showMyAge', false),
+        showGender: safeGet<String>('showGender', ''),
+        age: safeGet<int>('age', 18),
+        phoneNumber: safeGet<String>('phoneNumber', ''),
+        maxDistance: safeGet<int>('maximum_distance', 10),
+        ageRange: getAgeRange(),
+        editInfo: data.containsKey('editInfo') && data['editInfo'] is Map
+            ? data['editInfo'] as Map
+            : {},
+        streetView: data.containsKey('streetView') && data['streetView'] is Map
+            ? data['streetView'] as Map
+            : {},
+        isBot: safeGet<bool>('isBot', false),
+        imageUrl: data.containsKey('photos') && data['photos'] is List
+            ? List<String>.from(data['photos'])
+            : data.containsKey('Pictures') && data['Pictures'] is List
+                ? List<String>.from(data['Pictures'])
+                : [],
+      );
+    } catch (e) {
+      debugPrint('Error creating UserModel from document ${doc.id}: $e');
+      // Return a minimal user model to prevent crashes
+      return UserModel(
+        id: doc.id,
+        name: 'Unknown User',
+        age: 18,
+        isBlocked: false,
+        showGender: 'everyone',
+        ageRange: {'min': '18', 'max': '50'},
+        maxDistance: 10,
+        latitude: 0.0,
+        longitude: 0.0,
+        address: '',
+        imageUrl: [],
+        editInfo: {},
+      );
+    }
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {

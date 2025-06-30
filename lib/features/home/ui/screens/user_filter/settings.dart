@@ -145,7 +145,7 @@ class SettingPageState extends State<SettingPage> {
       },
       child: PopScope(
         canPop: false,
-        onPopInvoked: (bool didPop) async {
+        onPopInvokedWithResult: (bool didPop, Object? result) async {
           if (didPop) {
             return;
           }
@@ -222,7 +222,7 @@ class SettingPageState extends State<SettingPage> {
                                       ? "${widget.currentUser.phoneNumber}"
                                       : "Add phone Number".tr().toString(),
                                   style: TextStyle(
-                                      color: secondryColor,
+                                      color: AppColors.secondaryColor,
                                       fontWeight: FontWeight.w400),
                                 ),
                               ),
@@ -274,7 +274,7 @@ class SettingPageState extends State<SettingPage> {
                             .toString(),
                         style: TextStyle(
                             color: themeProvider.isDarkMode
-                                ? secondryColor
+                                ? AppColors.secondaryColor
                                 : Colors.black54),
                       ),
                     ),
@@ -310,14 +310,13 @@ class SettingPageState extends State<SettingPage> {
                         },
                         child: StreetViewButtonWigdet(
                             currentUser: widget.currentUser)),
-                    // for theme change and set button
+                    // for theme change and set labelLarge
                     const ChangeThemeButtonWidget(),
                     TextButtonWidget(
                       text: "Invite your friends",
-                      onTap: () {
-                        Share.share(
+                      onTap: () async {
+                        await Share.share(
                           'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
-                          subject: 'Look what I made!'.tr().toString(),
                         );
                       },
                       icon: Icons.share_outlined,

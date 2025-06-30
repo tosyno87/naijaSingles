@@ -262,7 +262,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   
                   const Spacer(),
                   
-                  // Verify button
+                  // Verify labelLarge
                   MultiBlocListener(
                     listeners: [
                       BlocListener<PhoneAuthBloc, PhoneAuthState>(
@@ -325,7 +325,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
-                              disabledBackgroundColor: primaryColor.withOpacity(0.5),
+                              disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),

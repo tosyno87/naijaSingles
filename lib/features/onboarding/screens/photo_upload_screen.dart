@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -95,7 +94,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: afropeepGreen.withOpacity(0.1),
+              color: afropeepGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -158,7 +157,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isRequired 
-                    ? (photo == null ? Colors.red.withOpacity(0.5) : afropeepGreen)
+                    ? (photo == null ? Colors.red.withValues(alpha: 0.5) : afropeepGreen)
                     : Colors.transparent,
                 width: 2,
               ),
@@ -176,7 +175,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                       Icon(
                         Icons.add_a_photo,
                         size: 36,
-                        color: isRequired ? Colors.red.withOpacity(0.7) : Colors.grey,
+                        color: isRequired ? Colors.red.withValues(alpha: 0.7) : Colors.grey,
                       ),
                       
                       const SizedBox(height: 8),
@@ -186,7 +185,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: isRequired ? Colors.red.withOpacity(0.7) : Colors.grey.shade700,
+                          color: isRequired ? Colors.red.withValues(alpha: 0.7) : Colors.grey.shade700,
                         ),
                       ),
                     ],
@@ -194,7 +193,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 : null,
           ),
           
-          // Remove button if photo exists
+          // Remove labelLarge if photo exists
           if (photo != null)
             Positioned(
               top: 8,
@@ -207,7 +206,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -259,7 +258,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: hasMinimumPhotos ? afropeepGreen.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+              color: hasMinimumPhotos ? afropeepGreen.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(

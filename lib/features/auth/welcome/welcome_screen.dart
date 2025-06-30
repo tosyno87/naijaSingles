@@ -1,12 +1,46 @@
+import 'dart:developer';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/routes/route_name.dart';
 import '../auth_method/auth_method_selection_screen.dart';
+import '../auth_method/sign_in_method_selection_screen.dart';
 import 'widgets/rotating_greeting_widget.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _isAuthenticated = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      setState(() {
+        _isAuthenticated = currentUser != null;
+        _isLoading = false;
+      });
+      log("User authentication status: ${_isAuthenticated ? 'Authenticated' : 'Not authenticated'}");
+    } catch (e) {
+      log("Error checking auth status: $e");
+      setState(() {
+        _isAuthenticated = false;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +103,10 @@ class WelcomeScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          const Color(0xFF008037).withOpacity(0.3),
+                          const Color(0xFF008037).withValues(alpha: 0.3),
                           const Color(0xFF008037),
                           const Color(0xFFEF476F),
-                          const Color(0xFFEF476F).withOpacity(0.3),
+                          const Color(0xFFEF476F).withValues(alpha: 0.3),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(2),
@@ -88,7 +122,7 @@ class WelcomeScreen extends StatelessWidget {
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                       fontStyle: FontStyle.italic,
-                      color: textColor.withOpacity(0.8),
+                      color: textColor.withValues(alpha: 0.8),
                     ),
                   ),
                   
@@ -112,96 +146,113 @@ class WelcomeScreen extends StatelessWidget {
                   
                   const Spacer(flex: 2),
                   
-                  // Create Account Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AuthMethodSelectionScreen(),
+                  // Show loading indicator while checking auth status
+                  if (_isLoading)
+                    const CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
+                    
+                  // Show different labelLarges based on authentication status
+                  if (!_isLoading) ...[
+                    // Continue to App labelLarge for authenticated users
+                    if (_isAuthenticated)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 2,
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 2,
-                      ),
-                      child: Text(
-                        "Create Account",
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          child: Text(
+                            "Continue to App",
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                      
+                    // Create Account and Login labelLarges for unauthenticated users
+                    if (!_isAuthenticated) ...[
+                      // Create Account Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AuthMethodSelectionScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: Text(
+                            "Create Account",
+                            style: GoogleFonts.montserrat(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Login Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignInMethodSelectionScreen(),
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: primaryColor,
+                            side: const BorderSide(color: primaryColor, width: 2),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            "Login",
+                            style: GoogleFonts.montserrat(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                   
-                  const SizedBox(height: 16),
-                  
-                  // Test Google Sign-In Button (for development only)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/google_sign_in_test');
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.amber),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        "Test Google Sign-In",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.amber,
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Sign In Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, RouteName.loginScreen);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: accentColor,
-                        side: BorderSide(color: accentColor, width: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        "Sign In",
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  SizedBox(height: screenSize.height * 0.08),
+                  const SizedBox(height: 32),
                 ],
               ),
-            ),
-          ),
+        ),
+      ),
     );
   }
 }

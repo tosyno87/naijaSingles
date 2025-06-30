@@ -143,18 +143,18 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF008037).withOpacity(0.3),
+                  color: const Color(0xFF008037).withValues(alpha: 0.3),
                   blurRadius: 20,
                   spreadRadius: 2,
                 ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
               ],
               border: Border.all(
-                color: const Color(0xFF008037).withOpacity(0.5),
+                color: const Color(0xFF008037).withValues(alpha: 0.5),
                 width: 2,
               ),
             ),
@@ -198,7 +198,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                     "You and ${widget.matchedUserName} like each other",
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: const Color(0xFF4E2B1B).withOpacity(0.8),
+                      color: const Color(0xFF4E2B1B).withValues(alpha: 0.8),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -219,7 +219,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF008037).withOpacity(0.1),
+                        color: const Color(0xFF008037).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -238,7 +238,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                 
                 const SizedBox(height: 40),
                 
-                // Action buttons
+                // Action labelLarges
                 isWideScreen
                     ? _buildHorizontalButtons()
                     : _buildVerticalButtons(),
@@ -258,7 +258,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF008037).withOpacity(0.4),
+            color: const Color(0xFF008037).withValues(alpha: 0.4),
             blurRadius: 12,
             spreadRadius: 2,
           ),
@@ -285,7 +285,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
   Widget _buildHorizontalButtons() {
     return Row(
       children: [
-        // Keep Exploring button
+        // Keep Exploring labelLarge
         Expanded(
           child: OutlinedButton(
             onPressed: _isProcessing ? null : () {
@@ -314,7 +314,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
         
         const SizedBox(width: 16),
         
-        // Send Message button
+        // Send Message labelLarge
         Expanded(
           child: ElevatedButton(
             onPressed: _isProcessing ? null : _handleSendMessage,
@@ -353,7 +353,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Send Message button
+        // Send Message labelLarge
         ElevatedButton(
           onPressed: _isProcessing ? null : _handleSendMessage,
           style: ElevatedButton.styleFrom(
@@ -385,7 +385,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
         
         const SizedBox(height: 12),
         
-        // Keep Exploring button
+        // Keep Exploring labelLarge
         OutlinedButton(
           onPressed: _isProcessing ? null : () {
             Navigator.pop(context);

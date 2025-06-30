@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/street_view_provider.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../match/bloc/match_bloc.dart';
+import '../../../match/bloc/match_user_bloc.dart';
 
 class StreetViewButtonWigdet extends StatefulWidget {
   final UserModel currentUser;
@@ -237,7 +237,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                   TextButton(
                                     child: Text(
                                       'Cancel'.tr().toString(),
-                                      style: TextStyle(color: secondryColor),
+                                      style: TextStyle(color: AppColors.secondaryColor),
                                     ),
                                     onPressed: () {
                                       setState(() {

@@ -261,7 +261,7 @@ class _MessageBoxState extends State<MessageBox> {
 
   Widget _buildTextComposer() {
     return IconTheme(
-        data: IconThemeData(color: _isWritting ? primaryColor : secondryColor),
+        data: IconThemeData(color: _isWritting ? primaryColor : AppColors.secondaryColor),
         child: Card(
           elevation: 10,
           margin: const EdgeInsets.all(0),
@@ -271,7 +271,7 @@ class _MessageBoxState extends State<MessageBox> {
           child: Container(
             decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor,
-                border: Border.all(color: secondryColor, width: 1),
+                border: Border.all(color: AppColors.secondaryColor, width: 1),
                 borderRadius: BorderRadius.circular(40)),
             margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
             child: Row(

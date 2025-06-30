@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../common/constants/colors.dart'; // Import MVP colors
 import 'services/chat_service.dart';
@@ -239,7 +238,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -381,7 +380,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 5,
                     offset: const Offset(0, 2),
                   ),
@@ -405,7 +404,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         _formatTime(message.timestamp),
                         style: GoogleFonts.poppins(
                           fontSize: 10,
-                          color: isMe ? Colors.white.withOpacity(0.7) : Colors.grey[500],
+                          color: isMe ? Colors.white.withValues(alpha: 0.7) : Colors.grey[500],
                         ),
                       ),
                       if (isMe) ...[
@@ -413,7 +412,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         Icon(
                           message.isRead ? Icons.done_all : Icons.done,
                           size: 12,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ],
                     ],

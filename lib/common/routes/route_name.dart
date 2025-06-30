@@ -20,7 +20,6 @@ class RouteName {
   static const String datingHomePage = '/dating';
   static const String exploreScreen = '/explore';
   static const String mainNavigation = '/main_navigation';
-  static const String googleSignInTest = '/google_sign_in_test';
   
   // Email authentication routes
   static const String emailSignup = '/email_signup';
@@ -32,7 +31,9 @@ class RouteName {
   static const String home = '/home';
   static const String discover = '/discover'; // Swipe/matching screen
   
-  // Legacy routes - to be migrated to new MVP flow
+  // Auth method selection routes
+  static const String authMethodSelection = '/auth_method_selection';
+  static const String signInMethodSelection = '/sign_in_method_selection';
   static const String genderScreen = '/gender';
   static const String sexualorientationScreen = '/sexual_details';
   static const String welcomeScreen = '/welcome';

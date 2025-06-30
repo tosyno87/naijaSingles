@@ -23,7 +23,7 @@ class ChatMessageRead {
             child: Padding(
               padding: const EdgeInsets.all(5.0),
               child: CircleAvatar(
-                backgroundColor: secondryColor,
+                backgroundColor: AppColors.secondaryColor,
                 radius: 25.0,
                 backgroundImage: NetworkImage(second.imageUrl![0] ?? ''),
               ),
@@ -78,7 +78,7 @@ class ChatMessageRead {
                                         .toString()
                                     : "",
                                 style: TextStyle(
-                                  color: secondryColor,
+                                  color: AppColors.secondaryColor,
                                   fontSize: 13.0,
                                   fontWeight: FontWeight.w600,
                                 )),
@@ -103,7 +103,7 @@ class ChatMessageRead {
                           margin: const EdgeInsets.only(
                               top: 8.0, bottom: 8.0, right: 10),
                           decoration: BoxDecoration(
-                              color: secondryColor.withValues(alpha: (.3 * 255).toDouble()),
+                              color: AppColors.secondaryColor.withValues(alpha: (.3 * 255).toDouble()),
                               borderRadius: BorderRadius.circular(15)),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +131,7 @@ class ChatMessageRead {
                                             .toString()
                                         : "",
                                     style: TextStyle(
-                                      color: secondryColor,
+                                      color: AppColors.secondaryColor,
                                       fontSize: 13.0,
                                       fontWeight: FontWeight.w600,
                                     ),

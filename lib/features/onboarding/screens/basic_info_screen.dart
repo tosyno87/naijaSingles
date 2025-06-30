@@ -120,8 +120,11 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     });
     
     // Save to controller
-    Provider.of<OnboardingController>(context, listen: false)
-        .setGender(gender);
+    final controller = Provider.of<OnboardingController>(context, listen: false);
+    print('🔍 BasicInfoScreen: Setting gender to "$gender"');
+    print('🔍 Controller instance: ${controller.hashCode}');
+    controller.setGender(gender);
+    print('🔍 Controller gender after setting: "${controller.gender}"');
   }
 
   @override
@@ -170,8 +173,11 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               ),
             ),
             onChanged: (value) {
-              Provider.of<OnboardingController>(context, listen: false)
-                  .setFullName(value);
+              final controller = Provider.of<OnboardingController>(context, listen: false);
+              print('🔍 BasicInfoScreen: Setting name to "$value"');
+              print('🔍 Controller instance: ${controller.hashCode}');
+              controller.setFullName(value);
+              print('🔍 Controller name after setting: "${controller.fullName}"');
             },
           ),
           

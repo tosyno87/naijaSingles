@@ -11,7 +11,7 @@ import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/image_widget.dart';
 import '../../../chat/ui/screens/chat_page.dart';
-import '../../bloc/match_bloc.dart';
+import '../../bloc/match_user_bloc.dart';
 
 class Matches extends StatefulWidget {
   final UserModel currentUser;
@@ -144,7 +144,7 @@ class _MatchesState extends State<Matches> {
                                           state.users[index].name!,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                              color: secondryColor,
+                                              color: AppColors.secondaryColor,
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.w600,
                                               overflow: TextOverflow.ellipsis),
@@ -160,7 +160,7 @@ class _MatchesState extends State<Matches> {
                             child: Text(
                             "No match found".tr().toString(),
                             style:
-                                TextStyle(color: secondryColor, fontSize: 16),
+                                TextStyle(color: AppColors.secondaryColor, fontSize: 16),
                           )));
               }
               return Padding(
@@ -168,7 +168,7 @@ class _MatchesState extends State<Matches> {
                 child: Center(
                     child: Text(
                   "No match found".tr().toString(),
-                  style: TextStyle(color: secondryColor, fontSize: 16),
+                  style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
                 )),
               );
             },

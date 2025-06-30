@@ -1,8 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../constants/colors.dart';
-
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
@@ -33,7 +31,7 @@ class CustomButton extends StatelessWidget {
           // Add subtle shadow for depth
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 3,
               offset: const Offset(0, 2),

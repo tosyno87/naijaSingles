@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_string_interpolations, sort_child_properties_last, use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,7 +18,7 @@ import '../../../../common/data/repo/calling_repo.dart';
 import '../../../../common/data/repo/user_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
-import '../../../match/bloc/match_bloc.dart';
+import '../../../match/bloc/match_user_bloc.dart';
 import '../../../report/report_user.dart';
 
 class ChatPage extends StatefulWidget {

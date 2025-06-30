@@ -167,7 +167,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                     ),
                     CupertinoSwitch(
                       value: showOnProfile,
-                      activeColor: const Color(0xFF27AE60),
+                      activeTrackColor: const Color(0xFF27AE60),
                       onChanged: (value) {
                         setState(() {
                           showOnProfile = value;
@@ -180,7 +180,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
               
               const SizedBox(height: 24),
               
-              // Continue button
+              // Continue labelLarge
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),
                 child: SizedBox(
@@ -249,7 +249,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
           color: isSelected ? const Color(0xFFE8F5E9) : Colors.grey[50],
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               spreadRadius: 0,
               offset: const Offset(0, 2),

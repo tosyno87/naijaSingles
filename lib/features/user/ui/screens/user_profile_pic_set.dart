@@ -2,15 +2,11 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart' as au;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 // ignore: depend_on_referenced_packages
-import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/upload_media.dart';
 
@@ -137,21 +133,21 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                           )
                         : _buildTipsSection(),
                       
-                      const SizedBox(height: 100), // Space for the bottom button
+                      const SizedBox(height: 100), // Space for the bottom labelLarge
                     ],
                   ),
                 ),
               ),
             ),
             
-            // Continue button fixed at the bottom
+            // Continue labelLarge fixed at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -245,7 +241,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
             boxShadow: [
               if (photos[selectedPhotoIndex] != null)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   spreadRadius: 0,
                   offset: const Offset(0, 2),
@@ -266,7 +262,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                       ),
                     ),
                     
-                    // Edit button overlay
+                    // Edit labelLarge overlay
                     Positioned(
                       bottom: 12,
                       right: 12,
@@ -275,7 +271,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
+                            color: Colors.black.withValues(alpha: 0.6),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: const Icon(

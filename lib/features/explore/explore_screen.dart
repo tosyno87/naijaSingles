@@ -1,14 +1,13 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/features/explore/services/match_service.dart';
-import 'package:naijasingles/features/explore/services/mock_match_service.dart';
 import 'package:naijasingles/features/explore/widgets/match_confirmation_modal.dart';
+import 'package:naijasingles/models/user_model.dart';
+import 'package:naijasingles/common/data/repo/user_search_repo.dart';
 
 // Afropeep MVP Color Scheme
 const Color kBackgroundColor = Color(0xFFFFF6E5); // Light cream
@@ -18,41 +17,13 @@ const Color kTextSecondary = Color(0xFF444444); // Dark gray
 const Color kBorderColor = Color(0xFFDADADA); // Light gray border
 const Color kRedColor = Color(0xFFFF5A5F); // Red for dislike
 
-// User Model
-class DiscoverUser {
-  final String id;
-  final String name;
-  final int age;
-  final String city;
-  final String tribe;
-  final String bio;
-  final String imageUrl;
-  final List<String> interests;
-
-  const DiscoverUser({
-    required this.id,
-    required this.name,
-    required this.age,
-    required this.city,
-    required this.tribe,
-    required this.bio,
-    required this.imageUrl,
-    required this.interests,
-  });
-  
-  // Getter to combine tribe and interests as tags for display
-  List<String> get tags {
-    return [tribe, ...interests];
-  }
-}
-
 class ExploreScreen extends StatefulWidget {
   // Add a parameter to track if this screen was navigated from Messages
   final bool showBackButton;
   
   const ExploreScreen({
     Key? key,
-    this.showBackButton = false, // Default to false (no back button)
+    this.showBackButton = false, // Default to false (no back labelLarge)
   }) : super(key: key);
 
   @override
@@ -73,72 +44,114 @@ class _ExploreScreenState extends State<ExploreScreen>
   late MatchEngine _matchEngine;
   List<SwipeItem> _swipeItems = [];
   
-  // Match service for handling likes and matches
-  // Use MockMatchService for testing, MatchService for production
-  final MatchService _matchService = MockMatchService(); // For testing
-  
-  // List of users to display
-  final List<DiscoverUser> _users = const [
-    DiscoverUser(
-      id: '1',
-      name: 'Amara',
-      age: 28,
-      city: 'Lagos',
-      tribe: 'Yoruba',
-      bio: 'Passionate about art and cultural heritage. Love to travel and explore new cuisines.',
-      imageUrl: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg',
-      interests: ['Art', 'Travel', 'Cooking'],
-    ),
-    DiscoverUser(
-      id: '2',
-      name: 'Kofi',
-      age: 32,
-      city: 'Accra',
-      tribe: 'Ashanti',
-      bio: 'Tech entrepreneur with a passion for African innovation. Basketball player and coffee enthusiast.',
-      imageUrl: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
-      interests: ['Tech', 'Basketball', 'Coffee'],
-    ),
-    DiscoverUser(
-      id: '3',
-      name: 'Zainab',
-      age: 26,
-      city: 'Abuja',
-      tribe: 'Hausa',
-      bio: 'Medical doctor by day, poet by night. Looking to connect with like-minded individuals.',
-      imageUrl: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg',
-      interests: ['Medicine', 'Poetry', 'Hiking'],
-    ),
-    DiscoverUser(
-      id: '4',
-      name: 'Kwame',
-      age: 30,
-      city: 'Kumasi',
-      tribe: 'Akan',
-      bio: 'Music producer and cultural advocate. Passionate about preserving traditional sounds.',
-      imageUrl: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg',
-      interests: ['Music', 'Culture', 'Photography'],
-    ),
-    DiscoverUser(
-      id: '5',
-      name: 'Nneka',
-      age: 27,
-      city: 'Port Harcourt',
-      tribe: 'Igbo',
-      bio: 'Environmental scientist working on sustainable solutions for African cities.',
-      imageUrl: 'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg',
-      interests: ['Environment', 'Sustainability', 'Reading'],
-    ),
-  ];
+  // List of users to display - now fetched from Firebase
+  List<UserModel> _users = [];
+  UserModel? _currentUser;
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _loadSwipeItems();
+    _loadCurrentUser();
     log("ExploreScreen initialized");
   }
 
+  Future<void> _loadCurrentUser() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userProvider.currentUser != null) {
+        _currentUser = userProvider.currentUser;
+        // Ensure maxDistance is reasonable for testing
+        if (_currentUser!.maxDistance == null || _currentUser!.maxDistance! < 100) {
+          _currentUser!.maxDistance = 1000; // Set to 1000km for testing
+        }
+        await _loadUsers();
+      } else {
+        // Try to get current user from Firebase Auth
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          // Load user data from Firestore
+          await _loadUserFromFirestore(user.uid);
+        } else {
+          setState(() {
+            _error = 'No authenticated user found';
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      log('Error loading current user: $e');
+      setState(() {
+        _error = 'Failed to load user data';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadUserFromFirestore(String userId) async {
+    try {
+      // This would need to be implemented based on your user loading logic
+      // For now, we'll create a basic user model with increased max distance for testing
+      _currentUser = UserModel(
+        id: userId,
+        name: 'Current User',
+        age: 25,
+        showGender: 'everyone',
+        ageRange: {'min': '18', 'max': '50'},
+        maxDistance: 1000, // Increased for testing - allows users up to 1000km away
+        latitude: 6.5244, // Lagos coordinates as default
+        longitude: 3.3792,
+      );
+      await _loadUsers();
+    } catch (e) {
+      log('Error loading user from Firestore: $e');
+      setState(() {
+        _error = 'Failed to load user profile';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadUsers() async {
+    if (_currentUser == null) return;
+    
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      // Debug: Check authentication status
+      final currentUser = FirebaseAuth.instance.currentUser;
+      log('Current Firebase user: ${currentUser?.uid}');
+      log('Current user model: ${_currentUser?.id}');
+      
+      if (currentUser == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final users = await UserSearchRepo.getUserList(_currentUser!);
+      
+      setState(() {
+        _users = users;
+        _isLoading = false;
+      });
+      
+      _loadSwipeItems();
+      log("Loaded ${users.length} users from Firebase");
+    } catch (e) {
+      log('Error loading users: $e');
+      setState(() {
+        _error = 'Failed to load users: ${e.toString()}';
+        _isLoading = false;
+      });
+    }
+  }
+
   void _loadSwipeItems() {
+    if (_users.isEmpty) return;
+    
     _swipeItems = _users.map((user) {
       return SwipeItem(
         content: user,
@@ -157,23 +170,62 @@ class _ExploreScreenState extends State<ExploreScreen>
     _matchEngine = MatchEngine(swipeItems: _swipeItems);
   }
 
-  void handleLike(DiscoverUser user) {
-    log('Liked: ${user.name}');
+  void handleLike(UserModel user) async {
+    if (_currentUser == null) return;
     
-    // Force show match confirmation for every like during testing
-    _showMatchConfirmation(
-      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-      user.imageUrl,
-      user.name,
-      user.id,
-    );
+    log('🔥 LIKE ACTION: ${_currentUser!.name} (${_currentUser!.id}) likes ${user.name} (${user.id})');
+    
+    try {
+      // Use the real match service to handle the like
+      final matchId = await UserSearchRepo.rightSwipe(_currentUser!, user);
+      
+      log('🔍 Match result: ${matchId ?? "No match"}');
+      
+      if (matchId != null) {
+        log('🎉 MATCH DETECTED! Match ID: $matchId');
+        // Show match confirmation modal
+        _showMatchConfirmation(
+          _currentUser!.imageUrl?.isNotEmpty == true ? _currentUser!.imageUrl![0] : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+          user.imageUrl?.isNotEmpty == true ? user.imageUrl![0] : '',
+          user.name ?? 'Unknown',
+          user.id,
+        );
+      } else {
+        log('💔 No match yet. ${user.name} needs to like you back.');
+        // Show a subtle notification that the like was saved
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('You liked ${user.name}! 💕'),
+            backgroundColor: kPrimaryColor,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      log('❌ Error handling like: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Like saved! 💕'),
+          backgroundColor: kPrimaryColor,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
-  void handlePass(DiscoverUser user) {
+  void handlePass(UserModel user) async {
+    if (_currentUser == null) return;
+    
     log('Passed: ${user.name}');
+    
+    try {
+      await UserSearchRepo.leftSwipe(_currentUser!, user);
+    } catch (e) {
+      log('Error handling pass: $e');
+    }
   }
 
-  void handleSave(DiscoverUser user) {
+  void handleSave(UserModel user) {
     log('Saved: ${user.name}');
     // Bookmark to saved list
     ScaffoldMessenger.of(context).showSnackBar(
@@ -199,7 +251,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.6),
+      barrierColor: Colors.black.withValues(alpha: 0.6),
       builder: (BuildContext context) {
         return MatchConfirmationModal(
           currentUserImageUrl: currentUserImageUrl,
@@ -233,20 +285,20 @@ class _ExploreScreenState extends State<ExploreScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // Simpler header layout with Row inside Padding
+            // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Only show back button if navigated from Messages
+                  // Only show back labelLarge if navigated from Messages
                   widget.showBackButton 
                     ? IconButton(
                         icon: Icon(Icons.arrow_back_ios, color: kTextPrimary),
                         onPressed: () => Navigator.of(context).pushReplacementNamed('/main_navigation'),
                       )
-                    : SizedBox(width: 48), // Empty space with same width as button
+                    : SizedBox(width: 48), // Empty space with same width as labelLarge
                   Text(
                     'Explore',
                     style: GoogleFonts.montserrat(
@@ -281,98 +333,163 @@ class _ExploreScreenState extends State<ExploreScreen>
               ),
             ),
             
-            // Swipe cards area
+            // Content area
             Expanded(
-              child: _swipeItems.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off_rounded,
-                            size: 60,
-                            color: kPrimaryColor.withOpacity(0.5),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No more profiles to show',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: kTextPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: SwipeCards(
-                        matchEngine: _matchEngine,
-                        itemBuilder: (BuildContext context, int index) {
-                          final user = _swipeItems[index].content as DiscoverUser;
-                          return ProfileCard(user: user);
-                        },
-                        onStackFinished: () {
-                          log('Stack is finished');
-                          // Handle when all cards are swiped
-                          setState(() {
-                            // Reload cards for demo purposes
-                            _loadSwipeItems();
-                          });
-                        },
-                        itemChanged: (SwipeItem item, int index) {
-                          log('Item changed: ${index}');
-                        },
-                        upSwipeAllowed: true, // Allow down swipe for "save for later"
-                        fillSpace: true,
-                      ),
-                    ),
+              child: _buildContent(),
             ),
             
-            // Action buttons - only two buttons: dislike and like
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 32.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, // Center the buttons
-                children: [
-                  // Dislike button (❌)
-                  _buildActionButton(
-                    icon: Icons.close_rounded,
-                    color: kRedColor,
-                    tooltip: 'Dislike',
-                    onPressed: () {
-                      if (_matchEngine.currentItem != null) {
-                        _matchEngine.currentItem?.nope();
-                      }
-                    },
-                    size: 56, // Fixed size
-                  ),
-                  
-                  const SizedBox(width: 60), // Fixed space between buttons
-                  
-                  // Like button (✅)
-                  _buildActionButton(
-                    icon: Icons.favorite_rounded,
-                    color: kPrimaryColor,
-                    tooltip: 'Like',
-                    onPressed: () {
-                      if (_matchEngine.currentItem != null) {
-                        _matchEngine.currentItem?.like();
-                      }
-                    },
-                    size: 56, // Fixed size
-                  ),
-                ],
+            // Action labelLarges - only show if not loading and have users
+            if (!_isLoading && _users.isNotEmpty && _error == null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 32.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Dislike labelLarge
+                    _buildActionButton(
+                      icon: Icons.close_rounded,
+                      color: kRedColor,
+                      tooltip: 'Dislike',
+                      onPressed: () {
+                        if (_matchEngine.currentItem != null) {
+                          _matchEngine.currentItem?.nope();
+                        }
+                      },
+                      size: 56,
+                    ),
+                    
+                    const SizedBox(width: 60),
+                    
+                    // Like labelLarge
+                    _buildActionButton(
+                      icon: Icons.favorite_rounded,
+                      color: kPrimaryColor,
+                      tooltip: 'Like',
+                      onPressed: () {
+                        if (_matchEngine.currentItem != null) {
+                          _matchEngine.currentItem?.like();
+                        }
+                      },
+                      size: 56,
+                    ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildContent() {
+    if (_isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: kPrimaryColor),
+            const SizedBox(height: 16),
+            Text(
+              'Loading users...',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: kTextSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 60,
+              color: kRedColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _error!,
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: kTextPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadCurrentUser,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_users.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off_rounded,
+              size: 60,
+              color: kPrimaryColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No more profiles to show',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: kTextPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Try adjusting your preferences',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: kTextSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: SwipeCards(
+        matchEngine: _matchEngine,
+        itemBuilder: (BuildContext context, int index) {
+          final user = _swipeItems[index].content as UserModel;
+          return ProfileCard(user: user);
+        },
+        onStackFinished: () {
+          log('Stack is finished');
+          // Reload users when stack is finished
+          _loadUsers();
+        },
+        itemChanged: (SwipeItem item, int index) {
+          log('Item changed: ${index}');
+        },
+        upSwipeAllowed: true,
+        fillSpace: true,
+      ),
+    );
+  }
   
-  // Helper method to build consistent action buttons with ripple effect
+  // Helper method to build consistent action labelLarges with ripple effect
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -384,14 +501,14 @@ class _ExploreScreenState extends State<ExploreScreen>
       message: tooltip,
       child: Material(
         elevation: 4,
-        shadowColor: color.withOpacity(0.3),
+        shadowColor: color.withValues(alpha: 0.3),
         shape: const CircleBorder(),
         color: color,
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onPressed,
-          splashColor: Colors.white.withOpacity(0.3),
-          highlightColor: Colors.white.withOpacity(0.1),
+          splashColor: Colors.white.withValues(alpha: 0.3),
+          highlightColor: Colors.white.withValues(alpha: 0.1),
           child: SizedBox(
             width: size,
             height: size,
@@ -409,7 +526,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
 // Profile Card Widget with fade-in animation
 class ProfileCard extends StatefulWidget {
-  final DiscoverUser user;
+  final UserModel user;
   
   const ProfileCard({
     Key? key,
@@ -451,7 +568,7 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final cardPadding = 16.0; // Fixed 16px padding
+    final cardPadding = 16.0;
     
     return FadeTransition(
       opacity: _fadeAnimation,
@@ -461,9 +578,9 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
           vertical: 12.0,
         ),
         child: Material(
-          elevation: 0, // No default elevation
+          elevation: 0,
           borderRadius: BorderRadius.circular(20),
-          color: kBackgroundColor, // Match background color
+          color: kBackgroundColor,
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -478,24 +595,33 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile image with proper sizing and error handling
+                // Profile image
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   child: AspectRatio(
-                    aspectRatio: 4/3, // Fixed aspect ratio for consistent sizing
-                    child: Image.network(
-                      widget.user.imageUrl,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[300],
-                        child: Icon(
-                          Icons.person,
-                          size: 80,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ),
+                    aspectRatio: 4/3,
+                    child: widget.user.imageUrl?.isNotEmpty == true
+                        ? Image.network(
+                            widget.user.imageUrl![0],
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: Colors.grey[300],
+                              child: Icon(
+                                Icons.person,
+                                size: 80,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          )
+                        : Container(
+                            color: Colors.grey[300],
+                            child: Icon(
+                              Icons.person,
+                              size: 80,
+                              color: Colors.grey[500],
+                            ),
+                          ),
                   ),
                 ),
                 
@@ -507,9 +633,9 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
                     children: [
                       // Name and age
                       Text(
-                        "${widget.user.name}, ${widget.user.age}",
+                        "${widget.user.name ?? 'Unknown'}, ${widget.user.age ?? 'N/A'}",
                         style: GoogleFonts.montserrat(
-                          fontSize: 20, // Fixed size for consistency
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: kTextPrimary,
                         ),
@@ -517,80 +643,74 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
                       const SizedBox(height: 6),
                       
                       // Location
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            size: 16,
-                            color: kTextSecondary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            widget.user.city, 
-                            style: GoogleFonts.montserrat(
-                              fontSize: 14, 
+                      if (widget.user.address != null)
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              size: 16,
                               color: kTextSecondary,
-                              fontWeight: FontWeight.w500,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // Tribe (emphasized) and interests (limited to 3)
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          // Primary tribe (emphasized badge)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: kPrimaryColor, width: 1.5),
-                            ),
-                            child: Text(
-                              widget.user.tribe,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                color: kPrimaryColor,
-                                fontWeight: FontWeight.w600,
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                widget.user.address!, 
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14, 
+                                  color: kTextSecondary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                          ),
-                          
-                          // Up to 3 interests
-                          ...widget.user.interests.take(3).map((interest) => Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              interest,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                color: kTextSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // Bio (max 2 lines)
-                      Text(
-                        widget.user.bio,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14, 
-                          color: kTextSecondary,
-                          height: 1.4,
+                          ],
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Distance
+                      if (widget.user.distanceBW != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: kPrimaryColor, width: 1.5),
+                          ),
+                          child: Text(
+                            '${widget.user.distanceBW} km away',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: kPrimaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Bio or interests
+                      if (widget.user.editInfo != null && 
+                          widget.user.editInfo!['userBio'] != null &&
+                          widget.user.editInfo!['userBio'].toString().isNotEmpty)
+                        Text(
+                          widget.user.editInfo!['userBio'].toString(),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14, 
+                            color: kTextSecondary,
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      else
+                        Text(
+                          'Looking to connect with new people',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14, 
+                            color: kTextSecondary,
+                            height: 1.4,
+                          ),
+                        ),
                     ],
                   ),
                 ),

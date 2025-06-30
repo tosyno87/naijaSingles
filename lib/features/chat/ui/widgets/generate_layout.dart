@@ -30,7 +30,7 @@ class Layout extends StatelessWidget {
                             top: 2.0, bottom: 2.0, right: 15),
                         height: 150,
                         width: 150.0,
-                        color: secondryColor.withValues(alpha: (.5 * 255).toDouble()),
+                        color: AppColors.secondaryColor.withValues(alpha: (.5 * 255).toDouble()),
                         padding: const EdgeInsets.all(5),
                         child: Stack(
                           children: <Widget>[
@@ -45,7 +45,7 @@ class Layout extends StatelessWidget {
                               child: documentSnapshot.get('isRead') == false
                                   ? Icon(
                                       Icons.done,
-                                      color: secondryColor,
+                                      color: AppColors.secondaryColor,
                                       size: 15,
                                     )
                                   : Icon(
@@ -68,7 +68,7 @@ class Layout extends StatelessWidget {
                                     .toString()
                                 : "",
                             style: TextStyle(
-                              color: secondryColor,
+                              color: AppColors.secondaryColor,
                               fontSize: 13.0,
                               fontWeight: FontWeight.w600,
                             )),
@@ -94,7 +94,7 @@ class Layout extends StatelessWidget {
                           top: 8.0, bottom: 8.0, left: 80.0, right: 10),
                       decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
-                              ? secondryColor.withValues(alpha: (.5 * 255).toDouble())
+                              ? AppColors.secondaryColor.withValues(alpha: (.5 * 255).toDouble())
                               : primaryColor.withValues(alpha: (.1 * 255).toDouble()),
                           borderRadius: BorderRadius.circular(15)),
                       child: Column(
@@ -123,7 +123,7 @@ class Layout extends StatelessWidget {
                                         .toString()
                                     : "",
                                 style: TextStyle(
-                                  color: secondryColor,
+                                  color: AppColors.secondaryColor,
                                   fontSize: 13.0,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -134,7 +134,7 @@ class Layout extends StatelessWidget {
                               documentSnapshot.get('isRead') == false
                                   ? Icon(
                                       Icons.done,
-                                      color: secondryColor,
+                                      color: AppColors.secondaryColor,
                                       size: 15,
                                     )
                                   : Icon(

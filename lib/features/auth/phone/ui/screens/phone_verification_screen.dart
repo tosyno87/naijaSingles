@@ -1,11 +1,8 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
-import '../../../auth_status/bloc/authstatus_bloc.dart';
 import '../../bloc/phone_auth_bloc.dart';
 import 'otp_verification_screen.dart';
 
@@ -136,7 +133,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -218,7 +215,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   
                   const SizedBox(height: 24),
                   
-                  // Continue button
+                  // Continue labelLarge
                   BlocConsumer<PhoneAuthBloc, PhoneAuthState>(
                     listener: (context, state) {
                       if (state is PhoneAuthError) {
@@ -255,7 +252,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: primaryColor.withOpacity(0.5),
+                            disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),

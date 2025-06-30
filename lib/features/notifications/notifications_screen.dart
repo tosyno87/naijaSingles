@@ -239,7 +239,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           color: isRead ? Colors.white : const Color(0xFFE8F5E9),
           border: Border(
             bottom: BorderSide(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -259,7 +259,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: notification.typeColor.withOpacity(0.1),
+                  color: notification.typeColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

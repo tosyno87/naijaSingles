@@ -8,6 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:developer';
+import '../onboarding/widgets/afropeep_height_dropdown.dart';
+
+// Color constants to match registration screens
+const Color primaryColor = Color(0xFF008037); // Deep green
+const Color textColor = Color(0xFF333333); // Dark text
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -37,6 +42,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // Preference values
   String _interestedIn = 'Female';
   RangeValues _ageRange = const RangeValues(18, 35);
+  
+  // New fields
+  String _heightFtIn = HeightData.defaultHeightFtIn;
+  int _heightCm = HeightData.defaultHeightCm;
+  String _lookingFor = 'Dating';
+  String _relationshipIntent = 'Not sure yet';
   
   // Photos
   List<dynamic> _photos = List.filled(5, null); // Can be File or String (URL)
@@ -99,8 +110,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Check if user is 18+
     bool isAdult = _age >= 18;
     
-    // Check if bio is between 150-200 characters
-    bool validBioLength = _bioController.text.length >= 150 && _bioController.text.length <= 200;
+    // Check if bio is at least 20 characters (match registration requirement)
+    bool validBioLength = _bioController.text.trim().length >= 20;
     
     // Check if at least 3 photos are uploaded
     bool hasEnoughPhotos = photoCount >= 3;
@@ -140,16 +151,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         
         // Load DOB and calculate age
-        if (userData['dob'] != null) {
+        if (userData['dateOfBirth'] != null) {
           setState(() {
-            _selectedDOB = DateTime.parse(userData['dob']);
+            _selectedDOB = DateTime.parse(userData['dateOfBirth']);
             _calculateAge();
           });
         }
         
         // Check if user has completed onboarding (has gender, DOB, and tribe)
         _hasCompletedOnboarding = userData['gender'] != null && 
-                                 userData['dob'] != null && 
+                                 userData['dateOfBirth'] != null && 
                                  userData['tribe'] != null;
         
         // Load tribe
@@ -160,6 +171,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _otherTribeController.text = _selectedTribe!;
               _selectedTribe = 'Other';
             }
+          });
+        }
+        
+        // Load new fields
+        if (userData['height'] != null) {
+          setState(() {
+            _heightCm = (userData['height'] as num).round();
+            // Try to find matching ft/in value
+            String? ftIn = HeightData.getFtInFromCm(_heightCm);
+            if (ftIn != null) {
+              _heightFtIn = ftIn;
+            }
+          });
+        }
+        if (userData['lookingFor'] != null) {
+          setState(() {
+            _lookingFor = userData['lookingFor'];
+          });
+        }
+        if (userData['relationshipIntent'] != null) {
+          setState(() {
+            _relationshipIntent = userData['relationshipIntent'];
           });
         }
         
@@ -284,7 +317,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
   
-  // Build image source option button
+  // Build image source option labelLarge
   Widget _buildImageSourceOption({
     required IconData icon,
     required String label,
@@ -298,7 +331,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: primaryColor.withOpacity(0.3)),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -440,13 +473,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'name': _nameController.text.trim(),
         'bio': _bioController.text.trim(),
         'gender': _selectedGender,
-        'dob': _selectedDOB?.toIso8601String(),
+        'dateOfBirth': _selectedDOB?.toIso8601String(),
         'age': _age,
         'tribe': _selectedTribe == 'Other' ? _otherTribeController.text.trim() : _selectedTribe,
         'photos': photoUrls,
+        'height': _heightCm,
+        'height_ft_in': _heightFtIn,
+        'height_cm': _heightCm,
+        'heightDisplay': _heightFtIn,
+        'lookingFor': _lookingFor,
+        'relationshipIntent': _relationshipIntent,
         'preferences': {
           'interestedIn': _interestedIn,
           'ageRange': [_ageRange.start.round(), _ageRange.end.round()],
+          'lookingFor': _lookingFor,
+          'relationshipIntent': _relationshipIntent,
         },
         'lastUpdated': DateTime.now().toIso8601String(),
       };
@@ -570,7 +611,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           border: Border.all(color: Colors.grey.shade300),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -594,7 +635,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -610,6 +651,107 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBioField() {
+    const int maxLength = 500; // Match registration max length
+    final int currentLength = _bioController.text.length;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'About Me',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: textColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        
+        // Bio input container - match registration styling
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: _bioController,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              color: textColor,
+            ),
+            maxLines: 8, // Match registration max lines
+            maxLength: maxLength,
+            decoration: InputDecoration(
+              hintText: "Write your bio here...", // Match registration hint
+              hintStyle: GoogleFonts.poppins(
+                color: Colors.grey.shade400,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: primaryColor, width: 2),
+              ),
+              contentPadding: const EdgeInsets.all(16),
+              counterText: "", // Hide default counter
+            ),
+            onChanged: (value) {
+              setState(() {}); // Update character counter
+              _validateForm(); // Validate form
+            },
+          ),
+        ),
+        
+        const SizedBox(height: 8),
+        
+        // Custom character counter - match registration styling
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Minimum 20 characters", // Match registration requirement
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: currentLength >= 20 ? primaryColor : Colors.grey,
+              ),
+            ),
+            Text(
+              "$currentLength/$maxLength",
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: currentLength >= 20 ? primaryColor : Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        
+        // Validation message
+        if (currentLength > 0 && currentLength < 20)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              "Bio should be at least 20 characters",
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: Colors.red,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -653,15 +795,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.05),
+        color: primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.2)),
+        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           Icon(
             icon,
-            color: primaryColor.withOpacity(0.7),
+            color: primaryColor.withValues(alpha: 0.7),
             size: 20,
           ),
           const SizedBox(width: 12),
@@ -678,7 +820,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -815,24 +957,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 16),
                     
-                    // Bio field
-                    _buildTextField(
-                      controller: _bioController,
-                      labelText: 'Bio',
-                      prefixIcon: Icons.description,
-                      helperText: 'Tell others about yourself (150-200 characters)',
-                      maxLines: 3,
-                      maxLength: 200,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your bio';
-                        }
-                        if (value.length < 150) {
-                          return 'Bio should be at least 150 characters';
-                        }
-                        return null;
-                      },
-                    ),
+                    // Bio field - Custom implementation to match registration
+                    _buildBioField(),
                     const SizedBox(height: 16),
                     
                     // Gender selection - only editable during onboarding
@@ -871,6 +997,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         : _buildTribeSelector(),
                     const SizedBox(height: 24),
                     
+                    // Height section
+                    _buildSectionTitle('Height'),
+                    const SizedBox(height: 16),
+                    AfropeepHeightDropdown(
+                      initialHeightFtIn: _heightFtIn,
+                      initialHeightCm: _heightCm,
+                      onChanged: (heightFtIn, heightCm) {
+                        setState(() {
+                          _heightFtIn = heightFtIn;
+                          _heightCm = heightCm;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    
                     // Preferences section
                     _buildSectionTitle('Preferences'),
                     const SizedBox(height: 16),
@@ -883,7 +1024,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     _buildAgeRangeSelector(),
                     const SizedBox(height: 32),
                     
-                    // Save button
+                    // Save labelLarge
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -941,7 +1082,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -954,14 +1095,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Icon(
                         Icons.add_photo_alternate,
                         size: 32,
-                        color: primaryColor.withOpacity(0.7),
+                        color: primaryColor.withValues(alpha: 0.7),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Add Photo',
                         style: GoogleFonts.poppins(
                           fontSize: 12,
-                          color: primaryColor.withOpacity(0.7),
+                          color: primaryColor.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -1027,7 +1168,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         right: 4,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
+                            color: Colors.black.withValues(alpha: 0.6),
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
@@ -1103,7 +1244,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             border: Border.all(color: Colors.grey.shade300),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -1189,7 +1330,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
@@ -1213,7 +1354,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               enabledThumbRadius: 8,
               elevation: 4,
             ),
-            overlayColor: primaryColor.withOpacity(0.2),
+            overlayColor: primaryColor.withValues(alpha: 0.2),
             trackHeight: 4,
             rangeThumbShape: const RoundRangeSliderThumbShape(
               enabledThumbRadius: 8,
@@ -1247,4 +1388,5 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ],
     );
   }
+
 }

@@ -129,14 +129,14 @@ class _ShowGenderState extends State<ShowGender> {
               ),
             ),
             
-            // Continue button fixed at the bottom
+            // Continue labelLarge fixed at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -201,7 +201,7 @@ class _ShowGenderState extends State<ShowGender> {
           color: isSelected ? const Color(0xFFE8F5E9) : Colors.grey[50],
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               spreadRadius: 0,
               offset: const Offset(0, 2),

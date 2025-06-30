@@ -44,7 +44,7 @@ class FaceBookButton extends StatelessWidget {
                       child: Text(
                     "LOG IN WITH FACEBOOK".tr().toString(),
                     style: TextStyle(
-                        color: textColor, fontWeight: FontWeight.bold),
+                        color: AppColors.textPrimary, fontWeight: FontWeight.bold),
                   )))),
         ),
       ),

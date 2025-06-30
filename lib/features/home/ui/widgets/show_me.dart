@@ -39,7 +39,7 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
             ListTile(
               title: DropdownButton(
                 iconEnabledColor: primaryColor,
-                iconDisabledColor: secondryColor,
+                iconDisabledColor: AppColors.secondaryColor,
                 iconSize: 24,
                 icon: const Icon(Icons.keyboard_arrow_down_outlined),
                 isExpanded: true,
@@ -49,7 +49,7 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
                     child: Text(
                       "Men".tr().toString(),
                       style: TextStyle(
-                        color: secondryColor,
+                        color: AppColors.secondaryColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -59,7 +59,7 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
                       value: "women",
                       child: Text("Women".tr().toString(),
                           style: TextStyle(
-                            color: secondryColor,
+                            color: AppColors.secondaryColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ))),
@@ -67,7 +67,7 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
                       value: "everyone",
                       child: Text("Everyone".tr().toString(),
                           style: TextStyle(
-                            color: secondryColor,
+                            color: AppColors.secondaryColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ))),

@@ -42,7 +42,7 @@ class MatchProfileScreen extends StatefulWidget {
 }
 
 class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTickerProviderStateMixin {
-  // Animation controller for like button
+  // Animation controller for like labelLarge
   late AnimationController _animationController;
   bool _isLiked = false;
 
@@ -120,7 +120,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -145,7 +145,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -252,7 +252,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: 0.03),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -295,7 +295,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: 0.03),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -327,14 +327,14 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
     );
   }
   
-  // Action buttons (Like, Pass, Message)
+  // Action labelLarges (Like, Pass, Message)
   Widget _buildActionButtons() {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Pass button
+          // Pass labelLarge
           _buildCircleButton(
             icon: Icons.close,
             color: Colors.red.shade400,
@@ -345,7 +345,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
             label: 'Pass',
           ),
           
-          // Like button
+          // Like labelLarge
           _buildCircleButton(
             icon: _isLiked ? Icons.favorite : Icons.favorite_border,
             color: const Color(0xFF008037),
@@ -375,7 +375,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
             isAnimated: true,
           ),
           
-          // Message button
+          // Message labelLarge
           _buildCircleButton(
             icon: Icons.chat_bubble_outline,
             color: Colors.blue.shade400,
@@ -400,7 +400,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
     );
   }
   
-  // Circle button with icon and label
+  // Circle labelLarge with icon and label
   Widget _buildCircleButton({
     required IconData icon,
     required Color color,
@@ -421,7 +421,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -463,7 +463,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isPrimary ? const Color(0xFF008037).withOpacity(0.1) : Colors.grey[200],
+        color: isPrimary ? const Color(0xFF008037).withValues(alpha: 0.1) : Colors.grey[200],
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isPrimary ? const Color(0xFF008037) : Colors.grey[400]!,

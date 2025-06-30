@@ -2,12 +2,9 @@
 
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,7 +14,6 @@ import 'package:naijasingles/common/routes/router.dart';
 import 'package:naijasingles/features/auth/facebook_login/facebook_login_bloc.dart';
 import 'package:naijasingles/features/auth/google_login/google_login_bloc.dart';
 import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
-import 'package:naijasingles/features/home/ui/screens/splash.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'package:naijasingles/features/payment/ui/in_app_purchase/get_products/getproducts_bloc.dart';
 // Removed street view import - feature deleted
@@ -38,7 +34,7 @@ import 'features/blockUser/bloc/bloc_user_list_bloc.dart';
 import 'features/home/bloc/searchuser_bloc.dart';
 import 'features/home/bloc/swipebloc_bloc.dart';
 import 'features/home/ui/screens/user_filter/bloc/userfilter_bloc.dart';
-import 'features/match/bloc/match_bloc.dart';
+import 'features/match/bloc/match_user_bloc.dart';
 import 'features/report/bloc/report_bloc.dart';
 import 'features/user/bloc/update_user_bloc.dart';
 import 'firebase_options.dart';

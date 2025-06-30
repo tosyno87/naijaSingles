@@ -88,9 +88,9 @@ class MatchScreenState extends State<MatchScreen> {
                   children: [
                     TabBar(
                       labelColor: primaryColor,
-                      indicatorColor: secondryColor,
+                      indicatorColor: AppColors.secondaryColor,
                       indicatorWeight: 1.0,
-                      unselectedLabelColor: secondryColor,
+                      unselectedLabelColor: AppColors.secondaryColor,
                       isScrollable: false,
                       indicatorSize: TabBarIndicatorSize.label,
                       tabs: [

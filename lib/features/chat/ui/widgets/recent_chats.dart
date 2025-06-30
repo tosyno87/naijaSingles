@@ -16,7 +16,7 @@ import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../../../../models/chat_model.dart';
-import '../../../match/bloc/match_bloc.dart';
+import '../../../match/bloc/match_user_bloc.dart';
 import '../../../match/ui/widget/matches_card.dart';
 
 class RecentChats extends StatefulWidget {
@@ -126,7 +126,7 @@ class _RecentChatsState extends State<RecentChats> {
                 ? Center(
                     child: Text(
                       "No Recent chat found".tr().toString(),
-                      style: TextStyle(color: secondryColor, fontSize: 16),
+                      style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
                     ),
                   )
                 : ListView.builder(
@@ -153,7 +153,7 @@ class _RecentChatsState extends State<RecentChats> {
                             //   child: Divider(
                             //     color: themeProvider.isDarkMode
                             //         ? Colors.grey.shade700
-                            //         : secondryColor.withOpacity(0.30),
+                            //         : AppColors.secondaryColor.withValues(alpha: 0.30),
                             //   ),
                             // ),
                             // Row(
@@ -218,7 +218,7 @@ class _RecentChatsState extends State<RecentChats> {
                                 child: Text(
                                   "No Recent chat found".tr().toString(),
                                   style: TextStyle(
-                                    color: secondryColor,
+                                    color: AppColors.secondaryColor,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -237,7 +237,7 @@ class _RecentChatsState extends State<RecentChats> {
           child: Center(
               child: Text(
             "No recent chat found".tr().toString(),
-            style: TextStyle(color: secondryColor, fontSize: 16),
+            style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
           )),
         );
       },

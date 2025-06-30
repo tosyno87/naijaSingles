@@ -19,3 +19,16 @@ class SwipeSucessState extends SwipeblocState {
   @override
   List<Object> get props => [users];
 }
+
+class SwipeMatchCreatedState extends SwipeblocState {
+  final List<UserModel> users;
+  final UserModel matchedUser;
+  
+  const SwipeMatchCreatedState({
+    required this.users,
+    required this.matchedUser,
+  });
+
+  @override
+  List<Object> get props => [users, matchedUser];
+}

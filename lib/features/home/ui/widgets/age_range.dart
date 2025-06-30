@@ -36,7 +36,7 @@ class _AgeRangeWidgetState extends State<AgeRangeWidget> {
               style: const TextStyle(fontSize: 16),
             ),
             subtitle: RangeSlider(
-                inactiveColor: secondryColor,
+                inactiveColor: AppColors.secondaryColor,
                 values: RangeValues(
                     double.parse(widget.currentUser.ageRange!['min']),
                     (double.parse(widget.currentUser.ageRange!['max']))),

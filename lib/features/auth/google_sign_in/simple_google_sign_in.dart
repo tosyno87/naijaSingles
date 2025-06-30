@@ -65,7 +65,7 @@ class SimpleGoogleSignIn {
   }
 }
 
-// A simple button widget that uses the SimpleGoogleSignIn class
+// A simple labelLarge widget that uses the SimpleGoogleSignIn class
 class SimpleGoogleSignInButton extends StatefulWidget {
   final Function(User?) onSignInComplete;
   

@@ -219,9 +219,9 @@ class ReportUserState extends State<ReportUser> {
                     ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStatePropertyAll(primaryColor),
+                              WidgetStatePropertyAll(primaryColor),
                           shape:
-                              MaterialStateProperty.all(const StadiumBorder()),
+                              WidgetStateProperty.all(const StadiumBorder()),
                         ),
                         onPressed: () async {
                           context.read<ReportBloc>().add(ReportUserRequest(

@@ -89,7 +89,7 @@ class PremiumDialog extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: secondryColor,
+                          color: AppColors.secondaryColor,
                           fontSize: 20),
                     ),
                     Padding(
@@ -109,7 +109,7 @@ class PremiumDialog extends StatelessWidget {
                                     Products(currentUser, null, const {})));
                       },
                       style: ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
+                          backgroundColor: WidgetStatePropertyAll(
                               primaryColor.withValues(alpha: (0.9 * 255).toDouble()))),
                       child: Text(
                         'Upgrade Now'.tr().toString(),

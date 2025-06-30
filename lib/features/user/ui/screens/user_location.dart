@@ -8,20 +8,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:naijasingles/services/firestore_database.dart';
 import 'package:naijasingles/services/location/bloc/userlocation_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/utils/welcome_dialog.dart';
-import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../auth/auth_status/bloc/registration/bloc/registration_bloc.dart';
 
@@ -193,7 +190,7 @@ class AllowLocation extends StatelessWidget {
                         
                         const Spacer(flex: 1),
                         
-                        // Primary green button
+                        // Primary green labelLarge
                         BlocConsumer<RegistrationBloc, RegistrationStates>(
                           listener: (context, state) {
                             if (state is RegistrationLoading) {
@@ -362,7 +359,7 @@ class AllowLocation extends StatelessWidget {
                         
                         const SizedBox(height: 16),
                         
-                        // Secondary "Skip for now" button
+                        // Secondary "Skip for now" labelLarge
                         TextButton(
                           onPressed: () {
                             if (!isProcessing.value) {

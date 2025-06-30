@@ -36,15 +36,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final user = _auth.currentUser;
       if (user != null) {
+        print('🔍 Loading user profile data for: ${user.uid}');
         final doc = await _firestore.collection('users').doc(user.uid).get();
         if (doc.exists) {
+          final data = doc.data();
+          print('✅ User data loaded successfully');
+          print('   Available fields: ${data?.keys.toList()}');
+          print('   Name: ${data?['name']}');
+          print('   Interests: ${data?['interests']}');
+          print('   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
+          print('   Looking for: ${data?['lookingFor']}');
+          print('   Bio length: ${(data?['bio'] ?? '').length} characters');
+          
           setState(() {
-            _userData = doc.data();
+            _userData = data;
             _isLoading = false;
           });
+        } else {
+          print('❌ No user document found');
+          setState(() => _isLoading = false);
         }
+      } else {
+        print('❌ No authenticated user');
+        setState(() => _isLoading = false);
       }
     } catch (e) {
+      print('❌ Error loading user data: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -89,6 +106,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     
                     const SizedBox(height: 16),
                     
+                    // Interests Card
+                    _buildInterestsCard(),
+                    
+                    const SizedBox(height: 16),
+                    
                     // Details Card
                     _buildDetailsCard(),
                     
@@ -121,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -164,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: primaryColor.withOpacity(0.2)),
+        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -172,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Icon(
             Icons.add_a_photo_outlined,
             size: 48,
-            color: primaryColor.withOpacity(0.6),
+            color: primaryColor.withValues(alpha: 0.6),
           ),
           const SizedBox(height: 8),
           Text(
@@ -189,7 +211,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildBasicInfoCard() {
     final name = _userData?['name'] ?? 'Your Name';
-    final age = _calculateAge(_userData?['dob']);
+    // Use pre-calculated age from database, fallback to calculation if not available
+    final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
     final gender = _userData?['gender'] ?? 'Not specified';
     
     return Card(
@@ -270,11 +293,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildDetailsCard() {
-    final tribe = _userData?['tribe'] ?? 'Not specified';
-    final preferences = _userData?['preferences'] as Map<String, dynamic>? ?? {};
-    final interestedIn = preferences['interestedIn'] ?? 'Not specified';
-    final ageRange = preferences['ageRange'] as List<dynamic>? ?? [];
+  Widget _buildInterestsCard() {
+    final interests = _userData?['interests'] as List<dynamic>? ?? [];
     
     return Card(
       color: cardColor,
@@ -285,18 +305,155 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.favorite_outline,
+                  color: primaryColor,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Interests',
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (interests.isEmpty)
+              Text(
+                'No interests added yet',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: textSecondary,
+                  fontStyle: FontStyle.italic,
+                ),
+              )
+            else
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: interests.map((interest) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                    ),
+                    child: Text(
+                      interest.toString(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: primaryColor,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailsCard() {
+    final tribe = _userData?['tribe'] ?? 'Not specified';
+    final preferences = _userData?['preferences'] as Map<String, dynamic>? ?? {};
+    final interestedIn = preferences['interestedIn'] ?? _userData?['interestedIn'] ?? 'Not specified';
+    final ageRange = preferences['ageRange'] as List<dynamic>? ?? [];
+    final lookingFor = preferences['lookingFor'] ?? _userData?['lookingFor'] ?? 'Not specified';
+    final relationshipIntent = preferences['relationshipIntent'] ?? _userData?['relationshipIntent'] ?? 'Not specified';
+    final heightDisplay = _userData?['heightDisplay'] ?? _userData?['height_ft_in'] ?? 'Not specified';
+    
+    // Additional fields from onboarding
+    final education = _userData?['education'] ?? '';
+    final occupation = _userData?['occupation'] ?? '';
+    final languages = _userData?['languages'] as List<dynamic>? ?? [];
+    final nationality = _userData?['nationality'] ?? '';
+    
+    return Card(
+      color: cardColor,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: primaryColor,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Details',
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            // Basic details
+            _buildDetailRow('Tribe/Ethnicity', tribe),
+            const SizedBox(height: 12),
+            _buildDetailRow('Height', heightDisplay),
+            
+            // Additional profile info (if available)
+            if (education.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildDetailRow('Education', education),
+            ],
+            if (occupation.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildDetailRow('Occupation', occupation),
+            ],
+            if (nationality.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildDetailRow('Nationality', nationality),
+            ],
+            if (languages.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildDetailRow('Languages', languages.join(', ')),
+            ],
+            
+            const SizedBox(height: 16),
+            
+            // Divider
+            Container(
+              height: 1,
+              color: textSecondary.withValues(alpha: 0.2),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Dating preferences
             Text(
-              'Details',
+              'Dating Preferences',
               style: GoogleFonts.poppins(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: textPrimary,
               ),
             ),
-            const SizedBox(height: 16),
-            _buildDetailRow('Tribe/Ethnicity', tribe),
             const SizedBox(height: 12),
-            _buildDetailRow('Looking for', interestedIn),
+            _buildDetailRow('Looking for', lookingFor),
+            const SizedBox(height: 12),
+            _buildDetailRow('Interested in', interestedIn),
+            const SizedBox(height: 12),
+            _buildDetailRow('Relationship goals', relationshipIntent),
             if (ageRange.length == 2) ...[
               const SizedBox(height: 12),
               _buildDetailRow('Age preference', '${ageRange[0]} - ${ageRange[1]} years'),
@@ -339,7 +496,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.1),
+        color: primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

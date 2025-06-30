@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/custom_button.dart';
@@ -291,7 +290,7 @@ class _UserNationalityState extends State<UserNationality> {
                       ),
               ),
               
-              // Continue button
+              // Continue labelLarge
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0, top: 10.0),
                 child: AnimatedOpacity(

@@ -1,13 +1,9 @@
 import 'dart:developer';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 
 class SexualOrientation extends StatefulWidget {
@@ -129,7 +125,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
                       
                       const SizedBox(height: 40),
                       
-                      // Orientation options with pill-shaped buttons
+                      // Orientation options with pill-shaped labelLarges
                       _buildOrientationGrid(),
                       
                       const SizedBox(height: 20),
@@ -196,7 +192,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
                             ),
                             CupertinoSwitch(
                               value: showOnProfile,
-                              activeColor: const Color(0xFF27AE60),
+                              activeTrackColor: const Color(0xFF27AE60),
                               onChanged: (value) {
                                 setState(() {
                                   showOnProfile = value;
@@ -207,21 +203,21 @@ class _SexualOrientationState extends State<SexualOrientation> {
                         ),
                       ),
                       
-                      const SizedBox(height: 100), // Space for the bottom button
+                      const SizedBox(height: 100), // Space for the bottom labelLarge
                     ],
                   ),
                 ),
               ),
             ),
             
-            // Sticky Continue button at the bottom
+            // Sticky Continue labelLarge at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -310,7 +306,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
               boxShadow: [
                 if (isSelected)
                   BoxShadow(
-                    color: const Color(0xFF27AE60).withOpacity(0.3),
+                    color: const Color(0xFF27AE60).withValues(alpha: 0.3),
                     blurRadius: 8,
                     spreadRadius: 1,
                     offset: const Offset(0, 2),

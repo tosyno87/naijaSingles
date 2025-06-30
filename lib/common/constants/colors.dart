@@ -9,11 +9,11 @@ const Color textSecondary = Color(0xFF8D6E63); // Light brown
 const Color textLight = Color(0xFF9E9E9E); // Gray
 
 // Legacy colors - deprecated, use above colors instead
-@deprecated
-const Color secondryColor = Colors.grey;
-@deprecated
+@Deprecated('Use Colors.grey instead')
+const Color secondaryColor = Colors.grey;
+@Deprecated('Use primaryColor instead')
 const Color darkPrimaryColor = Color(0x222E8B57);
-@deprecated
+@Deprecated('Use textPrimary or textSecondary instead')
 const Color textColor = Colors.white;
 
 // Accent colors for specific use cases
@@ -26,3 +26,22 @@ const Color infoColor = Color(0xFF2196F3); // Blue for info
 const Color primaryColorLight = Color(0x1A008037); // 10% opacity
 const Color primaryColorMedium = Color(0x4D008037); // 30% opacity
 const Color backgroundColorDark = Color(0xFFFDF1E7); // Slightly darker cream
+
+// AppColors class for backward compatibility
+class AppColors {
+  static const Color primaryColor = Color(0xFF008037);
+  static const Color backgroundColor = Color(0xFFFFF6E5);
+  static const Color cardColor = Color(0xFFFFFFFF);
+  static const Color textPrimary = Color(0xFF5D4037);
+  static const Color textSecondary = Color(0xFF8D6E63);
+  static const Color textLight = Color(0xFF9E9E9E);
+  static const Color accentColor = Color(0xFFFF5A5F);
+  static const Color errorColor = Color(0xFFFF5A5F);
+  static const Color successColor = Color(0xFF4CAF50);
+  static const Color warningColor = Color(0xFFFF9800);
+  static const Color infoColor = Color(0xFF2196F3);
+  static const Color secondaryColor = Color(0xFF8D6E63); // Add this back
+  
+  @Deprecated('Use AppColors.textSecondary instead')
+  static const Color secondryColor = textSecondary;
+}

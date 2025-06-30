@@ -61,7 +61,7 @@ class UpdateLocationState extends State<UpdateLocation> {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     return PopScope(
       canPop: true,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
         if (didPop) return;
         final NavigatorState navigator = Navigator.of(context);
         if (latitude != null && longitude != null) {

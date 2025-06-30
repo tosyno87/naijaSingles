@@ -9,7 +9,7 @@ class PaginationRepo {
   static updateNotification(
       UserModel currentUser, QueryDocumentSnapshot<Object?> doc) {
     db
-        .collection("/Users/${currentUser.id}/Matches")
+        .collection("users/${currentUser.id}/Matches")
         .doc('${doc.get("Matches")}')
         .update({'isRead': true});
   }

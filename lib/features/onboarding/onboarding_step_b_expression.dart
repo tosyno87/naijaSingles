@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../user/controllers/onboarding_controller.dart';
-import '../../common/constants/colors.dart';
-import '../../common/widgets/custom_button.dart';
 import 'shared_styles.dart';
 
 /// Second step of onboarding focusing on self-expression.
@@ -100,7 +98,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                 left: 24.0, 
                 right: 24.0, 
                 top: 24.0,
-                bottom: 100.0 + keyboardPadding, // Extra padding for button
+                bottom: 100.0 + keyboardPadding, // Extra padding for labelLarge
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +109,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: deepGreen.withOpacity(0.1),
+                          color: deepGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -167,7 +165,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -254,7 +252,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -332,7 +330,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -415,7 +413,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                   color: widget.backgroundColor,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, -4),
                     ),
@@ -430,7 +428,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Back button at the bottom left
+                    // Back labelLarge at the bottom left
                     TextButton.icon(
                       onPressed: () {
                         HapticFeedback.lightImpact();
@@ -450,7 +448,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       ),
                     ),
                     
-                    // Continue button
+                    // Continue labelLarge
                     SizedBox(
                       width: 150,
                       height: 56,

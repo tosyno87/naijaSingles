@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../user/controllers/onboarding_controller.dart';
-import '../../common/constants/colors.dart';
-import '../../common/widgets/custom_button.dart';
 import 'shared_styles.dart';
 
 /// Third step of onboarding focusing on personal values.
@@ -103,7 +101,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: deepGreen.withOpacity(0.1),
+                      color: deepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -147,7 +145,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -207,7 +205,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -268,7 +266,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
+                    color: Colors.amber.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.amber),
                   ),
@@ -294,11 +292,11 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                 ) : const SizedBox.shrink(),
               ),
               
-              // Navigation buttons
+              // Navigation labelLarges
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back button
+                  // Back labelLarge
                   TextButton.icon(
                     onPressed: () {
                       HapticFeedback.lightImpact();
@@ -318,7 +316,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                     ),
                   ),
                   
-                  // Finish button
+                  // Finish labelLarge
                   SizedBox(
                     width: 150,
                     height: 56,
@@ -405,13 +403,13 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                 _animationController.forward();
               },
               borderRadius: BorderRadius.circular(8),
-              splashColor: deepGreen.withOpacity(0.1),
-              highlightColor: deepGreen.withOpacity(0.05),
+              splashColor: deepGreen.withValues(alpha: 0.1),
+              highlightColor: deepGreen.withValues(alpha: 0.05),
               child: Container(
                 width: constraints.maxWidth / 2 - 8,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? deepGreen.withOpacity(0.1) : Colors.grey[100],
+                  color: isSelected ? deepGreen.withValues(alpha: 0.1) : Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isSelected ? deepGreen : Colors.grey[400]!,

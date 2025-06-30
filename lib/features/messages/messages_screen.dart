@@ -246,7 +246,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -277,7 +277,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                // Navigate directly to ExploreScreen with back button
+                // Navigate directly to ExploreScreen with back labelLarge
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const ExploreScreen(showBackButton: true),
@@ -327,13 +327,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
         border: thread.unread 
-            ? Border.all(color: primaryColor.withOpacity(0.3), width: 1)
+            ? Border.all(color: primaryColor.withValues(alpha: 0.3), width: 1)
             : null,
       ),
       child: Material(

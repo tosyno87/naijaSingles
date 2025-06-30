@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:naijasingles/features/explore/services/match_service.dart';
 
 /// A mock implementation of MatchService for testing purposes

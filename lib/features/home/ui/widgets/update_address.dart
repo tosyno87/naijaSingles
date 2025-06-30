@@ -62,7 +62,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
         title: Text(
           widget.currentUser.address ?? "".tr().toString(),
           style: TextStyle(
-            color: secondryColor,
+            color: AppColors.secondaryColor,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -177,7 +177,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
               ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all<Color>(primaryColor),
+                      WidgetStateProperty.all<Color>(primaryColor),
                 ),
                 child: Text(
                   "Confirm".tr().toString(),

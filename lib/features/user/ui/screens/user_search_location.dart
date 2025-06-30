@@ -13,15 +13,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/features/user/ui/screens/update_user_location.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/utils/welcome_dialog.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
-import '../../../../common/widgets/hookup_circularbar.dart';
 
 import '../../../../services/firestore_database.dart';
 import '../../../../services/location/bloc/userlocation_bloc.dart';
@@ -191,7 +188,7 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: _isTyping ? [
                                 BoxShadow(
-                                  color: const Color(0xFF27AE60).withOpacity(0.15),
+                                  color: const Color(0xFF27AE60).withValues(alpha: 0.15),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 )
@@ -286,7 +283,7 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                         
                         const SizedBox(height: 20),
                         
-                        // Continue button with animation
+                        // Continue labelLarge with animation
                         FadeTransition(
                           opacity: _fadeAnimation!,
                           child: BlocConsumer<RegistrationBloc, RegistrationStates>(
@@ -308,7 +305,7 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF27AE60).withOpacity(0.3),
+                                        color: const Color(0xFF27AE60).withValues(alpha: 0.3),
                                         blurRadius: 12,
                                         offset: const Offset(0, 4),
                                       ),
@@ -367,7 +364,7 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                                       borderRadius: BorderRadius.circular(16),
                                       boxShadow: _city.text.isNotEmpty ? [
                                         BoxShadow(
-                                          color: const Color(0xFF27AE60).withOpacity(0.3),
+                                          color: const Color(0xFF27AE60).withValues(alpha: 0.3),
                                           blurRadius: 12,
                                           offset: const Offset(0, 4),
                                         ),

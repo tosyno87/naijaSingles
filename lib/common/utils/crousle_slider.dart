@@ -72,12 +72,12 @@ class _CarouselSliderState extends State<CarouselSlider> {
                   alignment: Alignment.bottomCenter,
                   builder: DotSwiperPaginationBuilder(
                       activeSize: 10,
-                      color: secondryColor,
+                      color: AppColors.secondaryColor,
                       activeColor: primaryColor)),
               control: SwiperControl(
                 size: 20,
                 color: primaryColor,
-                disableColor: secondryColor,
+                disableColor: AppColors.secondaryColor,
               ),
               loop: false,
             ),

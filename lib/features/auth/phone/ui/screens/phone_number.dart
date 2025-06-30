@@ -2,27 +2,24 @@
 import 'dart:developer';
 
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
-// Removed welcome.dart import - file deleted
-import 'package:provider/provider.dart';
-
-import '../../../../../common/constants/colors.dart';
-import '../../../../../common/providers/theme_provider.dart';
 import '../../bloc/phone_auth_bloc.dart';
 
 // ignore: must_be_immutable
 class PhoneNumber extends StatefulWidget {
   bool updatePhoneNumber;
+  final bool isSignIn;
+  
   PhoneNumber({
     Key? key,
     required this.updatePhoneNumber,
+    this.isSignIn = false,
   }) : super(key: key);
 
   @override
@@ -32,15 +29,49 @@ class PhoneNumber extends StatefulWidget {
 class _PhoneNumberState extends State<PhoneNumber> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isValidNumber = false;
+  bool _isLoading = false;
 
-  String countryCode = '+1'; // Changed default to USA code
+  String countryCode = '+234'; // Default to Nigeria code
   TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
   
   @override
+  void initState() {
+    super.initState();
+    
+    // Add listener to validate phone number
+    phoneNumberController.addListener(_validatePhoneNumber);
+  }
+  
+  @override
+  void dispose() {
+    phoneNumberController.removeListener(_validatePhoneNumber);
+    phoneNumberController.dispose();
+    _codeController.dispose();
+    super.dispose();
+  }
+  
+  void _validatePhoneNumber() {
+    if (mounted) {
+      setState(() {
+        isValidNumber = phoneNumberController.text.trim().length >= 6;
+      });
+    }
+  }
+  
+  @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final screenSize = MediaQuery.of(context).size;
+    // Set system UI overlay style for status bar
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
+    ));
+
+    // Define colors based on MVP styling
+    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color primaryColor = Color(0xFF008037); // Deep Green
+    const Color textColor = Color(0xFF3E1F0D); // Deep brown
+    const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
+    const Color iconBackgroundColor = Color(0xFFDFF5E2); // Light green for icon background
     
     return RepositoryProvider(
       create: (context) => PhoneAuthRepository(),
@@ -50,280 +81,400 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 RepositoryProvider.of<PhoneAuthRepository>(context)),
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: Colors.white,
+          backgroundColor: backgroundColor,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.green[700]),
+              icon: const Icon(Icons.arrow_back_ios, color: primaryColor),
               onPressed: () => Navigator.of(context).pop(),
             ),
+            title: Text(
+              widget.isSignIn ? "Sign In with Phone" : "Sign Up with Phone",
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: primaryColor,
+              ),
+            ),
+            centerTitle: true,
           ),
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
-              listener: (context, state) {
-            if (state is PhoneAuthVerified) {
-              log("phone auth success listener called");
-              // Navigate to onboarding instead of deleted Welcome screen
-              Navigator.pushReplacementNamed(context, RouteName.onboarding);
-            }
+            listener: (context, state) {
+              if (state is PhoneAuthVerified) {
+                log("phone auth success listener called");
+                // Navigate based on sign in or sign up
+                if (widget.isSignIn) {
+                  Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
+                } else {
+                  Navigator.pushReplacementNamed(context, RouteName.onboarding);
+                }
+              }
 
-            if (state is PhoneAuthCodeSentSuccess) {
-              log("phone auth code sent success listener called");
-              log("phone ${phoneNumberController.text}");
-              
-              // Show loading indicator
-              showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (_) => const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFF2E8B57),
-                  ),
-                ),
-              );
-              
-              // Navigate after delay
-              Future.delayed(const Duration(seconds: 2), () {
-                Navigator.pop(context); // Close loading dialog
-                Navigator.pushNamed(context, RouteName.otpScreen,
+              if (state is PhoneAuthCodeSentSuccess) {
+                log("phone auth code sent success listener called");
+                if (mounted) {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  
+                  Navigator.pushNamed(context, RouteName.otpScreen,
                     arguments: {
                       'phoneNumber': countryCode + phoneNumberController.text,
                       'codeController': _codeController.text,
-                      'smsVerificationCode': state.verificationId,
-                      "updatenumber": widget.updatePhoneNumber
+                      'verificationId': state.verificationId,
+                      "updatenumber": widget.updatePhoneNumber,
+                      "isLogin": widget.isSignIn,
                     });
-              });
-            }
+                }
+              }
 
-            //Show error message if any error occurs while verifying phone number and otp code
-            if (state is PhoneAuthError) {
-              log("phone auth error listener called");
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          }, child: BlocBuilder<PhoneAuthBloc, PhoneAuthState>(
-                  builder: (context, state) {
-            if (state is PhoneAuthLoading) {
-              log("phone auth loading ui called");
-              return const Hookup4uBar();
-            }
-            return SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(height: screenSize.height * 0.04),
-                      
-                      // Phone icon
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.green[50],
+              if (state is PhoneAuthError) {
+                log("phone auth error listener called");
+                if (mounted) {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  CustomSnackbar.showSnackBarSimple(
+                    state.error,
+                    context,
+                  );
+                }
+              }
+            },
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Phone icon with Afrocentric style
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: iconBackgroundColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: primaryColor.withValues(alpha: 0.2),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.phone_android,
+                            color: primaryColor,
+                            size: 50,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.phone_android,
-                          size: 40,
-                          color: Colors.green[700],
+                        
+                        const SizedBox(height: 32),
+                        
+                        Text(
+                          "Enter your phone number",
+                          style: GoogleFonts.montserrat(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: primaryColor,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      
-                      SizedBox(height: screenSize.height * 0.04),
-                      
-                      // Header
-                      Text(
-                        "Verify your number",
-                        style: TextStyle(
-                          color: Colors.green[800],
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                        const SizedBox(height: 12),
+                        Text(
+                          "We'll send you a verification code",
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            color: subtextColor,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      // Subtitle
-                      Text(
-                        "We'll text you a code to get started",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[700],
-                          height: 1.4,
-                        ),
-                      ),
-                      
-                      SizedBox(height: screenSize.height * 0.06),
-                      
-                      // Phone number input
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                        const SizedBox(height: 40),
+                        
+                        // Phone number input with country code
+                        Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: isValidNumber ? primaryColor : Colors.transparent,
+                              width: isValidNumber ? 1.5 : 0,
+                            ),
+                          ),
                           child: Row(
                             children: [
                               // Country code picker
                               Container(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    right: BorderSide(
-                                      width: 1.0, 
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                ),
+                                padding: const EdgeInsets.only(left: 8),
                                 child: CountryCodePicker(
-                                  onChanged: (value) {
-                                    countryCode = value.dialCode!;
-                                    _validatePhoneNumber(phoneNumberController.text);
+                                  onChanged: (CountryCode code) {
+                                    if (mounted) {
+                                      setState(() {
+                                        countryCode = code.dialCode!;
+                                      });
+                                    }
                                   },
-                                  initialSelection: 'US', // USA
-                                  favorite: ['+1', 'US'],
+                                  initialSelection: 'NG',
+                                  favorite: const ['NG', 'GH', 'ZA', 'KE', 'US', 'GB'],
                                   showCountryOnly: false,
                                   showOnlyCountryWhenClosed: false,
                                   alignLeft: false,
-                                  textStyle: TextStyle(
-                                    color: Colors.green[800],
+                                  textStyle: GoogleFonts.montserrat(
+                                    color: const Color(0xFF3E1F0D),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  dialogTextStyle: GoogleFonts.montserrat(
+                                    color: const Color(0xFF3E1F0D),
                                     fontSize: 16,
                                   ),
-                                  dialogBackgroundColor: Colors.white,
-                                  boxDecoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
+                                  searchStyle: GoogleFonts.montserrat(
+                                    color: Colors.black,
+                                    fontSize: 16,
                                   ),
-                                  dialogTextStyle: TextStyle(
-                                    color: Colors.green[800],
+                                  dialogBackgroundColor: const Color(0xFFFFF6E5),
+                                  boxDecoration: BoxDecoration(
+                                    color: const Color(0xFFFFF6E5),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  barrierColor: Colors.black54,
+                                  backgroundColor: const Color(0xFFFFF6E5),
+                                  dialogSize: Size(MediaQuery.of(context).size.width * 0.9, MediaQuery.of(context).size.height * 0.7),
+                                  headerTextStyle: GoogleFonts.montserrat(
+                                    color: const Color(0xFF3E1F0D),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  searchDecoration: InputDecoration(
+                                    hintText: 'Search country',
+                                    hintStyle: GoogleFonts.montserrat(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 16,
+                                    ),
+                                    prefixIcon: const Icon(
+                                      Icons.search,
+                                      color: Color(0xFF008037),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFF008037),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
                                   ),
                                 ),
                               ),
                               
-                              // Phone number field
+                              // Vertical divider
+                              Container(
+                                height: 30,
+                                width: 1,
+                                color: Colors.grey.withValues(alpha: 0.3),
+                              ),
+                              
+                              // Phone number input
                               Expanded(
-                                child: TextFormField(
-                                  keyboardType: TextInputType.phone,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.green[800],
-                                  ),
-                                  cursorColor: Colors.green[700],
+                                child: TextField(
                                   controller: phoneNumberController,
-                                  onChanged: _validatePhoneNumber,
+                                  keyboardType: TextInputType.phone,
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 16,
+                                    color: textColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                   decoration: InputDecoration(
-                                    hintText: "Enter your number",
-                                    hintStyle: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey[500],
+                                    hintText: "Phone number",
+                                    hintStyle: GoogleFonts.montserrat(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                     border: InputBorder.none,
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 16,
-                                      vertical: 14,
+                                      vertical: 16,
                                     ),
                                   ),
+                                  inputFormatters: [
+                                    // Add space after every 3 digits
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    _PhoneNumberFormatter(),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      
-                      SizedBox(height: screenSize.height * 0.04),
-                      
-                      // Privacy notice
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          "By continuing, you agree to receive SMS messages for verification and may incur charges from your carrier.",
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Continue labelLarge
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: (!isValidNumber || _isLoading)
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    
+                                    // Remove spaces from phone number
+                                    final cleanPhoneNumber = phoneNumberController.text.replaceAll(' ', '');
+                                    
+                                    context.read<PhoneAuthBloc>().add(
+                                      SendOtpToPhoneEvent(
+                                        phoneNumber: countryCode + cleanPhoneNumber,
+                                      ),
+                                    );
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isValidNumber ? primaryColor : Colors.grey.shade400,
+                              foregroundColor: Colors.white,
+                              disabledBackgroundColor: Colors.grey.shade400,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: isValidNumber ? 3 : 1,
+                              shadowColor: isValidNumber ? primaryColor.withValues(alpha: 0.3) : Colors.transparent,
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    "Continue",
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Consent text
+                        Text(
+                          "By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                            height: 1.5,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            color: const Color(0xFF999999),
                           ),
                         ),
-                      ),
-                      
-                      SizedBox(height: screenSize.height * 0.06),
-                      
-                      // Continue button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: isValidNumber
-                              ? () {
-                                  _sendOtp(
-                                    phoneNumber: phoneNumberController.text,
-                                    context: context,
-                                  );
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Account toggle
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              widget.isSignIn 
+                                  ? "Don't have an account? " 
+                                  : "Already have an account? ",
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                color: textColor,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                if (widget.isSignIn) {
+                                  Navigator.pushReplacementNamed(context, '/auth_method_selection');
+                                } else {
+                                  Navigator.pushReplacementNamed(context, '/sign_in_method_selection');
                                 }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[700],
-                            disabledBackgroundColor: Colors.grey[300],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                              },
+                              child: Text(
+                                widget.isSignIn ? "Create one" : "Sign in",
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                ),
+                              ),
                             ),
-                            elevation: isValidNumber ? 2 : 0,
-                          ),
-                          child: Text(
-                            "Continue",
-                            style: TextStyle(
-                              color: isValidNumber ? Colors.white : Colors.grey[600],
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            );
-          })),
+            ),
+          ),
         ),
       ),
     );
   }
+}
 
-  void _validatePhoneNumber(String value) {
-    setState(() {
-      isValidNumber = validateMobile(value.trim());
-    });
-  }
-
-  void _sendOtp({required String phoneNumber, required BuildContext context}) {
-    final phoneNumberWithCode = "$countryCode$phoneNumber";
-    log("SendOtpToPhoneEvent($phoneNumberWithCode)");
-    
-    context.read<PhoneAuthBloc>().add(
-          SendOtpToPhoneEvent(
-            phoneNumber: phoneNumberWithCode,
-          ),
-        );
-  }
-
-  bool validateMobile(String value) {
-    String pattern = r'(^(?:[+0]9)?[0-9]{9,12}$)';
-    RegExp regExp = RegExp(pattern);
-    if (value.isEmpty) {
-      return false;
-    } else if (regExp.hasMatch(value.trim())) {
-      return true;
+// Custom formatter to add spaces after every 3 digits
+class _PhoneNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
     }
-    return regExp.hasMatch(value.trim());
+    
+    // Remove all spaces
+    final digitsOnly = newValue.text.replaceAll(' ', '');
+    
+    // Add a space after every 3 digits
+    final buffer = StringBuffer();
+    for (int i = 0; i < digitsOnly.length; i++) {
+      buffer.write(digitsOnly[i]);
+      if ((i + 1) % 3 == 0 && i != digitsOnly.length - 1) {
+        buffer.write(' ');
+      }
+    }
+    
+    final formattedText = buffer.toString();
+    
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
   }
 }

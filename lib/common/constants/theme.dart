@@ -53,7 +53,7 @@ class MyThemes {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: Colors.white.withOpacity(0.1),
+      fillColor: Colors.white.withValues(alpha: 0.1),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -61,7 +61,7 @@ class MyThemes {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -72,7 +72,7 @@ class MyThemes {
         borderSide: const BorderSide(color: AppColors.errorColor, width: 2),
       ),
       labelStyle: const TextStyle(color: AppColors.textSecondary),
-      hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+      hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primaryColor,

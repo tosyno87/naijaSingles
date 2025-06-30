@@ -1,13 +1,10 @@
 import 'dart:developer';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/afropeep_logo.dart';
 import '../../../auth/auth_status/bloc/authstatus_bloc.dart';
@@ -38,6 +35,13 @@ class SplashState extends State<Splash> {
     try {
       if (!mounted || _hasNavigated) return;
       
+      // Always navigate to the welcome screen regardless of authentication status
+      _hasNavigated = true;
+      log("Navigating to welcome screen as default home");
+      Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+      
+      // Original authentication logic (commented out)
+      /*
       final authBloc = BlocProvider.of<AuthstatusBloc>(context);
       final state = authBloc.state;
       
@@ -60,6 +64,7 @@ class SplashState extends State<Splash> {
         );
         Navigator.pushReplacementNamed(context, RouteName.loginScreen);
       }
+      */
     } catch (e) {
       log("Error in _checkAuthAndNavigate: $e");
     }
@@ -75,8 +80,16 @@ class SplashState extends State<Splash> {
         listener: (context, state) {
           log("Auth state changed in splash: $state");
           
+          // Disable automatic navigation based on auth state
+          // We always want to go to welcome screen now
           if (!mounted || _hasNavigated) return;
           
+          // Force navigation to welcome screen
+          _hasNavigated = true;
+          Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+          
+          // Original auth-based navigation (commented out)
+          /*
           if (state is AuthenticatedState) {
             _hasNavigated = true;
             log("User authenticated in listener: ${state.user.uid}");
@@ -93,6 +106,7 @@ class SplashState extends State<Splash> {
             );
             Navigator.pushReplacementNamed(context, RouteName.loginScreen);
           }
+          */
         },
         child: Center(
           child: Column(

@@ -9,7 +9,7 @@ import '../../../../common/data/repo/user_repo.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
-import '../../../match/bloc/match_bloc.dart';
+import '../../../match/bloc/match_user_bloc.dart';
 
 class UnMatcheWidget extends StatelessWidget {
   final UserModel currentUser;
@@ -86,7 +86,7 @@ class UnMatcheWidget extends StatelessWidget {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: secondryColor),
+                  color: AppColors.secondaryColor),
             ),
           )),
     );

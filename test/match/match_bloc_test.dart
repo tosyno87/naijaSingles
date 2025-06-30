@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:naijasingles/features/match/bloc/match_bloc.dart';
+import 'package:naijasingles/features/match/bloc/match_user_bloc.dart';
 import 'package:naijasingles/models/user_model.dart';
 
 void main() {

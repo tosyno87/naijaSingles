@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/models/user_model.dart';
+import 'package:naijasingles/features/match/services/likes_service.dart';
 
 import '../../constants/constants.dart';
 
@@ -12,6 +13,8 @@ class UserSearchRepo {
   static CollectionReference get docRef => db.collection('users');
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
+  static final LikesService _likesService = LikesService();
+  
   static Map items = {};
   static List<UserModel> matches = [];
   static List<UserModel> newmatches = [];
@@ -21,6 +24,7 @@ class UserSearchRepo {
   static List<UserModel> users = [];
   static Map likedMap = {};
   static Map disLikedMap = {};
+  
   static getAccessItems() async {
     db
         .collection("Item_access")
@@ -35,7 +39,7 @@ class UserSearchRepo {
 
   static Future<int> getSwipedCount(UserModel currentUser) async {
     final querySnapshot = await db
-        .collection('/Users/${currentUser.id}/CheckedUser')
+        .collection('users/${currentUser.id}/CheckedUser')
         .where(
           'timestamp',
           isGreaterThan:
@@ -61,12 +65,95 @@ class UserSearchRepo {
     }, SetOptions(merge: true));
   }
 
-  static Future<void> rightSwipe(
+  static Future<String?> rightSwipe(
+      UserModel currentUser, UserModel selectedUser) async {
+    try {
+      // Use the new likes service for mutual like detection
+      final currentUserId = currentUser.id;
+      final selectedUserId = selectedUser.id;
+      
+      String? matchId;
+      
+      if (currentUserId != null && selectedUserId != null) {
+        matchId = await _likesService.handleLike(currentUserId, selectedUserId);
+        
+        if (matchId != null) {
+          debugPrint("🎉 Match created! Match ID: $matchId");
+          // Return the match ID so the UI can show the match modal
+          return matchId;
+        } else {
+          debugPrint("Like saved, waiting for mutual like");
+        }
+      }
+
+      // Keep legacy behavior for backward compatibility
+      likedByList = await getLikedByList(currentUser);
+      if ((likedByList.contains(selectedUser.id) ||
+          (selectedUser.isBot ?? false))) {
+        debugPrint("Legacy match creation for backward compatibility");
+        await docRef
+            .doc(currentUser.id)
+            .collection("Matches")
+            .doc(selectedUser.id)
+            .set({
+          'Matches': selectedUser.id,
+          'isRead': false,
+          'userName': selectedUser.name ?? 'Unknown',
+          'pictureUrl': selectedUser.imageUrl?.isNotEmpty == true ? selectedUser.imageUrl![0] : '',
+          'timestamp': FieldValue.serverTimestamp()
+        }, SetOptions(merge: true));
+        await docRef
+            .doc(selectedUser.id)
+            .collection("Matches")
+            .doc(currentUser.id)
+            .set({
+          'Matches': currentUser.id,
+          'userName': currentUser.name ?? 'Unknown',
+          'pictureUrl': currentUser.imageUrl?.isNotEmpty == true ? currentUser.imageUrl![0] : '',
+          'isRead': false,
+          'timestamp': FieldValue.serverTimestamp()
+        }, SetOptions(merge: true));
+        
+        // Return a legacy match indicator
+        return 'legacy_match';
+      }
+
+      // Update legacy CheckedUser collection
+      await docRef
+          .doc(currentUser.id)
+          .collection("CheckedUser")
+          .doc(selectedUser.id)
+          .set({
+        'LikedUser': selectedUser.id,
+        'timestamp': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      
+      // Update legacy LikedBy collection
+      await docRef
+          .doc(selectedUser.id)
+          .collection("LikedBy")
+          .doc(currentUser.id)
+          .set({
+        'LikedBy': currentUser.id,
+        'timestamp': FieldValue.serverTimestamp()
+      }, SetOptions(merge: true));
+      
+      return null; // No match created
+    } catch (e) {
+      debugPrint('Error in rightSwipe: $e');
+      // Fallback to legacy behavior if new system fails
+      await _legacyRightSwipe(currentUser, selectedUser);
+      return null;
+    }
+  }
+
+  /// Legacy right swipe implementation as fallback
+  static Future<void> _legacyRightSwipe(
       UserModel currentUser, UserModel selectedUser) async {
     likedByList = await getLikedByList(currentUser);
     if ((likedByList.contains(selectedUser.id) ||
         (selectedUser.isBot ?? false))) {
-      debugPrint("coming umder searchrepo in if rightswipe");
+      debugPrint("coming under searchrepo in if rightswipe");
       await docRef
           .doc(currentUser.id)
           .collection("Matches")
@@ -74,8 +161,8 @@ class UserSearchRepo {
           .set({
         'Matches': selectedUser.id,
         'isRead': false,
-        'userName': selectedUser.name,
-        'pictureUrl': selectedUser.imageUrl![0],
+        'userName': selectedUser.name ?? 'Unknown',
+        'pictureUrl': selectedUser.imageUrl?.isNotEmpty == true ? selectedUser.imageUrl![0] : '',
         'timestamp': FieldValue.serverTimestamp()
       }, SetOptions(merge: true));
       await docRef
@@ -84,8 +171,8 @@ class UserSearchRepo {
           .doc(currentUser.id)
           .set({
         'Matches': currentUser.id,
-        'userName': currentUser.name,
-        'pictureUrl': currentUser.imageUrl![0],
+        'userName': currentUser.name ?? 'Unknown',
+        'pictureUrl': currentUser.imageUrl?.isNotEmpty == true ? currentUser.imageUrl![0] : '',
         'isRead': false,
         'timestamp': FieldValue.serverTimestamp()
       }, SetOptions(merge: true));
@@ -140,54 +227,75 @@ class UserSearchRepo {
   ) async {
     List<String> checkedUserIds = [];
 
-    final snapshot = await db
-        .collection('/Users/${currentUser.id}/CheckedUser')
-        .get();
-    if (snapshot.docs.isNotEmpty) {
-      for (final doc in snapshot.docs) {
-        final likedUser = doc.data()['LikedUser'];
-        final dislikedUser = doc.data()['DislikedUser'];
+    try {
+      // Debug logging
+      debugPrint('Getting user list for: ${currentUser.id}');
+      debugPrint('Current user auth: ${firebaseAuth.currentUser?.uid}');
+      
+      final snapshot = await db
+          .collection('users/${currentUser.id}/CheckedUser') // Fixed: using lowercase 'users'
+          .get();
+      if (snapshot.docs.isNotEmpty) {
+        for (final doc in snapshot.docs) {
+          final likedUser = doc.data()['LikedUser'];
+          final dislikedUser = doc.data()['DislikedUser'];
 
-        if (likedUser != null) {
-          checkedUserIds.add(likedUser);
+          if (likedUser != null) {
+            checkedUserIds.add(likedUser);
+          }
+          if (dislikedUser != null) {
+            checkedUserIds.add(dislikedUser);
+          }
         }
-        if (dislikedUser != null) {
-          checkedUserIds.add(dislikedUser);
+      }
+
+      debugPrint('Querying main users collection...');
+      final querySnapshot = await query(currentUser).get();
+      debugPrint('Query returned ${querySnapshot.docs.length} documents');
+      
+      if (querySnapshot.docs.isEmpty) {
+        debugPrint("no more data");
+        return [];
+      }
+
+      List<UserModel> userList = [];
+
+      for (var doc in querySnapshot.docs) {
+        try {
+          debugPrint('Processing document: ${doc.id}');
+          UserModel temp = UserModel.fromDocument(doc);
+          debugPrint('Created UserModel for: ${temp.name}');
+          
+          var distance = calculateDistance(currentUser.latitude,
+              currentUser.longitude, temp.latitude, temp.longitude);
+          temp.distanceBW = distance.round();
+
+          if (checkedUserIds.contains(temp.id)) {
+            debugPrint('Skipping already checked user: ${temp.name}');
+            continue;
+          }
+
+          if (distance <= currentUser.maxDistance! &&
+              temp.id != currentUser.id &&
+              !temp.isBlocked!) {
+            debugPrint("Adding user: ${temp.name}");
+            userList.add(temp);
+          } else {
+            debugPrint('Filtered out user: ${temp.name} (distance: $distance, maxDistance: ${currentUser.maxDistance}, blocked: ${temp.isBlocked})');
+          }
+        } catch (e) {
+          debugPrint('Error processing document ${doc.id}: $e');
+          // Continue with next document instead of failing completely
+          continue;
         }
       }
+
+      debugPrint('Final user list size: ${userList.length}');
+      return userList;
+    } catch (e) {
+      debugPrint('Error in getUserList: $e');
+      rethrow;
     }
-
-    final querySnapshot = await query(currentUser).get();
-    if (querySnapshot.docs.isEmpty) {
-      debugPrint("no more data");
-      return [];
-    }
-
-    List<UserModel> userList = [];
-
-    for (var doc in querySnapshot.docs) {
-      // log(doc.data().toString());
-      UserModel temp = UserModel.fromDocument(doc);
-      // log("searchrepotemp ${temp.toString()}");
-      var distance = calculateDistance(currentUser.latitude,
-          currentUser.longitude, temp.latitude, temp.longitude);
-      temp.distanceBW = distance.round();
-      // log("tempid$distance");
-
-      if (checkedUserIds.contains(temp.id)) {
-        continue;
-      }
-
-      if (distance <= currentUser.maxDistance! &&
-          temp.id != currentUser.id &&
-          !temp.isBlocked!) {
-        debugPrint("value coming}");
-        userList.add(temp);
-        // log("searchrepouser ${userList.toString()}");
-      }
-    }
-
-    return userList;
   }
 
   static Future<List<String>> getLikedByList(UserModel currentUser) async {

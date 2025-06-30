@@ -1,12 +1,7 @@
 import 'dart:developer';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:provider/provider.dart';
-
-import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 
 class UniversityPage extends StatefulWidget {
   const UniversityPage({super.key});
@@ -212,14 +207,14 @@ class _UniversityPage extends State<UniversityPage> {
               ),
             ),
             
-            // Continue button fixed at the bottom
+            // Continue labelLarge fixed at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),

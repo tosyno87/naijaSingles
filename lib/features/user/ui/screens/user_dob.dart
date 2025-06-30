@@ -1,13 +1,9 @@
 import 'dart:developer';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/custom_button.dart';
 
 class UserDOB extends StatefulWidget {
@@ -179,7 +175,7 @@ class _UserDOBState extends State<UserDOB> {
               
               const SizedBox(height: 40),
               
-              // Date selector button
+              // Date selector labelLarge
               GestureDetector(
                 onTap: _showDatePicker,
                 child: Container(
@@ -190,7 +186,7 @@ class _UserDOBState extends State<UserDOB> {
                     color: Colors.grey[50],
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
+                        color: Colors.black.withValues(alpha: 0.03),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -232,7 +228,7 @@ class _UserDOBState extends State<UserDOB> {
               
               const SizedBox(height: 24),
               
-              // Continue button
+              // Continue labelLarge
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),
                 child: CustomButton(

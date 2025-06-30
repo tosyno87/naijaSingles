@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../user/controllers/onboarding_controller.dart';
-import '../../common/constants/colors.dart';
-import '../../common/widgets/custom_button.dart';
 import 'shared_styles.dart';
 
 /// First step of onboarding focusing on cultural roots.
@@ -141,7 +139,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: deepGreen.withOpacity(0.1),
+                      color: deepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -191,7 +189,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -542,7 +540,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -566,7 +564,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
               
               const SizedBox(height: 40),
               
-              // Continue button
+              // Continue labelLarge
               Center(
                 child: SizedBox(
                   width: double.infinity,
@@ -636,14 +634,14 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
             HapticFeedback.selectionClick();
           },
           borderRadius: BorderRadius.circular(12),
-          splashColor: deepGreen.withOpacity(0.1),
-          highlightColor: deepGreen.withOpacity(0.05),
+          splashColor: deepGreen.withValues(alpha: 0.1),
+          highlightColor: deepGreen.withValues(alpha: 0.05),
           child: Container(
             constraints: const BoxConstraints(minHeight: 90),
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isSelected ? deepGreen.withOpacity(0.1) : Colors.white,
+              color: isSelected ? deepGreen.withValues(alpha: 0.1) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected ? deepGreen : Colors.grey[300]!,

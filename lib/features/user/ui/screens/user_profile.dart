@@ -82,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: const EdgeInsets.all(8.0),
                       child: CircleAvatar(
                         radius: 80,
-                        backgroundColor: secondryColor,
+                        backgroundColor: AppColors.secondaryColor,
                         child: Material(
                           color: Theme.of(context).primaryColor,
                           child: Stack(
@@ -207,7 +207,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   width: 70,
                                   child: FloatingActionButton(
                                       heroTag: UniqueKey(),
-                                      splashColor: secondryColor,
+                                      splashColor: AppColors.secondaryColor,
                                       backgroundColor: primaryColor,
                                       child: const Icon(
                                         Icons.add_a_photo,
@@ -241,7 +241,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     "Add media".tr().toString(),
-                                    style: TextStyle(color: secondryColor),
+                                    style: TextStyle(color: AppColors.secondaryColor),
                                   ),
                                 ),
                               ],
@@ -255,12 +255,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Column(
                                 children: <Widget>[
                                   FloatingActionButton(
-                                      splashColor: secondryColor,
+                                      splashColor: AppColors.secondaryColor,
                                       heroTag: UniqueKey(),
                                       backgroundColor: Colors.white,
                                       child: Icon(
                                         Icons.settings,
-                                        color: secondryColor,
+                                        color: AppColors.secondaryColor,
                                         size: 28,
                                       ),
                                       onPressed: () {
@@ -276,7 +276,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       "Settings".tr().toString(),
-                                      style: TextStyle(color: secondryColor),
+                                      style: TextStyle(color: AppColors.secondaryColor),
                                     ),
                                   )
                                 ],
@@ -293,11 +293,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: <Widget>[
                                   FloatingActionButton(
                                       heroTag: UniqueKey(),
-                                      splashColor: secondryColor,
+                                      splashColor: AppColors.secondaryColor,
                                       backgroundColor: Colors.white,
                                       child: Icon(
                                         Icons.edit,
-                                        color: secondryColor,
+                                        color: AppColors.secondaryColor,
                                         size: 28,
                                       ),
                                       onPressed: () {
@@ -309,7 +309,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: Text(
                                       "Edit Info".tr().toString(),
                                       style: TextStyle(
-                                        color: secondryColor,
+                                        color: AppColors.secondaryColor,
                                       ),
                                     ),
                                   ),
@@ -357,7 +357,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           );
                         }
                       },
-                      color: textColor,
+                      color: AppColors.textPrimary,
                       active: true)
                 ]),
           ),

@@ -97,7 +97,7 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                         TextButton(
                           child: Text(
                             'Cancel'.tr().toString(),
-                            style: TextStyle(color: secondryColor),
+                            style: TextStyle(color: AppColors.secondaryColor),
                           ),
                           onPressed: () {
                             Navigator.of(dialogContext).pop();

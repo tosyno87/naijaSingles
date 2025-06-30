@@ -8,7 +8,7 @@ abstract class PhoneAuthEvent extends Equatable {
   List<Object> get props => [];
 }
 
-// This event will be triggered when the user enters the phone number and presses the Send OTP button on the UI.
+// This event will be triggered when the user enters the phone number and presses the Send OTP labelLarge on the UI.
 class SendOtpToPhoneEvent extends PhoneAuthEvent {
   final String phoneNumber;
 
@@ -18,7 +18,7 @@ class SendOtpToPhoneEvent extends PhoneAuthEvent {
   List<Object> get props => [phoneNumber];
 }
 
-// This event will be triggered when the user enters the OTP and presses the Verify OTP button on the UI.
+// This event will be triggered when the user enters the OTP and presses the Verify OTP labelLarge on the UI.
 class VerifySentOtpEvent extends PhoneAuthEvent {
   final String otpCode;
   final String verificationId;

@@ -29,7 +29,6 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ChatService _chatService = ChatService();
-  bool _isTyping = false;
   String? _currentUserId;
   bool _hasText = false;
   
@@ -262,21 +261,6 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             ),
           ),
           
-          // Typing indicator
-          if (_isTyping)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '${widget.userName} is typing...',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ),
-          
           // Message input
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -328,19 +312,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         minLines: 1,
                         textCapitalization: TextCapitalization.sentences,
                         onChanged: (value) {
-                          // Typing indicator logic
-                          if (value.isNotEmpty && !_isTyping) {
-                            setState(() {
-                              _isTyping = true;
-                            });
-                            Future.delayed(const Duration(seconds: 3), () {
-                              if (mounted) {
-                                setState(() {
-                                  _isTyping = false;
-                                });
-                              }
-                            });
-                          }
+                          // No additional logic needed - text state is handled by listener
                         },
                       ),
                     ),

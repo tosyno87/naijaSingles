@@ -2,16 +2,41 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper function to check if two users are matched
+    // Note: This is a simplified version since we can't easily query by array contains in rules
+    // We'll temporarily allow chat creation and rely on app-level match verification
+    function areUsersMatched(userId1, userId2) {
+      // For now, allow chat creation - match verification will be handled at app level
+      // This prevents blocking legitimate matched users due to complex query limitations
+      return true;
+    }
+
+    // Helper function to check if user is blocked
+    function isUserBlocked(userId, blockedUserId) {
+      return exists(/databases/$(database)/documents/users/$(userId)/blockedlist/$(blockedUserId)) ||
+             exists(/databases/$(database)/documents/users/$(blockedUserId)/blockedlist/$(userId));
+    }
+
+    // Helper function to get other user ID from chat thread
+    function getOtherUserId(userIds, currentUserId) {
+      return userIds[0] == currentUserId ? userIds[1] : userIds[0];
+    }
+
     // Users collection - allow authenticated users to read others for matching
     match /users/{userId} {
       // Users can read and write their own data
       allow read, write: if request.auth != null && request.auth.uid == userId;
       
       // Authenticated users can read other users' profiles for matching/discovery
+      // Keep this simple for discovery - block enforcement happens at chat level
       allow read: if request.auth != null;
       
-      // Allow users to update their own profile
-      allow update: if request.auth != null && request.auth.uid == userId;
+      // Allow users to update their own profile with data validation
+      allow update: if request.auth != null && 
+                     request.auth.uid == userId &&
+                     // Prevent users from changing critical fields
+                     !request.resource.data.diff(resource.data).affectedKeys()
+                       .hasAny(['createdAt', 'uid', 'email', 'signInMethod']);
       
       // User subcollections
       match /CheckedUser/{checkedUserId} {
@@ -39,9 +64,10 @@ service cloud.firestore {
 
     // Likes collection - for the new likes service
     match /likes/{likeId} {
-      // Users can create likes where they are the 'from' user
+      // Users can create likes where they are the 'from' user and target isn't blocked
       allow create: if request.auth != null && 
-                     request.auth.uid == request.resource.data.from;
+                     request.auth.uid == request.resource.data.from &&
+                     !isUserBlocked(request.auth.uid, request.resource.data.to);
       
       // Users can read likes where they are involved (from or to)
       allow read: if request.auth != null && 
@@ -58,9 +84,11 @@ service cloud.firestore {
                      request.auth.uid == resource.data.from;
     }
 
-    // Legacy likes collection (if exists)
+    // Legacy likes collection - More restrictive
     match /Likes/{likeId} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+                    request.auth.uid == request.resource.data.from;
     }
 
     // Matches collection - for storing user matches
@@ -69,12 +97,17 @@ service cloud.firestore {
       allow read: if request.auth != null && 
                    request.auth.uid in resource.data.users;
       
-      // Users can create matches involving themselves
+      // Users can create matches involving themselves (usually done by system)
       allow create: if request.auth != null && 
-                     request.auth.uid in request.resource.data.users;
+                     request.auth.uid in request.resource.data.users &&
+                     request.resource.data.users.size() == 2;
       
       // Users can update matches they're part of
       allow update: if request.auth != null && 
+                     request.auth.uid in resource.data.users;
+      
+      // Users can delete matches they're part of (unmatch)
+      allow delete: if request.auth != null && 
                      request.auth.uid in resource.data.users;
     }
 
@@ -99,50 +132,84 @@ service cloud.firestore {
                       request.auth.uid == resource.data.user2);
     }
 
-    // Chat threads collection
+    // Chat threads collection - ENHANCED WITH PRACTICAL SECURITY
     match /chatThreads/{threadId} {
-      // Users can read chat threads they're part of
+      // Users can read chat threads they're part of and not blocked
       allow read: if request.auth != null &&
-                   request.auth.uid in resource.data.userIds;
+                   request.auth.uid in resource.data.userIds &&
+                   !isUserBlocked(request.auth.uid, 
+                     getOtherUserId(resource.data.userIds, request.auth.uid));
       
-      // Users can create chat threads involving themselves
+      // Users can create chat threads - match verification handled at app level
+      // This prevents blocking legitimate matches due to Firestore query limitations
       allow create: if request.auth != null &&
-                     request.auth.uid in request.resource.data.userIds;
+                     request.auth.uid in request.resource.data.userIds &&
+                     request.resource.data.userIds.size() == 2 &&
+                     // Basic validation - ensure it's a proper chat thread structure
+                     request.resource.data.keys().hasAll(['userIds', 'createdAt']) &&
+                     !isUserBlocked(request.auth.uid, 
+                       getOtherUserId(request.resource.data.userIds, request.auth.uid));
       
-      // Users can update chat threads they're part of
+      // Users can update chat threads they're part of (for last message, unread count)
       allow update: if request.auth != null &&
-                     request.auth.uid in resource.data.userIds;
+                     request.auth.uid in resource.data.userIds &&
+                     // Prevent changing userIds after creation
+                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['userIds']) &&
+                     !isUserBlocked(request.auth.uid, 
+                       getOtherUserId(resource.data.userIds, request.auth.uid));
       
       // Users can delete chat threads they're part of
       allow delete: if request.auth != null &&
                      request.auth.uid in resource.data.userIds;
     }
 
-    // Messages subcollection within chat threads
+    // Messages subcollection within chat threads - ENHANCED SECURITY
     match /chatThreads/{threadId}/messages/{messageId} {
       // Users can read messages in threads they're part of
       allow read: if request.auth != null && 
                    exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
                    request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
       
-      // Users can create messages in threads they're part of
+      // Users can create messages in threads they're part of with validation
       allow create: if request.auth != null && 
                      exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
                      request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds &&
-                     request.resource.data.senderId == request.auth.uid;
+                     request.resource.data.senderId == request.auth.uid &&
+                     // Message validation
+                     request.resource.data.keys().hasAll(['senderId', 'text', 'timestamp']) &&
+                     request.resource.data.text is string &&
+                     request.resource.data.text.size() > 0 &&
+                     request.resource.data.text.size() <= 1000; // Max message length
       
-      // Users can update messages in threads they're part of (for read status, etc.)
+      // Users can update messages for read status only
       allow update: if request.auth != null && 
                      exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
-                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
+                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds &&
+                     // Only allow updating read status, not content
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
       
-      // Users can delete messages in threads they're part of
+      // Users can delete their own messages only
       allow delete: if request.auth != null && 
                      exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
-                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
+                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds &&
+                     resource.data.senderId == request.auth.uid;
     }
 
-    // Chats collection
+    // Typing indicators subcollection (for future real-time typing)
+    match /chatThreads/{threadId}/typing/{userId} {
+      // Users can read typing status in threads they're part of
+      allow read: if request.auth != null && 
+                   exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                   request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
+      
+      // Users can only update their own typing status
+      allow write: if request.auth != null && 
+                    exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                    request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds &&
+                    request.auth.uid == userId;
+    }
+
+    // Chats collection (legacy support)
     match /chats/{chatId} {
       allow read, write: if request.auth != null && 
                           request.auth.uid in resource.data.users;
@@ -150,18 +217,24 @@ service cloud.firestore {
                      request.auth.uid in request.resource.data.users;
     }
 
-    // Reports collection - for user reports
+    // Reports collection - for user reports with validation
     match /reports/{reportId} {
       allow create: if request.auth != null && 
-                     request.auth.uid == request.resource.data.reporterId;
+                     request.auth.uid == request.resource.data.reporterId &&
+                     request.resource.data.keys().hasAll(['reporterId', 'reportedUserId', 'reason', 'timestamp']) &&
+                     request.resource.data.reason is string &&
+                     request.resource.data.reason.size() > 0;
       allow read: if request.auth != null && 
                    request.auth.uid == resource.data.reporterId;
     }
 
-    // Notifications collection
+    // Notifications collection with better validation
     match /notifications/{notificationId} {
-      allow read, write: if request.auth != null && 
-                          request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.userId;
+      allow write: if request.auth != null && 
+                    request.auth.uid == resource.data.userId;
+      // System can create notifications for users
       allow create: if request.auth != null;
     }
 

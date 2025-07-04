@@ -1,0 +1,184 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection - allow authenticated users to read others for matching
+    match /users/{userId} {
+      // Users can read and write their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Authenticated users can read other users' profiles for matching/discovery
+      allow read: if request.auth != null;
+      
+      // Allow users to update their own profile
+      allow update: if request.auth != null && request.auth.uid == userId;
+      
+      // User subcollections
+      match /CheckedUser/{checkedUserId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      match /LikedBy/{likedById} {
+        // Allow the user being liked to read who liked them
+        allow read: if request.auth != null && request.auth.uid == userId;
+        // Allow the liker to write their like
+        allow write: if request.auth != null && request.auth.uid == likedById;
+        // Allow both users to read the like data
+        allow read: if request.auth != null && 
+                     (request.auth.uid == userId || request.auth.uid == likedById);
+      }
+      
+      match /Matches/{matchId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      match /blockedlist/{blockedId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Likes collection - for the new likes service
+    match /likes/{likeId} {
+      // Users can create likes where they are the 'from' user
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.from;
+      
+      // Users can read likes where they are involved (from or to)
+      allow read: if request.auth != null && 
+                   (request.auth.uid == resource.data.from || 
+                    request.auth.uid == resource.data.to);
+      
+      // Users can update likes where they are involved (for mutual likes)
+      allow update: if request.auth != null && 
+                     (request.auth.uid == resource.data.from || 
+                      request.auth.uid == resource.data.to);
+      
+      // Users can delete their own likes
+      allow delete: if request.auth != null && 
+                     request.auth.uid == resource.data.from;
+    }
+
+    // Legacy likes collection (if exists)
+    match /Likes/{likeId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Matches collection - for storing user matches
+    match /matches/{matchId} {
+      // Users can read matches they're part of
+      allow read: if request.auth != null && 
+                   request.auth.uid in resource.data.users;
+      
+      // Users can create matches involving themselves
+      allow create: if request.auth != null && 
+                     request.auth.uid in request.resource.data.users;
+      
+      // Users can update matches they're part of
+      allow update: if request.auth != null && 
+                     request.auth.uid in resource.data.users;
+    }
+
+    // Legacy matches collection (for backward compatibility)
+    match /Matches/{matchId} {
+      // Users can read matches they're part of
+      allow read: if request.auth != null && 
+                   (request.auth.uid in resource.data.users ||
+                    request.auth.uid == resource.data.user1 ||
+                    request.auth.uid == resource.data.user2);
+      
+      // Users can create matches involving themselves
+      allow create: if request.auth != null && 
+                     (request.auth.uid in request.resource.data.users ||
+                      request.auth.uid == request.resource.data.user1 ||
+                      request.auth.uid == request.resource.data.user2);
+      
+      // Users can update matches they're part of
+      allow update: if request.auth != null && 
+                     (request.auth.uid in resource.data.users ||
+                      request.auth.uid == resource.data.user1 ||
+                      request.auth.uid == resource.data.user2);
+    }
+
+    // Chat threads collection
+    match /chatThreads/{threadId} {
+      // Users can read chat threads they're part of
+      allow read: if request.auth != null &&
+                   request.auth.uid in resource.data.userIds;
+      
+      // Users can create chat threads involving themselves
+      allow create: if request.auth != null &&
+                     request.auth.uid in request.resource.data.userIds;
+      
+      // Users can update chat threads they're part of
+      allow update: if request.auth != null &&
+                     request.auth.uid in resource.data.userIds;
+      
+      // Users can delete chat threads they're part of
+      allow delete: if request.auth != null &&
+                     request.auth.uid in resource.data.userIds;
+    }
+
+    // Messages subcollection within chat threads
+    match /chatThreads/{threadId}/messages/{messageId} {
+      // Users can read messages in threads they're part of
+      allow read: if request.auth != null && 
+                   exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                   request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
+      
+      // Users can create messages in threads they're part of
+      allow create: if request.auth != null && 
+                     exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds &&
+                     request.resource.data.senderId == request.auth.uid;
+      
+      // Users can update messages in threads they're part of (for read status, etc.)
+      allow update: if request.auth != null && 
+                     exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
+      
+      // Users can delete messages in threads they're part of
+      allow delete: if request.auth != null && 
+                     exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
+    }
+
+    // Chats collection
+    match /chats/{chatId} {
+      allow read, write: if request.auth != null && 
+                          request.auth.uid in resource.data.users;
+      allow create: if request.auth != null && 
+                     request.auth.uid in request.resource.data.users;
+    }
+
+    // Reports collection - for user reports
+    match /reports/{reportId} {
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.reporterId;
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.reporterId;
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+    }
+
+    // User settings/preferences
+    match /userSettings/{userId} {
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == userId;
+    }
+
+    // Item access collection (for app configuration)
+    match /Item_access/{itemId} {
+      allow read: if request.auth != null;
+    }
+
+    // Block any other access not explicitly allowed above
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

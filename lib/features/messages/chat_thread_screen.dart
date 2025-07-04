@@ -77,11 +77,21 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    _chatService.sendMessage(widget.threadId, text);
-    _messageController.clear();
-    
-    // Scroll to bottom after sending message
-    Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+    // Validate message length locally
+    if (text.length > 1000) {
+      _showErrorSnackBar('Message is too long. Please keep messages under 1000 characters.');
+      return;
+    }
+
+    _chatService.sendMessage(widget.threadId, text).then((success) {
+      if (success) {
+        _messageController.clear();
+        // Scroll to bottom after sending message
+        Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+      }
+    }).catchError((error) {
+      _showErrorSnackBar(error.toString().replaceAll('Exception: ', ''));
+    });
   }
 
   @override
@@ -919,6 +929,24 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+      ),
+    );
+  }
+  
+  // Show error snackbar
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.montserrat(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        duration: const Duration(seconds: 4),
       ),
     );
   }

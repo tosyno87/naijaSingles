@@ -52,6 +52,12 @@ class ChatService {
         return existingThreadId;
       }
       
+      // Verify users are matched before creating chat
+      final isMatched = await areUsersMatched(currentUserId!, otherUserId);
+      if (!isMatched) {
+        throw Exception('You can only chat with users you\'ve matched with. Keep swiping to find more matches!');
+      }
+      
       // Create a new thread document
       final threadRef = _chatThreadsCollection.doc();
       final threadId = threadRef.id;
@@ -91,8 +97,25 @@ class ChatService {
       });
       
       return threadId;
+    } on FirebaseException catch (e) {
+      debugPrint('Firebase error creating chat thread: ${e.code} - ${e.message}');
+      
+      // Handle specific security rule violations
+      if (e.code == 'permission-denied') {
+        if (e.message?.contains('isUserBlocked') == true) {
+          throw Exception('This conversation is not available.');
+        } else {
+          throw Exception('Unable to start conversation. Please try again later.');
+        }
+      }
+      
+      throw Exception('Failed to create chat: ${e.message}');
     } catch (e) {
       debugPrint('Error creating chat thread: $e');
+      // Re-throw our custom exceptions
+      if (e.toString().contains('You can only chat with users')) {
+        rethrow;
+      }
       return null;
     }
   }
@@ -101,6 +124,15 @@ class ChatService {
   Future<bool> sendMessage(String threadId, String text) async {
     try {
       if (currentUserId == null) return false;
+      
+      // Validate message content locally first
+      if (text.trim().isEmpty) {
+        throw Exception('Message cannot be empty.');
+      }
+      
+      if (text.length > 1000) {
+        throw Exception('Message is too long. Please keep messages under 1000 characters.');
+      }
       
       // Reference to the messages subcollection
       final messagesRef = _chatThreadsCollection
@@ -129,7 +161,7 @@ class ChatService {
       // Create message data
       final messageData = {
         'senderId': currentUserId,
-        'text': text,
+        'text': text.trim(),
         'timestamp': FieldValue.serverTimestamp(),
         'read': false
       };
@@ -140,7 +172,7 @@ class ChatService {
       // Update the thread with last message info
       final updateData = {
         'lastMessage': messageData,
-        'lastMessageText': text,
+        'lastMessageText': text.trim(),
         'lastMessageSenderId': currentUserId,
         'lastUpdated': FieldValue.serverTimestamp(),
         'unreadCount.$currentUserId': 0,
@@ -154,6 +186,21 @@ class ChatService {
       await _chatThreadsCollection.doc(threadId).update(updateData);
       
       return true;
+    } on FirebaseException catch (e) {
+      debugPrint('Firebase error sending message: ${e.code} - ${e.message}');
+      
+      // Handle specific security rule violations
+      if (e.code == 'permission-denied') {
+        if (e.message?.contains('text.size()') == true) {
+          throw Exception('Message is too long. Please keep messages under 1000 characters.');
+        } else if (e.message?.contains('isUserBlocked') == true) {
+          throw Exception('This conversation is no longer available.');
+        } else {
+          throw Exception('Unable to send message. Please try again.');
+        }
+      }
+      
+      throw Exception('Failed to send message: ${e.message}');
     } catch (e) {
       debugPrint('Error sending message: $e');
       return false;
@@ -291,17 +338,46 @@ class ChatService {
         });
   }
   
-  // Get user details
-  Future<Map<String, dynamic>?> getUserDetails(String userId) async {
+  // Check if two users are matched
+  Future<bool> areUsersMatched(String userId1, String userId2) async {
     try {
-      final userDoc = await _firestore.collection('users').doc(userId).get();
-      if (userDoc.exists) {
-        return userDoc.data() as Map<String, dynamic>;
+      // Check in matches collection
+      final matchQuery = await _firestore
+          .collection('matches')
+          .where('users', arrayContains: userId1)
+          .get();
+      
+      for (var doc in matchQuery.docs) {
+        final users = List<String>.from(doc.data()['users'] ?? []);
+        if (users.contains(userId2)) {
+          return true;
+        }
       }
-      return null;
+      
+      // Check legacy Matches collection
+      final legacyMatchQuery = await _firestore
+          .collection('Matches')
+          .where('users', arrayContains: userId1)
+          .get();
+      
+      for (var doc in legacyMatchQuery.docs) {
+        final data = doc.data();
+        final users = List<String>.from(data['users'] ?? []);
+        if (users.contains(userId2)) {
+          return true;
+        }
+        
+        // Also check user1/user2 fields for backward compatibility
+        if ((data['user1'] == userId1 && data['user2'] == userId2) ||
+            (data['user1'] == userId2 && data['user2'] == userId1)) {
+          return true;
+        }
+      }
+      
+      return false;
     } catch (e) {
-      debugPrint('Error getting user details: $e');
-      return null;
+      debugPrint('Error checking if users are matched: $e');
+      return false;
     }
   }
   

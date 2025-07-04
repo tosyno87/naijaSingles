@@ -122,25 +122,60 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.call, color: primaryColor), // Use MVP primary color
-            onPressed: () {
-              // Call functionality to be implemented
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Call feature coming soon!',
-                    style: GoogleFonts.montserrat(), // Use Montserrat
-                  ),
-                  backgroundColor: primaryColor, // Use MVP primary color
-                ),
-              );
-            },
+            icon: Icon(Icons.videocam, color: primaryColor),
+            onPressed: _showCallOptions,
           ),
           IconButton(
-            icon: Icon(Icons.more_vert, color: primaryColor), // Use MVP primary color
-            onPressed: () {
-              // More options functionality to be implemented
+            icon: Icon(Icons.info_outline, color: primaryColor),
+            onPressed: _showUserProfile,
+          ),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: primaryColor),
+            onSelected: (value) {
+              switch (value) {
+                case 'block':
+                  _showBlockUserDialog();
+                  break;
+                case 'report':
+                  _showReportUserDialog();
+                  break;
+                case 'clear':
+                  _showClearChatDialog();
+                  break;
+              }
             },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'block',
+                child: Row(
+                  children: [
+                    Icon(Icons.block, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Block User'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'report',
+                child: Row(
+                  children: [
+                    Icon(Icons.report, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Text('Report User'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'clear',
+                child: Row(
+                  children: [
+                    Icon(Icons.clear_all, color: Colors.grey),
+                    SizedBox(width: 8),
+                    Text('Clear Chat'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -534,6 +569,383 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+  
+  // Show call options
+  void _showCallOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.call, color: primaryColor),
+              title: Text(
+                'Voice Call',
+                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showComingSoonSnackBar('Voice call feature coming soon!');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.videocam, color: primaryColor),
+              title: Text(
+                'Video Call',
+                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showComingSoonSnackBar('Video call feature coming soon!');
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  // Show user profile quick view
+  void _showUserProfile() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Profile header
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: widget.avatarUrl != null
+                          ? NetworkImage(widget.avatarUrl!)
+                          : null,
+                      child: widget.avatarUrl == null
+                          ? Icon(Icons.person, size: 50, color: Colors.grey[600])
+                          : null,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      widget.userName,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tap to view full profile',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    // Quick actions
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildQuickActionButton(
+                          icon: Icons.call,
+                          label: 'Call',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showCallOptions();
+                          },
+                        ),
+                        _buildQuickActionButton(
+                          icon: Icons.block,
+                          label: 'Block',
+                          color: Colors.red,
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showBlockUserDialog();
+                          },
+                        ),
+                        _buildQuickActionButton(
+                          icon: Icons.report,
+                          label: 'Report',
+                          color: Colors.orange,
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showReportUserDialog();
+                          },
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    // Full profile button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _showComingSoonSnackBar('Full profile view coming soon!');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(
+                          'View Full Profile',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  // Build quick action button
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: (color ?? primaryColor).withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: color ?? primaryColor,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: GoogleFonts.montserrat(
+              fontSize: 12,
+              color: color ?? primaryColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  // Show block user dialog
+  void _showBlockUserDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Block ${widget.userName}?',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        content: Text(
+          'You won\'t be able to see each other\'s profiles or send messages.',
+          style: GoogleFonts.montserrat(
+            color: textSecondary,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showComingSoonSnackBar('Block feature coming soon!');
+            },
+            child: Text(
+              'Block',
+              style: GoogleFonts.montserrat(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  // Show report user dialog
+  void _showReportUserDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Report ${widget.userName}?',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        content: Text(
+          'Help us keep the community safe by reporting inappropriate behavior.',
+          style: GoogleFonts.montserrat(
+            color: textSecondary,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showComingSoonSnackBar('Report feature coming soon!');
+            },
+            child: Text(
+              'Report',
+              style: GoogleFonts.montserrat(
+                color: Colors.orange,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  // Show clear chat dialog
+  void _showClearChatDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Clear Chat History?',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        content: Text(
+          'This will delete all messages in this conversation. This action cannot be undone.',
+          style: GoogleFonts.montserrat(
+            color: textSecondary,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showComingSoonSnackBar('Clear chat feature coming soon!');
+            },
+            child: Text(
+              'Clear',
+              style: GoogleFonts.montserrat(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  // Show coming soon snackbar
+  void _showComingSoonSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.montserrat(color: Colors.white),
+        ),
+        backgroundColor: primaryColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
     );

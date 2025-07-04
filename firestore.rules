@@ -112,6 +112,10 @@ service cloud.firestore {
       // Users can update chat threads they're part of
       allow update: if request.auth != null &&
                      request.auth.uid in resource.data.userIds;
+      
+      // Users can delete chat threads they're part of
+      allow delete: if request.auth != null &&
+                     request.auth.uid in resource.data.userIds;
     }
 
     // Messages subcollection within chat threads
@@ -129,6 +133,11 @@ service cloud.firestore {
       
       // Users can update messages in threads they're part of (for read status, etc.)
       allow update: if request.auth != null && 
+                     exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
+      
+      // Users can delete messages in threads they're part of
+      allow delete: if request.auth != null && 
                      exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
                      request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
     }

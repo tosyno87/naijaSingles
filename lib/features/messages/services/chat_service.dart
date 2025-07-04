@@ -304,4 +304,35 @@ class ChatService {
       return null;
     }
   }
+  
+  // Delete a chat thread and all its messages
+  Future<bool> deleteChatThread(String threadId) async {
+    try {
+      if (currentUserId == null) return false;
+      
+      // Delete all messages in the thread first
+      final messagesRef = _chatThreadsCollection
+          .doc(threadId)
+          .collection('messages');
+      
+      final messagesSnapshot = await messagesRef.get();
+      
+      // Batch delete all messages
+      if (messagesSnapshot.docs.isNotEmpty) {
+        final batch = _firestore.batch();
+        for (var doc in messagesSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      }
+      
+      // Delete the thread document
+      await _chatThreadsCollection.doc(threadId).delete();
+      
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting chat thread: $e');
+      return false;
+    }
+  }
 }

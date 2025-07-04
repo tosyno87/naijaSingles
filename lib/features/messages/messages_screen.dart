@@ -320,149 +320,168 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   Widget _buildMessageThreadItem(MessageThreadInfo thread) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: thread.unread 
-            ? Border.all(color: primaryColor.withValues(alpha: 0.3), width: 1)
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    return Dismissible(
+      key: Key(thread.threadId),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.red,
           borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            _openChatThread(thread);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Avatar with online indicator
-                Stack(
-                  children: [
-                    Hero(
-                      tag: 'avatar-${thread.threadId}',
-                      child: Container(
-                        width: 56,
-                        height: 56,
+        ),
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+          size: 24,
+        ),
+      ),
+      confirmDismiss: (direction) async {
+        return await _showDeleteConfirmation(thread);
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+          border: thread.unread 
+              ? Border.all(color: primaryColor.withValues(alpha: 0.3), width: 1.5)
+              : null,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              _openChatThread(thread);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Enhanced avatar with status
+                  Stack(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: thread.unread ? primaryColor : Colors.grey.shade300,
-                            width: thread.unread ? 2 : 1,
+                            width: thread.unread ? 2.5 : 1,
                           ),
                         ),
                         child: CircleAvatar(
-                          radius: 26,
-                          backgroundColor: Colors.grey.shade200,
+                          radius: 28,
+                          backgroundColor: Colors.grey.shade100,
                           backgroundImage: thread.avatarUrl != null
                               ? NetworkImage(thread.avatarUrl!)
                               : null,
                           onBackgroundImageError: thread.avatarUrl != null 
                               ? (_, __) {} 
-                              : null, // Only provide error callback when there's an image
+                              : null,
                           child: thread.avatarUrl == null
                               ? Icon(
                                   Icons.person,
-                                  size: 28,
+                                  size: 30,
                                   color: Colors.grey.shade500,
                                 )
                               : null,
                         ),
                       ),
-                    ),
-                    if (thread.isOnline)
-                      Positioned(
-                        right: 2,
-                        bottom: 2,
-                        child: Container(
-                          width: 16,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4CAF50),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: cardColor,
-                              width: 2,
+                      // Online indicator
+                      if (thread.isOnline)
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF4CAF50),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: cardColor, width: 3),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                // Message content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              thread.otherUserName,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 18,
-                                fontWeight: thread.unread ? FontWeight.bold : FontWeight.w600,
-                                color: textPrimary,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                      // Unread indicator
+                      if (thread.unread)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: cardColor, width: 2),
                             ),
                           ),
-                          Text(
-                            thread.getRelativeTime(),
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              color: thread.unread ? primaryColor : textLight,
-                              fontWeight: thread.unread ? FontWeight.w600 : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              thread.lastMessage,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                color: thread.unread ? textPrimary : textSecondary,
-                                fontWeight: thread.unread ? FontWeight.w500 : FontWeight.normal,
-                                height: 1.3,
+                        ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  // Message content
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                thread.otherUserName,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 17,
+                                  fontWeight: thread.unread 
+                                      ? FontWeight.bold 
+                                      : FontWeight.w600,
+                                  color: textPrimary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                          ),
-                          if (thread.unread) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                shape: BoxShape.circle,
+                            Text(
+                              thread.getRelativeTime(),
+                              style: GoogleFonts.montserrat(
+                                fontSize: 12,
+                                color: thread.unread ? primaryColor : textLight,
+                                fontWeight: thread.unread 
+                                    ? FontWeight.w600 
+                                    : FontWeight.normal,
                               ),
                             ),
                           ],
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          thread.lastMessage,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            color: thread.unread ? textPrimary : textSecondary,
+                            fontWeight: thread.unread 
+                                ? FontWeight.w500 
+                                : FontWeight.normal,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -518,5 +537,136 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ],
       ),
     );
+  }
+  
+  // Show delete confirmation dialog
+  Future<bool?> _showDeleteConfirmation(MessageThreadInfo thread) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Delete Conversation',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete your conversation with ${thread.otherUserName}? This action cannot be undone.',
+          style: GoogleFonts.montserrat(
+            color: textSecondary,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context, true);
+              await _deleteChatThread(thread);
+            },
+            child: Text(
+              'Delete',
+              style: GoogleFonts.montserrat(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  // Delete chat thread with loading indicator
+  Future<void> _deleteChatThread(MessageThreadInfo thread) async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: primaryColor),
+            const SizedBox(height: 16),
+            Text(
+              'Deleting conversation...',
+              style: GoogleFonts.montserrat(
+                color: textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    
+    try {
+      final success = await _chatService.deleteChatThread(thread.threadId);
+      
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (success) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Conversation deleted',
+              style: GoogleFonts.montserrat(color: Colors.white),
+            ),
+            backgroundColor: primaryColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to delete conversation',
+              style: GoogleFonts.montserrat(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error deleting conversation',
+            style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    }
   }
 }

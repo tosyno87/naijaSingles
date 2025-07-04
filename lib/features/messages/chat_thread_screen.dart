@@ -376,29 +376,39 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           if (!isMe) ...[
             CircleAvatar(
               radius: 16,
+              backgroundColor: Colors.grey.shade200,
               backgroundImage: widget.avatarUrl != null
                   ? NetworkImage(widget.avatarUrl!)
-                  : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
-              onBackgroundImageError: (_, __) {},
+                  : null,
+              onBackgroundImageError: widget.avatarUrl != null 
+                  ? (_, __) {} 
+                  : null,
+              child: widget.avatarUrl == null
+                  ? Icon(
+                      Icons.person,
+                      size: 16,
+                      color: Colors.grey[600],
+                    )
+                  : null,
             ),
             const SizedBox(width: 8),
           ],
           
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isMe ? const Color(0xFF008037) : Colors.white,
+                color: isMe ? primaryColor : Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
-                  bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+                  topLeft: const Radius.circular(20),
+                  topRight: const Radius.circular(20),
+                  bottomLeft: isMe ? const Radius.circular(20) : const Radius.circular(4),
+                  bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(20),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 5,
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -409,27 +419,32 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   Text(
                     message.text,
                     style: GoogleFonts.poppins(
-                      fontSize: 14,
+                      fontSize: 15,
                       color: isMe ? Colors.white : Colors.black87,
+                      height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         _formatTime(message.timestamp),
                         style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          color: isMe ? Colors.white.withValues(alpha: 0.7) : Colors.grey[500],
+                          fontSize: 11,
+                          color: isMe 
+                              ? Colors.white.withValues(alpha: 0.8) 
+                              : Colors.grey[500],
                         ),
                       ),
                       if (isMe) ...[
                         const SizedBox(width: 4),
                         Icon(
                           message.isRead ? Icons.done_all : Icons.done,
-                          size: 12,
-                          color: Colors.white.withValues(alpha: 0.7),
+                          size: 14,
+                          color: message.isRead 
+                              ? Colors.blue[300] 
+                              : Colors.white.withValues(alpha: 0.8),
                         ),
                       ],
                     ],

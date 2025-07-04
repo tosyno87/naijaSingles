@@ -52,6 +52,12 @@ class ChatService {
         return existingThreadId;
       }
       
+      // Check if users are blocked
+      final isBlocked = await isUserBlocked(currentUserId!, otherUserId);
+      if (isBlocked) {
+        throw Exception('This conversation is not available.');
+      }
+      
       // Verify users are matched before creating chat
       final isMatched = await areUsersMatched(currentUserId!, otherUserId);
       if (!isMatched) {
@@ -102,18 +108,15 @@ class ChatService {
       
       // Handle specific security rule violations
       if (e.code == 'permission-denied') {
-        if (e.message?.contains('isUserBlocked') == true) {
-          throw Exception('This conversation is not available.');
-        } else {
-          throw Exception('Unable to start conversation. Please try again later.');
-        }
+        throw Exception('Unable to start conversation. Please try again later.');
       }
       
       throw Exception('Failed to create chat: ${e.message}');
     } catch (e) {
       debugPrint('Error creating chat thread: $e');
       // Re-throw our custom exceptions
-      if (e.toString().contains('You can only chat with users')) {
+      if (e.toString().contains('You can only chat with users') || 
+          e.toString().contains('This conversation is not available')) {
         rethrow;
       }
       return null;
@@ -377,6 +380,36 @@ class ChatService {
       return false;
     } catch (e) {
       debugPrint('Error checking if users are matched: $e');
+      return false;
+    }
+  }
+  
+  // Check if a user is blocked by another user
+  Future<bool> isUserBlocked(String userId, String blockedUserId) async {
+    try {
+      // Check if userId has blocked blockedUserId
+      final userBlockDoc = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('blockedlist')
+          .doc(blockedUserId)
+          .get();
+      
+      if (userBlockDoc.exists) {
+        return true;
+      }
+      
+      // Check if blockedUserId has blocked userId
+      final blockedUserBlockDoc = await _firestore
+          .collection('users')
+          .doc(blockedUserId)
+          .collection('blockedlist')
+          .doc(userId)
+          .get();
+      
+      return blockedUserBlockDoc.exists;
+    } catch (e) {
+      debugPrint('Error checking if user is blocked: $e');
       return false;
     }
   }

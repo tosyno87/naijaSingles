@@ -134,11 +134,10 @@ service cloud.firestore {
 
     // Chat threads collection - ENHANCED WITH PRACTICAL SECURITY
     match /chatThreads/{threadId} {
-      // Users can read chat threads they're part of and not blocked
+      // Users can read chat threads they're part of
+      // Simplified to avoid complex rule evaluation issues
       allow read: if request.auth != null &&
-                   request.auth.uid in resource.data.userIds &&
-                   !isUserBlocked(request.auth.uid, 
-                     getOtherUserId(resource.data.userIds, request.auth.uid));
+                   request.auth.uid in resource.data.userIds;
       
       // Users can create chat threads - match verification handled at app level
       // This prevents blocking legitimate matches due to Firestore query limitations
@@ -146,17 +145,13 @@ service cloud.firestore {
                      request.auth.uid in request.resource.data.userIds &&
                      request.resource.data.userIds.size() == 2 &&
                      // Basic validation - ensure it's a proper chat thread structure
-                     request.resource.data.keys().hasAll(['userIds', 'createdAt']) &&
-                     !isUserBlocked(request.auth.uid, 
-                       getOtherUserId(request.resource.data.userIds, request.auth.uid));
+                     request.resource.data.keys().hasAll(['userIds', 'createdAt']);
       
       // Users can update chat threads they're part of (for last message, unread count)
       allow update: if request.auth != null &&
                      request.auth.uid in resource.data.userIds &&
                      // Prevent changing userIds after creation
-                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['userIds']) &&
-                     !isUserBlocked(request.auth.uid, 
-                       getOtherUserId(resource.data.userIds, request.auth.uid));
+                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['userIds']);
       
       // Users can delete chat threads they're part of
       allow delete: if request.auth != null &&

@@ -71,5 +71,9 @@
 	<string>499452678798092</string>
 	<key>FacebookClientToken</key>
 	<string>YOUR-FACEBOOK-CLIENT-TOKEN</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to find nearby singles and matches in your area.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to find nearby singles and matches in your area.</string>
 </dict>
 </plist>

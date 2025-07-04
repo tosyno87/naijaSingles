@@ -31,11 +31,22 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final ChatService _chatService = ChatService();
   bool _isTyping = false;
   String? _currentUserId;
+  bool _hasText = false;
   
   @override
   void initState() {
     super.initState();
     _currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    
+    // Listen to text changes for send button animation
+    _messageController.addListener(() {
+      final hasText = _messageController.text.trim().isNotEmpty;
+      if (hasText != _hasText) {
+        setState(() {
+          _hasText = hasText;
+        });
+      }
+    });
     
     // Mark thread as read when opening
     _chatService.markThreadAsRead(widget.threadId);
@@ -244,76 +255,82 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.attach_file, color: Colors.grey),
-                  onPressed: () {
-                    // Attachment functionality to be implemented
-                  },
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Type a message...',
-                      hintStyle: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.grey[500],
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                    ),
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                    maxLines: 4,
-                    minLines: 1,
-                    textCapitalization: TextCapitalization.sentences,
-                    onChanged: (value) {
-                      // Simulate typing indicator
-                      if (value.isNotEmpty && !_isTyping) {
-                        setState(() {
-                          _isTyping = true;
-                        });
-                        Future.delayed(const Duration(seconds: 3), () {
-                          if (mounted) {
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Emoji button
+                  IconButton(
+                    icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+                    onPressed: _showEmojiPicker,
+                  ),
+                  Expanded(
+                    child: Container(
+                      constraints: const BoxConstraints(maxHeight: 120),
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Type a message...',
+                          hintStyle: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 4,
+                        minLines: 1,
+                        textCapitalization: TextCapitalization.sentences,
+                        onChanged: (value) {
+                          // Typing indicator logic
+                          if (value.isNotEmpty && !_isTyping) {
                             setState(() {
-                              _isTyping = false;
+                              _isTyping = true;
+                            });
+                            Future.delayed(const Duration(seconds: 3), () {
+                              if (mounted) {
+                                setState(() {
+                                  _isTyping = false;
+                                });
+                              }
                             });
                           }
-                        });
-                      }
-                    },
+                        },
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _sendMessage,
-                  child: Container(
+                  const SizedBox(width: 8),
+                  // Animated send button
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     width: 48,
                     height: 48,
-                    decoration: BoxDecoration( // Remove const to fix error
-                      color: primaryColor, // Use MVP primary color
+                    decoration: BoxDecoration(
+                      color: _hasText ? primaryColor : Colors.grey[300],
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.send,
-                      color: Colors.white,
-                      size: 20,
+                    child: IconButton(
+                      onPressed: _hasText ? _sendMessage : null,
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -453,5 +470,57 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   // Check if two dates are the same day
   bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+  }
+  
+  // Show emoji picker for enhanced messaging
+  void _showEmojiPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: 200,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 8,
+                padding: const EdgeInsets.all(16),
+                children: [
+                  '😊', '😂', '❤️', '👍', '👎', '😢', '😮', '😡',
+                  '🎉', '🔥', '💯', '👏', '🙏', '💪', '✨', '🌟',
+                ].map((emoji) => GestureDetector(
+                  onTap: () {
+                    _messageController.text += emoji;
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey[100],
+                    ),
+                    child: Center(
+                      child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                    ),
+                  ),
+                )).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

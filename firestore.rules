@@ -48,9 +48,19 @@ service cloud.firestore {
                    (request.auth.uid == resource.data.from || 
                     request.auth.uid == resource.data.to);
       
+      // Users can update likes where they are involved (for mutual likes)
+      allow update: if request.auth != null && 
+                     (request.auth.uid == resource.data.from || 
+                      request.auth.uid == resource.data.to);
+      
       // Users can delete their own likes
       allow delete: if request.auth != null && 
                      request.auth.uid == resource.data.from;
+    }
+
+    // Legacy likes collection (if exists)
+    match /Likes/{likeId} {
+      allow read, write: if request.auth != null;
     }
 
     // Matches collection - for storing user matches
@@ -66,6 +76,27 @@ service cloud.firestore {
       // Users can update matches they're part of
       allow update: if request.auth != null && 
                      request.auth.uid in resource.data.users;
+    }
+
+    // Legacy matches collection (for backward compatibility)
+    match /Matches/{matchId} {
+      // Users can read matches they're part of
+      allow read: if request.auth != null && 
+                   (request.auth.uid in resource.data.users ||
+                    request.auth.uid == resource.data.user1 ||
+                    request.auth.uid == resource.data.user2);
+      
+      // Users can create matches involving themselves
+      allow create: if request.auth != null && 
+                     (request.auth.uid in request.resource.data.users ||
+                      request.auth.uid == request.resource.data.user1 ||
+                      request.auth.uid == request.resource.data.user2);
+      
+      // Users can update matches they're part of
+      allow update: if request.auth != null && 
+                     (request.auth.uid in resource.data.users ||
+                      request.auth.uid == resource.data.user1 ||
+                      request.auth.uid == resource.data.user2);
     }
 
     // Chat threads collection
@@ -96,9 +127,10 @@ service cloud.firestore {
                      request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds &&
                      request.resource.data.senderId == request.auth.uid;
       
-      // Users can update their own messages
+      // Users can update messages in threads they're part of (for read status, etc.)
       allow update: if request.auth != null && 
-                     resource.data.senderId == request.auth.uid;
+                     exists(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+                     request.auth.uid in get(/databases/$(database)/documents/chatThreads/$(threadId)).data.userIds;
     }
 
     // Chats collection

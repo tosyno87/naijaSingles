@@ -233,7 +233,7 @@ class UserSearchRepo {
       debugPrint('Current user auth: ${firebaseAuth.currentUser?.uid}');
       
       final snapshot = await db
-          .collection('users/${currentUser.id}/CheckedUser') // Fixed: using lowercase 'users'
+          .collection('users/${currentUser.id}/CheckedUser')
           .get();
       if (snapshot.docs.isNotEmpty) {
         for (final doc in snapshot.docs) {
@@ -285,7 +285,6 @@ class UserSearchRepo {
           }
         } catch (e) {
           debugPrint('Error processing document ${doc.id}: $e');
-          // Continue with next document instead of failing completely
           continue;
         }
       }

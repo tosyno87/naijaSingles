@@ -21,3 +21,12 @@ class SearchUserLoadUserState extends SearchUserState {
 }
 
 class SearchUserFailedState extends SearchUserState {}
+
+class MigrationStatusState extends SearchUserState {
+  final bool shouldPromptForMigration;
+
+  const MigrationStatusState({required this.shouldPromptForMigration});
+
+  @override
+  List<Object> get props => [shouldPromptForMigration];
+}

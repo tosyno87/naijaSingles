@@ -59,7 +59,17 @@ class LikesService {
         return null;
       }
     } catch (e) {
-      debugPrint('Error handling like: $e');
+      debugPrint('❌ Error handling like: $e');
+      
+      // Provide more specific error messages
+      if (e.toString().contains('permission-denied')) {
+        debugPrint('🔒 Permission denied - check Firestore rules');
+      } else if (e.toString().contains('not-found')) {
+        debugPrint('👤 User not found');
+      } else if (e.toString().contains('network')) {
+        debugPrint('🌐 Network error - check connection');
+      }
+      
       return null;
     }
   }

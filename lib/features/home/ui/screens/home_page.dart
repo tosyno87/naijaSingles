@@ -4,6 +4,7 @@ import 'package:swipable_stack/swipable_stack.dart';
 import '../widgets/premium_swipe.dart';
 import '../widgets/swipe_card_list.dart';
 import '../widgets/swipe_buttons.dart';
+import '../widgets/privacy_migration_prompt.dart';
 import '../../../../models/user_model.dart';
 import '../../controllers/home_controller.dart';
 import '../../bloc/searchuser_bloc.dart';
@@ -23,6 +24,8 @@ class _HomepageState extends State<Homepage>
   final HomeController controller = HomeController();
   SwipableStackController? stackController;
   final List<UserModel> removedUsers = [];
+  bool _shouldShowMigrationPrompt = false;
+  bool _migrationPromptDismissed = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -36,6 +39,11 @@ class _HomepageState extends State<Homepage>
       context
           .read<SearchUserBloc>()
           .add(LoadUserEvent(currentUser: controller.currentUser));
+      
+      // Check if user needs privacy migration
+      context
+          .read<SearchUserBloc>()
+          .add(CheckMigrationStatusEvent(userId: controller.currentUser.id!));
     });
   }
 
@@ -70,48 +78,82 @@ class _HomepageState extends State<Homepage>
               const BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50)),
           color: Theme.of(context).primaryColor,
         ),
-        child: ClipRRect(
-          borderRadius:
-              const BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50)),
-          child: Stack(
-            children: [
-              AbsorbPointer(
-                absorbing: exceedSwipes,
-                child: Stack(
-                  children: [
-                    SwipeCardList(
-                      controller: controller,
-                      stackController: stackController,
-                      onUserRemoved: (user) {
+        child: BlocListener<SearchUserBloc, SearchUserState>(
+          listener: (context, state) {
+            if (state is MigrationStatusState) {
+              setState(() {
+                _shouldShowMigrationPrompt = state.shouldPromptForMigration && !_migrationPromptDismissed;
+              });
+            }
+          },
+          child: ClipRRect(
+            borderRadius:
+                const BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50)),
+            child: Stack(
+              children: [
+                AbsorbPointer(
+                  absorbing: exceedSwipes,
+                  child: Stack(
+                    children: [
+                      SwipeCardList(
+                        controller: controller,
+                        stackController: stackController,
+                        onUserRemoved: (user) {
+                          setState(() {
+                            removedUsers
+                              ..clear()
+                              ..add(user);
+                          });
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: SwipeButtons(
+                            stackController: stackController,
+                            onRewind: () {
+                              setState(() {
+                                removedUsers.clear();
+                              });
+                            },
+                            hasRemoved: removedUsers.isNotEmpty,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                exceedSwipes
+                    ? PremiumSwipePage(currentUser: controller.currentUser)
+                    : const SizedBox.shrink(),
+                
+                // Privacy Migration Prompt
+                if (_shouldShowMigrationPrompt)
+                  Positioned(
+                    top: 50,
+                    left: 0,
+                    right: 0,
+                    child: PrivacyMigrationPrompt(
+                      onDismiss: () {
                         setState(() {
-                          removedUsers
-                            ..clear()
-                            ..add(user);
+                          _migrationPromptDismissed = true;
+                          _shouldShowMigrationPrompt = false;
+                        });
+                      },
+                      onMigrate: () {
+                        // Refresh user list after migration
+                        context
+                            .read<SearchUserBloc>()
+                            .add(LoadUserEvent(currentUser: controller.currentUser));
+                        setState(() {
+                          _shouldShowMigrationPrompt = false;
                         });
                       },
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: SwipeButtons(
-                          stackController: stackController,
-                          onRewind: () {
-                            setState(() {
-                              removedUsers.clear();
-                            });
-                          },
-                          hasRemoved: removedUsers.isNotEmpty,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              exceedSwipes
-                  ? PremiumSwipePage(currentUser: controller.currentUser)
-                  : const SizedBox.shrink(),
-            ],
+                  ),
+              ],
+            ),
           ),
         ),
       ),

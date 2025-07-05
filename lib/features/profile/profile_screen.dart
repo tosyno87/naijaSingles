@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'edit_profile_screen.dart';
+import 'privacy_settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -116,8 +117,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     
                     const SizedBox(height: 32),
                     
-                    // Single Edit Profile Button
-                    _buildEditProfileButton(),
+                    // Profile Action Buttons
+                    _buildProfileActionButtons(),
                     
                     const SizedBox(height: 32),
                   ],
@@ -521,40 +522,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildEditProfileButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const EditProfileScreen(),
+  Widget _buildProfileActionButtons() {
+    return Row(
+      children: [
+        // Edit Profile Button
+        Expanded(
+          child: SizedBox(
+            height: 56,
+            child: ElevatedButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const EditProfileScreen(),
+                  ),
+                );
+                
+                // Reload data if profile was updated
+                if (result == true) {
+                  _loadUserData();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 3,
+              ),
+              child: Text(
+                'Edit Profile',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          );
-          
-          // Reload data if profile was updated
-          if (result == true) {
-            _loadUserData();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 3,
-        ),
-        child: Text(
-          'Edit Profile',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
           ),
         ),
-      ),
+        
+        const SizedBox(width: 12),
+        
+        // Privacy Settings Button
+        Expanded(
+          child: SizedBox(
+            height: 56,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PrivacySettingsScreen(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: cardColor,
+                foregroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: primaryColor, width: 2),
+                ),
+                elevation: 1,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.privacy_tip_outlined, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Privacy',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

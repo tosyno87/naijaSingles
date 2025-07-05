@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 /// Model class for app notifications
@@ -22,6 +23,34 @@ class AppNotification {
     this.actionId,
   });
 
+  /// Create from Firestore document
+  factory AppNotification.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return AppNotification(
+      id: doc.id,
+      title: data['title'] ?? '',
+      message: data['message'] ?? '',
+      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      type: data['type'] ?? 'general',
+      avatarUrl: data['avatarUrl'],
+      isRead: data['isRead'] ?? false,
+      actionId: data['actionId'],
+    );
+  }
+
+  /// Convert to Firestore document
+  Map<String, dynamic> toFirestore() {
+    return {
+      'title': title,
+      'message': message,
+      'timestamp': Timestamp.fromDate(timestamp),
+      'type': type,
+      'avatarUrl': avatarUrl,
+      'isRead': isRead,
+      'actionId': actionId,
+    };
+  }
+
   /// Returns the appropriate icon for the notification type
   IconData get typeIcon {
     switch (type) {
@@ -33,6 +62,8 @@ class AppNotification {
         return Icons.chat_bubble_outline;
       case 'invite':
         return Icons.group_add;
+      case 'view':
+        return Icons.visibility;
       default:
         return Icons.notifications;
     }
@@ -49,6 +80,8 @@ class AppNotification {
         return const Color(0xFF008037); // deepGreen
       case 'invite':
         return Colors.blue;
+      case 'view':
+        return Colors.grey;
       default:
         return Colors.grey;
     }

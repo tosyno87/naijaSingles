@@ -50,3 +50,9 @@ my_key.pub
 
 # Firebase service account keys
 *firebase-adminsdk*.json
+
+# Backup files
+*.bak
+*.orig
+*.rej
+*~

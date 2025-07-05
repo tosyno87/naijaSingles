@@ -76,6 +76,14 @@ service cloud.firestore {
       match /blockedlist/{blockedId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+      
+      // User notifications subcollection
+      match /notifications/{notificationId} {
+        // Users can read and write their own notifications
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        // Allow system (Cloud Functions) to create notifications
+        allow create: if request.auth != null;
+      }
     }
 
     // Likes collection - for the new likes service (Enhanced permissions)

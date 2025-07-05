@@ -274,11 +274,11 @@ class OnboardingController extends ChangeNotifier {
   }
 
   bool isBioComplete() {
-    return _bio.length >= 20; // Minimum bio length
+    return _bio.length >= 50; // Updated minimum bio length for dating context
   }
 
   bool areInterestsSelected() {
-    return _interests.isNotEmpty;
+    return _interests.length >= 5; // Require at least 5 interests for better matching
   }
 
   bool isPhotoUploaded() {

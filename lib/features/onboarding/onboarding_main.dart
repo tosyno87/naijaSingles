@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../user/controllers/onboarding_controller.dart';
 import 'screens/basic_info_screen.dart';
-import 'screens/bio_screen.dart';
-import 'screens/interests_screen.dart';
-import 'screens/photo_upload_screen.dart';
+import 'screens/enhanced_bio_screen.dart';
+import 'screens/enhanced_interests_screen.dart';
+import 'screens/enhanced_photo_upload_screen.dart';
 import 'screens/tribe_selection_screen.dart';
 import 'screens/preferences_onboarding_screen.dart';
 import 'screens/additional_info_onboarding_screen.dart';
@@ -25,8 +25,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
   final List<String> _pageNames = [
     "Basic Info",
     "Your Tribe", 
-    "About You",
-    "Interests",
+    "Tell Your Story",
+    "Your Interests",
     "Profile Photo",
     "Dating Preferences", // New screen
     "Additional Info"     // New screen
@@ -87,16 +87,16 @@ class _OnboardingMainState extends State<OnboardingMain> {
         return;
       }
     } else if (_currentPage == 2) { // Bio page
-      if (controller.bio.trim().isEmpty || controller.bio.trim().length < 20) {
+      if (controller.bio.trim().isEmpty || controller.bio.trim().length < 50) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please write a bio (at least 20 characters)")),
+          const SnackBar(content: Text("Please write a bio (at least 50 characters)")),
         );
         return;
       }
-    } else if (_currentPage == 3) { // Interests page
-      if (controller.interests.isEmpty) {
+    } else if (_currentPage == 3) { // Enhanced Interests page
+      if (controller.interests.length < 5) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select at least one interest")),
+          const SnackBar(content: Text("Please complete the interests selection process")),
         );
         return;
       }
@@ -305,9 +305,9 @@ class _OnboardingMainState extends State<OnboardingMain> {
                     children: const [
                       BasicInfoScreen(),
                       TribeSelectionScreen(),
-                      BioScreen(),
-                      InterestsScreen(),
-                      PhotoUploadScreen(),
+                      EnhancedBioScreen(),
+                      EnhancedInterestsScreen(),
+                      EnhancedPhotoUploadScreen(),
                       PreferencesOnboardingScreen(),
                       AdditionalInfoOnboardingScreen(),
                     ],

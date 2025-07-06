@@ -86,6 +86,66 @@ service cloud.firestore {
       }
     }
 
+    // Super Likes collection - for premium super like functionality
+    match /superLikes/{superLikeId} {
+      // Users can create super likes
+      allow create: if request.auth != null && 
+                     request.resource.data.fromUserId == request.auth.uid &&
+                     request.resource.data.keys().hasAll(['fromUserId', 'toUserId', 'timestamp']);
+      
+      // Users can read super likes they sent
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.fromUserId;
+      
+      // Users can read super likes they received
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.toUserId;
+      
+      // Users can update super likes they received (for responding)
+      allow update: if request.auth != null && 
+                     request.auth.uid == resource.data.toUserId;
+      
+      // Users can update super likes they sent (for status changes)
+      allow update: if request.auth != null && 
+                     request.auth.uid == resource.data.fromUserId;
+    }
+
+    // Swipe History collection - for undo functionality
+    match /swipeHistory/{swipeId} {
+      // Users can create their own swipe history
+      allow create: if request.auth != null && 
+                     request.resource.data.userId == request.auth.uid &&
+                     request.resource.data.keys().hasAll(['userId', 'targetUserId', 'direction', 'timestamp']);
+      
+      // Users can read their own swipe history
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.userId;
+      
+      // Users can update their own swipe history (for undo operations)
+      allow update: if request.auth != null && 
+                     request.auth.uid == resource.data.userId;
+    }
+
+    // Super Like Usage collection - for tracking daily limits
+    match /superLikeUsage/{usageId} {
+      // System can create usage records
+      allow create: if request.auth != null;
+      
+      // Users can read their own usage records
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.userId;
+    }
+
+    // Undo Usage collection - for tracking undo limits
+    match /undoUsage/{usageId} {
+      // System can create usage records
+      allow create: if request.auth != null;
+      
+      // Users can read their own usage records
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.userId;
+    }
+
     // Likes collection - for the new likes service (Enhanced permissions)
     match /likes/{likeId} {
       // Allow authenticated users to create likes (simplified for optimized service)

@@ -17,6 +17,15 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   DateTime? _selectedDate;
   String _selectedGender = '';
 
+  // Gender options for dropdown
+  final List<String> _genderOptions = [
+    'Male',
+    'Female',
+    'Non-binary',
+    'Prefer not to say',
+    'Other'
+  ];
+
   // Afropeep MVP theme colors
   static const Color backgroundColor = Color(0xFFFDF0E7);
   static const Color afropeepGreen = Color(0xFF007A33);
@@ -258,73 +267,53 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
             ),
           ),
           
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           
-          Row(
-            children: [
-              Expanded(
-                child: _buildGenderOption(
-                  label: "Male",
-                  icon: Icons.male,
-                  isSelected: _selectedGender == "Male",
-                  onTap: () => _selectGender("Male"),
+          // Gender dropdown with MVP styling
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            decoration: BoxDecoration(
+              color: cardBackground,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: DropdownButton<String>(
+              value: _selectedGender.isEmpty ? null : _selectedGender,
+              hint: Text(
+                "Select your gender",
+                style: GoogleFonts.poppins(
+                  color: textLightBrown,
+                  fontSize: 16,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildGenderOption(
-                  label: "Female",
-                  icon: Icons.female,
-                  isSelected: _selectedGender == "Female",
-                  onTap: () => _selectGender("Female"),
-                ),
+              isExpanded: true,
+              underline: const SizedBox(),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: afropeepGreen,
               ),
-            ],
+              dropdownColor: cardBackground,
+              items: _genderOptions.map((String gender) {
+                return DropdownMenuItem<String>(
+                  value: gender,
+                  child: Text(
+                    gender,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: textDarkBrown,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  _selectGender(newValue);
+                }
+              },
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildGenderOption({
-    required String label,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 16,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? afropeepGreen : cardBackground,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? afropeepGreen : Colors.transparent,
-            width: 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              size: 32,
-              color: isSelected ? Colors.white : afropeepGreen,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : textDarkBrown,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -3,12 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../user/controllers/onboarding_controller.dart';
 import 'screens/basic_info_screen.dart';
+import 'screens/location_screen.dart';
 import 'screens/enhanced_bio_screen.dart';
 import 'screens/enhanced_interests_screen.dart';
 import 'screens/enhanced_photo_upload_screen.dart';
 import 'screens/tribe_selection_screen.dart';
 import 'screens/preferences_onboarding_screen.dart';
-import 'screens/additional_info_onboarding_screen.dart';
+import 'screens/enhanced_additional_info_screen.dart';
 
 class OnboardingMain extends StatefulWidget {
   const OnboardingMain({super.key});
@@ -20,16 +21,17 @@ class OnboardingMain extends StatefulWidget {
 class _OnboardingMainState extends State<OnboardingMain> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  final int _totalPages = 7; // Updated to include new screens
+  final int _totalPages = 8; // Updated to include location screen
   
   final List<String> _pageNames = [
     "Basic Info",
+    "Your Location",
     "Your Tribe", 
     "Tell Your Story",
     "Your Interests",
     "Profile Photo",
-    "Dating Preferences", // New screen
-    "Additional Info"     // New screen
+    "Dating Preferences",
+    "Additional Info"
   ];
 
   @override
@@ -48,6 +50,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     print('   Name: "${controller.fullName}" (length: ${controller.fullName.length})');
     print('   DOB: ${controller.dateOfBirth}');
     print('   Gender: "${controller.gender}" (length: ${controller.gender.length})');
+    print('   Location: "${controller.locationName ?? 'Not set'}"');
     print('   Tribe: "${controller.tribe}" (length: ${controller.tribe.length})');
     print('   Bio: "${controller.bio}" (length: ${controller.bio.length})');
     print('   Interests: ${controller.interests}');
@@ -79,35 +82,42 @@ class _OnboardingMainState extends State<OnboardingMain> {
         );
         return;
       }
-    } else if (_currentPage == 1) { // Tribe selection page
+    } else if (_currentPage == 1) { // Location page
+      if (controller.locationName == null || controller.locationName!.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select your location")),
+        );
+        return;
+      }
+    } else if (_currentPage == 2) { // Tribe selection page
       if (controller.tribe.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please select your tribe")),
         );
         return;
       }
-    } else if (_currentPage == 2) { // Bio page
+    } else if (_currentPage == 3) { // Bio page
       if (controller.bio.trim().isEmpty || controller.bio.trim().length < 50) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please write a bio (at least 50 characters)")),
         );
         return;
       }
-    } else if (_currentPage == 3) { // Enhanced Interests page
+    } else if (_currentPage == 4) { // Enhanced Interests page
       if (controller.interests.length < 5) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please complete the interests selection process")),
         );
         return;
       }
-    } else if (_currentPage == 4) { // Photo upload page
+    } else if (_currentPage == 5) { // Photo upload page
       if (!controller.isPhotoUploaded()) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please upload at least 3 photos")),
         );
         return;
       }
-    } else if (_currentPage == 5) { // Dating preferences page
+    } else if (_currentPage == 6) { // Dating preferences page
       // Basic validation - these have defaults so they should always be set
       if (controller.interestedIn.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -115,11 +125,25 @@ class _OnboardingMainState extends State<OnboardingMain> {
         );
         return;
       }
-    } else if (_currentPage == 6) { // Additional preferences page
-      // Basic validation for height and other fields
+    } else if (_currentPage == 7) { // Enhanced additional info page
+      // Enhanced validation for new fields
       if (controller.height <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please set your height")),
+        );
+        return;
+      }
+      if (controller.lookingFor.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select what brings you to NaijaSingles")),
+        );
+        return;
+      }
+      // Only require relationship intent for dating users
+      if ((controller.lookingFor == 'Dating' || controller.lookingFor == 'Mixed') && 
+          controller.relationshipIntent.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select your relationship goals")),
         );
         return;
       }
@@ -156,6 +180,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     print('   Name: ${controller.fullName}');
     print('   Age: ${controller.age}');
     print('   Gender: ${controller.gender}');
+    print('   Location: ${controller.locationName ?? 'Not set'}');
     print('   Tribe: ${controller.tribe}');
     print('   Bio: ${controller.bio}');
     print('   Interests: ${controller.interests}');
@@ -165,6 +190,34 @@ class _OnboardingMainState extends State<OnboardingMain> {
     print('   Relationship Intent: ${controller.relationshipIntent}');
     print('   Interested In: ${controller.interestedIn}');
     print('   Age Range: ${controller.ageRange}');
+    
+    // Show completion success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.celebration, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Profile Complete! 🎉 Welcome to NaijaSingles!',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade600,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
     
     // Use the optimized save method that handles navigation
     controller.saveUserData(context: context).catchError((error) {
@@ -304,12 +357,13 @@ class _OnboardingMainState extends State<OnboardingMain> {
                     },
                     children: const [
                       BasicInfoScreen(),
+                      LocationScreen(),
                       TribeSelectionScreen(),
                       EnhancedBioScreen(),
                       EnhancedInterestsScreen(),
                       EnhancedPhotoUploadScreen(),
                       PreferencesOnboardingScreen(),
-                      AdditionalInfoOnboardingScreen(),
+                      EnhancedAdditionalInfoScreen(),
                     ],
                   ),
                 ),
@@ -325,25 +379,30 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         case 0:
                           canContinue = controller.isBasicInfoComplete();
                           break;
-                        case 1:
+                        case 1: // Location page
+                          canContinue = controller.locationName != null && 
+                                       controller.locationName!.trim().isNotEmpty;
+                          break;
+                        case 2: // Tribe page
                           canContinue = controller.isTribeSelected();
                           break;
-                        case 2:
+                        case 3: // Bio page
                           canContinue = controller.isBioComplete();
                           break;
-                        case 3:
+                        case 4: // Interests page
                           canContinue = controller.areInterestsSelected();
                           break;
-                        case 4:
+                        case 5: // Photo page
                           canContinue = controller.isPhotoUploaded();
                           break;
-                        case 5: // Dating preferences page
+                        case 6: // Dating preferences page
                           canContinue = controller.interestedIn.isNotEmpty;
                           break;
-                        case 6: // Additional info page
+                        case 7: // Enhanced additional info page
+                          final isDatingUser = controller.lookingFor == 'Dating' || controller.lookingFor == 'Mixed';
                           canContinue = controller.height > 0 && 
                                        controller.lookingFor.isNotEmpty && 
-                                       controller.relationshipIntent.isNotEmpty;
+                                       (!isDatingUser || controller.relationshipIntent.isNotEmpty);
                           break;
                       }
                       

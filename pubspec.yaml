@@ -65,6 +65,8 @@ dependencies:
   in_app_purchase_android: ^0.4.0+2 # Updated for latest Android IAP
   intl: ^0.20.2                  # Latest stable
   location: ^8.0.0               # Updated from 7.0.0
+  geolocator: ^13.0.1            # Added for GPS location
+  geocoding: ^3.0.0              # Added for address lookup
   rflutter_alert: ^2.0.7         # Kept at 2.0.7
   otp_autofill: ^4.1.0           # Updated from 3.0.2
   path_provider: ^2.1.5          # Updated to latest

@@ -18,7 +18,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   final int _optimalMax = 200;
   
   int _currentLength = 0;
-  final List<String> _selectedPrompts = [];
+  String? _selectedPrompt;
   
   // Personality prompts for dating context
   final List<String> _personalityPrompts = [
@@ -59,52 +59,32 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
     super.dispose();
   }
 
-  void _addPromptToBio(String prompt) {
-    if (!_selectedPrompts.contains(prompt)) {
-      setState(() {
-        _selectedPrompts.add(prompt);
-        
-        // Add prompt to bio with proper spacing
-        String currentText = _bioController.text;
-        if (currentText.isNotEmpty && !currentText.endsWith('\n')) {
-          currentText += '\n\n';
-        }
-        currentText += '$prompt ';
-        
-        _bioController.text = currentText;
-        _currentLength = currentText.length;
+  void _selectPrompt(String prompt) {
+    setState(() {
+      if (_selectedPrompt == prompt) {
+        // Deselect if same prompt is tapped
+        _selectedPrompt = null;
+        _bioController.clear();
+        _currentLength = 0;
+      } else {
+        // Select new prompt and replace bio content
+        _selectedPrompt = prompt;
+        _bioController.text = '$prompt ';
+        _currentLength = _bioController.text.length;
         
         // Move cursor to end
         _bioController.selection = TextSelection.fromPosition(
-          TextPosition(offset: currentText.length),
+          TextPosition(offset: _bioController.text.length),
         );
-      });
-      
-      // Save to controller
-      Provider.of<OnboardingController>(context, listen: false)
-          .setBio(_bioController.text);
-    }
-  }
-
-  void _removePrompt(String prompt) {
-    setState(() {
-      _selectedPrompts.remove(prompt);
-      
-      // Remove prompt from bio text
-      String currentText = _bioController.text;
-      currentText = currentText.replaceAll(prompt, '').trim();
-      
-      // Clean up extra spaces and newlines
-      currentText = currentText.replaceAll(RegExp(r'\n\s*\n\s*\n'), '\n\n');
-      
-      _bioController.text = currentText;
-      _currentLength = currentText.length;
+      }
     });
     
     // Save to controller
     Provider.of<OnboardingController>(context, listen: false)
         .setBio(_bioController.text);
   }
+
+
 
   BioQuality _analyzeBioQuality() {
     String bio = _bioController.text.toLowerCase();
@@ -150,7 +130,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
     
     return conversationStarters.any((starter) => bio.contains(starter)) ||
            bio.contains('?') || // Questions are great conversation starters
-           _selectedPrompts.isNotEmpty;
+           _selectedPrompt != null;
   }
 
   bool _containsCliches(String bio) {
@@ -268,12 +248,35 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
           
           const SizedBox(height: 8),
           
-          Text(
-            "Tap any prompt to add it to your bio, then complete the sentence",
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.black54,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  "Choose one prompt to get started",
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Text(
+                  "Select 1",
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: Colors.blue.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ),
           
           const SizedBox(height: 16),
@@ -283,16 +286,10 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
             spacing: 8,
             runSpacing: 8,
             children: _personalityPrompts.map((prompt) {
-              bool isSelected = _selectedPrompts.contains(prompt);
+              bool isSelected = _selectedPrompt == prompt;
               
               return GestureDetector(
-                onTap: () {
-                  if (isSelected) {
-                    _removePrompt(prompt);
-                  } else {
-                    _addPromptToBio(prompt);
-                  }
-                },
+                onTap: () => _selectPrompt(prompt),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
@@ -384,6 +381,11 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               onChanged: (value) {
                 setState(() {
                   _currentLength = value.length;
+                  
+                  // Check if user manually cleared the text or removed the selected prompt
+                  if (_selectedPrompt != null && !value.startsWith(_selectedPrompt!)) {
+                    _selectedPrompt = null;
+                  }
                 });
                 
                 // Save to controller

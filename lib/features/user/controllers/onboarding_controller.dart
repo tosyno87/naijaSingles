@@ -27,6 +27,7 @@ class OnboardingController extends ChangeNotifier {
   String? _occupation;
   String? _fashionStyle;
   String? _weekendVibe;
+  String _religion = ''; // Add religion field
   List<String> _languages = [];
   List<String> _genres = [];
   List<String> _values = [];
@@ -42,6 +43,10 @@ class OnboardingController extends ChangeNotifier {
   String _heightUnit = 'cm'; // 'cm' or 'ft'
   String _lookingFor = 'Dating'; // Dating, Friendship, Networking
   String _relationshipIntent = 'Not sure yet'; // Short-term, Long-term, Casual, Not sure yet
+  
+  // Enhanced additional info fields (using existing declarations above)
+  String _drinkingPreference = '';
+  String _smokingPreference = '';
 
   // Getters for basic data
   String get fullName => _fullName;
@@ -62,7 +67,6 @@ class OnboardingController extends ChangeNotifier {
   String? get intent => _intent;
   String? get nationality => _nationality;
   String? get education => _education;
-  String? get occupation => _occupation;
   String? get fashionStyle => _fashionStyle;
   String? get weekendVibe => _weekendVibe;
   List<String> get languages => _languages;
@@ -80,6 +84,14 @@ class OnboardingController extends ChangeNotifier {
   String get heightUnit => _heightUnit;
   String get lookingFor => _lookingFor;
   String get relationshipIntent => _relationshipIntent;
+  
+  // Enhanced additional info getters
+  String get educationLevel => _education ?? '';
+  String get religion => _religion;
+  List<String> get spokenLanguages => _languages;
+  String get occupation => _occupation ?? '';
+  String get drinkingPreference => _drinkingPreference;
+  String get smokingPreference => _smokingPreference;
   
   // Height display helper
   String get heightDisplay {
@@ -124,6 +136,12 @@ class OnboardingController extends ChangeNotifier {
   void setGender(String gender) {
     _gender = gender;
     notifyListeners();
+  }
+
+  void setLocationName(String locationName) {
+    _locationName = locationName;
+    notifyListeners();
+    print('🔍 OnboardingController: Location set to "$locationName"');
   }
 
   void setTribe(String tribe) {
@@ -253,6 +271,49 @@ class OnboardingController extends ChangeNotifier {
 
   void setRelationshipIntent(String intent) {
     _relationshipIntent = intent;
+    notifyListeners();
+  }
+
+  // Enhanced additional info setters
+  void setEducation(String education) {
+    _education = education;
+    notifyListeners();
+  }
+
+  void setReligion(String religion) {
+    _religion = religion;
+    notifyListeners();
+  }
+
+  void setSpokenLanguages(List<String> languages) {
+    _languages = List.from(languages);
+    notifyListeners();
+  }
+
+  void addLanguage(String language) {
+    if (!_languages.contains(language)) {
+      _languages.add(language);
+      notifyListeners();
+    }
+  }
+
+  void removeLanguage(String language) {
+    _languages.remove(language);
+    notifyListeners();
+  }
+
+  void setOccupation(String occupation) {
+    _occupation = occupation;
+    notifyListeners();
+  }
+
+  void setDrinkingPreference(String preference) {
+    _drinkingPreference = preference;
+    notifyListeners();
+  }
+
+  void setSmokingPreference(String preference) {
+    _smokingPreference = preference;
     notifyListeners();
   }
 
@@ -447,10 +508,13 @@ class OnboardingController extends ChangeNotifier {
       'occupation': _occupation,
       'fashionStyle': _fashionStyle,
       'weekendVibe': _weekendVibe,
+      'religion': _religion,
       'languages': _languages,
       'genres': _genres,
       'values': _values,
       'dealbreakers': _dealbreakers,
+      'drinkingPreference': _drinkingPreference,
+      'smokingPreference': _smokingPreference,
       
       // System fields
       'lastActive': DateTime.now().toIso8601String(),
@@ -484,10 +548,12 @@ class OnboardingController extends ChangeNotifier {
       
       // Location information
       'location': {
-        'latitude': 6.5244,
+        'latitude': 6.5244, // Default coordinates - should be updated with real GPS
         'longitude': 3.3792,
-        'address': _locationName ?? 'Lagos, Nigeria',
+        'address': _locationName ?? 'Location not set',
+        'city': _locationName ?? 'Location not set',
       },
+      'locationName': _locationName, // Direct field for easy access
       'latitude': 6.5244,
       'longitude': 3.3792,
       'maximum_distance': 50,
@@ -502,6 +568,7 @@ class OnboardingController extends ChangeNotifier {
     print('   Name: $_fullName');
     print('   Age: $age');
     print('   Gender: $_gender');
+    print('   Location: ${_locationName ?? 'Not set'}');
     print('   Tribe: $_tribe');
     print('   Bio: ${_bio.length} characters');
     print('   Interests: ${_interests.length} items - $_interests');
@@ -513,7 +580,10 @@ class OnboardingController extends ChangeNotifier {
     print('   Additional fields:');
     print('     Education: $_education');
     print('     Occupation: $_occupation');
+    print('     Religion: $_religion');
     print('     Languages: $_languages');
+    print('     Drinking: $_drinkingPreference');
+    print('     Smoking: $_smokingPreference');
     print('     Nationality: $_nationality');
     print('   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos');
     
@@ -652,6 +722,12 @@ class OnboardingController extends ChangeNotifier {
       isValid = false;
     }
     
+    // Location validation - NEW FIELD
+    if (_locationName == null || _locationName!.trim().isEmpty) {
+      missingFields.add('Location');
+      isValid = false;
+    }
+    
     // Check if at least one photo is uploaded
     bool hasPhotos = _profilePhotos.any((photo) => photo != null);
     if (!hasPhotos) {
@@ -664,6 +740,7 @@ class OnboardingController extends ChangeNotifier {
       print('   Name: $_fullName');
       print('   Age: $age years old');
       print('   Gender: $_gender');
+      print('   Location: ${_locationName ?? 'Not set'}');
       print('   Tribe: $_tribe');
       print('   Bio: ${_bio.length} characters');
       print('   Interests: ${_interests.length} selected');
@@ -686,6 +763,7 @@ class OnboardingController extends ChangeNotifier {
       'fullName': _fullName,
       'age': age,
       'gender': _gender,
+      'location': _locationName,
       'tribe': _tribe,
       'bioLength': _bio.length,
       'interestsCount': _interests.length,

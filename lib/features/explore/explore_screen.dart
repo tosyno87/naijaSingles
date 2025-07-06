@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/features/explore/widgets/match_confirmation_modal.dart';
+import 'package:naijasingles/features/dating/screens/user_detail_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:naijasingles/common/data/repo/user_search_repo.dart';
 
@@ -569,6 +570,7 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     final cardPadding = 16.0;
+    final photos = widget.user.imageUrl ?? [];
     
     return FadeTransition(
       opacity: _fadeAnimation,
@@ -581,49 +583,154 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
           elevation: 0,
           borderRadius: BorderRadius.circular(20),
           color: kBackgroundColor,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Profile image
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                  child: AspectRatio(
-                    aspectRatio: 4/3,
-                    child: widget.user.imageUrl?.isNotEmpty == true
-                        ? Image.network(
-                            widget.user.imageUrl![0],
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              color: Colors.grey[300],
-                              child: Icon(
-                                Icons.person,
-                                size: 80,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          )
-                        : Container(
-                            color: Colors.grey[300],
-                            child: Icon(
-                              Icons.person,
-                              size: 80,
-                              color: Colors.grey[500],
-                            ),
-                          ),
+          child: GestureDetector(
+            onTap: () {
+              // Navigate to detailed profile view
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserDetailScreen(
+                    user: widget.user,
+                    onLike: () {
+                      // Handle like action
+                      print('Liked user: ${widget.user.name}');
+                    },
+                    onPass: () {
+                      // Handle pass action
+                      print('Passed user: ${widget.user.name}');
+                    },
                   ),
                 ),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Profile image with photo indicators
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        child: AspectRatio(
+                          aspectRatio: 4/3,
+                          child: photos.isNotEmpty
+                              ? Image.network(
+                                  photos[0], // Show first photo
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    color: Colors.grey[300],
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 80,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  color: Colors.grey[300],
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 80,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                        ),
+                      ),
+                      
+                      // Photo count indicator
+                      if (photos.length > 1)
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.photo_library,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${photos.length}',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      
+                      // Tap to view indicator
+                      Positioned(
+                        bottom: 12,
+                        right: 12,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: kPrimaryColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: kPrimaryColor.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.visibility,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                      
+                      // Photo dots indicator (if multiple photos)
+                      if (photos.length > 1)
+                        Positioned(
+                          bottom: 12,
+                          left: 12,
+                          child: Row(
+                            children: List.generate(
+                              photos.length > 5 ? 5 : photos.length, // Show max 5 dots
+                              (index) => Container(
+                                margin: const EdgeInsets.only(right: 4),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: index == 0 
+                                      ? Colors.white 
+                                      : Colors.white.withOpacity(0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 
                 // User info
                 Padding(
@@ -711,14 +818,38 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
                             height: 1.4,
                           ),
                         ),
+                      
+                      const SizedBox(height: 12),
+                      
+                      // Tap to view profile hint
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.touch_app,
+                            size: 16,
+                            color: kPrimaryColor,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Tap to view full profile',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: kPrimaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
+          ), // Close Container
+        ), // Close GestureDetector  
+      ), // Close Material
+    ), // Close Padding
+    ); // Close FadeTransition
   }
 }

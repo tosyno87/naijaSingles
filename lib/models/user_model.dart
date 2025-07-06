@@ -29,6 +29,12 @@ class UserModel {
   final Map? editInfo;
   final Map? streetView;
   final bool? isBot;
+  final String? bio;
+  final String? profession;
+  final String? education;
+  final String? drinkingStatus;
+  final String? smokingStatus;
+  final DateTime? lastSeen;
 
   List? imageUrl = [];
   int? distanceBW;
@@ -58,6 +64,12 @@ class UserModel {
     this.streetView,
     this.distanceBW,
     this.sexualOrientation,
+    this.bio,
+    this.profession,
+    this.education,
+    this.drinkingStatus,
+    this.smokingStatus,
+    this.lastSeen,
   });
 
   @override
@@ -197,6 +209,22 @@ class UserModel {
             : data.containsKey('Pictures') && data['Pictures'] is List
                 ? List<String>.from(data['Pictures'])
                 : [],
+        bio: safeGet<String>('bio') ?? 
+            safeGetNested<String>('editInfo', 'bio', ''),
+        profession: safeGet<String>('profession') ?? 
+            safeGetNested<String>('editInfo', 'profession', '') ??
+            safeGetNested<String>('editInfo', 'job_title', ''),
+        education: safeGet<String>('education') ?? 
+            safeGetNested<String>('editInfo', 'education', ''),
+        drinkingStatus: safeGet<String>('drinkingStatus') ?? 
+            safeGetNested<String>('editInfo', 'drinkingStatus', ''),
+        smokingStatus: safeGet<String>('smokingStatus') ?? 
+            safeGetNested<String>('editInfo', 'smokingStatus', ''),
+        lastSeen: data.containsKey('lastSeen') && data['lastSeen'] is Timestamp
+            ? (data['lastSeen'] as Timestamp).toDate()
+            : data.containsKey('lastActive') && data['lastActive'] is Timestamp
+                ? (data['lastActive'] as Timestamp).toDate()
+                : null,
       );
     } catch (e) {
       debugPrint('Error creating UserModel from document ${doc.id}: $e');
@@ -214,6 +242,12 @@ class UserModel {
         address: '',
         imageUrl: [],
         editInfo: {},
+        bio: '',
+        profession: '',
+        education: '',
+        drinkingStatus: '',
+        smokingStatus: '',
+        lastSeen: null,
       );
     }
   }
@@ -257,6 +291,16 @@ class UserModel {
           ? (json['distanceBW'] as num).round()
           : null,
       isBot: json['isBot'] ?? false,
+      bio: json['bio'] ?? (json['editInfo'] != null ? json['editInfo']['bio'] : null),
+      profession: json['profession'] ?? (json['editInfo'] != null ? json['editInfo']['profession'] : null),
+      education: json['education'] ?? (json['editInfo'] != null ? json['editInfo']['education'] : null),
+      drinkingStatus: json['drinkingStatus'] ?? (json['editInfo'] != null ? json['editInfo']['drinkingStatus'] : null),
+      smokingStatus: json['smokingStatus'] ?? (json['editInfo'] != null ? json['editInfo']['smokingStatus'] : null),
+      lastSeen: json['lastSeen'] != null 
+          ? DateTime.tryParse(json['lastSeen'].toString())
+          : json['lastActive'] != null
+              ? DateTime.tryParse(json['lastActive'].toString())
+              : null,
     );
   }
 
@@ -294,6 +338,12 @@ class UserModel {
       'isBot': isBot,
       'photos': imageUrl,
       'distanceBW': distanceBW,
+      'bio': bio,
+      'profession': profession,
+      'education': education,
+      'drinkingStatus': drinkingStatus,
+      'smokingStatus': smokingStatus,
+      'lastSeen': lastSeen?.toIso8601String(),
     };
   }
 
@@ -329,6 +379,14 @@ class UserModel {
       imageUrl: map['photos'] is List ? List<String>.from(map['photos']) : null,
       distanceBW:
           map['distanceBW'] is num ? (map['distanceBW'] as num).toInt() : null,
+      bio: map['bio']?.toString(),
+      profession: map['profession']?.toString(),
+      education: map['education']?.toString(),
+      drinkingStatus: map['drinkingStatus']?.toString(),
+      smokingStatus: map['smokingStatus']?.toString(),
+      lastSeen: map['lastSeen'] != null 
+          ? DateTime.tryParse(map['lastSeen'].toString())
+          : null,
     );
   }
 

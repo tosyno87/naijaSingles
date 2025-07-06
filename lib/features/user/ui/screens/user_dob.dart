@@ -24,9 +24,10 @@ class _UserDOBState extends State<UserDOB> {
   void initState() {
     super.initState();
     // Initialize text controller
-    dobctlr.text = '${initialDate.day}/${initialDate.month}/${initialDate.year}';
+    dobctlr.text =
+        '${initialDate.day}/${initialDate.month}/${initialDate.year}';
   }
-  
+
   @override
   void dispose() {
     dobctlr.dispose();
@@ -70,7 +71,8 @@ class _UserDOBState extends State<UserDOB> {
                   initialDateTime: selecteddate,
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
-                      dobctlr.text = '${newdate.day}/${newdate.month}/${newdate.year}';
+                      dobctlr.text =
+                          '${newdate.day}/${newdate.month}/${newdate.year}';
                       selecteddate = newdate;
                       isDateSelected = true;
                     });
@@ -114,7 +116,7 @@ class _UserDOBState extends State<UserDOB> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -137,19 +139,20 @@ class _UserDOBState extends State<UserDOB> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              
+
               // Progress indicator
               Container(
                 height: 4,
-                width: screenSize.width * 0.30, // 30% of screen width (second step)
+                width: screenSize.width *
+                    0.30, // 30% of screen width (second step)
                 decoration: BoxDecoration(
                   color: const Color(0xFF27AE60),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Title section - Option 1: Playful & Flirty
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,9 +175,9 @@ class _UserDOBState extends State<UserDOB> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Date selector labelLarge
               GestureDetector(
                 onTap: _showDatePicker,
@@ -213,9 +216,9 @@ class _UserDOBState extends State<UserDOB> {
                   ),
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Age requirement note
               const Text(
                 "You must be 18+ to join NaijaSingles",
@@ -225,9 +228,9 @@ class _UserDOBState extends State<UserDOB> {
                   fontStyle: FontStyle.italic,
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Continue labelLarge
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),

@@ -8,18 +8,18 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Print the current user ID
   final currentUser = FirebaseAuth.instance.currentUser;
   print('Current User ID: ${currentUser?.uid}');
-  
+
   // Check if it matches test users
   final testUserIds = ['test_user_1', 'test_user_2'];
   final matches = currentUser != null && testUserIds.contains(currentUser.uid);
-  
+
   print('Test User IDs: $testUserIds');
   print(matches ? 'MATCH FOUND! ✅' : 'NO MATCH ❌');
-  
+
   // Exit the app after printing
   runApp(const PrintUserIdApp());
 }

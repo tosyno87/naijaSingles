@@ -201,10 +201,7 @@ class SettingPageState extends State<SettingPage> {
                       ),
                     ),
 
-
-
                     ListTile(
-
                       title: Card(
                           child: Padding(
                         padding: const EdgeInsets.all(15.0),

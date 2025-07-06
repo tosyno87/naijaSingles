@@ -20,7 +20,8 @@ class MatchNotificationDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MatchNotificationDialog> createState() => _MatchNotificationDialogState();
+  State<MatchNotificationDialog> createState() =>
+      _MatchNotificationDialogState();
 }
 
 class _MatchNotificationDialogState extends State<MatchNotificationDialog>
@@ -33,12 +34,12 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
   @override
   void initState() {
     super.initState();
-    
+
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    
+
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
@@ -147,9 +148,9 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                     size: 40,
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Match text
                 const Text(
                   "It's a Match! 🎉",
@@ -160,9 +161,9 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 Text(
                   "You and ${widget.otherUser?.name ?? 'this person'} liked each other!",
                   style: const TextStyle(
@@ -171,9 +172,9 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // User avatars (if available)
                 if (widget.otherUser?.imageUrl?.isNotEmpty == true)
                   Row(
@@ -194,18 +195,18 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                           size: 30,
                         ),
                       ),
-                      
+
                       const SizedBox(width: 20),
-                      
+
                       // Heart icon
                       const Icon(
                         Icons.favorite,
                         color: Colors.red,
                         size: 30,
                       ),
-                      
+
                       const SizedBox(width: 20),
-                      
+
                       // Other user avatar
                       Container(
                         width: 60,
@@ -221,9 +222,9 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                       ),
                     ],
                   ),
-                
+
                 const SizedBox(height: 30),
-                
+
                 // Action labelLarges
                 Row(
                   children: [
@@ -247,9 +248,7 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                         ),
                       ),
                     ),
-                    
                     const SizedBox(width: 16),
-                    
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _goToChat,

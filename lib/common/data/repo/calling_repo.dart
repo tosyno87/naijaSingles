@@ -92,7 +92,9 @@ class CallingRepo {
                 context,
                 MaterialPageRoute(
                   builder: (context) => DialCall(
-                      channelName: chatId, receiver: second, callType: callType),
+                      channelName: chatId,
+                      receiver: second,
+                      callType: callType),
                 ),
               );
             }

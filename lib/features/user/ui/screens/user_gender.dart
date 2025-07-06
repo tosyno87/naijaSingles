@@ -23,27 +23,27 @@ class Gender extends StatefulWidget {
 class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
   String? selectedGender;
   bool showOnProfile = true;
-  
+
   // Use nullable types instead of late initialization
   AnimationController? _animationController;
   Animation<double>? _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize animation controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     // Initialize animation
     _fadeAnimation = CurvedAnimation(
       parent: _animationController!,
       curve: Curves.easeInOut,
     );
-    
+
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
@@ -51,7 +51,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
       }
     });
   }
-  
+
   @override
   void dispose() {
     _animationController?.dispose();
@@ -60,10 +60,11 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    var userData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     log(userData.toString());
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -86,19 +87,20 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              
+
               // Progress indicator
               Container(
                 height: 4,
-                width: screenSize.width * 0.45, // 45% of screen width (third step)
+                width:
+                    screenSize.width * 0.45, // 45% of screen width (third step)
                 decoration: BoxDecoration(
                   color: const Color(0xFF27AE60),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Title section
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,9 +123,9 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Gender options with card-style layout
               Column(
                 children: [
@@ -149,9 +151,9 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                   ),
                 ],
               ),
-              
+
               const Spacer(),
-              
+
               // iOS-style toggle for "Show my gender on profile"
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -177,34 +179,32 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Continue labelLarge
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: selectedGender == null ? null : () {
-                      if (selectedGender != null) {
-                        final userGender = {
-                          'userGender': selectedGender,
-                          'showOnProfile': showOnProfile
-                        };
-                        userData.addAll(userGender);
-                        Navigator.pushNamed(
-                          context, 
-                          RouteName.nationalityScreen,
-                          arguments: userData
-                        );
-                      } else {
-                        CustomSnackbar.showSnackBarSimple(
-                          "Please select your gender",
-                          context
-                        );
-                      }
-                    },
+                    onPressed: selectedGender == null
+                        ? null
+                        : () {
+                            if (selectedGender != null) {
+                              final userGender = {
+                                'userGender': selectedGender,
+                                'showOnProfile': showOnProfile
+                              };
+                              userData.addAll(userGender);
+                              Navigator.pushNamed(
+                                  context, RouteName.nationalityScreen,
+                                  arguments: userData);
+                            } else {
+                              CustomSnackbar.showSnackBarSimple(
+                                  "Please select your gender", context);
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF27AE60),
                       foregroundColor: Colors.white,
@@ -233,9 +233,10 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
       ),
     );
   }
-  
+
   // Card-style gender option with shadow and rounded corners
-  Widget _buildGenderCard(String title, bool isSelected, VoidCallback onTap, IconData icon) {
+  Widget _buildGenderCard(
+      String title, bool isSelected, VoidCallback onTap, IconData icon) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

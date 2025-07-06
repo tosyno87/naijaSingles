@@ -8,10 +8,12 @@ class AdditionalInfoOnboardingScreen extends StatefulWidget {
   const AdditionalInfoOnboardingScreen({Key? key}) : super(key: key);
 
   @override
-  State<AdditionalInfoOnboardingScreen> createState() => _AdditionalInfoOnboardingScreenState();
+  State<AdditionalInfoOnboardingScreen> createState() =>
+      _AdditionalInfoOnboardingScreenState();
 }
 
-class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardingScreen> {
+class _AdditionalInfoOnboardingScreenState
+    extends State<AdditionalInfoOnboardingScreen> {
   String _heightFtIn = HeightData.defaultHeightFtIn;
   int _heightCm = HeightData.defaultHeightCm;
   String _lookingFor = 'Dating';
@@ -19,22 +21,47 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
 
   final List<Map<String, dynamic>> _lookingForOptions = [
     {'label': 'Dating', 'value': 'Dating', 'icon': Icons.favorite_outline},
-    {'label': 'Friendship', 'value': 'Friendship', 'icon': Icons.people_outline},
-    {'label': 'Networking', 'value': 'Networking', 'icon': Icons.business_center_outlined},
+    {
+      'label': 'Friendship',
+      'value': 'Friendship',
+      'icon': Icons.people_outline
+    },
+    {
+      'label': 'Networking',
+      'value': 'Networking',
+      'icon': Icons.business_center_outlined
+    },
   ];
 
   final List<Map<String, dynamic>> _relationshipIntentOptions = [
-    {'label': 'Short-term fun', 'value': 'Short-term', 'icon': Icons.flash_on_outlined},
-    {'label': 'Long-term relationship', 'value': 'Long-term', 'icon': Icons.favorite_border},
-    {'label': 'Casual dating', 'value': 'Casual', 'icon': Icons.coffee_outlined},
-    {'label': 'Not sure yet', 'value': 'Not sure yet', 'icon': Icons.help_outline},
+    {
+      'label': 'Short-term fun',
+      'value': 'Short-term',
+      'icon': Icons.flash_on_outlined
+    },
+    {
+      'label': 'Long-term relationship',
+      'value': 'Long-term',
+      'icon': Icons.favorite_border
+    },
+    {
+      'label': 'Casual dating',
+      'value': 'Casual',
+      'icon': Icons.coffee_outlined
+    },
+    {
+      'label': 'Not sure yet',
+      'value': 'Not sure yet',
+      'icon': Icons.help_outline
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // Initialize height from controller if available
     if (controller.height > 0) {
       _heightCm = controller.height.round();
@@ -44,7 +71,7 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
         _heightFtIn = ftIn;
       }
     }
-    
+
     _lookingFor = controller.lookingFor;
     _relationshipIntent = controller.relationshipIntent;
   }
@@ -53,7 +80,7 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(isTablet ? 32 : 24),
       child: Column(
@@ -76,11 +103,12 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
               color: Colors.black54,
             ),
           ),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Height Section
-          _buildSectionHeader('Height', 'Your height helps with better matching'),
+          _buildSectionHeader(
+              'Height', 'Your height helps with better matching'),
           SizedBox(height: isTablet ? 20 : 16),
           AfropeepHeightDropdown(
             initialHeightFtIn: _heightFtIn,
@@ -91,25 +119,28 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
                 _heightCm = heightCm;
               });
               // Save to controller
-              final controller = Provider.of<OnboardingController>(context, listen: false);
+              final controller =
+                  Provider.of<OnboardingController>(context, listen: false);
               controller.setHeightFromDropdown(heightFtIn, heightCm);
             },
           ),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Looking For Section
-          _buildSectionHeader('I\'m looking for', 'What brings you to NaijaSingles?'),
+          _buildSectionHeader(
+              'I\'m looking for', 'What brings you to NaijaSingles?'),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildLookingForOptions(),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Relationship Intent Section
-          _buildSectionHeader('Relationship goals', 'What are you hoping to find?'),
+          _buildSectionHeader(
+              'Relationship goals', 'What are you hoping to find?'),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildRelationshipIntentOptions(),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
         ],
       ),
@@ -119,7 +150,7 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
   Widget _buildSectionHeader(String title, String subtitle) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -146,7 +177,7 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
   List<Widget> _buildLookingForOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return _lookingForOptions.map((option) {
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
@@ -159,7 +190,8 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
               _lookingFor = value;
             });
             // Save to controller
-            final controller = Provider.of<OnboardingController>(context, listen: false);
+            final controller =
+                Provider.of<OnboardingController>(context, listen: false);
             controller.setLookingFor(value);
           },
           option['icon'],
@@ -171,7 +203,7 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return _relationshipIntentOptions.map((option) {
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
@@ -184,7 +216,8 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
               _relationshipIntent = value;
             });
             // Save to controller
-            final controller = Provider.of<OnboardingController>(context, listen: false);
+            final controller =
+                Provider.of<OnboardingController>(context, listen: false);
             controller.setRelationshipIntent(value);
           },
           option['icon'],
@@ -203,7 +236,7 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
     final isSelected = selectedValue == value;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return GestureDetector(
       onTap: () => onSelected(value),
       child: Container(
@@ -213,7 +246,9 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
           vertical: isTablet ? 20 : 16,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF008037).withValues(alpha: 0.1) : Colors.white,
+          color: isSelected
+              ? const Color(0xFF008037).withValues(alpha: 0.1)
+              : Colors.white,
           border: Border.all(
             color: isSelected ? const Color(0xFF008037) : Colors.grey.shade300,
             width: 2,
@@ -231,7 +266,8 @@ class _AdditionalInfoOnboardingScreenState extends State<AdditionalInfoOnboardin
           children: [
             Icon(
               icon,
-              color: isSelected ? const Color(0xFF008037) : Colors.grey.shade600,
+              color:
+                  isSelected ? const Color(0xFF008037) : Colors.grey.shade600,
               size: isTablet ? 24 : 20,
             ),
             SizedBox(width: isTablet ? 16 : 12),

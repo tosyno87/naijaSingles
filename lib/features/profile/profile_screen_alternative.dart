@@ -24,7 +24,7 @@ class ProfileScreenAlternative extends StatelessWidget {
           ),
         ),
       ),
-      
+
       // App bar with menu
       appBar: AppBar(
         backgroundColor: Color(0xFFFDF1E7),
@@ -54,7 +54,7 @@ class ProfileScreenAlternative extends StatelessWidget {
           ),
         ],
       ),
-      
+
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -65,7 +65,7 @@ class ProfileScreenAlternative extends StatelessWidget {
                 child: Text('Profile Content'),
               ),
             ),
-            
+
             // No buttons needed - everything in FAB and menu
             SizedBox(height: 80), // Space for FAB
           ],

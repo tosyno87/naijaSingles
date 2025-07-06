@@ -241,7 +241,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     "Add media".tr().toString(),
-                                    style: TextStyle(color: AppColors.secondaryColor),
+                                    style: TextStyle(
+                                        color: AppColors.secondaryColor),
                                   ),
                                 ),
                               ],
@@ -276,7 +277,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       "Settings".tr().toString(),
-                                      style: TextStyle(color: AppColors.secondaryColor),
+                                      style: TextStyle(
+                                          color: AppColors.secondaryColor),
                                     ),
                                   )
                                 ],

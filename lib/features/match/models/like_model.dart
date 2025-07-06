@@ -14,7 +14,7 @@ class LikeModel {
   // Create a LikeModel from a Firestore document
   factory LikeModel.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     return LikeModel(
       from: data['from'] ?? '',
       to: data['to'] ?? '',
@@ -52,10 +52,8 @@ class LikeModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
-    return other is LikeModel &&
-        other.from == from &&
-        other.to == to;
+
+    return other is LikeModel && other.from == from && other.to == to;
   }
 
   @override

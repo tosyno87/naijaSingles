@@ -31,52 +31,58 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   final GlobalKey _locationKey = GlobalKey();
   final GlobalKey _bioKey = GlobalKey();
   final GlobalKey _continueButtonKey = GlobalKey();
-  
+
   // Text controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-  
+
   // Form validation
   final _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
-  
+
   // Age range for picker
-  final List<int> _ageOptions = List.generate(63, (index) => index + 18); // 18-80
+  final List<int> _ageOptions =
+      List.generate(63, (index) => index + 18); // 18-80
   int? _selectedAge;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize text controllers with existing values if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+
       if (controller.userName != null) {
         _nameController.text = controller.userName!;
       }
-      
+
       if (controller.dateOfBirth != null) {
         // Calculate age from date of birth
         final now = DateTime.now();
-        final age = now.year - controller.dateOfBirth!.year - 
-            (now.month < controller.dateOfBirth!.month || 
-            (now.month == controller.dateOfBirth!.month && now.day < controller.dateOfBirth!.day) ? 1 : 0);
-        
+        final age = now.year -
+            controller.dateOfBirth!.year -
+            (now.month < controller.dateOfBirth!.month ||
+                    (now.month == controller.dateOfBirth!.month &&
+                        now.day < controller.dateOfBirth!.day)
+                ? 1
+                : 0);
+
         _selectedAge = age;
       }
-      
+
       if (controller.locationName != null) {
         _locationController.text = controller.locationName!;
       }
-      
+
       if (controller.bio != null) {
         _bioController.text = controller.bio!;
       }
     });
   }
-  
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -84,13 +90,13 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
     _bioController.dispose();
     super.dispose();
   }
-  
+
   // Show age picker modal
   void _showAgePickerModal(BuildContext context) {
     // Define the cream background color for consistency
     const Color backgroundColor = Color(0xFFFDF6EC);
     const Color deepGreen = Color(0xFF008037);
-    
+
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
@@ -129,7 +135,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Age grid
                 Container(
                   constraints: BoxConstraints(
@@ -138,7 +144,8 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                   child: GridView.builder(
                     shrinkWrap: true,
                     physics: const BouncingScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       childAspectRatio: 1.5,
                       crossAxisSpacing: 10,
@@ -148,7 +155,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     itemBuilder: (context, index) {
                       final age = _ageOptions[index];
                       final isSelected = _selectedAge == age;
-                      
+
                       return InkWell(
                         onTap: () {
                           setState(() {
@@ -171,8 +178,11 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                               age.toString(),
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected ? Colors.white : Colors.black87,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color:
+                                    isSelected ? Colors.white : Colors.black87,
                               ),
                             ),
                           ),
@@ -181,9 +191,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     },
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Done labelLarge
                 SizedBox(
                   width: double.infinity,
@@ -220,7 +230,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
     if (!_formKey.currentState!.validate()) {
       return false;
     }
-    
+
     // Check if age is selected
     if (_selectedAge == null) {
       setState(() {
@@ -228,23 +238,25 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
       });
       return false;
     }
-    
+
     return true;
   }
 
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<OnboardingController>(context);
-    
+
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);
-    
+
     return Scaffold(
       backgroundColor: widget.backgroundColor,
       body: SafeArea(
         child: Form(
           key: _formKey,
-          autovalidateMode: _autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
+          autovalidateMode: _autoValidate
+              ? AutovalidateMode.always
+              : AutovalidateMode.disabled,
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
@@ -254,7 +266,8 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: deepGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -270,9 +283,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Header
                 Text(
                   'Tell us about yourself',
@@ -292,7 +305,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                
+
                 // Name field
                 Container(
                   decoration: BoxDecoration(
@@ -361,11 +374,13 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: deepGreen, width: 2),
+                            borderSide:
+                                const BorderSide(color: deepGreen, width: 2),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.red[400]!, width: 1),
+                            borderSide:
+                                BorderSide(color: Colors.red[400]!, width: 1),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -385,9 +400,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Age field
                 Container(
                   decoration: BoxDecoration(
@@ -429,7 +444,8 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         onTap: () => _showAgePickerModal(context),
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey[400]!),
                             borderRadius: BorderRadius.circular(12),
@@ -455,11 +471,17 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                       ),
                                     ),
                                     Text(
-                                      _selectedAge != null ? _selectedAge.toString() : 'Select your age',
+                                      _selectedAge != null
+                                          ? _selectedAge.toString()
+                                          : 'Select your age',
                                       style: GoogleFonts.poppins(
-                                        color: _selectedAge != null ? Colors.black87 : Colors.grey[600],
+                                        color: _selectedAge != null
+                                            ? Colors.black87
+                                            : Colors.grey[600],
                                         fontSize: 16,
-                                        fontWeight: _selectedAge != null ? FontWeight.w500 : FontWeight.normal,
+                                        fontWeight: _selectedAge != null
+                                            ? FontWeight.w500
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ],
@@ -487,9 +509,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Location field
                 Container(
                   decoration: BoxDecoration(
@@ -558,23 +580,27 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: deepGreen, width: 2),
+                            borderSide:
+                                const BorderSide(color: deepGreen, width: 2),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.red[400]!, width: 1),
+                            borderSide:
+                                BorderSide(color: Colors.red[400]!, width: 1),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 16,
                           ),
                           suffixIcon: IconButton(
-                            icon: const Icon(Icons.my_location, color: deepGreen),
+                            icon:
+                                const Icon(Icons.my_location, color: deepGreen),
                             onPressed: () {
                               // Location picker functionality would go here
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Location detection coming soon!'),
+                                  content:
+                                      Text('Location detection coming soon!'),
                                   duration: Duration(seconds: 2),
                                 ),
                               );
@@ -591,9 +617,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Bio field
                 Container(
                   decoration: BoxDecoration(
@@ -648,7 +674,8 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           fontWeight: FontWeight.w500,
                         ),
                         decoration: InputDecoration(
-                          hintText: 'Tell others about yourself, your interests, and what you\'re looking for...',
+                          hintText:
+                              'Tell others about yourself, your interests, and what you\'re looking for...',
                           hintStyle: GoogleFonts.poppins(
                             color: Colors.grey[600],
                             fontSize: 14,
@@ -665,11 +692,13 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: deepGreen, width: 2),
+                            borderSide:
+                                const BorderSide(color: deepGreen, width: 2),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.red[400]!, width: 1),
+                            borderSide:
+                                BorderSide(color: Colors.red[400]!, width: 1),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -692,9 +721,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Continue labelLarge
                 Center(
                   child: SizedBox(
@@ -706,22 +735,25 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         // Validate form
                         if (_validateFields()) {
                           // Save data to controller
-                          controller.updateUserName(_nameController.text.trim());
-                          
+                          controller
+                              .updateUserName(_nameController.text.trim());
+
                           // Create a date of birth from the age
                           if (_selectedAge != null) {
                             final now = DateTime.now();
-                            final dob = DateTime(now.year - _selectedAge!, now.month, now.day);
+                            final dob = DateTime(
+                                now.year - _selectedAge!, now.month, now.day);
                             controller.updateDateOfBirth(dob);
                           }
-                          
+
                           // Save location (in a real app, we would also save lat/lng)
                           // For now, we'll just use a placeholder for lat/lng
-                          controller.updateLocation(0.0, 0.0, _locationController.text.trim());
-                          
+                          controller.updateLocation(
+                              0.0, 0.0, _locationController.text.trim());
+
                           // Save bio
                           controller.updateBio(_bioController.text.trim());
-                          
+
                           // Proceed to next step
                           HapticFeedback.mediumImpact();
                           widget.onNext();
@@ -730,7 +762,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           setState(() {
                             _autoValidate = true;
                           });
-                          
+
                           // Provide feedback
                           HapticFeedback.vibrate();
                         }
@@ -753,7 +785,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
               ],
             ),

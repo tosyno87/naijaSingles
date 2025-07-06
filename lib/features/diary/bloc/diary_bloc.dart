@@ -18,8 +18,7 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
     on<_DiaryEntriesUpdated>(_onEntriesUpdated);
   }
 
-  Future<void> _onLoad(
-      LoadDiaryEntries event, Emitter<DiaryState> emit) async {
+  Future<void> _onLoad(LoadDiaryEntries event, Emitter<DiaryState> emit) async {
     emit(DiaryLoading());
     await _subscription?.cancel();
     _subscription = repository.entriesStream().listen((entries) {
@@ -47,8 +46,7 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
     return super.close();
   }
 
-  void _onEntriesUpdated(
-      _DiaryEntriesUpdated event, Emitter<DiaryState> emit) {
+  void _onEntriesUpdated(_DiaryEntriesUpdated event, Emitter<DiaryState> emit) {
     emit(DiaryLoaded(event.entries));
   }
 }

@@ -17,11 +17,12 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
   int _currentPhotoIndex = 0; // Track current photo for indicators
-  PageController _photoPageController = PageController(); // Control photo swiping
+  PageController _photoPageController =
+      PageController(); // Control photo swiping
 
   // Afrocentric color scheme
   static const Color backgroundColor = Color(0xFFFDF1E7); // Warm cream
@@ -54,10 +55,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Available fields: ${data?.keys.toList()}');
           print('   Name: ${data?['name']}');
           print('   Interests: ${data?['interests']}');
-          print('   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
+          print(
+              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
           print('   Looking for: ${data?['lookingFor']}');
           print('   Bio length: ${(data?['bio'] ?? '').length} characters');
-          
+
           setState(() {
             _userData = data;
             _isLoading = false;
@@ -137,8 +139,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          Icons.privacy_tip_outlined, 
-                          color: primaryColor, 
+                          Icons.privacy_tip_outlined,
+                          color: primaryColor,
                           size: 20,
                         ),
                       ),
@@ -185,8 +187,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          Icons.settings_outlined, 
-                          color: textPrimary, 
+                          Icons.settings_outlined,
+                          color: textPrimary,
                           size: 20,
                         ),
                       ),
@@ -231,32 +233,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     // Profile Photos Section
                     _buildPhotoSection(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Basic Info Card
                     _buildBasicInfoCard(),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // About Me Card
                     _buildAboutMeCard(),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Interests Card
                     _buildInterestsCard(),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Details Card
                     _buildDetailsCard(),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // Profile Action Buttons
                     _buildProfileActionButtons(),
-                    
+
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -267,11 +269,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildPhotoSection() {
     final photos = _userData?['photos'] as List<dynamic>? ?? [];
-    
+
     if (photos.isEmpty) {
       return _buildEmptyPhotoPlaceholder();
     }
-    
+
     return Column(
       children: [
         // Main photo viewer with swipe
@@ -334,36 +336,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 );
                               },
-                              loadingBuilder: (context, child, loadingProgress) {
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
                                 return Container(
                                   color: Colors.grey.shade100,
                                   child: Center(
                                     child: CircularProgressIndicator(
                                       color: primaryColor,
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded /
-                                              loadingProgress.expectedTotalBytes!
-                                          : null,
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
                                     ),
                                   ),
                                 );
                               },
                             ),
-                            
+
                             // Enhanced gradient overlay for better text visibility
                             Positioned(
                               bottom: 0,
                               left: 0,
                               right: 0,
                               child: Container(
-                                height: 100, // Increased height for better coverage
+                                height:
+                                    100, // Increased height for better coverage
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      Colors.black.withOpacity(0.8), // Increased opacity
+                                      Colors.black.withOpacity(
+                                          0.8), // Increased opacity
                                       Colors.black.withOpacity(0.4),
                                       Colors.transparent,
                                     ],
@@ -371,15 +380,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             // Enhanced photo counter with better contrast
                             Positioned(
                               top: 16,
                               right: 16,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.8), // Increased opacity
+                                  color: Colors.black
+                                      .withOpacity(0.8), // Increased opacity
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: Colors.white.withOpacity(0.2),
@@ -391,7 +402,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w600, // Increased weight
+                                    fontWeight:
+                                        FontWeight.w600, // Increased weight
                                     shadows: [
                                       Shadow(
                                         offset: const Offset(0, 1),
@@ -403,7 +415,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             // Enhanced tap indicator with better visibility
                             Positioned(
                               bottom: 16,
@@ -411,7 +423,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.8), // Increased opacity
+                                  color: Colors.black
+                                      .withOpacity(0.8), // Increased opacity
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: Colors.white.withOpacity(0.3),
@@ -439,7 +452,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 },
               ),
-              
+
               // Enhanced Left/Right navigation arrows with better visibility
               if (photos.length > 1) ...[
                 Positioned(
@@ -526,9 +539,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Photo indicators (dots)
         if (photos.length > 1)
           Row(
@@ -540,17 +553,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: index == _currentPhotoIndex ? 24 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: index == _currentPhotoIndex 
-                      ? primaryColor 
+                  color: index == _currentPhotoIndex
+                      ? primaryColor
                       : primaryColor.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
             ),
           ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Photo grid view (thumbnail strip)
         if (photos.length > 1)
           Container(
@@ -610,7 +623,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
   }
-  
+
   // Full screen photo viewer
   void _showFullScreenPhoto(List<dynamic> photos, int initialIndex) {
     Navigator.of(context).push(
@@ -656,7 +669,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Use pre-calculated age from database, fallback to calculation if not available
     final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
     final gender = _userData?['gender'] ?? 'Not specified';
-    
+
     return Card(
       color: cardColor,
       elevation: 2,
@@ -702,7 +715,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildAboutMeCard() {
     final bio = _userData?['bio'] ?? '';
-    
+
     return Card(
       color: cardColor,
       elevation: 2,
@@ -737,7 +750,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildInterestsCard() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
-    
+
     return Card(
       color: cardColor,
       elevation: 2,
@@ -781,11 +794,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 runSpacing: 8,
                 children: interests.map((interest) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: primaryColor.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       interest.toString(),
@@ -806,19 +821,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildDetailsCard() {
     final tribe = _userData?['tribe'] ?? 'Not specified';
-    final preferences = _userData?['preferences'] as Map<String, dynamic>? ?? {};
-    final interestedIn = preferences['interestedIn'] ?? _userData?['interestedIn'] ?? 'Not specified';
+    final preferences =
+        _userData?['preferences'] as Map<String, dynamic>? ?? {};
+    final interestedIn = preferences['interestedIn'] ??
+        _userData?['interestedIn'] ??
+        'Not specified';
     final ageRange = preferences['ageRange'] as List<dynamic>? ?? [];
-    final lookingFor = preferences['lookingFor'] ?? _userData?['lookingFor'] ?? 'Not specified';
-    final relationshipIntent = preferences['relationshipIntent'] ?? _userData?['relationshipIntent'] ?? 'Not specified';
-    final heightDisplay = _userData?['heightDisplay'] ?? _userData?['height_ft_in'] ?? 'Not specified';
-    
+    final lookingFor = preferences['lookingFor'] ??
+        _userData?['lookingFor'] ??
+        'Not specified';
+    final relationshipIntent = preferences['relationshipIntent'] ??
+        _userData?['relationshipIntent'] ??
+        'Not specified';
+    final heightDisplay = _userData?['heightDisplay'] ??
+        _userData?['height_ft_in'] ??
+        'Not specified';
+
     // Additional fields from onboarding
     final education = _userData?['education'] ?? '';
     final occupation = _userData?['occupation'] ?? '';
     final languages = _userData?['languages'] as List<dynamic>? ?? [];
     final nationality = _userData?['nationality'] ?? '';
-    
+
     return Card(
       color: cardColor,
       elevation: 2,
@@ -847,12 +871,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Basic details
             _buildDetailRow('Tribe/Ethnicity', tribe),
             const SizedBox(height: 12),
             _buildDetailRow('Height', heightDisplay),
-            
+
             // Additional profile info (if available)
             if (education.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -870,17 +894,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 12),
               _buildDetailRow('Languages', languages.join(', ')),
             ],
-            
+
             const SizedBox(height: 16),
-            
+
             // Divider
             Container(
               height: 1,
               color: textSecondary.withValues(alpha: 0.2),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Dating preferences
             Text(
               'Dating Preferences',
@@ -898,7 +922,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildDetailRow('Relationship goals', relationshipIntent),
             if (ageRange.length == 2) ...[
               const SizedBox(height: 12),
-              _buildDetailRow('Age preference', '${ageRange[0]} - ${ageRange[1]} years'),
+              _buildDetailRow(
+                  'Age preference', '${ageRange[0]} - ${ageRange[1]} years'),
             ],
           ],
         ),
@@ -975,7 +1000,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               builder: (_) => const EditProfileScreen(),
             ),
           );
-          
+
           // Reload data if profile was updated
           if (result == true) {
             _loadUserData();
@@ -1009,12 +1034,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   int? _calculateAge(String? dobString) {
     if (dobString == null) return null;
-    
+
     try {
       final dob = DateTime.parse(dobString);
       final now = DateTime.now();
       int age = now.year - dob.year;
-      if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+      if (now.month < dob.month ||
+          (now.month == dob.month && now.day < dob.day)) {
         age--;
       }
       return age;
@@ -1132,7 +1158,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
               );
             },
           ),
-          
+
           // Photo indicators at bottom
           if (widget.photos.length > 1)
             Positioned(
@@ -1148,8 +1174,8 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                     width: index == _currentIndex ? 24 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: index == _currentIndex 
-                          ? Colors.white 
+                      color: index == _currentIndex
+                          ? Colors.white
                           : Colors.white.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(4),
                     ),

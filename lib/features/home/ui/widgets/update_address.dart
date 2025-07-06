@@ -176,8 +176,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
               ),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStateProperty.all<Color>(primaryColor),
+                  backgroundColor: WidgetStateProperty.all<Color>(primaryColor),
                 ),
                 child: Text(
                   "Confirm".tr().toString(),

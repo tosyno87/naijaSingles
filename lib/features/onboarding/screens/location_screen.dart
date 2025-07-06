@@ -30,12 +30,14 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
-      if (controller.locationName != null && controller.locationName!.isNotEmpty) {
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+
+      if (controller.locationName != null &&
+          controller.locationName!.isNotEmpty) {
         setState(() {
           _currentLocation = controller.locationName;
           _cityController.text = controller.locationName!;
@@ -105,7 +107,7 @@ class _LocationScreenState extends State<LocationScreen> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         String location = '';
-        
+
         // Format location based on country
         if (place.country == 'United States') {
           location = '${place.locality}, ${place.administrativeArea}';
@@ -123,9 +125,10 @@ class _LocationScreenState extends State<LocationScreen> {
         });
 
         // Save to controller
-        final controller = Provider.of<OnboardingController>(context, listen: false);
+        final controller =
+            Provider.of<OnboardingController>(context, listen: false);
         controller.setLocationName(location);
-        
+
         print('🔍 LocationScreen: GPS location set to "$location"');
       }
     } catch (e) {
@@ -147,10 +150,10 @@ class _LocationScreenState extends State<LocationScreen> {
     try {
       // Get location from zip code
       List<Location> locations = await locationFromAddress(zipCode);
-      
+
       if (locations.isNotEmpty) {
         Location location = locations[0];
-        
+
         // Get address details from coordinates
         List<Placemark> placemarks = await placemarkFromCoordinates(
           location.latitude,
@@ -160,7 +163,7 @@ class _LocationScreenState extends State<LocationScreen> {
         if (placemarks.isNotEmpty) {
           Placemark place = placemarks[0];
           String locationString = '';
-          
+
           // Format location based on country
           if (place.country == 'United States') {
             locationString = '${place.locality}, ${place.administrativeArea}';
@@ -177,10 +180,12 @@ class _LocationScreenState extends State<LocationScreen> {
           });
 
           // Save to controller
-          final controller = Provider.of<OnboardingController>(context, listen: false);
+          final controller =
+              Provider.of<OnboardingController>(context, listen: false);
           controller.setLocationName(locationString);
-          
-          print('🔍 LocationScreen: Zip code location set to "$locationString"');
+
+          print(
+              '🔍 LocationScreen: Zip code location set to "$locationString"');
         }
       }
     } catch (e) {
@@ -188,7 +193,8 @@ class _LocationScreenState extends State<LocationScreen> {
         _isLoadingLocation = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not find location for zip code: $zipCode')),
+        SnackBar(
+            content: Text('Could not find location for zip code: $zipCode')),
       );
       print('Error searching by zip: $e');
     }
@@ -202,9 +208,10 @@ class _LocationScreenState extends State<LocationScreen> {
     });
 
     // Save to controller
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     controller.setLocationName(city.trim());
-    
+
     print('🔍 LocationScreen: Manual location set to "$city"');
   }
 
@@ -274,9 +281,9 @@ class _LocationScreenState extends State<LocationScreen> {
               color: textDarkBrown,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Text(
             "This helps us connect you with people nearby",
             style: GoogleFonts.poppins(
@@ -284,15 +291,15 @@ class _LocationScreenState extends State<LocationScreen> {
               color: textLightBrown,
             ),
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // GPS Location Button
           Container(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _isLoadingLocation ? null : _getCurrentLocation,
-              icon: _isLoadingLocation 
+              icon: _isLoadingLocation
                   ? SizedBox(
                       width: 20,
                       height: 20,
@@ -303,7 +310,9 @@ class _LocationScreenState extends State<LocationScreen> {
                     )
                   : Icon(Icons.my_location, color: Colors.white),
               label: Text(
-                _isLoadingLocation ? 'Getting Location...' : 'Use My Current Location',
+                _isLoadingLocation
+                    ? 'Getting Location...'
+                    : 'Use My Current Location',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -319,9 +328,9 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Divider
           Row(
             children: [
@@ -339,9 +348,9 @@ class _LocationScreenState extends State<LocationScreen> {
               Expanded(child: Divider(color: Colors.grey.shade300)),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Manual input toggle
           Row(
             children: [
@@ -354,7 +363,8 @@ class _LocationScreenState extends State<LocationScreen> {
                       color: !_useZipCode ? afropeepGreen : cardBackground,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: !_useZipCode ? afropeepGreen : Colors.grey.shade300,
+                        color:
+                            !_useZipCode ? afropeepGreen : Colors.grey.shade300,
                       ),
                     ),
                     child: Text(
@@ -378,7 +388,8 @@ class _LocationScreenState extends State<LocationScreen> {
                       color: _useZipCode ? afropeepGreen : cardBackground,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: _useZipCode ? afropeepGreen : Colors.grey.shade300,
+                        color:
+                            _useZipCode ? afropeepGreen : Colors.grey.shade300,
                       ),
                     ),
                     child: Text(
@@ -394,9 +405,9 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Manual input field
           if (!_useZipCode) ...[
             TextField(
@@ -471,9 +482,9 @@ class _LocationScreenState extends State<LocationScreen> {
               onSubmitted: _searchLocationByZip,
             ),
           ],
-          
+
           const SizedBox(height: 24),
-          
+
           // Current location display
           if (_currentLocation != null) ...[
             Container(
@@ -525,7 +536,7 @@ class _LocationScreenState extends State<LocationScreen> {
             ),
             const SizedBox(height: 24),
           ],
-          
+
           // Privacy note
           Container(
             padding: const EdgeInsets.all(16),

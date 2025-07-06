@@ -237,7 +237,8 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                   TextButton(
                                     child: Text(
                                       'Cancel'.tr().toString(),
-                                      style: TextStyle(color: AppColors.secondaryColor),
+                                      style: TextStyle(
+                                          color: AppColors.secondaryColor),
                                     ),
                                     onPressed: () {
                                       setState(() {

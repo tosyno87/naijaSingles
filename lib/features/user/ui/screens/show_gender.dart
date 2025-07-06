@@ -36,9 +36,10 @@ class _ShowGenderState extends State<ShowGender> {
   @override
   Widget build(BuildContext context) {
     // for adding userdetails in this user map from navigation
-    var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    var userData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -64,19 +65,20 @@ class _ShowGenderState extends State<ShowGender> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                    
+
                     // Progress indicator
                     Container(
                       height: 4,
-                      width: screenSize.width * 0.90, // 90% of screen width (sixth step)
+                      width: screenSize.width *
+                          0.90, // 90% of screen width (sixth step)
                       decoration: BoxDecoration(
                         color: const Color(0xFF27AE60),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Title section
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,9 +101,9 @@ class _ShowGenderState extends State<ShowGender> {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Preference options with card-style layout
                     Column(
                       children: [
@@ -128,7 +130,7 @@ class _ShowGenderState extends State<ShowGender> {
                 ),
               ),
             ),
-            
+
             // Continue labelLarge fixed at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
@@ -145,15 +147,15 @@ class _ShowGenderState extends State<ShowGender> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: selectedPreference == null ? null : () {
-                    userData.addAll({'showGender': selectedPreference});
-                    log(userData.toString());
-                    Navigator.pushNamed(
-                      context, 
-                      RouteName.universityScreen,
-                      arguments: userData
-                    );
-                  },
+                  onPressed: selectedPreference == null
+                      ? null
+                      : () {
+                          userData.addAll({'showGender': selectedPreference});
+                          log(userData.toString());
+                          Navigator.pushNamed(
+                              context, RouteName.universityScreen,
+                              arguments: userData);
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),
                     foregroundColor: Colors.white,
@@ -181,11 +183,11 @@ class _ShowGenderState extends State<ShowGender> {
       ),
     );
   }
-  
+
   // Card-style preference option with shadow and rounded corners
   Widget _buildPreferenceCard(String title, String value, IconData icon) {
     final bool isSelected = selectedPreference == value;
-    
+
     return GestureDetector(
       onTap: () {
         _selectOption(value);

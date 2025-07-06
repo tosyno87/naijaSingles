@@ -87,21 +87,21 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
     emit(EmailAuthLoading());
     try {
       log("Creating new account with email: ${event.email}");
-      
+
       // Create user with email and password
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-      
+
       final user = userCredential.user;
-      
+
       if (user != null) {
         log("Successfully created account for: ${user.uid}");
-        
+
         // Create user document in Firestore
         await _createUserDocument(user);
-        
+
         emit(EmailAuthSuccess(user: user));
       } else {
         emit(EmailAuthError(error: "Failed to create account"));
@@ -109,25 +109,28 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
     } on FirebaseAuthException catch (e) {
       log("Firebase Auth Error: ${e.code} - ${e.message}");
       String errorMessage;
-      
+
       switch (e.code) {
         case 'email-already-in-use':
-          errorMessage = 'This email is already registered. Please log in instead.';
+          errorMessage =
+              'This email is already registered. Please log in instead.';
           break;
         case 'invalid-email':
           errorMessage = 'The email address is not valid.';
           break;
         case 'weak-password':
-          errorMessage = 'The password is too weak. Please use a stronger password.';
+          errorMessage =
+              'The password is too weak. Please use a stronger password.';
           break;
         default:
           errorMessage = e.message ?? 'An error occurred during sign up.';
       }
-      
+
       emit(EmailAuthError(error: errorMessage));
     } catch (e) {
       log("Error during sign up: $e");
-      emit(EmailAuthError(error: "An unexpected error occurred. Please try again."));
+      emit(EmailAuthError(
+          error: "An unexpected error occurred. Please try again."));
     }
   }
 
@@ -138,21 +141,21 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
     emit(EmailAuthLoading());
     try {
       log("Signing in with email: ${event.email}");
-      
+
       // Sign in with email and password
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-      
+
       final user = userCredential.user;
-      
+
       if (user != null) {
         log("Successfully signed in: ${user.uid}");
-        
+
         // Update last login timestamp
         await _updateLastLogin(user);
-        
+
         emit(EmailAuthSuccess(user: user));
       } else {
         emit(EmailAuthError(error: "Failed to sign in"));
@@ -160,7 +163,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
     } on FirebaseAuthException catch (e) {
       log("Firebase Auth Error: ${e.code} - ${e.message}");
       String errorMessage;
-      
+
       switch (e.code) {
         case 'user-not-found':
           errorMessage = 'No account found with this email.';
@@ -177,11 +180,12 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
         default:
           errorMessage = e.message ?? 'An error occurred during sign in.';
       }
-      
+
       emit(EmailAuthError(error: errorMessage));
     } catch (e) {
       log("Error during sign in: $e");
-      emit(EmailAuthError(error: "An unexpected error occurred. Please try again."));
+      emit(EmailAuthError(
+          error: "An unexpected error occurred. Please try again."));
     }
   }
 
@@ -192,15 +196,15 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
     emit(EmailAuthLoading());
     try {
       log("Sending password reset email to: ${event.email}");
-      
+
       await _auth.sendPasswordResetEmail(email: event.email);
-      
+
       log("Password reset email sent successfully");
       emit(EmailPasswordResetSent());
     } on FirebaseAuthException catch (e) {
       log("Firebase Auth Error: ${e.code} - ${e.message}");
       String errorMessage;
-      
+
       switch (e.code) {
         case 'user-not-found':
           errorMessage = 'No account found with this email.';
@@ -209,20 +213,22 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
           errorMessage = 'The email address is not valid.';
           break;
         default:
-          errorMessage = e.message ?? 'An error occurred while sending the password reset email.';
+          errorMessage = e.message ??
+              'An error occurred while sending the password reset email.';
       }
-      
+
       emit(EmailAuthError(error: errorMessage));
     } catch (e) {
       log("Error sending password reset: $e");
-      emit(EmailAuthError(error: "An unexpected error occurred. Please try again."));
+      emit(EmailAuthError(
+          error: "An unexpected error occurred. Please try again."));
     }
   }
 
   Future<void> _createUserDocument(User user) async {
     try {
       final userRef = _firestore.collection('users').doc(user.uid);
-      
+
       await userRef.set({
         // Remove the redundant 'id' field since the document ID already serves this purpose
         'email': user.email,
@@ -233,7 +239,7 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
         'signInMethod': 'email',
         'onboardingCompleted': false,
       });
-      
+
       log("Created user document for: ${user.uid}");
     } catch (e) {
       log("Error creating user document: $e");
@@ -245,12 +251,12 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
   Future<void> _updateLastLogin(User user) async {
     try {
       final userRef = _firestore.collection('users').doc(user.uid);
-      
+
       await userRef.update({
         'lastActive': FieldValue.serverTimestamp(),
         'lastSignIn': FieldValue.serverTimestamp(),
       });
-      
+
       log("Updated last login for: ${user.uid}");
     } catch (e) {
       log("Error updating last login: $e");

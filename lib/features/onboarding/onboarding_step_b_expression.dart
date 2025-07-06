@@ -23,43 +23,57 @@ class OnboardingStepBExpression extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<OnboardingStepBExpression> createState() => _OnboardingStepBExpressionState();
+  State<OnboardingStepBExpression> createState() =>
+      _OnboardingStepBExpressionState();
 }
 
-class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> with SingleTickerProviderStateMixin {
+class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
+    with SingleTickerProviderStateMixin {
   // Keys for accessibility and testing
   final GlobalKey _musicKey = GlobalKey();
   final GlobalKey _fashionKey = GlobalKey();
   final GlobalKey _weekendKey = GlobalKey();
   final GlobalKey _continueButtonKey = GlobalKey();
-  
+
   // Text controllers for text fields
   final TextEditingController _fashionController = TextEditingController();
   final TextEditingController _weekendController = TextEditingController();
-  
+
   // Animation controller for chip selection
   late final AnimationController _animationController;
-  
+
   // Music genres popular in Nigeria and Africa
   final List<String> _musicGenres = [
-    'Afrobeats', 'Highlife', 'Juju', 'Fuji', 'Gospel',
-    'Hip Hop', 'R&B', 'Amapiano', 'Traditional', 'Jazz',
-    'Reggae', 'Dancehall', 'Alte', 'Afro-fusion'
+    'Afrobeats',
+    'Highlife',
+    'Juju',
+    'Fuji',
+    'Gospel',
+    'Hip Hop',
+    'R&B',
+    'Amapiano',
+    'Traditional',
+    'Jazz',
+    'Reggae',
+    'Dancehall',
+    'Alte',
+    'Afro-fusion'
   ];
 
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize animation controller
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    
+
     // Initialize text controllers with existing values if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
       if (controller.fashionStyle != null) {
         _fashionController.text = controller.fashionStyle!;
       }
@@ -80,13 +94,13 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<OnboardingController>(context);
-    
+
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
-    
+
     // Calculate bottom padding based on keyboard visibility
     final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
-    
+
     return Scaffold(
       backgroundColor: widget.backgroundColor,
       body: SafeArea(
@@ -95,8 +109,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
             // Main content
             SingleChildScrollView(
               padding: EdgeInsets.only(
-                left: 24.0, 
-                right: 24.0, 
+                left: 24.0,
+                right: 24.0,
                 top: 24.0,
                 bottom: 100.0 + keyboardPadding, // Extra padding for labelLarge
               ),
@@ -107,7 +121,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: deepGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
@@ -123,9 +138,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Header
                   Text(
                     'Your Style & Expression',
@@ -145,7 +160,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // New section title
                   Text(
                     "How do you express yourself?",
@@ -155,9 +170,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       color: Colors.brown.shade800,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Music genres card
                   Container(
                     decoration: BoxDecoration(
@@ -197,25 +212,31 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                         const SizedBox(height: 12),
                         Semantics(
                           label: 'Music genre selection',
-                          hint: 'Select one or more music genres that you enjoy',
+                          hint:
+                              'Select one or more music genres that you enjoy',
                           child: Wrap(
                             key: _musicKey,
                             spacing: 8,
                             runSpacing: 12,
                             children: _musicGenres.map((genre) {
-                              final isSelected = controller.genres.contains(genre);
+                              final isSelected =
+                                  controller.genres.contains(genre);
                               return FilterChip(
                                 label: Text(
                                   genre,
                                   style: GoogleFonts.poppins(
-                                    color: isSelected ? Colors.white : Colors.black87,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black87,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 selected: isSelected,
                                 onSelected: (selected) {
-                                  List<String> updatedGenres = [...controller.genres];
+                                  List<String> updatedGenres = [
+                                    ...controller.genres
+                                  ];
                                   if (selected) {
                                     updatedGenres.add(genre);
                                   } else {
@@ -228,11 +249,14 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                                 selectedColor: deepGreen,
                                 checkmarkColor: Colors.white,
                                 showCheckmark: true,
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                   side: BorderSide(
-                                    color: isSelected ? deepGreen : Colors.grey[400]!,
+                                    color: isSelected
+                                        ? deepGreen
+                                        : Colors.grey[400]!,
                                   ),
                                 ),
                               );
@@ -242,9 +266,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Fashion style card
                   Container(
                     decoration: BoxDecoration(
@@ -306,7 +330,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: deepGreen, width: 2),
+                              borderSide:
+                                  const BorderSide(color: deepGreen, width: 2),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -320,9 +345,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Weekend vibe card
                   Container(
                     decoration: BoxDecoration(
@@ -348,7 +373,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                               size: 24,
                             ),
                             const SizedBox(width: 8),
-                            _buildSectionTitle('What\'s your ideal weekend like?'),
+                            _buildSectionTitle(
+                                'What\'s your ideal weekend like?'),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -384,7 +410,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: deepGreen, width: 2),
+                              borderSide:
+                                  const BorderSide(color: deepGreen, width: 2),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -398,12 +425,12 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 40),
                 ],
               ),
             ),
-            
+
             // Navigation bar at the bottom
             Align(
               alignment: Alignment.bottomCenter,
@@ -420,8 +447,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                   ],
                 ),
                 padding: EdgeInsets.only(
-                  left: 24, 
-                  right: 24, 
+                  left: 24,
+                  right: 24,
                   bottom: 32 + keyboardPadding,
                   top: 16,
                 ),
@@ -444,20 +471,23 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
                       ),
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.grey.shade700,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                       ),
                     ),
-                    
+
                     // Continue labelLarge
                     SizedBox(
                       width: 150,
                       height: 56,
                       child: ElevatedButton(
                         key: _continueButtonKey,
-                        onPressed: _isStepValid(controller) ? () {
-                          HapticFeedback.mediumImpact();
-                          widget.onNext();
-                        } : null,
+                        onPressed: _isStepValid(controller)
+                            ? () {
+                                HapticFeedback.mediumImpact();
+                                widget.onNext();
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: deepGreen,
                           foregroundColor: Colors.white,
@@ -485,7 +515,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
       ),
     );
   }
-  
+
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) {
     return Text(
@@ -497,13 +527,13 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression> w
       ),
     );
   }
-  
+
   /// Validates if all required fields are filled
   bool _isStepValid(OnboardingController controller) {
     return controller.genres.isNotEmpty &&
-           controller.fashionStyle != null && 
-           controller.fashionStyle!.trim().isNotEmpty &&
-           controller.weekendVibe != null && 
-           controller.weekendVibe!.trim().isNotEmpty;
+        controller.fashionStyle != null &&
+        controller.fashionStyle!.trim().isNotEmpty &&
+        controller.weekendVibe != null &&
+        controller.weekendVibe!.trim().isNotEmpty;
   }
 }

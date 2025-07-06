@@ -25,8 +25,10 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
   bool _isExpanded = false;
 
   // MVP Colors
-  static const Color backgroundColor = Color(0xFFF7E8DA); // Card background from MVP
-  static const Color primaryGreen = Color(0xFF007A33); // Afropeep green from MVP
+  static const Color backgroundColor =
+      Color(0xFFF7E8DA); // Card background from MVP
+  static const Color primaryGreen =
+      Color(0xFF007A33); // Afropeep green from MVP
   static const Color textDarkBrown = Color(0xFF3A1D0F); // Dark text from MVP
   static const Color textLightBrown = Color(0xFF8B6C59); // Light text from MVP
   static const Color creamBackground = Color(0xFFFFF6E5); // Main background
@@ -64,7 +66,7 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -83,7 +85,9 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
               color: backgroundColor,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _isExpanded ? primaryGreen : primaryGreen.withValues(alpha: 0.3),
+                color: _isExpanded
+                    ? primaryGreen
+                    : primaryGreen.withValues(alpha: 0.3),
                 width: _isExpanded ? 2 : 1,
               ),
               boxShadow: [
@@ -109,9 +113,9 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
                     size: isTablet ? 24 : 20,
                   ),
                 ),
-                
+
                 SizedBox(width: isTablet ? 16 : 12),
-                
+
                 // Height info
                 Expanded(
                   child: Column(
@@ -149,7 +153,7 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
                     ],
                   ),
                 ),
-                
+
                 // Expand/collapse indicator
                 AnimatedRotation(
                   turns: _isExpanded ? 0.5 : 0,
@@ -164,7 +168,7 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
             ),
           ),
         ),
-        
+
         // Expandable picker section
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -186,7 +190,7 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
                 )
               : const SizedBox.shrink(),
         ),
-        
+
         // Helper text when collapsed
         if (!_isExpanded) ...[
           SizedBox(height: isTablet ? 8 : 6),

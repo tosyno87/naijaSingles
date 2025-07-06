@@ -64,7 +64,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       create: (context) => PhoneAuthRepository(),
       child: BlocProvider(
         create: (context) => PhoneAuthBloc(
-          phoneAuthRepository: RepositoryProvider.of<PhoneAuthRepository>(context),
+          phoneAuthRepository:
+              RepositoryProvider.of<PhoneAuthRepository>(context),
         ),
         child: BlocConsumer<PhoneAuthBloc, PhoneAuthState>(
           listener: (context, state) {
@@ -72,7 +73,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               log("phone auth success listener called");
               // Navigate to appropriate screen based on sign in or sign up
               if (widget.isSignIn) {
-                Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
+                Navigator.pushReplacementNamed(
+                    context, RouteName.mainNavigation);
               } else {
                 Navigator.pushReplacementNamed(context, RouteName.onboarding);
               }
@@ -83,18 +85,14 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               setState(() {
                 _isLoading = false;
               });
-              
-              Navigator.pushNamed(
-                context, 
-                RouteName.otpScreen,
-                arguments: {
-                  'phoneNumber': _selectedCountryCode + _phoneController.text,
-                  'codeController': _codeController.text,
-                  'verificationId': state.verificationId,
-                  'updatenumber': widget.updatePhoneNumber,
-                  'isLogin': widget.isSignIn,
-                }
-              );
+
+              Navigator.pushNamed(context, RouteName.otpScreen, arguments: {
+                'phoneNumber': _selectedCountryCode + _phoneController.text,
+                'codeController': _codeController.text,
+                'verificationId': state.verificationId,
+                'updatenumber': widget.updatePhoneNumber,
+                'isLogin': widget.isSignIn,
+              });
             }
 
             if (state is PhoneAuthError) {
@@ -150,7 +148,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      
+
                       // Phone number input with country code
                       Container(
                         decoration: BoxDecoration(
@@ -168,7 +166,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           children: [
                             // Country code dropdown
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
                                 border: Border(
                                   right: BorderSide(
@@ -195,15 +194,17 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                   });
                                 },
                                 items: _countryCodes
-                                    .map<DropdownMenuItem<String>>((Map<String, String> value) {
+                                    .map<DropdownMenuItem<String>>(
+                                        (Map<String, String> value) {
                                   return DropdownMenuItem<String>(
                                     value: value['code'],
-                                    child: Text("${value['code']} (${value['name']})"),
+                                    child: Text(
+                                        "${value['code']} (${value['name']})"),
                                   );
                                 }).toList(),
                               ),
                             ),
-                            
+
                             // Phone number input
                             Expanded(
                               child: TextField(
@@ -229,16 +230,16 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 32),
-                      
+
                       // Continue labelLarge
                       SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: _isLoading 
-                              ? null 
+                          onPressed: _isLoading
+                              ? null
                               : () {
                                   if (_phoneController.text.isEmpty) {
                                     CustomSnackbar.showSnackBarSimple(
@@ -247,23 +248,25 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                     );
                                     return;
                                   }
-                                  
+
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  
-                                  final phoneNumber = _selectedCountryCode + _phoneController.text.trim();
-                                  
+
+                                  final phoneNumber = _selectedCountryCode +
+                                      _phoneController.text.trim();
+
                                   context.read<PhoneAuthBloc>().add(
-                                    SendOtpToPhoneEvent(
-                                      phoneNumber: phoneNumber,
-                                    ),
-                                  );
+                                        SendOtpToPhoneEvent(
+                                          phoneNumber: phoneNumber,
+                                        ),
+                                      );
                                 },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
+                            disabledBackgroundColor:
+                                primaryColor.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -287,16 +290,16 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                 ),
                         ),
                       ),
-                      
+
                       const Spacer(),
-                      
+
                       // Account toggle
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            widget.isSignIn 
-                                ? "Don't have an account? " 
+                            widget.isSignIn
+                                ? "Don't have an account? "
                                 : "Already have an account? ",
                             style: GoogleFonts.montserrat(
                               fontSize: 14,
@@ -306,9 +309,11 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           GestureDetector(
                             onTap: () {
                               if (widget.isSignIn) {
-                                Navigator.pushReplacementNamed(context, '/auth_method_selection');
+                                Navigator.pushReplacementNamed(
+                                    context, '/auth_method_selection');
                               } else {
-                                Navigator.pushReplacementNamed(context, '/sign_in_method_selection');
+                                Navigator.pushReplacementNamed(
+                                    context, '/sign_in_method_selection');
                               }
                             },
                             child: Text(

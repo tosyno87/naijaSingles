@@ -8,7 +8,8 @@ class EmailPasswordResetScreen extends StatefulWidget {
   const EmailPasswordResetScreen({Key? key}) : super(key: key);
 
   @override
-  State<EmailPasswordResetScreen> createState() => _EmailPasswordResetScreenState();
+  State<EmailPasswordResetScreen> createState() =>
+      _EmailPasswordResetScreenState();
 }
 
 class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
@@ -96,7 +97,8 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value)) {
                           return 'Please enter a valid email address';
                         }
                         return null;

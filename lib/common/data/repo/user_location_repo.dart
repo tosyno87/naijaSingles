@@ -52,9 +52,8 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       // Get location with timeout
       loc.LocationData? coordinates;
       try {
-        coordinates = await location
-            .getLocation()
-            .timeout(const Duration(seconds: 10));
+        coordinates =
+            await location.getLocation().timeout(const Duration(seconds: 10));
       } catch (e) {
         log("Error getting location with timeout: ${e.toString()}");
         return getDefaultLocation();
@@ -64,7 +63,7 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
         log("Location request timed out");
         return getDefaultLocation();
       }
-      
+
       if (coordinates.latitude == null || coordinates.longitude == null) {
         log("Could not get coordinates - null values");
         return getDefaultLocation();
@@ -121,10 +120,11 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       log("REVERSE ${response.body}");
 
       if (response.statusCode == 200) {
-        final extractedData = json.decode(response.body) as Map<String, dynamic>;
+        final extractedData =
+            json.decode(response.body) as Map<String, dynamic>;
 
-        if (extractedData.containsKey("results") && 
-            extractedData["results"] is List && 
+        if (extractedData.containsKey("results") &&
+            extractedData["results"] is List &&
             extractedData["results"].isNotEmpty) {
           final addressDetails = extractedData["results"][0];
           return ReverseGeocode.fromJson(addressDetails);
@@ -157,7 +157,8 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
       log("REVERSE ${response.body}");
 
       if (response.statusCode == 200) {
-        final extractedData = json.decode(response.body) as Map<String, dynamic>;
+        final extractedData =
+            json.decode(response.body) as Map<String, dynamic>;
 
         // Check if the API returned an error
         if (extractedData.containsKey("error_message")) {
@@ -165,8 +166,8 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           throw "Google Maps API error: ${extractedData["error_message"]}";
         }
 
-        if (extractedData.containsKey("results") && 
-            extractedData["results"] is List && 
+        if (extractedData.containsKey("results") &&
+            extractedData["results"] is List &&
             extractedData["results"].isNotEmpty) {
           final addressDetails = extractedData["results"][0];
           final List<dynamic> addressComponents =
@@ -177,7 +178,8 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           String subLocality = '';
 
           for (var component in addressComponents) {
-            final List<String> types = List<String>.from(component["types"] ?? []);
+            final List<String> types =
+                List<String>.from(component["types"] ?? []);
             if (types.contains("country")) {
               countryName = component["long_name"] ?? "";
             }
@@ -187,7 +189,8 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
           }
 
           Map<String, dynamic> obj = {
-            'PlaceName': addressDetails["formatted_address"] ?? "Unknown Location",
+            'PlaceName':
+                addressDetails["formatted_address"] ?? "Unknown Location",
             'countryName': countryName,
             'subLocality': subLocality,
             'latitude': latitude,

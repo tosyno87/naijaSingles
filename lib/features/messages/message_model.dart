@@ -51,7 +51,11 @@ class MessageThreadInfo {
       return weekdays[timestamp.weekday - 1];
     } else if (difference.inHours > 0) {
       // Format as time if within a day
-      final hour = timestamp.hour > 12 ? timestamp.hour - 12 : timestamp.hour == 0 ? 12 : timestamp.hour;
+      final hour = timestamp.hour > 12
+          ? timestamp.hour - 12
+          : timestamp.hour == 0
+              ? 12
+              : timestamp.hour;
       final period = timestamp.hour >= 12 ? 'PM' : 'AM';
       final minute = timestamp.minute.toString().padLeft(2, '0');
       return '$hour:$minute $period';

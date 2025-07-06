@@ -55,7 +55,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
   @override
   void initState() {
     super.initState();
-    
+
     // Set initial values or default to 5'7" (170 cm)
     if (widget.initialHeightFtIn != null && widget.initialHeightCm != null) {
       _selectedHeightFtIn = widget.initialHeightFtIn;
@@ -67,7 +67,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
       );
       _selectedHeightFtIn = defaultHeight['ft_in'];
       _selectedHeightCm = defaultHeight['cm'];
-      
+
       // Notify parent of default selection
       widget.onChanged(_selectedHeightFtIn!, _selectedHeightCm!);
     }
@@ -77,7 +77,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -102,7 +102,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
               ),
             ),
           ),
-          
+
           // Dropdown
           Container(
             width: double.infinity,
@@ -167,19 +167,19 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
                     final selectedOption = _heightOptions.firstWhere(
                       (option) => option['ft_in'] == newValue,
                     );
-                    
+
                     setState(() {
                       _selectedHeightFtIn = selectedOption['ft_in'];
                       _selectedHeightCm = selectedOption['cm'];
                     });
-                    
+
                     widget.onChanged(_selectedHeightFtIn!, _selectedHeightCm!);
                   }
                 },
               ),
             ),
           ),
-          
+
           // Caption
           Padding(
             padding: EdgeInsets.only(
@@ -205,7 +205,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
 class HeightData {
   static const String defaultHeightFtIn = '5\'7"';
   static const int defaultHeightCm = 170;
-  
+
   // Get cm value from ft/in string
   static int? getCmFromFtIn(String ftIn) {
     try {
@@ -217,7 +217,7 @@ class HeightData {
       return null;
     }
   }
-  
+
   // Get ft/in string from cm value
   static String? getFtInFromCm(int cm) {
     try {
@@ -229,7 +229,7 @@ class HeightData {
       return null;
     }
   }
-  
+
   // Get display string from ft/in
   static String? getDisplayFromFtIn(String ftIn) {
     try {
@@ -241,8 +241,8 @@ class HeightData {
       return null;
     }
   }
-  
+
   // Get all height options
-  static List<Map<String, dynamic>> get allHeightOptions => 
+  static List<Map<String, dynamic>> get allHeightOptions =>
       _AfropeepHeightDropdownState._heightOptions;
 }

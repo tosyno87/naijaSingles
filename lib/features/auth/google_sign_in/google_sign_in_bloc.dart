@@ -48,7 +48,8 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
     // Explicitly specify scopes (optional)
     scopes: ['email', 'profile'],
     // For iOS, specify the client ID explicitly
-    clientId: '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
+    clientId:
+        '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
   );
 
   GoogleSignInBloc() : super(GoogleSignInInitial()) {
@@ -62,20 +63,20 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
     emit(GoogleSignInLoading());
     try {
       log("Starting Google Sign In process...");
-      
+
       // Check if user is already signed in with Google
       final currentUser = _googleSignIn.currentUser;
       if (currentUser != null) {
         log("User already signed in with Google. Signing out first...");
         await _googleSignIn.signOut();
       }
-      
+
       // Trigger the Google Sign In flow
       log("Triggering Google Sign In UI...");
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
+
       log("Google Sign In result: ${googleUser != null ? 'Success' : 'Canceled/Failed'}");
-      
+
       if (googleUser == null) {
         // User canceled the sign-in flow
         log("Google Sign In was canceled by user");
@@ -85,7 +86,8 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
 
       log("Getting Google authentication details...");
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       log("Got auth tokens - Access token length: ${googleAuth.accessToken?.length ?? 0}, ID token length: ${googleAuth.idToken?.length ?? 0}");
 
       // Create a new credential
@@ -102,12 +104,12 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
       if (user != null) {
         // Check if this is a new user (first time sign-in)
         final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
-        
+
         log("Google Sign In successful. User: ${user.uid}, New user: $isNewUser");
-        
+
         // Create or update user document in Firestore
         await _updateUserData(user, isNewUser);
-        
+
         emit(GoogleSignInSuccess(user: user));
       } else {
         log("Failed to sign in with Google - user is null");
@@ -115,14 +117,16 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
       }
     } catch (e) {
       log("Google Sign In error: $e");
-      emit(GoogleSignInFailure(error: "Error signing in with Google: ${e.toString()}"));
+      emit(GoogleSignInFailure(
+          error: "Error signing in with Google: ${e.toString()}"));
     }
   }
 
   Future<void> _updateUserData(User user, bool isNewUser) async {
     try {
-      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-      
+      final userRef =
+          FirebaseFirestore.instance.collection('users').doc(user.uid);
+
       if (isNewUser) {
         // Create a new user document
         await userRef.set({

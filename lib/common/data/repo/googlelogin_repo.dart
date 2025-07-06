@@ -21,24 +21,26 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
     try {
       // Begin interactive sign-in process
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
+
       // If user cancels the sign-in flow, return null
       if (googleUser == null) {
         throw Exception('Google sign in was canceled by user');
       }
-      
+
       // Obtain auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      
+
       // Sign in to Firebase with the Google credential
-      final userCredential = await firebaseAuthInstance.signInWithCredential(credential);
-      
+      final userCredential =
+          await firebaseAuthInstance.signInWithCredential(credential);
+
       // Return the user
       return userCredential.user;
     } catch (e) {

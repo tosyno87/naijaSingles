@@ -69,5 +69,4 @@ class ExploreMap {
 
     return userList;
   }
-
 }

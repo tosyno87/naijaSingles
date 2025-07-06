@@ -2,10 +2,11 @@ part of 'authstatus_bloc.dart';
 
 abstract class AuthstatusState extends Equatable {
   const AuthstatusState();
-  
+
   @override
   List<Object> get props => [];
 }
+
 class AuthIntialState extends AuthstatusState {}
 
 class AuthLoadingState extends AuthstatusState {}

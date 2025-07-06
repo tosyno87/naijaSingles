@@ -28,7 +28,7 @@ class SecurityEvent {
   final String severity; // 'low', 'medium', 'high', 'critical'
   final String? ipAddress;
   final String? userAgent;
-  
+
   SecurityEvent({
     required this.id,
     required this.type,
@@ -41,7 +41,7 @@ class SecurityEvent {
     this.ipAddress,
     this.userAgent,
   });
-  
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -58,7 +58,7 @@ class SecurityEvent {
       'alertSent': false,
     };
   }
-  
+
   factory SecurityEvent.fromMap(Map<String, dynamic> map, String id) {
     return SecurityEvent(
       id: id,
@@ -82,9 +82,9 @@ class SecurityEvent {
 class SecurityLoggingService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   String? get currentUserId => _auth.currentUser?.uid;
-  
+
   /// Log a security event
   Future<void> logSecurityEvent({
     required SecurityEventType type,
@@ -95,7 +95,7 @@ class SecurityLoggingService {
   }) async {
     try {
       if (currentUserId == null) return;
-      
+
       final event = SecurityEvent(
         id: _firestore.collection('security_logs').doc().id,
         type: type,
@@ -109,20 +109,19 @@ class SecurityLoggingService {
         ipAddress: null,
         userAgent: null,
       );
-      
+
       await _firestore
           .collection('security_logs')
           .doc(event.id)
           .set(event.toMap());
-      
+
       // Check if this event should trigger an alert
       await _checkForAlerts(event);
-      
     } catch (e) {
       debugPrint('Error logging security event: $e');
     }
   }
-  
+
   /// Log unauthorized profile access attempt
   Future<void> logUnauthorizedAccess({
     required String targetUserId,
@@ -141,7 +140,7 @@ class SecurityLoggingService {
       severity: 'high',
     );
   }
-  
+
   /// Log blocked field access attempt
   Future<void> logBlockedFieldAccess({
     required String targetUserId,
@@ -160,7 +159,7 @@ class SecurityLoggingService {
       severity: 'medium',
     );
   }
-  
+
   /// Log suspicious activity (mass data access)
   Future<void> logSuspiciousActivity({
     required String activity,
@@ -179,7 +178,7 @@ class SecurityLoggingService {
       severity: count > 50 ? 'critical' : 'high',
     );
   }
-  
+
   /// Log profile scraping attempt
   Future<void> logProfileScraping({
     required int profilesAccessed,
@@ -187,7 +186,8 @@ class SecurityLoggingService {
   }) async {
     await logSecurityEvent(
       type: SecurityEventType.profileScraping,
-      description: 'Potential profile scraping: $profilesAccessed profiles in ${timeWindow.inMinutes} minutes',
+      description:
+          'Potential profile scraping: $profilesAccessed profiles in ${timeWindow.inMinutes} minutes',
       metadata: {
         'profilesAccessed': profilesAccessed,
         'timeWindowMinutes': timeWindow.inMinutes,
@@ -196,7 +196,7 @@ class SecurityLoggingService {
       severity: profilesAccessed > 100 ? 'critical' : 'high',
     );
   }
-  
+
   /// Log chat spam
   Future<void> logChatSpam({
     required String targetUserId,
@@ -205,7 +205,8 @@ class SecurityLoggingService {
   }) async {
     await logSecurityEvent(
       type: SecurityEventType.chatSpam,
-      description: 'Potential chat spam: $messageCount messages in ${timeWindow.inMinutes} minutes',
+      description:
+          'Potential chat spam: $messageCount messages in ${timeWindow.inMinutes} minutes',
       targetUserId: targetUserId,
       metadata: {
         'messageCount': messageCount,
@@ -215,7 +216,7 @@ class SecurityLoggingService {
       severity: messageCount > 20 ? 'high' : 'medium',
     );
   }
-  
+
   /// Log user report submission
   Future<void> logReportSubmission({
     required String reportedUserId,
@@ -234,7 +235,7 @@ class SecurityLoggingService {
       severity: 'medium',
     );
   }
-  
+
   /// Log block action
   Future<void> logBlockAction({
     required String blockedUserId,
@@ -251,7 +252,7 @@ class SecurityLoggingService {
       severity: 'low',
     );
   }
-  
+
   /// Check if event should trigger alerts
   Future<void> _checkForAlerts(SecurityEvent event) async {
     try {
@@ -263,23 +264,22 @@ class SecurityLoggingService {
             await _sendCriticalAlert(event);
           }
           break;
-        
+
         case SecurityEventType.unauthorizedProfileAccess:
           await _checkForRepeatedViolations(event);
           break;
-        
+
         default:
           break;
       }
-      
+
       // Check for user-specific violation patterns
       await _checkUserViolationPattern(event.userId);
-      
     } catch (e) {
       debugPrint('Error checking for alerts: $e');
     }
   }
-  
+
   /// Send critical alert to admin
   Future<void> _sendCriticalAlert(SecurityEvent event) async {
     try {
@@ -293,42 +293,42 @@ class SecurityLoggingService {
         'processed': false,
         'metadata': event.metadata,
       });
-      
+
       // Mark event as alert sent
       await _firestore
           .collection('security_logs')
           .doc(event.id)
           .update({'alertSent': true});
-      
     } catch (e) {
       debugPrint('Error sending critical alert: $e');
     }
   }
-  
+
   /// Check for repeated violations by same user
   Future<void> _checkForRepeatedViolations(SecurityEvent event) async {
     try {
       final now = DateTime.now();
       final oneHourAgo = now.subtract(const Duration(hours: 1));
-      
+
       final recentViolations = await _firestore
           .collection('security_logs')
           .where('userId', isEqualTo: event.userId)
           .where('type', isEqualTo: event.type.name)
           .where('timestamp', isGreaterThan: Timestamp.fromDate(oneHourAgo))
           .get();
-      
+
       if (recentViolations.docs.length >= 5) {
-        await _sendRepeatedViolationAlert(event.userId, event.type, recentViolations.docs.length);
+        await _sendRepeatedViolationAlert(
+            event.userId, event.type, recentViolations.docs.length);
       }
-      
     } catch (e) {
       debugPrint('Error checking repeated violations: $e');
     }
   }
-  
+
   /// Send repeated violation alert
-  Future<void> _sendRepeatedViolationAlert(String userId, SecurityEventType type, int count) async {
+  Future<void> _sendRepeatedViolationAlert(
+      String userId, SecurityEventType type, int count) async {
     try {
       await _firestore.collection('admin_alerts').add({
         'type': 'repeated_violations',
@@ -336,39 +336,38 @@ class SecurityLoggingService {
         'violationType': type.name,
         'count': count,
         'timeWindow': '1 hour',
-        'description': 'User has $count ${type.name} violations in the last hour',
+        'description':
+            'User has $count ${type.name} violations in the last hour',
         'severity': 'high',
         'timestamp': FieldValue.serverTimestamp(),
         'processed': false,
         'recommendedAction': 'Consider temporary suspension',
       });
-      
     } catch (e) {
       debugPrint('Error sending repeated violation alert: $e');
     }
   }
-  
+
   /// Check overall user violation pattern
   Future<void> _checkUserViolationPattern(String userId) async {
     try {
       final now = DateTime.now();
       final oneDayAgo = now.subtract(const Duration(days: 1));
-      
+
       final recentEvents = await _firestore
           .collection('security_logs')
           .where('userId', isEqualTo: userId)
           .where('timestamp', isGreaterThan: Timestamp.fromDate(oneDayAgo))
           .get();
-      
+
       if (recentEvents.docs.length >= 10) {
         await _sendUserPatternAlert(userId, recentEvents.docs.length);
       }
-      
     } catch (e) {
       debugPrint('Error checking user violation pattern: $e');
     }
   }
-  
+
   /// Send user pattern alert
   Future<void> _sendUserPatternAlert(String userId, int eventCount) async {
     try {
@@ -377,20 +376,21 @@ class SecurityLoggingService {
         'userId': userId,
         'eventCount': eventCount,
         'timeWindow': '24 hours',
-        'description': 'User has $eventCount security events in the last 24 hours',
+        'description':
+            'User has $eventCount security events in the last 24 hours',
         'severity': 'high',
         'timestamp': FieldValue.serverTimestamp(),
         'processed': false,
         'recommendedAction': 'Review user activity and consider restrictions',
       });
-      
     } catch (e) {
       debugPrint('Error sending user pattern alert: $e');
     }
   }
-  
+
   /// Get security events for a user (admin function)
-  Future<List<SecurityEvent>> getUserSecurityEvents(String userId, {int limit = 50}) async {
+  Future<List<SecurityEvent>> getUserSecurityEvents(String userId,
+      {int limit = 50}) async {
     try {
       final query = await _firestore
           .collection('security_logs')
@@ -398,40 +398,39 @@ class SecurityLoggingService {
           .orderBy('timestamp', descending: true)
           .limit(limit)
           .get();
-      
+
       return query.docs
           .map((doc) => SecurityEvent.fromMap(doc.data(), doc.id))
           .toList();
-      
     } catch (e) {
       debugPrint('Error getting user security events: $e');
       return [];
     }
   }
-  
+
   /// Get security statistics (admin function)
   Future<Map<String, dynamic>> getSecurityStats({int days = 7}) async {
     try {
       final now = DateTime.now();
       final startDate = now.subtract(Duration(days: days));
-      
+
       final events = await _firestore
           .collection('security_logs')
           .where('timestamp', isGreaterThan: Timestamp.fromDate(startDate))
           .get();
-      
+
       Map<String, int> eventCounts = {};
       Map<String, int> severityCounts = {};
-      
+
       for (var doc in events.docs) {
         final data = doc.data();
         final type = data['type'] as String;
         final severity = data['severity'] as String;
-        
+
         eventCounts[type] = (eventCounts[type] ?? 0) + 1;
         severityCounts[severity] = (severityCounts[severity] ?? 0) + 1;
       }
-      
+
       return {
         'totalEvents': events.docs.length,
         'eventTypes': eventCounts,
@@ -439,7 +438,6 @@ class SecurityLoggingService {
         'timeRange': '$days days',
         'generatedAt': DateTime.now().toIso8601String(),
       };
-      
     } catch (e) {
       debugPrint('Error getting security stats: $e');
       return {};

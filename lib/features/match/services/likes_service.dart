@@ -7,16 +7,18 @@ import '../models/match_model.dart';
 class LikesService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   // Get current user ID
   String? get currentUserId => _auth.currentUser?.uid;
-  
+
   // Collection references
   CollectionReference get _likesCollection => _firestore.collection('likes');
-  CollectionReference get _matchesCollection => _firestore.collection('matches');
-  CollectionReference get _chatThreadsCollection => _firestore.collection('chatThreads');
+  CollectionReference get _matchesCollection =>
+      _firestore.collection('matches');
+  CollectionReference get _chatThreadsCollection =>
+      _firestore.collection('chatThreads');
   CollectionReference get _usersCollection => _firestore.collection('users');
-  
+
   /// Handle like action with mutual like detection
   /// Returns the match ID if a mutual match is created, null otherwise
   Future<String?> handleLike(String fromUserId, String toUserId) async {
@@ -42,17 +44,17 @@ class LikesService {
 
       if (reverseLike.exists) {
         debugPrint('🎉 Mutual like detected! Creating match...');
-        
+
         // Create match and chat thread
         final matchId = await _createMatch(fromUserId, toUserId);
-        
+
         if (matchId != null) {
           debugPrint('✅ Match created successfully: $matchId');
-          
+
           // Optional: Trigger notification or other side effects here
           await _triggerMatchNotification(fromUserId, toUserId);
         }
-        
+
         return matchId;
       } else {
         debugPrint('No mutual like yet. Waiting for $toUserId to like back.');
@@ -60,7 +62,7 @@ class LikesService {
       }
     } catch (e) {
       debugPrint('❌ Error handling like: $e');
-      
+
       // Provide more specific error messages
       if (e.toString().contains('permission-denied')) {
         debugPrint('🔒 Permission denied - check Firestore rules');
@@ -69,7 +71,7 @@ class LikesService {
       } else if (e.toString().contains('network')) {
         debugPrint('🌐 Network error - check connection');
       }
-      
+
       return null;
     }
   }
@@ -87,7 +89,7 @@ class LikesService {
       // Get user details for chat thread creation
       final userADoc = await _usersCollection.doc(userAId).get();
       final userBDoc = await _usersCollection.doc(userBId).get();
-      
+
       if (!userADoc.exists || !userBDoc.exists) {
         debugPrint('One or both users do not exist');
         return null;
@@ -95,7 +97,7 @@ class LikesService {
 
       final userAData = userADoc.data() as Map<String, dynamic>;
       final userBData = userBDoc.data() as Map<String, dynamic>;
-      
+
       final userAName = userAData['name'] ?? 'User';
       final userBName = userBData['name'] ?? 'User';
 
@@ -136,7 +138,8 @@ class LikesService {
       debugPrint('Match document created: $matchId');
 
       // Update legacy match collections for backward compatibility
-      await _updateLegacyMatches(userAId, userBId, userAName, userBName, userAData, userBData);
+      await _updateLegacyMatches(
+          userAId, userBId, userAName, userBName, userAData, userBData);
 
       return matchId;
     } catch (e) {
@@ -147,20 +150,20 @@ class LikesService {
 
   /// Update legacy match collections for backward compatibility
   Future<void> _updateLegacyMatches(
-    String userAId, 
-    String userBId, 
-    String userAName, 
+    String userAId,
+    String userBId,
+    String userAName,
     String userBName,
     Map<String, dynamic> userAData,
     Map<String, dynamic> userBData,
   ) async {
     try {
       // Get image URLs for legacy format
-      final userAImageUrl = (userAData['imageUrl'] as List?)?.isNotEmpty == true 
-          ? userAData['imageUrl'][0] 
+      final userAImageUrl = (userAData['imageUrl'] as List?)?.isNotEmpty == true
+          ? userAData['imageUrl'][0]
           : '';
-      final userBImageUrl = (userBData['imageUrl'] as List?)?.isNotEmpty == true 
-          ? userBData['imageUrl'][0] 
+      final userBImageUrl = (userBData['imageUrl'] as List?)?.isNotEmpty == true
+          ? userBData['imageUrl'][0]
           : '';
 
       // Update User A's matches collection
@@ -199,18 +202,17 @@ class LikesService {
   Future<String?> _getExistingMatch(String userAId, String userBId) async {
     try {
       final querySnapshot = await _matchesCollection
-          .where('users', arrayContainsAny: [userAId])
-          .get();
+          .where('users', arrayContainsAny: [userAId]).get();
 
       for (final doc in querySnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
         final users = List<String>.from(data['users'] ?? []);
-        
+
         if (users.contains(userAId) && users.contains(userBId)) {
           return doc.id;
         }
       }
-      
+
       return null;
     } catch (e) {
       debugPrint('Error checking existing match: $e');
@@ -221,47 +223,46 @@ class LikesService {
   /// Trigger match notification (Cloud Function handles automatically)
   Future<void> _triggerMatchNotification(String userAId, String userBId) async {
     try {
-      debugPrint('🎉 Match created! Cloud Function will handle notifications automatically');
+      debugPrint(
+          '🎉 Match created! Cloud Function will handle notifications automatically');
       debugPrint('   User A: $userAId');
       debugPrint('   User B: $userBId');
-      
+
       // The Cloud Function (onMatchCreated) will automatically trigger
       // when the match document is created in _createMatch()
       // No manual intervention needed - it's fully automated!
-      
+
       // Optional: Add immediate local feedback for the current user
       await _showLocalMatchFeedback(userAId, userBId);
-      
     } catch (e) {
       debugPrint('❌ Error in match notification trigger: $e');
     }
   }
-  
+
   /// Show immediate local feedback for match (before push notification arrives)
   Future<void> _showLocalMatchFeedback(String userAId, String userBId) async {
     try {
       final currentUserId = FirebaseAuth.instance.currentUser?.uid;
       if (currentUserId == null) return;
-      
+
       // Determine the other user
       final otherUserId = currentUserId == userAId ? userBId : userAId;
-      
+
       // Get other user's data for immediate feedback
       final otherUserDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(otherUserId)
           .get();
-          
+
       if (!otherUserDoc.exists) return;
-      
+
       final otherUserData = otherUserDoc.data()!;
       final otherUserName = otherUserData['name'] ?? 'Someone';
-      
+
       debugPrint('✨ Showing immediate match feedback for $otherUserName');
-      
+
       // You can add a local notification or UI feedback here
       // This provides instant gratification while the push notification is being sent
-      
     } catch (e) {
       debugPrint('Error showing local match feedback: $e');
     }
@@ -282,9 +283,8 @@ class LikesService {
   /// Get all users who liked the current user
   Future<List<String>> getUsersWhoLikedMe(String userId) async {
     try {
-      final querySnapshot = await _likesCollection
-          .where('to', isEqualTo: userId)
-          .get();
+      final querySnapshot =
+          await _likesCollection.where('to', isEqualTo: userId).get();
 
       return querySnapshot.docs
           .map((doc) => doc.data() as Map<String, dynamic>)
@@ -299,9 +299,8 @@ class LikesService {
   /// Get all users that the current user has liked
   Future<List<String>> getUsersILiked(String userId) async {
     try {
-      final querySnapshot = await _likesCollection
-          .where('from', isEqualTo: userId)
-          .get();
+      final querySnapshot =
+          await _likesCollection.where('from', isEqualTo: userId).get();
 
       return querySnapshot.docs
           .map((doc) => doc.data() as Map<String, dynamic>)
@@ -335,7 +334,7 @@ class LikesService {
     try {
       final likeDocId = '${fromUserId}_likes_${toUserId}';
       await _likesCollection.doc(likeDocId).delete();
-      
+
       debugPrint('Like removed: $fromUserId unliked $toUserId');
       return true;
     } catch (e) {
@@ -364,8 +363,7 @@ class LikesService {
         .where('users', arrayContains: userId)
         .orderBy('matchedAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => MatchModel.fromDocument(doc))
-            .toList());
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => MatchModel.fromDocument(doc)).toList());
   }
 }

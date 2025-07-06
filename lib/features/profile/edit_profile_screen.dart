@@ -24,72 +24,89 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
-  
+
   // Text controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _otherTribeController = TextEditingController();
-  
+
   // Selected values
   String _selectedGender = 'Male';
   DateTime? _selectedDOB;
   int _age = 0;
   String? _selectedTribe;
-  
+
   // Track if user has completed onboarding (gender/age locked after first save)
   bool _hasCompletedOnboarding = false;
-  
+
   // Preference values
   String _interestedIn = 'Female';
   RangeValues _ageRange = const RangeValues(18, 35);
-  
+
   // New fields
   String _heightFtIn = HeightData.defaultHeightFtIn;
   int _heightCm = HeightData.defaultHeightCm;
   String _lookingFor = 'Dating';
   String _relationshipIntent = 'Not sure yet';
-  
+
   // Photos
   List<dynamic> _photos = List.filled(5, null); // Can be File or String (URL)
   bool _isUploading = false;
   bool _formValid = false;
-  
+
   // Lists for dropdowns and selections
-  final List<String> _genders = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
-  final List<String> _interestedInOptions = ['Male', 'Female', 'Everyone'];
-  
-  final List<String> _tribes = [
-    'Yoruba', 'Igbo', 'Hausa', 'Fulani', 'Edo', 'Ijaw', 'Kanuri', 'Ibibio', 
-    'Tiv', 'Efik', 'Nupe', 'Urhobo', 'Igala', 'Other'
+  final List<String> _genders = [
+    'Male',
+    'Female',
+    'Non-binary',
+    'Prefer not to say'
   ];
-  
+  final List<String> _interestedInOptions = ['Male', 'Female', 'Everyone'];
+
+  final List<String> _tribes = [
+    'Yoruba',
+    'Igbo',
+    'Hausa',
+    'Fulani',
+    'Edo',
+    'Ijaw',
+    'Kanuri',
+    'Ibibio',
+    'Tiv',
+    'Efik',
+    'Nupe',
+    'Urhobo',
+    'Igala',
+    'Other'
+  ];
+
   // Image picker
   final ImagePicker _picker = ImagePicker();
-  
+
   // Firebase references
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  
+
   // Define colors based on Afropeep MVP
   final Color backgroundColor = const Color(0xFFFDF1E7); // Cream background
   final Color primaryColor = const Color(0xFF008037); // Afropeep green
   final Color textColor = Colors.black87;
   final Color errorColor = Colors.red.shade700;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Load existing user data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadUserData();
     });
-    
+
     // Add listener to bio text field to validate form
     _bioController.addListener(_validateForm);
   }
-  
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -97,33 +114,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _otherTribeController.dispose();
     super.dispose();
   }
-  
+
   void _validateForm() {
     if (!mounted) return;
-    
+
     // Count valid photos
     int photoCount = _photos.where((photo) => photo != null).length;
-    
+
     // Check if all required fields are valid
     bool isValid = _formKey.currentState?.validate() ?? false;
-    
+
     // Check if user is 18+
     bool isAdult = _age >= 18;
-    
+
     // Check if bio is at least 20 characters (match registration requirement)
     bool validBioLength = _bioController.text.trim().length >= 20;
-    
+
     // Check if at least 3 photos are uploaded
     bool hasEnoughPhotos = photoCount >= 3;
-    
+
     setState(() {
       _formValid = isValid && isAdult && validBioLength && hasEnoughPhotos;
     });
   }
-  
+
   Future<void> _loadUserData() async {
     setState(() => _isUploading = true);
-    
+
     try {
       final user = _auth.currentUser;
       if (user == null) {
@@ -132,24 +149,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
         return;
       }
-      
+
       // Get user data from Firestore
-      final docSnapshot = await _firestore.collection('users').doc(user.uid).get();
-      
+      final docSnapshot =
+          await _firestore.collection('users').doc(user.uid).get();
+
       if (docSnapshot.exists) {
         final userData = docSnapshot.data()!;
-        
+
         // Load basic info
         _nameController.text = userData['name'] ?? '';
         _bioController.text = userData['bio'] ?? '';
-        
+
         // Load gender
         if (userData['gender'] != null) {
           setState(() {
             _selectedGender = userData['gender'];
           });
         }
-        
+
         // Load DOB and calculate age
         if (userData['dateOfBirth'] != null) {
           setState(() {
@@ -157,12 +175,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _calculateAge();
           });
         }
-        
+
         // Check if user has completed onboarding (has gender, DOB, and tribe)
-        _hasCompletedOnboarding = userData['gender'] != null && 
-                                 userData['dateOfBirth'] != null && 
-                                 userData['tribe'] != null;
-        
+        _hasCompletedOnboarding = userData['gender'] != null &&
+            userData['dateOfBirth'] != null &&
+            userData['tribe'] != null;
+
         // Load tribe
         if (userData['tribe'] != null) {
           setState(() {
@@ -173,7 +191,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }
           });
         }
-        
+
         // Load new fields
         if (userData['height'] != null) {
           setState(() {
@@ -195,7 +213,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _relationshipIntent = userData['relationshipIntent'];
           });
         }
-        
+
         // Load photos with better error handling
         if (userData['photos'] != null && userData['photos'] is List) {
           final photoUrls = List<String>.from(userData['photos']);
@@ -211,28 +229,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           });
           log('Loaded ${photoUrls.length} photos from Firestore');
         }
-        
+
         // Load preferences
         if (userData['preferences'] != null) {
           final prefs = userData['preferences'];
-          
+
           if (prefs['interestedIn'] != null) {
             setState(() {
               _interestedIn = prefs['interestedIn'];
             });
           }
-          
+
           if (prefs['ageRange'] != null && prefs['ageRange'] is List) {
             final range = List<int>.from(prefs['ageRange']);
             if (range.length == 2) {
               setState(() {
-                _ageRange = RangeValues(range[0].toDouble(), range[1].toDouble());
+                _ageRange =
+                    RangeValues(range[0].toDouble(), range[1].toDouble());
               });
             }
           }
         }
       }
-      
+
       // Validate form after loading data
       _validateForm();
     } catch (e) {
@@ -244,22 +263,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() => _isUploading = false);
     }
   }
-  
+
   // Pick image for a specific slot
   Future<void> _pickImage(int index) async {
     try {
       // Show image source selection dialog
       final ImageSource? source = await _showImageSourceDialog();
-      
+
       if (source == null) return;
-      
+
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
         maxWidth: 1200,
         maxHeight: 1200,
         imageQuality: 85,
       );
-      
+
       if (pickedFile != null) {
         setState(() {
           _photos[index] = File(pickedFile.path);
@@ -272,7 +291,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
     }
   }
-  
+
   // Show dialog to choose camera or gallery
   Future<ImageSource?> _showImageSourceDialog() async {
     return await showModalBottomSheet<ImageSource>(
@@ -316,7 +335,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
-  
+
   // Build image source option labelLarge
   Widget _buildImageSourceOption({
     required IconData icon,
@@ -350,28 +369,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
-  
+
   // Remove photo from a specific slot
   void _removePhoto(int index) {
     setState(() {
       _photos[index] = null;
-      
+
       // Shift photos to fill the gap
       final List<dynamic> newPhotos = List.filled(5, null);
       int newIndex = 0;
-      
+
       for (var photo in _photos) {
         if (photo != null && newIndex < newPhotos.length) {
           newPhotos[newIndex] = photo;
           newIndex++;
         }
       }
-      
+
       _photos = newPhotos;
       _validateForm();
     });
   }
-  
+
   Future<void> _showDeleteDialog(int index) async {
     return showDialog<void>(
       context: context,
@@ -427,33 +446,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isUploading = true);
-    
+
     try {
       final user = _auth.currentUser;
       if (user == null) {
         throw Exception('User not authenticated');
       }
-      
+
       // Verify user is still authenticated
       await user.reload();
       if (_auth.currentUser == null) {
         throw Exception('Authentication expired. Please log in again.');
       }
-      
+
       // Upload photos if they are File objects
       List<String> photoUrls = [];
-      
+
       for (int i = 0; i < _photos.length; i++) {
         final photo = _photos[i];
-        
+
         if (photo == null) continue;
-        
+
         if (photo is File) {
           // Upload new photo - path must match Firebase Storage rules
           try {
-            final ref = _storage.ref().child('profile_photos/${user.uid}/photo_$i.jpg');
+            final ref =
+                _storage.ref().child('profile_photos/${user.uid}/photo_$i.jpg');
             final uploadTask = await ref.putFile(photo);
             final url = await ref.getDownloadURL();
             photoUrls.add(url);
@@ -467,7 +487,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           photoUrls.add(photo);
         }
       }
-      
+
       // Create user data map
       final Map<String, dynamic> userData = {
         'name': _nameController.text.trim(),
@@ -475,7 +495,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'gender': _selectedGender,
         'dateOfBirth': _selectedDOB?.toIso8601String(),
         'age': _age,
-        'tribe': _selectedTribe == 'Other' ? _otherTribeController.text.trim() : _selectedTribe,
+        'tribe': _selectedTribe == 'Other'
+            ? _otherTribeController.text.trim()
+            : _selectedTribe,
         'photos': photoUrls,
         'height': _heightCm,
         'height_ft_in': _heightFtIn,
@@ -491,20 +513,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         },
         'lastUpdated': DateTime.now().toIso8601String(),
       };
-      
+
       // Update Firestore
       await _firestore.collection('users').doc(user.uid).update(userData);
-      
+
       // Update display name in Firebase Auth
       await user.updateDisplayName(_nameController.text.trim());
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Profile updated successfully'),
           backgroundColor: Colors.green,
         ),
       );
-      
+
       // Navigate back with success indicator
       Navigator.pop(context, true);
     } catch (e) {
@@ -538,7 +560,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           runSpacing: 8,
           children: _interestedInOptions.map((option) {
             final isSelected = _interestedIn == option;
-            
+
             return ChoiceChip(
               label: Text(
                 option,
@@ -577,7 +599,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       onTap: () async {
         final DateTime? picked = await showDatePicker(
           context: context,
-          initialDate: _selectedDOB ?? DateTime.now().subtract(const Duration(days: 365 * 25)),
+          initialDate: _selectedDOB ??
+              DateTime.now().subtract(const Duration(days: 365 * 25)),
           firstDate: DateTime(1950),
           lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
           builder: (context, child) {
@@ -594,7 +617,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             );
           },
         );
-        
+
         if (picked != null && picked != _selectedDOB) {
           setState(() {
             _selectedDOB = picked;
@@ -627,7 +650,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ? DateFormat('MMMM d, yyyy').format(_selectedDOB!)
                     : 'Select your date of birth',
                 style: GoogleFonts.poppins(
-                  color: _selectedDOB != null ? textColor : Colors.grey.shade600,
+                  color:
+                      _selectedDOB != null ? textColor : Colors.grey.shade600,
                 ),
               ),
             ),
@@ -657,7 +681,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget _buildBioField() {
     const int maxLength = 500; // Match registration max length
     final int currentLength = _bioController.text.length;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -670,7 +694,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Bio input container - match registration styling
         Container(
           decoration: BoxDecoration(
@@ -714,9 +738,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             },
           ),
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Custom character counter - match registration styling
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -738,7 +762,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ],
         ),
-        
+
         // Validation message
         if (currentLength > 0 && currentLength < 20)
           Padding(
@@ -789,7 +813,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       onChanged: (_) => _validateForm(),
     );
   }
-  
+
   Widget _buildReadOnlyField(String value, IconData icon) {
     return Container(
       width: double.infinity,
@@ -866,7 +890,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_selectedDOB != null) {
       final now = DateTime.now();
       int age = now.year - _selectedDOB!.year;
-      if (now.month < _selectedDOB!.month || 
+      if (now.month < _selectedDOB!.month ||
           (now.month == _selectedDOB!.month && now.day < _selectedDOB!.day)) {
         age--;
       }
@@ -924,7 +948,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     _buildSectionTitle('Profile Photos (Min. 3)'),
                     const SizedBox(height: 8),
                     _buildPhotoGrid(),
-                    
+
                     // Photo count warning if needed
                     if (_photos.where((p) => p != null).length < 3)
                       Padding(
@@ -938,11 +962,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     const SizedBox(height: 24),
-                    
+
                     // Basic info section
                     _buildSectionTitle('Basic Information'),
                     const SizedBox(height: 16),
-                    
+
                     // Name field
                     _buildTextField(
                       controller: _nameController,
@@ -956,47 +980,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Bio field - Custom implementation to match registration
                     _buildBioField(),
                     const SizedBox(height: 16),
-                    
+
                     // Gender selection - only editable during onboarding
                     _buildSectionTitle('Gender'),
                     const SizedBox(height: 8),
-                    _hasCompletedOnboarding 
-                        ? _buildReadOnlyField(_selectedGender, Icons.person_outline)
+                    _hasCompletedOnboarding
+                        ? _buildReadOnlyField(
+                            _selectedGender, Icons.person_outline)
                         : _buildGenderSelector(),
                     const SizedBox(height: 24),
-                    
+
                     // Date of Birth - only editable during onboarding
                     _buildSectionTitle('Date of Birth'),
                     const SizedBox(height: 8),
                     _hasCompletedOnboarding
                         ? _buildReadOnlyField(
-                            _selectedDOB != null 
+                            _selectedDOB != null
                                 ? '${_selectedDOB!.day}/${_selectedDOB!.month}/${_selectedDOB!.year} ($_age years old)'
                                 : 'Not set',
-                            Icons.cake_outlined
-                          )
+                            Icons.cake_outlined)
                         : _buildDateOfBirthSelector(),
                     const SizedBox(height: 24),
-                    
+
                     // Tribe selection - only editable during onboarding
                     _buildSectionTitle('Tribe/Ethnicity'),
                     const SizedBox(height: 8),
-                    _hasCompletedOnboarding 
+                    _hasCompletedOnboarding
                         ? _buildReadOnlyField(
-                            _selectedTribe == 'Other' 
-                                ? _otherTribeController.text.isNotEmpty 
-                                    ? _otherTribeController.text 
+                            _selectedTribe == 'Other'
+                                ? _otherTribeController.text.isNotEmpty
+                                    ? _otherTribeController.text
                                     : 'Other'
                                 : _selectedTribe ?? 'Not specified',
-                            Icons.people_outline
-                          )
+                            Icons.people_outline)
                         : _buildTribeSelector(),
                     const SizedBox(height: 24),
-                    
+
                     // Height section
                     _buildSectionTitle('Height'),
                     const SizedBox(height: 16),
@@ -1011,19 +1034,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Preferences section
                     _buildSectionTitle('Preferences'),
                     const SizedBox(height: 16),
-                    
+
                     // Interested in
                     _buildInterestedInSelector(),
                     const SizedBox(height: 16),
-                    
+
                     // Age range
                     _buildAgeRangeSelector(),
                     const SizedBox(height: 32),
-                    
+
                     // Save labelLarge
                     SizedBox(
                       width: double.infinity,
@@ -1055,7 +1078,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
     );
   }
-  
+
   Widget _buildPhotoGrid() {
     return GridView.builder(
       shrinkWrap: true,
@@ -1068,7 +1091,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       itemCount: 5, // Maximum 5 photos
       itemBuilder: (context, index) {
         final photo = _photos[index];
-        
+
         return GestureDetector(
           onTap: () => _pickImage(index),
           onLongPress: photo != null ? () => _showDeleteDialog(index) : null,
@@ -1120,15 +1143,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             : Image.network(
                                 photo,
                                 fit: BoxFit.cover,
-                                loadingBuilder: (context, child, loadingProgress) {
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Container(
                                     color: Colors.grey.shade100,
                                     child: Center(
                                       child: CircularProgressIndicator(
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded /
-                                                loadingProgress.expectedTotalBytes!
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
                                             : null,
                                         color: primaryColor,
                                         strokeWidth: 2,
@@ -1141,7 +1169,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   return Container(
                                     color: Colors.grey.shade200,
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.error_outline,
@@ -1193,14 +1222,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
     );
   }
-  
+
   Widget _buildGenderSelector() {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: _genders.map((gender) {
         final isSelected = _selectedGender == gender;
-        
+
         return ChoiceChip(
           label: Text(
             gender,
@@ -1232,7 +1261,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }).toList(),
     );
   }
-  
+
   Widget _buildTribeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1254,7 +1283,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             value: _selectedTribe,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               hintText: 'Select your tribe/ethnicity',
               hintStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
               prefixIcon: Icon(Icons.people, color: primaryColor),
@@ -1300,7 +1330,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             style: GoogleFonts.poppins(),
             validator: (value) {
-              if (_selectedTribe == 'Other' && (value == null || value.isEmpty)) {
+              if (_selectedTribe == 'Other' &&
+                  (value == null || value.isEmpty)) {
                 return 'Please specify your tribe/ethnicity';
               }
               return null;
@@ -1311,7 +1342,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ],
     );
   }
-  
+
   Widget _buildAgeRangeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1361,7 +1392,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               elevation: 4,
             ),
             rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
-            rangeValueIndicatorShape: const PaddleRangeSliderValueIndicatorShape(),
+            rangeValueIndicatorShape:
+                const PaddleRangeSliderValueIndicatorShape(),
             valueIndicatorColor: primaryColor,
             valueIndicatorTextStyle: GoogleFonts.poppins(
               color: Colors.white,
@@ -1388,5 +1420,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ],
     );
   }
-
 }

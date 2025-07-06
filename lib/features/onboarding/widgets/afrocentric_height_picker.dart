@@ -15,20 +15,21 @@ class AfrocentricHeightPicker extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AfrocentricHeightPicker> createState() => _AfrocentricHeightPickerState();
+  State<AfrocentricHeightPicker> createState() =>
+      _AfrocentricHeightPickerState();
 }
 
 class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
   late String _selectedUnit;
   late double _heightInCm;
-  
+
   // For CM picker
   late FixedExtentScrollController _cmController;
-  
+
   // For FT/IN picker
   late FixedExtentScrollController _feetController;
   late FixedExtentScrollController _inchesController;
-  
+
   // Height ranges
   static const int minCm = 120; // 4 feet
   static const int maxCm = 220; // 7'2"
@@ -37,8 +38,10 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
   static const int maxInches = 11;
 
   // MVP Colors
-  static const Color backgroundColor = Color(0xFFF7E8DA); // Card background from MVP
-  static const Color primaryGreen = Color(0xFF007A33); // Afropeep green from MVP
+  static const Color backgroundColor =
+      Color(0xFFF7E8DA); // Card background from MVP
+  static const Color primaryGreen =
+      Color(0xFF007A33); // Afropeep green from MVP
   static const Color textDarkBrown = Color(0xFF3A1D0F); // Dark text from MVP
   static const Color textLightBrown = Color(0xFF8B6C59); // Light text from MVP
   static const Color creamBackground = Color(0xFFFFF6E5); // Main background
@@ -48,7 +51,7 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
     super.initState();
     _selectedUnit = widget.initialUnit;
     _heightInCm = widget.initialHeight;
-    
+
     _initializeControllers();
   }
 
@@ -61,8 +64,9 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
       double totalInches = _heightInCm / 2.54;
       int feet = (totalInches / 12).floor().clamp(minFeet, maxFeet);
       int inches = (totalInches % 12).round().clamp(0, maxInches);
-      
-      _feetController = FixedExtentScrollController(initialItem: feet - minFeet);
+
+      _feetController =
+          FixedExtentScrollController(initialItem: feet - minFeet);
       _inchesController = FixedExtentScrollController(initialItem: inches);
     }
   }
@@ -112,7 +116,7 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 32 : 24),
@@ -152,9 +156,9 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
               ),
             ],
           ),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Unit toggle - pill style
           Container(
             decoration: BoxDecoration(
@@ -170,9 +174,9 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
               ],
             ),
           ),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Selected height display - prominent
           Container(
             padding: EdgeInsets.symmetric(
@@ -228,9 +232,9 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
               ],
             ),
           ),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Inline scroll picker
           Container(
             height: isTablet ? 200 : 180,
@@ -239,11 +243,13 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: primaryGreen.withValues(alpha: 0.2)),
             ),
-            child: _selectedUnit == 'cm' ? _buildCmPicker(isTablet) : _buildFeetInchesPicker(isTablet),
+            child: _selectedUnit == 'cm'
+                ? _buildCmPicker(isTablet)
+                : _buildFeetInchesPicker(isTablet),
           ),
-          
+
           SizedBox(height: isTablet ? 16 : 12),
-          
+
           // Helper text with African touch
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -271,7 +277,7 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
 
   Widget _buildUnitToggle(String label, String value, bool isTablet) {
     final isSelected = _selectedUnit == value;
-    
+
     return GestureDetector(
       onTap: () => _onUnitChanged(value),
       child: AnimatedContainer(
@@ -318,7 +324,7 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
           double totalInches = cm / 2.54;
           int feet = (totalInches / 12).floor();
           int inches = (totalInches % 12).round();
-          
+
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -397,7 +403,7 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
             ),
           ),
         ),
-        
+
         // Separator with African pattern inspiration
         Container(
           width: 2,
@@ -415,7 +421,7 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
             ),
           ),
         ),
-        
+
         // Inches picker
         Expanded(
           child: CupertinoPicker(

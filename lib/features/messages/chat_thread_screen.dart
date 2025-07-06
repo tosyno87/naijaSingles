@@ -35,12 +35,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final ChatService _chatService = ChatService();
   String? _currentUserId;
   bool _hasText = false;
-  
+
   @override
   void initState() {
     super.initState();
     _currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    
+
     // Listen to text changes for send button animation
     _messageController.addListener(() {
       final hasText = _messageController.text.trim().isNotEmpty;
@@ -50,10 +50,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         });
       }
     });
-    
+
     // Mark thread as read when opening
     _chatService.markThreadAsRead(widget.threadId);
-    
+
     // Scroll to bottom when messages load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
@@ -83,7 +83,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
     // Validate message length locally
     if (text.length > 1000) {
-      _showErrorSnackBar('Message is too long. Please keep messages under 1000 characters.');
+      _showErrorSnackBar(
+          'Message is too long. Please keep messages under 1000 characters.');
       return;
     }
 
@@ -107,7 +108,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         elevation: 1,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: primaryColor), // Use MVP primary color
+          icon: Icon(Icons.arrow_back_ios,
+              color: primaryColor), // Use MVP primary color
           onPressed: () => Navigator.pop(context),
         ),
         title: GestureDetector(
@@ -120,7 +122,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   radius: 16,
                   backgroundImage: widget.avatarUrl != null
                       ? NetworkImage(widget.avatarUrl!)
-                      : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
+                      : const AssetImage(
+                              'assets/images/placeholder_profile.jpg')
+                          as ImageProvider,
                   onBackgroundImageError: (_, __) {},
                 ),
               ),
@@ -132,7 +136,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   children: [
                     Text(
                       widget.userName,
-                      style: GoogleFonts.montserrat( // Use Montserrat for MVP
+                      style: GoogleFonts.montserrat(
+                        // Use Montserrat for MVP
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: textPrimary, // Use MVP text color
@@ -221,7 +226,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                
+
                 if (snapshot.hasError) {
                   return Center(
                     child: Text(
@@ -230,9 +235,9 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     ),
                   );
                 }
-                
+
                 final messages = snapshot.data ?? [];
-                
+
                 if (messages.isEmpty) {
                   return Center(
                     child: Column(
@@ -254,7 +259,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Say hi to ${widget.userName}!',
-                          style: GoogleFonts.montserrat( // Use Montserrat for MVP
+                          style: GoogleFonts.montserrat(
+                            // Use Montserrat for MVP
                             fontSize: 14,
                             color: primaryColor, // Use MVP primary color
                           ),
@@ -263,24 +269,26 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     ),
                   );
                 }
-                
+
                 // Scroll to bottom when new messages arrive
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _scrollToBottom();
                 });
-                
+
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
                     final isMe = message.senderId == _currentUserId;
-                    
+
                     // Group messages by date
-                    final showDateSeparator = index == 0 || 
-                        !_isSameDay(messages[index].timestamp, messages[index - 1].timestamp);
-                    
+                    final showDateSeparator = index == 0 ||
+                        !_isSameDay(messages[index].timestamp,
+                            messages[index - 1].timestamp);
+
                     return Column(
                       children: [
                         if (showDateSeparator)
@@ -293,7 +301,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               },
             ),
           ),
-          
+
           // Message input
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -312,7 +320,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 children: [
                   // Emoji button
                   IconButton(
-                    icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+                    icon: const Icon(Icons.emoji_emotions_outlined,
+                        color: Colors.grey),
                     onPressed: _showEmojiPicker,
                   ),
                   Expanded(
@@ -377,7 +386,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Date separator
   Widget _buildDateSeparator(DateTime timestamp) {
     return Container(
@@ -404,13 +413,14 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Message bubble
   Widget _buildMessageBubble(Message message, bool isMe) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
@@ -420,9 +430,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               backgroundImage: widget.avatarUrl != null
                   ? NetworkImage(widget.avatarUrl!)
                   : null,
-              onBackgroundImageError: widget.avatarUrl != null 
-                  ? (_, __) {} 
-                  : null,
+              onBackgroundImageError:
+                  widget.avatarUrl != null ? (_, __) {} : null,
               child: widget.avatarUrl == null
                   ? Icon(
                       Icons.person,
@@ -433,7 +442,6 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             ),
             const SizedBox(width: 8),
           ],
-          
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -442,8 +450,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(20),
                   topRight: const Radius.circular(20),
-                  bottomLeft: isMe ? const Radius.circular(20) : const Radius.circular(4),
-                  bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(20),
+                  bottomLeft: isMe
+                      ? const Radius.circular(20)
+                      : const Radius.circular(4),
+                  bottomRight: isMe
+                      ? const Radius.circular(4)
+                      : const Radius.circular(20),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -472,8 +484,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         _formatTime(message.timestamp),
                         style: GoogleFonts.poppins(
                           fontSize: 11,
-                          color: isMe 
-                              ? Colors.white.withValues(alpha: 0.8) 
+                          color: isMe
+                              ? Colors.white.withValues(alpha: 0.8)
                               : Colors.grey[500],
                         ),
                       ),
@@ -482,8 +494,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         Icon(
                           message.isRead ? Icons.done_all : Icons.done,
                           size: 14,
-                          color: message.isRead 
-                              ? Colors.blue[300] 
+                          color: message.isRead
+                              ? Colors.blue[300]
                               : Colors.white.withValues(alpha: 0.8),
                         ),
                       ],
@@ -497,36 +509,59 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Format time for message bubbles
   String _formatTime(DateTime timestamp) {
-    final hour = timestamp.hour > 12 ? timestamp.hour - 12 : timestamp.hour == 0 ? 12 : timestamp.hour;
+    final hour = timestamp.hour > 12
+        ? timestamp.hour - 12
+        : timestamp.hour == 0
+            ? 12
+            : timestamp.hour;
     final period = timestamp.hour >= 12 ? 'PM' : 'AM';
     final minute = timestamp.minute.toString().padLeft(2, '0');
     return '$hour:$minute $period';
   }
-  
+
   // Format date for separators
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final yesterday = DateTime(now.year, now.month, now.day - 1);
-    
-    if (date.year == now.year && date.month == now.month && date.day == now.day) {
+
+    if (date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day) {
       return 'Today';
-    } else if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
+    } else if (date.year == yesterday.year &&
+        date.month == yesterday.month &&
+        date.day == yesterday.day) {
       return 'Yesterday';
     } else {
       // Format as full date
-      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
       return '${date.day} ${months[date.month - 1]} ${date.year}';
     }
   }
-  
+
   // Check if two dates are the same day
   bool _isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
-  
+
   // Show emoji picker for enhanced messaging
   void _showEmojiPicker() {
     showModalBottomSheet(
@@ -554,23 +589,40 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 crossAxisCount: 8,
                 padding: const EdgeInsets.all(16),
                 children: [
-                  '😊', '😂', '❤️', '👍', '👎', '😢', '😮', '😡',
-                  '🎉', '🔥', '💯', '👏', '🙏', '💪', '✨', '🌟',
-                ].map((emoji) => GestureDetector(
-                  onTap: () {
-                    _messageController.text += emoji;
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey[100],
-                    ),
-                    child: Center(
-                      child: Text(emoji, style: const TextStyle(fontSize: 24)),
-                    ),
-                  ),
-                )).toList(),
+                  '😊',
+                  '😂',
+                  '❤️',
+                  '👍',
+                  '👎',
+                  '😢',
+                  '😮',
+                  '😡',
+                  '🎉',
+                  '🔥',
+                  '💯',
+                  '👏',
+                  '🙏',
+                  '💪',
+                  '✨',
+                  '🌟',
+                ]
+                    .map((emoji) => GestureDetector(
+                          onTap: () {
+                            _messageController.text += emoji;
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey[100],
+                            ),
+                            child: Center(
+                              child: Text(emoji,
+                                  style: const TextStyle(fontSize: 24)),
+                            ),
+                          ),
+                        ))
+                    .toList(),
               ),
             ),
           ],
@@ -578,7 +630,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Show call options
   void _showCallOptions() {
     showModalBottomSheet(
@@ -629,7 +681,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Navigate to full user profile screen
   Future<void> _viewFullUserProfile() async {
     if (widget.otherUserId == null) {
@@ -680,24 +732,25 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           .collection('users')
           .doc(widget.otherUserId!)
           .get();
-      
+
       // Close loading dialog
       if (mounted) Navigator.pop(context);
-      
+
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
-        
+
         // Convert Firestore data to UserModel
         final userModel = UserModel(
           id: widget.otherUserId!,
           name: userData['name'] ?? widget.userName,
           age: userData['age'] ?? 0,
-          imageUrl: List<String>.from(userData['photos'] ?? userData['imageUrl'] ?? []),
+          imageUrl: List<String>.from(
+              userData['photos'] ?? userData['imageUrl'] ?? []),
           address: userData['locationName'] ?? userData['address'],
           distanceBW: userData['distanceBW'],
           editInfo: userData['editInfo'] ?? {},
         );
-        
+
         // Navigate to profile screen
         Navigator.push(
           context,
@@ -720,7 +773,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     } catch (e) {
       // Close loading dialog if still open
       if (mounted) Navigator.pop(context);
-      
+
       log('Error loading user profile: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -776,7 +829,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Show block user dialog
   void _showBlockUserDialog() {
     showDialog(
@@ -825,7 +878,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Show report user dialog
   void _showReportUserDialog() {
     showDialog(
@@ -874,7 +927,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Show clear chat dialog
   void _showClearChatDialog() {
     showDialog(
@@ -923,7 +976,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Show coming soon snackbar
   void _showComingSoonSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -940,7 +993,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       ),
     );
   }
-  
+
   // Show error snackbar
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

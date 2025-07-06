@@ -7,6 +7,7 @@ import 'package:naijasingles/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MockPhoneAuthRepository extends Mock implements PhoneAuthRepository {}
+
 class MockFirebaseUser extends Mock implements User {}
 
 void main() {

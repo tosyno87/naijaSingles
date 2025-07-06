@@ -3,6 +3,7 @@ import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/common/constants/constants.dart';
 import 'package:naijasingles/common/data/repo/user_messaging_repo.dart';
+
 void main() {
   test('getChatUserDetails returns user data', () async {
     firebaseFireStoreInstance = FakeFirebaseFirestore();

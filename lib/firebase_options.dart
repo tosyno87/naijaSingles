@@ -82,18 +82,19 @@ class FirebaseEmulators {
   /// Connect to Firebase emulators if in debug mode
   static void connectToEmulators() {
     // Disable emulator connections for production
-    if (false) { // Changed from kDebugMode to false to disable emulators
+    if (false) {
+      // Changed from kDebugMode to false to disable emulators
       try {
         FirebaseFirestore.instance.settings = const Settings(
           host: 'localhost:8080',
           sslEnabled: false,
           persistenceEnabled: false,
         );
-        
+
         FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-        
+
         FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
-        
+
         debugPrint('🔥 Connected to Firebase emulators');
       } catch (e) {
         debugPrint('❌ Failed to connect to Firebase emulators: $e');

@@ -48,7 +48,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               ),
             ),
             const SizedBox(height: 40),
-            
+
             // Interested In Section
             Text(
               'I\'m interested in',
@@ -60,9 +60,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             ),
             const SizedBox(height: 16),
             _buildInterestedInOptions(),
-            
+
             const SizedBox(height: 40),
-            
+
             // Age Range Section
             Text(
               'Age Range',
@@ -74,9 +74,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             ),
             const SizedBox(height: 16),
             _buildAgeRangeSlider(),
-            
+
             const Spacer(),
-            
+
             // Continue Button
             SizedBox(
               width: double.infinity,
@@ -119,7 +119,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
 
   Widget _buildInterestedInOption(String label, String value) {
     final isSelected = _selectedInterestedIn == value;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -130,7 +130,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF008037).withValues(alpha: 0.1) : Colors.white,
+          color: isSelected
+              ? const Color(0xFF008037).withValues(alpha: 0.1)
+              : Colors.white,
           border: Border.all(
             color: isSelected ? const Color(0xFF008037) : Colors.grey.shade300,
             width: 2,
@@ -179,12 +181,13 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   }
 
   void _savePreferences() {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // Save preferences to controller
     controller.setInterestedIn(_selectedInterestedIn);
     controller.setAgeRange([_ageRange.start.round(), _ageRange.end.round()]);
-    
+
     // Navigate to next screen or complete onboarding
     Navigator.pop(context);
   }

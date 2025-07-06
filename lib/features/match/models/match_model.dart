@@ -18,13 +18,13 @@ class MatchModel {
   // Create a MatchModel from a Firestore document
   factory MatchModel.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     return MatchModel(
       id: doc.id,
       users: List<String>.from(data['users'] ?? []),
-      matchedAt: (data['matchedAt'] as Timestamp?)?.toDate() ?? 
-                 (data['timestamp'] as Timestamp?)?.toDate() ?? 
-                 DateTime.now(),
+      matchedAt: (data['matchedAt'] as Timestamp?)?.toDate() ??
+          (data['timestamp'] as Timestamp?)?.toDate() ??
+          DateTime.now(),
       matchStatus: data['matchStatus'] ?? 'matched',
       chatThreadId: data['chatThreadId'],
     );
@@ -65,7 +65,7 @@ class MatchModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is MatchModel &&
         other.id == id &&
         other.users.length == users.length &&
@@ -75,5 +75,9 @@ class MatchModel {
   }
 
   @override
-  int get hashCode => id.hashCode ^ users.hashCode ^ matchStatus.hashCode ^ chatThreadId.hashCode;
+  int get hashCode =>
+      id.hashCode ^
+      users.hashCode ^
+      matchStatus.hashCode ^
+      chatThreadId.hashCode;
 }

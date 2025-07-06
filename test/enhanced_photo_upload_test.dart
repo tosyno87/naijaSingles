@@ -6,7 +6,8 @@ import 'package:naijasingles/features/user/controllers/onboarding_controller.dar
 
 void main() {
   group('Enhanced Photo Upload Screen Tests', () {
-    testWidgets('Enhanced photo upload screen renders correctly', (WidgetTester tester) async {
+    testWidgets('Enhanced photo upload screen renders correctly',
+        (WidgetTester tester) async {
       // Create a test app with the enhanced photo upload screen
       await tester.pumpWidget(
         MaterialApp(
@@ -23,7 +24,7 @@ void main() {
       expect(find.text('Add Your Profile Photos'), findsOneWidget);
       expect(find.text('MAIN PHOTO'), findsOneWidget);
       expect(find.text('Photo Tips'), findsOneWidget);
-      
+
       // Verify photo slots are present
       expect(find.text('Main Photo'), findsOneWidget);
       expect(find.text('Full Body'), findsOneWidget);
@@ -32,7 +33,8 @@ void main() {
       expect(find.text('Lifestyle'), findsOneWidget);
     });
 
-    testWidgets('Photo tips dialog opens when tapped', (WidgetTester tester) async {
+    testWidgets('Photo tips dialog opens when tapped',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -55,7 +57,8 @@ void main() {
       expect(find.text('What to Avoid'), findsOneWidget);
     });
 
-    testWidgets('Primary photo slot has special styling', (WidgetTester tester) async {
+    testWidgets('Primary photo slot has special styling',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -70,7 +73,7 @@ void main() {
       // Verify primary photo slot exists with special styling
       expect(find.text('MAIN PHOTO'), findsOneWidget);
       expect(find.text('Main Photo'), findsOneWidget);
-      
+
       // Verify required indicator
       expect(find.text('REQUIRED'), findsOneWidget);
     });

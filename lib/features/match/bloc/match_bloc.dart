@@ -19,7 +19,6 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
   })  : _matchService = matchService ?? MatchService(),
         _likesService = likesService ?? LikesService(),
         super(const MatchInitial()) {
-    
     on<LikeUserEvent>(_onLikeUser);
     on<LoadMatchesEvent>(_onLoadMatches);
     on<MatchCreatedEvent>(_onMatchCreated);
@@ -28,12 +27,13 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     on<DeleteMatchEvent>(_onDeleteMatch);
   }
 
-  Future<void> _onLikeUser(LikeUserEvent event, Emitter<MatchState> emit) async {
+  Future<void> _onLikeUser(
+      LikeUserEvent event, Emitter<MatchState> emit) async {
     try {
       emit(LikeProcessing(toUserId: event.toUserId));
-      
+
       final matchId = await _matchService.handleLike(event.toUserId);
-      
+
       if (matchId != null) {
         // It's a match!
         final match = await _likesService.getMatchById(matchId);
@@ -42,7 +42,7 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
           isMatch: true,
           matchId: matchId,
         ));
-        
+
         // Emit match created state for UI animations/notifications
         emit(MatchCreated(
           matchId: matchId,
@@ -62,10 +62,11 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     }
   }
 
-  Future<void> _onLoadMatches(LoadMatchesEvent event, Emitter<MatchState> emit) async {
+  Future<void> _onLoadMatches(
+      LoadMatchesEvent event, Emitter<MatchState> emit) async {
     try {
       emit(const MatchLoading());
-      
+
       final matches = await _matchService.getUserMatches();
       emit(MatchesLoaded(matches: matches));
     } catch (e) {
@@ -74,7 +75,8 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     }
   }
 
-  Future<void> _onMatchCreated(MatchCreatedEvent event, Emitter<MatchState> emit) async {
+  Future<void> _onMatchCreated(
+      MatchCreatedEvent event, Emitter<MatchState> emit) async {
     try {
       final match = await _likesService.getMatchById(event.matchId);
       emit(MatchCreated(
@@ -88,12 +90,14 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     }
   }
 
-  Future<void> _onDismissMatchNotification(DismissMatchNotificationEvent event, Emitter<MatchState> emit) async {
+  Future<void> _onDismissMatchNotification(
+      DismissMatchNotificationEvent event, Emitter<MatchState> emit) async {
     // Return to initial state or previous state
     emit(const MatchInitial());
   }
 
-  Future<void> _onUnlikeUser(UnlikeUserEvent event, Emitter<MatchState> emit) async {
+  Future<void> _onUnlikeUser(
+      UnlikeUserEvent event, Emitter<MatchState> emit) async {
     try {
       final currentUserId = _likesService.currentUserId;
       if (currentUserId == null) {
@@ -101,8 +105,9 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
         return;
       }
 
-      final success = await _likesService.removeLike(currentUserId, event.toUserId);
-      
+      final success =
+          await _likesService.removeLike(currentUserId, event.toUserId);
+
       if (success) {
         emit(UnlikeSuccess(toUserId: event.toUserId));
       } else {
@@ -114,10 +119,11 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     }
   }
 
-  Future<void> _onDeleteMatch(DeleteMatchEvent event, Emitter<MatchState> emit) async {
+  Future<void> _onDeleteMatch(
+      DeleteMatchEvent event, Emitter<MatchState> emit) async {
     try {
       final success = await _matchService.deleteMatch(event.matchId);
-      
+
       if (success) {
         emit(MatchDeleted(matchId: event.matchId));
         // Reload matches after deletion

@@ -6,7 +6,8 @@ import 'package:naijasingles/features/user/controllers/onboarding_controller.dar
 
 void main() {
   group('Enhanced Additional Info Screen Tests', () {
-    testWidgets('Enhanced additional info screen renders correctly', (WidgetTester tester) async {
+    testWidgets('Enhanced additional info screen renders correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -20,8 +21,9 @@ void main() {
 
       // Verify the screen renders
       expect(find.text('Tell us more about you'), findsOneWidget);
-      expect(find.text('Help us create better matches for you'), findsOneWidget);
-      
+      expect(
+          find.text('Help us create better matches for you'), findsOneWidget);
+
       // Verify main sections are present
       expect(find.text('Height'), findsOneWidget);
       expect(find.text('What brings you to NaijaSingles?'), findsOneWidget);
@@ -31,7 +33,8 @@ void main() {
       expect(find.text('Languages'), findsOneWidget);
     });
 
-    testWidgets('Progress indicator shows completion status', (WidgetTester tester) async {
+    testWidgets('Progress indicator shows completion status',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -45,10 +48,12 @@ void main() {
 
       // Verify progress indicator is present
       expect(find.text('Profile completion: 1 of 6 sections'), findsOneWidget);
-      expect(find.text('Complete profiles get 3x more matches!'), findsOneWidget);
+      expect(
+          find.text('Complete profiles get 3x more matches!'), findsOneWidget);
     });
 
-    testWidgets('Info card explains importance of information', (WidgetTester tester) async {
+    testWidgets('Info card explains importance of information',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -62,10 +67,12 @@ void main() {
 
       // Verify info card is present
       expect(find.text('Why we ask for this information'), findsOneWidget);
-      expect(find.text('These details help us find better matches'), findsOneWidget);
+      expect(find.text('These details help us find better matches'),
+          findsOneWidget);
     });
 
-    testWidgets('Looking for options include Nigerian context', (WidgetTester tester) async {
+    testWidgets('Looking for options include Nigerian context',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -84,7 +91,8 @@ void main() {
       expect(find.text('New friends & connections'), findsOneWidget);
     });
 
-    testWidgets('Relationship intent options are culturally relevant', (WidgetTester tester) async {
+    testWidgets('Relationship intent options are culturally relevant',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -121,7 +129,8 @@ void main() {
       expect(find.text('English'), findsOneWidget);
     });
 
-    testWidgets('Religion options include Nigerian context', (WidgetTester tester) async {
+    testWidgets('Religion options include Nigerian context',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -139,7 +148,8 @@ void main() {
       expect(find.text('Traditional African Religion'), findsOneWidget);
     });
 
-    testWidgets('Lifestyle preferences are included', (WidgetTester tester) async {
+    testWidgets('Lifestyle preferences are included',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
@@ -159,9 +169,10 @@ void main() {
   });
 
   group('Enhanced Additional Info Controller Integration', () {
-    testWidgets('Controller methods are called when options are selected', (WidgetTester tester) async {
+    testWidgets('Controller methods are called when options are selected',
+        (WidgetTester tester) async {
       final controller = OnboardingController();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider.value(
@@ -176,13 +187,14 @@ void main() {
       // Test looking for selection
       await tester.tap(find.text('Serious relationship'));
       await tester.pumpAndSettle();
-      
+
       expect(controller.lookingFor, 'Serious');
     });
 
-    testWidgets('Language selection works correctly', (WidgetTester tester) async {
+    testWidgets('Language selection works correctly',
+        (WidgetTester tester) async {
       final controller = OnboardingController();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider.value(
@@ -197,7 +209,7 @@ void main() {
       // Test language selection
       await tester.tap(find.text('Yoruba'));
       await tester.pumpAndSettle();
-      
+
       expect(controller.spokenLanguages, contains('Yoruba'));
     });
   });

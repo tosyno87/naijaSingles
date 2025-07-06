@@ -38,15 +38,16 @@ class AllowLocation extends StatelessWidget {
     // Function to handle registration without location
     void proceedWithoutLocation() async {
       if (isProcessing.value) return;
-      
+
       isProcessing.value = true;
       log("Proceeding without location");
-      
+
       try {
         // Get default location
-        final UserLocationReporistoryImpl locationRepo = UserLocationReporistoryImpl();
+        final UserLocationReporistoryImpl locationRepo =
+            UserLocationReporistoryImpl();
         final defaultLocation = await locationRepo.getDefaultLocation();
-        
+
         // Add default location to user data
         userData.addAll({
           'location': {
@@ -62,43 +63,35 @@ class AllowLocation extends StatelessWidget {
           'lastvisited': FieldValue.serverTimestamp(),
           'createdAt': FieldValue.serverTimestamp()
         });
-        
+
         log("Added default location to user data");
-        
+
         // Upload profile picture
         try {
           UploadTask? task = await FireStoreClass.uploadprofile(
-            currentUserId: auth.currentUser!.uid,
-            file: profilePic
-          );
-          
+              currentUserId: auth.currentUser!.uid, file: profilePic);
+
           if (task != null) {
             // Complete registration
-            context.read<RegistrationBloc>().add(
-              RegistrationRequest(userdata: userData)
-            );
+            context
+                .read<RegistrationBloc>()
+                .add(RegistrationRequest(userdata: userData));
           } else {
             isProcessing.value = false;
             CustomSnackbar.showSnackBarSimple(
-              "Failed to upload image. Please try again.",
-              context
-            );
+                "Failed to upload image. Please try again.", context);
           }
         } catch (e) {
           isProcessing.value = false;
           log("Error uploading profile: ${e.toString()}");
           CustomSnackbar.showSnackBarSimple(
-            "Error uploading profile: ${e.toString()}",
-            context
-          );
+              "Error uploading profile: ${e.toString()}", context);
         }
       } catch (e) {
         isProcessing.value = false;
         log("Error in proceedWithoutLocation: ${e.toString()}");
         CustomSnackbar.showSnackBarSimple(
-          "Error completing registration: ${e.toString()}",
-          context
-        );
+            "Error completing registration: ${e.toString()}", context);
       }
     }
 
@@ -135,19 +128,20 @@ class AllowLocation extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Spacer(flex: 1),
-                        
+
                         // Progress indicator (100% complete)
                         Container(
                           height: 4,
-                          width: MediaQuery.of(context).size.width - 48, // Full width minus padding
+                          width: MediaQuery.of(context).size.width -
+                              48, // Full width minus padding
                           decoration: BoxDecoration(
                             color: const Color(0xFF27AE60),
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Green-themed location illustration
                         Container(
                           width: 180,
@@ -163,7 +157,7 @@ class AllowLocation extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 40),
-                        
+
                         // Title with larger, bolder font
                         const Text(
                           "Enable Location",
@@ -174,9 +168,9 @@ class AllowLocation extends StatelessWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Subtitle with muted gray color
                         const Text(
                           "We'll use your location to help you find people nearby.",
@@ -187,9 +181,9 @@ class AllowLocation extends StatelessWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        
+
                         const Spacer(flex: 1),
-                        
+
                         // Primary green labelLarge
                         BlocConsumer<RegistrationBloc, RegistrationStates>(
                           listener: (context, state) {
@@ -234,17 +228,19 @@ class AllowLocation extends StatelessWidget {
                                         },
                                         'lastvisited':
                                             FieldValue.serverTimestamp(),
-                                        'createdAt': FieldValue.serverTimestamp()
+                                        'createdAt':
+                                            FieldValue.serverTimestamp()
                                       },
                                     );
                                     log("added user finally $userData.toString()");
-                                    
+
                                     try {
                                       UploadTask? task =
                                           await FireStoreClass.uploadprofile(
-                                              currentUserId: auth.currentUser!.uid,
+                                              currentUserId:
+                                                  auth.currentUser!.uid,
                                               file: profilePic);
-                                      
+
                                       if (task != null) {
                                         context.read<RegistrationBloc>().add(
                                             RegistrationRequest(
@@ -275,7 +271,7 @@ class AllowLocation extends StatelessWidget {
                                   log("Location failed: ${state.message}");
                                   CustomSnackbar.showSnackBarSimple(
                                       state.message, context);
-                                  
+
                                   // Show dialog to proceed with default location
                                   showDialog(
                                     context: context,
@@ -307,7 +303,7 @@ class AllowLocation extends StatelessWidget {
                                 }
                               },
                               builder: (context, state) {
-                                if (state is UserLocationLoading || 
+                                if (state is UserLocationLoading ||
                                     state is UserLocationSuccess) {
                                   return Container(
                                     width: double.infinity,
@@ -356,9 +352,9 @@ class AllowLocation extends StatelessWidget {
                             );
                           },
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Secondary "Skip for now" labelLarge
                         TextButton(
                           onPressed: () {

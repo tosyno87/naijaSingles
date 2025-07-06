@@ -15,7 +15,7 @@ import '../../bloc/phone_auth_bloc.dart';
 class PhoneNumber extends StatefulWidget {
   bool updatePhoneNumber;
   final bool isSignIn;
-  
+
   PhoneNumber({
     Key? key,
     required this.updatePhoneNumber,
@@ -34,15 +34,15 @@ class _PhoneNumberState extends State<PhoneNumber> {
   String countryCode = '+234'; // Default to Nigeria code
   TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Add listener to validate phone number
     phoneNumberController.addListener(_validatePhoneNumber);
   }
-  
+
   @override
   void dispose() {
     phoneNumberController.removeListener(_validatePhoneNumber);
@@ -50,7 +50,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
     _codeController.dispose();
     super.dispose();
   }
-  
+
   void _validatePhoneNumber() {
     if (mounted) {
       setState(() {
@@ -58,7 +58,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
       });
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     // Set system UI overlay style for status bar
@@ -71,8 +71,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color textColor = Color(0xFF3E1F0D); // Deep brown
     const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
-    const Color iconBackgroundColor = Color(0xFFDFF5E2); // Light green for icon background
-    
+    const Color iconBackgroundColor =
+        Color(0xFFDFF5E2); // Light green for icon background
+
     return RepositoryProvider(
       create: (context) => PhoneAuthRepository(),
       child: BlocProvider(
@@ -105,7 +106,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 log("phone auth success listener called");
                 // Navigate based on sign in or sign up
                 if (widget.isSignIn) {
-                  Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
+                  Navigator.pushReplacementNamed(
+                      context, RouteName.mainNavigation);
                 } else {
                   Navigator.pushReplacementNamed(context, RouteName.onboarding);
                 }
@@ -117,15 +119,14 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   setState(() {
                     _isLoading = false;
                   });
-                  
-                  Navigator.pushNamed(context, RouteName.otpScreen,
-                    arguments: {
-                      'phoneNumber': countryCode + phoneNumberController.text,
-                      'codeController': _codeController.text,
-                      'verificationId': state.verificationId,
-                      "updatenumber": widget.updatePhoneNumber,
-                      "isLogin": widget.isSignIn,
-                    });
+
+                  Navigator.pushNamed(context, RouteName.otpScreen, arguments: {
+                    'phoneNumber': countryCode + phoneNumberController.text,
+                    'codeController': _codeController.text,
+                    'verificationId': state.verificationId,
+                    "updatenumber": widget.updatePhoneNumber,
+                    "isLogin": widget.isSignIn,
+                  });
                 }
               }
 
@@ -172,9 +173,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             size: 50,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 32),
-                        
+
                         Text(
                           "Enter your phone number",
                           style: GoogleFonts.montserrat(
@@ -194,7 +195,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 40),
-                        
+
                         // Phone number input with country code
                         Container(
                           height: 60,
@@ -209,7 +210,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                               ),
                             ],
                             border: Border.all(
-                              color: isValidNumber ? primaryColor : Colors.transparent,
+                              color: isValidNumber
+                                  ? primaryColor
+                                  : Colors.transparent,
                               width: isValidNumber ? 1.5 : 0,
                             ),
                           ),
@@ -227,7 +230,14 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     }
                                   },
                                   initialSelection: 'NG',
-                                  favorite: const ['NG', 'GH', 'ZA', 'KE', 'US', 'GB'],
+                                  favorite: const [
+                                    'NG',
+                                    'GH',
+                                    'ZA',
+                                    'KE',
+                                    'US',
+                                    'GB'
+                                  ],
                                   showCountryOnly: false,
                                   showOnlyCountryWhenClosed: false,
                                   alignLeft: false,
@@ -244,14 +254,17 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     color: Colors.black,
                                     fontSize: 16,
                                   ),
-                                  dialogBackgroundColor: const Color(0xFFFFF6E5),
+                                  dialogBackgroundColor:
+                                      const Color(0xFFFFF6E5),
                                   boxDecoration: BoxDecoration(
                                     color: const Color(0xFFFFF6E5),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   barrierColor: Colors.black54,
                                   backgroundColor: const Color(0xFFFFF6E5),
-                                  dialogSize: Size(MediaQuery.of(context).size.width * 0.9, MediaQuery.of(context).size.height * 0.7),
+                                  dialogSize: Size(
+                                      MediaQuery.of(context).size.width * 0.9,
+                                      MediaQuery.of(context).size.height * 0.7),
                                   headerTextStyle: GoogleFonts.montserrat(
                                     color: const Color(0xFF3E1F0D),
                                     fontSize: 18,
@@ -295,14 +308,14 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   ),
                                 ),
                               ),
-                              
+
                               // Vertical divider
                               Container(
                                 height: 30,
                                 width: 1,
                                 color: Colors.grey.withValues(alpha: 0.3),
                               ),
-                              
+
                               // Phone number input
                               Expanded(
                                 child: TextField(
@@ -335,9 +348,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Continue labelLarge
                         SizedBox(
                           width: double.infinity,
@@ -349,25 +362,32 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    
+
                                     // Remove spaces from phone number
-                                    final cleanPhoneNumber = phoneNumberController.text.replaceAll(' ', '');
-                                    
+                                    final cleanPhoneNumber =
+                                        phoneNumberController.text
+                                            .replaceAll(' ', '');
+
                                     context.read<PhoneAuthBloc>().add(
-                                      SendOtpToPhoneEvent(
-                                        phoneNumber: countryCode + cleanPhoneNumber,
-                                      ),
-                                    );
+                                          SendOtpToPhoneEvent(
+                                            phoneNumber:
+                                                countryCode + cleanPhoneNumber,
+                                          ),
+                                        );
                                   },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isValidNumber ? primaryColor : Colors.grey.shade400,
+                              backgroundColor: isValidNumber
+                                  ? primaryColor
+                                  : Colors.grey.shade400,
                               foregroundColor: Colors.white,
                               disabledBackgroundColor: Colors.grey.shade400,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               elevation: isValidNumber ? 3 : 1,
-                              shadowColor: isValidNumber ? primaryColor.withValues(alpha: 0.3) : Colors.transparent,
+                              shadowColor: isValidNumber
+                                  ? primaryColor.withValues(alpha: 0.3)
+                                  : Colors.transparent,
                             ),
                             child: _isLoading
                                 ? const SizedBox(
@@ -387,9 +407,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Consent text
                         Text(
                           "By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.",
@@ -399,16 +419,16 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             color: const Color(0xFF999999),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Account toggle
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              widget.isSignIn 
-                                  ? "Don't have an account? " 
+                              widget.isSignIn
+                                  ? "Don't have an account? "
                                   : "Already have an account? ",
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
@@ -418,9 +438,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             GestureDetector(
                               onTap: () {
                                 if (widget.isSignIn) {
-                                  Navigator.pushReplacementNamed(context, '/auth_method_selection');
+                                  Navigator.pushReplacementNamed(
+                                      context, '/auth_method_selection');
                                 } else {
-                                  Navigator.pushReplacementNamed(context, '/sign_in_method_selection');
+                                  Navigator.pushReplacementNamed(
+                                      context, '/sign_in_method_selection');
                                 }
                               },
                               child: Text(
@@ -457,10 +479,10 @@ class _PhoneNumberFormatter extends TextInputFormatter {
     if (newValue.text.isEmpty) {
       return newValue;
     }
-    
+
     // Remove all spaces
     final digitsOnly = newValue.text.replaceAll(' ', '');
-    
+
     // Add a space after every 3 digits
     final buffer = StringBuffer();
     for (int i = 0; i < digitsOnly.length; i++) {
@@ -469,9 +491,9 @@ class _PhoneNumberFormatter extends TextInputFormatter {
         buffer.write(' ');
       }
     }
-    
+
     final formattedText = buffer.toString();
-    
+
     return TextEditingValue(
       text: formattedText,
       selection: TextSelection.collapsed(offset: formattedText.length),

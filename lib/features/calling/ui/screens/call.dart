@@ -127,10 +127,11 @@ class CallPageState extends State<CallPage> {
               ),
               const SizedBox(height: 20),
               Text(
-                widget.callType == 'VideoCall' 
+                widget.callType == 'VideoCall'
                     ? 'Video calling is temporarily disabled'
                     : 'Audio calling is temporarily disabled',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text('Channel: ${widget.channelName}'),

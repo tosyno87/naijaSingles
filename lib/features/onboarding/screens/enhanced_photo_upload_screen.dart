@@ -14,7 +14,8 @@ class EnhancedPhotoUploadScreen extends StatefulWidget {
   const EnhancedPhotoUploadScreen({super.key});
 
   @override
-  State<EnhancedPhotoUploadScreen> createState() => _EnhancedPhotoUploadScreenState();
+  State<EnhancedPhotoUploadScreen> createState() =>
+      _EnhancedPhotoUploadScreenState();
 }
 
 class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
@@ -72,42 +73,45 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   }
 
   Future<void> _pickImage(ImageSource source, int index) async {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     await controller.pickProfilePhoto(source, index);
-    
+
     // Analyze photo quality if photo was selected
     if (controller.profilePhotos[index] != null) {
-      final quality = PhotoQualityAnalyzer.analyzePhoto(controller.profilePhotos[index]!);
+      final quality =
+          PhotoQualityAnalyzer.analyzePhoto(controller.profilePhotos[index]!);
       setState(() {
         _photoQualities[index] = quality;
       });
-      
+
       if (_showRealTimeQuality) {
         _showQualityFeedback(quality, index);
       }
     }
-    
+
     setState(() {});
   }
 
   // Phase 2: Photo reordering functionality
   void _reorderPhotos(int oldIndex, int newIndex) {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // Don't allow reordering the primary photo (index 0)
     if (oldIndex == 0 || newIndex == 0) return;
-    
+
     final photos = List<File?>.from(controller.profilePhotos);
     final photo = photos.removeAt(oldIndex);
     photos.insert(newIndex, photo);
-    
+
     // Update controller with reordered photos
     for (int i = 0; i < photos.length; i++) {
       controller.profilePhotos[i] = photos[i];
     }
-    
+
     setState(() {});
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -122,25 +126,26 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
   // Phase 2: Set primary photo functionality
   void _setPrimaryPhoto(int index) {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     if (index == 0) return; // Already primary
-    
+
     final photos = List<File?>.from(controller.profilePhotos);
     final newPrimaryPhoto = photos[index];
     final currentPrimaryPhoto = photos[0];
-    
+
     // Swap photos
     photos[0] = newPrimaryPhoto;
     photos[index] = currentPrimaryPhoto;
-    
+
     // Update controller
     for (int i = 0; i < photos.length; i++) {
       controller.profilePhotos[i] = photos[i];
     }
-    
+
     setState(() {});
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -186,14 +191,14 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     if (!quality.hasFace) issues.add("face not clearly visible");
     if (!quality.isWellLit) issues.add("poor lighting");
     if (!quality.isSharp) issues.add("image is blurry");
-    
+
     if (issues.isEmpty) return "Great photo quality!";
     return "Consider retaking: ${issues.join(', ')}";
   }
 
   void _showImageSourceDialog(int index) {
     final guidance = photoGuidance[index]!;
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -222,9 +227,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 ),
               ],
             ),
-            
             const SizedBox(height: 8),
-            
             Text(
               guidance.description,
               style: GoogleFonts.poppins(
@@ -232,9 +235,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 color: textLightBrown,
               ),
             ),
-            
             const SizedBox(height: 16),
-            
             _buildImageSourceOption(
               icon: Icons.camera_alt,
               title: "Take a Photo",
@@ -244,9 +245,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 _pickImage(ImageSource.camera, index);
               },
             ),
-            
             const Divider(height: 24),
-            
             _buildImageSourceOption(
               icon: Icons.photo_library,
               title: "Choose from Gallery",
@@ -284,9 +283,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               size: 24,
             ),
           ),
-          
           const SizedBox(width: 16),
-          
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +296,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     color: textDarkBrown,
                   ),
                 ),
-                
                 Text(
                   subtitle,
                   style: GoogleFonts.poppins(
@@ -310,7 +306,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               ],
             ),
           ),
-          
           Icon(
             Icons.arrow_forward_ios,
             color: afropeepGreen,
@@ -326,20 +321,22 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     final photo = controller.profilePhotos[index];
     final bool isRequired = index < 3; // First 3 photos are required
     final guidance = photoGuidance[index]!;
-    
+
     // Use primary photo slot for index 0
     if (index == 0) {
       return PrimaryPhotoSlot(
         photo: photo,
         guidance: guidance,
         onTap: () => _showImageSourceDialog(index),
-        onRemove: photo != null ? () {
-          controller.removeProfilePhoto(index);
-          setState(() {});
-        } : null,
+        onRemove: photo != null
+            ? () {
+                controller.removeProfilePhoto(index);
+                setState(() {});
+              }
+            : null,
       );
     }
-    
+
     return GestureDetector(
       onTap: () => _showImageSourceDialog(index),
       child: Stack(
@@ -351,8 +348,10 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               color: cardBackground,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isRequired 
-                    ? (photo == null ? Colors.red.withValues(alpha: 0.5) : afropeepGreen)
+                color: isRequired
+                    ? (photo == null
+                        ? Colors.red.withValues(alpha: 0.5)
+                        : afropeepGreen)
                     : Colors.transparent,
                 width: 2,
               ),
@@ -370,32 +369,35 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                       Icon(
                         _getPhotoTypeIcon(guidance.type),
                         size: 36,
-                        color: isRequired ? Colors.red.withValues(alpha: 0.7) : Colors.grey,
+                        color: isRequired
+                            ? Colors.red.withValues(alpha: 0.7)
+                            : Colors.grey,
                       ),
-                      
                       const SizedBox(height: 8),
-                      
                       Text(
                         guidance.title,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isRequired ? Colors.red.withValues(alpha: 0.7) : Colors.grey.shade700,
+                          color: isRequired
+                              ? Colors.red.withValues(alpha: 0.7)
+                              : Colors.grey.shade700,
                         ),
                       ),
-                      
                       Text(
                         isRequired ? "Required" : "Optional",
                         style: GoogleFonts.poppins(
                           fontSize: 12,
-                          color: isRequired ? Colors.red.withValues(alpha: 0.7) : Colors.grey.shade600,
+                          color: isRequired
+                              ? Colors.red.withValues(alpha: 0.7)
+                              : Colors.grey.shade600,
                         ),
                       ),
                     ],
                   )
                 : null,
           ),
-          
+
           // Photo type indicator
           if (photo == null)
             Positioned(
@@ -403,7 +405,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               left: 8,
               child: PhotoTypeIndicator(type: guidance.type),
             ),
-          
+
           // Quality indicator for uploaded photos
           if (photo != null)
             Positioned(
@@ -411,7 +413,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               left: 8,
               child: _buildQualityIndicator(photo),
             ),
-          
+
           // Remove button if photo exists
           if (photo != null)
             Positioned(
@@ -443,7 +445,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
   Widget _buildQualityIndicator(File photo) {
     final quality = PhotoQualityAnalyzer.analyzePhoto(photo);
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
@@ -533,9 +535,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 Icons.star,
                 goldAccent,
               ),
-              
               SizedBox(height: 16),
-              
               _buildTipSection(
                 "Nigerian Dating Context",
                 [
@@ -547,9 +547,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 Icons.flag,
                 Colors.green,
               ),
-              
               SizedBox(height: 16),
-              
               _buildTipSection(
                 "What to Avoid",
                 [
@@ -591,7 +589,8 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     );
   }
 
-  Widget _buildTipSection(String title, List<String> tips, IconData icon, Color color) {
+  Widget _buildTipSection(
+      String title, List<String> tips, IconData icon, Color color) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -609,27 +608,27 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
             ),
           ],
         ),
-        
         SizedBox(height: 8),
-        
-        ...tips.map((tip) => Padding(
-          padding: const EdgeInsets.only(bottom: 4, left: 24),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("• ", style: TextStyle(color: color)),
-              Expanded(
-                child: Text(
-                  tip,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: textLightBrown,
+        ...tips
+            .map((tip) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4, left: 24),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("• ", style: TextStyle(color: color)),
+                      Expanded(
+                        child: Text(
+                          tip,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: textLightBrown,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-            ],
-          ),
-        )).toList(),
+                ))
+            .toList(),
       ],
     );
   }
@@ -637,9 +636,10 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<OnboardingController>(context);
-    final int uploadedCount = controller.profilePhotos.where((photo) => photo != null).length;
+    final int uploadedCount =
+        controller.profilePhotos.where((photo) => photo != null).length;
     final bool hasMinimumPhotos = uploadedCount >= 3;
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -653,9 +653,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               color: textDarkBrown,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Text(
             "Upload at least 3 photos to complete your profile. Your first photo will be your main profile photo.",
             style: GoogleFonts.poppins(
@@ -663,9 +663,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               color: textLightBrown,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Photo count indicator and actions
           Column(
             children: [
@@ -673,9 +673,12 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 children: [
                   Flexible(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: hasMinimumPhotos ? afropeepGreen.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                        color: hasMinimumPhotos
+                            ? afropeepGreen.withValues(alpha: 0.1)
+                            : Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -688,15 +691,16 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                       ),
                     ),
                   ),
-                  
+
                   SizedBox(width: 8),
-                  
+
                   // Action buttons
                   if (uploadedCount > 0)
                     TextButton(
                       onPressed: _showProfilePreview,
                       style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         minimumSize: Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
@@ -716,7 +720,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                         ],
                       ),
                     ),
-                  
+
                   TextButton(
                     onPressed: _showPhotoTipsDialog,
                     style: TextButton.styleFrom(
@@ -727,7 +731,8 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.help_outline, size: 14, color: afropeepGreen),
+                        Icon(Icons.help_outline,
+                            size: 14, color: afropeepGreen),
                         SizedBox(width: 4),
                         Text(
                           "Tips",
@@ -742,7 +747,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   ),
                 ],
               ),
-              
+
               // Phase 2: Toggle for reorderable grid
               if (uploadedCount > 1)
                 Padding(
@@ -776,9 +781,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 ),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Phase 2: Conditional photo grid (reorderable or standard)
           if (_useReorderableGrid && uploadedCount > 1)
             ReorderablePhotoGrid(
@@ -796,9 +801,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
             // Standard photo grid
             // Primary photo (index 0) - full width
             _buildPhotoItem(0),
-            
+
             const SizedBox(height: 12),
-            
+
             // Photo grid - second row (required photos)
             Row(
               children: [
@@ -807,9 +812,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 Expanded(child: _buildPhotoItem(2)),
               ],
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Photo grid - third row (optional photos)
             Row(
               children: [
@@ -819,9 +824,9 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               ],
             ),
           ],
-          
+
           const SizedBox(height: 32),
-          
+
           // Enhanced photo tips card
           Container(
             padding: const EdgeInsets.all(16),
@@ -861,9 +866,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 12),
-                
                 _buildQuickTipItem(
                   Icons.star,
                   "Main Photo: Clear face shot with a genuine smile",
@@ -889,9 +892,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   "Lifestyle: Your hobbies, travels, or cultural interests",
                   Colors.orange,
                 ),
-                
                 const SizedBox(height: 12),
-                
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(

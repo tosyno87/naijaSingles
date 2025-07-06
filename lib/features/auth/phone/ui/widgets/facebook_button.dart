@@ -29,8 +29,10 @@ class FaceBookButton extends StatelessWidget {
                               begin: Alignment.topRight,
                               end: Alignment.bottomLeft,
                               colors: [
-                                  primaryColor.withValues(alpha: (.5 * 255).toDouble()),
-                                  primaryColor.withValues(alpha: (.8 * 255).toDouble()),
+                                  primaryColor.withValues(
+                                      alpha: (.5 * 255).toDouble()),
+                                  primaryColor.withValues(
+                                      alpha: (.8 * 255).toDouble()),
                                   primaryColor,
                                   primaryColor
                                 ])
@@ -44,7 +46,8 @@ class FaceBookButton extends StatelessWidget {
                       child: Text(
                     "LOG IN WITH FACEBOOK".tr().toString(),
                     style: TextStyle(
-                        color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold),
                   )))),
         ),
       ),

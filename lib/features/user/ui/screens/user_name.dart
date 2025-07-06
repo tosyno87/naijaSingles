@@ -38,7 +38,7 @@ class UserNameState extends State<UserName> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -61,7 +61,7 @@ class UserNameState extends State<UserName> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const SizedBox(height: 20),
-              
+
               // Progress indicator
               Container(
                 height: 4,
@@ -71,9 +71,9 @@ class UserNameState extends State<UserName> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Title - Option 2: Playful & Flirty
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,9 +96,9 @@ class UserNameState extends State<UserName> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Text field
               Container(
                 decoration: BoxDecoration(
@@ -106,7 +106,8 @@ class UserNameState extends State<UserName> {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.grey[200]!),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: TextFormField(
                   controller: _controller,
                   focusNode: _focusNode,
@@ -124,9 +125,9 @@ class UserNameState extends State<UserName> {
                   },
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Continue labelLarge
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),

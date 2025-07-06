@@ -97,7 +97,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     // Background color for the app
     const Color backgroundColor = Color(0xFFFDF6EC);
-    
+
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);
 
@@ -230,7 +230,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Widget _buildNotificationItem(AppNotification notification) {
     final bool isRead = notification.isRead;
-    
+
     return InkWell(
       onTap: () => _handleNotificationTap(notification),
       child: Container(
@@ -268,9 +268,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   size: 24,
                 ),
               ),
-              
+
             const SizedBox(width: 12),
-            
+
             // Content
             Expanded(
               child: Column(
@@ -305,7 +305,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ],
               ),
             ),
-            
+
             // Unread indicator
             if (!isRead)
               Container(

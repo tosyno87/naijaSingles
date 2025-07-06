@@ -37,7 +37,6 @@ class UsersList extends StatefulWidget {
 }
 
 class UsersListState extends State<UsersList> with WidgetsBindingObserver {
-
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
@@ -47,7 +46,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
         debugPrint('this is the last profile');
       }
     });
-    
+
     super.initState();
   }
 

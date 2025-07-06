@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-// Note: This is a basic test structure. 
+// Note: This is a basic test structure.
 // For full testing, you would need to set up Firebase mocks properly.
 
 void main() {
@@ -12,7 +12,7 @@ void main() {
       // 2. Set up test data
       // 3. Test the handleLike method
       // 4. Verify the results
-      
+
       expect(true, true); // Placeholder assertion
     });
 

@@ -126,7 +126,8 @@ class _RecentChatsState extends State<RecentChats> {
                 ? Center(
                     child: Text(
                       "No Recent chat found".tr().toString(),
-                      style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+                      style: TextStyle(
+                          color: AppColors.secondaryColor, fontSize: 16),
                     ),
                   )
                 : ListView.builder(

@@ -18,11 +18,11 @@ class Splash extends StatefulWidget {
 
 class SplashState extends State<Splash> {
   bool _hasNavigated = false;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Add a delay to show the splash screen
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted && !_hasNavigated) {
@@ -30,16 +30,16 @@ class SplashState extends State<Splash> {
       }
     });
   }
-  
+
   void _checkAuthAndNavigate() {
     try {
       if (!mounted || _hasNavigated) return;
-      
+
       // Always navigate to the welcome screen regardless of authentication status
       _hasNavigated = true;
       log("Navigating to welcome screen as default home");
       Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
-      
+
       // Original authentication logic (commented out)
       /*
       final authBloc = BlocProvider.of<AuthstatusBloc>(context);
@@ -73,21 +73,21 @@ class SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    
+
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: BlocListener<AuthstatusBloc, AuthstatusState>(
         listener: (context, state) {
           log("Auth state changed in splash: $state");
-          
+
           // Disable automatic navigation based on auth state
           // We always want to go to welcome screen now
           if (!mounted || _hasNavigated) return;
-          
+
           // Force navigation to welcome screen
           _hasNavigated = true;
           Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
-          
+
           // Original auth-based navigation (commented out)
           /*
           if (state is AuthenticatedState) {
@@ -114,9 +114,9 @@ class SplashState extends State<Splash> {
             children: [
               // Logo
               const AfropeepLogo(size: 100),
-              
+
               const SizedBox(height: 20),
-              
+
               // App name
               Text(
                 "NaijaSingles",
@@ -127,9 +127,9 @@ class SplashState extends State<Splash> {
                   letterSpacing: 1.2,
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Loading indicator
               const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),

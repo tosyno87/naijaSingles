@@ -126,7 +126,8 @@ class DialCallState extends State<DialCall> {
                         ispickup = true;
                         return CallPage(
                             channelName: widget.channelName!,
-                            role: 1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
+                            role:
+                                1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
                             callType: widget.callType!);
 
                       case "Decline":

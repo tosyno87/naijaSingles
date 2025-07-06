@@ -14,10 +14,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   // MVP color scheme (matching profile_screen.dart)
   static const Color backgroundColor = Color(0xFFFDF1E7); // Warm cream
-  static const Color primaryColor = Color(0xFF008037); // Deep green (afropeepGreen)
+  static const Color primaryColor =
+      Color(0xFF008037); // Deep green (afropeepGreen)
   static const Color cardColor = Color(0xFFFFFBF5); // Light cream for cards
   static final Color textPrimary = Colors.brown.shade800;
   static final Color textSecondary = Colors.brown.shade600;
@@ -25,7 +26,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final user = _auth.currentUser;
-    
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -53,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Account Section
             _buildSectionHeader('Account'),
             const SizedBox(height: 16),
-            
+
             _buildSettingsCard([
               _buildSettingsItem(
                 icon: Icons.person_outline,
@@ -79,13 +80,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => _showChangePasswordDialog(),
               ),
             ]),
-            
+
             const SizedBox(height: 32),
-            
+
             // Privacy & Safety Section
             _buildSectionHeader('Privacy & Safety'),
             const SizedBox(height: 16),
-            
+
             _buildSettingsCard([
               _buildSettingsItem(
                 icon: Icons.privacy_tip_outlined,
@@ -111,13 +112,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => _showComingSoon('Safety Center'),
               ),
             ]),
-            
+
             const SizedBox(height: 32),
-            
+
             // App Settings Section
             _buildSectionHeader('App Settings'),
             const SizedBox(height: 16),
-            
+
             _buildSettingsCard([
               _buildSettingsItem(
                 icon: Icons.notifications_outlined,
@@ -140,13 +141,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => _showComingSoon('Language Settings'),
               ),
             ]),
-            
+
             const SizedBox(height: 32),
-            
+
             // Support Section
             _buildSectionHeader('Support'),
             const SizedBox(height: 16),
-            
+
             _buildSettingsCard([
               _buildSettingsItem(
                 icon: Icons.help_outline,
@@ -169,9 +170,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => _showAboutDialog(),
               ),
             ]),
-            
+
             const SizedBox(height: 40),
-            
+
             // Sign Out Button - Robust solution with proper width constraints
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -200,9 +201,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Delete Account Button - Robust solution with proper width constraints
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -216,7 +217,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     foregroundColor: Colors.red.shade700,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(color: Colors.red.shade300, width: 2), // Same border as Sign Out
+                      side: BorderSide(
+                          color: Colors.red.shade300,
+                          width: 2), // Same border as Sign Out
                     ),
                     elevation: 2, // Same elevation as Sign Out
                   ),
@@ -231,7 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 40),
           ],
         ),
@@ -393,7 +396,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               child: Text(
                 'Cancel',
@@ -417,8 +421,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 2,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Proper padding
-                minimumSize: const Size(100, 44), // Minimum size to prevent cramping
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 12), // Proper padding
+                minimumSize:
+                    const Size(100, 44), // Minimum size to prevent cramping
               ),
               child: Text(
                 'Sign Out',
@@ -462,7 +468,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: textPrimary, // Use textPrimary for high contrast against cardColor
+                color:
+                    textPrimary, // Use textPrimary for high contrast against cardColor
               ),
             ),
             const SizedBox(height: 16),
@@ -500,7 +507,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               child: Text(
                 'Cancel',
@@ -524,7 +532,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 2,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 minimumSize: const Size(80, 44),
               ),
               child: Text(
@@ -545,7 +554,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showDeleteConfirmation() {
     Navigator.pop(context); // Close first dialog
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -578,7 +587,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               child: Text(
                 'Cancel',
@@ -605,7 +615,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 2,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 minimumSize: const Size(120, 44), // Wider for "Confirm Delete"
               ),
               child: Text(
@@ -628,7 +639,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       // Close dialog
       Navigator.pop(context);
-      
+
       // Show loading
       showDialog(
         context: context,
@@ -668,13 +679,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       );
-      
+
       // Sign out from Firebase
       await _auth.signOut();
-      
+
       // Close loading dialog
       if (mounted) Navigator.pop(context);
-      
+
       // Navigate to login screen
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -682,11 +693,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           (route) => false,
         );
       }
-      
     } catch (e) {
       // Close loading dialog
       if (mounted) Navigator.pop(context);
-      
+
       log('Error signing out: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

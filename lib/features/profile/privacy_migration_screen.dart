@@ -14,22 +14,22 @@ class PrivacyMigrationScreen extends StatefulWidget {
 
 class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
   final PrivacyMigrationService _migrationService = PrivacyMigrationService();
-  
+
   bool _isLoading = false;
   bool _isMigrating = false;
   Map<String, dynamic>? _migrationStatus;
-  
+
   @override
   void initState() {
     super.initState();
     _checkMigrationStatus();
   }
-  
+
   Future<void> _checkMigrationStatus() async {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       final status = await _migrationService.getMigrationStatus();
       setState(() {
@@ -43,19 +43,19 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       _showErrorSnackBar('Failed to check migration status');
     }
   }
-  
+
   Future<void> _startMigration() async {
     setState(() {
       _isMigrating = true;
     });
-    
+
     try {
       final success = await _migrationService.migrateCurrentUserData();
-      
+
       if (success) {
         _showSuccessSnackBar('Privacy migration completed successfully!');
         await _checkMigrationStatus(); // Refresh status
-        
+
         // Navigate to privacy settings
         if (mounted) {
           Navigator.pushReplacement(
@@ -76,29 +76,31 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       });
     }
   }
-  
+
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
+        content:
+            Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: primaryColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
-  
+
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
+        content:
+            Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,17 +126,17 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
           : _buildContent(),
     );
   }
-  
+
   Widget _buildContent() {
     final isMigrated = _migrationStatus?['migrated'] ?? false;
-    
+
     if (isMigrated) {
       return _buildAlreadyMigratedContent();
     } else {
       return _buildMigrationNeededContent();
     }
   }
-  
+
   Widget _buildMigrationNeededContent() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -146,7 +148,10 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [primaryColor.withValues(alpha: 0.1), primaryColor.withValues(alpha: 0.05)],
+                colors: [
+                  primaryColor.withValues(alpha: 0.1),
+                  primaryColor.withValues(alpha: 0.05)
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -182,9 +187,9 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // What's New Section
           _buildSectionHeader('What\'s New'),
           const SizedBox(height: 16),
@@ -211,9 +216,9 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
             'Enhanced Security',
             'Your sensitive data is now stored separately and protected with advanced security rules.',
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // What Happens Section
           _buildSectionHeader('What Happens During Migration'),
           const SizedBox(height: 16),
@@ -226,9 +231,9 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               'Maintains all your existing profile information',
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Migration Button
           SizedBox(
             width: double.infinity,
@@ -252,7 +257,8 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -274,9 +280,9 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Skip Button
           TextButton(
             onPressed: _isMigrating ? null : () => Navigator.pop(context),
@@ -288,13 +294,13 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 32),
         ],
       ),
     );
   }
-  
+
   Widget _buildAlreadyMigratedContent() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -359,7 +365,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       ),
     );
   }
-  
+
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
@@ -370,7 +376,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       ),
     );
   }
-  
+
   Widget _buildFeatureCard(IconData icon, String title, String description) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -427,7 +433,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       ),
     );
   }
-  
+
   Widget _buildInfoCard(String title, List<String> points) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -453,33 +459,35 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          ...points.map((point) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 6),
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    point,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      color: textSecondary,
+          ...points
+              .map((point) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            point,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-          )).toList(),
+                  ))
+              .toList(),
         ],
       ),
     );

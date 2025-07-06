@@ -4,9 +4,9 @@ import 'animated_loading_indicator.dart';
 
 class LoadingTransitionScreen extends StatelessWidget {
   final String message;
-  
+
   const LoadingTransitionScreen({
-    Key? key, 
+    Key? key,
     this.message = "Setting up your profile...",
   }) : super(key: key);
 

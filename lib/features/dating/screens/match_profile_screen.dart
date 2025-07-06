@@ -41,7 +41,8 @@ class MatchProfileScreen extends StatefulWidget {
   State<MatchProfileScreen> createState() => _MatchProfileScreenState();
 }
 
-class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTickerProviderStateMixin {
+class _MatchProfileScreenState extends State<MatchProfileScreen>
+    with SingleTickerProviderStateMixin {
   // Animation controller for like labelLarge
   late AnimationController _animationController;
   bool _isLiked = false;
@@ -65,10 +66,10 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
   Widget build(BuildContext context) {
     // Background color for the dating screens
     const Color backgroundColor = Color(0xFFFDF6EC);
-    
+
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);
-    
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -94,23 +95,23 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
           children: [
             // Top Profile Card
             _buildProfileHeader(),
-            
+
             // About Section
             _buildAboutSection(),
-            
+
             // Interests Section
             _buildInterestsSection(),
-            
+
             // Action Buttons
             _buildActionButtons(),
-            
+
             const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
-  
+
   // Top profile card with image, name, age, location, and tags
   Widget _buildProfileHeader() {
     return Container(
@@ -171,9 +172,9 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Name and age
           Text(
             '${widget.user.name}, ${widget.user.age}',
@@ -183,9 +184,9 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               color: Colors.brown.shade800,
             ),
           ),
-          
+
           const SizedBox(height: 4),
-          
+
           // Location
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -205,9 +206,9 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Tags
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -218,17 +219,19 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               children: [
                 _buildTag(widget.user.tribe, true),
                 _buildTag(widget.user.profession, false),
-                ...widget.user.personality.map((trait) => _buildTag(trait, false)).toList(),
+                ...widget.user.personality
+                    .map((trait) => _buildTag(trait, false))
+                    .toList(),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 24),
         ],
       ),
     );
   }
-  
+
   // About section with bio
   Widget _buildAboutSection() {
     return Padding(
@@ -271,7 +274,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
       ),
     );
   }
-  
+
   // Interests section
   Widget _buildInterestsSection() {
     return Padding(
@@ -316,7 +319,8 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
                   backgroundColor: const Color(0xFFE8F5E9),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
-                    side: const BorderSide(color: Color(0xFF008037), width: 0.5),
+                    side:
+                        const BorderSide(color: Color(0xFF008037), width: 0.5),
                   ),
                 );
               }).toList(),
@@ -326,7 +330,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
       ),
     );
   }
-  
+
   // Action labelLarges (Like, Pass, Message)
   Widget _buildActionButtons() {
     return Padding(
@@ -344,7 +348,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
             },
             label: 'Pass',
           ),
-          
+
           // Like labelLarge
           _buildCircleButton(
             icon: _isLiked ? Icons.favorite : Icons.favorite_border,
@@ -356,7 +360,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
               });
               _animationController.reset();
               _animationController.forward();
-              
+
               // Show a snackbar when liked
               if (_isLiked) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -374,7 +378,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
             label: 'Like',
             isAnimated: true,
           ),
-          
+
           // Message labelLarge
           _buildCircleButton(
             icon: Icons.chat_bubble_outline,
@@ -399,7 +403,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
       ),
     );
   }
-  
+
   // Circle labelLarge with icon and label
   Widget _buildCircleButton({
     required IconData icon,
@@ -429,20 +433,20 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
             ),
             child: Center(
               child: isAnimated
-                ? AnimatedScale(
-                    scale: _isLiked ? 1.2 : 1.0,
-                    duration: const Duration(milliseconds: 300),
-                    child: Icon(
+                  ? AnimatedScale(
+                      scale: _isLiked ? 1.2 : 1.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Icon(
+                        icon,
+                        color: color,
+                        size: 30,
+                      ),
+                    )
+                  : Icon(
                       icon,
                       color: color,
                       size: 30,
                     ),
-                  )
-                : Icon(
-                    icon,
-                    color: color,
-                    size: 30,
-                  ),
             ),
           ),
         ),
@@ -457,13 +461,15 @@ class _MatchProfileScreenState extends State<MatchProfileScreen> with SingleTick
       ],
     );
   }
-  
+
   // Tag widget for profile attributes
   Widget _buildTag(String label, bool isPrimary) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isPrimary ? const Color(0xFF008037).withValues(alpha: 0.1) : Colors.grey[200],
+        color: isPrimary
+            ? const Color(0xFF008037).withValues(alpha: 0.1)
+            : Colors.grey[200],
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isPrimary ? const Color(0xFF008037) : Colors.grey[400]!,

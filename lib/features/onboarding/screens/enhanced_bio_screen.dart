@@ -16,10 +16,10 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   final int _minLength = 50;
   final int _optimalMin = 50;
   final int _optimalMax = 200;
-  
+
   int _currentLength = 0;
   String? _selectedPrompt;
-  
+
   // Personality prompts for dating context
   final List<String> _personalityPrompts = [
     "I'm the type of person who...",
@@ -39,11 +39,12 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+
       if (controller.bio.isNotEmpty) {
         _bioController.text = controller.bio;
         setState(() {
@@ -71,37 +72,36 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
         _selectedPrompt = prompt;
         _bioController.text = '$prompt ';
         _currentLength = _bioController.text.length;
-        
+
         // Move cursor to end
         _bioController.selection = TextSelection.fromPosition(
           TextPosition(offset: _bioController.text.length),
         );
       }
     });
-    
+
     // Save to controller
     Provider.of<OnboardingController>(context, listen: false)
         .setBio(_bioController.text);
   }
 
-
-
   BioQuality _analyzeBioQuality() {
     String bio = _bioController.text.toLowerCase();
-    
-    bool hasOptimalLength = _currentLength >= _optimalMin && _currentLength <= _optimalMax;
+
+    bool hasOptimalLength =
+        _currentLength >= _optimalMin && _currentLength <= _optimalMax;
     bool hasMinLength = _currentLength >= _minLength;
     bool hasPersonality = _hasPersonalityWords(bio);
     bool hasConversationStarter = _hasConversationStarter(bio);
     bool avoidsCliches = !_containsCliches(bio);
-    
+
     int score = 0;
     if (hasMinLength) score += 20;
     if (hasOptimalLength) score += 20;
     if (hasPersonality) score += 25;
     if (hasConversationStarter) score += 25;
     if (avoidsCliches) score += 10;
-    
+
     return BioQuality(
       score: score,
       hasOptimalLength: hasOptimalLength,
@@ -114,31 +114,63 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
   bool _hasPersonalityWords(String bio) {
     List<String> personalityWords = [
-      'love', 'enjoy', 'passionate', 'hobby', 'interest', 'like', 'favorite',
-      'travel', 'music', 'food', 'adventure', 'creative', 'funny', 'kind',
-      'active', 'outdoors', 'reading', 'cooking', 'dancing', 'sports'
+      'love',
+      'enjoy',
+      'passionate',
+      'hobby',
+      'interest',
+      'like',
+      'favorite',
+      'travel',
+      'music',
+      'food',
+      'adventure',
+      'creative',
+      'funny',
+      'kind',
+      'active',
+      'outdoors',
+      'reading',
+      'cooking',
+      'dancing',
+      'sports'
     ];
-    
+
     return personalityWords.any((word) => bio.contains(word));
   }
 
   bool _hasConversationStarter(String bio) {
     List<String> conversationStarters = [
-      'ask me', 'tell me', 'what about', 'favorite', 'currently', 'obsessed',
-      'challenge me', 'debate', 'recommend', 'share', 'discuss'
+      'ask me',
+      'tell me',
+      'what about',
+      'favorite',
+      'currently',
+      'obsessed',
+      'challenge me',
+      'debate',
+      'recommend',
+      'share',
+      'discuss'
     ];
-    
+
     return conversationStarters.any((starter) => bio.contains(starter)) ||
-           bio.contains('?') || // Questions are great conversation starters
-           _selectedPrompt != null;
+        bio.contains('?') || // Questions are great conversation starters
+        _selectedPrompt != null;
   }
 
   bool _containsCliches(String bio) {
     List<String> cliches = [
-      'love to laugh', 'work hard play hard', 'live laugh love', 'no drama',
-      'just ask', 'good vibes only', 'fluent in sarcasm', 'netflix and chill'
+      'love to laugh',
+      'work hard play hard',
+      'live laugh love',
+      'no drama',
+      'just ask',
+      'good vibes only',
+      'fluent in sarcasm',
+      'netflix and chill'
     ];
-    
+
     return cliches.any((cliche) => bio.contains(cliche));
   }
 
@@ -146,7 +178,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFF008037);
     const Color textColor = Color(0xFF333333);
-    
+
     BioQuality quality = _analyzeBioQuality();
 
     return SingleChildScrollView(
@@ -163,9 +195,9 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               color: textColor,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Text(
             "Share what makes you unique and what you're looking for. A great bio helps you connect with the right people!",
             style: GoogleFonts.poppins(
@@ -174,15 +206,16 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               height: 1.4,
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Bio Quality Indicator
           if (_currentLength > 0) ...[
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: _getBioQualityColor(quality.score).withValues(alpha: 0.1),
+                color:
+                    _getBioQualityColor(quality.score).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _getBioQualityColor(quality.score),
@@ -235,7 +268,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
             ),
             const SizedBox(height: 20),
           ],
-          
+
           // Personality Prompts Section
           Text(
             "Get started with prompts",
@@ -245,9 +278,9 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               color: textColor,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Row(
             children: [
               Expanded(
@@ -278,22 +311,25 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Prompts Grid
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: _personalityPrompts.map((prompt) {
               bool isSelected = _selectedPrompt == prompt;
-              
+
               return GestureDetector(
                 onTap: () => _selectPrompt(prompt),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.white,
+                    color: isSelected
+                        ? primaryColor.withValues(alpha: 0.1)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected ? primaryColor : Colors.grey.shade300,
@@ -316,7 +352,8 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: isSelected ? primaryColor : Colors.black87,
-                          fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.w500 : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -325,9 +362,9 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               );
             }).toList(),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Bio Text Field
           Text(
             "Your bio",
@@ -337,9 +374,9 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               color: textColor,
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -362,7 +399,8 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               maxLines: 8,
               maxLength: _maxLength,
               decoration: InputDecoration(
-                hintText: "Write about yourself, your interests, and what you're looking for...",
+                hintText:
+                    "Write about yourself, your interests, and what you're looking for...",
                 hintStyle: GoogleFonts.poppins(
                   color: Colors.grey.shade400,
                   fontSize: 15,
@@ -381,22 +419,23 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               onChanged: (value) {
                 setState(() {
                   _currentLength = value.length;
-                  
+
                   // Check if user manually cleared the text or removed the selected prompt
-                  if (_selectedPrompt != null && !value.startsWith(_selectedPrompt!)) {
+                  if (_selectedPrompt != null &&
+                      !value.startsWith(_selectedPrompt!)) {
                     _selectedPrompt = null;
                   }
                 });
-                
+
                 // Save to controller
                 Provider.of<OnboardingController>(context, listen: false)
                     .setBio(value);
               },
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Character Counter with Quality Indicator
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -413,17 +452,16 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 "$_currentLength/$_maxLength",
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: _currentLength >= _minLength
-                      ? primaryColor
-                      : Colors.grey,
+                  color:
+                      _currentLength >= _minLength ? primaryColor : Colors.grey,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Bio Tips
           Container(
             padding: const EdgeInsets.all(20),
@@ -456,9 +494,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 12),
-                
                 _buildTipItem(
                   "Be authentic and show your personality",
                   Icons.favorite_outline,
@@ -535,9 +571,11 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   String _getBioImprovementTip(BioQuality quality) {
     if (!quality.hasMinLength) return "Add more details about yourself";
     if (!quality.hasPersonality) return "Share your interests and hobbies";
-    if (!quality.hasConversationStarter) return "Add something people can ask you about";
+    if (!quality.hasConversationStarter)
+      return "Add something people can ask you about";
     if (!quality.avoidsCliches) return "Try to be more specific and unique";
-    if (!quality.hasOptimalLength) return "Aim for 50-200 characters for best results";
+    if (!quality.hasOptimalLength)
+      return "Aim for 50-200 characters for best results";
     return "You're doing great!";
   }
 

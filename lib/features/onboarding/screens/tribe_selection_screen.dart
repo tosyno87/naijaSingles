@@ -36,11 +36,12 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+
       if (controller.tribe.isNotEmpty) {
         if (_mainTribes.contains(controller.tribe)) {
           setState(() {
@@ -67,7 +68,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
     setState(() {
       _selectedTribe = tribe;
       _showOtherField = tribe == 'Other';
-      
+
       if (tribe != 'Other') {
         // Save to controller if not "Other"
         if (tribe != null) {
@@ -93,16 +94,17 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
               color: textLightBrown,
             ),
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Dropdown for tribe selection
           Container(
             decoration: BoxDecoration(
               color: cardBackground,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _selectedTribe != null ? afropeepGreen : Colors.transparent,
+                color:
+                    _selectedTribe != null ? afropeepGreen : Colors.transparent,
                 width: 1,
               ),
             ),
@@ -134,11 +136,10 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
               ),
             ),
           ),
-          
+
           // Other tribe input field (conditionally shown)
           if (_showOtherField) ...[
             const SizedBox(height: 24),
-            
             Text(
               "Please specify your tribe",
               style: GoogleFonts.poppins(
@@ -147,9 +148,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                 color: textDarkBrown,
               ),
             ),
-            
             const SizedBox(height: 12),
-            
             TextField(
               controller: _otherTribeController,
               style: GoogleFonts.poppins(

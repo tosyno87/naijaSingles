@@ -28,7 +28,7 @@ class OtpPage extends StatefulWidget {
   final String phoneNumber;
   final String verificationId;
   final bool isLogin; // Added to distinguish between login and registration
-  
+
   OtpPage({
     Key? key,
     this.codeController = '',
@@ -205,11 +205,11 @@ class _OtpPageState extends State<OtpPage> {
                           log("state user ${state.user}");
                           Provider.of<UserProvider>(context, listen: false)
                               .currentUser = state.user;
-                          
+
                           // If this is a login flow, go to main navigation
                           if (widget.isLogin) {
-                            Navigator.of(context).pushReplacementNamed(
-                                RouteName.mainNavigation);
+                            Navigator.of(context)
+                                .pushReplacementNamed(RouteName.mainNavigation);
                           } else {
                             // For registration or phone update
                             Navigator.of(context).pushReplacementNamed(
@@ -270,7 +270,8 @@ class _OtpPageState extends State<OtpPage> {
                                 } else {
                                   log("Error: Token is null after phone verification");
                                   CustomSnackbar.showSnackBarSimple(
-                                      'Authentication error: Token is null', context);
+                                      'Authentication error: Token is null',
+                                      context);
                                 }
                               }).catchError((error) {
                                 log("Error getting token after phone verification: $error");
@@ -280,7 +281,8 @@ class _OtpPageState extends State<OtpPage> {
                             } else {
                               log("Error: User is null after phone verification");
                               CustomSnackbar.showSnackBarSimple(
-                                  'Authentication error: User is null', context);
+                                  'Authentication error: User is null',
+                                  context);
                             }
                           } catch (e) {
                             log("Exception during token retrieval after phone verification: $e");

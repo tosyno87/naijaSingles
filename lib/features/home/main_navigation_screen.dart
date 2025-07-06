@@ -9,9 +9,9 @@ import 'package:naijasingles/debug/simple_debug.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final bool backgroundTasksRunning;
-  
+
   const MainNavigationScreen({
-    Key? key, 
+    Key? key,
     this.backgroundTasksRunning = false,
   }) : super(key: key);
 
@@ -22,23 +22,24 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
   late bool _backgroundTasksRunning;
-  
+
   // Define the pages to be shown for each tab (removed Dating tab)
   // Order matches the BottomNavigationBarItems below
   final List<Widget> _pages = [
-    const ExploreScreen(showBackButton: false),   // Tab 0: Explore - no back labelLarge
-    const MessagesScreen(),  // Tab 1: Messages
-    const ProfileScreen(),   // Tab 2: Profile
+    const ExploreScreen(
+        showBackButton: false), // Tab 0: Explore - no back labelLarge
+    const MessagesScreen(), // Tab 1: Messages
+    const ProfileScreen(), // Tab 2: Profile
   ];
-  
+
   // Deep green color for accents
   static const Color deepGreen = Color(0xFF008037);
-  
+
   @override
   void initState() {
     super.initState();
     _backgroundTasksRunning = widget.backgroundTasksRunning;
-    
+
     // Auto-hide the background task indicator after 10 seconds
     if (_backgroundTasksRunning) {
       Future.delayed(const Duration(seconds: 10), () {
@@ -50,7 +51,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       });
     }
   }
-  
+
   void setBackgroundTasksComplete() {
     if (mounted) {
       setState(() {
@@ -58,6 +59,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,14 +68,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: [
           // Main content
           _pages[_selectedIndex],
-          
+
           // Background task indicator
           if (_backgroundTasksRunning)
             Positioned(
               top: MediaQuery.of(context).padding.top + 8,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: deepGreen.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
@@ -108,7 +111,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
               ),
             ),
-          
+
           // Debug button (only in debug mode)
           if (kDebugMode)
             Positioned(
@@ -117,13 +120,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: FloatingActionButton(
                 mini: true,
                 backgroundColor: Colors.red.withOpacity(0.8),
-                child: const Icon(Icons.bug_report, color: Colors.white, size: 16),
+                child:
+                    const Icon(Icons.bug_report, color: Colors.white, size: 16),
                 onPressed: () => _showDebugMenu(context),
               ),
             ),
         ],
       ),
-      
+
       // SINGLE bottom navigation bar for the entire app
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -160,7 +164,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
-  
+
   void _showDebugMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -173,19 +177,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               '🐛 Debug Menu',
               style: GoogleFonts.montserrat(
-                fontSize: 20, 
-                fontWeight: FontWeight.bold
-              ),
+                  fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            
             _buildDebugButton(
               'Test Database Connection',
               Icons.storage,
               () => SimpleDebug.testDatabaseConnection(),
             ),
-            
             _buildDebugButton(
               'Clear My Swipe History',
               Icons.refresh,
@@ -195,13 +195,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   await SimpleDebug.clearSwipeHistory(user.uid);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Swipe history cleared! Check console for details.')),
+                      const SnackBar(
+                          content: Text(
+                              'Swipe history cleared! Check console for details.')),
                     );
                   }
                 }
               },
             ),
-            
             _buildDebugButton(
               'Show My Excluded Users',
               Icons.visibility_off,
@@ -211,13 +212,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   await SimpleDebug.showExcludedUsers(user.uid);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Check console for excluded users list.')),
+                      const SnackBar(
+                          content:
+                              Text('Check console for excluded users list.')),
                     );
                   }
                 }
               },
             ),
-            
             const SizedBox(height: 16),
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -229,7 +231,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildDebugButton(String title, IconData icon, VoidCallback onPressed) {
+  Widget _buildDebugButton(
+      String title, IconData icon, VoidCallback onPressed) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: ElevatedButton.icon(

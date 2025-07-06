@@ -33,10 +33,8 @@ class UserProvider extends ChangeNotifier {
     if (user != null) {
       try {
         // Listen to the specific document directly using the user's UID as the document ID
-        _userSubscription = _userCollection
-            .doc(user.uid)
-            .snapshots()
-            .listen((documentSnapshot) {
+        _userSubscription = _userCollection.doc(user.uid).snapshots().listen(
+            (documentSnapshot) {
           try {
             if (documentSnapshot.exists) {
               final userData = UserModel.fromDocument(documentSnapshot);

@@ -39,7 +39,7 @@ class _HomepageState extends State<Homepage>
       context
           .read<SearchUserBloc>()
           .add(LoadUserEvent(currentUser: controller.currentUser));
-      
+
       // Check if user needs privacy migration
       context
           .read<SearchUserBloc>()
@@ -61,6 +61,7 @@ class _HomepageState extends State<Homepage>
         .update({'lastvisited': DateTime.now()});
     super.didChangeDependencies();
   }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -74,21 +75,22 @@ class _HomepageState extends State<Homepage>
       backgroundColor: Theme.of(context).primaryColor,
       body: Container(
         decoration: BoxDecoration(
-          borderRadius:
-              const BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50)),
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(50), topRight: Radius.circular(50)),
           color: Theme.of(context).primaryColor,
         ),
         child: BlocListener<SearchUserBloc, SearchUserState>(
           listener: (context, state) {
             if (state is MigrationStatusState) {
               setState(() {
-                _shouldShowMigrationPrompt = state.shouldPromptForMigration && !_migrationPromptDismissed;
+                _shouldShowMigrationPrompt = state.shouldPromptForMigration &&
+                    !_migrationPromptDismissed;
               });
             }
           },
           child: ClipRRect(
-            borderRadius:
-                const BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50)),
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(50), topRight: Radius.circular(50)),
             child: Stack(
               children: [
                 AbsorbPointer(
@@ -127,7 +129,7 @@ class _HomepageState extends State<Homepage>
                 exceedSwipes
                     ? PremiumSwipePage(currentUser: controller.currentUser)
                     : const SizedBox.shrink(),
-                
+
                 // Privacy Migration Prompt
                 if (_shouldShowMigrationPrompt)
                   Positioned(
@@ -143,9 +145,8 @@ class _HomepageState extends State<Homepage>
                       },
                       onMigrate: () {
                         // Refresh user list after migration
-                        context
-                            .read<SearchUserBloc>()
-                            .add(LoadUserEvent(currentUser: controller.currentUser));
+                        context.read<SearchUserBloc>().add(
+                            LoadUserEvent(currentUser: controller.currentUser));
                         setState(() {
                           _shouldShowMigrationPrompt = false;
                         });

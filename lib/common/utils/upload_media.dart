@@ -61,14 +61,14 @@ class _SelectMedia extends StatelessWidget {
             log("filechat is ${file.path}");
             return file;
           } else {
-              if (!context.mounted) return null;
-              var croppedfile = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      CropMedia(title: '', file: file, checktype: checktype),
-                ),
-              );
+            if (!context.mounted) return null;
+            var croppedfile = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    CropMedia(title: '', file: file, checktype: checktype),
+              ),
+            );
 
             log("croppedfile is ${croppedfile.path}");
             return croppedfile;

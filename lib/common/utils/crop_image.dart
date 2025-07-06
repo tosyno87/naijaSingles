@@ -22,32 +22,33 @@ class CropMedia extends StatefulWidget {
   CropMediaState createState() => CropMediaState();
 }
 
-class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixin {
+class CropMediaState extends State<CropMedia>
+    with SingleTickerProviderStateMixin {
   CropController controller = CropController();
   bool isFinished = true;
   bool _hasChanges = false;
-  
+
   // Animation controller - using nullable types instead of late
   AnimationController? _animationController;
   Animation<double>? _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
     controller = CropController(aspectRatio: 1);
-    
+
     // Initialize animation controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    
+
     // Initialize animation
     _fadeAnimation = CurvedAnimation(
       parent: _animationController!,
       curve: Curves.easeInOut,
     );
-    
+
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
@@ -62,7 +63,7 @@ class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixi
     _animationController?.dispose();
     super.dispose();
   }
-  
+
   void _onCropChanged() {
     if (!_hasChanges) {
       setState(() {
@@ -74,7 +75,7 @@ class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixi
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
@@ -121,7 +122,8 @@ class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixi
                     width: 20.0,
                     height: 20.0,
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF27AE60)),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xFF27AE60)),
                       strokeWidth: 2.0,
                     ),
                   ),
@@ -136,7 +138,7 @@ class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixi
           : _buildBodyContent(isDarkMode),
     );
   }
-  
+
   Widget _buildBodyContent(bool isDarkMode) {
     return Column(
       children: [
@@ -159,7 +161,7 @@ class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixi
             ),
           ),
         ),
-        
+
         // Instruction text
         Container(
           color: isDarkMode ? Colors.black : Colors.white,
@@ -173,7 +175,7 @@ class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixi
             ),
           ),
         ),
-        
+
         // Bottom toolbar
         Container(
           margin: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
@@ -220,7 +222,7 @@ class CropMediaState extends State<CropMedia> with SingleTickerProviderStateMixi
       ],
     );
   }
-  
+
   Widget _buildToolbarButton(IconData icon, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,

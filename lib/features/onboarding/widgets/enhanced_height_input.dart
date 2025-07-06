@@ -47,7 +47,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
   void _showHeightPicker() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -70,7 +70,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            
+
             // Header
             Padding(
               padding: EdgeInsets.all(isTablet ? 24 : 20),
@@ -112,7 +112,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                 ],
               ),
             ),
-            
+
             // iOS Height Picker
             Expanded(
               child: Padding(
@@ -139,7 +139,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     if (widget.useIOSPicker) {
       return _buildPickerButton();
     } else {
@@ -150,7 +150,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
   Widget _buildPickerButton() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -220,9 +220,9 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
             ),
           ),
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Helper text
         Text(
           'Tap above to select your height with an easy-to-use picker',
@@ -239,7 +239,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
     late TextEditingController _controller;
-    
+
     void _updateController() {
       if (_heightUnit == 'cm') {
         _controller = TextEditingController(text: _height.round().toString());
@@ -252,7 +252,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
     }
 
     _updateController();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -271,8 +271,8 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: isTablet ? 16 : 12),
                   decoration: BoxDecoration(
-                    color: _heightUnit == 'cm' 
-                        ? const Color(0xFF008037) 
+                    color: _heightUnit == 'cm'
+                        ? const Color(0xFF008037)
                         : Colors.grey.shade200,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(12),
@@ -285,7 +285,8 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     style: GoogleFonts.poppins(
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
-                      color: _heightUnit == 'cm' ? Colors.white : Colors.black54,
+                      color:
+                          _heightUnit == 'cm' ? Colors.white : Colors.black54,
                     ),
                   ),
                 ),
@@ -303,8 +304,8 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: isTablet ? 16 : 12),
                   decoration: BoxDecoration(
-                    color: _heightUnit == 'ft' 
-                        ? const Color(0xFF008037) 
+                    color: _heightUnit == 'ft'
+                        ? const Color(0xFF008037)
                         : Colors.grey.shade200,
                     borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(12),
@@ -317,7 +318,8 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     style: GoogleFonts.poppins(
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
-                      color: _heightUnit == 'ft' ? Colors.white : Colors.black54,
+                      color:
+                          _heightUnit == 'ft' ? Colors.white : Colors.black54,
                     ),
                   ),
                 ),
@@ -325,9 +327,9 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Height input
         TextFormField(
           controller: _controller,

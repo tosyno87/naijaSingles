@@ -74,7 +74,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 20),
-                      
+
                       // Logo - Stylized Afropeep text
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -102,7 +102,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           ),
                         ],
                       ),
-                      
+
                       // African pattern decorative element
                       Container(
                         margin: const EdgeInsets.only(top: 8),
@@ -120,9 +120,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       Text(
                         "Welcome Back",
                         style: GoogleFonts.poppins(
@@ -131,9 +131,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           color: textColor,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       Text(
                         "Sign in to continue",
                         style: GoogleFonts.poppins(
@@ -141,9 +141,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           color: textColor.withValues(alpha: 0.7),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Error message for BLoC state
                       if (state is EmailAuthError)
                         Container(
@@ -168,9 +168,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                             ],
                           ),
                         ),
-                      
+
                       if (state is EmailAuthError) const SizedBox(height: 24),
-                      
+
                       // Email field
                       _buildOutlinedTextField(
                         controller: _emailController,
@@ -178,9 +178,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                         prefixIcon: Icons.email_outlined,
                         keyboardType: TextInputType.emailAddress,
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Password field
                       _buildOutlinedTextField(
                         controller: _passwordController,
@@ -189,7 +189,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                         obscureText: _obscurePassword,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.grey,
                           ),
                           onPressed: () {
@@ -199,9 +201,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           },
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       // Forgot password
                       Align(
                         alignment: Alignment.centerRight,
@@ -210,7 +212,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const EmailPasswordResetScreen(),
+                                builder: (context) =>
+                                    const EmailPasswordResetScreen(),
                               ),
                             );
                           },
@@ -229,9 +232,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 32),
-                      
+
                       // Login labelLarge
                       SizedBox(
                         width: double.infinity,
@@ -252,7 +255,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
+                            disabledBackgroundColor:
+                                primaryColor.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -276,9 +280,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // OR divider
                       Row(
                         children: [
@@ -307,9 +311,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Sign up prompt
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -326,7 +330,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const AuthMethodSelectionScreen(),
+                                  builder: (context) =>
+                                      const AuthMethodSelectionScreen(),
                                 ),
                               );
                             },
@@ -341,7 +346,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -382,7 +387,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
           if (value == null || value.isEmpty) {
             return 'This field is required';
           }
-          if (keyboardType == TextInputType.emailAddress && 
+          if (keyboardType == TextInputType.emailAddress &&
               !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
             return 'Please enter a valid email address';
           }

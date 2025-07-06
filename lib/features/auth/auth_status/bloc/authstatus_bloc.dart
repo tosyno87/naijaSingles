@@ -40,19 +40,19 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
       AuthRequestEvent event, Emitter<AuthstatusState> emit) async {
     try {
       emit(AuthLoadingState());
-      
+
       // Check if user is signed in
       try {
         var issingedin = await phoneAuthRepository.isSignedIn();
         log("Is signed in check: $issingedin");
-        
+
         if (issingedin) {
           var user = auth.currentUser;
           if (user != null) {
             log("User signed in successfully: ${user.uid}");
             log("Phone number: ${user.phoneNumber ?? 'No phone number'}");
             log("Email: ${user.email ?? 'No email'}");
-            
+
             // Verify token can be retrieved
             try {
               final token = await user.getIdToken(true);

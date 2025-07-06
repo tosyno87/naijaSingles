@@ -25,7 +25,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   Future<void> _pickImage(ImageSource source, int index) async {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     await controller.pickProfilePhoto(source, index);
     setState(() {});
   }
@@ -51,9 +52,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 color: textDarkBrown,
               ),
             ),
-            
             const SizedBox(height: 16),
-            
             _buildImageSourceOption(
               icon: Icons.camera_alt,
               title: "Take a Photo",
@@ -63,9 +62,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 _pickImage(ImageSource.camera, index);
               },
             ),
-            
             const Divider(height: 24),
-            
             _buildImageSourceOption(
               icon: Icons.photo_library,
               title: "Choose from Gallery",
@@ -103,9 +100,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               size: 24,
             ),
           ),
-          
           const SizedBox(width: 16),
-          
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +113,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                     color: textDarkBrown,
                   ),
                 ),
-                
                 Text(
                   subtitle,
                   style: GoogleFonts.poppins(
@@ -129,7 +123,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               ],
             ),
           ),
-          
           Icon(
             Icons.arrow_forward_ios,
             color: afropeepGreen,
@@ -144,7 +137,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     final controller = Provider.of<OnboardingController>(context);
     final photo = controller.profilePhotos[index];
     final bool isRequired = index < 3; // First 3 photos are required
-    
+
     return GestureDetector(
       onTap: () => _showImageSourceDialog(index),
       child: Stack(
@@ -156,8 +149,10 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               color: cardBackground,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isRequired 
-                    ? (photo == null ? Colors.red.withValues(alpha: 0.5) : afropeepGreen)
+                color: isRequired
+                    ? (photo == null
+                        ? Colors.red.withValues(alpha: 0.5)
+                        : afropeepGreen)
                     : Colors.transparent,
                 width: 2,
               ),
@@ -175,24 +170,26 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                       Icon(
                         Icons.add_a_photo,
                         size: 36,
-                        color: isRequired ? Colors.red.withValues(alpha: 0.7) : Colors.grey,
+                        color: isRequired
+                            ? Colors.red.withValues(alpha: 0.7)
+                            : Colors.grey,
                       ),
-                      
                       const SizedBox(height: 8),
-                      
                       Text(
                         isRequired ? "Required" : "Add Photo",
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: isRequired ? Colors.red.withValues(alpha: 0.7) : Colors.grey.shade700,
+                          color: isRequired
+                              ? Colors.red.withValues(alpha: 0.7)
+                              : Colors.grey.shade700,
                         ),
                       ),
                     ],
                   )
                 : null,
           ),
-          
+
           // Remove labelLarge if photo exists
           if (photo != null)
             Positioned(
@@ -225,9 +222,10 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<OnboardingController>(context);
-    final int uploadedCount = controller.profilePhotos.where((photo) => photo != null).length;
+    final int uploadedCount =
+        controller.profilePhotos.where((photo) => photo != null).length;
     final bool hasMinimumPhotos = uploadedCount >= 3;
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -241,9 +239,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               color: textDarkBrown,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Text(
             "Upload at least 3 photos to complete your profile",
             style: GoogleFonts.poppins(
@@ -251,14 +249,16 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               color: textLightBrown,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Photo count indicator
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: hasMinimumPhotos ? afropeepGreen.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+              color: hasMinimumPhotos
+                  ? afropeepGreen.withValues(alpha: 0.1)
+                  : Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
@@ -270,9 +270,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Photo grid - first row (required photos)
           Row(
             children: [
@@ -281,9 +281,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               Expanded(child: _buildPhotoItem(1)),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Photo grid - second row (1 required, 2 optional)
           Row(
             children: [
@@ -292,14 +292,14 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               Expanded(child: _buildPhotoItem(3)),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Photo grid - third row (optional)
           _buildPhotoItem(4),
-          
+
           const SizedBox(height: 32),
-          
+
           // Photo tips
           Container(
             padding: const EdgeInsets.all(16),
@@ -322,9 +322,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                     color: Colors.blue.shade800,
                   ),
                 ),
-                
                 const SizedBox(height: 8),
-                
                 _buildTipItem(
                   "Use clear, well-lit photos that show your face",
                 ),

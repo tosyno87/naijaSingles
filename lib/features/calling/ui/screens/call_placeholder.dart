@@ -39,7 +39,8 @@ class CallPlaceholder extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
               ),
               onPressed: () => Navigator.pop(context),
               child: const Text('Return to Chat'),

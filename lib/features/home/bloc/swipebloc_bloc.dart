@@ -29,8 +29,7 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
     on<LeftSwipeEvent>((event, emit) async {
       try {
         await this.leftSwipe(event.currentUser, event.selectedUser);
-        List<UserModel> userList =
-            await this.getUserList(event.currentUser);
+        List<UserModel> userList = await this.getUserList(event.currentUser);
         emit(SwipeSucessState(userList));
 
         log("afterlefteventuser${userList.toString()}");
@@ -40,27 +39,26 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
         log('Error while processing left swipe: $e');
       }
     });
-    
+
     on<RightSwipeEvent>((event, emit) async {
       try {
         // Check if this will create a match
         final selectedUserId = event.selectedUser.id;
         bool hasAlreadyLiked = false;
-        
+
         if (selectedUserId != null) {
           hasAlreadyLiked = await _matchService.hasUserLiked(selectedUserId);
         }
-        
+
         await this.rightSwipe(event.currentUser, event.selectedUser);
-        
-        List<UserModel> userList =
-            await this.getUserList(event.currentUser);
+
+        List<UserModel> userList = await this.getUserList(event.currentUser);
 
         // Check if a match was created by looking for mutual likes
         final usersWhoLikedMe = await _matchService.getUsersWhoLikedMe();
-        final isMatch = selectedUserId != null && 
-                       usersWhoLikedMe.contains(selectedUserId) && 
-                       !hasAlreadyLiked;
+        final isMatch = selectedUserId != null &&
+            usersWhoLikedMe.contains(selectedUserId) &&
+            !hasAlreadyLiked;
 
         if (isMatch) {
           // Emit match state

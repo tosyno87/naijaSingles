@@ -6,14 +6,17 @@ import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingAdditionalPreferencesScreen extends StatefulWidget {
   final VoidCallback? onNext;
-  
-  const OnboardingAdditionalPreferencesScreen({Key? key, this.onNext}) : super(key: key);
+
+  const OnboardingAdditionalPreferencesScreen({Key? key, this.onNext})
+      : super(key: key);
 
   @override
-  State<OnboardingAdditionalPreferencesScreen> createState() => _OnboardingAdditionalPreferencesScreenState();
+  State<OnboardingAdditionalPreferencesScreen> createState() =>
+      _OnboardingAdditionalPreferencesScreenState();
 }
 
-class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditionalPreferencesScreen> {
+class _OnboardingAdditionalPreferencesScreenState
+    extends State<OnboardingAdditionalPreferencesScreen> {
   late double _height;
   late String _heightUnit;
   String _lookingFor = 'Dating';
@@ -21,21 +24,46 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
 
   final List<Map<String, dynamic>> _lookingForOptions = [
     {'label': 'Dating', 'value': 'Dating', 'icon': Icons.favorite_outline},
-    {'label': 'Friendship', 'value': 'Friendship', 'icon': Icons.people_outline},
-    {'label': 'Networking', 'value': 'Networking', 'icon': Icons.business_center_outlined},
+    {
+      'label': 'Friendship',
+      'value': 'Friendship',
+      'icon': Icons.people_outline
+    },
+    {
+      'label': 'Networking',
+      'value': 'Networking',
+      'icon': Icons.business_center_outlined
+    },
   ];
 
   final List<Map<String, dynamic>> _relationshipIntentOptions = [
-    {'label': 'Short-term fun', 'value': 'Short-term', 'icon': Icons.flash_on_outlined},
-    {'label': 'Long-term relationship', 'value': 'Long-term', 'icon': Icons.favorite_border},
-    {'label': 'Casual dating', 'value': 'Casual', 'icon': Icons.coffee_outlined},
-    {'label': 'Not sure yet', 'value': 'Not sure yet', 'icon': Icons.help_outline},
+    {
+      'label': 'Short-term fun',
+      'value': 'Short-term',
+      'icon': Icons.flash_on_outlined
+    },
+    {
+      'label': 'Long-term relationship',
+      'value': 'Long-term',
+      'icon': Icons.favorite_border
+    },
+    {
+      'label': 'Casual dating',
+      'value': 'Casual',
+      'icon': Icons.coffee_outlined
+    },
+    {
+      'label': 'Not sure yet',
+      'value': 'Not sure yet',
+      'icon': Icons.help_outline
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     _height = controller.height;
     _heightUnit = controller.heightUnit;
     _lookingFor = controller.lookingFor;
@@ -46,7 +74,7 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
         horizontal: isTablet ? 32 : 24,
@@ -72,9 +100,9 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
               color: Colors.black54,
             ),
           ),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Height Section
           const SectionHeader(
             title: 'Height',
@@ -91,9 +119,9 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
               });
             },
           ),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Looking For Section
           const SectionHeader(
             title: 'I\'m looking for',
@@ -101,9 +129,9 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
           ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildLookingForOptions(),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Relationship Intent Section
           const SectionHeader(
             title: 'Relationship goals',
@@ -111,15 +139,15 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
           ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildRelationshipIntentOptions(),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Continue Button
           ContinueButton(
             onPressed: _saveAndContinue,
             text: 'Complete Profile',
           ),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
         ],
       ),
@@ -129,7 +157,7 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
   List<Widget> _buildLookingForOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return _lookingForOptions.map((option) {
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
@@ -151,7 +179,7 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return _relationshipIntentOptions.map((option) {
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
@@ -171,13 +199,14 @@ class _OnboardingAdditionalPreferencesScreenState extends State<OnboardingAdditi
   }
 
   void _saveAndContinue() {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // Save all preferences
     controller.setHeight(_height, _heightUnit);
     controller.setLookingFor(_lookingFor);
     controller.setRelationshipIntent(_relationshipIntent);
-    
+
     // Call the onNext callback to complete onboarding
     if (widget.onNext != null) {
       widget.onNext!();

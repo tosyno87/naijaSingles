@@ -131,7 +131,8 @@ class NotificationsState extends State<Notifications> {
                 ? Center(
                     child: Text(
                     "No match found".tr().toString(),
-                    style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+                    style: TextStyle(
+                        color: AppColors.secondaryColor, fontSize: 16),
                   ))
                 : ListView.builder(
                     controller: _scrollController,
@@ -160,12 +161,15 @@ class NotificationsState extends State<Notifications> {
                                   ? themeProvider.isDarkMode
                                       ? Theme.of(context)
                                           .scaffoldBackgroundColor
-                                      : primaryColor.withValues(alpha: (.15 * 255).toDouble())
+                                      : primaryColor.withValues(
+                                          alpha: (.15 * 255).toDouble())
                                   : themeProvider.isDarkMode
                                       ? Theme.of(context)
                                           .scaffoldBackgroundColor
-                                          .withValues(alpha: (0.70 * 255).toDouble())
-                                      : AppColors.secondaryColor.withValues(alpha: (.15 * 255).toDouble()),
+                                          .withValues(
+                                              alpha: (0.70 * 255).toDouble())
+                                      : AppColors.secondaryColor.withValues(
+                                          alpha: (.15 * 255).toDouble()),
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(5),

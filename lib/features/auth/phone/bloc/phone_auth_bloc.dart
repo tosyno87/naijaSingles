@@ -34,7 +34,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
 
     // When the otp verification is successful, this event will be fired
     on<OnPhoneAuthVerificationCompleteEvent>(_loginWithCredential);
-    
+
     // For development testing with Firebase test phone numbers
     on<UseTestPhoneAuthEvent>(_onUseTestPhoneAuth);
   }
@@ -144,14 +144,15 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
       emit(PhoneAuthError(error: e.toString()));
     }
   }
-  
+
   // Handler for development testing with Firebase test phone numbers
   FutureOr<void> _onUseTestPhoneAuth(
       UseTestPhoneAuthEvent event, Emitter<PhoneAuthState> emit) async {
     try {
       emit(PhoneAuthLoading());
       // Test phone authentication is disabled in production
-      emit(const PhoneAuthError(error: "Test authentication is not available in production"));
+      emit(const PhoneAuthError(
+          error: "Test authentication is not available in production"));
     } catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }

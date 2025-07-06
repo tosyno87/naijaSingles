@@ -52,10 +52,10 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                             userId: user.id!,
                             content: text,
                             userName: user.name ?? '',
-                            userImage:
-                                user.imageUrl != null && user.imageUrl!.isNotEmpty
-                                    ? user.imageUrl!.first
-                                    : null,
+                            userImage: user.imageUrl != null &&
+                                    user.imageUrl!.isNotEmpty
+                                ? user.imageUrl!.first
+                                : null,
                           ));
                       _controller.clear();
                     }

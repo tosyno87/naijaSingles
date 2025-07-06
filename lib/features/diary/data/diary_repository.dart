@@ -51,10 +51,8 @@ class DiaryRepository {
   }
 
   Stream<List<DiaryEntry>> entriesStream() {
-    return diaryRef
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
+    return diaryRef.orderBy('timestamp', descending: true).snapshots().map(
+        (snapshot) => snapshot.docs
             .where((doc) => doc.data() != null)
             .map((doc) => DiaryEntry.fromDocument(doc))
             .toList());

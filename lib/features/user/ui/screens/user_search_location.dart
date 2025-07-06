@@ -32,7 +32,8 @@ class SearchLocation extends StatefulWidget {
   _SearchLocationState createState() => _SearchLocationState();
 }
 
-class _SearchLocationState extends State<SearchLocation> with SingleTickerProviderStateMixin {
+class _SearchLocationState extends State<SearchLocation>
+    with SingleTickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final FirebaseAuth auth = firebaseAuthInstance;
 
@@ -50,14 +51,14 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    
+
     _fadeAnimation = CurvedAnimation(
       parent: _animationController!,
       curve: Curves.easeOut,
     );
-    
+
     _animationController!.forward();
-    
+
     _focusNode.addListener(() {
       if (mounted) {
         setState(() {
@@ -81,7 +82,7 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
         as Map<String, dynamic>)['userData'];
     var profilePic = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['profilePic'] as File;
-    
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserLocationReporistory>(
@@ -142,14 +143,14 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                       ),
                     ),
                   ),
-                  
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         const SizedBox(height: 20),
-                        
+
                         // Title and subtitle with fade animation
                         FadeTransition(
                           opacity: _fadeAnimation!,
@@ -176,9 +177,9 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Location icon and input field with animation
                         FadeTransition(
                           opacity: _fadeAnimation!,
@@ -186,13 +187,16 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                             decoration: BoxDecoration(
                               color: const Color(0xFFF5F5F5),
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: _isTyping ? [
-                                BoxShadow(
-                                  color: const Color(0xFF27AE60).withValues(alpha: 0.15),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                )
-                              ] : [],
+                              boxShadow: _isTyping
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF27AE60)
+                                            .withValues(alpha: 0.15),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      )
+                                    ]
+                                  : [],
                             ),
                             child: TextField(
                               readOnly: true,
@@ -204,7 +208,8 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                                   color: Color(0xFF888888),
                                 ),
                                 prefixIcon: const Padding(
-                                  padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                                  padding:
+                                      EdgeInsets.only(left: 16.0, right: 8.0),
                                   child: Icon(
                                     Icons.location_on_rounded,
                                     color: Color(0xFF27AE60),
@@ -249,9 +254,9 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                             ),
                           ),
                         ),
-                        
+
                         const Spacer(),
-                        
+
                         // Progress indicator
                         FadeTransition(
                           opacity: _fadeAnimation!,
@@ -268,7 +273,8 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                                 child: Row(
                                   children: [
                                     Container(
-                                      width: MediaQuery.of(context).size.width * 0.3,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF27AE60),
                                         borderRadius: BorderRadius.circular(2),
@@ -280,17 +286,19 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Continue labelLarge with animation
                         FadeTransition(
                           opacity: _fadeAnimation!,
-                          child: BlocConsumer<RegistrationBloc, RegistrationStates>(
+                          child: BlocConsumer<RegistrationBloc,
+                              RegistrationStates>(
                             listener: (context, registrationState) {
                               if (registrationState is RegistrationSuccess) {
                                 log("userregistrationsuccess");
-                                Provider.of<UserProvider>(context, listen: false)
+                                Provider.of<UserProvider>(context,
+                                        listen: false)
                                     .currentUser = registrationState.user;
                                 showWelcomDialog(context);
                               }
@@ -305,7 +313,8 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF27AE60).withValues(alpha: 0.3),
+                                        color: const Color(0xFF27AE60)
+                                            .withValues(alpha: 0.3),
                                         blurRadius: 12,
                                         offset: const Offset(0, 4),
                                       ),
@@ -325,32 +334,41 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                                           userData.addAll(
                                             {
                                               'location': {
-                                                'latitude': selectedLocation?['position']
+                                                'latitude': selectedLocation?[
+                                                        'position']
                                                     ['coordinates'][1],
-                                                'longitude': selectedLocation?['position']
+                                                'longitude': selectedLocation?[
+                                                        'position']
                                                     ['coordinates'][0],
-                                                'address': selectedLocation?['address'],
+                                                'address': selectedLocation?[
+                                                    'address'],
                                               },
                                               'maximum_distance': 20,
                                               'age_range': {
                                                 'min': "20",
                                                 'max': "50",
                                               },
-                                              'lastvisited': FieldValue.serverTimestamp(),
-                                              'createdAt': FieldValue.serverTimestamp()
+                                              'lastvisited':
+                                                  FieldValue.serverTimestamp(),
+                                              'createdAt':
+                                                  FieldValue.serverTimestamp()
                                             },
                                           );
                                           await FireStoreClass.uploadprofile(
-                                              currentUserId: auth.currentUser!.uid,
+                                              currentUserId:
+                                                  auth.currentUser!.uid,
                                               file: profilePic);
                                           context.read<RegistrationBloc>().add(
-                                                RegistrationRequest(userdata: userData),
+                                                RegistrationRequest(
+                                                    userdata: userData),
                                               );
                                           log("added user finally \$userData.toString()");
                                         }
                                       : () {
                                           CustomSnackbar.showSnackBarSimple(
-                                            "Please select location to continue".tr().toString(),
+                                            "Please select location to continue"
+                                                .tr()
+                                                .toString(),
                                             context,
                                           );
                                         },
@@ -362,13 +380,16 @@ class _SearchLocationState extends State<SearchLocation> with SingleTickerProvid
                                           ? const Color(0xFF27AE60)
                                           : const Color(0xFFCCCCCC),
                                       borderRadius: BorderRadius.circular(16),
-                                      boxShadow: _city.text.isNotEmpty ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF27AE60).withValues(alpha: 0.3),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ] : [],
+                                      boxShadow: _city.text.isNotEmpty
+                                          ? [
+                                              BoxShadow(
+                                                color: const Color(0xFF27AE60)
+                                                    .withValues(alpha: 0.3),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ]
+                                          : [],
                                     ),
                                     child: const Center(
                                       child: Text(

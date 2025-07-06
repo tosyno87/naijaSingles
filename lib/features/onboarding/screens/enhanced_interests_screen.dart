@@ -7,12 +7,13 @@ class EnhancedInterestsScreen extends StatefulWidget {
   const EnhancedInterestsScreen({super.key});
 
   @override
-  State<EnhancedInterestsScreen> createState() => _EnhancedInterestsScreenState();
+  State<EnhancedInterestsScreen> createState() =>
+      _EnhancedInterestsScreenState();
 }
 
 class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   List<String> _selectedInterests = [];
-  
+
   // MVP theme colors
   static const Color afropeepGreen = Color(0xFF007A33);
   static const Color cardBackground = Color(0xFFF7E8DA);
@@ -22,39 +23,49 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   // Simplified interests list - organized by category but presented as flat list
   final List<String> _allInterests = [
     // Lifestyle
-    'Fitness', 'Yoga', 'Fashion', 'Photography', 'Reading', 'Writing', 'Personal Development',
-    
-    // Entertainment  
-    'Movies', 'Music', 'Concerts', 'Comedy Shows', 'Netflix', 'Podcasts', 'Gaming', 'Karaoke',
-    
+    'Fitness', 'Yoga', 'Fashion', 'Photography', 'Reading', 'Writing',
+    'Personal Development',
+
+    // Entertainment
+    'Movies', 'Music', 'Concerts', 'Comedy Shows', 'Netflix', 'Podcasts',
+    'Gaming', 'Karaoke',
+
     // Sports
-    'Football', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Cycling', 'Volleyball',
-    
+    'Football', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Cycling',
+    'Volleyball',
+
     // Food & Dining
-    'Cooking', 'Fine Dining', 'Street Food', 'Baking', 'Wine Tasting', 'Coffee', 'Brunch',
-    
+    'Cooking', 'Fine Dining', 'Street Food', 'Baking', 'Wine Tasting', 'Coffee',
+    'Brunch',
+
     // Nigerian Culture
-    'Afrobeats', 'Highlife Music', 'Nollywood', 'Jollof Rice', 'Suya', 'Owanbe Parties', 
-    'Traditional Weddings', 'Ankara Fashion', 'Nigerian Comedy', 'Pidgin English',
-    
+    'Afrobeats', 'Highlife Music', 'Nollywood', 'Jollof Rice', 'Suya',
+    'Owanbe Parties',
+    'Traditional Weddings', 'Ankara Fashion', 'Nigerian Comedy',
+    'Pidgin English',
+
     // Creative Arts
-    'Painting', 'Drawing', 'Singing', 'Dancing', 'Music Production', 'Fashion Design',
-    
+    'Painting', 'Drawing', 'Singing', 'Dancing', 'Music Production',
+    'Fashion Design',
+
     // Social & Community
-    'Church Activities', 'Family Time', 'Volunteering', 'Community Service', 'Religious Studies',
-    
+    'Church Activities', 'Family Time', 'Volunteering', 'Community Service',
+    'Religious Studies',
+
     // Travel & Adventure
-    'Travel', 'Hiking', 'Beach Activities', 'Road Trips', 'City Exploration', 'Food Tourism',
+    'Travel', 'Hiking', 'Beach Activities', 'Road Trips', 'City Exploration',
+    'Food Tourism',
   ];
 
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+
       if (controller.interests.isNotEmpty) {
         setState(() {
           _selectedInterests = List.from(controller.interests);
@@ -93,9 +104,9 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               color: textDarkBrown,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Text(
             "Select at least 5 interests to help us find your perfect matches",
             style: GoogleFonts.poppins(
@@ -103,9 +114,9 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               color: textLightBrown,
             ),
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Interests dropdown
           Text(
             "Choose your interests",
@@ -115,9 +126,9 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               color: textDarkBrown,
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             decoration: BoxDecoration(
@@ -162,19 +173,19 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               },
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Selected interests count
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: _selectedInterests.length >= 5 
+              color: _selectedInterests.length >= 5
                   ? afropeepGreen.withOpacity(0.1)
                   : Colors.orange.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: _selectedInterests.length >= 5 
+                color: _selectedInterests.length >= 5
                     ? afropeepGreen.withOpacity(0.3)
                     : Colors.orange.withOpacity(0.3),
               ),
@@ -183,10 +194,10 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  _selectedInterests.length >= 5 
+                  _selectedInterests.length >= 5
                       ? Icons.check_circle
                       : Icons.info_outline,
-                  color: _selectedInterests.length >= 5 
+                  color: _selectedInterests.length >= 5
                       ? afropeepGreen
                       : Colors.orange.shade700,
                   size: 16,
@@ -197,7 +208,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: _selectedInterests.length >= 5 
+                    color: _selectedInterests.length >= 5
                         ? afropeepGreen
                         : Colors.orange.shade700,
                   ),
@@ -205,9 +216,9 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Selected interests display
           if (_selectedInterests.isNotEmpty) ...[
             Text(
@@ -218,15 +229,14 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                 color: textDarkBrown,
               ),
             ),
-            
             const SizedBox(height: 16),
-            
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: _selectedInterests.map((interest) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: afropeepGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),

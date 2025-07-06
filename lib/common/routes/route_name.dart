@@ -20,17 +20,17 @@ class RouteName {
   static const String datingHomePage = '/dating';
   static const String exploreScreen = '/explore';
   static const String mainNavigation = '/main_navigation';
-  
+
   // Email authentication routes
   static const String emailSignup = '/email_signup';
   static const String emailLogin = '/email_login';
   static const String emailPasswordReset = '/email_password_reset';
-  
+
   // Main navigation routes
   static const String onboarding = '/onboarding';
   static const String home = '/home';
   static const String discover = '/discover'; // Swipe/matching screen
-  
+
   // Auth method selection routes
   static const String authMethodSelection = '/auth_method_selection';
   static const String signInMethodSelection = '/sign_in_method_selection';
@@ -42,7 +42,7 @@ class RouteName {
   static const String universityScreen = '/user_university';
   static const String userDobScreen = '/user_dob';
   static const String nationalityScreen = '/nationality';
-  
+
   // Old onboarding routes - kept for backward compatibility
   static const String onboardingFlow = '/onboarding_flow';
   static const String mvpOnboarding = '/mvp_onboarding';

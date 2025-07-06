@@ -7,24 +7,24 @@ import '../message_model.dart';
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   // Collection references
-  final CollectionReference _chatThreadsCollection = 
+  final CollectionReference _chatThreadsCollection =
       FirebaseFirestore.instance.collection('chatThreads');
-  
+
   // Get current user ID
   String? get currentUserId => _auth.currentUser?.uid;
-  
+
   // Check if a chat thread exists between two users
   Future<String?> getChatThreadId(String otherUserId) async {
     try {
       if (currentUserId == null) return null;
-      
+
       // Query for threads containing both users
       final querySnapshot = await _chatThreadsCollection
           .where('userIds', arrayContains: currentUserId)
           .get();
-      
+
       // Find the thread that contains the other user
       for (var doc in querySnapshot.docs) {
         List<dynamic> userIds = doc['userIds'];
@@ -32,7 +32,7 @@ class ChatService {
           return doc.id;
         }
       }
-      
+
       // No thread found
       return null;
     } catch (e) {
@@ -40,38 +40,41 @@ class ChatService {
       return null;
     }
   }
-  
+
   // Create a new chat thread between two users
-  Future<String?> createChatThread(String otherUserId, String otherUserName) async {
+  Future<String?> createChatThread(
+      String otherUserId, String otherUserName) async {
     try {
       if (currentUserId == null) return null;
-      
+
       // Check if thread already exists
       final existingThreadId = await getChatThreadId(otherUserId);
       if (existingThreadId != null) {
         return existingThreadId;
       }
-      
+
       // Check if users are blocked
       final isBlocked = await isUserBlocked(currentUserId!, otherUserId);
       if (isBlocked) {
         throw Exception('This conversation is not available.');
       }
-      
+
       // Verify users are matched before creating chat
       final isMatched = await areUsersMatched(currentUserId!, otherUserId);
       if (!isMatched) {
-        throw Exception('You can only chat with users you\'ve matched with. Keep swiping to find more matches!');
+        throw Exception(
+            'You can only chat with users you\'ve matched with. Keep swiping to find more matches!');
       }
-      
+
       // Create a new thread document
       final threadRef = _chatThreadsCollection.doc();
       final threadId = threadRef.id;
-      
+
       // Get current user's name - handle case where document doesn't exist
       String currentUserName = 'User';
       try {
-        final currentUserDoc = await _firestore.collection('users').doc(currentUserId).get();
+        final currentUserDoc =
+            await _firestore.collection('users').doc(currentUserId).get();
         if (currentUserDoc.exists) {
           final data = currentUserDoc.data() as Map<String, dynamic>?;
           if (data != null && data.containsKey('name')) {
@@ -82,7 +85,7 @@ class ChatService {
         debugPrint('Error getting current user name: $e');
         // Continue with default name
       }
-      
+
       // Create thread data
       await threadRef.set({
         'threadId': threadId,
@@ -96,52 +99,51 @@ class ChatService {
         'lastMessageSenderId': null,
         'lastUpdated': FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
-        'unreadCount': {
-          currentUserId: 0,
-          otherUserId: 0
-        }
+        'unreadCount': {currentUserId: 0, otherUserId: 0}
       });
-      
+
       return threadId;
     } on FirebaseException catch (e) {
-      debugPrint('Firebase error creating chat thread: ${e.code} - ${e.message}');
-      
+      debugPrint(
+          'Firebase error creating chat thread: ${e.code} - ${e.message}');
+
       // Handle specific security rule violations
       if (e.code == 'permission-denied') {
-        throw Exception('Unable to start conversation. Please try again later.');
+        throw Exception(
+            'Unable to start conversation. Please try again later.');
       }
-      
+
       throw Exception('Failed to create chat: ${e.message}');
     } catch (e) {
       debugPrint('Error creating chat thread: $e');
       // Re-throw our custom exceptions
-      if (e.toString().contains('You can only chat with users') || 
+      if (e.toString().contains('You can only chat with users') ||
           e.toString().contains('This conversation is not available')) {
         rethrow;
       }
       return null;
     }
   }
-  
+
   // Send a message in a thread
   Future<bool> sendMessage(String threadId, String text) async {
     try {
       if (currentUserId == null) return false;
-      
+
       // Validate message content locally first
       if (text.trim().isEmpty) {
         throw Exception('Message cannot be empty.');
       }
-      
+
       if (text.length > 1000) {
-        throw Exception('Message is too long. Please keep messages under 1000 characters.');
+        throw Exception(
+            'Message is too long. Please keep messages under 1000 characters.');
       }
-      
+
       // Reference to the messages subcollection
-      final messagesRef = _chatThreadsCollection
-          .doc(threadId)
-          .collection('messages');
-      
+      final messagesRef =
+          _chatThreadsCollection.doc(threadId).collection('messages');
+
       // Get the thread document to find the other user's ID
       String otherUserId = '';
       try {
@@ -160,7 +162,7 @@ class ChatService {
         debugPrint('Error getting thread document: $e');
         // Continue with empty otherUserId
       }
-      
+
       // Create message data
       final messageData = {
         'senderId': currentUserId,
@@ -168,10 +170,10 @@ class ChatService {
         'timestamp': FieldValue.serverTimestamp(),
         'read': false
       };
-      
+
       // Add the message
       await messagesRef.add(messageData);
-      
+
       // Update the thread with last message info
       final updateData = {
         'lastMessage': messageData,
@@ -180,69 +182,69 @@ class ChatService {
         'lastUpdated': FieldValue.serverTimestamp(),
         'unreadCount.$currentUserId': 0,
       };
-      
+
       // Only update the other user's unread count if we found their ID
       if (otherUserId.isNotEmpty) {
         updateData['unreadCount.$otherUserId'] = FieldValue.increment(1);
       }
-      
+
       await _chatThreadsCollection.doc(threadId).update(updateData);
-      
+
       return true;
     } on FirebaseException catch (e) {
       debugPrint('Firebase error sending message: ${e.code} - ${e.message}');
-      
+
       // Handle specific security rule violations
       if (e.code == 'permission-denied') {
         if (e.message?.contains('text.size()') == true) {
-          throw Exception('Message is too long. Please keep messages under 1000 characters.');
+          throw Exception(
+              'Message is too long. Please keep messages under 1000 characters.');
         } else if (e.message?.contains('isUserBlocked') == true) {
           throw Exception('This conversation is no longer available.');
         } else {
           throw Exception('Unable to send message. Please try again.');
         }
       }
-      
+
       throw Exception('Failed to send message: ${e.message}');
     } catch (e) {
       debugPrint('Error sending message: $e');
       return false;
     }
   }
-  
+
   // Mark messages as read
   Future<void> markThreadAsRead(String threadId) async {
     try {
       if (currentUserId == null) return;
-      
+
       try {
         // Update the unread count for current user to 0
-        await _chatThreadsCollection.doc(threadId).update({
-          'unreadCount.$currentUserId': 0
-        });
+        await _chatThreadsCollection
+            .doc(threadId)
+            .update({'unreadCount.$currentUserId': 0});
       } catch (e) {
         debugPrint('Error updating unread count: $e');
         // Continue to try marking messages as read
       }
-      
+
       try {
         // Mark all unread messages as read
-        final messagesRef = _chatThreadsCollection
-            .doc(threadId)
-            .collection('messages');
-        
+        final messagesRef =
+            _chatThreadsCollection.doc(threadId).collection('messages');
+
         final unreadMessages = await messagesRef
             .where('senderId', isNotEqualTo: currentUserId)
             .where('read', isEqualTo: false)
             .get();
-        
+
         // Batch update all unread messages
         if (unreadMessages.docs.isNotEmpty) {
           final batch = _firestore.batch();
           for (var doc in unreadMessages.docs) {
             batch.update(doc.reference, {'read': true});
           }
-          
+
           await batch.commit();
         }
       } catch (e) {
@@ -252,7 +254,7 @@ class ChatService {
       debugPrint('Error in markThreadAsRead: $e');
     }
   }
-  
+
   // Stream of messages for a specific thread
   Stream<List<Message>> getMessagesStream(String threadId) {
     return _chatThreadsCollection
@@ -261,62 +263,65 @@ class ChatService {
         .orderBy('timestamp', descending: false)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return Message(
-              id: doc.id,
-              senderId: data['senderId'] ?? '',
-              text: data['text'] ?? '',
-              timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-              isRead: data['read'] ?? false,
-            );
-          }).toList();
-        });
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Message(
+          id: doc.id,
+          senderId: data['senderId'] ?? '',
+          text: data['text'] ?? '',
+          timestamp:
+              (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          isRead: data['read'] ?? false,
+        );
+      }).toList();
+    });
   }
-  
+
   // Stream of all chat threads for current user with enhanced error handling
   Stream<List<MessageThreadInfo>> getChatThreadsStream() {
     if (currentUserId == null) {
       return Stream.value([]);
     }
-    
+
     return _chatThreadsCollection
         .where('userIds', arrayContains: currentUserId)
         .orderBy('lastUpdated', descending: true)
         .snapshots()
         .handleError((error) {
-          debugPrint('Error in getChatThreadsStream: $error');
-          // Return empty list on error to prevent UI crashes
-          return [];
-        })
-        .map((snapshot) {
-          try {
-            return snapshot.docs.map((doc) {
+      debugPrint('Error in getChatThreadsStream: $error');
+      // Return empty list on error to prevent UI crashes
+      return [];
+    }).map((snapshot) {
+      try {
+        return snapshot.docs
+            .map((doc) {
               try {
                 final data = doc.data() as Map<String, dynamic>;
-                
+
                 // Find the other user's ID
                 final userIds = List<String>.from(data['userIds'] ?? []);
                 final otherUserId = userIds.firstWhere(
                   (id) => id != currentUserId,
                   orElse: () => '',
                 );
-                
+
                 // Get user names
                 final userNames = data['userNames'] as Map<String, dynamic>?;
                 final otherUserName = userNames?[otherUserId] ?? 'User';
-                
+
                 // Get unread count for current user
-                final unreadCount = data['unreadCount'] as Map<String, dynamic>?;
+                final unreadCount =
+                    data['unreadCount'] as Map<String, dynamic>?;
                 final unread = (unreadCount?[currentUserId] ?? 0) > 0;
-                
+
                 return MessageThreadInfo(
                   threadId: doc.id,
                   otherUserId: otherUserId,
                   otherUserName: otherUserName,
                   lastMessage: data['lastMessageText'] ?? 'Say hello!',
                   lastMessageSenderId: data['lastMessageSenderId'],
-                  timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
+                  timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ??
+                      DateTime.now(),
                   unread: unread,
                   avatarUrl: null, // Will be fetched separately in the UI
                   isOnline: false, // TODO: Implement online status
@@ -333,14 +338,16 @@ class ChatService {
                   unread: false,
                 );
               }
-            }).where((thread) => thread.otherUserId.isNotEmpty).toList();
-          } catch (e) {
-            debugPrint('Error mapping chat threads: $e');
-            return <MessageThreadInfo>[];
-          }
-        });
+            })
+            .where((thread) => thread.otherUserId.isNotEmpty)
+            .toList();
+      } catch (e) {
+        debugPrint('Error mapping chat threads: $e');
+        return <MessageThreadInfo>[];
+      }
+    });
   }
-  
+
   // Check if two users are matched
   Future<bool> areUsersMatched(String userId1, String userId2) async {
     try {
@@ -349,41 +356,41 @@ class ChatService {
           .collection('matches')
           .where('users', arrayContains: userId1)
           .get();
-      
+
       for (var doc in matchQuery.docs) {
         final users = List<String>.from(doc.data()['users'] ?? []);
         if (users.contains(userId2)) {
           return true;
         }
       }
-      
+
       // Check legacy Matches collection
       final legacyMatchQuery = await _firestore
           .collection('Matches')
           .where('users', arrayContains: userId1)
           .get();
-      
+
       for (var doc in legacyMatchQuery.docs) {
         final data = doc.data();
         final users = List<String>.from(data['users'] ?? []);
         if (users.contains(userId2)) {
           return true;
         }
-        
+
         // Also check user1/user2 fields for backward compatibility
         if ((data['user1'] == userId1 && data['user2'] == userId2) ||
             (data['user1'] == userId2 && data['user2'] == userId1)) {
           return true;
         }
       }
-      
+
       return false;
     } catch (e) {
       debugPrint('Error checking if users are matched: $e');
       return false;
     }
   }
-  
+
   // Check if a user is blocked by another user
   Future<bool> isUserBlocked(String userId, String blockedUserId) async {
     try {
@@ -394,11 +401,11 @@ class ChatService {
           .collection('blockedlist')
           .doc(blockedUserId)
           .get();
-      
+
       if (userBlockDoc.exists) {
         return true;
       }
-      
+
       // Check if blockedUserId has blocked userId
       final blockedUserBlockDoc = await _firestore
           .collection('users')
@@ -406,26 +413,25 @@ class ChatService {
           .collection('blockedlist')
           .doc(userId)
           .get();
-      
+
       return blockedUserBlockDoc.exists;
     } catch (e) {
       debugPrint('Error checking if user is blocked: $e');
       return false;
     }
   }
-  
+
   // Delete a chat thread and all its messages
   Future<bool> deleteChatThread(String threadId) async {
     try {
       if (currentUserId == null) return false;
-      
+
       // Delete all messages in the thread first
-      final messagesRef = _chatThreadsCollection
-          .doc(threadId)
-          .collection('messages');
-      
+      final messagesRef =
+          _chatThreadsCollection.doc(threadId).collection('messages');
+
       final messagesSnapshot = await messagesRef.get();
-      
+
       // Batch delete all messages
       if (messagesSnapshot.docs.isNotEmpty) {
         final batch = _firestore.batch();
@@ -434,10 +440,10 @@ class ChatService {
         }
         await batch.commit();
       }
-      
+
       // Delete the thread document
       await _chatThreadsCollection.doc(threadId).delete();
-      
+
       return true;
     } catch (e) {
       debugPrint('Error deleting chat thread: $e');

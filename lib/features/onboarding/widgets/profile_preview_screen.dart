@@ -65,8 +65,11 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
       ),
       body: Consumer<OnboardingController>(
         builder: (context, controller, _) {
-          final photos = controller.profilePhotos.where((p) => p != null).cast<File>().toList();
-          
+          final photos = controller.profilePhotos
+              .where((p) => p != null)
+              .cast<File>()
+              .toList();
+
           if (photos.isEmpty) {
             return _buildNoPhotosState();
           }
@@ -76,22 +79,22 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               children: [
                 // Photo carousel section
                 _buildPhotoCarousel(photos),
-                
+
                 SizedBox(height: 20),
-                
+
                 // Profile card preview
                 _buildProfileCard(controller),
-                
+
                 SizedBox(height: 20),
-                
+
                 // Match potential indicator
                 _buildMatchPotentialCard(controller),
-                
+
                 SizedBox(height: 20),
-                
+
                 // Improvement suggestions
                 _buildQuickImprovements(controller),
-                
+
                 SizedBox(height: 20),
               ],
             ),
@@ -139,7 +142,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               );
             },
           ),
-          
+
           // Photo indicators
           if (photos.length > 1)
             Positioned(
@@ -163,7 +166,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 }).toList(),
               ),
             ),
-          
+
           // Primary photo badge
           if (_currentPhotoIndex == 0)
             Positioned(
@@ -192,7 +195,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 ),
               ),
             ),
-          
+
           // Navigation arrows
           if (photos.length > 1) ...[
             if (_currentPhotoIndex > 0)
@@ -221,7 +224,6 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                   ),
                 ),
               ),
-            
             if (_currentPhotoIndex < photos.length - 1)
               Positioned(
                 right: 16,
@@ -301,9 +303,9 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ],
           ),
-          
+
           SizedBox(height: 12),
-          
+
           // Bio
           if (controller.bio.isNotEmpty)
             Text(
@@ -314,9 +316,9 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 height: 1.4,
               ),
             ),
-          
+
           SizedBox(height: 16),
-          
+
           // Interests
           if (controller.interests.isNotEmpty) ...[
             Text(
@@ -327,9 +329,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 color: textDarkBrown,
               ),
             ),
-            
             SizedBox(height: 8),
-            
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -355,7 +355,6 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 );
               }).toList(),
             ),
-            
             if (controller.interests.length > 6)
               Padding(
                 padding: EdgeInsets.only(top: 8),
@@ -378,17 +377,17 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
     final photos = controller.profilePhotos.where((p) => p != null).length;
     final hasGoodBio = controller.bio.length >= 50;
     final hasInterests = controller.interests.length >= 5;
-    
+
     int score = 0;
     if (photos >= 3) score += 40;
     if (photos >= 5) score += 10;
     if (hasGoodBio) score += 30;
     if (hasInterests) score += 20;
-    
+
     Color scoreColor;
     String scoreLabel;
     IconData scoreIcon;
-    
+
     if (score >= 80) {
       scoreColor = Colors.green;
       scoreLabel = "Excellent";
@@ -457,14 +456,13 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ],
           ),
-          
           SizedBox(height: 12),
-          
           Row(
             children: [
               _buildScoreItem("Photos", photos, 5, photos >= 3),
               _buildScoreItem("Bio", hasGoodBio ? 1 : 0, 1, hasGoodBio),
-              _buildScoreItem("Interests", hasInterests ? 1 : 0, 1, hasInterests),
+              _buildScoreItem(
+                  "Interests", hasInterests ? 1 : 0, 1, hasInterests),
             ],
           ),
         ],
@@ -504,12 +502,12 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
 
   Widget _buildQuickImprovements(OnboardingController controller) {
     List<String> improvements = [];
-    
+
     final photos = controller.profilePhotos.where((p) => p != null).length;
     if (photos < 5) improvements.add("Add ${5 - photos} more photos");
     if (controller.bio.length < 50) improvements.add("Write a longer bio");
     if (controller.interests.length < 5) improvements.add("Add more interests");
-    
+
     if (improvements.isEmpty) {
       return Container(
         margin: EdgeInsets.symmetric(horizontal: 16),
@@ -569,25 +567,25 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ],
           ),
-          
           SizedBox(height: 8),
-          
-          ...improvements.map((improvement) => Padding(
-            padding: EdgeInsets.only(bottom: 4),
-            child: Row(
-              children: [
-                Icon(Icons.arrow_right, color: Colors.blue, size: 16),
-                SizedBox(width: 4),
-                Text(
-                  improvement,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.blue.shade700,
-                  ),
-                ),
-              ],
-            ),
-          )).toList(),
+          ...improvements
+              .map((improvement) => Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        Icon(Icons.arrow_right, color: Colors.blue, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          improvement,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.blue.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ))
+              .toList(),
         ],
       ),
     );
@@ -661,9 +659,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ),
           ),
-          
           SizedBox(width: 12),
-          
           Expanded(
             child: ElevatedButton(
               onPressed: _shareProfile,
@@ -710,30 +706,25 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 color: textDarkBrown,
               ),
             ),
-            
             SizedBox(height: 16),
-            
             _buildTipItem(
               Icons.photo_camera,
               "Photo Variety",
               "Include different types of photos: close-up, full-body, activity, and social photos.",
               Colors.blue,
             ),
-            
             _buildTipItem(
               Icons.edit,
               "Compelling Bio",
               "Write 50-200 characters that show your personality and give conversation starters.",
               Colors.green,
             ),
-            
             _buildTipItem(
               Icons.favorite,
               "Diverse Interests",
               "Select 5-10 interests that represent different aspects of your personality.",
               Colors.purple,
             ),
-            
             _buildTipItem(
               Icons.star,
               "Main Photo",
@@ -746,7 +737,8 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
     );
   }
 
-  Widget _buildTipItem(IconData icon, String title, String description, Color color) {
+  Widget _buildTipItem(
+      IconData icon, String title, String description, Color color) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16),
       child: Row(
@@ -760,9 +752,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             ),
             child: Icon(icon, color: color, size: 20),
           ),
-          
           SizedBox(width: 12),
-          
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -775,9 +765,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     color: textDarkBrown,
                   ),
                 ),
-                
                 SizedBox(height: 4),
-                
                 Text(
                   description,
                   style: GoogleFonts.poppins(

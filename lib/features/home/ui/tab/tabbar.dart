@@ -417,7 +417,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                 builder: (context) => CallPage(
                       callType: currentCall['extra']['callType'],
                       channelName: currentCall['extra']['channelId'],
-                      role: 1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
+                      role:
+                          1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
                     )));
       } else {
         debugPrint('call expired');
@@ -552,7 +553,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                 builder: (context) => CallPage(
                       callType: callType,
                       channelName: channelId,
-                      role: 1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
+                      role:
+                          1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
                     )));
       } else {
         debugPrint('call expired');
@@ -579,7 +581,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final userProvider = Provider.of<UserProvider>(context, listen: true);
     // debugPrint("user print ${userProvider.currentUser.toString()}");
-    
+
     // Handle FCM token with proper error handling
     try {
       FirebaseMessaging.instance.getToken().then((token) async {
@@ -592,8 +594,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
           if (!isPuchased) {
             await firebaseFireStoreInstance
                 .collection('users')
-            .doc(userProvider.currentUser!.id)
-            .update({'isPremium': false});
+                .doc(userProvider.currentUser!.id)
+                .update({'isPremium': false});
           }
         }
       }).catchError((error) {
@@ -619,95 +621,96 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
             : userProvider.currentUser == null
                 ? const Center(child: CircularProgressIndicator())
                 : DefaultTabController(
-                length: 6,
-                initialIndex: chatdata.contains('notification')
-                    ? 4
-                    : widget.isPaymentSuccess != null
-                        ? widget.isPaymentSuccess!
-                            ? 0
-                            : 1
-                        : 1,
-                child: Scaffold(
-                    appBar: AppBar(
-                      elevation: 0,
-                      backgroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
-                      automaticallyImplyLeading: false,
-                      title: TabBar(
-                          labelColor: themeProvider.isDarkMode
-                              ? primaryColor
-                              : Colors.white,
-                          indicatorColor: themeProvider.isDarkMode
-                              ? primaryColor
-                              : Colors.white,
-                          unselectedLabelColor: themeProvider.isDarkMode
-                              ? Colors.white
-                              : Colors.black,
-                          dividerColor: Colors.transparent,
-                          isScrollable: false,
-                          indicatorSize: TabBarIndicatorSize.label,
-                          onTap: (index) {
-                            log("Tab selected: $index");
-                            if (index == 2) {
-                              // If Explore tab is selected, navigate to the standalone page
-                              Navigator.of(context).pushNamed(RouteName.exploreScreen);
-                            }
-                          },
-                          tabs: const [
-                            Tab(
-                              icon: Icon(
-                                Icons.person,
-                                size: 30,
-                              ),
-                            ),
-                            Tab(
-                              icon: Icon(
-                                Icons.whatshot,
-                              ),
-                            ),
-                            Tab(icon: Icon(Icons.explore)),
-                            Tab(icon: Icon(Icons.card_giftcard)),
-                            Tab(
-                              icon: Icon(
-                                Icons.notifications,
-                              ),
-                            ),
-                            Tab(
-                              icon: Icon(
-                                Icons.message,
-                              ),
-                            )
-                          ]),
-                    ),
-                    body: TabBarView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        Center(
-                          child: ProfilePage(
-                              isPuchased: isPuchased,
-                              items: items,
-                              purchases: purchases),
+                    length: 6,
+                    initialIndex: chatdata.contains('notification')
+                        ? 4
+                        : widget.isPaymentSuccess != null
+                            ? widget.isPaymentSuccess!
+                                ? 0
+                                : 1
+                            : 1,
+                    child: Scaffold(
+                        appBar: AppBar(
+                          elevation: 0,
+                          backgroundColor:
+                              Theme.of(context).scaffoldBackgroundColor,
+                          automaticallyImplyLeading: false,
+                          title: TabBar(
+                              labelColor: themeProvider.isDarkMode
+                                  ? primaryColor
+                                  : Colors.white,
+                              indicatorColor: themeProvider.isDarkMode
+                                  ? primaryColor
+                                  : Colors.white,
+                              unselectedLabelColor: themeProvider.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black,
+                              dividerColor: Colors.transparent,
+                              isScrollable: false,
+                              indicatorSize: TabBarIndicatorSize.label,
+                              onTap: (index) {
+                                log("Tab selected: $index");
+                                if (index == 2) {
+                                  // If Explore tab is selected, navigate to the standalone page
+                                  Navigator.of(context)
+                                      .pushNamed(RouteName.exploreScreen);
+                                }
+                              },
+                              tabs: const [
+                                Tab(
+                                  icon: Icon(
+                                    Icons.person,
+                                    size: 30,
+                                  ),
+                                ),
+                                Tab(
+                                  icon: Icon(
+                                    Icons.whatshot,
+                                  ),
+                                ),
+                                Tab(icon: Icon(Icons.explore)),
+                                Tab(icon: Icon(Icons.card_giftcard)),
+                                Tab(
+                                  icon: Icon(
+                                    Icons.notifications,
+                                  ),
+                                ),
+                                Tab(
+                                  icon: Icon(
+                                    Icons.message,
+                                  ),
+                                )
+                              ]),
                         ),
-                        Center(
-                            child: Homepage(
-                          items: items,
-                          isPurchased: isPuchased,
-                        )),
-                        Center(
-                            child: Container(
+                        body: TabBarView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: [
+                            Center(
+                              child: ProfilePage(
+                                  isPuchased: isPuchased,
+                                  items: items,
+                                  purchases: purchases),
+                            ),
+                            Center(
+                                child: Homepage(
+                              items: items,
+                              isPurchased: isPuchased,
+                            )),
+                            Center(
+                                child: Container(
                               color: Colors.amber.withValues(alpha: 0.3),
                               child: ExploreScreen(),
                             )),
-                        Center(
-                            child: ExploreMapWidget(
-                          isPuchased: isPuchased,
-                          currentUser: userProvider.currentUser!,
+                            Center(
+                                child: ExploreMapWidget(
+                              isPuchased: isPuchased,
+                              currentUser: userProvider.currentUser!,
+                            )),
+                            const Center(child: Notifications()),
+                            const Center(child: MatchScreen()),
+                          ],
                         )),
-                        const Center(child: Notifications()),
-                        const Center(child: MatchScreen()),
-                      ],
-                    )),
-              ),
+                  ),
       ),
     );
   }

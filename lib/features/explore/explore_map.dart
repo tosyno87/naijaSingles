@@ -180,16 +180,16 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                         ),
                         markers: Set<Marker>.from(
                           state.users.map((user) => Marker(
-                            markerId: MarkerId(user.id ?? ''),
-                            position: LatLng(
-                              user.latitude ?? 0.0,
-                              user.longitude ?? 0.0,
-                            ),
-                            infoWindow: InfoWindow(
-                              title: user.name,
-                              snippet: '${user.age} years old',
-                            ),
-                          )),
+                                markerId: MarkerId(user.id ?? ''),
+                                position: LatLng(
+                                  user.latitude ?? 0.0,
+                                  user.longitude ?? 0.0,
+                                ),
+                                infoWindow: InfoWindow(
+                                  title: user.name,
+                                  snippet: '${user.age} years old',
+                                ),
+                              )),
                         ),
                       );
               }

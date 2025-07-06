@@ -58,7 +58,6 @@ class UserModel {
     this.streetView,
     this.distanceBW,
     this.sexualOrientation,
-
   });
 
   @override
@@ -70,8 +69,9 @@ class UserModel {
     try {
       // Get the document ID as the user ID
       final String userId = doc.id;
-      final Map<String, dynamic> data = doc.data() as Map<String, dynamic>? ?? {};
-      
+      final Map<String, dynamic> data =
+          doc.data() as Map<String, dynamic>? ?? {};
+
       // Helper function to safely get values
       T? safeGet<T>(String key, [T? defaultValue]) {
         try {
@@ -90,7 +90,8 @@ class UserModel {
       }
 
       // Helper function to safely get nested values
-      T? safeGetNested<T>(String parentKey, String childKey, [T? defaultValue]) {
+      T? safeGetNested<T>(String parentKey, String childKey,
+          [T? defaultValue]) {
         try {
           if (data.containsKey(parentKey) && data[parentKey] is Map) {
             final parent = data[parentKey] as Map;
@@ -118,9 +119,9 @@ class UserModel {
               'min': (ageRange['min'] ?? 18).toString(),
               'max': (ageRange['max'] ?? 50).toString(),
             };
-          } else if (data.containsKey('preferences') && 
-                     data['preferences'] is Map &&
-                     data['preferences']['ageRange'] is List) {
+          } else if (data.containsKey('preferences') &&
+              data['preferences'] is Map &&
+              data['preferences']['ageRange'] is List) {
             final ageRangeList = data['preferences']['ageRange'] as List;
             if (ageRangeList.length >= 2) {
               return {
@@ -150,23 +151,31 @@ class UserModel {
       }
 
       final locationData = getLocationData();
-      
+
       return UserModel(
         id: userId,
         name: safeGet<String>('name', ''),
         isBlocked: safeGet<bool>('isBlocked', false),
         address: locationData['address']?.toString() ?? '',
-        latitude: locationData['latitude'] is num ? (locationData['latitude'] as num).toDouble() : 0.0,
-        longitude: locationData['longitude'] is num ? (locationData['longitude'] as num).toDouble() : 0.0,
+        latitude: locationData['latitude'] is num
+            ? (locationData['latitude'] as num).toDouble()
+            : 0.0,
+        longitude: locationData['longitude'] is num
+            ? (locationData['longitude'] as num).toDouble()
+            : 0.0,
         coordinates: locationData.isNotEmpty ? locationData : {},
-        currentCoordinates: data.containsKey('currentLocation') && data['currentLocation'] is Map
+        currentCoordinates: data.containsKey('currentLocation') &&
+                data['currentLocation'] is Map
             ? data['currentLocation'] as Map
-            : locationData.isNotEmpty ? locationData : {},
-        sexualOrientation: data.containsKey('sexualOrientation') && data['sexualOrientation'] is Map
+            : locationData.isNotEmpty
+                ? locationData
+                : {},
+        sexualOrientation: data.containsKey('sexualOrientation') &&
+                data['sexualOrientation'] is Map
             ? data['sexualOrientation'] as Map
             : {},
-        userGender: safeGet<String>('gender') ?? 
-                   safeGetNested<String>('editInfo', 'userGender', ''),
+        userGender: safeGet<String>('gender') ??
+            safeGetNested<String>('editInfo', 'userGender', ''),
         company: safeGetNested<String>('editInfo', 'company', ''),
         job_title: safeGetNested<String>('editInfo', 'job_title', ''),
         living_in: safeGetNested<String>('editInfo', 'living_in', ''),
@@ -211,34 +220,43 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-        // Use the document ID as the user ID if available, otherwise fall back to 'userId'
-        id: json['id'] ?? json['userId'] ?? "",
-        name: json['name'] ?? json['UserName'] ?? "",
-        isBlocked: json['isBlocked'] ?? false,
-        address: json['location'] != null ? json['location']['address'] ?? "" : "",
-        latitude: json['location'] != null ? json['location']['latitude'] ?? 0 : 0,
-        longitude: json['location'] != null ? json['location']['longitude'] ?? 0 : 0,
-        coordinates: json['coordinates'] ?? {},
-        currentCoordinates: json['currentCoordinates'],
-        sexualOrientation: json['sexualOrientation'],
-        userGender: json['gender'] ?? (json['editInfo'] != null ? json['editInfo']['userGender'] : null),
-        living_in: json['living_in'],
-        job_title: json['job_title'],
-        company: json['company'],
-        showMyAge: json['showMyAge'],
-        showGender: json['showGender'],
-        age: json['age'],
-        phoneNumber: json['phoneNumber'],
-        maxDistance: json['maximum_distance'] ?? 10,
-        ageRange: json['age_range'] ?? (json['preferences'] != null ? 
-            {'min': json['preferences']['ageRange'][0], 'max': json['preferences']['ageRange'][1]} : null),
-        editInfo: json['editInfo'],
-        streetView: json['streetView'],
-        imageUrl: json['photos'] ?? json['Pictures'],
-        distanceBW: json['distanceBW'] != null
-            ? (json['distanceBW'] as num).round()
-            : null,
-        isBot: json['isBot'] ?? false,
+      // Use the document ID as the user ID if available, otherwise fall back to 'userId'
+      id: json['id'] ?? json['userId'] ?? "",
+      name: json['name'] ?? json['UserName'] ?? "",
+      isBlocked: json['isBlocked'] ?? false,
+      address:
+          json['location'] != null ? json['location']['address'] ?? "" : "",
+      latitude:
+          json['location'] != null ? json['location']['latitude'] ?? 0 : 0,
+      longitude:
+          json['location'] != null ? json['location']['longitude'] ?? 0 : 0,
+      coordinates: json['coordinates'] ?? {},
+      currentCoordinates: json['currentCoordinates'],
+      sexualOrientation: json['sexualOrientation'],
+      userGender: json['gender'] ??
+          (json['editInfo'] != null ? json['editInfo']['userGender'] : null),
+      living_in: json['living_in'],
+      job_title: json['job_title'],
+      company: json['company'],
+      showMyAge: json['showMyAge'],
+      showGender: json['showGender'],
+      age: json['age'],
+      phoneNumber: json['phoneNumber'],
+      maxDistance: json['maximum_distance'] ?? 10,
+      ageRange: json['age_range'] ??
+          (json['preferences'] != null
+              ? {
+                  'min': json['preferences']['ageRange'][0],
+                  'max': json['preferences']['ageRange'][1]
+                }
+              : null),
+      editInfo: json['editInfo'],
+      streetView: json['streetView'],
+      imageUrl: json['photos'] ?? json['Pictures'],
+      distanceBW: json['distanceBW'] != null
+          ? (json['distanceBW'] as num).round()
+          : null,
+      isBot: json['isBot'] ?? false,
     );
   }
 
@@ -248,7 +266,7 @@ class UserModel {
   }
 
   // Add missing methods for compatibility with new services
-  
+
   /// Convert UserModel to Map for caching and storage
   Map<String, dynamic> toMap() {
     return {
@@ -286,8 +304,10 @@ class UserModel {
       name: map['name']?.toString(),
       isBlocked: map['isBlocked'] as bool? ?? false,
       address: map['address']?.toString(),
-      latitude: map['latitude'] is num ? (map['latitude'] as num).toDouble() : null,
-      longitude: map['longitude'] is num ? (map['longitude'] as num).toDouble() : null,
+      latitude:
+          map['latitude'] is num ? (map['latitude'] as num).toDouble() : null,
+      longitude:
+          map['longitude'] is num ? (map['longitude'] as num).toDouble() : null,
       coordinates: map['coordinates'] as Map?,
       currentCoordinates: map['currentCoordinates'] as Map?,
       sexualOrientation: map['sexualOrientation'] as Map?,
@@ -299,39 +319,44 @@ class UserModel {
       showGender: map['showGender']?.toString(),
       age: map['age'] is num ? (map['age'] as num).toInt() : null,
       phoneNumber: map['phoneNumber']?.toString(),
-      maxDistance: map['maximum_distance'] is num ? (map['maximum_distance'] as num).toInt() : null,
+      maxDistance: map['maximum_distance'] is num
+          ? (map['maximum_distance'] as num).toInt()
+          : null,
       ageRange: map['age_range'] as Map?,
       editInfo: map['editInfo'] as Map?,
       streetView: map['streetView'] as Map?,
       isBot: map['isBot'] as bool? ?? false,
       imageUrl: map['photos'] is List ? List<String>.from(map['photos']) : null,
-      distanceBW: map['distanceBW'] is num ? (map['distanceBW'] as num).toInt() : null,
+      distanceBW:
+          map['distanceBW'] is num ? (map['distanceBW'] as num).toInt() : null,
     );
   }
 
   // Add missing getters for compatibility with new services
-  
+
   /// Get user's gender
   String? get gender => userGender;
-  
+
   /// Get minimum age preference
   int? get ageRangeMin {
     if (ageRange != null && ageRange!['min'] != null) {
       if (ageRange!['min'] is int) return ageRange!['min'] as int;
-      if (ageRange!['min'] is String) return int.tryParse(ageRange!['min'] as String);
+      if (ageRange!['min'] is String)
+        return int.tryParse(ageRange!['min'] as String);
     }
     return 18; // Default minimum age
   }
-  
+
   /// Get maximum age preference
   int? get ageRangeMax {
     if (ageRange != null && ageRange!['max'] != null) {
       if (ageRange!['max'] is int) return ageRange!['max'] as int;
-      if (ageRange!['max'] is String) return int.tryParse(ageRange!['max'] as String);
+      if (ageRange!['max'] is String)
+        return int.tryParse(ageRange!['max'] as String);
     }
     return 50; // Default maximum age
   }
-  
+
   /// Get distance range preference
   int? get distanceRange => maxDistance;
 }

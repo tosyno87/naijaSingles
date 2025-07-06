@@ -8,10 +8,12 @@ class EnhancedAdditionalInfoScreen extends StatefulWidget {
   const EnhancedAdditionalInfoScreen({Key? key}) : super(key: key);
 
   @override
-  State<EnhancedAdditionalInfoScreen> createState() => _EnhancedAdditionalInfoScreenState();
+  State<EnhancedAdditionalInfoScreen> createState() =>
+      _EnhancedAdditionalInfoScreenState();
 }
 
-class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScreen> {
+class _EnhancedAdditionalInfoScreenState
+    extends State<EnhancedAdditionalInfoScreen> {
   // Afropeep theme colors
   static const Color backgroundColor = Color(0xFFFDF0E7);
   static const Color afropeepGreen = Color(0xFF007A33);
@@ -33,9 +35,10 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
   String _occupation = '';
   String _drinkingPreference = '';
   String _smokingPreference = '';
-  
+
   // Text controller for custom language input
-  final TextEditingController _customLanguageController = TextEditingController();
+  final TextEditingController _customLanguageController =
+      TextEditingController();
 
   // Platform purpose options - what brings users to NaijaSingles
   final List<Map<String, dynamic>> _platformPurposeOptions = [
@@ -48,7 +51,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
     },
     {
       'label': 'Friendship & Social',
-      'value': 'Friendship & Social', 
+      'value': 'Friendship & Social',
       'icon': Icons.people,
       'description': 'Making new friends and expanding social circles',
       'color': Colors.blue.shade400,
@@ -123,85 +126,326 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
 
   // Professional focus options for networking users
   final List<Map<String, dynamic>> _professionalFocusOptions = [
-    {'label': 'Business Development', 'value': 'Business Development', 'icon': Icons.trending_up, 'color': Colors.green.shade400},
-    {'label': 'Career Mentorship', 'value': 'Career Mentorship', 'icon': Icons.school, 'color': Colors.blue.shade400},
-    {'label': 'Industry Connections', 'value': 'Industry Connections', 'icon': Icons.business, 'color': Colors.purple.shade400},
-    {'label': 'Startup Collaboration', 'value': 'Startup Collaboration', 'icon': Icons.lightbulb, 'color': Colors.orange.shade400},
-    {'label': 'Investment Opportunities', 'value': 'Investment Opportunities', 'icon': Icons.attach_money, 'color': Colors.teal.shade400},
-    {'label': 'Skill Exchange', 'value': 'Skill Exchange', 'icon': Icons.swap_horiz, 'color': Colors.indigo.shade400},
+    {
+      'label': 'Business Development',
+      'value': 'Business Development',
+      'icon': Icons.trending_up,
+      'color': Colors.green.shade400
+    },
+    {
+      'label': 'Career Mentorship',
+      'value': 'Career Mentorship',
+      'icon': Icons.school,
+      'color': Colors.blue.shade400
+    },
+    {
+      'label': 'Industry Connections',
+      'value': 'Industry Connections',
+      'icon': Icons.business,
+      'color': Colors.purple.shade400
+    },
+    {
+      'label': 'Startup Collaboration',
+      'value': 'Startup Collaboration',
+      'icon': Icons.lightbulb,
+      'color': Colors.orange.shade400
+    },
+    {
+      'label': 'Investment Opportunities',
+      'value': 'Investment Opportunities',
+      'icon': Icons.attach_money,
+      'color': Colors.teal.shade400
+    },
+    {
+      'label': 'Skill Exchange',
+      'value': 'Skill Exchange',
+      'icon': Icons.swap_horiz,
+      'color': Colors.indigo.shade400
+    },
   ];
 
   // Social interests options for friendship users
   final List<Map<String, dynamic>> _socialInterestsOptions = [
-    {'label': 'Activity Partners', 'value': 'Activity Partners', 'icon': Icons.sports_soccer, 'color': Colors.green.shade400},
-    {'label': 'Study Groups', 'value': 'Study Groups', 'icon': Icons.menu_book, 'color': Colors.blue.shade400},
-    {'label': 'Social Events', 'value': 'Social Events', 'icon': Icons.celebration, 'color': Colors.purple.shade400},
-    {'label': 'Travel Companions', 'value': 'Travel Companions', 'icon': Icons.flight, 'color': Colors.orange.shade400},
-    {'label': 'Hobby Groups', 'value': 'Hobby Groups', 'icon': Icons.palette, 'color': Colors.pink.shade400},
-    {'label': 'Support Network', 'value': 'Support Network', 'icon': Icons.group, 'color': Colors.teal.shade400},
+    {
+      'label': 'Activity Partners',
+      'value': 'Activity Partners',
+      'icon': Icons.sports_soccer,
+      'color': Colors.green.shade400
+    },
+    {
+      'label': 'Study Groups',
+      'value': 'Study Groups',
+      'icon': Icons.menu_book,
+      'color': Colors.blue.shade400
+    },
+    {
+      'label': 'Social Events',
+      'value': 'Social Events',
+      'icon': Icons.celebration,
+      'color': Colors.purple.shade400
+    },
+    {
+      'label': 'Travel Companions',
+      'value': 'Travel Companions',
+      'icon': Icons.flight,
+      'color': Colors.orange.shade400
+    },
+    {
+      'label': 'Hobby Groups',
+      'value': 'Hobby Groups',
+      'icon': Icons.palette,
+      'color': Colors.pink.shade400
+    },
+    {
+      'label': 'Support Network',
+      'value': 'Support Network',
+      'icon': Icons.group,
+      'color': Colors.teal.shade400
+    },
   ];
 
   final List<Map<String, dynamic>> _educationOptions = [
-    {'label': 'High School', 'value': 'High School', 'icon': Icons.school, 'color': Colors.blue.shade400},
-    {'label': 'Some University', 'value': 'Some University', 'icon': Icons.school_outlined, 'color': Colors.green.shade400},
-    {'label': 'Bachelor\'s Degree', 'value': 'Bachelor\'s Degree', 'icon': Icons.school, 'color': Colors.purple.shade400},
-    {'label': 'Master\'s Degree', 'value': 'Master\'s Degree', 'icon': Icons.school, 'color': Colors.orange.shade400},
-    {'label': 'PhD/Doctorate', 'value': 'PhD/Doctorate', 'icon': Icons.school, 'color': Colors.red.shade400},
-    {'label': 'Professional Certification', 'value': 'Professional Certification', 'icon': Icons.work, 'color': Colors.indigo.shade400},
-    {'label': 'Trade/Vocational School', 'value': 'Trade/Vocational School', 'icon': Icons.build, 'color': Colors.teal.shade400},
+    {
+      'label': 'High School',
+      'value': 'High School',
+      'icon': Icons.school,
+      'color': Colors.blue.shade400
+    },
+    {
+      'label': 'Some University',
+      'value': 'Some University',
+      'icon': Icons.school_outlined,
+      'color': Colors.green.shade400
+    },
+    {
+      'label': 'Bachelor\'s Degree',
+      'value': 'Bachelor\'s Degree',
+      'icon': Icons.school,
+      'color': Colors.purple.shade400
+    },
+    {
+      'label': 'Master\'s Degree',
+      'value': 'Master\'s Degree',
+      'icon': Icons.school,
+      'color': Colors.orange.shade400
+    },
+    {
+      'label': 'PhD/Doctorate',
+      'value': 'PhD/Doctorate',
+      'icon': Icons.school,
+      'color': Colors.red.shade400
+    },
+    {
+      'label': 'Professional Certification',
+      'value': 'Professional Certification',
+      'icon': Icons.work,
+      'color': Colors.indigo.shade400
+    },
+    {
+      'label': 'Trade/Vocational School',
+      'value': 'Trade/Vocational School',
+      'icon': Icons.build,
+      'color': Colors.teal.shade400
+    },
   ];
 
   final List<Map<String, dynamic>> _religionOptions = [
-    {'label': 'Christianity', 'value': 'Christianity', 'icon': Icons.church, 'color': Colors.blue.shade400},
-    {'label': 'Islam', 'value': 'Islam', 'icon': Icons.mosque, 'color': Colors.green.shade400},
-    {'label': 'Traditional African Religion', 'value': 'Traditional African Religion', 'icon': Icons.nature_people, 'color': Colors.brown.shade400},
-    {'label': 'Other', 'value': 'Other', 'icon': Icons.more_horiz, 'color': Colors.grey.shade400},
-    {'label': 'Spiritual but not religious', 'value': 'Spiritual but not religious', 'icon': Icons.self_improvement, 'color': Colors.purple.shade400},
-    {'label': 'Not religious', 'value': 'Not religious', 'icon': Icons.remove_circle_outline, 'color': Colors.orange.shade400},
+    {
+      'label': 'Christianity',
+      'value': 'Christianity',
+      'icon': Icons.church,
+      'color': Colors.blue.shade400
+    },
+    {
+      'label': 'Islam',
+      'value': 'Islam',
+      'icon': Icons.mosque,
+      'color': Colors.green.shade400
+    },
+    {
+      'label': 'Traditional African Religion',
+      'value': 'Traditional African Religion',
+      'icon': Icons.nature_people,
+      'color': Colors.brown.shade400
+    },
+    {
+      'label': 'Other',
+      'value': 'Other',
+      'icon': Icons.more_horiz,
+      'color': Colors.grey.shade400
+    },
+    {
+      'label': 'Spiritual but not religious',
+      'value': 'Spiritual but not religious',
+      'icon': Icons.self_improvement,
+      'color': Colors.purple.shade400
+    },
+    {
+      'label': 'Not religious',
+      'value': 'Not religious',
+      'icon': Icons.remove_circle_outline,
+      'color': Colors.orange.shade400
+    },
   ];
 
   final List<Map<String, dynamic>> _languageOptions = [
     // Major African Languages - simplified for debugging
-    {'label': 'English', 'value': 'English', 'icon': Icons.language, 'color': Colors.blue.shade400},
-    {'label': 'Arabic', 'value': 'Arabic', 'icon': Icons.language, 'color': Colors.green.shade400},
-    {'label': 'French', 'value': 'French', 'icon': Icons.language, 'color': Colors.purple.shade400},
-    {'label': 'Portuguese', 'value': 'Portuguese', 'icon': Icons.language, 'color': Colors.orange.shade400},
-    {'label': 'Swahili', 'value': 'Swahili', 'icon': Icons.language, 'color': Colors.teal.shade400},
-    
+    {
+      'label': 'English',
+      'value': 'English',
+      'icon': Icons.language,
+      'color': Colors.blue.shade400
+    },
+    {
+      'label': 'Arabic',
+      'value': 'Arabic',
+      'icon': Icons.language,
+      'color': Colors.green.shade400
+    },
+    {
+      'label': 'French',
+      'value': 'French',
+      'icon': Icons.language,
+      'color': Colors.purple.shade400
+    },
+    {
+      'label': 'Portuguese',
+      'value': 'Portuguese',
+      'icon': Icons.language,
+      'color': Colors.orange.shade400
+    },
+    {
+      'label': 'Swahili',
+      'value': 'Swahili',
+      'icon': Icons.language,
+      'color': Colors.teal.shade400
+    },
+
     // Other option - prominently placed
-    {'label': 'Other (Type your language)', 'value': 'Other', 'icon': Icons.edit, 'color': Colors.grey.shade500},
-    
+    {
+      'label': 'Other (Type your language)',
+      'value': 'Other',
+      'icon': Icons.edit,
+      'color': Colors.grey.shade500
+    },
+
     // Popular African Languages
-    {'label': 'Yoruba', 'value': 'Yoruba', 'icon': Icons.language, 'color': Colors.red.shade400},
-    {'label': 'Igbo', 'value': 'Igbo', 'icon': Icons.language, 'color': Colors.indigo.shade400},
-    {'label': 'Hausa', 'value': 'Hausa', 'icon': Icons.language, 'color': Colors.brown.shade400},
-    {'label': 'Amharic', 'value': 'Amharic', 'icon': Icons.language, 'color': Colors.deepOrange.shade400},
-    {'label': 'Zulu', 'value': 'Zulu', 'icon': Icons.language, 'color': Colors.red.shade600},
-    {'label': 'Xhosa', 'value': 'Xhosa', 'icon': Icons.language, 'color': Colors.purple.shade600},
-    {'label': 'Afrikaans', 'value': 'Afrikaans', 'icon': Icons.language, 'color': Colors.orange.shade600},
-    {'label': 'Somali', 'value': 'Somali', 'icon': Icons.language, 'color': Colors.blueGrey.shade400},
-    {'label': 'Oromo', 'value': 'Oromo', 'icon': Icons.language, 'color': Colors.lightGreen.shade400},
+    {
+      'label': 'Yoruba',
+      'value': 'Yoruba',
+      'icon': Icons.language,
+      'color': Colors.red.shade400
+    },
+    {
+      'label': 'Igbo',
+      'value': 'Igbo',
+      'icon': Icons.language,
+      'color': Colors.indigo.shade400
+    },
+    {
+      'label': 'Hausa',
+      'value': 'Hausa',
+      'icon': Icons.language,
+      'color': Colors.brown.shade400
+    },
+    {
+      'label': 'Amharic',
+      'value': 'Amharic',
+      'icon': Icons.language,
+      'color': Colors.deepOrange.shade400
+    },
+    {
+      'label': 'Zulu',
+      'value': 'Zulu',
+      'icon': Icons.language,
+      'color': Colors.red.shade600
+    },
+    {
+      'label': 'Xhosa',
+      'value': 'Xhosa',
+      'icon': Icons.language,
+      'color': Colors.purple.shade600
+    },
+    {
+      'label': 'Afrikaans',
+      'value': 'Afrikaans',
+      'icon': Icons.language,
+      'color': Colors.orange.shade600
+    },
+    {
+      'label': 'Somali',
+      'value': 'Somali',
+      'icon': Icons.language,
+      'color': Colors.blueGrey.shade400
+    },
+    {
+      'label': 'Oromo',
+      'value': 'Oromo',
+      'icon': Icons.language,
+      'color': Colors.lightGreen.shade400
+    },
   ];
 
   final List<Map<String, dynamic>> _drinkingOptions = [
-    {'label': 'Never', 'value': 'Never', 'icon': Icons.block, 'color': Colors.red.shade400},
-    {'label': 'Rarely', 'value': 'Rarely', 'icon': Icons.remove_circle_outline, 'color': Colors.orange.shade400},
-    {'label': 'Socially', 'value': 'Socially', 'icon': Icons.people, 'color': Colors.green.shade400},
-    {'label': 'Regularly', 'value': 'Regularly', 'icon': Icons.local_bar, 'color': Colors.blue.shade400},
+    {
+      'label': 'Never',
+      'value': 'Never',
+      'icon': Icons.block,
+      'color': Colors.red.shade400
+    },
+    {
+      'label': 'Rarely',
+      'value': 'Rarely',
+      'icon': Icons.remove_circle_outline,
+      'color': Colors.orange.shade400
+    },
+    {
+      'label': 'Socially',
+      'value': 'Socially',
+      'icon': Icons.people,
+      'color': Colors.green.shade400
+    },
+    {
+      'label': 'Regularly',
+      'value': 'Regularly',
+      'icon': Icons.local_bar,
+      'color': Colors.blue.shade400
+    },
   ];
 
   final List<Map<String, dynamic>> _smokingOptions = [
-    {'label': 'Never', 'value': 'Never', 'icon': Icons.smoke_free, 'color': Colors.green.shade400},
-    {'label': 'Rarely', 'value': 'Rarely', 'icon': Icons.remove_circle_outline, 'color': Colors.orange.shade400},
-    {'label': 'Socially', 'value': 'Socially', 'icon': Icons.people, 'color': Colors.yellow.shade600},
-    {'label': 'Regularly', 'value': 'Regularly', 'icon': Icons.smoking_rooms, 'color': Colors.red.shade400},
+    {
+      'label': 'Never',
+      'value': 'Never',
+      'icon': Icons.smoke_free,
+      'color': Colors.green.shade400
+    },
+    {
+      'label': 'Rarely',
+      'value': 'Rarely',
+      'icon': Icons.remove_circle_outline,
+      'color': Colors.orange.shade400
+    },
+    {
+      'label': 'Socially',
+      'value': 'Socially',
+      'icon': Icons.people,
+      'color': Colors.yellow.shade600
+    },
+    {
+      'label': 'Regularly',
+      'value': 'Regularly',
+      'icon': Icons.smoking_rooms,
+      'color': Colors.red.shade400
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // Initialize from controller if available
     if (controller.height > 0) {
       _heightCm = controller.height.round();
@@ -210,7 +454,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
         _heightFtIn = ftIn;
       }
     }
-    
+
     // Map controller value to display value
     String displayValue;
     switch (controller.lookingFor) {
@@ -233,12 +477,13 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
     _relationshipIntent = controller.relationshipIntent;
     _education = controller.educationLevel;
     _religion = controller.religion;
-    
+
     // Handle primary language - check if it's in our predefined list
     if (controller.spokenLanguages.isNotEmpty) {
       final controllerLanguage = controller.spokenLanguages.first;
-      final isInPredefinedList = _languageOptions.any((option) => option['value'] == controllerLanguage);
-      
+      final isInPredefinedList = _languageOptions
+          .any((option) => option['value'] == controllerLanguage);
+
       if (isInPredefinedList) {
         _primaryLanguage = controllerLanguage;
       } else {
@@ -248,7 +493,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
         _customLanguageController.text = controllerLanguage;
       }
     }
-    
+
     _occupation = controller.occupation;
     _drinkingPreference = controller.drinkingPreference;
     _smokingPreference = controller.smokingPreference;
@@ -258,49 +503,54 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
     int count = 0;
     if (_heightCm > 0) count++;
     if (_platformPurpose.isNotEmpty) count++;
-    
+
     // Conditional fields based on platform purpose
     if (_isDatingUser() && _relationshipIntent.isNotEmpty) count++;
     if (_isNetworkingUser() && _professionalFocus.isNotEmpty) count++;
     if (_isFriendshipUser() && _socialInterests.isNotEmpty) count++;
-    
+
     // Common fields
     if (_education.isNotEmpty) count++;
-    
+
     // Language field - check if primary language is selected and if "Other", check custom language
-    if (_primaryLanguage.isNotEmpty && 
+    if (_primaryLanguage.isNotEmpty &&
         (_primaryLanguage != 'Other' || _customLanguage.isNotEmpty)) count++;
-    
+
     // Religion only for dating users
-    if ((_isDatingUser() || _platformPurpose == 'All of the Above') && _religion.isNotEmpty) count++;
-    
+    if ((_isDatingUser() || _platformPurpose == 'All of the Above') &&
+        _religion.isNotEmpty) count++;
+
     return count;
   }
 
   int _getTotalFieldsCount() {
     int total = 3; // Height, Platform Purpose, Education always required
-    
+
     // Add conditional fields based on platform purpose
     if (_isDatingUser()) total += 2; // Relationship Intent + Religion
     if (_isNetworkingUser()) total += 1; // Professional Focus
     if (_isFriendshipUser()) total += 1; // Social Interests
-    if (_platformPurpose == 'All of the Above') total += 2; // All conditional fields
-    
+    if (_platformPurpose == 'All of the Above')
+      total += 2; // All conditional fields
+
     total += 1; // Languages always required
-    
+
     return total;
   }
 
   bool _isDatingUser() {
-    return _platformPurpose == 'Dating & Romance' || _platformPurpose == 'All of the Above';
+    return _platformPurpose == 'Dating & Romance' ||
+        _platformPurpose == 'All of the Above';
   }
 
   bool _isNetworkingUser() {
-    return _platformPurpose == 'Professional Networking' || _platformPurpose == 'All of the Above';
+    return _platformPurpose == 'Professional Networking' ||
+        _platformPurpose == 'All of the Above';
   }
 
   bool _isFriendshipUser() {
-    return _platformPurpose == 'Friendship & Social' || _platformPurpose == 'All of the Above';
+    return _platformPurpose == 'Friendship & Social' ||
+        _platformPurpose == 'All of the Above';
   }
 
   String _getEducationSubtitle() {
@@ -335,7 +585,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
     final isTablet = screenWidth > 600;
     final completedFields = _getCompletedFieldsCount();
     final totalFields = _getTotalFieldsCount();
-    
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(isTablet ? 32 : 24),
       child: Column(
@@ -343,18 +593,18 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
         children: [
           // Header with progress
           _buildHeader(isTablet, completedFields, totalFields),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Info card explaining importance
           _buildInfoCard(
             'Why we ask for this information',
             'These details help us find better matches and show you to people looking for the same things. Your information is private and secure.',
             Icons.info_outline,
           ),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Height Section
           _buildSectionHeader('Height', 'Height preferences matter in dating'),
           SizedBox(height: isTablet ? 16 : 12),
@@ -366,24 +616,27 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                 _heightFtIn = heightFtIn;
                 _heightCm = heightCm;
               });
-              final controller = Provider.of<OnboardingController>(context, listen: false);
+              final controller =
+                  Provider.of<OnboardingController>(context, listen: false);
               controller.setHeightFromDropdown(heightFtIn, heightCm);
             },
           ),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Platform Purpose Section - What brings you to NaijaSingles?
-          _buildSectionHeader('What brings you to NaijaSingles?', 'Help us understand how to serve you better'),
+          _buildSectionHeader('What brings you to NaijaSingles?',
+              'Help us understand how to serve you better'),
           SizedBox(height: isTablet ? 16 : 12),
           _buildPlatformPurposeDropdown(),
-          
+
           // Show relationship intent only for dating users
           if (_isDatingUser()) ...[
             SizedBox(height: isTablet ? 32 : 24),
-            
+
             // Relationship Intent Section
-            _buildSectionHeader('Relationship goals', 'What are you hoping to find romantically?'),
+            _buildSectionHeader('Relationship goals',
+                'What are you hoping to find romantically?'),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _relationshipIntent,
@@ -393,18 +646,20 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                 setState(() {
                   _relationshipIntent = value;
                 });
-                final controller = Provider.of<OnboardingController>(context, listen: false);
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
                 controller.setRelationshipIntent(value);
               },
             ),
           ],
-          
+
           // Show networking-specific sections for networking users
           if (_isNetworkingUser()) ...[
             SizedBox(height: isTablet ? 32 : 24),
-            
+
             // Professional Focus Section
-            _buildSectionHeader('Professional Focus', 'What type of professional connections are you seeking?'),
+            _buildSectionHeader('Professional Focus',
+                'What type of professional connections are you seeking?'),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _professionalFocus,
@@ -418,13 +673,14 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
               },
             ),
           ],
-          
+
           // Show friendship-specific sections for friendship users
           if (_isFriendshipUser()) ...[
             SizedBox(height: isTablet ? 32 : 24),
-            
+
             // Social Interests Section
-            _buildSectionHeader('Social Interests', 'What kind of friendships are you looking for?'),
+            _buildSectionHeader('Social Interests',
+                'What kind of friendships are you looking for?'),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _socialInterests,
@@ -438,14 +694,11 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
               },
             ),
           ],
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Education Section - Show for all users but with different context
-          _buildSectionHeader(
-            'Education', 
-            _getEducationSubtitle()
-          ),
+          _buildSectionHeader('Education', _getEducationSubtitle()),
           SizedBox(height: isTablet ? 16 : 12),
           _buildGenericDropdown(
             value: _education,
@@ -455,16 +708,18 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
               setState(() {
                 _education = value;
               });
-              final controller = Provider.of<OnboardingController>(context, listen: false);
+              final controller =
+                  Provider.of<OnboardingController>(context, listen: false);
               controller.setEducation(value);
             },
           ),
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Religion Section - Show mainly for dating users, optional for others
           if (_isDatingUser() || _platformPurpose == 'All of the Above') ...[
-            _buildSectionHeader('Faith & Religion', 'Important for many Nigerian relationships'),
+            _buildSectionHeader('Faith & Religion',
+                'Important for many Nigerian relationships'),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _religion,
@@ -474,16 +729,17 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                 setState(() {
                   _religion = value;
                 });
-                final controller = Provider.of<OnboardingController>(context, listen: false);
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
                 controller.setReligion(value);
               },
             ),
-            
             SizedBox(height: isTablet ? 32 : 24),
           ],
-          
+
           // Languages Section - Show for all users
-          _buildSectionHeader('Languages', 'Primary language you speak fluently'),
+          _buildSectionHeader(
+              'Languages', 'Primary language you speak fluently'),
           Text(
             _getLanguageSubtitle(),
             style: GoogleFonts.poppins(
@@ -506,7 +762,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                   _customLanguageController.clear();
                 }
               });
-              final controller = Provider.of<OnboardingController>(context, listen: false);
+              final controller =
+                  Provider.of<OnboardingController>(context, listen: false);
               // Update controller with selected language or custom language
               final languageToSave = value == 'Other' ? _customLanguage : value;
               if (languageToSave.isNotEmpty) {
@@ -514,7 +771,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
               }
             },
           ),
-          
+
           // Show custom language input when "Other" is selected
           if (_primaryLanguage == 'Other') ...[
             SizedBox(height: isTablet ? 16 : 12),
@@ -563,7 +820,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                   setState(() {
                     _customLanguage = value;
                   });
-                  final controller = Provider.of<OnboardingController>(context, listen: false);
+                  final controller =
+                      Provider.of<OnboardingController>(context, listen: false);
                   // Update controller with custom language
                   if (value.isNotEmpty) {
                     controller.setSpokenLanguages([value]);
@@ -572,14 +830,15 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
               ),
             ),
           ],
-          
+
           SizedBox(height: isTablet ? 32 : 24),
-          
+
           // Lifestyle Preferences - Show mainly for dating users
           if (_isDatingUser()) ...[
-            _buildSectionHeader('Lifestyle', 'Optional but helps with compatibility'),
+            _buildSectionHeader(
+                'Lifestyle', 'Optional but helps with compatibility'),
             SizedBox(height: isTablet ? 16 : 12),
-            
+
             // Drinking
             Text(
               'Drinking',
@@ -598,13 +857,14 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                 setState(() {
                   _drinkingPreference = value;
                 });
-                final controller = Provider.of<OnboardingController>(context, listen: false);
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
                 controller.setDrinkingPreference(value);
               },
             ),
-            
+
             SizedBox(height: 16),
-            
+
             // Smoking
             Text(
               'Smoking',
@@ -623,14 +883,15 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                 setState(() {
                   _smokingPreference = value;
                 });
-                final controller = Provider.of<OnboardingController>(context, listen: false);
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
                 controller.setSmokingPreference(value);
               },
             ),
-            
+
             SizedBox(height: isTablet ? 48 : 32),
           ],
-          
+
           // Simple progress indicator
           Container(
             margin: EdgeInsets.symmetric(horizontal: 20),
@@ -685,7 +946,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
           ),
         ),
         SizedBox(height: 16),
-        
+
         // Progress indicator
         Container(
           padding: EdgeInsets.all(12),
@@ -787,10 +1048,10 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return options.map((option) {
       final isSelected = selectedValue == option['value'];
-      
+
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 12 : 10),
         child: GestureDetector(
@@ -799,7 +1060,9 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
             width: double.infinity,
             padding: EdgeInsets.all(isTablet ? 16 : 14),
             decoration: BoxDecoration(
-              color: isSelected ? afropeepGreen.withValues(alpha: 0.1) : Colors.white,
+              color: isSelected
+                  ? afropeepGreen.withValues(alpha: 0.1)
+                  : Colors.white,
               border: Border.all(
                 color: isSelected ? afropeepGreen : Colors.grey.shade300,
                 width: 2,
@@ -836,7 +1099,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                         option['label'],
                         style: GoogleFonts.poppins(
                           fontSize: isTablet ? 16 : 14,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w500,
                           color: isSelected ? afropeepGreen : textDarkBrown,
                         ),
                       ),
@@ -875,11 +1139,13 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     // Check if the current value exists in options, if not, use null to show hint
-    final validValue = value.isNotEmpty && 
-        options.any((option) => option['value'] == value) ? value : null;
-    
+    final validValue =
+        value.isNotEmpty && options.any((option) => option['value'] == value)
+            ? value
+            : null;
+
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
@@ -915,7 +1181,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
           icon: Padding(
             padding: EdgeInsets.only(right: 12),
             child: Icon(
-              Icons.keyboard_arrow_down, 
+              Icons.keyboard_arrow_down,
               color: afropeepGreen,
               size: isTablet ? 24 : 20,
             ),
@@ -937,7 +1203,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                       Container(
                         padding: EdgeInsets.all(isTablet ? 6 : 4),
                         decoration: BoxDecoration(
-                          color: (option['color'] ?? Colors.grey).withValues(alpha: 0.15),
+                          color: (option['color'] ?? Colors.grey)
+                              .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Icon(
@@ -978,7 +1245,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
   Widget _buildSectionHeader(String title, String subtitle) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1005,7 +1272,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
   Widget _buildPlatformPurposeDropdown() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
@@ -1031,7 +1298,7 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
           icon: Padding(
             padding: EdgeInsets.only(right: 12),
             child: Icon(
-              Icons.keyboard_arrow_down, 
+              Icons.keyboard_arrow_down,
               color: afropeepGreen,
               size: isTablet ? 24 : 20,
             ),
@@ -1052,7 +1319,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                     Container(
                       padding: EdgeInsets.all(isTablet ? 6 : 4),
                       decoration: BoxDecoration(
-                        color: (option['color'] as Color).withValues(alpha: 0.15),
+                        color:
+                            (option['color'] as Color).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Icon(
@@ -1084,7 +1352,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
               setState(() {
                 _platformPurpose = value;
               });
-              final controller = Provider.of<OnboardingController>(context, listen: false);
+              final controller =
+                  Provider.of<OnboardingController>(context, listen: false);
               // Map display values back to controller values
               String controllerValue;
               switch (value) {
@@ -1118,10 +1387,10 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return options.map((option) {
       final isSelected = selectedValue == option['value'];
-      
+
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 10 : 8),
         child: GestureDetector(
@@ -1133,7 +1402,9 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
               vertical: isTablet ? 14 : 12,
             ),
             decoration: BoxDecoration(
-              color: isSelected ? afropeepGreen.withValues(alpha: 0.1) : Colors.white,
+              color: isSelected
+                  ? afropeepGreen.withValues(alpha: 0.1)
+                  : Colors.white,
               border: Border.all(
                 color: isSelected ? afropeepGreen : Colors.grey.shade300,
                 width: 1.5,
@@ -1153,7 +1424,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                     option['label'],
                     style: GoogleFonts.poppins(
                       fontSize: isTablet ? 15 : 13,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
                       color: isSelected ? afropeepGreen : textDarkBrown,
                     ),
                   ),
@@ -1183,13 +1455,15 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
         runSpacing: 8,
         children: options.map((option) {
           final isSelected = selectedValue == option['value'];
-          
+
           return GestureDetector(
             onTap: () => onSelected(option['value']),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? afropeepGreen.withValues(alpha: 0.1) : cardBackground,
+                color: isSelected
+                    ? afropeepGreen.withValues(alpha: 0.1)
+                    : cardBackground,
                 border: Border.all(
                   color: isSelected ? afropeepGreen : Colors.grey.shade300,
                   width: 1.5,
@@ -1209,7 +1483,8 @@ class _EnhancedAdditionalInfoScreenState extends State<EnhancedAdditionalInfoScr
                     option['label'],
                     style: GoogleFonts.poppins(
                       fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
                       color: isSelected ? afropeepGreen : textDarkBrown,
                     ),
                   ),

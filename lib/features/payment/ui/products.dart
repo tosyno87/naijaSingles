@@ -121,12 +121,8 @@ class ProductsState extends State<Products> {
         });
 
         for (final purchase in purchases) {
-          await InAppPurchaseRepoImpl.verifyPuchase(
-                  purchase.productID,
-                  purchases,
-                  widget.currentUser!,
-                  widget.items,
-                  context)
+          await InAppPurchaseRepoImpl.verifyPuchase(purchase.productID,
+                  purchases, widget.currentUser!, widget.items, context)
               .whenComplete(() async {
             await firebaseFireStoreInstance
                 .collection('users')
@@ -438,7 +434,9 @@ class ProductsState extends State<Products> {
                                     },
                                     child: Container(
                                         decoration: BoxDecoration(
-                                          color: AppColors.secondaryColor.withValues(alpha: (.7 * 255).toDouble()),
+                                          color: AppColors.secondaryColor
+                                              .withValues(
+                                                  alpha: (.7 * 255).toDouble()),
                                           shape: BoxShape.rectangle,
                                           borderRadius:
                                               BorderRadius.circular(25),
@@ -573,7 +571,9 @@ class ProductsState extends State<Products> {
           ? BoxDecoration(
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context).primaryColor.withValues(alpha: (0.5 * 255).toDouble()),
+              color: Theme.of(context)
+                  .primaryColor
+                  .withValues(alpha: (0.5 * 255).toDouble()),
               border: Border.all(width: 2, color: primaryColor))
           : null,
       duration: const Duration(milliseconds: 500),

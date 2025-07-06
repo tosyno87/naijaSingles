@@ -20,12 +20,18 @@ class MyThemes {
     ),
     textTheme: GoogleFonts.montserratTextTheme(
       const TextTheme(
-        displayLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-        displayMedium: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-        displaySmall: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-        headlineMedium: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-        headlineSmall: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-        titleLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        displayLarge: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+        displayMedium: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+        displaySmall: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+        headlineMedium: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+        headlineSmall: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        titleLarge: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
         bodyLarge: TextStyle(color: AppColors.textPrimary),
         bodyMedium: TextStyle(color: AppColors.textSecondary),
       ),
@@ -72,7 +78,8 @@ class MyThemes {
         borderSide: const BorderSide(color: AppColors.errorColor, width: 2),
       ),
       labelStyle: const TextStyle(color: AppColors.textSecondary),
-      hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
+      hintStyle:
+          TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primaryColor,

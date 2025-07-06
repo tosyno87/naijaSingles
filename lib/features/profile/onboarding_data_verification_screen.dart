@@ -8,13 +8,15 @@ class OnboardingDataVerificationScreen extends StatefulWidget {
   const OnboardingDataVerificationScreen({Key? key}) : super(key: key);
 
   @override
-  State<OnboardingDataVerificationScreen> createState() => _OnboardingDataVerificationScreenState();
+  State<OnboardingDataVerificationScreen> createState() =>
+      _OnboardingDataVerificationScreenState();
 }
 
-class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerificationScreen> {
+class _OnboardingDataVerificationScreenState
+    extends State<OnboardingDataVerificationScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
   List<String> _missingFields = [];
@@ -52,20 +54,20 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
       if (user != null) {
         print('🔍 Loading user data for verification: ${user.uid}');
         final doc = await _firestore.collection('users').doc(user.uid).get();
-        
+
         if (doc.exists) {
           final data = doc.data()!;
-          
+
           // Verify which fields are present
           _presentFields.clear();
           _missingFields.clear();
-          
+
           for (String field in _expectedFields) {
             if (data.containsKey(field) && data[field] != null) {
               // Check if field has meaningful data
               final value = data[field];
               bool hasData = false;
-              
+
               if (value is String) {
                 hasData = value.isNotEmpty;
               } else if (value is List) {
@@ -77,7 +79,7 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
               } else {
                 hasData = true; // Other types considered present
               }
-              
+
               if (hasData) {
                 _presentFields.add(field);
               } else {
@@ -87,12 +89,12 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
               _missingFields.add('$field (missing)');
             }
           }
-          
+
           setState(() {
             _userData = data;
             _isLoading = false;
           });
-          
+
           print('✅ Data verification complete');
           print('   Present fields: $_presentFields');
           print('   Missing fields: $_missingFields');
@@ -131,24 +133,24 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
                 children: [
                   // Summary Card
                   _buildSummaryCard(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Present Fields Card
                   _buildPresentFieldsCard(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Missing Fields Card
                   _buildMissingFieldsCard(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Raw Data Card
                   _buildRawDataCard(),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Refresh Button
                   SizedBox(
                     width: double.infinity,
@@ -181,10 +183,10 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
   }
 
   Widget _buildSummaryCard() {
-    final completionPercentage = _expectedFields.isEmpty 
-        ? 0.0 
+    final completionPercentage = _expectedFields.isEmpty
+        ? 0.0
         : (_presentFields.length / _expectedFields.length) * 100;
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -199,37 +201,37 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Progress bar
             LinearProgressIndicator(
               value: completionPercentage / 100,
               backgroundColor: Colors.grey.shade300,
               valueColor: AlwaysStoppedAnimation<Color>(
-                completionPercentage >= 80 
-                    ? Colors.green 
-                    : completionPercentage >= 50 
-                        ? Colors.orange 
+                completionPercentage >= 80
+                    ? Colors.green
+                    : completionPercentage >= 50
+                        ? Colors.orange
                         : Colors.red,
               ),
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             Text(
               '${completionPercentage.toStringAsFixed(1)}% Complete',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: completionPercentage >= 80 
-                    ? Colors.green 
-                    : completionPercentage >= 50 
-                        ? Colors.orange 
+                color: completionPercentage >= 80
+                    ? Colors.green
+                    : completionPercentage >= 50
+                        ? Colors.orange
                         : Colors.red,
               ),
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             Text(
               '${_presentFields.length} of ${_expectedFields.length} fields present',
               style: GoogleFonts.poppins(
@@ -265,7 +267,6 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
               ],
             ),
             const SizedBox(height: 12),
-            
             if (_presentFields.isEmpty)
               Text(
                 'No fields found',
@@ -318,7 +319,6 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
               ],
             ),
             const SizedBox(height: 12),
-            
             if (_missingFields.isEmpty)
               Text(
                 'All expected fields are present! 🎉',
@@ -364,7 +364,6 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
               ),
             ),
             const SizedBox(height: 12),
-            
             if (_userData == null)
               Text(
                 'No data available',
@@ -382,11 +381,17 @@ class _OnboardingDataVerificationScreenState extends State<OnboardingDataVerific
                   _buildDataRow('Age', _userData!['age']),
                   _buildDataRow('Gender', _userData!['gender']),
                   _buildDataRow('Tribe', _userData!['tribe']),
-                  _buildDataRow('Bio Length', '${(_userData!['bio'] ?? '').length} chars'),
-                  _buildDataRow('Interests', '${(_userData!['interests'] as List?)?.length ?? 0} items'),
-                  _buildDataRow('Height', _userData!['heightDisplay'] ?? _userData!['height_ft_in']),
+                  _buildDataRow('Bio Length',
+                      '${(_userData!['bio'] ?? '').length} chars'),
+                  _buildDataRow('Interests',
+                      '${(_userData!['interests'] as List?)?.length ?? 0} items'),
+                  _buildDataRow(
+                      'Height',
+                      _userData!['heightDisplay'] ??
+                          _userData!['height_ft_in']),
                   _buildDataRow('Looking For', _userData!['lookingFor']),
-                  _buildDataRow('Relationship Intent', _userData!['relationshipIntent']),
+                  _buildDataRow(
+                      'Relationship Intent', _userData!['relationshipIntent']),
                   _buildDataRow('Interested In', _userData!['interestedIn']),
                 ],
               ),

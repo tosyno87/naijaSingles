@@ -24,7 +24,8 @@ class MatchConfirmationModal extends StatefulWidget {
   State<MatchConfirmationModal> createState() => _MatchConfirmationModalState();
 }
 
-class _MatchConfirmationModalState extends State<MatchConfirmationModal> with SingleTickerProviderStateMixin {
+class _MatchConfirmationModalState extends State<MatchConfirmationModal>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -38,21 +39,21 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    
+
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.elasticOut,
       ),
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
       ),
     );
-    
+
     _animationController.forward();
   }
 
@@ -65,24 +66,24 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
   // Handle sending a message to the matched user
   Future<void> _handleSendMessage() async {
     if (_isProcessing) return;
-    
+
     setState(() {
       _isProcessing = true;
     });
-    
+
     try {
       // Create or get chat thread
       final threadId = await _chatService.createChatThread(
         widget.matchedUserId,
         widget.matchedUserName,
       );
-      
+
       if (threadId != null) {
         if (!mounted) return;
-        
+
         // Close the modal
         Navigator.pop(context);
-        
+
         // Navigate to chat thread
         Navigator.push(
           context,
@@ -128,7 +129,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final bool isWideScreen = screenSize.width > 400;
-    
+
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
       child: Dialog(
@@ -172,9 +173,9 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                     size: 50,
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Title with fade animation
                 FadeTransition(
                   opacity: _fadeAnimation,
@@ -188,9 +189,9 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                     textAlign: TextAlign.center,
                   ),
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Subtitle with fade animation
                 FadeTransition(
                   opacity: _fadeAnimation,
@@ -203,18 +204,18 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                     textAlign: TextAlign.center,
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Profile pictures
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Current user avatar
                     _buildProfileAvatar(widget.currentUserImageUrl),
-                    
+
                     const SizedBox(width: 20),
-                    
+
                     // Heart icon
                     Container(
                       padding: const EdgeInsets.all(8),
@@ -228,16 +229,16 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                         size: 24,
                       ),
                     ),
-                    
+
                     const SizedBox(width: 20),
-                    
+
                     // Matched user avatar
                     _buildProfileAvatar(widget.matchedUserImageUrl),
                   ],
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Action labelLarges
                 isWideScreen
                     ? _buildHorizontalButtons()
@@ -249,7 +250,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
       ),
     );
   }
-  
+
   Widget _buildProfileAvatar(String imageUrl) {
     return Container(
       width: 100,
@@ -281,16 +282,18 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
       ),
     );
   }
-  
+
   Widget _buildHorizontalButtons() {
     return Row(
       children: [
         // Keep Exploring labelLarge
         Expanded(
           child: OutlinedButton(
-            onPressed: _isProcessing ? null : () {
-              Navigator.pop(context);
-            },
+            onPressed: _isProcessing
+                ? null
+                : () {
+                    Navigator.pop(context);
+                  },
             style: OutlinedButton.styleFrom(
               side: BorderSide(
                 color: _isProcessing ? Colors.grey : const Color(0xFF008037),
@@ -311,9 +314,9 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
             ),
           ),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Send Message labelLarge
         Expanded(
           child: ElevatedButton(
@@ -348,7 +351,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
       ],
     );
   }
-  
+
   Widget _buildVerticalButtons() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -382,14 +385,16 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal> with Si
                   ),
                 ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Keep Exploring labelLarge
         OutlinedButton(
-          onPressed: _isProcessing ? null : () {
-            Navigator.pop(context);
-          },
+          onPressed: _isProcessing
+              ? null
+              : () {
+                  Navigator.pop(context);
+                },
           style: OutlinedButton.styleFrom(
             side: BorderSide(
               color: _isProcessing ? Colors.grey : const Color(0xFF008037),

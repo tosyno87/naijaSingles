@@ -8,7 +8,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   runApp(const CheckUserIdApp());
 }
 
@@ -29,11 +29,11 @@ class CheckUserIdApp extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
               }
-              
+
               final userId = snapshot.data;
               final testUserIds = ['test_user_1', 'test_user_2'];
               final matches = userId != null && testUserIds.contains(userId);
-              
+
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

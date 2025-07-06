@@ -193,7 +193,7 @@ class ImageProperties {
         .ref()
         .child('users/${currentUser.id}/${image.hashCode}.jpg');
     UploadTask uploadTask = storageReference.putFile(image);
-    
+
     await uploadTask.whenComplete(() {
       storageReference.getDownloadURL().then((fileURL) async {
         Map<String, dynamic> updateObject = {

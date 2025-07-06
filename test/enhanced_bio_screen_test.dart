@@ -12,7 +12,8 @@ void main() {
       controller = OnboardingController();
     });
 
-    testWidgets('Enhanced bio screen renders correctly', (WidgetTester tester) async {
+    testWidgets('Enhanced bio screen renders correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider<OnboardingController>(
@@ -31,7 +32,8 @@ void main() {
       expect(find.text('Tips for a great bio'), findsOneWidget);
     });
 
-    testWidgets('Personality prompts are displayed', (WidgetTester tester) async {
+    testWidgets('Personality prompts are displayed',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider<OnboardingController>(
@@ -66,14 +68,16 @@ void main() {
       expect(bioField, findsOneWidget);
 
       // Enter text
-      await tester.enterText(bioField, 'This is my test bio with enough characters to meet the minimum requirement.');
+      await tester.enterText(bioField,
+          'This is my test bio with enough characters to meet the minimum requirement.');
       await tester.pump();
 
       // Verify character count updates
       expect(find.textContaining('/300'), findsOneWidget);
     });
 
-    testWidgets('Prompt selection works correctly', (WidgetTester tester) async {
+    testWidgets('Prompt selection works correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider<OnboardingController>(
@@ -88,7 +92,7 @@ void main() {
       // Find and tap a prompt
       final prompt = find.text("I'm passionate about...");
       expect(prompt, findsOneWidget);
-      
+
       await tester.tap(prompt);
       await tester.pump();
 
@@ -98,7 +102,8 @@ void main() {
       expect(textField.controller?.text, contains("I'm passionate about..."));
     });
 
-    testWidgets('Bio quality indicator shows correctly', (WidgetTester tester) async {
+    testWidgets('Bio quality indicator shows correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider<OnboardingController>(
@@ -119,8 +124,8 @@ void main() {
       expect(find.textContaining('Add'), findsWidgets);
 
       // Enter a longer, better bio
-      await tester.enterText(bioField, 
-        'I love hiking and exploring new places. Currently passionate about photography and cooking. Looking for someone who shares my love for adventure and good food!');
+      await tester.enterText(bioField,
+          'I love hiking and exploring new places. Currently passionate about photography and cooking. Looking for someone who shares my love for adventure and good food!');
       await tester.pump();
 
       // Should show better quality indicator

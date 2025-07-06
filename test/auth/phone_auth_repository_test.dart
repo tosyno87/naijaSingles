@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
+
 class MockUser extends Mock implements User {}
 
 void main() {

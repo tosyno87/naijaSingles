@@ -159,8 +159,8 @@ class _MatchesState extends State<Matches> {
                         : Center(
                             child: Text(
                             "No match found".tr().toString(),
-                            style:
-                                TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+                            style: TextStyle(
+                                color: AppColors.secondaryColor, fontSize: 16),
                           )));
               }
               return Padding(
@@ -168,7 +168,8 @@ class _MatchesState extends State<Matches> {
                 child: Center(
                     child: Text(
                   "No match found".tr().toString(),
-                  style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+                  style:
+                      TextStyle(color: AppColors.secondaryColor, fontSize: 16),
                 )),
               );
             },

@@ -30,7 +30,8 @@ class Layout extends StatelessWidget {
                             top: 2.0, bottom: 2.0, right: 15),
                         height: 150,
                         width: 150.0,
-                        color: AppColors.secondaryColor.withValues(alpha: (.5 * 255).toDouble()),
+                        color: AppColors.secondaryColor
+                            .withValues(alpha: (.5 * 255).toDouble()),
                         padding: const EdgeInsets.all(5),
                         child: Stack(
                           children: <Widget>[
@@ -94,8 +95,10 @@ class Layout extends StatelessWidget {
                           top: 8.0, bottom: 8.0, left: 80.0, right: 10),
                       decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
-                              ? AppColors.secondaryColor.withValues(alpha: (.5 * 255).toDouble())
-                              : primaryColor.withValues(alpha: (.1 * 255).toDouble()),
+                              ? AppColors.secondaryColor
+                                  .withValues(alpha: (.5 * 255).toDouble())
+                              : primaryColor.withValues(
+                                  alpha: (.1 * 255).toDouble()),
                           borderRadius: BorderRadius.circular(15)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

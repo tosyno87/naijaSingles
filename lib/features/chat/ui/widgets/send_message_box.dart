@@ -193,8 +193,7 @@ class _MessageBoxState extends State<MessageBox> {
                       },
                     ),
                   ),
-                  if (messages.isEmpty && !isBlocked)
-                    _buildPromptSuggestions(),
+                  if (messages.isEmpty && !isBlocked) _buildPromptSuggestions(),
                   const Divider(height: 1.0),
                   Container(
                     alignment: Alignment.bottomCenter,
@@ -261,7 +260,8 @@ class _MessageBoxState extends State<MessageBox> {
 
   Widget _buildTextComposer() {
     return IconTheme(
-        data: IconThemeData(color: _isWritting ? primaryColor : AppColors.secondaryColor),
+        data: IconThemeData(
+            color: _isWritting ? primaryColor : AppColors.secondaryColor),
         child: Card(
           elevation: 10,
           margin: const EdgeInsets.all(0),

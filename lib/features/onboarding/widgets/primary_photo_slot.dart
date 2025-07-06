@@ -96,7 +96,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Content when no photo
             if (photo == null)
               Positioned.fill(
@@ -119,9 +119,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                           color: goldAccent,
                         ),
                       ),
-                      
                       SizedBox(height: 8),
-                      
                       Text(
                         guidance.title,
                         style: GoogleFonts.poppins(
@@ -130,9 +128,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                           color: textDarkBrown,
                         ),
                       ),
-                      
                       SizedBox(height: 4),
-                      
                       Flexible(
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12),
@@ -148,11 +144,10 @@ class PrimaryPhotoSlot extends StatelessWidget {
                           ),
                         ),
                       ),
-                      
                       SizedBox(height: 6),
-                      
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
@@ -171,7 +166,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                   ),
                 ),
               ),
-            
+
             // Remove button when photo exists
             if (photo != null && onRemove != null)
               Positioned(
@@ -193,7 +188,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                   ),
                 ),
               ),
-            
+
             // Primary photo indicator when photo exists
             if (photo != null)
               Positioned(

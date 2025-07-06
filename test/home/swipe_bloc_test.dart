@@ -16,7 +16,8 @@ void main() {
         getUserList: (_) async => list,
         leftSwipe: (_, __) async {},
       ),
-      act: (bloc) => bloc.add(RightSwipeEvent(currentUser: currentUser, selectedUser: selectedUser)),
+      act: (bloc) => bloc.add(RightSwipeEvent(
+          currentUser: currentUser, selectedUser: selectedUser)),
       expect: () => [SwipeSucessState(list)],
     );
 
@@ -27,7 +28,8 @@ void main() {
         getUserList: (_) async => list,
         rightSwipe: (_, __) async {},
       ),
-      act: (bloc) => bloc.add(LeftSwipeEvent(currentUser: currentUser, selectedUser: selectedUser)),
+      act: (bloc) => bloc.add(
+          LeftSwipeEvent(currentUser: currentUser, selectedUser: selectedUser)),
       expect: () => [SwipeSucessState(list)],
     );
 
@@ -38,7 +40,8 @@ void main() {
         getUserList: (_) async => [],
         leftSwipe: (_, __) async {},
       ),
-      act: (bloc) => bloc.add(RightSwipeEvent(currentUser: currentUser, selectedUser: selectedUser)),
+      act: (bloc) => bloc.add(RightSwipeEvent(
+          currentUser: currentUser, selectedUser: selectedUser)),
       expect: () => [SwipeFailedState()],
     );
   });

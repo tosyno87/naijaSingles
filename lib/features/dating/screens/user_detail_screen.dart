@@ -35,8 +35,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final photos = widget.user.imageUrl?.cast<String>() ?? <String>[]; // Fix type casting
-    
+    final photos =
+        widget.user.imageUrl?.cast<String>() ?? <String>[]; // Fix type casting
+
     return Scaffold(
       backgroundColor: backgroundColor,
       extendBodyBehindAppBar: true, // Allow content behind app bar
@@ -94,7 +95,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               child: _buildPhotoSection(photos),
             ),
           ),
-          
+
           // Profile content
           SliverToBoxAdapter(
             child: Container(
@@ -118,25 +119,27 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   children: [
                     // Basic info
                     _buildBasicInfo(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Bio section
                     if (_getBio().isNotEmpty) ...[
                       _buildBioSection(),
                       const SizedBox(height: 24),
                     ],
-                    
+
                     // Interests section
                     if (_getInterests().isNotEmpty) ...[
                       _buildInterestsSection(),
                       const SizedBox(height: 24),
                     ],
-                    
+
                     // Additional info
                     _buildAdditionalInfo(),
-                    
-                    const SizedBox(height: 24), // Extra space at bottom for comfortable scrolling
+
+                    const SizedBox(
+                        height:
+                            24), // Extra space at bottom for comfortable scrolling
                   ],
                 ),
               ),
@@ -320,9 +323,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             color: textDarkBrown,
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Location and distance
         Row(
           children: [
@@ -344,11 +347,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 ),
               ),
             ],
-            
             if (widget.user.distanceBW != null) ...[
               const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: afropeepGreen.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
@@ -372,7 +375,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   Widget _buildBioSection() {
     final bio = _getBio();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -384,9 +387,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             color: textDarkBrown,
           ),
         ),
-        
         const SizedBox(height: 12),
-        
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -410,7 +411,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   Widget _buildInterestsSection() {
     final interests = _getInterests();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -422,9 +423,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             color: textDarkBrown,
           ),
         ),
-        
         const SizedBox(height: 12),
-        
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -463,9 +462,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             color: textDarkBrown,
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Info cards
         if (widget.user.editInfo?['userGender'] != null)
           _buildInfoCard(
@@ -473,21 +472,21 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             label: "Gender",
             value: widget.user.editInfo!['userGender'].toString(),
           ),
-        
+
         if (widget.user.editInfo?['userHeight'] != null)
           _buildInfoCard(
             icon: Icons.height,
             label: "Height",
             value: widget.user.editInfo!['userHeight'].toString(),
           ),
-        
+
         if (widget.user.editInfo?['userEducation'] != null)
           _buildInfoCard(
             icon: Icons.school_outlined,
             label: "Education",
             value: widget.user.editInfo!['userEducation'].toString(),
           ),
-        
+
         if (widget.user.editInfo?['userOccupation'] != null)
           _buildInfoCard(
             icon: Icons.work_outline,
@@ -525,9 +524,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               size: 20,
             ),
           ),
-          
           const SizedBox(width: 16),
-          
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -577,7 +574,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     if (widget.user.editInfo?['interests'] is List) {
       return List<String>.from(widget.user.editInfo!['interests']);
     }
-    
+
     // Add more interest extraction logic based on your data structure
     return [];
   }
@@ -678,7 +675,6 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
               );
             },
           ),
-          
           if (widget.photos.length > 1)
             Positioned(
               bottom: 50,
@@ -693,8 +689,8 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                     width: index == _currentIndex ? 24 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: index == _currentIndex 
-                          ? Colors.white 
+                      color: index == _currentIndex
+                          ? Colors.white
                           : Colors.white.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(4),
                     ),

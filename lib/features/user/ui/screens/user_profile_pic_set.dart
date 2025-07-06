@@ -17,33 +17,34 @@ class UserProfilePic extends StatefulWidget {
   State<UserProfilePic> createState() => _UserProfilePicState();
 }
 
-class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProviderStateMixin {
+class _UserProfilePicState extends State<UserProfilePic>
+    with SingleTickerProviderStateMixin {
   final au.FirebaseAuth? auth = firebaseAuthInstance;
-  
+
   // List to store multiple photos
   List<File?> photos = [null, null, null];
   int selectedPhotoIndex = 0;
-  
+
   // Animation controller
   AnimationController? _animationController;
   Animation<double>? _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize animation controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     // Initialize animation
     _fadeAnimation = CurvedAnimation(
       parent: _animationController!,
       curve: Curves.easeInOut,
     );
-    
+
     // Start animation after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _animationController != null) {
@@ -51,23 +52,24 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
       }
     });
   }
-  
+
   @override
   void dispose() {
     _animationController?.dispose();
     super.dispose();
   }
-  
+
   // Count how many photos have been added
   int get photoCount => photos.where((photo) => photo != null).length;
-  
+
   // Check if we have at least 1 photo to continue
   bool get canContinue => photoCount >= 1;
 
   @override
   Widget build(BuildContext context) {
-    var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    
+    var userData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -94,52 +96,53 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      
+
                       // Header section
                       _fadeAnimation != null
-                        ? FadeTransition(
-                            opacity: _fadeAnimation!,
-                            child: _buildHeaderSection(),
-                          )
-                        : _buildHeaderSection(),
-                      
+                          ? FadeTransition(
+                              opacity: _fadeAnimation!,
+                              child: _buildHeaderSection(),
+                            )
+                          : _buildHeaderSection(),
+
                       const SizedBox(height: 40),
-                      
+
                       // Main photo upload section
                       _fadeAnimation != null
-                        ? FadeTransition(
-                            opacity: _fadeAnimation!,
-                            child: _buildMainPhotoSection(),
-                          )
-                        : _buildMainPhotoSection(),
-                      
+                          ? FadeTransition(
+                              opacity: _fadeAnimation!,
+                              child: _buildMainPhotoSection(),
+                            )
+                          : _buildMainPhotoSection(),
+
                       const SizedBox(height: 24),
-                      
+
                       // Photo grid section
                       _fadeAnimation != null
-                        ? FadeTransition(
-                            opacity: _fadeAnimation!,
-                            child: _buildPhotoGridSection(),
-                          )
-                        : _buildPhotoGridSection(),
-                      
+                          ? FadeTransition(
+                              opacity: _fadeAnimation!,
+                              child: _buildPhotoGridSection(),
+                            )
+                          : _buildPhotoGridSection(),
+
                       const SizedBox(height: 24),
-                      
+
                       // Tips section
                       _fadeAnimation != null
-                        ? FadeTransition(
-                            opacity: _fadeAnimation!,
-                            child: _buildTipsSection(),
-                          )
-                        : _buildTipsSection(),
-                      
-                      const SizedBox(height: 100), // Space for the bottom labelLarge
+                          ? FadeTransition(
+                              opacity: _fadeAnimation!,
+                              child: _buildTipsSection(),
+                            )
+                          : _buildTipsSection(),
+
+                      const SizedBox(
+                          height: 100), // Space for the bottom labelLarge
                     ],
                   ),
                 ),
               ),
             ),
-            
+
             // Continue labelLarge fixed at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
@@ -156,17 +159,17 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: canContinue ? () {
-                    log("userdata is ${userData.toString()}");
-                    Navigator.pushNamed(
-                      context, 
-                      RouteName.allowLocationScreen, 
-                      arguments: {
-                        'userData': userData,
-                        'profilePic': photos[selectedPhotoIndex]
-                      }
-                    );
-                  } : null,
+                  onPressed: canContinue
+                      ? () {
+                          log("userdata is ${userData.toString()}");
+                          Navigator.pushNamed(
+                              context, RouteName.allowLocationScreen,
+                              arguments: {
+                                'userData': userData,
+                                'profilePic': photos[selectedPhotoIndex]
+                              });
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),
                     foregroundColor: Colors.white,
@@ -194,7 +197,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
       ),
     );
   }
-  
+
   // Header section with title and subtitle
   Widget _buildHeaderSection() {
     return Column(
@@ -220,7 +223,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
       ],
     );
   }
-  
+
   // Main photo upload section
   Widget _buildMainPhotoSection() {
     return Center(
@@ -261,7 +264,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                         fit: BoxFit.cover,
                       ),
                     ),
-                    
+
                     // Edit labelLarge overlay
                     Positioned(
                       bottom: 12,
@@ -299,7 +302,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                         size: const Size(280, 350),
                       ),
                     ),
-                    
+
                     // Placeholder content
                     Center(
                       child: Column(
@@ -340,7 +343,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
       ),
     );
   }
-  
+
   // Photo grid section
   Widget _buildPhotoGridSection() {
     return Column(
@@ -377,10 +380,14 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: selectedPhotoIndex == index && photos[index] != null
-                          ? const Color(0xFF27AE60)
-                          : Colors.grey[300]!,
-                      width: selectedPhotoIndex == index && photos[index] != null ? 2 : 1,
+                      color:
+                          selectedPhotoIndex == index && photos[index] != null
+                              ? const Color(0xFF27AE60)
+                              : Colors.grey[300]!,
+                      width:
+                          selectedPhotoIndex == index && photos[index] != null
+                              ? 2
+                              : 1,
                     ),
                   ),
                   child: photos[index] != null
@@ -396,7 +403,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            
+
                             // Selected indicator
                             if (selectedPhotoIndex == index)
                               Positioned(
@@ -432,7 +439,7 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
       ],
     );
   }
-  
+
   // Tips section
   Widget _buildTipsSection() {
     return Container(
@@ -481,10 +488,11 @@ class _UserProfilePicState extends State<UserProfilePic> with SingleTickerProvid
       ),
     );
   }
-  
+
   // Method to pick an image
   Future<void> _pickImage(int index) async {
-    final file = await UploadMedia.getImage(context: context, checktype: 'profile');
+    final file =
+        await UploadMedia.getImage(context: context, checktype: 'profile');
     if (file != null && mounted) {
       setState(() {
         photos[index] = file;
@@ -514,28 +522,18 @@ class DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     // Draw top line
-    _drawDashedLine(canvas, paint, 
-      const Offset(0, 0), 
-      Offset(size.width, 0)
-    );
-    
+    _drawDashedLine(canvas, paint, const Offset(0, 0), Offset(size.width, 0));
+
     // Draw right line
-    _drawDashedLine(canvas, paint, 
-      Offset(size.width, 0), 
-      Offset(size.width, size.height)
-    );
-    
+    _drawDashedLine(
+        canvas, paint, Offset(size.width, 0), Offset(size.width, size.height));
+
     // Draw bottom line
-    _drawDashedLine(canvas, paint, 
-      Offset(size.width, size.height), 
-      Offset(0, size.height)
-    );
-    
+    _drawDashedLine(
+        canvas, paint, Offset(size.width, size.height), Offset(0, size.height));
+
     // Draw left line
-    _drawDashedLine(canvas, paint, 
-      Offset(0, size.height), 
-      const Offset(0, 0)
-    );
+    _drawDashedLine(canvas, paint, Offset(0, size.height), const Offset(0, 0));
   }
 
   void _drawDashedLine(Canvas canvas, Paint paint, Offset start, Offset end) {
@@ -543,17 +541,17 @@ class DashedBorderPainter extends CustomPainter {
     final dx = end.dx - start.dx;
     final dy = end.dy - start.dy;
     final distance = math.sqrt(dx * dx + dy * dy);
-    
+
     // Calculate the number of dashes
     final dashCount = distance / (strokeWidth + gap);
-    
+
     // Calculate the small dx and dy for each dash
     final dashDx = dx / dashCount;
     final dashDy = dy / dashCount;
-    
+
     // Start drawing from the start point
     var currentPoint = start;
-    
+
     // Draw the dashes
     final int count = dashCount.floor();
     for (var i = 0; i < count; i++) {
@@ -563,7 +561,7 @@ class DashedBorderPainter extends CustomPainter {
         Offset(currentPoint.dx + dashDx / 2, currentPoint.dy + dashDy / 2),
         paint,
       );
-      
+
       // Move to the next dash start point (skipping the gap)
       currentPoint = Offset(
         currentPoint.dx + dashDx,

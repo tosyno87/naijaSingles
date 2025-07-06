@@ -254,7 +254,8 @@ class IncomingState extends State<Incoming> with TickerProviderStateMixin {
                       log("call is picked up ${widget.callInfo['channel_id']} , callType ${snapshot.data!.docs[0]['callType']}");
                       return CallPage(
                         channelName: widget.callInfo['channel_id'],
-                        role: 1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
+                        role:
+                            1, // ClientRoleType.clientRoleBroadcaster replaced with integer value
                         callType: snapshot.data!.docs[0]['callType'],
                       );
                     }
@@ -321,7 +322,8 @@ class IncomingState extends State<Incoming> with TickerProviderStateMixin {
       height: radius,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.blue.withValues(alpha: ((1 - _controller.value) * 255).toDouble()),
+        color: Colors.blue
+            .withValues(alpha: ((1 - _controller.value) * 255).toDouble()),
       ),
     );
   }

@@ -29,7 +29,8 @@ class SwipeButtons extends StatelessWidget {
                 backgroundColor: Colors.white,
                 onPressed: () {
                   log('rewind pressed');
-                  stackController?.rewind(duration: const Duration(milliseconds: 500));
+                  stackController?.rewind(
+                      duration: const Duration(milliseconds: 500));
                   onRewind();
                 },
                 child: Icon(

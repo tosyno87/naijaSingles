@@ -22,9 +22,9 @@ class MatchUserBloc extends Bloc<MatchUserEvent, MatchUserState> {
   ) async {
     try {
       emit(MatchUserLoadingState());
-      
+
       final matches = await getMatches(event.currentUser);
-      
+
       emit(MatchUserLoadedState(matches));
     } catch (e) {
       debugPrint('Error loading matches: $e');

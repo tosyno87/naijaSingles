@@ -6,21 +6,24 @@ import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingPreferencesScreen extends StatefulWidget {
   final VoidCallback? onNext;
-  
+
   const OnboardingPreferencesScreen({Key? key, this.onNext}) : super(key: key);
 
   @override
-  State<OnboardingPreferencesScreen> createState() => _OnboardingPreferencesScreenState();
+  State<OnboardingPreferencesScreen> createState() =>
+      _OnboardingPreferencesScreenState();
 }
 
-class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScreen> {
+class _OnboardingPreferencesScreenState
+    extends State<OnboardingPreferencesScreen> {
   String _selectedInterestedIn = 'everyone';
   RangeValues _ageRange = const RangeValues(18, 50);
 
   @override
   void initState() {
     super.initState();
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     _selectedInterestedIn = controller.interestedIn;
     _ageRange = RangeValues(
       controller.ageRange[0].toDouble(),
@@ -32,7 +35,7 @@ class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScree
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: isTablet ? 32 : 24,
@@ -58,9 +61,9 @@ class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScree
               color: Colors.black54,
             ),
           ),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Interested In Section
           const SectionHeader(
             title: 'I\'m interested in',
@@ -68,9 +71,9 @@ class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScree
           ),
           SizedBox(height: isTablet ? 20 : 16),
           _buildInterestedInOptions(),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Age Range Section
           const SectionHeader(
             title: 'Age Range',
@@ -78,9 +81,9 @@ class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScree
           ),
           SizedBox(height: isTablet ? 20 : 16),
           _buildAgeRangeSlider(),
-          
+
           const Spacer(),
-          
+
           // Continue Button
           ContinueButton(
             onPressed: _saveAndContinue,
@@ -94,7 +97,7 @@ class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScree
   Widget _buildInterestedInOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       children: [
         SelectionOption(
@@ -139,7 +142,7 @@ class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScree
   Widget _buildAgeRangeSlider() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       children: [
         Text(
@@ -169,12 +172,13 @@ class _OnboardingPreferencesScreenState extends State<OnboardingPreferencesScree
   }
 
   void _saveAndContinue() {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // Save preferences to controller
     controller.setInterestedIn(_selectedInterestedIn);
     controller.setAgeRange([_ageRange.start.round(), _ageRange.end.round()]);
-    
+
     // Call the onNext callback to move to next page
     if (widget.onNext != null) {
       widget.onNext!();

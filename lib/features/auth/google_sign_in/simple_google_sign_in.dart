@@ -14,43 +14,45 @@ class SimpleGoogleSignIn {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
     // For iOS, explicitly specify the client ID
-    clientId: '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
+    clientId:
+        '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
   );
 
   // Simple method to sign in with Google
   Future<User?> signIn() async {
     try {
       log("Starting simple Google Sign-In process...");
-      
+
       // Sign out first to ensure a fresh sign-in attempt
       await _googleSignIn.signOut();
       log("Signed out from previous Google session");
-      
+
       // Begin interactive sign-in process
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       log("Google Sign-In result: ${googleUser != null ? 'Success' : 'Canceled/Failed'}");
-      
+
       if (googleUser == null) {
         log("Google Sign-In was canceled by user");
         return null;
       }
-      
+
       // Get authentication details
       log("Getting Google authentication details...");
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       log("Got auth tokens - Access token: ${googleAuth.accessToken != null}, ID token: ${googleAuth.idToken != null}");
-      
+
       // Create Firebase credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      
+
       // Sign in to Firebase
       log("Signing in to Firebase with Google credential...");
       final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
-      
+
       if (user != null) {
         log("Google Sign-In successful. User: ${user.uid}");
         return user;
@@ -68,19 +70,20 @@ class SimpleGoogleSignIn {
 // A simple labelLarge widget that uses the SimpleGoogleSignIn class
 class SimpleGoogleSignInButton extends StatefulWidget {
   final Function(User?) onSignInComplete;
-  
+
   const SimpleGoogleSignInButton({
     Key? key,
     required this.onSignInComplete,
   }) : super(key: key);
 
   @override
-  State<SimpleGoogleSignInButton> createState() => _SimpleGoogleSignInButtonState();
+  State<SimpleGoogleSignInButton> createState() =>
+      _SimpleGoogleSignInButtonState();
 }
 
 class _SimpleGoogleSignInButtonState extends State<SimpleGoogleSignInButton> {
   bool _isLoading = false;
-  
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -117,12 +120,12 @@ class _SimpleGoogleSignInButtonState extends State<SimpleGoogleSignInButton> {
       ),
     );
   }
-  
+
   Future<void> _handleSignIn() async {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       final user = await SimpleGoogleSignIn().signIn();
       widget.onSignInComplete(user);

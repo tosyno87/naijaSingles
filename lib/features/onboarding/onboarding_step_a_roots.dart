@@ -29,32 +29,63 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   final GlobalKey<FormFieldState> _tribeFieldKey = GlobalKey<FormFieldState>();
   final GlobalKey _languagesKey = GlobalKey();
   final GlobalKey _continueButtonKey = GlobalKey();
-  
+
   final TextEditingController _tribeController = TextEditingController();
-  
+
   // State for dropdown and custom tribe entry
   String? _selectedTribe;
   bool _isCustomTribe = false;
-  
+
   // State for language selection
   String? _selectedLanguage;
   bool _isCustomLanguage = false;
-  final TextEditingController _customLanguageController = TextEditingController();
-  
+  final TextEditingController _customLanguageController =
+      TextEditingController();
+
   // List of African tribes for dropdown
   final List<String> _africanTribes = [
-    'Yoruba', 'Igbo', 'Hausa', 'Amhara', 'Tigray', 'Oromo', 'Fulani',
-    'Zulu', 'Xhosa', 'Shona', 'Twi', 'Ewe', 'Wolof', 'Somali', 'Berber',
-    'Tutsi', 'Akan', 'Baganda', 'Other'
+    'Yoruba',
+    'Igbo',
+    'Hausa',
+    'Amhara',
+    'Tigray',
+    'Oromo',
+    'Fulani',
+    'Zulu',
+    'Xhosa',
+    'Shona',
+    'Twi',
+    'Ewe',
+    'Wolof',
+    'Somali',
+    'Berber',
+    'Tutsi',
+    'Akan',
+    'Baganda',
+    'Other'
   ];
-  
+
   // List of languages for dropdown
   final List<String> _availableLanguages = [
-    'English', 'Yoruba', 'Igbo', 'Hausa', 'Pidgin', 'French', 'Arabic', 
-    'Swahili', 'Amharic', 'Zulu', 'Xhosa', 'Twi', 'Wolof', 'Somali', 
-    'Portuguese', 'Spanish', 'Other'
+    'English',
+    'Yoruba',
+    'Igbo',
+    'Hausa',
+    'Pidgin',
+    'French',
+    'Arabic',
+    'Swahili',
+    'Amharic',
+    'Zulu',
+    'Xhosa',
+    'Twi',
+    'Wolof',
+    'Somali',
+    'Portuguese',
+    'Spanish',
+    'Other'
   ];
-  
+
   // Intent options with icons, titles and descriptions
   final List<Map<String, dynamic>> _intentOptions = [
     {
@@ -80,20 +111,21 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   @override
   void initState() {
     super.initState();
-    
+
     // Add listener to text controller to rebuild UI when text changes
     _tribeController.addListener(() {
       print("Tribe text changed: '${_tribeController.text}'");
       setState(() {});
     });
-    
+
     // Initialize text controller with existing value if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
       if (controller.tribe != null && controller.tribe!.isNotEmpty) {
         print("Setting initial tribe: '${controller.tribe}'");
         _tribeController.text = controller.tribe!;
-        
+
         // Check if the tribe is in our dropdown list
         if (_africanTribes.contains(controller.tribe)) {
           setState(() {
@@ -121,10 +153,10 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<OnboardingController>(context);
-    
+
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
-    
+
     return Scaffold(
       backgroundColor: widget.backgroundColor,
       body: SafeArea(
@@ -137,7 +169,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: deepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -153,9 +186,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Header section
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,9 +212,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // White card container for all input fields
               Container(
                 decoration: BoxDecoration(
@@ -202,7 +235,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     // Tribe input
                     _buildSectionTitle('What is your tribe or ethnic group?'),
                     const SizedBox(height: 12),
-                    
+
                     // Dropdown for tribe selection
                     DropdownButtonFormField<String>(
                       key: _tribeFieldKey,
@@ -255,7 +288,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: deepGreen, width: 2),
+                          borderSide:
+                              const BorderSide(color: deepGreen, width: 2),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -271,7 +305,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       icon: Icon(Icons.arrow_drop_down, color: deepGreen),
                       isExpanded: true,
                     ),
-                    
+
                     // Manual entry field if "Other" is selected
                     if (_isCustomTribe) ...[
                       const SizedBox(height: 16),
@@ -300,7 +334,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: deepGreen, width: 2),
+                            borderSide:
+                                const BorderSide(color: deepGreen, width: 2),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -318,7 +353,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       ),
                     ],
                     const SizedBox(height: 32),
-                    
+
                     // Languages selection
                     _buildSectionTitle('Which languages do you speak?'),
                     const SizedBox(height: 8),
@@ -330,7 +365,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Display selected languages as chips
                     if (controller.languages.isNotEmpty) ...[
                       Wrap(
@@ -350,7 +385,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             deleteIconColor: Colors.white,
                             onDeleted: () {
                               setState(() {
-                                List<String> updatedLanguages = [...controller.languages];
+                                List<String> updatedLanguages = [
+                                  ...controller.languages
+                                ];
                                 updatedLanguages.remove(language);
                                 controller.updateLanguages(updatedLanguages);
                               });
@@ -360,7 +397,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       ),
                       const SizedBox(height: 16),
                     ],
-                    
+
                     // Dropdown for language selection
                     DropdownButtonFormField<String>(
                       key: _languagesKey,
@@ -382,13 +419,15 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           setState(() {
                             _selectedLanguage = value;
                             _isCustomLanguage = false;
-                            
+
                             // Add to languages list if not already there
                             if (!controller.languages.contains(value)) {
-                              List<String> updatedLanguages = [...controller.languages];
+                              List<String> updatedLanguages = [
+                                ...controller.languages
+                              ];
                               updatedLanguages.add(value);
                               controller.updateLanguages(updatedLanguages);
-                              
+
                               // Reset dropdown after selection
                               _selectedLanguage = null;
                             }
@@ -426,7 +465,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: deepGreen, width: 2),
+                          borderSide:
+                              const BorderSide(color: deepGreen, width: 2),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -442,7 +482,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       icon: Icon(Icons.arrow_drop_down, color: deepGreen),
                       isExpanded: true,
                     ),
-                    
+
                     // Manual entry field if "Other" is selected
                     if (_isCustomLanguage) ...[
                       const SizedBox(height: 16),
@@ -466,15 +506,18 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.grey[400]!),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey[400]!),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.grey[400]!),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey[400]!),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: deepGreen, width: 2),
+                                  borderSide: const BorderSide(
+                                      color: deepGreen, width: 2),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -491,16 +534,21 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: () {
-                              final customLanguage = _customLanguageController.text.trim();
+                              final customLanguage =
+                                  _customLanguageController.text.trim();
                               if (customLanguage.isNotEmpty) {
                                 setState(() {
                                   // Add custom language to the list
-                                  if (!controller.languages.contains(customLanguage)) {
-                                    List<String> updatedLanguages = [...controller.languages];
+                                  if (!controller.languages
+                                      .contains(customLanguage)) {
+                                    List<String> updatedLanguages = [
+                                      ...controller.languages
+                                    ];
                                     updatedLanguages.add(customLanguage);
-                                    controller.updateLanguages(updatedLanguages);
+                                    controller
+                                        .updateLanguages(updatedLanguages);
                                   }
-                                  
+
                                   // Reset custom language state
                                   _customLanguageController.clear();
                                   _isCustomLanguage = false;
@@ -530,9 +578,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Intent selection in a separate white card
               Container(
                 decoration: BoxDecoration(
@@ -553,17 +601,17 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     _buildSectionTitle('What are you looking for?'),
                     const SizedBox(height: 16),
                     ..._intentOptions.map((option) => _buildIntentOption(
-                      option: option,
-                      isSelected: controller.intent == option['value'],
-                      onTap: () => controller.updateIntent(option['value']),
-                      deepGreen: deepGreen,
-                    )),
+                          option: option,
+                          isSelected: controller.intent == option['value'],
+                          onTap: () => controller.updateIntent(option['value']),
+                          deepGreen: deepGreen,
+                        )),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Continue labelLarge
               Center(
                 child: SizedBox(
@@ -571,10 +619,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   height: 56,
                   child: ElevatedButton(
                     key: _continueButtonKey,
-                    onPressed: _isStepValid(controller) ? () {
-                      HapticFeedback.mediumImpact();
-                      widget.onNext();
-                    } : null,
+                    onPressed: _isStepValid(controller)
+                        ? () {
+                            HapticFeedback.mediumImpact();
+                            widget.onNext();
+                          }
+                        : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: deepGreen,
                       foregroundColor: Colors.white,
@@ -601,7 +651,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
       ),
     );
   }
-  
+
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) {
     return Text(
@@ -613,7 +663,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
       ),
     );
   }
-  
+
   /// Builds an intent option card with icon, title and description
   Widget _buildIntentOption({
     required Map<String, dynamic> option,
@@ -641,7 +691,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isSelected ? deepGreen.withValues(alpha: 0.1) : Colors.white,
+              color:
+                  isSelected ? deepGreen.withValues(alpha: 0.1) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected ? deepGreen : Colors.grey[300]!,
@@ -699,7 +750,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
       ),
     );
   }
-  
+
   /// Validates if all required fields are filled
   bool _isStepValid(OnboardingController controller) {
     // For tribe, check if a dropdown option is selected or custom tribe is entered
@@ -707,9 +758,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     if (_selectedTribe == 'Other') {
       isTribeValid = _tribeController.text.trim().isNotEmpty;
     }
-    
+
     return isTribeValid &&
-           controller.languages.isNotEmpty &&
-           controller.intent != null;
+        controller.languages.isNotEmpty &&
+        controller.intent != null;
   }
 }

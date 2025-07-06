@@ -82,18 +82,21 @@ class PrivacyMigrationPrompt extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Benefits
-          _buildBenefit(Icons.visibility_outlined, 'Control what others see about you'),
+          _buildBenefit(
+              Icons.visibility_outlined, 'Control what others see about you'),
           const SizedBox(height: 8),
-          _buildBenefit(Icons.location_on_outlined, 'Choose your location privacy level'),
+          _buildBenefit(
+              Icons.location_on_outlined, 'Choose your location privacy level'),
           const SizedBox(height: 8),
-          _buildBenefit(Icons.shield_outlined, 'Enhanced security for your data'),
-          
+          _buildBenefit(
+              Icons.shield_outlined, 'Enhanced security for your data'),
+
           const SizedBox(height: 20),
-          
+
           // Action Buttons
           Row(
             children: [

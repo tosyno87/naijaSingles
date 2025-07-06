@@ -7,23 +7,26 @@ class PreferencesOnboardingScreen extends StatefulWidget {
   const PreferencesOnboardingScreen({Key? key}) : super(key: key);
 
   @override
-  State<PreferencesOnboardingScreen> createState() => _PreferencesOnboardingScreenState();
+  State<PreferencesOnboardingScreen> createState() =>
+      _PreferencesOnboardingScreenState();
 }
 
-class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScreen> {
+class _PreferencesOnboardingScreenState
+    extends State<PreferencesOnboardingScreen> {
   String _selectedInterestedIn = 'everyone';
   RangeValues _ageRange = const RangeValues(18, 50);
 
   @override
   void initState() {
     super.initState();
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     _selectedInterestedIn = controller.interestedIn;
     _ageRange = RangeValues(
       controller.ageRange[0].toDouble(),
       controller.ageRange[1].toDouble(),
     );
-    
+
     // Debug logging
     print('🔍 PreferencesOnboardingScreen initState:');
     print('   Initial interestedIn: "${controller.interestedIn}"');
@@ -36,7 +39,7 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Padding(
       padding: EdgeInsets.all(isTablet ? 32 : 24),
       child: Column(
@@ -59,9 +62,9 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
               color: Colors.black54,
             ),
           ),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Interested In Section
           Text(
             'I\'m interested in',
@@ -73,9 +76,9 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
           ),
           SizedBox(height: isTablet ? 20 : 16),
           _buildInterestedInOptions(),
-          
+
           SizedBox(height: isTablet ? 48 : 40),
-          
+
           // Age Range Section
           Text(
             'Age Range',
@@ -87,7 +90,7 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
           ),
           SizedBox(height: isTablet ? 20 : 16),
           _buildAgeRangeSlider(),
-          
+
           const Spacer(),
         ],
       ),
@@ -97,7 +100,7 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
   Widget _buildInterestedInOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       children: [
         _buildInterestedInOption('Men', 'men', Icons.male),
@@ -113,19 +116,22 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
     final isSelected = _selectedInterestedIn == value;
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
           _selectedInterestedIn = value;
         });
         // Save to controller immediately
-        final controller = Provider.of<OnboardingController>(context, listen: false);
+        final controller =
+            Provider.of<OnboardingController>(context, listen: false);
         controller.setInterestedIn(value);
-        
+
         // Debug logging
-        print('🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"');
-        print('   Controller interestedIn after setting: "${controller.interestedIn}"');
+        print(
+            '🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"');
+        print(
+            '   Controller interestedIn after setting: "${controller.interestedIn}"');
       },
       child: Container(
         width: double.infinity,
@@ -134,7 +140,9 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
           vertical: isTablet ? 20 : 16,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF008037).withValues(alpha: 0.1) : Colors.white,
+          color: isSelected
+              ? const Color(0xFF008037).withValues(alpha: 0.1)
+              : Colors.white,
           border: Border.all(
             color: isSelected ? const Color(0xFF008037) : Colors.grey.shade300,
             width: 2,
@@ -152,7 +160,8 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
           children: [
             Icon(
               icon,
-              color: isSelected ? const Color(0xFF008037) : Colors.grey.shade600,
+              color:
+                  isSelected ? const Color(0xFF008037) : Colors.grey.shade600,
               size: isTablet ? 24 : 20,
             ),
             SizedBox(width: isTablet ? 16 : 12),
@@ -181,7 +190,7 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
   Widget _buildAgeRangeSlider() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       children: [
         Text(
@@ -205,12 +214,15 @@ class _PreferencesOnboardingScreenState extends State<PreferencesOnboardingScree
               _ageRange = values;
             });
             // Save to controller immediately
-            final controller = Provider.of<OnboardingController>(context, listen: false);
+            final controller =
+                Provider.of<OnboardingController>(context, listen: false);
             controller.setAgeRange([values.start.round(), values.end.round()]);
-            
+
             // Debug logging
-            print('🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}');
-            print('   Controller ageRange after setting: ${controller.ageRange}');
+            print(
+                '🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}');
+            print(
+                '   Controller ageRange after setting: ${controller.ageRange}');
           },
         ),
       ],

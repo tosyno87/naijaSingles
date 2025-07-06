@@ -23,7 +23,7 @@ class SwipeSucessState extends SwipeblocState {
 class SwipeMatchCreatedState extends SwipeblocState {
   final List<UserModel> users;
   final UserModel matchedUser;
-  
+
   const SwipeMatchCreatedState({
     required this.users,
     required this.matchedUser,

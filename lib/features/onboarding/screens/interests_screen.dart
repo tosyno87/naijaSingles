@@ -15,22 +15,24 @@ class _InterestsScreenState extends State<InterestsScreen> {
     // Activities
     'Travel', 'Cooking', 'Hiking', 'Photography', 'Dancing',
     'Reading', 'Writing', 'Painting', 'Singing', 'Gaming',
-    
+
     // Sports
     'Football', 'Basketball', 'Tennis', 'Swimming', 'Yoga',
     'Running', 'Cycling', 'Volleyball', 'Fitness', 'Martial Arts',
-    
+
     // Entertainment
     'Movies', 'Music', 'Concerts', 'Theatre', 'Comedy',
     'Netflix', 'Podcasts', 'Festivals', 'Clubbing', 'Karaoke',
-    
+
     // Food & Drink
     'Fine Dining', 'Street Food', 'Baking', 'Wine Tasting', 'Craft Beer',
     'Vegetarian', 'Foodie', 'Coffee', 'Brunch', 'BBQ',
-    
+
     // Nigerian Specific
-    'Afrobeats', 'Nollywood', 'Jollof Rice', 'Traditional Dance', 'Cultural Events',
-    'Local Markets', 'Nigerian Fashion', 'Pidgin', 'Owanbe Parties', 'Nigerian Literature',
+    'Afrobeats', 'Nollywood', 'Jollof Rice', 'Traditional Dance',
+    'Cultural Events',
+    'Local Markets', 'Nigerian Fashion', 'Pidgin', 'Owanbe Parties',
+    'Nigerian Literature',
   ];
 
   List<String> _selectedInterests = [];
@@ -40,11 +42,12 @@ class _InterestsScreenState extends State<InterestsScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+
       if (controller.interests.isNotEmpty) {
         setState(() {
           _selectedInterests = List.from(controller.interests);
@@ -89,10 +92,11 @@ class _InterestsScreenState extends State<InterestsScreen> {
     if (_searchQuery.isEmpty) {
       return _interests;
     }
-    
-    return _interests.where((interest) => 
-      interest.toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
+
+    return _interests
+        .where((interest) =>
+            interest.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
   }
 
   @override
@@ -118,9 +122,9 @@ class _InterestsScreenState extends State<InterestsScreen> {
                   color: textColor,
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               Text(
                 "Choose up to 10 interests to help us match you with like-minded people",
                 style: GoogleFonts.poppins(
@@ -128,9 +132,9 @@ class _InterestsScreenState extends State<InterestsScreen> {
                   color: Colors.black54,
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Search box
               TextField(
                 controller: _searchController,
@@ -168,9 +172,9 @@ class _InterestsScreenState extends State<InterestsScreen> {
                   });
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Selected count
               Text(
                 "${_selectedInterests.length}/10 selected",
@@ -185,7 +189,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
             ],
           ),
         ),
-        
+
         // Interests grid
         Expanded(
           child: _filteredInterests.isEmpty
@@ -210,7 +214,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                   itemBuilder: (context, index) {
                     final interest = _filteredInterests[index];
                     final isSelected = _selectedInterests.contains(interest);
-                    
+
                     return InkWell(
                       onTap: () => _toggleInterest(interest),
                       borderRadius: BorderRadius.circular(12),
@@ -243,9 +247,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: isSelected
-                                    ? Colors.white
-                                    : textColor,
+                                color: isSelected ? Colors.white : textColor,
                               ),
                             ),
                           ),

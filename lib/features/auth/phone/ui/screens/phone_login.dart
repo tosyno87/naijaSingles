@@ -6,7 +6,8 @@ import '../../../../../common/routes/route_name.dart';
 class PhoneNumber extends StatefulWidget {
   final bool updatePhoneNumber;
 
-  const PhoneNumber({Key? key, required this.updatePhoneNumber}) : super(key: key);
+  const PhoneNumber({Key? key, required this.updatePhoneNumber})
+      : super(key: key);
 
   @override
   State<PhoneNumber> createState() => _PhoneNumberState();
@@ -49,7 +50,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
     });
 
     final phoneNumber = _selectedCountryCode + _phoneController.text.trim();
-    
+
     // For now, just navigate to the existing phone number screen
     // This is a temporary solution until we implement the proper phone login flow
     Navigator.pushNamed(
@@ -107,7 +108,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Phone number input with country code
               Container(
                 decoration: BoxDecoration(
@@ -151,8 +152,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             _selectedCountryCode = newValue!;
                           });
                         },
-                        items: _countryCodes
-                            .map<DropdownMenuItem<String>>((Map<String, String> value) {
+                        items: _countryCodes.map<DropdownMenuItem<String>>(
+                            (Map<String, String> value) {
                           return DropdownMenuItem<String>(
                             value: value['code'],
                             child: Text("${value['code']} (${value['name']})"),
@@ -160,7 +161,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         }).toList(),
                       ),
                     ),
-                    
+
                     // Phone number input
                     Expanded(
                       child: TextField(
@@ -186,9 +187,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Continue labelLarge
               SizedBox(
                 width: double.infinity,
@@ -198,7 +199,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
+                    disabledBackgroundColor:
+                        primaryColor.withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -222,9 +224,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         ),
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Don't have an account? Sign up
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

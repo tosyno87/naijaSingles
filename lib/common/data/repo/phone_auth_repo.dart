@@ -119,7 +119,7 @@ class PhoneAuthRepository {
         log("Cannot get token: No user is signed in");
         return null;
       }
-      
+
       return await user.getIdToken(true); // Force refresh the token
     } catch (e) {
       log("Error getting token: $e");

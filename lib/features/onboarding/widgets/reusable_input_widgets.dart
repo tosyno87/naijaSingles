@@ -24,7 +24,7 @@ class SelectionOption extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelected = selectedValue == value;
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return GestureDetector(
       onTap: () => onSelected(value),
       child: Container(
@@ -34,7 +34,9 @@ class SelectionOption extends StatelessWidget {
           vertical: screenWidth > 600 ? 20 : 16,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF008037).withValues(alpha: 0.1) : Colors.white,
+          color: isSelected
+              ? const Color(0xFF008037).withValues(alpha: 0.1)
+              : Colors.white,
           border: Border.all(
             color: isSelected ? const Color(0xFF008037) : Colors.grey.shade300,
             width: 2,
@@ -54,7 +56,8 @@ class SelectionOption extends StatelessWidget {
             if (icon != null) ...[
               Icon(
                 icon,
-                color: isSelected ? const Color(0xFF008037) : Colors.grey.shade600,
+                color:
+                    isSelected ? const Color(0xFF008037) : Colors.grey.shade600,
                 size: screenWidth > 600 ? 24 : 20,
               ),
               SizedBox(width: screenWidth > 600 ? 16 : 12),
@@ -96,7 +99,7 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -200,7 +203,7 @@ class _HeightInputState extends State<HeightInput> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,8 +218,8 @@ class _HeightInputState extends State<HeightInput> {
                     vertical: screenWidth > 600 ? 16 : 12,
                   ),
                   decoration: BoxDecoration(
-                    color: _selectedUnit == 'cm' 
-                        ? const Color(0xFF008037) 
+                    color: _selectedUnit == 'cm'
+                        ? const Color(0xFF008037)
                         : Colors.grey.shade200,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(12),
@@ -229,7 +232,8 @@ class _HeightInputState extends State<HeightInput> {
                     style: GoogleFonts.poppins(
                       fontSize: screenWidth > 600 ? 16 : 14,
                       fontWeight: FontWeight.w600,
-                      color: _selectedUnit == 'cm' ? Colors.white : Colors.black54,
+                      color:
+                          _selectedUnit == 'cm' ? Colors.white : Colors.black54,
                     ),
                   ),
                 ),
@@ -243,8 +247,8 @@ class _HeightInputState extends State<HeightInput> {
                     vertical: screenWidth > 600 ? 16 : 12,
                   ),
                   decoration: BoxDecoration(
-                    color: _selectedUnit == 'ft' 
-                        ? const Color(0xFF008037) 
+                    color: _selectedUnit == 'ft'
+                        ? const Color(0xFF008037)
                         : Colors.grey.shade200,
                     borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(12),
@@ -257,7 +261,8 @@ class _HeightInputState extends State<HeightInput> {
                     style: GoogleFonts.poppins(
                       fontSize: screenWidth > 600 ? 16 : 14,
                       fontWeight: FontWeight.w600,
-                      color: _selectedUnit == 'ft' ? Colors.white : Colors.black54,
+                      color:
+                          _selectedUnit == 'ft' ? Colors.white : Colors.black54,
                     ),
                   ),
                 ),
@@ -265,9 +270,9 @@ class _HeightInputState extends State<HeightInput> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Height input
         TextFormField(
           controller: _controller,
@@ -303,12 +308,12 @@ class _HeightInputState extends State<HeightInput> {
             color: Colors.black87,
           ),
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Display current height in both units
         Text(
-          _selectedUnit == 'cm' 
+          _selectedUnit == 'cm'
               ? 'Height: ${_height.round()} cm (${_convertToFeetInches(_height)})'
               : 'Height: ${_convertToFeetInches(_height)} (${_height.round()} cm)',
           style: GoogleFonts.poppins(
@@ -350,14 +355,15 @@ class ContinueButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return SizedBox(
       width: double.infinity,
       height: screenWidth > 600 ? 64 : 56,
       child: ElevatedButton(
         onPressed: isEnabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled ? const Color(0xFF008037) : Colors.grey.shade400,
+          backgroundColor:
+              isEnabled ? const Color(0xFF008037) : Colors.grey.shade400,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

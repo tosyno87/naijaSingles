@@ -26,16 +26,17 @@ class OnboardingStepCValues extends StatefulWidget {
   State<OnboardingStepCValues> createState() => _OnboardingStepCValuesState();
 }
 
-class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with SingleTickerProviderStateMixin {
+class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
+    with SingleTickerProviderStateMixin {
   // Keys for accessibility and testing
   final GlobalKey _valuesKey = GlobalKey();
   final GlobalKey _dealbreakersKey = GlobalKey();
   final GlobalKey _finishButtonKey = GlobalKey();
-  
+
   // State variables for animation and validation feedback
   bool _showValidationMessage = false;
   late AnimationController _animationController;
-  
+
   // Values that might matter in a partner
   final List<Map<String, dynamic>> _partnerValues = [
     {'id': 'family', 'label': 'Family-oriented'},
@@ -51,7 +52,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
     {'id': 'independence', 'label': 'Independence'},
     {'id': 'adventure', 'label': 'Adventurous spirit'},
   ];
-  
+
   // Potential dealbreakers
   final List<Map<String, dynamic>> _dealbreakers = [
     {'id': 'smoking', 'label': 'Smoking'},
@@ -64,7 +65,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
     {'id': 'children', 'label': 'Has children from previous relationship'},
     {'id': 'no_family', 'label': 'Doesn\'t want family/children'},
   ];
-  
+
   @override
   void initState() {
     super.initState();
@@ -73,7 +74,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
       duration: const Duration(milliseconds: 200),
     );
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -83,10 +84,10 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<OnboardingController>(context);
-    
+
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
-    
+
     return Scaffold(
       backgroundColor: widget.backgroundColor,
       body: SafeArea(
@@ -99,7 +100,8 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: deepGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -115,9 +117,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Header
               Text(
                 'Your Values & Preferences',
@@ -137,7 +139,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Partner values card
               Container(
                 decoration: BoxDecoration(
@@ -167,18 +169,22 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                     const SizedBox(height: 16),
                     Semantics(
                       label: 'Partner values selection',
-                      hint: 'Select at least 3 values that matter to you in a partner',
+                      hint:
+                          'Select at least 3 values that matter to you in a partner',
                       child: Wrap(
                         key: _valuesKey,
                         spacing: 8,
                         runSpacing: 12,
                         children: _partnerValues.map((value) {
-                          final isSelected = controller.values.contains(value['id']);
+                          final isSelected =
+                              controller.values.contains(value['id']);
                           return _buildValueCheckbox(
                             label: value['label'],
                             isSelected: isSelected,
                             onChanged: (selected) {
-                              List<String> updatedValues = [...controller.values];
+                              List<String> updatedValues = [
+                                ...controller.values
+                              ];
                               if (selected) {
                                 updatedValues.add(value['id']);
                               } else {
@@ -195,9 +201,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Dealbreakers card
               Container(
                 decoration: BoxDecoration(
@@ -227,24 +233,29 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                     const SizedBox(height: 16),
                     Semantics(
                       label: 'Dealbreakers selection',
-                      hint: 'Select any absolute dealbreakers for you in a relationship',
+                      hint:
+                          'Select any absolute dealbreakers for you in a relationship',
                       child: Wrap(
                         key: _dealbreakersKey,
                         spacing: 8,
                         runSpacing: 12,
                         children: _dealbreakers.map((dealbreaker) {
-                          final isSelected = controller.dealbreakers.contains(dealbreaker['id']);
+                          final isSelected = controller.dealbreakers
+                              .contains(dealbreaker['id']);
                           return _buildValueCheckbox(
                             label: dealbreaker['label'],
                             isSelected: isSelected,
                             onChanged: (selected) {
-                              List<String> updatedDealbreakers = [...controller.dealbreakers];
+                              List<String> updatedDealbreakers = [
+                                ...controller.dealbreakers
+                              ];
                               if (selected) {
                                 updatedDealbreakers.add(dealbreaker['id']);
                               } else {
                                 updatedDealbreakers.remove(dealbreaker['id']);
                               }
-                              controller.updateDealbreakers(updatedDealbreakers);
+                              controller
+                                  .updateDealbreakers(updatedDealbreakers);
                               HapticFeedback.selectionClick();
                             },
                             deepGreen: deepGreen,
@@ -255,43 +266,46 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Validation message
               AnimatedOpacity(
                 opacity: _showValidationMessage ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 300),
-                child: _showValidationMessage ? Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.amber),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.info_outline,
-                        color: Colors.amber,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Please select at least 3 values that matter to you',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.amber[800],
-                          ),
+                child: _showValidationMessage
+                    ? Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.amber),
                         ),
-                      ),
-                    ],
-                  ),
-                ) : const SizedBox.shrink(),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.info_outline,
+                              color: Colors.amber,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Please select at least 3 values that matter to you',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.amber[800],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
-              
+
               // Navigation labelLarges
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -312,36 +326,38 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                     ),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.grey.shade700,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                   ),
-                  
+
                   // Finish labelLarge
                   SizedBox(
                     width: 150,
                     height: 56,
                     child: ElevatedButton(
                       key: _finishButtonKey,
-                      onPressed: _isStepValid(controller) 
-                        ? () {
-                            HapticFeedback.mediumImpact();
-                            // Navigate to Dating Homepage instead of calling finishOnboarding
-                            Navigator.pushReplacementNamed(context, '/dating');
-                          } 
-                        : () {
-                            setState(() {
-                              _showValidationMessage = true;
-                              // Hide the message after 3 seconds
-                              Future.delayed(const Duration(seconds: 3), () {
-                                if (mounted) {
-                                  setState(() {
-                                    _showValidationMessage = false;
-                                  });
-                                }
+                      onPressed: _isStepValid(controller)
+                          ? () {
+                              HapticFeedback.mediumImpact();
+                              // Navigate to Dating Homepage instead of calling finishOnboarding
+                              Navigator.pushReplacementNamed(
+                                  context, '/dating');
+                            }
+                          : () {
+                              setState(() {
+                                _showValidationMessage = true;
+                                // Hide the message after 3 seconds
+                                Future.delayed(const Duration(seconds: 3), () {
+                                  if (mounted) {
+                                    setState(() {
+                                      _showValidationMessage = false;
+                                    });
+                                  }
+                                });
                               });
-                            });
-                            HapticFeedback.vibrate();
-                          },
+                              HapticFeedback.vibrate();
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: deepGreen,
                         foregroundColor: Colors.white,
@@ -369,7 +385,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
       ),
     );
   }
-  
+
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) {
     return Text(
@@ -381,7 +397,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
       ),
     );
   }
-  
+
   /// Builds a custom checkbox for values selection
   Widget _buildValueCheckbox({
     required String label,
@@ -407,9 +423,12 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
               highlightColor: deepGreen.withValues(alpha: 0.05),
               child: Container(
                 width: constraints.maxWidth / 2 - 8,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? deepGreen.withValues(alpha: 0.1) : Colors.grey[100],
+                  color: isSelected
+                      ? deepGreen.withValues(alpha: 0.1)
+                      : Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isSelected ? deepGreen : Colors.grey[400]!,
@@ -424,11 +443,11 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                       decoration: BoxDecoration(
                         color: isSelected ? deepGreen : Colors.white,
                         borderRadius: BorderRadius.circular(4),
-                        border: isSelected 
-                            ? null 
+                        border: isSelected
+                            ? null
                             : Border.all(color: Colors.grey[400]!),
                       ),
-                      child: isSelected 
+                      child: isSelected
                           ? const Icon(
                               Icons.check,
                               size: 18,
@@ -443,7 +462,8 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: isSelected ? deepGreen : Colors.black87,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w500,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -458,7 +478,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues> with Sing
       },
     );
   }
-  
+
   /// Validates if all required fields are filled
   bool _isStepValid(OnboardingController controller) {
     // Require at least 3 values

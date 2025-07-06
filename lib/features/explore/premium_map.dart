@@ -109,8 +109,8 @@ class PremiumDialog extends StatelessWidget {
                                     Products(currentUser, null, const {})));
                       },
                       style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                              primaryColor.withValues(alpha: (0.9 * 255).toDouble()))),
+                          backgroundColor: WidgetStatePropertyAll(primaryColor
+                              .withValues(alpha: (0.9 * 255).toDouble()))),
                       child: Text(
                         'Upgrade Now'.tr().toString(),
                         style: const TextStyle(

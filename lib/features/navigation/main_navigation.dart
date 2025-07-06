@@ -14,15 +14,15 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
-  
+
   // Define all main screens here (removed Dating tab)
   // Order matches the BottomNavigationBarItems below
   final List<Widget> _screens = [
-    const ExploreScreen(),   // Tab 0: Explore
-    const MessagesScreen(),  // Tab 1: Messages
-    const ProfileScreen(),   // Tab 2: Profile
+    const ExploreScreen(), // Tab 0: Explore
+    const MessagesScreen(), // Tab 1: Messages
+    const ProfileScreen(), // Tab 2: Profile
   ];
-  
+
   // Deep green color for accents
   static const Color deepGreen = Color(0xFF008037);
 
@@ -31,7 +31,7 @@ class _MainNavigationState extends State<MainNavigation> {
     return Scaffold(
       // The body will switch between screens based on the current index
       body: _screens[_currentIndex],
-      
+
       // SINGLE bottom navigation bar for the entire app
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

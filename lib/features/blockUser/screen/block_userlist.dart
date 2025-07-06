@@ -116,7 +116,8 @@ class _BlockedUserState extends State<BlockedUser> {
                               ? Theme.of(context)
                                   .scaffoldBackgroundColor
                                   .withValues(alpha: (0.60 * 255).toDouble())
-                              : AppColors.secondaryColor.withValues(alpha: (.2 * 255).toDouble()),
+                              : AppColors.secondaryColor
+                                  .withValues(alpha: (.2 * 255).toDouble()),
                           borderRadius: const BorderRadius.only(
                             topRight: Radius.circular(20.0),
                             topLeft: Radius.circular(20.0),
@@ -235,7 +236,8 @@ class _BlockedUserState extends State<BlockedUser> {
                 : Center(
                     child: Text(
                       "No Block user found".tr().toString(),
-                      style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+                      style: TextStyle(
+                          color: AppColors.secondaryColor, fontSize: 16),
                     ),
                   ),
           );

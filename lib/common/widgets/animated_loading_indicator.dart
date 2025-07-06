@@ -4,7 +4,7 @@ import 'dart:math' as math;
 class AnimatedLoadingIndicator extends StatefulWidget {
   final Color color;
   final double size;
-  
+
   const AnimatedLoadingIndicator({
     Key? key,
     this.color = const Color(0xFF008037),
@@ -12,13 +12,14 @@ class AnimatedLoadingIndicator extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<AnimatedLoadingIndicator> createState() => _AnimatedLoadingIndicatorState();
+  State<AnimatedLoadingIndicator> createState() =>
+      _AnimatedLoadingIndicatorState();
 }
 
-class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator> 
+class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  
+
   @override
   void initState() {
     super.initState();
@@ -27,13 +28,13 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
       duration: const Duration(seconds: 2),
     )..repeat();
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -94,30 +95,30 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
 class _LoadingDotPainter extends CustomPainter {
   final Color color;
   final double progress;
-  
+
   _LoadingDotPainter({
     required this.color,
     required this.progress,
   });
-  
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    
+
     // Calculate dot position
     final angle = 2 * math.pi * progress;
     final dotX = center.dx + radius * math.cos(angle);
     final dotY = center.dy + radius * math.sin(angle);
-    
+
     // Draw dot
     final dotPaint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
-    
+
     canvas.drawCircle(Offset(dotX, dotY), 6, dotPaint);
   }
-  
+
   @override
   bool shouldRepaint(_LoadingDotPainter oldDelegate) {
     return oldDelegate.progress != progress;

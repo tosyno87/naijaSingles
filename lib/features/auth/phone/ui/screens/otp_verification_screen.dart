@@ -65,9 +65,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         _canResend = false;
         _remainingTime = 60;
       });
-      
+
       _startTimer();
-      
+
       BlocProvider.of<PhoneAuthBloc>(context).add(
         SendOtpToPhoneEvent(phoneNumber: widget.phoneNumber),
       );
@@ -134,7 +134,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               ),
             ),
           ),
-          
+
           // Main content
           SafeArea(
             child: Padding(
@@ -143,15 +143,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-                  
+
                   // Header image
                   Image.asset(
                     'asset/auth/verifyOtp.png',
                     height: 180,
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Header text
                   Text(
                     "Verification Code",
@@ -162,9 +162,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       color: textColor,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Phone number display
                   RichText(
                     textAlign: TextAlign.center,
@@ -186,9 +186,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 40),
-                  
+
                   // OTP input field
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -223,9 +223,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       },
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Timer and resend option
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -259,9 +259,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             ),
                     ],
                   ),
-                  
+
                   const Spacer(),
-                  
+
                   // Verify labelLarge
                   MultiBlocListener(
                     listeners: [
@@ -319,13 +319,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       child: BlocBuilder<PhoneAuthBloc, PhoneAuthState>(
                         builder: (context, state) {
                           return ElevatedButton(
-                            onPressed: state is PhoneAuthLoading
-                                ? null
-                                : _verifyOtp,
+                            onPressed:
+                                state is PhoneAuthLoading ? null : _verifyOtp,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
-                              disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
+                              disabledBackgroundColor:
+                                  primaryColor.withValues(alpha: 0.5),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -352,7 +352,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       ),
                     ),
                   ),
-                  
+
                   SizedBox(height: screenSize.height * 0.08),
                 ],
               ),

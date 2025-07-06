@@ -24,7 +24,7 @@ class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
     log('GoogleLoginRequested()');
     emit(GoogleLoginLoading());
     log('Transition to GoogleLoginLoading()');
-    
+
     try {
       log('Attempting to sign in with Google...');
       final user = await _repository.signInWithGoogle();
@@ -35,8 +35,8 @@ class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
       emit(const GoogleLoginFailed(message: 'No Internet Connection'));
     } catch (e) {
       log('Google sign-in failed: ${e.toString()}');
-      final errorMessage = e.toString().contains('Exception:') 
-          ? e.toString().split('Exception:').last.trim() 
+      final errorMessage = e.toString().contains('Exception:')
+          ? e.toString().split('Exception:').last.trim()
           : e.toString();
       emit(GoogleLoginFailed(message: errorMessage));
     }

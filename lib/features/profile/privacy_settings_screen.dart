@@ -62,7 +62,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
+        content:
+            Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: primaryColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -73,7 +74,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
+        content:
+            Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -142,9 +144,9 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           ),
           const SizedBox(height: 16),
           _buildCommunicationSection(),
-          
+
           const SizedBox(height: 32),
-          
+
           // Activity Status Section
           _buildSectionHeader(
             '👀 ACTIVITY STATUS',
@@ -152,9 +154,9 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           ),
           const SizedBox(height: 16),
           _buildActivitySection(),
-          
+
           const SizedBox(height: 32),
-          
+
           // Profile Visibility Section
           _buildSectionHeader(
             '🧬 PROFILE VISIBILITY',
@@ -162,9 +164,9 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           ),
           const SizedBox(height: 16),
           _buildProfileVisibilitySection(),
-          
+
           const SizedBox(height: 32),
-          
+
           // Location Privacy Section
           _buildSectionHeader(
             '📍 LOCATION PRIVACY',
@@ -172,10 +174,10 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           ),
           const SizedBox(height: 16),
           _buildLocationPrivacySection(),
-          
+
           const SizedBox(height: 32),
           _buildPrivacySummary(),
-          
+
           const SizedBox(height: 100), // Bottom padding
         ],
       ),
@@ -395,7 +397,9 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isDestructive && value ? Colors.red.shade700 : textPrimary,
+                    color: isDestructive && value
+                        ? Colors.red.shade700
+                        : textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -403,7 +407,9 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                   subtitle,
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
-                    color: isDestructive && value ? Colors.red.shade500 : textSecondary,
+                    color: isDestructive && value
+                        ? Colors.red.shade500
+                        : textSecondary,
                   ),
                 ),
               ],

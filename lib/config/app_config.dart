@@ -6,7 +6,6 @@ const String termConditionUrl =
 const String privacyUrl =
     "https://www.deligence.com/apps/hookup4u/Privacy-Policy.html";
 
-
 // Add google map key for google places search
 const googleMapsKey = 'AIzaSyCDhfoQyJeKhBluyuXHV7mvwxbxMQozdx8';
 //for support to user add you mail

@@ -4,61 +4,62 @@ import 'notification_model.dart';
 class NotificationService {
   // Singleton instance
   static final NotificationService _instance = NotificationService._internal();
-  
+
   factory NotificationService() {
     return _instance;
   }
-  
+
   NotificationService._internal();
-  
+
   // In-memory storage for notifications
   final List<AppNotification> _notifications = [];
-  
+
   /// Get all notifications
   List<AppNotification> getAllNotifications() {
     if (_notifications.isEmpty) {
       _loadDummyNotifications();
     }
-    
+
     // Sort by timestamp (newest first)
     _notifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return _notifications;
   }
-  
+
   /// Get unread notifications count
   int getUnreadCount() {
     return _notifications.where((notification) => !notification.isRead).length;
   }
-  
+
   /// Mark a notification as read
   void markAsRead(String id) {
-    final index = _notifications.indexWhere((notification) => notification.id == id);
+    final index =
+        _notifications.indexWhere((notification) => notification.id == id);
     if (index != -1) {
       _notifications[index] = _notifications[index].copyWith(isRead: true);
     }
   }
-  
+
   /// Mark all notifications as read
   void markAllAsRead() {
     for (var i = 0; i < _notifications.length; i++) {
       _notifications[i] = _notifications[i].copyWith(isRead: true);
     }
   }
-  
+
   /// Delete a notification
   void deleteNotification(String id) {
     _notifications.removeWhere((notification) => notification.id == id);
   }
-  
+
   /// Add a new notification
   void addNotification(AppNotification notification) {
     _notifications.add(notification);
   }
-  
+
   /// Load dummy notifications for demo purposes
   void _loadDummyNotifications() {
     final now = DateTime.now();
-    
+
     _notifications.addAll([
       AppNotification(
         id: '1',

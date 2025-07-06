@@ -18,11 +18,12 @@ class _BioScreenState extends State<BioScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<OnboardingController>(context, listen: false);
-      
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+
       if (controller.bio.isNotEmpty) {
         _bioController.text = controller.bio;
         setState(() {
@@ -57,9 +58,9 @@ class _BioScreenState extends State<BioScreen> {
               color: textColor,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Text(
             "Share a bit about who you are, what you enjoy, and what you're looking for",
             style: GoogleFonts.poppins(
@@ -67,9 +68,9 @@ class _BioScreenState extends State<BioScreen> {
               color: Colors.black54,
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Bio text field
           Container(
             decoration: BoxDecoration(
@@ -111,16 +112,16 @@ class _BioScreenState extends State<BioScreen> {
                 setState(() {
                   _currentLength = value.length;
                 });
-                
+
                 // Save to controller
                 Provider.of<OnboardingController>(context, listen: false)
                     .setBio(value);
               },
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Character counter
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -129,16 +130,14 @@ class _BioScreenState extends State<BioScreen> {
                 "$_currentLength/$_maxLength",
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: _currentLength >= 20
-                      ? primaryColor
-                      : Colors.grey,
+                  color: _currentLength >= 20 ? primaryColor : Colors.grey,
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Bio tips
           Container(
             padding: const EdgeInsets.all(16),
@@ -161,9 +160,7 @@ class _BioScreenState extends State<BioScreen> {
                     color: Colors.amber.shade800,
                   ),
                 ),
-                
                 const SizedBox(height: 8),
-                
                 _buildTipItem(
                   "Be authentic and show your personality",
                 ),

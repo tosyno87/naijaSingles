@@ -19,27 +19,32 @@ class RotatingGreetingWidget extends StatelessWidget {
           repeatForever: true,
           pause: const Duration(seconds: 2),
           animatedTexts: [
-            FadeAnimatedText('Nnoo', 
+            FadeAnimatedText(
+              'Nnoo',
               duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
               fadeOutBegin: 0.8,
             ),
-            FadeAnimatedText('Karibu', 
+            FadeAnimatedText(
+              'Karibu',
               duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
               fadeOutBegin: 0.8,
             ),
-            FadeAnimatedText('Barka da zuwa', 
+            FadeAnimatedText(
+              'Barka da zuwa',
               duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
               fadeOutBegin: 0.8,
             ),
-            FadeAnimatedText('Wamkelekile', 
+            FadeAnimatedText(
+              'Wamkelekile',
               duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
               fadeOutBegin: 0.8,
             ),
-            FadeAnimatedText('Akwaaba', 
+            FadeAnimatedText(
+              'Akwaaba',
               duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
               fadeOutBegin: 0.8,

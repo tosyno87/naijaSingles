@@ -24,7 +24,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
     {'name': 'Pansexual', 'selected': false},
     {'name': 'Queer', 'selected': false},
   ];
-  
+
   List<String> selectedOrientations = [];
   bool showOnProfile = true;
 
@@ -32,9 +32,9 @@ class _SexualOrientationState extends State<SexualOrientation> {
     setState(() {
       // Toggle selection state
       orientationList[index]['selected'] = !orientationList[index]['selected'];
-      
+
       String orientation = orientationList[index]['name'];
-      
+
       if (orientationList[index]['selected']) {
         // Check if we already have 3 selections
         if (selectedOrientations.length >= 3) {
@@ -46,7 +46,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
           );
           return;
         }
-        
+
         // Add to selected list
         selectedOrientations.add(orientation);
       } else {
@@ -58,9 +58,10 @@ class _SexualOrientationState extends State<SexualOrientation> {
 
   @override
   Widget build(BuildContext context) {
-    var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    var userData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -87,19 +88,20 @@ class _SexualOrientationState extends State<SexualOrientation> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      
+
                       // Progress indicator
                       Container(
                         height: 4,
-                        width: screenSize.width * 0.75, // 75% of screen width (fifth step)
+                        width: screenSize.width *
+                            0.75, // 75% of screen width (fifth step)
                         decoration: BoxDecoration(
                           color: const Color(0xFF27AE60),
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Title section
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,14 +124,14 @@ class _SexualOrientationState extends State<SexualOrientation> {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Orientation options with pill-shaped labelLarges
                       _buildOrientationGrid(),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // "Prefer not to say" option
                       GestureDetector(
                         onTap: () {
@@ -139,22 +141,25 @@ class _SexualOrientationState extends State<SexualOrientation> {
                               orientation['selected'] = false;
                             }
                             selectedOrientations.clear();
-                            
+
                             // Add "Prefer not to say"
                             selectedOrientations.add("Prefer not to say");
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 20),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: selectedOrientations.contains("Prefer not to say") 
-                                  ? const Color(0xFF27AE60) 
+                              color: selectedOrientations
+                                      .contains("Prefer not to say")
+                                  ? const Color(0xFF27AE60)
                                   : Colors.grey[300]!,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.circular(30),
-                            color: selectedOrientations.contains("Prefer not to say")
+                            color: selectedOrientations
+                                    .contains("Prefer not to say")
                                 ? const Color(0xFFE8F5E9)
                                 : Colors.white,
                           ),
@@ -163,10 +168,12 @@ class _SexualOrientationState extends State<SexualOrientation> {
                               "Prefer not to say",
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: selectedOrientations.contains("Prefer not to say") 
-                                    ? FontWeight.bold 
+                                fontWeight: selectedOrientations
+                                        .contains("Prefer not to say")
+                                    ? FontWeight.bold
                                     : FontWeight.normal,
-                                color: selectedOrientations.contains("Prefer not to say")
+                                color: selectedOrientations
+                                        .contains("Prefer not to say")
                                     ? const Color(0xFF27AE60)
                                     : Colors.black87,
                               ),
@@ -174,9 +181,9 @@ class _SexualOrientationState extends State<SexualOrientation> {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // iOS-style toggle for "Show my orientation on profile"
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -202,14 +209,15 @@ class _SexualOrientationState extends State<SexualOrientation> {
                           ],
                         ),
                       ),
-                      
-                      const SizedBox(height: 100), // Space for the bottom labelLarge
+
+                      const SizedBox(
+                          height: 100), // Space for the bottom labelLarge
                     ],
                   ),
                 ),
               ),
             ),
-            
+
             // Sticky Continue labelLarge at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
@@ -226,20 +234,20 @@ class _SexualOrientationState extends State<SexualOrientation> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: selectedOrientations.isEmpty ? null : () {
-                    userData.addAll({
-                      "sexualOrientation": {
-                        'orientation': selectedOrientations,
-                        'showOnProfile': showOnProfile
-                      },
-                    });
-                    log(userData.toString());
-                    Navigator.pushNamed(
-                      context, 
-                      RouteName.showGenderScreen,
-                      arguments: userData
-                    );
-                  },
+                  onPressed: selectedOrientations.isEmpty
+                      ? null
+                      : () {
+                          userData.addAll({
+                            "sexualOrientation": {
+                              'orientation': selectedOrientations,
+                              'showOnProfile': showOnProfile
+                            },
+                          });
+                          log(userData.toString());
+                          Navigator.pushNamed(
+                              context, RouteName.showGenderScreen,
+                              arguments: userData);
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),
                     foregroundColor: Colors.white,
@@ -267,7 +275,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
       ),
     );
   }
-  
+
   Widget _buildOrientationGrid() {
     return GridView.builder(
       shrinkWrap: true,
@@ -282,7 +290,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
       itemBuilder: (context, index) {
         final orientation = orientationList[index];
         final isSelected = orientation['selected'];
-        
+
         return GestureDetector(
           onTap: () {
             // Don't allow selection if "Prefer not to say" is selected
@@ -291,7 +299,7 @@ class _SexualOrientationState extends State<SexualOrientation> {
                 selectedOrientations.clear();
               });
             }
-            
+
             _toggleOrientation(index);
           },
           child: AnimatedContainer(

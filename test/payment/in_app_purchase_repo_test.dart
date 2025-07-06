@@ -28,7 +28,8 @@ void main() {
         status: PurchaseStatus.purchased,
       );
 
-      final result = InAppPurchaseRepoImpl.hasPurchased('id2', [purchase1, purchase2]);
+      final result =
+          InAppPurchaseRepoImpl.hasPurchased('id2', [purchase1, purchase2]);
 
       expect(result.productID, 'id2');
     });

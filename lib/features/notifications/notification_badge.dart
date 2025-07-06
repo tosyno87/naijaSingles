@@ -9,7 +9,7 @@ class NotificationBadge extends StatefulWidget {
   final Color iconColor;
   final double iconSize;
   final Color badgeColor;
-  
+
   const NotificationBadge({
     Key? key,
     this.iconColor = const Color(0xFF008037),
@@ -24,19 +24,19 @@ class NotificationBadge extends StatefulWidget {
 class _NotificationBadgeState extends State<NotificationBadge> {
   final NotificationService _notificationService = NotificationService();
   int _unreadCount = 0;
-  
+
   @override
   void initState() {
     super.initState();
     _updateUnreadCount();
   }
-  
+
   void _updateUnreadCount() {
     setState(() {
       _unreadCount = _notificationService.getUnreadCount();
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -45,7 +45,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
           context,
           MaterialPageRoute(builder: (_) => const NotificationsScreen()),
         );
-        
+
         // Update unread count when returning from notifications screen
         _updateUnreadCount();
       },

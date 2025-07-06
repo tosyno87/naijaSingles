@@ -23,7 +23,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   final ChatService _chatService = ChatService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   // Afropeep MVP Color Scheme
   static const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
   static const Color primaryColor = Color(0xFF008037); // Deep green
@@ -65,18 +65,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildLoadingState();
           }
-          
+
           if (snapshot.hasError) {
             log('Error loading messages: ${snapshot.error}');
             return _buildErrorState(snapshot.error.toString());
           }
-          
+
           final threads = snapshot.data ?? [];
-          
+
           if (threads.isEmpty) {
             return _buildEmptyState();
           }
-          
+
           return _buildMessagesList(threads);
         },
       ),
@@ -98,47 +98,49 @@ class _MessagesScreenState extends State<MessagesScreen> {
         .snapshots()
         .asyncMap((snapshot) async {
       List<MessageThreadInfo> threads = [];
-      
+
       for (var doc in snapshot.docs) {
         try {
           final data = doc.data();
-          
+
           // Find the other user's ID
           final userIds = List<String>.from(data['userIds'] ?? []);
           final otherUserId = userIds.firstWhere(
             (id) => id != currentUserId,
             orElse: () => '',
           );
-          
+
           if (otherUserId.isEmpty) continue;
-          
+
           // Get other user's data
-          final otherUserDoc = await _firestore.collection('users').doc(otherUserId).get();
+          final otherUserDoc =
+              await _firestore.collection('users').doc(otherUserId).get();
           String otherUserName = 'User';
           String? avatarUrl;
-          
+
           if (otherUserDoc.exists) {
             final userData = otherUserDoc.data() as Map<String, dynamic>?;
             otherUserName = userData?['name'] ?? 'User';
-            
+
             // Get first photo as avatar
             final photos = userData?['photos'] as List<dynamic>?;
             if (photos != null && photos.isNotEmpty) {
               avatarUrl = photos.first as String?;
             }
           }
-          
+
           // Get unread count for current user
           final unreadCount = data['unreadCount'] as Map<String, dynamic>?;
           final unread = (unreadCount?[currentUserId] ?? 0) > 0;
-          
+
           threads.add(MessageThreadInfo(
             threadId: doc.id,
             otherUserId: otherUserId,
             otherUserName: otherUserName,
             lastMessage: data['lastMessageText'] ?? 'Say hello!',
             lastMessageSenderId: data['lastMessageSenderId'],
-            timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
+            timestamp:
+                (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
             unread: unread,
             avatarUrl: avatarUrl,
             isOnline: false, // TODO: Implement online status
@@ -148,10 +150,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
           continue;
         }
       }
-      
+
       // Sort by timestamp in memory (since we can't use orderBy without index)
       threads.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      
+
       return threads;
     }).handleError((error) {
       log('Error in _getChatThreadsStreamWithUserData: $error');
@@ -222,7 +224,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
               child: Text(
                 'Retry',
@@ -282,7 +285,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 // Navigate directly to ExploreScreen with back labelLarge
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const ExploreScreen(showBackButton: true),
+                    builder: (context) =>
+                        const ExploreScreen(showBackButton: true),
                   ),
                 );
               },
@@ -292,7 +296,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 elevation: 2,
               ),
               child: Text(
@@ -354,8 +359,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
               offset: const Offset(0, 3),
             ),
           ],
-          border: thread.unread 
-              ? Border.all(color: primaryColor.withValues(alpha: 0.3), width: 1.5)
+          border: thread.unread
+              ? Border.all(
+                  color: primaryColor.withValues(alpha: 0.3), width: 1.5)
               : null,
         ),
         child: Material(
@@ -380,7 +386,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: thread.unread ? primaryColor : Colors.grey.shade300,
+                              color: thread.unread
+                                  ? primaryColor
+                                  : Colors.grey.shade300,
                               width: thread.unread ? 2.5 : 1,
                             ),
                           ),
@@ -390,9 +398,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             backgroundImage: thread.avatarUrl != null
                                 ? NetworkImage(thread.avatarUrl!)
                                 : null,
-                            onBackgroundImageError: thread.avatarUrl != null 
-                                ? (_, __) {} 
-                                : null,
+                            onBackgroundImageError:
+                                thread.avatarUrl != null ? (_, __) {} : null,
                             child: thread.avatarUrl == null
                                 ? Icon(
                                     Icons.person,
@@ -403,7 +410,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           ),
                         ),
                       ),
-                      
+
                       // Profile view indicator
                       Positioned(
                         bottom: 0,
@@ -465,7 +472,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           children: [
                             Expanded(
                               child: GestureDetector(
-                                onTap: () => _viewUserProfile(thread.otherUserId),
+                                onTap: () =>
+                                    _viewUserProfile(thread.otherUserId),
                                 child: Row(
                                   children: [
                                     Flexible(
@@ -473,8 +481,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                         thread.otherUserName,
                                         style: GoogleFonts.montserrat(
                                           fontSize: 17,
-                                          fontWeight: thread.unread 
-                                              ? FontWeight.bold 
+                                          fontWeight: thread.unread
+                                              ? FontWeight.bold
                                               : FontWeight.w600,
                                           color: textPrimary,
                                         ),
@@ -496,8 +504,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                               style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 color: thread.unread ? primaryColor : textLight,
-                                fontWeight: thread.unread 
-                                    ? FontWeight.w600 
+                                fontWeight: thread.unread
+                                    ? FontWeight.w600
                                     : FontWeight.normal,
                               ),
                             ),
@@ -511,8 +519,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             color: thread.unread ? textPrimary : textSecondary,
-                            fontWeight: thread.unread 
-                                ? FontWeight.w500 
+                            fontWeight: thread.unread
+                                ? FontWeight.w500
                                 : FontWeight.normal,
                             height: 1.3,
                           ),
@@ -532,7 +540,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   void _openChatThread(MessageThreadInfo thread) {
     // Mark as read when tapped
     _chatService.markThreadAsRead(thread.threadId);
-    
+
     // Navigate to chat thread screen
     Navigator.push(
       context,
@@ -578,7 +586,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
     );
   }
-  
+
   // Show delete confirmation dialog
   Future<bool?> _showDeleteConfirmation(MessageThreadInfo thread) async {
     return showDialog<bool>(
@@ -627,7 +635,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
     );
   }
-  
+
   // Delete chat thread with loading indicator
   Future<void> _deleteChatThread(MessageThreadInfo thread) async {
     // Show loading indicator
@@ -651,13 +659,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-    
+
     try {
       final success = await _chatService.deleteChatThread(thread.threadId);
-      
+
       // Close loading dialog
       if (mounted) Navigator.pop(context);
-      
+
       if (success) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
@@ -692,7 +700,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     } catch (e) {
       // Close loading dialog
       if (mounted) Navigator.pop(context);
-      
+
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -744,24 +752,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
       // Fetch user data from Firestore
       final userDoc = await _firestore.collection('users').doc(userId).get();
-      
+
       // Close loading dialog
       if (mounted) Navigator.pop(context);
-      
+
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
-        
+
         // Convert Firestore data to UserModel
         final userModel = UserModel(
           id: userId,
           name: userData['name'] ?? 'Unknown User',
           age: userData['age'] ?? 0,
-          imageUrl: List<String>.from(userData['photos'] ?? userData['imageUrl'] ?? []),
+          imageUrl: List<String>.from(
+              userData['photos'] ?? userData['imageUrl'] ?? []),
           address: userData['locationName'] ?? userData['address'],
           distanceBW: userData['distanceBW'],
           editInfo: userData['editInfo'] ?? {},
         );
-        
+
         // Navigate to profile screen
         Navigator.push(
           context,
@@ -788,7 +797,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     } catch (e) {
       // Close loading dialog if still open
       if (mounted) Navigator.pop(context);
-      
+
       log('Error loading user profile: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

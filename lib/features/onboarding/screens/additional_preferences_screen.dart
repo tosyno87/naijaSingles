@@ -8,10 +8,12 @@ class AdditionalPreferencesScreen extends StatefulWidget {
   const AdditionalPreferencesScreen({Key? key}) : super(key: key);
 
   @override
-  State<AdditionalPreferencesScreen> createState() => _AdditionalPreferencesScreenState();
+  State<AdditionalPreferencesScreen> createState() =>
+      _AdditionalPreferencesScreenState();
 }
 
-class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScreen> {
+class _AdditionalPreferencesScreenState
+    extends State<AdditionalPreferencesScreen> {
   late double _height;
   late String _heightUnit;
   String _lookingFor = 'Dating';
@@ -19,21 +21,46 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
 
   final List<Map<String, dynamic>> _lookingForOptions = [
     {'label': 'Dating', 'value': 'Dating', 'icon': Icons.favorite_outline},
-    {'label': 'Friendship', 'value': 'Friendship', 'icon': Icons.people_outline},
-    {'label': 'Networking', 'value': 'Networking', 'icon': Icons.business_center_outlined},
+    {
+      'label': 'Friendship',
+      'value': 'Friendship',
+      'icon': Icons.people_outline
+    },
+    {
+      'label': 'Networking',
+      'value': 'Networking',
+      'icon': Icons.business_center_outlined
+    },
   ];
 
   final List<Map<String, dynamic>> _relationshipIntentOptions = [
-    {'label': 'Short-term fun', 'value': 'Short-term', 'icon': Icons.flash_on_outlined},
-    {'label': 'Long-term relationship', 'value': 'Long-term', 'icon': Icons.favorite_border},
-    {'label': 'Casual dating', 'value': 'Casual', 'icon': Icons.coffee_outlined},
-    {'label': 'Not sure yet', 'value': 'Not sure yet', 'icon': Icons.help_outline},
+    {
+      'label': 'Short-term fun',
+      'value': 'Short-term',
+      'icon': Icons.flash_on_outlined
+    },
+    {
+      'label': 'Long-term relationship',
+      'value': 'Long-term',
+      'icon': Icons.favorite_border
+    },
+    {
+      'label': 'Casual dating',
+      'value': 'Casual',
+      'icon': Icons.coffee_outlined
+    },
+    {
+      'label': 'Not sure yet',
+      'value': 'Not sure yet',
+      'icon': Icons.help_outline
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     _height = controller.height;
     _heightUnit = controller.heightUnit;
     _lookingFor = controller.lookingFor;
@@ -45,7 +72,7 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isTablet = screenWidth > 600;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFFDF1E7),
       appBar: AppBar(
@@ -92,9 +119,9 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
                         color: Colors.black54,
                       ),
                     ),
-                    
+
                     SizedBox(height: isTablet ? 48 : 40),
-                    
+
                     // Height Section
                     const SectionHeader(
                       title: 'Height',
@@ -111,9 +138,9 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
                         });
                       },
                     ),
-                    
+
                     SizedBox(height: isTablet ? 48 : 40),
-                    
+
                     // Looking For Section
                     const SectionHeader(
                       title: 'I\'m looking for',
@@ -121,9 +148,9 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
                     ),
                     SizedBox(height: isTablet ? 20 : 16),
                     ..._buildLookingForOptions(),
-                    
+
                     SizedBox(height: isTablet ? 48 : 40),
-                    
+
                     // Relationship Intent Section
                     const SectionHeader(
                       title: 'Relationship goals',
@@ -131,15 +158,15 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
                     ),
                     SizedBox(height: isTablet ? 20 : 16),
                     ..._buildRelationshipIntentOptions(),
-                    
+
                     SizedBox(height: isTablet ? 48 : 40),
-                    
+
                     // Continue Button
                     ContinueButton(
                       onPressed: _saveAndContinue,
                       text: 'Continue',
                     ),
-                    
+
                     SizedBox(height: isTablet ? 32 : 24),
                   ],
                 ),
@@ -154,7 +181,7 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
   List<Widget> _buildLookingForOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return _lookingForOptions.map((option) {
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
@@ -176,7 +203,7 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return _relationshipIntentOptions.map((option) {
       return Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
@@ -196,17 +223,18 @@ class _AdditionalPreferencesScreenState extends State<AdditionalPreferencesScree
   }
 
   void _saveAndContinue() {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // Save all preferences
     controller.setHeight(_height, _heightUnit);
     controller.setLookingFor(_lookingFor);
     controller.setRelationshipIntent(_relationshipIntent);
-    
+
     // Navigate to next screen or complete onboarding
     // You can customize this based on your onboarding flow
     Navigator.pop(context);
-    
+
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

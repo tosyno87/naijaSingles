@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 class EmailAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   // Sign in with email and password
   Future<UserCredential> signInWithEmail({
     required String email,
@@ -21,7 +21,7 @@ class EmailAuthService {
       rethrow;
     }
   }
-  
+
   // Register with email and password
   Future<UserCredential> registerWithEmail({
     required String email,
@@ -34,10 +34,10 @@ class EmailAuthService {
         email: email.trim(),
         password: password,
       );
-      
+
       // Update the user's display name
       await userCredential.user?.updateDisplayName(name);
-      
+
       // Create the user document in Firestore
       if (userCredential.user != null) {
         await _createUserDocument(
@@ -46,14 +46,14 @@ class EmailAuthService {
           name: name,
         );
       }
-      
+
       return userCredential;
     } catch (e) {
       debugPrint('Error registering with email: $e');
       rethrow;
     }
   }
-  
+
   // Create user document in Firestore
   Future<void> _createUserDocument({
     required String userId,
@@ -75,7 +75,7 @@ class EmailAuthService {
       rethrow;
     }
   }
-  
+
   // Send password reset email
   Future<void> sendPasswordResetEmail(String email) async {
     try {
@@ -85,7 +85,7 @@ class EmailAuthService {
       rethrow;
     }
   }
-  
+
   // Update user email
   Future<void> updateEmail(String newEmail) async {
     try {
@@ -101,7 +101,7 @@ class EmailAuthService {
       rethrow;
     }
   }
-  
+
   // Update user password
   Future<void> updatePassword(String newPassword) async {
     try {
@@ -114,7 +114,7 @@ class EmailAuthService {
       rethrow;
     }
   }
-  
+
   // Re-authenticate user (required for sensitive operations)
   Future<UserCredential> reauthenticate(String password) async {
     try {
@@ -125,12 +125,12 @@ class EmailAuthService {
           message: 'No user is currently signed in.',
         );
       }
-      
+
       final credential = EmailAuthProvider.credential(
         email: user.email!,
         password: password,
       );
-      
+
       return await user.reauthenticateWithCredential(credential);
     } catch (e) {
       debugPrint('Error reauthenticating: $e');

@@ -21,14 +21,14 @@ class IOSHeightPicker extends StatefulWidget {
 class _IOSHeightPickerState extends State<IOSHeightPicker> {
   late String _selectedUnit;
   late double _heightInCm;
-  
+
   // For CM picker
   late FixedExtentScrollController _cmController;
-  
+
   // For FT/IN picker
   late FixedExtentScrollController _feetController;
   late FixedExtentScrollController _inchesController;
-  
+
   // Height ranges
   static const int minCm = 120; // 4 feet
   static const int maxCm = 220; // 7'2"
@@ -41,7 +41,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
     super.initState();
     _selectedUnit = widget.initialUnit;
     _heightInCm = widget.initialHeight;
-    
+
     _initializeControllers();
   }
 
@@ -54,8 +54,9 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
       double totalInches = _heightInCm / 2.54;
       int feet = (totalInches / 12).floor().clamp(minFeet, maxFeet);
       int inches = (totalInches % 12).round().clamp(0, maxInches);
-      
-      _feetController = FixedExtentScrollController(initialItem: feet - minFeet);
+
+      _feetController =
+          FixedExtentScrollController(initialItem: feet - minFeet);
       _inchesController = FixedExtentScrollController(initialItem: inches);
     }
   }
@@ -105,7 +106,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -125,8 +126,8 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                       vertical: isTablet ? 16 : 12,
                     ),
                     decoration: BoxDecoration(
-                      color: _selectedUnit == 'cm' 
-                          ? const Color(0xFF008037) 
+                      color: _selectedUnit == 'cm'
+                          ? const Color(0xFF008037)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -136,7 +137,9 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                       style: GoogleFonts.poppins(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
-                        color: _selectedUnit == 'cm' ? Colors.white : Colors.black54,
+                        color: _selectedUnit == 'cm'
+                            ? Colors.white
+                            : Colors.black54,
                       ),
                     ),
                   ),
@@ -150,8 +153,8 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                       vertical: isTablet ? 16 : 12,
                     ),
                     decoration: BoxDecoration(
-                      color: _selectedUnit == 'ft' 
-                          ? const Color(0xFF008037) 
+                      color: _selectedUnit == 'ft'
+                          ? const Color(0xFF008037)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -161,7 +164,9 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                       style: GoogleFonts.poppins(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
-                        color: _selectedUnit == 'ft' ? Colors.white : Colors.black54,
+                        color: _selectedUnit == 'ft'
+                            ? Colors.white
+                            : Colors.black54,
                       ),
                     ),
                   ),
@@ -170,9 +175,9 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             ],
           ),
         ),
-        
+
         SizedBox(height: isTablet ? 24 : 20),
-        
+
         // Height display
         Center(
           child: Container(
@@ -198,9 +203,9 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             ),
           ),
         ),
-        
+
         SizedBox(height: isTablet ? 24 : 20),
-        
+
         // iOS-style picker
         Container(
           height: isTablet ? 200 : 180,
@@ -215,15 +220,17 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
               ),
             ],
           ),
-          child: _selectedUnit == 'cm' ? _buildCmPicker() : _buildFeetInchesPicker(),
+          child: _selectedUnit == 'cm'
+              ? _buildCmPicker()
+              : _buildFeetInchesPicker(),
         ),
-        
+
         SizedBox(height: isTablet ? 16 : 12),
-        
+
         // Helper text
         Center(
           child: Text(
-            _selectedUnit == 'cm' 
+            _selectedUnit == 'cm'
                 ? 'Scroll to select your height in centimeters'
                 : 'Scroll to select your height in feet and inches',
             style: GoogleFonts.poppins(
@@ -240,7 +247,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
   Widget _buildCmPicker() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return CupertinoPicker(
       scrollController: _cmController,
       itemExtent: isTablet ? 50 : 45,
@@ -262,7 +269,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
           double totalInches = cm / 2.54;
           int feet = (totalInches / 12).floor();
           int inches = (totalInches % 12).round();
-          
+
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -293,7 +300,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
   Widget _buildFeetInchesPicker() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    
+
     return Row(
       children: [
         // Feet picker
@@ -342,7 +349,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             ),
           ),
         ),
-        
+
         // Separator
         Container(
           width: 1,
@@ -350,7 +357,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
           color: Colors.grey.shade300,
           margin: const EdgeInsets.symmetric(vertical: 20),
         ),
-        
+
         // Inches picker
         Expanded(
           child: CupertinoPicker(

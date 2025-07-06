@@ -33,13 +33,12 @@ class UserMessagingRepo {
               currentUser.longitude != null &&
               tempuser.latitude != null &&
               tempuser.longitude != null) {
-            tempuser.distanceBW =
-                calculateDistance(
-                        currentUser.latitude!,
-                        currentUser.longitude!,
-                        tempuser.latitude!,
-                        tempuser.longitude!)
-                    .round();
+            tempuser.distanceBW = calculateDistance(
+                    currentUser.latitude!,
+                    currentUser.longitude!,
+                    tempuser.latitude!,
+                    tempuser.longitude!)
+                .round();
           }
           matches.add(tempuser);
           // matches.sort((a, b) => b.lastmsg!.compareTo(
@@ -235,5 +234,4 @@ class UserMessagingRepo {
       debugPrint("Error checking if blocked document exists: $error");
     });
   }
-
 }

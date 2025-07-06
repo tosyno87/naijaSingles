@@ -41,7 +41,7 @@ class AppColors {
   static const Color warningColor = Color(0xFFFF9800);
   static const Color infoColor = Color(0xFF2196F3);
   static const Color secondaryColor = Color(0xFF8D6E63); // Add this back
-  
+
   @Deprecated('Use AppColors.textSecondary instead')
   static const Color secondryColor = textSecondary;
 }

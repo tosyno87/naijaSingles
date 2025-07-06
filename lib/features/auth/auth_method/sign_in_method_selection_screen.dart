@@ -51,7 +51,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Main content
           SafeArea(
             child: Padding(
@@ -60,7 +60,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 24),
-                  
+
                   // Header text - Bold Montserrat
                   Text(
                     "Sign In or Create Account",
@@ -71,9 +71,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       color: textColor,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Subtitle - Regular Montserrat, light brown
                   Text(
                     "Choose how you'd like to continue",
@@ -84,9 +84,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       color: textLightBrown,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 48),
-                  
+
                   // Phone Number Button
                   _buildAuthMethodButton(
                     context: context,
@@ -98,14 +98,15 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PhoneNumber(updatePhoneNumber: false, isSignIn: true),
+                          builder: (context) => PhoneNumber(
+                              updatePhoneNumber: false, isSignIn: true),
                         ),
                       );
                     },
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Email Button
                   _buildAuthMethodButton(
                     context: context,
@@ -122,9 +123,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Google Sign In Button
                   BlocProvider(
                     create: (context) => GoogleLoginBloc(),
@@ -132,7 +133,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       listener: (context, state) {
                         if (state is GoogleLoginSuccess) {
                           // Navigate to home screen on successful sign-in
-                          Navigator.pushReplacementNamed(context, '/main_navigation');
+                          Navigator.pushReplacementNamed(
+                              context, '/main_navigation');
                         } else if (state is GoogleLoginFailed) {
                           CustomSnackbar.showSnackBarSimple(
                             state.message,
@@ -156,7 +158,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       },
                     ),
                   ),
-                  
+
                   // Apple Sign In Button (iOS only)
                   if (Platform.isIOS) ...[
                     const SizedBox(height: 16),
@@ -174,9 +176,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       },
                     ),
                   ],
-                  
+
                   const Spacer(),
-                  
+
                   // Don't have an account? Create one
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -193,7 +195,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const AuthMethodSelectionScreen(),
+                              builder: (context) =>
+                                  const AuthMethodSelectionScreen(),
                             ),
                           );
                         },
@@ -208,7 +211,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 24),
                 ],
               ),
@@ -235,7 +238,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16), // 16dp radius as specified
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFFF6E5).withValues(alpha: 0.5), // Soft cream shadow
+            color: const Color(0xFFFFF6E5)
+                .withValues(alpha: 0.5), // Soft cream shadow
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -268,7 +272,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     text,
-                    style: GoogleFonts.montserrat( // Montserrat font as specified
+                    style: GoogleFonts.montserrat(
+                      // Montserrat font as specified
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,

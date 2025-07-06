@@ -15,7 +15,8 @@ class PhoneVerificationScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<PhoneVerificationScreen> createState() => _PhoneVerificationScreenState();
+  State<PhoneVerificationScreen> createState() =>
+      _PhoneVerificationScreenState();
 }
 
 class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
@@ -38,7 +39,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
   void _sendOtp({required String phoneNumber, required BuildContext context}) {
     final formattedNumber = countryCode + phoneNumber.trim();
-    
+
     BlocProvider.of<PhoneAuthBloc>(context).add(
       SendOtpToPhoneEvent(phoneNumber: formattedNumber),
     );
@@ -84,7 +85,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
               ),
             ),
           ),
-          
+
           // Main content
           SafeArea(
             child: Padding(
@@ -93,15 +94,15 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-                  
+
                   // Header image
                   Image.asset(
                     'asset/auth/verifyPhone.png',
                     height: 180,
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Header text
                   Text(
                     "Verify Your Phone Number",
@@ -112,9 +113,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       color: textColor,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   Text(
                     "We'll send you a verification code to confirm your identity",
                     textAlign: TextAlign.center,
@@ -123,9 +124,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       color: Colors.black54,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 40),
-                  
+
                   // Phone number input
                   Container(
                     decoration: BoxDecoration(
@@ -167,7 +168,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                             color: Colors.green[800],
                           ),
                         ),
-                        
+
                         // Phone number field
                         Expanded(
                           child: TextFormField(
@@ -196,9 +197,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       ],
                     ),
                   ),
-                  
+
                   const Spacer(),
-                  
+
                   // Privacy notice
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -212,9 +213,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Continue labelLarge
                   BlocConsumer<PhoneAuthBloc, PhoneAuthState>(
                     listener: (context, state) {
@@ -228,7 +229,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => OtpVerificationScreen(
-                              phoneNumber: countryCode + phoneNumberController.text.trim(),
+                              phoneNumber: countryCode +
+                                  phoneNumberController.text.trim(),
                               verificationId: state.verificationId,
                               updatePhoneNumber: widget.updatePhoneNumber,
                             ),
@@ -252,7 +254,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
+                            disabledBackgroundColor:
+                                primaryColor.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -278,7 +281,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       );
                     },
                   ),
-                  
+
                   SizedBox(height: screenSize.height * 0.08),
                 ],
               ),

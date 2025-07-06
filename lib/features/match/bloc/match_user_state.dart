@@ -13,9 +13,9 @@ class MatchUserLoadingState extends MatchUserState {}
 
 class MatchUserLoadedState extends MatchUserState {
   final List<UserModel> users;
-  
+
   const MatchUserLoadedState(this.users);
-  
+
   @override
   List<Object?> get props => [users];
 }

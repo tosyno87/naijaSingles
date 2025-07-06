@@ -25,22 +25,21 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  
+
   // Initialize Firebase with error handling
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     log('🔥 Firebase initialized successfully');
-    
+
     // Initialize Enhanced Notification Service
     await EnhancedNotificationService.initialize();
     log('🔔 Enhanced Notification Service initialized');
-    
   } catch (e) {
     log('❌ Firebase initialization error: $e');
   }
-  
+
   // Reset authentication state for testing
   try {
     await FirebaseAuth.instance.signOut();
@@ -48,7 +47,7 @@ Future<void> main() async {
   } catch (e) {
     log("⚠️ Error resetting auth state: $e");
   }
-  
+
   // Add debug logging for auth state changes
   FirebaseAuth.instance.authStateChanges().listen(
     (User? user) {
@@ -138,7 +137,9 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'NaijaSingles',
           debugShowCheckedModeBanner: false,
-          theme: themeProvider.isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,
+          theme: themeProvider.isDarkMode
+              ? MyThemes.darkTheme
+              : MyThemes.lightTheme,
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,

@@ -38,11 +38,14 @@ abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
     RouteName.splashScreen: (context) => const Splash(),
-    RouteName.loginScreen: (context) => const EmailLoginScreen(), // Redirect to EmailLoginScreen
+    RouteName.loginScreen: (context) =>
+        const EmailLoginScreen(), // Redirect to EmailLoginScreen
     RouteName.tabScreen: (context) => const Tabbar("active", false),
     // Auth method selection routes
-    RouteName.authMethodSelection: (context) => const AuthMethodSelectionScreen(),
-    RouteName.signInMethodSelection: (context) => const SignInMethodSelectionScreen(),
+    RouteName.authMethodSelection: (context) =>
+        const AuthMethodSelectionScreen(),
+    RouteName.signInMethodSelection: (context) =>
+        const SignInMethodSelectionScreen(),
     // Email authentication routes
     RouteName.emailSignup: (context) => const EmailSignupScreen(),
     RouteName.emailLogin: (context) => const EmailLoginScreen(),
@@ -100,38 +103,39 @@ abstract class AppRouter {
         phoneNumber:
             (ModalRoute.of(context)!.settings.arguments as Map)['phoneNumber']
                 .toString(),
-        updatePhoneNumber: (ModalRoute.of(context)!.settings.arguments
-            as Map)['updatenumber'],
-        isLogin: (ModalRoute.of(context)!.settings.arguments
-            as Map)['isLogin'] ?? false),
+        updatePhoneNumber:
+            (ModalRoute.of(context)!.settings.arguments as Map)['updatenumber'],
+        isLogin:
+            (ModalRoute.of(context)!.settings.arguments as Map)['isLogin'] ??
+                false),
     RouteName.userDobScreen: (context) => UserDOB(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
-    RouteName.exploreScreen: (context) => const ExploreScreen(showBackButton: false), // No back button by default
-    
+    RouteName.exploreScreen: (context) =>
+        const ExploreScreen(showBackButton: false), // No back button by default
+
     // Main navigation routes (consolidated - removed duplicates)
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.home: (context) => const Tabbar("active", false),
     RouteName.discover: (context) => const Tabbar("discover", false),
-
   };
 
   /// Generate route method for MaterialApp
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final String routeName = settings.name ?? '';
     final WidgetBuilder? builder = allRoutes[routeName];
-    
+
     if (builder != null) {
       return MaterialPageRoute(
         builder: builder,
         settings: settings,
       );
     }
-    
+
     // Return a default route if the route is not found
     return MaterialPageRoute(
       builder: (context) => Scaffold(

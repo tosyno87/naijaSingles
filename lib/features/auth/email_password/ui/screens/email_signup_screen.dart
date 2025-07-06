@@ -98,21 +98,25 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF3A1D0F)),
+                        prefixIcon: const Icon(Icons.email_outlined,
+                            color: Color(0xFF3A1D0F)),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF3A1D0F)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF3A1D0F)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF007A33), width: 2),
+                          borderSide: const BorderSide(
+                              color: Color(0xFF007A33), width: 2),
                         ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value)) {
                           return 'Please enter a valid email address';
                         }
                         return null;
@@ -133,10 +137,13 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF3A1D0F)),
+                        prefixIcon: const Icon(Icons.lock_outline,
+                            color: Color(0xFF3A1D0F)),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: const Color(0xFF3A1D0F),
                           ),
                           onPressed: () {
@@ -147,11 +154,13 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF3A1D0F)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF3A1D0F)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF007A33), width: 2),
+                          borderSide: const BorderSide(
+                              color: Color(0xFF007A33), width: 2),
                         ),
                       ),
                       validator: (value) {
@@ -179,25 +188,31 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF3A1D0F)),
+                        prefixIcon: const Icon(Icons.lock_outline,
+                            color: Color(0xFF3A1D0F)),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: const Color(0xFF3A1D0F),
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
                             });
                           },
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF3A1D0F)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF3A1D0F)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF007A33), width: 2),
+                          borderSide: const BorderSide(
+                              color: Color(0xFF007A33), width: 2),
                         ),
                       ),
                       validator: (value) {
@@ -266,7 +281,8 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/email_login');
+                            Navigator.pushReplacementNamed(
+                                context, '/email_login');
                           },
                           child: Text(
                             'Log In',

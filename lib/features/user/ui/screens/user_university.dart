@@ -15,7 +15,7 @@ class _UniversityPage extends State<UniversityPage> {
   final TextEditingController _universityController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
-  
+
   // Popular universities in Africa and diaspora
   final List<String> _suggestions = [
     'University of Lagos',
@@ -25,24 +25,24 @@ class _UniversityPage extends State<UniversityPage> {
     'University of Cape Town',
     'Ashesi University'
   ];
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Listen for focus changes
     _focusNode.addListener(() {
       setState(() {
         _isFocused = _focusNode.hasFocus;
       });
     });
-    
+
     // Auto focus the text field after the first frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
   }
-  
+
   @override
   void dispose() {
     _universityController.dispose();
@@ -53,9 +53,10 @@ class _UniversityPage extends State<UniversityPage> {
   @override
   Widget build(BuildContext context) {
     // For adding userdetails in this user map from navigation
-    var userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    var userData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -82,19 +83,20 @@ class _UniversityPage extends State<UniversityPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      
+
                       // Progress indicator
                       Container(
                         height: 4,
-                        width: screenSize.width * 0.95, // 95% of screen width (almost complete)
+                        width: screenSize.width *
+                            0.95, // 95% of screen width (almost complete)
                         decoration: BoxDecoration(
                           color: const Color(0xFF27AE60),
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Title section
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,9 +119,9 @@ class _UniversityPage extends State<UniversityPage> {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Input section with card-style design
                       Container(
                         decoration: BoxDecoration(
@@ -147,16 +149,19 @@ class _UniversityPage extends State<UniversityPage> {
                             ),
                             prefixIcon: Icon(
                               Icons.school_rounded,
-                              color: _isFocused ? const Color(0xFF27AE60) : Colors.grey[400],
+                              color: _isFocused
+                                  ? const Color(0xFF27AE60)
+                                  : Colors.grey[400],
                             ),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 16),
                             border: InputBorder.none,
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 30),
-                      
+
                       // Suggestions section with chips
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,11 +187,13 @@ class _UniversityPage extends State<UniversityPage> {
                                   });
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 10),
                                   decoration: BoxDecoration(
                                     color: Colors.grey[50],
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: Colors.grey[300]!),
+                                    border:
+                                        Border.all(color: Colors.grey[300]!),
                                   ),
                                   child: Text(
                                     suggestion,
@@ -206,7 +213,7 @@ class _UniversityPage extends State<UniversityPage> {
                 ),
               ),
             ),
-            
+
             // Continue labelLarge fixed at the bottom
             Container(
               padding: const EdgeInsets.all(24.0),
@@ -223,22 +230,22 @@ class _UniversityPage extends State<UniversityPage> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: university.isNotEmpty ? () {
-                    userData.addAll({
-                      'editInfo': {
-                        'university': university,
-                        'userGender': userData['userGender'],
-                        'showOnProfile': userData['showOnProfile']
-                      }
-                    });
+                  onPressed: university.isNotEmpty
+                      ? () {
+                          userData.addAll({
+                            'editInfo': {
+                              'university': university,
+                              'userGender': userData['userGender'],
+                              'showOnProfile': userData['showOnProfile']
+                            }
+                          });
 
-                    log(userData.toString());
-                    Navigator.pushNamed(
-                      context, 
-                      RouteName.profilePicSetScreen,
-                      arguments: userData
-                    );
-                  } : null,
+                          log(userData.toString());
+                          Navigator.pushNamed(
+                              context, RouteName.profilePicSetScreen,
+                              arguments: userData);
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),
                     foregroundColor: Colors.white,

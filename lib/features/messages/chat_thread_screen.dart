@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer';
 
 import '../../common/constants/colors.dart'; // Import MVP colors
+import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
+import '../../models/user_model.dart'; // Import UserModel
 import 'services/chat_service.dart';
 import 'message_model.dart';
 
@@ -106,28 +110,47 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           icon: Icon(Icons.arrow_back_ios, color: primaryColor), // Use MVP primary color
           onPressed: () => Navigator.pop(context),
         ),
-        title: Row(
-          children: [
-            Hero(
-              tag: 'avatar-${widget.threadId}',
-              child: CircleAvatar(
-                radius: 16,
-                backgroundImage: widget.avatarUrl != null
-                    ? NetworkImage(widget.avatarUrl!)
-                    : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
-                onBackgroundImageError: (_, __) {},
+        title: GestureDetector(
+          onTap: () => _viewFullUserProfile(),
+          child: Row(
+            children: [
+              Hero(
+                tag: 'avatar-${widget.threadId}',
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundImage: widget.avatarUrl != null
+                      ? NetworkImage(widget.avatarUrl!)
+                      : const AssetImage('assets/images/placeholder_profile.jpg') as ImageProvider,
+                  onBackgroundImageError: (_, __) {},
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              widget.userName,
-              style: GoogleFonts.montserrat( // Use Montserrat for MVP
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textPrimary, // Use MVP text color
+              const SizedBox(width: 8),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.userName,
+                      style: GoogleFonts.montserrat( // Use Montserrat for MVP
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary, // Use MVP text color
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'Tap to view profile',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 11,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           IconButton(
@@ -607,130 +630,115 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     );
   }
   
-  // Show user profile quick view
-  void _showUserProfile() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  // Navigate to full user profile screen
+  Future<void> _viewFullUserProfile() async {
+    if (widget.otherUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'User profile not available',
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
         ),
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
+      );
+      return;
+    }
+
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    // Profile header
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: widget.avatarUrl != null
-                          ? NetworkImage(widget.avatarUrl!)
-                          : null,
-                      child: widget.avatarUrl == null
-                          ? Icon(Icons.person, size: 50, color: Colors.grey[600])
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      widget.userName,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Tap to view full profile',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    // Quick actions
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildQuickActionButton(
-                          icon: Icons.call,
-                          label: 'Call',
-                          onTap: () {
-                            Navigator.pop(context);
-                            _showCallOptions();
-                          },
-                        ),
-                        _buildQuickActionButton(
-                          icon: Icons.block,
-                          label: 'Block',
-                          color: Colors.red,
-                          onTap: () {
-                            Navigator.pop(context);
-                            _showBlockUserDialog();
-                          },
-                        ),
-                        _buildQuickActionButton(
-                          icon: Icons.report,
-                          label: 'Report',
-                          color: Colors.orange,
-                          onTap: () {
-                            Navigator.pop(context);
-                            _showReportUserDialog();
-                          },
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    // Full profile button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _showComingSoonSnackBar('Full profile view coming soon!');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: Text(
-                          'View Full Profile',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: primaryColor),
+                const SizedBox(height: 16),
+                Text(
+                  'Loading profile...',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: textPrimary,
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    );
+      );
+
+      // Fetch user data from Firestore
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.otherUserId!)
+          .get();
+      
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (userDoc.exists) {
+        final userData = userDoc.data() as Map<String, dynamic>;
+        
+        // Convert Firestore data to UserModel
+        final userModel = UserModel(
+          id: widget.otherUserId!,
+          name: userData['name'] ?? widget.userName,
+          age: userData['age'] ?? 0,
+          imageUrl: List<String>.from(userData['photos'] ?? userData['imageUrl'] ?? []),
+          address: userData['locationName'] ?? userData['address'],
+          distanceBW: userData['distanceBW'],
+          editInfo: userData['editInfo'] ?? {},
+        );
+        
+        // Navigate to profile screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserDetailScreen(user: userModel),
+          ),
+        );
+      } else {
+        // Show error if user not found
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'User profile not found',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted) Navigator.pop(context);
+      
+      log('Error loading user profile: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to load profile',
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-  
+
+  // Show user profile quick view (keeping for the info button)
+  void _showUserProfile() {
+    _viewFullUserProfile(); // Just redirect to full profile
+  }
+
   // Build quick action button
   Widget _buildQuickActionButton({
     required IconData icon,

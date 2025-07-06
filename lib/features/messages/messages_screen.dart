@@ -9,6 +9,8 @@ import 'services/chat_service.dart';
 import 'message_model.dart';
 import 'chat_thread_screen.dart';
 import '../explore/explore_screen.dart'; // Import ExploreScreen directly
+import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
+import '../../models/user_model.dart'; // Import UserModel
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({Key? key}) : super(key: key);
@@ -367,35 +369,58 @@ class _MessagesScreenState extends State<MessagesScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  // Enhanced avatar with status
+                  // Enhanced avatar with status and profile tap
                   Stack(
                     children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: thread.unread ? primaryColor : Colors.grey.shade300,
-                            width: thread.unread ? 2.5 : 1,
+                      GestureDetector(
+                        onTap: () => _viewUserProfile(thread.otherUserId),
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: thread.unread ? primaryColor : Colors.grey.shade300,
+                              width: thread.unread ? 2.5 : 1,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.grey.shade100,
+                            backgroundImage: thread.avatarUrl != null
+                                ? NetworkImage(thread.avatarUrl!)
+                                : null,
+                            onBackgroundImageError: thread.avatarUrl != null 
+                                ? (_, __) {} 
+                                : null,
+                            child: thread.avatarUrl == null
+                                ? Icon(
+                                    Icons.person,
+                                    size: 30,
+                                    color: Colors.grey.shade500,
+                                  )
+                                : null,
                           ),
                         ),
-                        child: CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Colors.grey.shade100,
-                          backgroundImage: thread.avatarUrl != null
-                              ? NetworkImage(thread.avatarUrl!)
-                              : null,
-                          onBackgroundImageError: thread.avatarUrl != null 
-                              ? (_, __) {} 
-                              : null,
-                          child: thread.avatarUrl == null
-                              ? Icon(
-                                  Icons.person,
-                                  size: 30,
-                                  color: Colors.grey.shade500,
-                                )
-                              : null,
+                      ),
+                      
+                      // Profile view indicator
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: primaryColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: Icon(
+                            Icons.visibility,
+                            color: Colors.white,
+                            size: 12,
+                          ),
                         ),
                       ),
                       // Online indicator
@@ -439,16 +464,31 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: Text(
-                                thread.otherUserName,
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 17,
-                                  fontWeight: thread.unread 
-                                      ? FontWeight.bold 
-                                      : FontWeight.w600,
-                                  color: textPrimary,
+                              child: GestureDetector(
+                                onTap: () => _viewUserProfile(thread.otherUserId),
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        thread.otherUserName,
+                                        style: GoogleFonts.montserrat(
+                                          fontSize: 17,
+                                          fontWeight: thread.unread 
+                                              ? FontWeight.bold 
+                                              : FontWeight.w600,
+                                          color: textPrimary,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.info_outline,
+                                      size: 16,
+                                      color: primaryColor.withOpacity(0.7),
+                                    ),
+                                  ],
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             Text(
@@ -659,6 +699,102 @@ class _MessagesScreenState extends State<MessagesScreen> {
           content: Text(
             'Error deleting conversation',
             style: GoogleFonts.montserrat(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    }
+  }
+
+  // Method to view user profile from messages
+  Future<void> _viewUserProfile(String userId) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: primaryColor),
+                const SizedBox(height: 16),
+                Text(
+                  'Loading profile...',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      // Fetch user data from Firestore
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (userDoc.exists) {
+        final userData = userDoc.data() as Map<String, dynamic>;
+        
+        // Convert Firestore data to UserModel
+        final userModel = UserModel(
+          id: userId,
+          name: userData['name'] ?? 'Unknown User',
+          age: userData['age'] ?? 0,
+          imageUrl: List<String>.from(userData['photos'] ?? userData['imageUrl'] ?? []),
+          address: userData['locationName'] ?? userData['address'],
+          distanceBW: userData['distanceBW'],
+          editInfo: userData['editInfo'] ?? {},
+        );
+        
+        // Navigate to profile screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserDetailScreen(user: userModel),
+          ),
+        );
+      } else {
+        // Show error if user not found
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'User profile not found',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted) Navigator.pop(context);
+      
+      log('Error loading user profile: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to load profile',
+            style: GoogleFonts.poppins(color: Colors.white),
           ),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,

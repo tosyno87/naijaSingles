@@ -222,19 +222,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               },
                             ),
                             
-                            // Gradient overlay for better text visibility
+                            // Enhanced gradient overlay for better text visibility
                             Positioned(
                               bottom: 0,
                               left: 0,
                               right: 0,
                               child: Container(
-                                height: 80,
+                                height: 100, // Increased height for better coverage
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      Colors.black.withOpacity(0.6),
+                                      Colors.black.withOpacity(0.8), // Increased opacity
+                                      Colors.black.withOpacity(0.4),
                                       Colors.transparent,
                                     ],
                                   ),
@@ -242,41 +243,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             
-                            // Photo counter
+                            // Enhanced photo counter with better contrast
                             Positioned(
                               top: 16,
                               right: 16,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: Colors.black.withOpacity(0.8), // Increased opacity
                                   borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                    width: 1,
+                                  ),
                                 ),
                                 child: Text(
                                   '${index + 1} of ${photos.length}',
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w600, // Increased weight
+                                    shadows: [
+                                      Shadow(
+                                        offset: const Offset(0, 1),
+                                        blurRadius: 2,
+                                        color: Colors.black.withOpacity(0.8),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                             
-                            // Tap to view full screen indicator
+                            // Enhanced tap indicator with better visibility
                             Positioned(
                               bottom: 16,
                               right: 16,
                               child: Container(
-                                padding: const EdgeInsets.all(8),
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: Colors.black.withOpacity(0.8), // Increased opacity
                                   shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.3),
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                                 child: Icon(
                                   Icons.fullscreen,
                                   color: Colors.white,
-                                  size: 20,
+                                  size: 18,
                                 ),
                               ),
                             ),
@@ -288,10 +311,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               
-              // Left/Right navigation arrows (for desktop/web)
+              // Enhanced Left/Right navigation arrows with better visibility
               if (photos.length > 1) ...[
                 Positioned(
-                  left: 8,
+                  left: 12,
                   top: 0,
                   bottom: 0,
                   child: Center(
@@ -305,10 +328,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withOpacity(0.7),
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Icon(
                           Icons.chevron_left,
@@ -320,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 Positioned(
-                  right: 8,
+                  right: 12,
                   top: 0,
                   bottom: 0,
                   child: Center(
@@ -334,10 +368,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withOpacity(0.7),
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Icon(
                           Icons.chevron_right,

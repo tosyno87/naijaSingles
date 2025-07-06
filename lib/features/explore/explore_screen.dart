@@ -591,14 +591,6 @@ class _ProfileCardState extends State<ProfileCard> with SingleTickerProviderStat
                 MaterialPageRoute(
                   builder: (context) => UserDetailScreen(
                     user: widget.user,
-                    onLike: () {
-                      // Handle like action
-                      print('Liked user: ${widget.user.name}');
-                    },
-                    onPass: () {
-                      // Handle pass action
-                      print('Passed user: ${widget.user.name}');
-                    },
                   ),
                 ),
               );

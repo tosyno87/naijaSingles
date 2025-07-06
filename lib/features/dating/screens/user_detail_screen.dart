@@ -6,14 +6,10 @@ import 'package:naijasingles/models/user_model.dart';
 /// This is different from MatchProfileScreen which is for after matching
 class UserDetailScreen extends StatefulWidget {
   final UserModel user;
-  final VoidCallback? onLike;
-  final VoidCallback? onPass;
 
   const UserDetailScreen({
     Key? key,
     required this.user,
-    this.onLike,
-    this.onPass,
   }) : super(key: key);
 
   @override
@@ -43,16 +39,59 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     
     return Scaffold(
       backgroundColor: backgroundColor,
+      extendBodyBehindAppBar: true, // Allow content behind app bar
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Text(
+            "${widget.user.name?.split(' ').first ?? 'Profile'}",
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: CustomScrollView(
         slivers: [
-          // Photo section with app bar
-          SliverAppBar(
-            expandedHeight: 500,
-            pinned: true,
-            backgroundColor: afropeepGreen,
-            iconTheme: const IconThemeData(color: Colors.white),
-            flexibleSpace: FlexibleSpaceBar(
-              background: _buildPhotoSection(photos),
+          // Photo section
+          SliverToBoxAdapter(
+            child: Container(
+              height: 500,
+              child: _buildPhotoSection(photos),
             ),
           ),
           
@@ -64,6 +103,13 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(24),
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
               ),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -90,7 +136,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     // Additional info
                     _buildAdditionalInfo(),
                     
-                    const SizedBox(height: 100), // Space for bottom buttons
+                    const SizedBox(height: 24), // Extra space at bottom for comfortable scrolling
                   ],
                 ),
               ),
@@ -98,9 +144,6 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           ),
         ],
       ),
-      
-      // Bottom action buttons
-      bottomNavigationBar: _buildBottomActions(),
     );
   }
 
@@ -189,7 +232,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           },
         ),
 
-        // Photo indicators
+        // Enhanced photo indicators with better contrast
         if (photos.length > 1)
           Positioned(
             top: 60,
@@ -201,36 +244,61 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                 photos.length,
                 (index) => Container(
                   margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: index == _currentPhotoIndex ? 24 : 8,
+                  width: index == _currentPhotoIndex ? 28 : 8,
                   height: 4,
                   decoration: BoxDecoration(
                     color: index == _currentPhotoIndex
                         ? Colors.white
-                        : Colors.white.withOpacity(0.5),
+                        : Colors.white.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
 
-        // Photo counter
+        // Enhanced photo counter with better visibility
         if (photos.length > 1)
           Positioned(
             top: 80,
             right: 16,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withOpacity(0.8), // Increased opacity
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Text(
                 '${_currentPhotoIndex + 1} of ${photos.length}',
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600, // Increased weight
+                  shadows: [
+                    Shadow(
+                      offset: const Offset(0, 1),
+                      blurRadius: 2,
+                      color: Colors.black.withOpacity(0.8),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -482,94 +550,6 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomActions() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Pass button
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                widget.onPass?.call();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.red.shade600,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: Colors.red.shade600, width: 2),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.close, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Pass',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          const SizedBox(width: 16),
-          
-          // Like button
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                widget.onLike?.call();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: afropeepGreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 2,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.favorite, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Like',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],

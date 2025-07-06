@@ -24,7 +24,7 @@ jobs:
       run: flutter pub get
       
     - name: Check formatting
-      run: flutter format --dry-run --set-exit-if-changed .
+      run: dart format --set-exit-if-changed .
       
     - name: Analyze code
       run: flutter analyze --fatal-infos
@@ -35,10 +35,9 @@ jobs:
     - name: Generate coverage report
       run: |
         flutter test --coverage
-        genhtml coverage/lcov.info -o coverage/html
         
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: coverage/lcov.info
         fail_ci_if_error: false

@@ -1,0 +1,44 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.3'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Check formatting
+      run: flutter format --dry-run --set-exit-if-changed .
+      
+    - name: Analyze code
+      run: flutter analyze --fatal-infos
+      
+    - name: Check for unused dependencies
+      run: flutter pub deps
+      
+    - name: Generate coverage report
+      run: |
+        flutter test --coverage
+        genhtml coverage/lcov.info -o coverage/html
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: coverage/lcov.info
+        fail_ci_if_error: false

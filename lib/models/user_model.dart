@@ -246,4 +246,92 @@ class UserModel {
     final userMap = jsonDecode(userString);
     return UserModel.fromJson(userMap);
   }
+
+  // Add missing methods for compatibility with new services
+  
+  /// Convert UserModel to Map for caching and storage
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'isBlocked': isBlocked,
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+      'coordinates': coordinates,
+      'currentCoordinates': currentCoordinates,
+      'sexualOrientation': sexualOrientation,
+      'gender': userGender,
+      'living_in': living_in,
+      'job_title': job_title,
+      'company': company,
+      'showMyAge': showMyAge,
+      'showGender': showGender,
+      'age': age,
+      'phoneNumber': phoneNumber,
+      'maximum_distance': maxDistance,
+      'age_range': ageRange,
+      'editInfo': editInfo,
+      'streetView': streetView,
+      'isBot': isBot,
+      'photos': imageUrl,
+      'distanceBW': distanceBW,
+    };
+  }
+
+  /// Create UserModel from Map (for caching)
+  factory UserModel.fromMap(Map<String, dynamic> map, String userId) {
+    return UserModel(
+      id: userId,
+      name: map['name']?.toString(),
+      isBlocked: map['isBlocked'] as bool? ?? false,
+      address: map['address']?.toString(),
+      latitude: map['latitude'] is num ? (map['latitude'] as num).toDouble() : null,
+      longitude: map['longitude'] is num ? (map['longitude'] as num).toDouble() : null,
+      coordinates: map['coordinates'] as Map?,
+      currentCoordinates: map['currentCoordinates'] as Map?,
+      sexualOrientation: map['sexualOrientation'] as Map?,
+      userGender: map['gender']?.toString(),
+      living_in: map['living_in']?.toString(),
+      job_title: map['job_title']?.toString(),
+      company: map['company']?.toString(),
+      showMyAge: map['showMyAge'] as bool?,
+      showGender: map['showGender']?.toString(),
+      age: map['age'] is num ? (map['age'] as num).toInt() : null,
+      phoneNumber: map['phoneNumber']?.toString(),
+      maxDistance: map['maximum_distance'] is num ? (map['maximum_distance'] as num).toInt() : null,
+      ageRange: map['age_range'] as Map?,
+      editInfo: map['editInfo'] as Map?,
+      streetView: map['streetView'] as Map?,
+      isBot: map['isBot'] as bool? ?? false,
+      imageUrl: map['photos'] is List ? List<String>.from(map['photos']) : null,
+      distanceBW: map['distanceBW'] is num ? (map['distanceBW'] as num).toInt() : null,
+    );
+  }
+
+  // Add missing getters for compatibility with new services
+  
+  /// Get user's gender
+  String? get gender => userGender;
+  
+  /// Get minimum age preference
+  int? get ageRangeMin {
+    if (ageRange != null && ageRange!['min'] != null) {
+      if (ageRange!['min'] is int) return ageRange!['min'] as int;
+      if (ageRange!['min'] is String) return int.tryParse(ageRange!['min'] as String);
+    }
+    return 18; // Default minimum age
+  }
+  
+  /// Get maximum age preference
+  int? get ageRangeMax {
+    if (ageRange != null && ageRange!['max'] != null) {
+      if (ageRange!['max'] is int) return ageRange!['max'] as int;
+      if (ageRange!['max'] is String) return int.tryParse(ageRange!['max'] as String);
+    }
+    return 50; // Default maximum age
+  }
+  
+  /// Get distance range preference
+  int? get distanceRange => maxDistance;
 }

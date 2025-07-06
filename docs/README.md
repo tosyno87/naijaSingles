@@ -4,60 +4,58 @@ This directory contains consolidated documentation for the NaijaSingles project.
 
 ## Documentation Structure
 
-### 1. **IMPLEMENTATION_HISTORY.md**
-- Mutual likes implementation
-- Onboarding data completeness
-- Height dropdown implementation
-- Match system fixes
-- Typing indicator fixes
+### Core Implementation Docs
+- **match_system_analysis.md** - Complete match system analysis and implementation
+- **priority_1_performance_optimization.md** - Performance optimization strategies
+- **priority_2_enhanced_matching_complete.md** - Enhanced matching system implementation
+- **priority_3_user_experience_complete.md** - User experience improvements
 
-### 2. **SECURITY_AND_RULES.md**
-- Firestore rules analysis
-- Security implementation summary
-- Security rules testing
-- Firestore rules migration
+### Implementation History
+- **MUTUAL_LIKES_IMPLEMENTATION.md** - Mutual likes system implementation
+- **onboarding_data_completeness_implementation.md** - Onboarding flow completion
+- **afropeep_height_dropdown_implementation.md** - Height dropdown implementation
+- **MATCH_SYSTEM_FIX_SUMMARY.md** - Match system bug fixes
+- **TYPING_INDICATOR_FIX.md** - Chat typing indicator fixes
 
-### 3. **CODE_ANALYSIS.md**
-- Unused imports cleanup
-- Unused code analysis
-- Project reviews
-- Code quality improvements
+### Security & Rules
+- **SECURITY_AND_RULES.md** - Consolidated security documentation
+- **SECURITY_IMPLEMENTATION_SUMMARY.md** - Security implementation details
+- **FIRESTORE_RULES_ANALYSIS.md** - Firestore rules analysis
+- **FIRESTORE_RULES_MIGRATION.md** - Rules migration guide
+- **SECURITY_RULES_TESTING.md** - Security testing procedures
 
-### 4. **CHAT_AND_FEATURES.md**
-- Chat improvements priority
-- Feature implementation notes
-- UI/UX improvements
+### Analysis & Discovery
+- **DISCOVERY_ANALYSIS.md** - User discovery system analysis
+- **discovery_regression_analysis.md** - Discovery regression fixes
+- **user_discovery_analysis.md** - User discovery optimization
+- **USER_PROFILE_SECURITY_ANALYSIS.md** - Profile security analysis
 
-### 5. **DISCOVERY_ANALYSIS.md**
-- User discovery regression analysis
-- Discovery system improvements
-- Query optimization
+### Features & Chat
+- **CHAT_IMPROVEMENTS_PRIORITY.md** - Chat system improvements
+- **BIO_ENTRY_SCREEN_ENHANCEMENT.md** - Bio entry screen improvements
+- **BIO_ENHANCEMENT_PHASE1_COMPLETE.md** - Bio enhancement completion
 
-### 6. **PUSH_NOTIFICATIONS_ANALYSIS.md**
-- Current push notification system analysis
-- Gaps and missing features
-- Architecture review
-- Improvement recommendations
+### Push Notifications
+- **PUSH_NOTIFICATIONS_ANALYSIS.md** - Current notification system analysis
+- **PUSH_NOTIFICATIONS_IMPLEMENTATION_PLAN.md** - Implementation guide
+- **PHASE_1_IMPLEMENTATION_COMPLETE.md** - Phase 1 completion summary
+- **PHASE_1_COMPLETION_SUMMARY.md** - Phase 1 detailed summary
+- **PHASE_2_COMPLETION_SUMMARY.md** - Phase 2 completion details
 
-### 7. **PUSH_NOTIFICATIONS_IMPLEMENTATION_PLAN.md**
-- Step-by-step implementation guide
-- Cloud Functions setup
-- Flutter integration
-- Code examples and deployment steps
+### Code Quality
+- **UNUSED_CODE_ANALYSIS.md** - Code cleanup analysis
+- **IMPLEMENTATION_HISTORY.md** - Overall implementation timeline
 
-### 8. **PHASE_1_IMPLEMENTATION_COMPLETE.md**
-- Complete Phase 1 implementation summary
-- Real-time notification system
-- Testing guide and deployment status
-- Next steps and activation checklist
+## Debug & Testing
+
+For debugging tools and testing procedures, see the **DEBUG_GUIDE.md** in the project root.
 
 ## Quick Reference
 
-- For security-related documentation, see `SECURITY_AND_RULES.md`
-- For implementation history, see `IMPLEMENTATION_HISTORY.md`
-- For code quality analysis, see `CODE_ANALYSIS.md`
-- For feature development, see `CHAT_AND_FEATURES.md`
-- For discovery system, see `DISCOVERY_ANALYSIS.md`
-- For push notifications, see `PUSH_NOTIFICATIONS_ANALYSIS.md`
-- For notification implementation, see `PUSH_NOTIFICATIONS_IMPLEMENTATION_PLAN.md`
-- For Phase 1 completion status, see `PHASE_1_IMPLEMENTATION_COMPLETE.md`
+- **Security**: See `SECURITY_AND_RULES.md` and related security docs
+- **Match System**: See `match_system_analysis.md` and priority docs
+- **User Discovery**: See `DISCOVERY_ANALYSIS.md` and discovery-related docs
+- **Push Notifications**: See notification-related docs for implementation
+- **Chat Features**: See `CHAT_IMPROVEMENTS_PRIORITY.md`
+- **Performance**: See `priority_1_performance_optimization.md`
+- **Debugging**: See `../DEBUG_GUIDE.md` in project root

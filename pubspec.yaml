@@ -93,6 +93,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   bloc_test: ^10.0.0
+  integration_test:
+    sdk: flutter
   mocktail: ^1.0.4
   mockito: ^5.4.4                   # Added mockito
   fake_cloud_firestore: ^3.1.0

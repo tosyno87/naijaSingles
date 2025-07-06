@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/messages/messages_screen.dart';
 import 'package:naijasingles/features/profile/profile_screen.dart';
+import 'package:naijasingles/debug/simple_debug.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final bool backgroundTasksRunning;
@@ -105,6 +108,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
               ),
             ),
+          
+          // Debug button (only in debug mode)
+          if (kDebugMode)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 50,
+              right: 16,
+              child: FloatingActionButton(
+                mini: true,
+                backgroundColor: Colors.red.withOpacity(0.8),
+                child: const Icon(Icons.bug_report, color: Colors.white, size: 16),
+                onPressed: () => _showDebugMenu(context),
+              ),
+            ),
         ],
       ),
       
@@ -141,6 +157,89 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             label: 'Profile',
           ),
         ],
+      ),
+    );
+  }
+  
+  void _showDebugMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '🐛 Debug Menu',
+              style: GoogleFonts.montserrat(
+                fontSize: 20, 
+                fontWeight: FontWeight.bold
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            
+            _buildDebugButton(
+              'Test Database Connection',
+              Icons.storage,
+              () => SimpleDebug.testDatabaseConnection(),
+            ),
+            
+            _buildDebugButton(
+              'Clear My Swipe History',
+              Icons.refresh,
+              () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  await SimpleDebug.clearSwipeHistory(user.uid);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Swipe history cleared! Check console for details.')),
+                    );
+                  }
+                }
+              },
+            ),
+            
+            _buildDebugButton(
+              'Show My Excluded Users',
+              Icons.visibility_off,
+              () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  await SimpleDebug.showExcludedUsers(user.uid);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Check console for excluded users list.')),
+                    );
+                  }
+                }
+              },
+            ),
+            
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDebugButton(String title, IconData icon, VoidCallback onPressed) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon),
+        label: Text(title),
+        style: ElevatedButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.all(12),
+        ),
       ),
     );
   }

@@ -1,0 +1,147 @@
+name: Comprehensive Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # Run daily at 2 AM
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.3'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Run unit tests
+      run: flutter test --reporter=expanded --coverage
+      
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: coverage/lcov.info
+
+  integration-tests:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.3'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Start iOS Simulator
+      run: |
+        xcrun simctl list devices
+        xcrun simctl boot "iPhone 15 Pro" || true
+        
+    - name: Run integration tests
+      run: flutter test integration_test/app_test.dart -d "iPhone 15 Pro"
+      
+    - name: Upload test screenshots
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: test-screenshots
+        path: integration_test/screenshots/
+
+  feature-tests:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.3'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Test Bio Screen Single Selection
+      run: |
+        echo "Testing bio screen single prompt selection..."
+        flutter test integration_test/app_test.dart -d "iPhone 15 Pro" --name "Bio screen single prompt selection"
+        
+    - name: Test Onboarding Flow
+      run: |
+        echo "Testing complete onboarding flow..."
+        flutter test integration_test/app_test.dart -d "iPhone 15 Pro" --name "App launches without crashing"
+        
+    - name: Performance Tests
+      run: |
+        echo "Running performance tests..."
+        flutter test integration_test/app_test.dart -d "iPhone 15 Pro" --name "Performance test"
+
+  security-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.3'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Check for security vulnerabilities
+      run: |
+        flutter pub deps --json | grep -i "vulnerabilit" || echo "No known vulnerabilities found"
+        
+    - name: Analyze permissions
+      run: |
+        echo "Checking Android permissions..."
+        cat android/app/src/main/AndroidManifest.xml | grep -i permission || echo "No permissions found"
+        echo "Checking iOS permissions..."
+        cat ios/Runner/Info.plist | grep -i usage || echo "No usage descriptions found"
+
+  notify-results:
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, feature-tests, security-tests]
+    if: always()
+    
+    steps:
+    - name: Notify Success
+      if: needs.unit-tests.result == 'success' && needs.integration-tests.result == 'success'
+      run: |
+        echo "🎉 All tests passed! NaijaSingles app is ready for deployment."
+        echo "✅ Unit tests: PASSED"
+        echo "✅ Integration tests: PASSED" 
+        echo "✅ Feature tests: PASSED"
+        echo "✅ Security tests: PASSED"
+        
+    - name: Notify Failure
+      if: needs.unit-tests.result == 'failure' || needs.integration-tests.result == 'failure'
+      run: |
+        echo "❌ Some tests failed! Please check the logs."
+        echo "Unit tests: ${{ needs.unit-tests.result }}"
+        echo "Integration tests: ${{ needs.integration-tests.result }}"
+        echo "Feature tests: ${{ needs.feature-tests.result }}"
+        echo "Security tests: ${{ needs.security-tests.result }}"

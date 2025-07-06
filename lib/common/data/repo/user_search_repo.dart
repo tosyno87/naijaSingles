@@ -5,6 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:naijasingles/features/match/services/likes_service.dart';
+import 'package:naijasingles/services/optimized_match_service.dart';
+import 'package:naijasingles/services/cached_user_service.dart';
+import 'package:naijasingles/services/paginated_user_service.dart';
 
 import '../../constants/constants.dart';
 
@@ -14,6 +17,11 @@ class UserSearchRepo {
 
   static FirebaseAuth firebaseAuth = firebaseAuthInstance;
   static final LikesService _likesService = LikesService();
+  
+  // New optimized services
+  static final OptimizedMatchService _optimizedMatchService = OptimizedMatchService();
+  static final CachedUserService _cachedUserService = CachedUserService();
+  static final PaginatedUserService _paginatedUserService = PaginatedUserService();
   
   static Map items = {};
   static List<UserModel> matches = [];
@@ -68,25 +76,52 @@ class UserSearchRepo {
   static Future<String?> rightSwipe(
       UserModel currentUser, UserModel selectedUser) async {
     try {
-      // Use the new likes service for mutual like detection
+      debugPrint('🚀 Optimized right swipe: ${currentUser.name} → ${selectedUser.name}');
+      
+      // Use optimized match service (2-3 Firestore reads max)
       final currentUserId = currentUser.id;
       final selectedUserId = selectedUser.id;
       
-      String? matchId;
-      
       if (currentUserId != null && selectedUserId != null) {
-        matchId = await _likesService.handleLike(currentUserId, selectedUserId);
+        final result = await _optimizedMatchService.handleLike(currentUserId, selectedUserId);
         
-        if (matchId != null) {
-          debugPrint("🎉 Match created! Match ID: $matchId");
-          // Return the match ID so the UI can show the match modal
-          return matchId;
+        if (result.isSuccess) {
+          if (result.isMatch) {
+            debugPrint("🎉 Match created! Match ID: ${result.matchId}");
+            return result.matchId;
+          } else {
+            debugPrint("💌 Like saved, waiting for mutual like");
+          }
         } else {
-          debugPrint("Like saved, waiting for mutual like");
+          debugPrint("❌ Error in optimized match service: ${result.error}");
+          // Fall back to legacy system
+          return await _legacyRightSwipe(currentUser, selectedUser);
         }
       }
 
-      // Keep legacy behavior for backward compatibility
+      // Update CheckedUser collection for swipe tracking
+      await docRef
+          .doc(currentUser.id)
+          .collection("CheckedUser")
+          .doc(selectedUser.id)
+          .set({
+        'LikedUser': selectedUser.id,
+        'timestamp': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      
+      return null; // No match created
+      
+    } catch (e) {
+      debugPrint('❌ Error in optimized rightSwipe: $e');
+      // Fallback to legacy behavior if optimized system fails
+      return await _legacyRightSwipe(currentUser, selectedUser);
+    }
+  }
+
+  /// Legacy right swipe implementation as fallback
+  static Future<String?> _legacyRightSwipe(
+      UserModel currentUser, UserModel selectedUser) async {
+    try {
       likedByList = await getLikedByList(currentUser);
       if ((likedByList.contains(selectedUser.id) ||
           (selectedUser.isBot ?? false))) {
@@ -140,94 +175,96 @@ class UserSearchRepo {
       
       return null; // No match created
     } catch (e) {
-      debugPrint('Error in rightSwipe: $e');
-      // Fallback to legacy behavior if new system fails
-      await _legacyRightSwipe(currentUser, selectedUser);
+      debugPrint('Error in legacy rightSwipe: $e');
       return null;
     }
-  }
-
-  /// Legacy right swipe implementation as fallback
-  static Future<void> _legacyRightSwipe(
-      UserModel currentUser, UserModel selectedUser) async {
-    likedByList = await getLikedByList(currentUser);
-    if ((likedByList.contains(selectedUser.id) ||
-        (selectedUser.isBot ?? false))) {
-      debugPrint("coming under searchrepo in if rightswipe");
-      await docRef
-          .doc(currentUser.id)
-          .collection("Matches")
-          .doc(selectedUser.id)
-          .set({
-        'Matches': selectedUser.id,
-        'isRead': false,
-        'userName': selectedUser.name ?? 'Unknown',
-        'pictureUrl': selectedUser.imageUrl?.isNotEmpty == true ? selectedUser.imageUrl![0] : '',
-        'timestamp': FieldValue.serverTimestamp()
-      }, SetOptions(merge: true));
-      await docRef
-          .doc(selectedUser.id)
-          .collection("Matches")
-          .doc(currentUser.id)
-          .set({
-        'Matches': currentUser.id,
-        'userName': currentUser.name ?? 'Unknown',
-        'pictureUrl': currentUser.imageUrl?.isNotEmpty == true ? currentUser.imageUrl![0] : '',
-        'isRead': false,
-        'timestamp': FieldValue.serverTimestamp()
-      }, SetOptions(merge: true));
-    }
-
-    await docRef
-        .doc(currentUser.id)
-        .collection("CheckedUser")
-        .doc(selectedUser.id)
-        .set({
-      'LikedUser': selectedUser.id,
-      'timestamp': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
-    await docRef
-        .doc(selectedUser.id)
-        .collection("LikedBy")
-        .doc(currentUser.id)
-        .set({
-      'LikedBy': currentUser.id,
-      'timestamp': FieldValue.serverTimestamp()
-    }, SetOptions(merge: true));
   }
 
   static Query query(UserModel currentUser) {
     if (currentUser.showGender == 'everyone') {
       return docRef
-          .where(
-            'age',
-            isGreaterThanOrEqualTo: int.parse(currentUser.ageRange!['min']),
-          )
+          .where('showGender', whereIn: ['everyone', currentUser.gender])
           .where('age',
-              isLessThanOrEqualTo: int.parse(currentUser.ageRange!['max']))
+              isGreaterThanOrEqualTo: currentUser.ageRangeMin ?? 18)
+          .where('age', isLessThanOrEqualTo: currentUser.ageRangeMax ?? 100)
           .orderBy('age', descending: false);
     } else {
       return docRef
-          .where('editInfo.userGender', isEqualTo: currentUser.showGender)
-          .where(
-            'age',
-            isGreaterThanOrEqualTo: int.parse(currentUser.ageRange!['min']),
-          )
+          .where('gender', isEqualTo: currentUser.showGender)
+          .where('showGender', whereIn: ['everyone', currentUser.gender])
           .where('age',
-              isLessThanOrEqualTo: int.parse(currentUser.ageRange!['max']))
-          //FOR FETCH USER WHO MATCH WITH USER SEXUAL ORIENTAION
-          // .where('sexualOrientation.orientation',
-          //     arrayContainsAny: currentUser.sexualOrientation)
+              isGreaterThanOrEqualTo: currentUser.ageRangeMin ?? 18)
+          .where('age', isLessThanOrEqualTo: currentUser.ageRangeMax ?? 100)
           .orderBy('age', descending: false);
     }
   }
 
+  /// Optimized user list fetching with caching and pagination
   static Future<List<UserModel>> getUserList(
+    UserModel currentUser, {
+    bool forceRefresh = false,
+  }) async {
+    try {
+      debugPrint('🔍 Getting optimized user list for ${currentUser.name}');
+      
+      // Use cached service for better performance
+      final result = await _cachedUserService.getCachedUsers(
+        currentUser: currentUser,
+        forceRefresh: forceRefresh,
+      );
+      
+      if (result.isSuccess) {
+        debugPrint('✅ Retrieved ${result.items.length} users from optimized service');
+        return result.items;
+      } else {
+        debugPrint('❌ Error from cached service: ${result.error}');
+        // Fallback to legacy method
+        return await _legacyGetUserList(currentUser);
+      }
+      
+    } catch (e) {
+      debugPrint('❌ Error in optimized getUserList: $e');
+      // Fallback to legacy method
+      return await _legacyGetUserList(currentUser);
+    }
+  }
+  
+  /// Get more users with pagination
+  static Future<List<UserModel>> getMoreUsers(
+    UserModel currentUser,
+    PaginatedResult<UserModel> previousResult,
+  ) async {
+    try {
+      debugPrint('📄 Loading more users...');
+      
+      final result = await _cachedUserService.getMoreUsers(
+        currentUser: currentUser,
+        previousResult: previousResult,
+      );
+      
+      if (result.isSuccess) {
+        debugPrint('✅ Loaded ${result.items.length} more users');
+        return result.items;
+      } else {
+        debugPrint('❌ Error loading more users: ${result.error}');
+        return [];
+      }
+      
+    } catch (e) {
+      debugPrint('❌ Error in getMoreUsers: $e');
+      return [];
+    }
+  }
+  
+  /// Legacy getUserList method as fallback
+  static Future<List<UserModel>> _legacyGetUserList(
     UserModel currentUser,
   ) async {
     List<String> checkedUserIds = [];
 
     try {
+      debugPrint('⚠️ Using legacy getUserList as fallback');
+      
       // Debug logging
       debugPrint('Getting user list for: ${currentUser.id}');
       debugPrint('Current user auth: ${firebaseAuth.currentUser?.uid}');
@@ -289,10 +326,10 @@ class UserSearchRepo {
         }
       }
 
-      debugPrint('Final user list size: ${userList.length}');
+      debugPrint('Final legacy user list size: ${userList.length}');
       return userList;
     } catch (e) {
-      debugPrint('Error in getUserList: $e');
+      debugPrint('Error in legacy getUserList: $e');
       rethrow;
     }
   }
@@ -302,10 +339,13 @@ class UserSearchRepo {
         .doc(currentUser.id)
         .collection("LikedBy")
         .get();
-
-    return snapshot.docs
-        .map((f) => f['LikedBy'] as String)
-        .toList();
+    List<String> likedByList = [];
+    if (snapshot.docs.isNotEmpty) {
+      for (final doc in snapshot.docs) {
+        likedByList.add(doc.data()['LikedBy']);
+      }
+    }
+    return likedByList;
   }
 
   static double calculateDistance(lat1, lon1, lat2, lon2) {

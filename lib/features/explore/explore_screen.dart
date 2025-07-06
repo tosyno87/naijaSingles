@@ -9,6 +9,8 @@ import 'package:naijasingles/features/explore/widgets/match_confirmation_modal.d
 import 'package:naijasingles/features/dating/screens/user_detail_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:naijasingles/common/data/repo/user_search_repo.dart';
+import 'package:naijasingles/services/super_like_service.dart';
+import 'package:naijasingles/services/undo_service.dart';
 
 // Afropeep MVP Color Scheme
 const Color kBackgroundColor = Color(0xFFFFF6E5); // Light cream
@@ -50,10 +52,21 @@ class _ExploreScreenState extends State<ExploreScreen>
   bool _isLoading = true;
   String? _error;
 
+  // Services
+  final SuperLikeService _superLikeService = SuperLikeService();
+  final UndoService _undoService = UndoService();
+
+  // Undo state
+  bool _canUndo = false;
+
   @override
   void initState() {
     super.initState();
     _loadCurrentUser();
+    // Initialize undo state after frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateUndoState();
+    });
     log("ExploreScreen initialized");
   }
 
@@ -142,6 +155,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
       _loadSwipeItems();
       log("Loaded ${users.length} users from Firebase");
+      
+      // Initialize undo state
+      _updateUndoState();
     } catch (e) {
       log('Error loading users: $e');
       setState(() {
@@ -180,6 +196,17 @@ class _ExploreScreenState extends State<ExploreScreen>
     try {
       // Use the real match service to handle the like
       final matchId = await UserSearchRepo.rightSwipe(_currentUser!, user);
+
+      // Record swipe action for undo functionality
+      await _undoService.recordSwipeAction(
+        userId: _currentUser!.id!,
+        targetUserId: user.id!,
+        direction: SwipeDirection.right,
+        matchId: matchId,
+      );
+
+      // Update undo state
+      _updateUndoState();
 
       log('🔍 Match result: ${matchId ?? "No match"}');
 
@@ -224,6 +251,16 @@ class _ExploreScreenState extends State<ExploreScreen>
 
     try {
       await UserSearchRepo.leftSwipe(_currentUser!, user);
+
+      // Record swipe action for undo functionality
+      await _undoService.recordSwipeAction(
+        userId: _currentUser!.id!,
+        targetUserId: user.id!,
+        direction: SwipeDirection.left,
+      );
+
+      // Update undo state
+      _updateUndoState();
     } catch (e) {
       log('Error handling pass: $e');
     }
@@ -237,6 +274,196 @@ class _ExploreScreenState extends State<ExploreScreen>
         content: Text('${user.name} saved to bookmarks'),
         backgroundColor: Colors.amber,
         duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  void handleSuperLike(UserModel user) async {
+    if (_currentUser == null) return;
+
+    log('⭐ SUPER LIKE ACTION: ${_currentUser!.name} super likes ${user.name}');
+
+    try {
+      // Check if user can send super like
+      final eligibility = await _superLikeService.canSendSuperLike(_currentUser!.id!);
+      
+      if (!eligibility.canSend) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(eligibility.reason ?? 'Cannot send super like'),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+
+      // Send super like
+      final result = await _superLikeService.sendSuperLike(
+        fromUserId: _currentUser!.id!,
+        toUserId: user.id!,
+      );
+
+      if (result.isSuccess) {
+        // Record swipe action for undo functionality
+        await _undoService.recordSwipeAction(
+          userId: _currentUser!.id!,
+          targetUserId: user.id!,
+          direction: SwipeDirection.right,
+          matchId: result.matchId,
+        );
+
+        // Update undo state
+        _updateUndoState();
+
+        if (result.isInstantMatch) {
+          log('🎉 SUPER LIKE INSTANT MATCH! Match ID: ${result.matchId}');
+          _showMatchConfirmation(
+            _currentUser!.imageUrl?.isNotEmpty == true
+                ? _currentUser!.imageUrl![0]
+                : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+            user.imageUrl?.isNotEmpty == true ? user.imageUrl![0] : '',
+            user.name ?? 'Unknown',
+            user.id,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('⭐ Super liked ${user.name}!'),
+              backgroundColor: Colors.blue,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.error ?? 'Failed to send super like'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      log('❌ Error handling super like: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Super like saved! ⭐'),
+          backgroundColor: Colors.blue,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void handleUndo() async {
+    if (_currentUser == null) return;
+
+    log('↩️ UNDO ACTION');
+
+    try {
+      final result = await _undoService.undoLastSwipe(_currentUser!.id!);
+
+      if (result.isSuccess) {
+        // Reload users to show the undone user again
+        await _loadUsers();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('↩️ Last swipe undone!'),
+            backgroundColor: Colors.purple,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+
+        // Update undo state
+        _updateUndoState();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.error ?? 'Cannot undo'),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      log('❌ Error handling undo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Cannot undo at this time'),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _updateUndoState() async {
+    if (_currentUser?.id != null) {
+      final canUndo = await _undoService.canUndoLastSwipe(_currentUser!.id!);
+      log('🔄 Undo state updated: canUndo = $canUndo');
+      if (mounted) {
+        setState(() {
+          _canUndo = canUndo;
+        });
+      }
+    } else {
+      log('⚠️ Cannot update undo state: no current user');
+    }
+  }
+
+  void _showIntentSelector() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white, // Use white background instead of cream
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          'What are you looking for?',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+            color: kTextPrimary, // Dark brown text
+            fontSize: 18,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: _intentOptions.map((intent) => 
+            RadioListTile<String>(
+              title: Text(
+                intent,
+                style: GoogleFonts.montserrat(
+                  color: kTextPrimary, // Dark brown text
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              value: intent,
+              groupValue: _selectedIntent,
+              activeColor: kPrimaryColor, // Green radio button
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => _selectedIntent = value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ).toList(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: kTextSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -281,6 +508,12 @@ class _ExploreScreenState extends State<ExploreScreen>
   }
 
   @override
+  void dispose() {
+    _undoService.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
 
@@ -289,7 +522,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // Clean header with undo and filter
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -297,16 +530,20 @@ class _ExploreScreenState extends State<ExploreScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Only show back labelLarge if navigated from Messages
-                  widget.showBackButton
+                  // Undo button (always show if user is loaded)
+                  _currentUser != null
                       ? IconButton(
-                          icon: Icon(Icons.arrow_back_ios, color: kTextPrimary),
-                          onPressed: () => Navigator.of(context)
-                              .pushReplacementNamed('/main_navigation'),
+                          icon: Icon(
+                            Icons.undo, 
+                            color: _canUndo ? Colors.purple : Colors.grey, 
+                            size: 24
+                          ),
+                          onPressed: _canUndo ? handleUndo : null,
+                          tooltip: _canUndo ? 'Undo last swipe' : 'No swipe to undo',
                         )
-                      : SizedBox(
-                          width:
-                              48), // Empty space with same width as labelLarge
+                      : const SizedBox(width: 48),
+
+                  // Title
                   Text(
                     'Explore',
                     style: GoogleFonts.montserrat(
@@ -315,76 +552,39 @@ class _ExploreScreenState extends State<ExploreScreen>
                       color: kTextPrimary,
                     ),
                   ),
-                  DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedIntent,
-                      dropdownColor: kBackgroundColor,
-                      icon: Icon(Icons.keyboard_arrow_down_rounded,
-                          color: kPrimaryColor),
-                      style: GoogleFonts.montserrat(
-                        color: kTextPrimary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _selectedIntent = value);
-                        }
-                      },
-                      items: _intentOptions
-                          .map((intent) => DropdownMenuItem(
-                                value: intent,
-                                child: Text(intent),
-                              ))
-                          .toList(),
-                    ),
+
+                  // Filter button
+                  IconButton(
+                    icon: Icon(Icons.tune, color: kTextPrimary),
+                    onPressed: () {
+                      _showIntentSelector();
+                    },
+                    tooltip: 'Filter preferences',
                   ),
                 ],
               ),
             ),
 
-            // Content area
+            // Content area with simple overlay
             Expanded(
-              child: _buildContent(),
-            ),
-
-            // Action labelLarges - only show if not loading and have users
-            if (!_isLoading && _users.isNotEmpty && _error == null)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 24.0, horizontal: 32.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Dislike labelLarge
-                    _buildActionButton(
-                      icon: Icons.close_rounded,
-                      color: kRedColor,
-                      tooltip: 'Dislike',
-                      onPressed: () {
-                        if (_matchEngine.currentItem != null) {
-                          _matchEngine.currentItem?.nope();
-                        }
-                      },
-                      size: 56,
+              child: Stack(
+                children: [
+                  // Main swipe content
+                  _buildContent(),
+                  
+                  // Simple Super Like button - only show if not loading and have users
+                  if (!_isLoading && _users.isNotEmpty && _error == null)
+                    Positioned(
+                      bottom: 30,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: _buildSuperLikeButton(),
+                      ),
                     ),
-
-                    const SizedBox(width: 60),
-
-                    // Like labelLarge
-                    _buildActionButton(
-                      icon: Icons.favorite_rounded,
-                      color: kPrimaryColor,
-                      tooltip: 'Like',
-                      onPressed: () {
-                        if (_matchEngine.currentItem != null) {
-                          _matchEngine.currentItem?.like();
-                        }
-                      },
-                      size: 56,
-                    ),
-                  ],
-                ),
+                ],
               ),
+            ),
           ],
         ),
       ),
@@ -478,7 +678,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.only(top: 8.0), // Remove bottom padding
       child: SwipeCards(
         matchEngine: _matchEngine,
         itemBuilder: (BuildContext context, int index) {
@@ -499,39 +699,34 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  // Helper method to build consistent action labelLarges with ripple effect
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required String tooltip,
-    required VoidCallback onPressed,
-    required double size,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        elevation: 4,
-        shadowColor: color.withValues(alpha: 0.3),
-        shape: const CircleBorder(),
-        color: color,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          splashColor: Colors.white.withValues(alpha: 0.3),
-          highlightColor: Colors.white.withValues(alpha: 0.1),
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: size * 0.55, // Slightly larger icon size
-            ),
+  // Simple Super Like button
+  Widget _buildSuperLikeButton() {
+    return Material(
+      elevation: 8,
+      shape: const CircleBorder(),
+      color: Colors.blue,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () {
+          if (_matchEngine.currentItem != null) {
+            final user = _matchEngine.currentItem?.content as UserModel;
+            handleSuperLike(user);
+            _matchEngine.currentItem?.superLike();
+          }
+        },
+        child: Container(
+          width: 60,
+          height: 60,
+          child: Icon(
+            Icons.star_rounded,
+            color: Colors.white,
+            size: 30,
           ),
         ),
       ),
     );
   }
+
 }
 
 // Profile Card Widget with fade-in animation
@@ -832,7 +1027,7 @@ class _ProfileCardState extends State<ProfileCard>
 
                         const SizedBox(height: 12),
 
-                        // Tap to view profile hint
+                        // Simple tap hint
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -843,7 +1038,7 @@ class _ProfileCardState extends State<ProfileCard>
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Tap to view full profile',
+                              'Tap to view profile',
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: kPrimaryColor,

@@ -680,7 +680,7 @@ class SuperLikeStats {
       sentCount: 0,
       receivedCount: 0,
       dailyUsedCount: 0,
-      dailyLimit: FREE_SUPER_LIKES_PER_DAY,
+      dailyLimit: SuperLikeService.FREE_SUPER_LIKES_PER_DAY,
       responseRate: 0.0,
       matchRate: 0.0,
       isPremium: false,

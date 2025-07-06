@@ -49,6 +49,7 @@ class PaginatedUserService {
       for (final doc in querySnapshot.docs) {
         try {
           final userData = doc.data() as Map<String, dynamic>;
+          debugPrint('👤 Processing user: ${doc.id} - ${userData['name'] ?? 'No name'}');
 
           // Skip excluded users
           if (excludedUserIds.contains(doc.id)) {
@@ -58,10 +59,12 @@ class PaginatedUserService {
 
           // Create UserModel
           final user = UserModel.fromMap(userData, doc.id);
+          debugPrint('✅ Created UserModel for: ${user.name}');
 
           // Apply distance filter if location is available
           if (await _isWithinDistance(currentUser, user)) {
             users.add(user);
+            debugPrint('✅ Added user to results: ${user.name}');
           } else {
             debugPrint('📍 User ${user.name} is too far away');
           }
@@ -100,31 +103,58 @@ class PaginatedUserService {
   Query _buildUserQuery(UserModel currentUser) {
     Query query = _usersCollection;
 
-    // Filter by gender preference
+    debugPrint('🔍 Building query for user: ${currentUser.name}');
+    debugPrint('   - showGender: ${currentUser.showGender}');
+    debugPrint('   - ageRangeMin: ${currentUser.ageRangeMin}');
+    debugPrint('   - ageRangeMax: ${currentUser.ageRangeMax}');
+
+    // Filter by gender preference (using legacy logic that works)
     if (currentUser.showGender != null &&
         currentUser.showGender != 'everyone') {
+      // User wants to see specific gender
       query = query.where('gender', isEqualTo: currentUser.showGender);
       debugPrint('🔍 Filtering by gender: ${currentUser.showGender}');
+      
+      // Also ensure those users want to see current user's gender
+      if (currentUser.gender != null) {
+        query = query.where('showGender', whereIn: ['everyone', currentUser.gender]);
+        debugPrint('🔍 Ensuring mutual gender preference');
+      }
+    } else {
+      // User wants to see everyone, but still filter by who wants to see them
+      if (currentUser.gender != null) {
+        query = query.where('showGender', whereIn: ['everyone', currentUser.gender]);
+        debugPrint('🔍 Filtering by who wants to see ${currentUser.gender}');
+      } else {
+        debugPrint('🔍 No gender filter applied (showing everyone)');
+      }
     }
 
     // Filter by age range
     if (currentUser.ageRangeMin != null && currentUser.ageRangeMax != null) {
-      final minBirthYear = DateTime.now().year - currentUser.ageRangeMax!;
-      final maxBirthYear = DateTime.now().year - currentUser.ageRangeMin!;
-
       query = query
           .where('age', isGreaterThanOrEqualTo: currentUser.ageRangeMin)
           .where('age', isLessThanOrEqualTo: currentUser.ageRangeMax);
 
       debugPrint(
           '🔍 Filtering by age: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}');
+    } else {
+      debugPrint('🔍 No age filter applied');
     }
 
     // Exclude current user
     // Note: We'll handle this in post-processing to avoid complex queries
 
-    // Order by last active (most recent first)
-    query = query.orderBy('lastSeen', descending: true);
+    // Order by a field that's more likely to exist
+    // Try different ordering strategies
+    try {
+      // First try ordering by age (which should exist)
+      query = query.orderBy('age', descending: false);
+      debugPrint('🔍 Ordering by age');
+    } catch (e) {
+      debugPrint('⚠️ Age ordering failed: $e');
+      // If that fails, don't order at all for now
+    }
 
     return query;
   }
@@ -143,8 +173,10 @@ class PaginatedUserService {
           .collection('CheckedUser')
           .get();
 
+      debugPrint('👀 Found ${checkedUsers.docs.length} checked users');
       for (final doc in checkedUsers.docs) {
         excludedIds.add(doc.id);
+        debugPrint('   - Checked: ${doc.id}');
       }
 
       // Get blocked users
@@ -153,8 +185,10 @@ class PaginatedUserService {
           .collection('blockedlist')
           .get();
 
+      debugPrint('🚫 Found ${blockedUsers.docs.length} blocked users');
       for (final doc in blockedUsers.docs) {
         excludedIds.add(doc.id);
+        debugPrint('   - Blocked: ${doc.id}');
       }
 
       // Get users who blocked current user (if possible to query efficiently)

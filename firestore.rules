@@ -305,6 +305,15 @@ service cloud.firestore {
       allow create: if request.auth != null;
     }
 
+    // Notification Logs collection - for analytics (admin only)
+    match /notificationLogs/{logId} {
+      // Only allow system/admin to write logs
+      allow create: if request.auth != null;
+      // Users can read their own notification logs
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.userId;
+    }
+
     // User settings/preferences
     match /userSettings/{userId} {
       allow read, write: if request.auth != null && 

@@ -15,6 +15,12 @@ class EnhancedNotificationService {
       FlutterLocalNotificationsPlugin();
 
   static bool _initialized = false;
+  static GlobalKey<NavigatorState>? _navigatorKey;
+
+  /// Set navigator key for navigation
+  static void setNavigatorKey(GlobalKey<NavigatorState> navigatorKey) {
+    _navigatorKey = navigatorKey;
+  }
 
   /// Initialize the enhanced notification service
   static Future<void> initialize() async {
@@ -92,20 +98,24 @@ class EnhancedNotificationService {
       sound: RawResourceAndroidNotificationSound('like_sound'),
     );
 
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(matchChannel);
+    const superLikeChannel = AndroidNotificationChannel(
+      'super_likes',
+      'Super Like Notifications',
+      description: 'Notifications for super likes',
+      importance: Importance.max,
+      sound: RawResourceAndroidNotificationSound('super_like_sound'),
+    );
 
-    await _localNotifications
+    final androidPlugin = _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(messageChannel);
+            AndroidFlutterLocalNotificationsPlugin>();
 
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(likeChannel);
+    if (androidPlugin != null) {
+      await androidPlugin.createNotificationChannel(matchChannel);
+      await androidPlugin.createNotificationChannel(messageChannel);
+      await androidPlugin.createNotificationChannel(likeChannel);
+      await androidPlugin.createNotificationChannel(superLikeChannel);
+    }
   }
 
   /// Request notification permissions
@@ -218,6 +228,9 @@ class EnhancedNotificationService {
       case 'like':
         await _navigateToProfile(data);
         break;
+      case 'super_like':
+        await _navigateToProfile(data);
+        break;
       default:
         debugPrint('Unknown notification type: $type');
     }
@@ -272,22 +285,66 @@ class EnhancedNotificationService {
   /// Navigate to match screen
   static Future<void> _navigateToMatch(Map<String, dynamic> data) async {
     debugPrint('🎉 Navigating to match: ${data['matchedUserName']}');
-    // TODO: Implement navigation to match screen
-    // Navigator.pushNamed(context, '/match', arguments: data);
+    
+    final context = _navigatorKey?.currentContext;
+    if (context != null) {
+      // Navigate to match confirmation screen or chat
+      Navigator.pushNamed(
+        context, 
+        '/match_confirmation',
+        arguments: {
+          'matchedUserId': data['matchedUserId'],
+          'matchedUserName': data['matchedUserName'],
+          'matchedUserPhoto': data['matchedUserPhoto'],
+        },
+      );
+    } else {
+      debugPrint('⚠️ Navigator context not available for match navigation');
+    }
   }
 
   /// Navigate to chat screen
   static Future<void> _navigateToChat(Map<String, dynamic> data) async {
     debugPrint('💬 Navigating to chat: ${data['threadId']}');
-    // TODO: Implement navigation to chat screen
-    // Navigator.pushNamed(context, '/chat', arguments: data);
+    
+    final context = _navigatorKey?.currentContext;
+    if (context != null) {
+      // Navigate to specific chat thread
+      Navigator.pushNamed(
+        context,
+        '/chat_thread',
+        arguments: {
+          'threadId': data['threadId'],
+          'otherUserId': data['senderId'],
+          'otherUserName': data['senderName'],
+          'otherUserPhoto': data['senderPhoto'],
+        },
+      );
+    } else {
+      debugPrint('⚠️ Navigator context not available for chat navigation');
+    }
   }
 
   /// Navigate to profile screen
   static Future<void> _navigateToProfile(Map<String, dynamic> data) async {
-    debugPrint('👤 Navigating to profile: ${data['likerName']}');
-    // TODO: Implement navigation to profile screen
-    // Navigator.pushNamed(context, '/profile', arguments: data);
+    debugPrint('👤 Navigating to profile: ${data['likerName'] ?? data['senderName']}');
+    
+    final context = _navigatorKey?.currentContext;
+    if (context != null) {
+      // Navigate to user profile
+      Navigator.pushNamed(
+        context,
+        '/user_profile',
+        arguments: {
+          'userId': data['likerId'] ?? data['senderId'],
+          'userName': data['likerName'] ?? data['senderName'],
+          'userPhoto': data['likerPhoto'] ?? data['senderPhoto'],
+          'isFromNotification': true,
+        },
+      );
+    } else {
+      debugPrint('⚠️ Navigator context not available for profile navigation');
+    }
   }
 
   /// Get user's notifications from Firestore (real-time)

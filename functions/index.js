@@ -99,6 +99,47 @@ exports.onMessageSent = functions.firestore
     }
   });
 
+// ⭐ SUPER LIKE NOTIFICATIONS - Triggered when super like is created
+exports.onSuperLikeCreated = functions.firestore
+  .document('superLikes/{superLikeId}')
+  .onCreate(async (snap, context) => {
+    const superLikeData = snap.data();
+    const superLikeId = context.params.superLikeId;
+    
+    console.log(`⭐ New super like created: ${superLikeId}`, superLikeData);
+    
+    try {
+      const fromUserId = superLikeData.fromUserId;
+      const toUserId = superLikeData.toUserId;
+      
+      if (!fromUserId || !toUserId) {
+        console.log('Invalid super like - missing user IDs');
+        return;
+      }
+      
+      // Get both users' data
+      const [fromUserDoc, toUserDoc] = await Promise.all([
+        admin.firestore().collection('users').doc(fromUserId).get(),
+        admin.firestore().collection('users').doc(toUserId).get()
+      ]);
+      
+      if (!fromUserDoc.exists || !toUserDoc.exists) {
+        console.log('One or both users not found for super like');
+        return;
+      }
+      
+      const fromUser = { id: fromUserId, ...fromUserDoc.data() };
+      const toUser = { id: toUserId, ...toUserDoc.data() };
+      
+      await sendSuperLikeNotification(toUser, fromUser, superLikeId);
+      
+      console.log('✅ Super like notification sent successfully');
+      
+    } catch (error) {
+      console.error('❌ Error sending super like notification:', error);
+    }
+  });
+
 // 💖 LIKE NOTIFICATIONS - Triggered when someone likes a profile
 exports.onLikeCreated = functions.firestore
   .document('users/{userId}/LikedBy/{likeId}')
@@ -185,6 +226,9 @@ async function sendMatchNotification(user, matchedUser) {
     await admin.messaging().send(message);
     console.log(`✅ Match notification sent to ${user.id}`);
     
+    // Log successful notification
+    await logNotificationAnalytics(user.id, 'match', 'sent');
+    
     // Store in-app notification
     await storeInAppNotification(user.id, {
       type: 'match',
@@ -196,6 +240,7 @@ async function sendMatchNotification(user, matchedUser) {
     
   } catch (error) {
     console.error(`❌ Error sending match notification to ${user.id}:`, error);
+    await logNotificationAnalytics(user.id, 'match', 'failed', error.message);
   }
 }
 
@@ -257,6 +302,9 @@ async function sendMessageNotification(recipient, sender, messageData, threadId)
     await admin.messaging().send(message);
     console.log(`✅ Message notification sent to ${recipient.id}`);
     
+    // Log successful notification
+    await logNotificationAnalytics(recipient.id, 'message', 'sent');
+    
     // Store in-app notification
     await storeInAppNotification(recipient.id, {
       type: 'message',
@@ -268,6 +316,77 @@ async function sendMessageNotification(recipient, sender, messageData, threadId)
     
   } catch (error) {
     console.error(`❌ Error sending message notification to ${recipient.id}:`, error);
+    await logNotificationAnalytics(recipient.id, 'message', 'failed', error.message);
+  }
+}
+
+// ⭐ Helper function to send super like notification
+async function sendSuperLikeNotification(recipient, sender, superLikeId) {
+  const pushToken = recipient.pushToken;
+  if (!pushToken) {
+    console.log(`No push token for user ${recipient.id}`);
+    return;
+  }
+  
+  // Check notification preferences
+  const notificationPrefs = recipient.notificationPreferences || {};
+  if (notificationPrefs.superLikeNotifications === false) {
+    console.log(`Super like notifications disabled for user ${recipient.id}`);
+    return;
+  }
+  
+  const message = {
+    notification: {
+      title: '⭐ Super Like!',
+      body: `${sender.name || 'Someone special'} super liked you! They really want to connect.`,
+    },
+    data: {
+      type: 'super_like',
+      senderId: sender.id,
+      senderName: sender.name || '',
+      senderPhoto: getFirstPhoto(sender),
+      superLikeId: superLikeId,
+      action: 'open_profile',
+    },
+    token: pushToken,
+    android: {
+      notification: {
+        icon: 'ic_notification',
+        color: '#0066FF',
+        sound: 'super_like_sound',
+        channelId: 'super_likes',
+      },
+    },
+    apns: {
+      payload: {
+        aps: {
+          sound: 'super_like_sound.caf',
+          badge: 1,
+        },
+      },
+    },
+  };
+  
+  try {
+    await admin.messaging().send(message);
+    console.log(`✅ Super like notification sent to ${recipient.id}`);
+    
+    // Log successful notification
+    await logNotificationAnalytics(recipient.id, 'super_like', 'sent');
+    
+    // Store in-app notification
+    await storeInAppNotification(recipient.id, {
+      type: 'super_like',
+      title: '⭐ Super Like!',
+      message: `${sender.name || 'Someone special'} super liked you!`,
+      avatarUrl: getFirstPhoto(sender),
+      actionId: sender.id,
+      superLikeId: superLikeId,
+    });
+    
+  } catch (error) {
+    console.error(`❌ Error sending super like notification to ${recipient.id}:`, error);
+    await logNotificationAnalytics(recipient.id, 'super_like', 'failed', error.message);
   }
 }
 
@@ -321,6 +440,9 @@ async function sendLikeNotification(likedUser, liker) {
     await admin.messaging().send(message);
     console.log(`✅ Like notification sent to ${likedUser.id}`);
     
+    // Log successful notification
+    await logNotificationAnalytics(likedUser.id, 'like', 'sent');
+    
     // Store in-app notification
     await storeInAppNotification(likedUser.id, {
       type: 'like',
@@ -332,26 +454,48 @@ async function sendLikeNotification(likedUser, liker) {
     
   } catch (error) {
     console.error(`❌ Error sending like notification to ${likedUser.id}:`, error);
+    await logNotificationAnalytics(likedUser.id, 'like', 'failed', error.message);
   }
 }
 
 // 📱 Helper function to store in-app notification
 async function storeInAppNotification(userId, notificationData) {
   try {
-    await admin.firestore()
+    const notificationRef = admin.firestore()
       .collection('users')
       .doc(userId)
       .collection('notifications')
-      .add({
-        ...notificationData,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        isRead: false,
-        id: admin.firestore().collection('_').doc().id, // Generate unique ID
-      });
+      .doc();
+      
+    await notificationRef.set({
+      ...notificationData,
+      id: notificationRef.id,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      isRead: false,
+    });
       
     console.log(`✅ In-app notification stored for user ${userId}`);
+    
+    // Log notification analytics
+    await logNotificationAnalytics(userId, notificationData.type, 'stored');
+    
   } catch (error) {
     console.error(`❌ Error storing in-app notification for ${userId}:`, error);
+  }
+}
+
+// 📊 Helper function to log notification analytics
+async function logNotificationAnalytics(userId, type, status, error = null) {
+  try {
+    await admin.firestore().collection('notificationLogs').add({
+      userId: userId,
+      type: type,
+      status: status, // 'sent', 'failed', 'stored'
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      error: error,
+    });
+  } catch (logError) {
+    console.error('Error logging notification analytics:', logError);
   }
 }
 

@@ -28,6 +28,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   static const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
+  static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/delete
+  static const Color successColor = Color(0xFF4CAF50); // Green for success
   static final Color textPrimary = Colors.brown.shade800;
   static final Color textSecondary = Colors.brown.shade600;
   static final Color textLight = Colors.grey.shade600;
@@ -335,7 +337,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         padding: const EdgeInsets.only(right: 20),
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.red,
+          color: errorColor,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Icon(
@@ -559,30 +561,108 @@ class _MessagesScreenState extends State<MessagesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Search Messages',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        contentPadding: const EdgeInsets.all(24),
+        title: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search,
+                color: primaryColor,
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Search Messages',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
-        content: Text(
-          'Search functionality coming soon!',
-          style: GoogleFonts.montserrat(color: textSecondary),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Search functionality is coming soon!',
+              style: GoogleFonts.montserrat(
+                color: textSecondary,
+                fontSize: 16,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: primaryColor.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: primaryColor,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'We\'re working on adding message search to help you find conversations faster.',
+                      style: GoogleFonts.montserrat(
+                        color: primaryColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'OK',
-              style: GoogleFonts.montserrat(
-                color: primaryColor,
-                fontWeight: FontWeight.w600,
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Got it',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
         ],
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
     );
   }
@@ -591,69 +671,192 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Future<bool?> _showDeleteConfirmation(MessageThreadInfo thread) async {
     return showDialog<bool>(
       context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Delete Conversation',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        contentPadding: const EdgeInsets.all(24),
+        title: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: errorColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.delete_outline,
+                color: errorColor,
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Delete Conversation',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
-        content: Text(
-          'Are you sure you want to delete your conversation with ${thread.otherUserName}? This action cannot be undone.',
-          style: GoogleFonts.montserrat(
-            color: textSecondary,
-            height: 1.4,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Are you sure you want to delete your conversation with ${thread.otherUserName}?',
+              style: GoogleFonts.montserrat(
+                color: textSecondary,
+                fontSize: 16,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: errorColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: errorColor.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: errorColor,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This will also unmatch you both. This action cannot be undone.',
+                      style: GoogleFonts.montserrat(
+                        color: errorColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: textSecondary.withOpacity(0.3)),
+                    ),
+                  ),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.montserrat(
+                      color: textSecondary,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context, true);
-              await _deleteChatThread(thread);
-            },
-            child: Text(
-              'Delete',
-              style: GoogleFonts.montserrat(
-                color: Colors.red,
-                fontWeight: FontWeight.w600,
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(context, true);
+                    await _deleteChatThread(thread);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: errorColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Delete',
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
     );
   }
 
   // Delete chat thread with loading indicator
   Future<void> _deleteChatThread(MessageThreadInfo thread) async {
-    // Show loading indicator
+    // Show MVP compliant loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        contentPadding: const EdgeInsets.all(32),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: primaryColor),
-            const SizedBox(height: 16),
-            Text(
-              'Deleting conversation...',
-              style: GoogleFonts.montserrat(
-                color: textSecondary,
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
               ),
+              child: Center(
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(
+                    color: primaryColor,
+                    strokeWidth: 3,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Deleting Conversation',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Please wait while we remove your conversation and unmatch you both...',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -671,10 +874,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Conversation deleted',
+              'Conversation deleted and users unmatched',
               style: GoogleFonts.montserrat(color: Colors.white),
             ),
-            backgroundColor: primaryColor,
+            backgroundColor: successColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -721,31 +924,57 @@ class _MessagesScreenState extends State<MessagesScreen> {
   // Method to view user profile from messages
   Future<void> _viewUserProfile(String userId) async {
     try {
-      // Show loading indicator
+      // Show MVP compliant loading indicator
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(color: primaryColor),
-                const SizedBox(height: 16),
-                Text(
-                  'Loading profile...',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: textPrimary,
+        builder: (context) => AlertDialog(
+          backgroundColor: cardColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 8,
+          contentPadding: const EdgeInsets.all(32),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                      strokeWidth: 3,
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Loading Profile',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Please wait while we fetch the user profile...',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: textSecondary,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       );

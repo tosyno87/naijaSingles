@@ -197,16 +197,9 @@ class _ExploreScreenState extends State<ExploreScreen>
       // Use the real match service to handle the like
       final matchId = await UserSearchRepo.rightSwipe(_currentUser!, user);
 
-      // Record swipe action for undo functionality
-      await _undoService.recordSwipeAction(
-        userId: _currentUser!.id!,
-        targetUserId: user.id!,
-        direction: SwipeDirection.right,
-        matchId: matchId,
-      );
-
-      // Update undo state
-      _updateUndoState();
+      // ❌ DON'T record likes for undo - likes should be permanent commitments
+      // This follows proper dating app logic (like Bumble/Tinder)
+      // Only passes (left swipes) can be undone
 
       log('🔍 Match result: ${matchId ?? "No match"}');
 
@@ -305,16 +298,8 @@ class _ExploreScreenState extends State<ExploreScreen>
       );
 
       if (result.isSuccess) {
-        // Record swipe action for undo functionality
-        await _undoService.recordSwipeAction(
-          userId: _currentUser!.id!,
-          targetUserId: user.id!,
-          direction: SwipeDirection.right,
-          matchId: result.matchId,
-        );
-
-        // Update undo state
-        _updateUndoState();
+        // ❌ DON'T record Super Likes for undo - premium actions should be permanent
+        // Super Likes are paid/limited features and should be final commitments
 
         if (result.isInstantMatch) {
           log('🎉 SUPER LIKE INSTANT MATCH! Match ID: ${result.matchId}');
@@ -370,7 +355,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('↩️ Last swipe undone!'),
+            content: Text('↩️ Pass undone! You\'ll see them again.'),
             backgroundColor: Colors.purple,
             duration: const Duration(seconds: 2),
           ),
@@ -539,7 +524,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                             size: 24
                           ),
                           onPressed: _canUndo ? handleUndo : null,
-                          tooltip: _canUndo ? 'Undo last swipe' : 'No swipe to undo',
+                          tooltip: _canUndo ? 'Undo last pass' : 'No pass to undo',
                         )
                       : const SizedBox(width: 48),
 

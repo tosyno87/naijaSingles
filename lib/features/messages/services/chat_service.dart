@@ -421,10 +421,21 @@ class ChatService {
     }
   }
 
-  // Delete a chat thread and all its messages
+  // Delete a chat thread and all its messages, and unmatch users
   Future<bool> deleteChatThread(String threadId) async {
     try {
       if (currentUserId == null) return false;
+
+      // Get thread info to find the other user
+      final threadDoc = await _chatThreadsCollection.doc(threadId).get();
+      if (!threadDoc.exists) return false;
+
+      final threadData = threadDoc.data() as Map<String, dynamic>;
+      final userIds = List<String>.from(threadData['userIds'] ?? []);
+      
+      if (userIds.length != 2) return false;
+      
+      final otherUserId = userIds.firstWhere((id) => id != currentUserId);
 
       // Delete all messages in the thread first
       final messagesRef =
@@ -444,10 +455,80 @@ class ChatService {
       // Delete the thread document
       await _chatThreadsCollection.doc(threadId).delete();
 
+      // Unmatch users - remove from both users' matches collections
+      await _unmatchUsers(currentUserId!, otherUserId);
+
+      debugPrint('✅ Chat deleted and users unmatched: $currentUserId <-> $otherUserId');
       return true;
     } catch (e) {
       debugPrint('Error deleting chat thread: $e');
       return false;
+    }
+  }
+
+  // Unmatch two users by removing their match records
+  Future<void> _unmatchUsers(String userId1, String userId2) async {
+    try {
+      final batch = _firestore.batch();
+
+      // Remove from new matches collection
+      final matchesQuery = await _firestore
+          .collection('matches')
+          .where('users', arrayContains: userId1)
+          .get();
+
+      for (var doc in matchesQuery.docs) {
+        final users = List<String>.from(doc.data()['users'] ?? []);
+        if (users.contains(userId2)) {
+          batch.delete(doc.reference);
+          debugPrint('🗑️ Deleted match: ${doc.id}');
+        }
+      }
+
+      // Remove from legacy Matches collection
+      final legacyMatchesQuery = await _firestore
+          .collection('Matches')
+          .where('users', arrayContains: userId1)
+          .get();
+
+      for (var doc in legacyMatchesQuery.docs) {
+        final users = List<String>.from(doc.data()['users'] ?? []);
+        if (users.contains(userId2)) {
+          batch.delete(doc.reference);
+          debugPrint('🗑️ Deleted legacy match: ${doc.id}');
+        }
+      }
+
+      // Remove from user subcollections
+      batch.delete(_firestore
+          .collection('users')
+          .doc(userId1)
+          .collection('Matches')
+          .doc(userId2));
+      
+      batch.delete(_firestore
+          .collection('users')
+          .doc(userId2)
+          .collection('Matches')
+          .doc(userId1));
+
+      // Remove likes to prevent immediate re-matching
+      batch.delete(_firestore
+          .collection('users')
+          .doc(userId1)
+          .collection('LikedBy')
+          .doc(userId2));
+      
+      batch.delete(_firestore
+          .collection('users')
+          .doc(userId2)
+          .collection('LikedBy')
+          .doc(userId1));
+
+      await batch.commit();
+      debugPrint('✅ Users successfully unmatched');
+    } catch (e) {
+      debugPrint('❌ Error unmatching users: $e');
     }
   }
 }

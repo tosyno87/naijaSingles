@@ -130,11 +130,18 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // Global navigator key for notification navigation
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
+    // Set navigator key for notification service
+    EnhancedNotificationService.setNavigatorKey(navigatorKey);
+    
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
+          navigatorKey: navigatorKey, // Add navigator key
           title: 'NaijaSingles',
           debugShowCheckedModeBanner: false,
           theme: themeProvider.isDarkMode

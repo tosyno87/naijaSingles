@@ -1,26 +1,37 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:naijasingles/services/performance_monitor.dart';
 
-/// Undo service that allows users to reverse their last swipe action
+/// Undo service that allows users to reverse their last PASS action only
+/// 
+/// IMPORTANT: Following proper dating app business logic:
+/// ✅ LEFT SWIPES (passes) can be undone - prevents accidental rejections
+/// ❌ RIGHT SWIPES (likes) cannot be undone - maintains commitment and trust
+/// ❌ SUPER LIKES cannot be undone - premium actions should be final
+/// 
+/// LIMITS (like Tinder/Bumble):
+/// 🆓 Free users: 1 undo per day
+/// 💎 Premium users: 5 undos per day
+/// ⏰ Must undo within 10 seconds of the pass
+/// 
+/// This prevents users from:
+/// - Taking back likes after seeing if someone likes them back
+/// - Breaking established matches by undoing likes
+/// - Gaming the system with unlimited undos
+/// - Overusing the undo feature (scarcity creates value)
+/// 
 /// Implements Priority 3: User Experience Enhancements
 class UndoService {
   static const Duration UNDO_WINDOW = Duration(seconds: 10);
-  static const int MAX_UNDO_HISTORY = 5; // Keep last 5 swipes for undo
-  static const int DAILY_UNDO_LIMIT = 3; // Free users get 3 undos per day
-  static const int PREMIUM_UNDO_LIMIT = 20; // Premium users get more undos
+  static const int MAX_UNDO_HISTORY = 3; // Keep last 3 swipes for undo
+  static const int DAILY_UNDO_LIMIT = 1; // Free users get 1 undo per day (like Tinder)
+  static const int PREMIUM_UNDO_LIMIT = 5; // Premium users get 5 undos per day
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Collection references
+  // Collection references (only the ones we actually use)
   CollectionReference get _usersCollection => _firestore.collection('users');
-  CollectionReference get _likesCollection => _firestore.collection('likes');
-  CollectionReference get _matchesCollection =>
-      _firestore.collection('matches');
   CollectionReference get _swipeHistoryCollection =>
       _firestore.collection('swipeHistory');
 
@@ -81,17 +92,27 @@ class UndoService {
       final lastSwipe = await getLastSwipeAction(userId);
 
       if (lastSwipe == null) {
+        debugPrint('⚠️ No swipe found to undo for user $userId');
+        return false;
+      }
+
+      // ✅ ONLY allow undoing LEFT swipes (passes)
+      // This follows proper dating app logic - likes should be permanent
+      if (lastSwipe.direction != SwipeDirection.left) {
+        debugPrint('⚠️ Cannot undo ${lastSwipe.direction.name} swipe - only passes can be undone');
         return false;
       }
 
       // Check if within undo window
       final timeSinceSwipe = DateTime.now().difference(lastSwipe.timestamp);
       if (timeSinceSwipe > UNDO_WINDOW) {
+        debugPrint('⚠️ Undo window expired for user $userId (${timeSinceSwipe.inSeconds}s > ${UNDO_WINDOW.inSeconds}s)');
         return false;
       }
 
       // Check if already undone
       if (!lastSwipe.canUndo) {
+        debugPrint('⚠️ Swipe already undone or expired for user $userId');
         return false;
       }
 
@@ -101,11 +122,13 @@ class UndoService {
       final limit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
 
       if (undoCount >= limit) {
+        final limitText = isPremiun ? "premium limit" : "daily limit";
         debugPrint(
-            '⚠️ User $userId has reached daily undo limit ($undoCount/$limit)');
+            '⚠️ User $userId has reached $limitText ($undoCount/$limit undos used)');
         return false;
       }
 
+      debugPrint('✅ User $userId can undo last pass (${timeSinceSwipe.inSeconds}s ago)');
       return true;
     } catch (e) {
       debugPrint('❌ Error checking undo availability: $e');
@@ -149,13 +172,28 @@ class UndoService {
 
         // Check if undo is possible
         if (!await canUndoLastSwipe(userId)) {
+          final undoCount = await getDailyUndoCount(userId);
+          final isPremiun = await _isPremiuUser(userId);
+          final limit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
+          
+          if (undoCount >= limit) {
+            final limitText = isPremiun ? "premium daily limit" : "daily limit";
+            return UndoResult.failed(
+                'You\'ve used your $limitText ($undoCount/$limit undos). Try again tomorrow!');
+          }
+          
           return UndoResult.failed(
-              'Cannot undo: outside time window or limit reached');
+              'Cannot undo: only passes can be undone within ${UNDO_WINDOW.inSeconds} seconds');
         }
 
         final lastSwipe = await getLastSwipeAction(userId);
         if (lastSwipe == null) {
-          return UndoResult.failed('No recent swipe found to undo');
+          return UndoResult.failed('No recent pass found to undo');
+        }
+
+        // Double-check it's a left swipe (pass)
+        if (lastSwipe.direction != SwipeDirection.left) {
+          return UndoResult.failed('Can only undo passes, not likes or super likes');
         }
 
         // Perform the undo operation
@@ -169,15 +207,15 @@ class UndoService {
           await _recordUndoUsage(userId);
 
           debugPrint(
-              '✅ Successfully undid swipe: ${lastSwipe.userId} → ${lastSwipe.targetUserId}');
+              '✅ Successfully undid pass: ${lastSwipe.userId} → ${lastSwipe.targetUserId}');
 
           return UndoResult.success(
             targetUserId: lastSwipe.targetUserId,
             originalDirection: lastSwipe.direction,
-            wasMatch: lastSwipe.matchId != null,
+            wasMatch: false, // Passes never create matches
           );
         } else {
-          return UndoResult.failed('Failed to reverse swipe action');
+          return UndoResult.failed('Failed to reverse pass action');
         }
       } catch (e) {
         debugPrint('❌ Error undoing last swipe: $e');
@@ -191,12 +229,13 @@ class UndoService {
     try {
       final batch = _firestore.batch();
 
-      if (swipeAction.direction == SwipeDirection.right) {
-        // Undo right swipe (like)
-        await _undoRightSwipe(swipeAction, batch);
-      } else {
-        // Undo left swipe (pass)
+      // ✅ Only handle left swipes (passes) - right swipes should never reach here
+      if (swipeAction.direction == SwipeDirection.left) {
         await _undoLeftSwipe(swipeAction, batch);
+      } else {
+        // This should never happen due to our checks above
+        debugPrint('❌ Attempted to undo non-pass swipe: ${swipeAction.direction}');
+        return false;
       }
 
       // Mark swipe as undone in history
@@ -224,39 +263,7 @@ class UndoService {
     }
   }
 
-  /// Undo a right swipe (like)
-  Future<void> _undoRightSwipe(
-      SwipeAction swipeAction, WriteBatch batch) async {
-    final userId = swipeAction.userId;
-    final targetUserId = swipeAction.targetUserId;
-
-    // Remove like
-    final likeDocId = '${userId}_likes_${targetUserId}';
-    batch.delete(_likesCollection.doc(likeDocId));
-
-    // If it was a match, remove the match
-    if (swipeAction.matchId != null) {
-      batch.delete(_matchesCollection.doc(swipeAction.matchId!));
-
-      // Remove from legacy match collections
-      batch.delete(
-          _usersCollection.doc(userId).collection('Matches').doc(targetUserId));
-      batch.delete(
-          _usersCollection.doc(targetUserId).collection('Matches').doc(userId));
-
-      debugPrint('🔥 Undoing match: ${swipeAction.matchId}');
-    }
-
-    // Remove from checked users so they can see each other again
-    batch.delete(_usersCollection
-        .doc(userId)
-        .collection('CheckedUser')
-        .doc(targetUserId));
-
-    debugPrint('💔 Undoing right swipe (like): $userId → $targetUserId');
-  }
-
-  /// Undo a left swipe (pass)
+  /// Undo a left swipe (pass) - the only type of swipe that can be undone
   Future<void> _undoLeftSwipe(SwipeAction swipeAction, WriteBatch batch) async {
     final userId = swipeAction.userId;
     final targetUserId = swipeAction.targetUserId;
@@ -268,6 +275,7 @@ class UndoService {
         .doc(targetUserId));
 
     debugPrint('👈 Undoing left swipe (pass): $userId → $targetUserId');
+    debugPrint('✅ User will see $targetUserId again in their discovery queue');
   }
 
   /// Set timer to disable undo after window expires

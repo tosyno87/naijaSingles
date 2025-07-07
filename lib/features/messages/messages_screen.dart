@@ -558,6 +558,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   void _showSearchDialog() {
+    if (!mounted) return;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -642,7 +644,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
@@ -669,6 +675,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   // Show delete confirmation dialog
   Future<bool?> _showDeleteConfirmation(MessageThreadInfo thread) async {
+    if (!mounted) return false;
+    
     return showDialog<bool>(
       context: context,
       barrierDismissible: false, // Prevent dismissing by tapping outside
@@ -755,7 +763,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
             children: [
               Expanded(
                 child: TextButton(
-                  onPressed: () => Navigator.pop(context, false),
+                  onPressed: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context, false);
+                    }
+                  },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -777,7 +789,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () async {
-                    Navigator.pop(context, true);
+                    // Close dialog first
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context, true);
+                    }
+                    // Then delete chat thread
                     await _deleteChatThread(thread);
                   },
                   style: ElevatedButton.styleFrom(
@@ -808,6 +824,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   // Delete chat thread with loading indicator
   Future<void> _deleteChatThread(MessageThreadInfo thread) async {
+    if (!mounted) return;
+    
     // Show MVP compliant loading indicator
     showDialog(
       context: context,
@@ -867,11 +885,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
       final success = await _chatService.deleteChatThread(thread.threadId);
 
       // Close loading dialog
-      if (mounted) Navigator.pop(context);
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
 
       if (success) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Conversation deleted and users unmatched',
@@ -884,9 +905,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ),
           ),
         );
+        }
       } else {
         // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Failed to delete conversation',
@@ -899,13 +922,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ),
           ),
         );
+        }
       }
     } catch (e) {
       // Close loading dialog
-      if (mounted) Navigator.pop(context);
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
 
       // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'Error deleting conversation',
@@ -918,11 +945,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         ),
       );
+      }
     }
   }
 
   // Method to view user profile from messages
   Future<void> _viewUserProfile(String userId) async {
+    if (!mounted) return;
+    
     try {
       // Show MVP compliant loading indicator
       showDialog(
@@ -983,7 +1013,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
       final userDoc = await _firestore.collection('users').doc(userId).get();
 
       // Close loading dialog
-      if (mounted) Navigator.pop(context);
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
 
       if (userDoc.exists) {
         final userData = userDoc.data() as Map<String, dynamic>;
@@ -1025,7 +1057,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
       }
     } catch (e) {
       // Close loading dialog if still open
-      if (mounted) Navigator.pop(context);
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
 
       log('Error loading user profile: $e');
       ScaffoldMessenger.of(context).showSnackBar(

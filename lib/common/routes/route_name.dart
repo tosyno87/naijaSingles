@@ -46,4 +46,14 @@ class RouteName {
   // Old onboarding routes - kept for backward compatibility
   static const String onboardingFlow = '/onboarding_flow';
   static const String mvpOnboarding = '/mvp_onboarding';
+
+  // Settings screens routes
+  static const String blockedUsers = '/blocked_users';
+  static const String notificationSettings = '/notification_settings';
+  static const String safetyCenter = '/safety_center';
+  static const String helpCenter = '/help_center';
+  static const String languageSettings = '/language_settings';
+  static const String locationSettings = '/location_settings';
+  static const String accountDeletion = '/account_deletion';
+  static const String feedbackScreen = '/feedback';
 }

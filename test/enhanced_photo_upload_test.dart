@@ -81,7 +81,7 @@ void main() {
 
   group('Photo Type Guidance Tests', () {
     test('Photo type guidance provides correct information', () {
-      const guidance = PhotoTypeGuidance(
+      final guidance = PhotoTypeGuidance(
         type: PhotoType.closeUp,
         title: "Main Photo",
         description: "A clear, smiling face shot with good lighting",

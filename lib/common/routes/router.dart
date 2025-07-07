@@ -26,6 +26,8 @@ import 'package:naijasingles/features/user/ui/screens/user_sexual_details.dart';
 import 'package:naijasingles/features/user/ui/screens/user_university.dart';
 import 'package:naijasingles/features/auth/auth_method/auth_method_selection_screen.dart';
 import 'package:naijasingles/features/auth/auth_method/sign_in_method_selection_screen.dart';
+import 'package:naijasingles/features/settings/blocked_users_screen.dart';
+import 'package:naijasingles/features/settings/notification_settings_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
@@ -116,6 +118,10 @@ abstract class AppRouter {
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(showBackButton: false), // No back button by default
+
+    // Settings screens
+    RouteName.blockedUsers: (context) => const BlockedUsersScreen(),
+    RouteName.notificationSettings: (context) => const NotificationSettingsScreen(),
 
     // Main navigation routes (consolidated - removed duplicates)
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),

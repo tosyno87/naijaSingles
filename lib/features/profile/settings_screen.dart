@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:developer';
 
+import '../../common/routes/route_name.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
@@ -102,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.block_outlined,
                 title: 'Blocked Users',
                 subtitle: 'Manage blocked accounts',
-                onTap: () => _showComingSoon('Blocked Users'),
+                onTap: () => Navigator.pushNamed(context, RouteName.blockedUsers),
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -124,7 +126,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.notifications_outlined,
                 title: 'Notifications',
                 subtitle: 'Manage your notification preferences',
-                onTap: () => _showComingSoon('Notification Settings'),
+                onTap: () => Navigator.pushNamed(context, RouteName.notificationSettings),
               ),
               _buildDivider(),
               _buildSettingsItem(

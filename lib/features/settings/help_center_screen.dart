@@ -15,7 +15,6 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   static const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
-  static const Color successColor = Color(0xFF4CAF50); // Green for success
   static final Color textPrimary = Colors.brown.shade800;
   static final Color textSecondary = Colors.brown.shade600;
   static final Color textLight = Colors.grey.shade600;
@@ -257,7 +256,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'We\'re here to help! Choose the best way to reach us.',
+                  'We\'re here to help! Send us an email and we\'ll get back to you as soon as possible.',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     color: textSecondary,
@@ -271,7 +270,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           
           const SizedBox(height: 24),
           
-          // Contact Options
+          // Email Support Option
           _buildContactOption(
             icon: Icons.email,
             title: 'Email Support',
@@ -282,32 +281,52 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           
           const SizedBox(height: 16),
           
-          _buildContactOption(
-            icon: Icons.chat,
-            title: 'Live Chat',
-            subtitle: 'Chat with our support team',
-            description: 'Available 9 AM - 6 PM WAT',
-            onTap: _showLiveChatInfo,
-          ),
-          
-          const SizedBox(height: 16),
-          
-          _buildContactOption(
-            icon: Icons.phone,
-            title: 'Phone Support',
-            subtitle: 'Call us directly',
-            description: '+234 (0) 123 456 7890',
-            onTap: () => _makePhoneCall('+2341234567890'),
-          ),
-          
-          const SizedBox(height: 16),
-          
+          // Send Feedback Option
           _buildContactOption(
             icon: Icons.feedback,
             title: 'Send Feedback',
             subtitle: 'Share your thoughts',
             description: 'Help us improve the app',
             onTap: () => Navigator.pushNamed(context, '/feedback'),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Support Info
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: primaryColor.withOpacity(0.2)),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.schedule, color: primaryColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Response Time',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'We typically respond to emails within 24-48 hours during business days (Monday to Friday, 9 AM - 6 PM WAT).',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -563,125 +582,6 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
       log('Error opening email: $e');
       _showErrorSnackBar('Could not open email app');
     }
-  }
-
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri phoneUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    
-    try {
-      if (await canLaunchUrl(phoneUri)) {
-        await launchUrl(phoneUri);
-      } else {
-        _showErrorSnackBar('Could not make phone call');
-      }
-    } catch (e) {
-      log('Error making phone call: $e');
-      _showErrorSnackBar('Could not make phone call');
-    }
-  }
-
-  void _showLiveChatInfo() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        contentPadding: const EdgeInsets.all(24),
-        title: Column(
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.chat, color: primaryColor, size: 30),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Live Chat',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: textPrimary,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Live chat is coming soon! For now, please use email or phone support for immediate assistance.',
-              style: GoogleFonts.montserrat(
-                color: textSecondary,
-                fontSize: 16,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: primaryColor.withOpacity(0.2),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.schedule, color: primaryColor, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Support hours: 9 AM - 6 PM WAT, Monday to Friday',
-                      style: GoogleFonts.montserrat(
-                        color: primaryColor,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Got it',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      ),
-    );
   }
 
   void _showErrorSnackBar(String message) {

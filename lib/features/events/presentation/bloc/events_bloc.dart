@@ -3,8 +3,7 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../data/models/event_model.dart';
-import '../../data/services/eventbrite_service.dart';
-import '../../data/services/events_firestore_service.dart';
+import '../../data/repositories/events_repository.dart';
 
 // Events Events
 abstract class EventsEvent extends Equatable {
@@ -167,18 +166,15 @@ class EventFilter extends Equatable {
 
 // Events BLoC
 class EventsBloc extends Bloc<EventsEvent, EventsState> {
-  final EventbriteService _eventbriteService;
-  final EventsFirestoreService _firestoreService;
+  final EventsRepository _repository;
   
   static const int _eventsPerPage = 20;
   int _currentPage = 1;
   List<EventModel> _allEvents = [];
 
   EventsBloc({
-    required EventbriteService eventbriteService,
-    required EventsFirestoreService firestoreService,
-  })  : _eventbriteService = eventbriteService,
-        _firestoreService = firestoreService,
+    required EventsRepository repository,
+  })  : _repository = repository,
         super(EventsInitial()) {
     
     on<LoadEventsEvent>(_onLoadEvents);
@@ -195,80 +191,24 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         emit(EventsLoading());
       }
 
-      // First, try to load from Firestore (cached events)
-      List<EventModel> firestoreEvents = [];
-      try {
-        firestoreEvents = await _firestoreService.fetchEvents(limit: _eventsPerPage);
-        log('Loaded ${firestoreEvents.length} events from Firestore cache', name: 'EventsBloc');
-      } catch (e) {
-        log('Failed to load from Firestore: $e', name: 'EventsBloc');
-      }
-
-      // If we have cached events and not forcing refresh, use them
-      if (firestoreEvents.isNotEmpty && !event.forceRefresh) {
-        _allEvents = firestoreEvents;
-        _currentPage = 1;
-        emit(EventsLoaded(
-          events: _allEvents,
-          hasReachedMax: firestoreEvents.length < _eventsPerPage,
-        ));
-        
-        // Fetch fresh events in background and update cache
-        _fetchAndCacheEventsInBackground();
-        return;
-      }
-
-      // Fetch fresh events from Eventbrite
-      final freshEvents = await _eventbriteService.fetchAfrocentricEvents(
+      final events = await _repository.getEvents(
         page: 1,
         limit: _eventsPerPage,
+        forceRefresh: event.forceRefresh,
       );
 
-      if (freshEvents.isNotEmpty) {
-        // Cache events in Firestore
-        await _firestoreService.saveEvents(freshEvents);
-        
-        _allEvents = freshEvents;
-        _currentPage = 1;
-        
-        emit(EventsLoaded(
-          events: _allEvents,
-          hasReachedMax: freshEvents.length < _eventsPerPage,
-        ));
-      } else if (firestoreEvents.isNotEmpty) {
-        // Fallback to cached events if API fails
-        _allEvents = firestoreEvents;
-        emit(EventsLoaded(
-          events: _allEvents,
-          hasReachedMax: true,
-        ));
-      } else {
-        emit(const EventsError(
-          message: 'No events found. Please check your internet connection and try again.',
-          isNetworkError: true,
-        ));
-      }
+      _allEvents = events;
+      _currentPage = 1;
+      
+      emit(EventsLoaded(
+        events: _allEvents,
+        hasReachedMax: events.length < _eventsPerPage,
+      ));
     } catch (e) {
       log('Error loading events: $e', name: 'EventsBloc');
-      
-      // Try to load cached events as fallback
-      try {
-        final cachedEvents = await _firestoreService.fetchEvents(limit: _eventsPerPage);
-        if (cachedEvents.isNotEmpty) {
-          _allEvents = cachedEvents;
-          emit(EventsLoaded(
-            events: _allEvents,
-            hasReachedMax: true,
-          ));
-          return;
-        }
-      } catch (cacheError) {
-        log('Failed to load cached events: $cacheError', name: 'EventsBloc');
-      }
-      
       emit(EventsError(
         message: _getErrorMessage(e),
-        isNetworkError: e is EventbriteException,
+        isNetworkError: _isNetworkError(e),
       ));
     }
   }
@@ -286,15 +226,12 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     emit(currentState.copyWith(isLoadingMore: true));
 
     try {
-      final moreEvents = await _eventbriteService.fetchAfrocentricEvents(
+      final moreEvents = await _repository.getEvents(
         page: _currentPage + 1,
         limit: _eventsPerPage,
       );
 
       if (moreEvents.isNotEmpty) {
-        // Cache new events
-        await _firestoreService.saveEvents(moreEvents);
-        
         _allEvents.addAll(moreEvents);
         _currentPage++;
         
@@ -326,23 +263,16 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
       List<EventModel> filteredEvents;
       
       if (event.filter.hasActiveFilters) {
-        // Apply filters to cached events first
-        filteredEvents = _applyFilters(_allEvents, event.filter);
-        
-        // If we need more events or specific filtering, fetch from API
-        if (filteredEvents.length < 10 && event.filter.category != null) {
-          final apiEvents = await _eventbriteService.searchEvents(
-            query: _getCategorySearchQuery(event.filter.category!),
-            limit: _eventsPerPage,
-            location: event.filter.location,
-            category: event.filter.category,
-          );
-          
-          if (apiEvents.isNotEmpty) {
-            await _firestoreService.saveEvents(apiEvents);
-            filteredEvents = _applyFilters(apiEvents, event.filter);
-          }
+        if (event.filter.category != null) {
+          // Get events by category
+          filteredEvents = await _repository.getEventsByCategory(event.filter.category!);
+        } else {
+          // Apply other filters to cached events
+          filteredEvents = _applyFilters(_allEvents, event.filter);
         }
+        
+        // Apply additional filters if needed
+        filteredEvents = _applyFilters(filteredEvents, event.filter);
       } else {
         filteredEvents = _allEvents;
       }
@@ -367,37 +297,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     emit(EventsSearching(event.query));
 
     try {
-      // Search in cached events first
-      final cachedResults = _allEvents
-          .where((event) =>
-              event.name.toLowerCase().contains(event.query.toLowerCase()) ||
-              event.description.toLowerCase().contains(event.query.toLowerCase()) ||
-              event.category.toLowerCase().contains(event.query.toLowerCase()))
-          .toList();
-
-      // Search via API for more comprehensive results
-      final apiResults = await _eventbriteService.searchEvents(
-        query: event.query,
-        limit: _eventsPerPage,
-      );
-
-      // Combine and deduplicate results
-      final allResults = <String, EventModel>{};
-      
-      for (final event in cachedResults) {
-        allResults[event.eventbriteId] = event;
-      }
-      
-      for (final event in apiResults) {
-        allResults[event.eventbriteId] = event;
-      }
-
-      final searchResults = allResults.values.toList();
-      
-      // Cache new events from API
-      if (apiResults.isNotEmpty) {
-        await _firestoreService.saveEvents(apiResults);
-      }
+      final searchResults = await _repository.searchEvents(event.query);
 
       emit(EventsLoaded(
         events: searchResults,
@@ -445,46 +345,19 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }).toList();
   }
 
-  String _getCategorySearchQuery(String category) {
-    switch (category.toLowerCase()) {
-      case 'music':
-        return 'afrobeats OR african music OR live music';
-      case 'business':
-        return 'african business OR networking OR entrepreneurship';
-      case 'community':
-        return 'african community OR cultural event OR meetup';
-      case 'food':
-        return 'african food OR nigerian food OR ghanaian food';
-      case 'arts':
-        return 'african art OR cultural art OR exhibition';
-      default:
-        return 'african OR afrocentric';
-    }
-  }
-
-  Future<void> _fetchAndCacheEventsInBackground() async {
-    try {
-      final freshEvents = await _eventbriteService.fetchAfrocentricEvents(
-        page: 1,
-        limit: _eventsPerPage,
-      );
-      
-      if (freshEvents.isNotEmpty) {
-        await _firestoreService.saveEvents(freshEvents);
-        log('Background cache updated with ${freshEvents.length} events', name: 'EventsBloc');
-      }
-    } catch (e) {
-      log('Background cache update failed: $e', name: 'EventsBloc');
-    }
-  }
-
   String _getErrorMessage(dynamic error) {
-    if (error is EventbriteException) {
-      return error.message;
-    } else if (error is FirestoreException) {
-      return error.message;
+    if (error.toString().contains('EventbriteException')) {
+      return 'Failed to load events. Please check your internet connection and try again.';
+    } else if (error.toString().contains('FirestoreException')) {
+      return 'Failed to save events. Please try again.';
     } else {
       return 'An unexpected error occurred. Please try again.';
     }
+  }
+
+  bool _isNetworkError(dynamic error) {
+    return error.toString().contains('EventbriteException') ||
+           error.toString().contains('SocketException') ||
+           error.toString().contains('TimeoutException');
   }
 }

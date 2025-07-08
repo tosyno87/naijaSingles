@@ -7,6 +7,11 @@ import 'dart:developer';
 import '../../common/routes/route_name.dart';
 import '../settings/safety_center_screen.dart';
 import '../settings/help_center_screen.dart';
+import '../settings/language_settings_screen.dart';
+import '../settings/location_settings_screen.dart';
+import '../settings/account_deletion_screen.dart';
+import '../settings/password_settings_screen.dart';
+import 'privacy_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -65,16 +70,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Edit Profile',
                 subtitle: 'Update your photos and info',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to edit profile (handled by parent)
+                  Navigator.pushNamed(context, RouteName.editProfileScreen);
                 },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.email_outlined,
-                title: 'Email',
-                subtitle: user?.email ?? 'Not available',
-                onTap: () => _showEmailDialog(),
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -97,8 +94,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Privacy Settings',
                 subtitle: 'Control who can see your profile',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to privacy settings (handled by parent)
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PrivacySettingsScreen(),
+                    ),
+                  );
                 },
               ),
               _buildDivider(),
@@ -142,14 +143,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.location_on_outlined,
                 title: 'Location',
                 subtitle: 'Update your location settings',
-                onTap: () => _showComingSoon('Location Settings'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LocationSettingsScreen(),
+                    ),
+                  );
+                },
               ),
               _buildDivider(),
               _buildSettingsItem(
                 icon: Icons.language_outlined,
                 title: 'Language',
                 subtitle: 'English (US)',
-                onTap: () => _showComingSoon('Language Settings'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LanguageSettingsScreen(),
+                    ),
+                  );
+                },
               ),
             ]),
 
@@ -624,7 +639,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                _showComingSoon('Account Deletion');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AccountDeletionScreen(),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
@@ -736,12 +756,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _showEmailDialog() {
-    _showComingSoon('Email Settings');
-  }
-
   void _showChangePasswordDialog() {
-    _showComingSoon('Change Password');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const PasswordSettingsScreen(),
+      ),
+    );
   }
 
   void _showFeedbackDialog() {

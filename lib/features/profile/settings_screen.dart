@@ -5,6 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:developer';
 
 import '../../common/routes/route_name.dart';
+import '../settings/safety_center_screen.dart';
+import '../settings/help_center_screen.dart';
+import '../settings/feedback_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -111,7 +114,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.report_outlined,
                 title: 'Safety Center',
                 subtitle: 'Report issues and get help',
-                onTap: () => _showComingSoon('Safety Center'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SafetyCenterScreen(),
+                    ),
+                  );
+                },
               ),
             ]),
 
@@ -155,7 +165,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.help_outline,
                 title: 'Help Center',
                 subtitle: 'Get help and support',
-                onTap: () => _showComingSoon('Help Center'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const HelpCenterScreen(),
+                    ),
+                  );
+                },
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -729,7 +746,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showFeedbackDialog() {
-    _showComingSoon('Send Feedback');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const FeedbackScreen(),
+      ),
+    );
   }
 
   void _showAboutDialog() {

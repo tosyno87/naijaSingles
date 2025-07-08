@@ -28,6 +28,9 @@ import 'package:naijasingles/features/auth/auth_method/auth_method_selection_scr
 import 'package:naijasingles/features/auth/auth_method/sign_in_method_selection_screen.dart';
 import 'package:naijasingles/features/settings/blocked_users_screen.dart';
 import 'package:naijasingles/features/settings/notification_settings_screen.dart';
+import 'package:naijasingles/features/settings/safety_center_screen.dart';
+import 'package:naijasingles/features/settings/help_center_screen.dart';
+import 'package:naijasingles/features/settings/feedback_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
@@ -122,6 +125,9 @@ abstract class AppRouter {
     // Settings screens
     RouteName.blockedUsers: (context) => const BlockedUsersScreen(),
     RouteName.notificationSettings: (context) => const NotificationSettingsScreen(),
+    RouteName.safetyCenter: (context) => const SafetyCenterScreen(),
+    RouteName.helpCenter: (context) => const HelpCenterScreen(),
+    RouteName.feedbackScreen: (context) => const FeedbackScreen(),
 
     // Main navigation routes (consolidated - removed duplicates)
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),

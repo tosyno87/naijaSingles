@@ -7,7 +7,6 @@ import 'dart:developer';
 import '../../common/routes/route_name.dart';
 import '../settings/safety_center_screen.dart';
 import '../settings/help_center_screen.dart';
-import '../settings/feedback_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -746,12 +745,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showFeedbackDialog() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const FeedbackScreen(),
-      ),
-    );
+    Navigator.pushNamed(context, RouteName.feedbackScreen);
   }
 
   void _showAboutDialog() {

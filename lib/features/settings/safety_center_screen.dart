@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:developer';
 
 class SafetyCenterScreen extends StatefulWidget {
   const SafetyCenterScreen({Key? key}) : super(key: key);
@@ -67,10 +65,6 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
             
             // Report & Block Tools
             _buildReportToolsSection(),
-            const SizedBox(height: 24),
-            
-            // Emergency Resources
-            _buildEmergencyResourcesSection(),
           ],
         ),
       ),
@@ -447,121 +441,6 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
     );
   }
 
-  Widget _buildEmergencyResourcesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Emergency Resources',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: errorColor.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: errorColor.withOpacity(0.2)),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.emergency, color: errorColor, size: 24),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Emergency Contacts',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildEmergencyContact('Police Emergency', '199', Icons.local_police),
-              const SizedBox(height: 8),
-              _buildEmergencyContact('Medical Emergency', '199', Icons.local_hospital),
-              const SizedBox(height: 8),
-              _buildEmergencyContact('Fire Emergency', '199', Icons.local_fire_department),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: warningColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info, color: warningColor, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'If you\'re in immediate danger, call emergency services right away.',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 13,
-                          color: textPrimary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmergencyContact(String title, String number, IconData icon) {
-    return GestureDetector(
-      onTap: () => _makePhoneCall(number),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: errorColor, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: textPrimary,
-                ),
-              ),
-            ),
-            Text(
-              number,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: errorColor,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(Icons.phone, color: errorColor, size: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showReportDialog() {
     showDialog(
       context: context,
@@ -698,32 +577,5 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       ),
     );
-  }
-
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    
-    try {
-      if (await canLaunchUrl(launchUri)) {
-        await launchUrl(launchUri);
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Could not make phone call',
-                style: GoogleFonts.montserrat(color: Colors.white),
-              ),
-              backgroundColor: errorColor,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      log('Error making phone call: $e');
-    }
   }
 }

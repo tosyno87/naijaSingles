@@ -106,8 +106,8 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
           context,
           CupertinoPageRoute(builder: (context) {
             return Tabbar(
-              purchase.productID,
-              true,
+              isPaymentSuccess: true,
+              currentUserId: purchase.productID,
             );
           }),
         );

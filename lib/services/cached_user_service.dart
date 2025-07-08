@@ -29,11 +29,15 @@ class CachedUserService {
   Future<PaginatedResult<UserModel>> getCachedUsers({
     required UserModel currentUser,
     bool forceRefresh = false,
+    String? intentFilter, // Add intent filter parameter
   }) async {
     try {
-      final cacheKey = _generateCacheKey(currentUser);
+      final cacheKey = _generateCacheKey(currentUser, intentFilter: intentFilter);
 
       debugPrint('🗄️ Checking cache for key: $cacheKey');
+      if (intentFilter != null) {
+        debugPrint('🎯 Cache key includes intent filter: $intentFilter');
+      }
 
       // Check if we should use cache
       if (!forceRefresh && await _isCacheValid(cacheKey)) {
@@ -56,6 +60,7 @@ class CachedUserService {
       final result = await _paginatedUserService.getUsers(
         currentUser: currentUser,
         pageSize: 50, // Fetch more for caching
+        intentFilter: intentFilter, // Pass intent filter
       );
 
       if (result.isSuccess && result.items.isNotEmpty) {
@@ -69,7 +74,7 @@ class CachedUserService {
       debugPrint('❌ Error in getCachedUsers: $e');
 
       // Try to return stale cache as fallback
-      final cacheKey = _generateCacheKey(currentUser);
+      final cacheKey = _generateCacheKey(currentUser, intentFilter: intentFilter);
       final staleCache = await _getCachedUserList(cacheKey);
 
       if (staleCache.isNotEmpty) {
@@ -237,13 +242,18 @@ class CachedUserService {
   }
 
   /// Generate cache key based on user preferences
-  String _generateCacheKey(UserModel currentUser) {
+  String _generateCacheKey(UserModel currentUser, {String? intentFilter}) {
     final keyComponents = [
       currentUser.id ?? 'unknown',
       currentUser.showGender ?? 'everyone',
       '${currentUser.ageRangeMin ?? 18}-${currentUser.ageRangeMax ?? 100}',
       '${currentUser.distanceRange ?? 100}km',
     ];
+
+    // Add intent filter to cache key if specified
+    if (intentFilter != null && intentFilter.isNotEmpty) {
+      keyComponents.add('intent_$intentFilter');
+    }
 
     return keyComponents.join('_');
   }

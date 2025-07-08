@@ -247,11 +247,6 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         'description': 'If something feels wrong or uncomfortable, trust your gut and leave the situation.',
       },
       {
-        'icon': Icons.video_call,
-        'title': 'Video Chat First',
-        'description': 'Consider having a video call before meeting in person to verify their identity.',
-      },
-      {
         'icon': Icons.no_drinks,
         'title': 'Watch Your Drink',
         'description': 'Never leave your drink unattended and don\'t accept drinks from strangers.',

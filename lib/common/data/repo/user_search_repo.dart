@@ -205,14 +205,19 @@ class UserSearchRepo {
   static Future<List<UserModel>> getUserList(
     UserModel currentUser, {
     bool forceRefresh = false,
+    String? intentFilter, // Add intent filter parameter
   }) async {
     try {
       debugPrint('🔍 Getting optimized user list for ${currentUser.name}');
+      if (intentFilter != null) {
+        debugPrint('🎯 Filtering by intent: $intentFilter');
+      }
 
       // Use cached service for better performance
       final result = await _cachedUserService.getCachedUsers(
         currentUser: currentUser,
         forceRefresh: forceRefresh,
+        intentFilter: intentFilter, // Pass intent filter
       );
 
       if (result.isSuccess) {
@@ -222,12 +227,12 @@ class UserSearchRepo {
       } else {
         debugPrint('❌ Error from cached service: ${result.error}');
         // Fallback to legacy method
-        return await _legacyGetUserList(currentUser);
+        return await _legacyGetUserList(currentUser, intentFilter: intentFilter);
       }
     } catch (e) {
       debugPrint('❌ Error in optimized getUserList: $e');
       // Fallback to legacy method
-      return await _legacyGetUserList(currentUser);
+      return await _legacyGetUserList(currentUser, intentFilter: intentFilter);
     }
   }
 
@@ -259,12 +264,16 @@ class UserSearchRepo {
 
   /// Legacy getUserList method as fallback
   static Future<List<UserModel>> _legacyGetUserList(
-    UserModel currentUser,
-  ) async {
+    UserModel currentUser, {
+    String? intentFilter, // Add intent filter parameter
+  }) async {
     List<String> checkedUserIds = [];
 
     try {
       debugPrint('⚠️ Using legacy getUserList as fallback');
+      if (intentFilter != null) {
+        debugPrint('🎯 Legacy filtering by intent: $intentFilter');
+      }
 
       // Debug logging
       debugPrint('Getting user list for: ${currentUser.id}');
@@ -312,10 +321,19 @@ class UserSearchRepo {
             continue;
           }
 
+          // Apply intent filter if specified
+          if (intentFilter != null && intentFilter.isNotEmpty) {
+            final userIntent = temp.lookingFor ?? 'Dating';
+            if (userIntent != intentFilter) {
+              debugPrint('Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)');
+              continue;
+            }
+          }
+
           if (distance <= currentUser.maxDistance! &&
               temp.id != currentUser.id &&
               !temp.isBlocked!) {
-            debugPrint("Adding user: ${temp.name}");
+            debugPrint("Adding user: ${temp.name} (intent: ${temp.lookingFor})");
             userList.add(temp);
           } else {
             debugPrint(

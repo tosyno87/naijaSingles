@@ -138,7 +138,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar(null, false)));
+                                                  const Tabbar()));
                                     },
                                   );
                                   break;
@@ -154,7 +154,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar(null, false)));
+                                                  const Tabbar()));
                                     },
                                   );
                                   break;
@@ -169,7 +169,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar(null, false)));
+                                                  const Tabbar()));
                                     },
                                   );
                                   break;
@@ -185,7 +185,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar(null, false)));
+                                                  const Tabbar(isPaymentSuccess: false)));
                                     },
                                   );
                                   break;
@@ -201,7 +201,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar(null, false)));
+                                                  const Tabbar()));
                                     },
                                   );
                                   break;
@@ -217,7 +217,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar(null, false)));
+                                                  const Tabbar()));
                                     },
                                   );
                                   break;

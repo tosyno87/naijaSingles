@@ -35,6 +35,7 @@ class UserModel {
   final String? drinkingStatus;
   final String? smokingStatus;
   final DateTime? lastSeen;
+  final String? lookingFor; // What the user is looking for: Dating, Friendship, Networking
 
   List? imageUrl = [];
   int? distanceBW;
@@ -70,6 +71,7 @@ class UserModel {
     this.drinkingStatus,
     this.smokingStatus,
     this.lastSeen,
+    this.lookingFor,
   });
 
   @override
@@ -225,6 +227,8 @@ class UserModel {
             : data.containsKey('lastActive') && data['lastActive'] is Timestamp
                 ? (data['lastActive'] as Timestamp).toDate()
                 : null,
+        lookingFor: safeGet<String>('lookingFor') ?? 
+            safeGetNested<String>('editInfo', 'lookingFor', 'Dating'),
       );
     } catch (e) {
       debugPrint('Error creating UserModel from document ${doc.id}: $e');
@@ -248,6 +252,7 @@ class UserModel {
         drinkingStatus: '',
         smokingStatus: '',
         lastSeen: null,
+        lookingFor: 'Dating',
       );
     }
   }
@@ -301,6 +306,7 @@ class UserModel {
           : json['lastActive'] != null
               ? DateTime.tryParse(json['lastActive'].toString())
               : null,
+      lookingFor: json['lookingFor'] ?? (json['editInfo'] != null ? json['editInfo']['lookingFor'] : 'Dating'),
     );
   }
 
@@ -344,6 +350,7 @@ class UserModel {
       'drinkingStatus': drinkingStatus,
       'smokingStatus': smokingStatus,
       'lastSeen': lastSeen?.toIso8601String(),
+      'lookingFor': lookingFor,
     };
   }
 
@@ -387,6 +394,7 @@ class UserModel {
       lastSeen: map['lastSeen'] != null 
           ? DateTime.tryParse(map['lastSeen'].toString())
           : null,
+      lookingFor: map['lookingFor']?.toString() ?? 'Dating',
     );
   }
 

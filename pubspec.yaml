@@ -45,7 +45,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1           # Upgraded from 8.1.6
-  flutter_callkit_incoming: ^2.5.2 # Updated to latest
   flutter_local_notifications: ^17.2.3 # Added for enhanced notifications
   google_api_headers: ^4.5.2     # Updated to latest headers
   flutter_flushbar: ^0.0.2       # Kept at 0.0.2

@@ -24,9 +24,13 @@ class PaginatedUserService {
     required UserModel currentUser,
     DocumentSnapshot? lastDocument,
     int pageSize = PAGE_SIZE,
+    String? intentFilter, // Add intent filter parameter
   }) async {
     try {
       debugPrint('🔍 Fetching users - Page size: $pageSize');
+      if (intentFilter != null) {
+        debugPrint('🎯 Filtering by intent: $intentFilter');
+      }
 
       // Build the base query
       Query query = _buildUserQuery(currentUser);
@@ -61,10 +65,19 @@ class PaginatedUserService {
           final user = UserModel.fromMap(userData, doc.id);
           debugPrint('✅ Created UserModel for: ${user.name}');
 
+          // Apply intent filter if specified
+          if (intentFilter != null && intentFilter.isNotEmpty) {
+            final userIntent = user.lookingFor ?? 'Dating';
+            if (userIntent != intentFilter) {
+              debugPrint('🎯 Skipping user ${user.name} - intent mismatch (user: $userIntent, filter: $intentFilter)');
+              continue;
+            }
+          }
+
           // Apply distance filter if location is available
           if (await _isWithinDistance(currentUser, user)) {
             users.add(user);
-            debugPrint('✅ Added user to results: ${user.name}');
+            debugPrint('✅ Added user to results: ${user.name} (intent: ${user.lookingFor})');
           } else {
             debugPrint('📍 User ${user.name} is too far away');
           }

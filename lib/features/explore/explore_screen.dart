@@ -141,12 +141,17 @@ class _ExploreScreenState extends State<ExploreScreen>
       final currentUser = FirebaseAuth.instance.currentUser;
       log('Current Firebase user: ${currentUser?.uid}');
       log('Current user model: ${_currentUser?.id}');
+      log('Selected intent filter: $_selectedIntent');
 
       if (currentUser == null) {
         throw Exception('User not authenticated');
       }
 
-      final users = await UserSearchRepo.getUserList(_currentUser!);
+      // Pass the selected intent as a filter
+      final users = await UserSearchRepo.getUserList(
+        _currentUser!,
+        intentFilter: _selectedIntent,
+      );
 
       setState(() {
         _users = users;
@@ -154,7 +159,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       });
 
       _loadSwipeItems();
-      log("Loaded ${users.length} users from Firebase");
+      log("Loaded ${users.length} users from Firebase with intent filter: $_selectedIntent");
       
       // Initialize undo state
       _updateUndoState();
@@ -429,8 +434,23 @@ class _ExploreScreenState extends State<ExploreScreen>
               groupValue: _selectedIntent,
               activeColor: kPrimaryColor, // Green radio button
               onChanged: (value) {
-                if (value != null) {
+                if (value != null && value != _selectedIntent) {
                   setState(() => _selectedIntent = value);
+                  Navigator.pop(context);
+                  
+                  // Show loading indicator and reload users with new filter
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Filtering for $value...'),
+                      backgroundColor: kPrimaryColor,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  
+                  // Reload users with the new intent filter
+                  _loadUsers();
+                } else if (value != null) {
+                  // Same intent selected, just close dialog
                   Navigator.pop(context);
                 }
               },
@@ -511,41 +531,112 @@ class _ExploreScreenState extends State<ExploreScreen>
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              child: Column(
                 children: [
-                  // Undo button (always show if user is loaded)
-                  _currentUser != null
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.undo, 
-                            color: _canUndo ? Colors.purple : Colors.grey, 
-                            size: 24
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Undo button (always show if user is loaded)
+                      _currentUser != null
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.undo, 
+                                color: _canUndo ? Colors.purple : Colors.grey, 
+                                size: 24
+                              ),
+                              onPressed: _canUndo ? handleUndo : null,
+                              tooltip: _canUndo ? 'Undo last pass' : 'No pass to undo',
+                            )
+                          : const SizedBox(width: 48),
+
+                      // Title
+                      Text(
+                        'Explore',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: kTextPrimary,
+                        ),
+                      ),
+
+                      // Filter button with indicator
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.tune, color: kTextPrimary),
+                            onPressed: () {
+                              _showIntentSelector();
+                            },
+                            tooltip: 'Filter preferences',
                           ),
-                          onPressed: _canUndo ? handleUndo : null,
-                          tooltip: _canUndo ? 'Undo last pass' : 'No pass to undo',
-                        )
-                      : const SizedBox(width: 48),
-
-                  // Title
-                  Text(
-                    'Explore',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: kTextPrimary,
+                          // Active filter indicator
+                          if (_selectedIntent != 'Dating')
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: kPrimaryColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  
+                  // Current filter indicator
+                  if (_selectedIntent != 'Dating')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: kPrimaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: kPrimaryColor, width: 1),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _selectedIntent == 'Friendship' 
+                                  ? Icons.people 
+                                  : _selectedIntent == 'Networking'
+                                      ? Icons.business_center
+                                      : Icons.favorite,
+                              size: 16,
+                              color: kPrimaryColor,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Looking for $_selectedIntent',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: kPrimaryColor,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() => _selectedIntent = 'Dating');
+                                _loadUsers();
+                              },
+                              child: Icon(
+                                Icons.close,
+                                size: 16,
+                                color: kPrimaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-
-                  // Filter button
-                  IconButton(
-                    icon: Icon(Icons.tune, color: kTextPrimary),
-                    onPressed: () {
-                      _showIntentSelector();
-                    },
-                    tooltip: 'Filter preferences',
-                  ),
                 ],
               ),
             ),

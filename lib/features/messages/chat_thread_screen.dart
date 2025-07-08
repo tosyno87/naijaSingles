@@ -654,28 +654,6 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.call, color: primaryColor),
-              title: Text(
-                'Voice Call',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _showComingSoonSnackBar('Voice call feature coming soon!');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.videocam, color: primaryColor),
-              title: Text(
-                'Video Call',
-                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _showComingSoonSnackBar('Video call feature coming soon!');
-              },
-            ),
             const SizedBox(height: 20),
           ],
         ),

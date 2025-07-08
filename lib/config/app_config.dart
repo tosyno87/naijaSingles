@@ -1,5 +1,27 @@
-// Enter your Agora AppId for calling
-const agoraAppId = "00000000000000000000000000000";
+// App Configuration Constants
+class AppConfig {
+  // App Information
+  static const String appName = 'NaijaSingles';
+  static const String appVersion = '1.0.0';
+  
+  // API Configuration
+  static const String baseUrl = 'https://api.naijasingles.com';
+  
+  // Feature Flags
+  static const bool enableAnalytics = true;
+  static const bool enableCrashReporting = true;
+  static const bool enablePushNotifications = true;
+  
+  // Social Media Links
+  static const String instagramUrl = 'https://instagram.com/naijasingles';
+  static const String twitterUrl = 'https://twitter.com/naijasingles';
+  static const String facebookUrl = 'https://facebook.com/naijasingles';
+  
+  // Support
+  static const String supportEmail = 'support@naijasingles.com';
+  static const String privacyPolicyUrl = 'https://naijasingles.com/privacy';
+  static const String termsOfServiceUrl = 'https://naijasingles.com/terms';
+}
 // add your privacy policy url
 const String termConditionUrl =
     "https://www.deligence.com/apps/hookup4u/Terms-Service.html";

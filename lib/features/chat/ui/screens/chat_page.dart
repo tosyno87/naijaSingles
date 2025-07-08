@@ -14,7 +14,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
-import '../../../../common/data/repo/calling_repo.dart';
+// Calling functionality temporarily disabled
+// // Calling functionality removed
 import '../../../../common/data/repo/user_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
@@ -110,34 +111,6 @@ class ChatPageState extends State<ChatPage> {
               onPressed: () => Navigator.pop(context),
             ),
             actions: <Widget>[
-              IconButton(
-                  icon: const Icon(Icons.call),
-                  onPressed: () {
-                    debounce(() async {
-                      await CallingRepo.onJoin(
-                          "AudioCall",
-                          isBlocked,
-                          widget.chatId,
-                          widget.sender.id,
-                          context,
-                          widget.second);
-                    });
-
-                    // onJoin("AudioCall");
-                  }),
-              IconButton(
-                  icon: const Icon(Icons.video_call),
-                  onPressed: () {
-                    debounce(() async {
-                      await CallingRepo.onJoin(
-                          "VideoCall",
-                          isBlocked,
-                          widget.chatId,
-                          widget.sender.id,
-                          context,
-                          widget.second);
-                    });
-                  }),
               PopupMenuButton(itemBuilder: (ct) {
                 return [
                   PopupMenuItem(

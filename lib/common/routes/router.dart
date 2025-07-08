@@ -48,7 +48,7 @@ abstract class AppRouter {
     RouteName.splashScreen: (context) => const Splash(),
     RouteName.loginScreen: (context) =>
         const EmailLoginScreen(), // Redirect to EmailLoginScreen
-    RouteName.tabScreen: (context) => const Tabbar("active", false),
+    RouteName.tabScreen: (context) => const Tabbar(),
     // Auth method selection routes
     RouteName.authMethodSelection: (context) =>
         const AuthMethodSelectionScreen(),
@@ -138,8 +138,8 @@ abstract class AppRouter {
     // Main navigation routes (consolidated - removed duplicates)
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.onboarding: (context) => const OnboardingMain(),
-    RouteName.home: (context) => const Tabbar("active", false),
-    RouteName.discover: (context) => const Tabbar("discover", false),
+    RouteName.home: (context) => const Tabbar(),
+    RouteName.discover: (context) => const Tabbar(),
   };
 
   /// Generate route method for MaterialApp

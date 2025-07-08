@@ -160,10 +160,6 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.videocam, color: primaryColor),
-            onPressed: _showCallOptions,
-          ),
-          IconButton(
             icon: Icon(Icons.info_outline, color: primaryColor),
             onPressed: _showUserProfile,
           ),
@@ -626,35 +622,6 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     .toList(),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Show call options
-  void _showCallOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),

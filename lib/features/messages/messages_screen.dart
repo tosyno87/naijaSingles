@@ -42,7 +42,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         backgroundColor: backgroundColor,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        iconTheme: IconThemeData(color: textPrimary), // Fix back arrow color
+        automaticallyImplyLeading: false, // Hide back button on main screen
         title: Text(
           'Messages',
           style: GoogleFonts.montserrat(
@@ -52,14 +52,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: primaryColor, size: 28),
-            onPressed: () {
-              _showSearchDialog();
-            },
-          ),
-        ],
+
       ),
       body: StreamBuilder<List<MessageThreadInfo>>(
         stream: _getChatThreadsStreamWithUserData(),
@@ -145,7 +138,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
             unread: unread,
             avatarUrl: avatarUrl,
-            isOnline: false, // TODO: Implement online status
           ));
         } catch (e) {
           log('Error processing thread: $e');
@@ -432,21 +424,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           ),
                         ),
                       ),
-                      // Online indicator
-                      if (thread.isOnline)
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            width: 18,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: cardColor, width: 3),
-                            ),
-                          ),
-                        ),
+
                       // Unread indicator
                       if (thread.unread)
                         Positioned(
@@ -557,121 +535,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     );
   }
 
-  void _showSearchDialog() {
-    if (!mounted) return;
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        contentPadding: const EdgeInsets.all(24),
-        title: Column(
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.search,
-                color: primaryColor,
-                size: 30,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Search Messages',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: textPrimary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Search functionality is coming soon!',
-              style: GoogleFonts.montserrat(
-                color: textSecondary,
-                fontSize: 16,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: primaryColor.withOpacity(0.2),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: primaryColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'We\'re working on adding message search to help you find conversations faster.',
-                      style: GoogleFonts.montserrat(
-                        color: primaryColor,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Got it',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-        ],
-        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      ),
-    );
-  }
+
 
   // Show delete confirmation dialog
   Future<bool?> _showDeleteConfirmation(MessageThreadInfo thread) async {

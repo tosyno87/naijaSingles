@@ -23,7 +23,6 @@ class MessageThreadInfo {
   final DateTime timestamp;
   final bool unread;
   final String? avatarUrl;
-  final bool isOnline;
 
   MessageThreadInfo({
     required this.threadId,
@@ -34,7 +33,6 @@ class MessageThreadInfo {
     required this.timestamp,
     required this.unread,
     this.avatarUrl,
-    this.isOnline = false,
   });
 
   // Helper method to format timestamp as relative time

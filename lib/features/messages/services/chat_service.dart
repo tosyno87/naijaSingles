@@ -324,7 +324,6 @@ class ChatService {
                       DateTime.now(),
                   unread: unread,
                   avatarUrl: null, // Will be fetched separately in the UI
-                  isOnline: false, // TODO: Implement online status
                 );
               } catch (e) {
                 debugPrint('Error processing individual thread: $e');

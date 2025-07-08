@@ -85,6 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
+        automaticallyImplyLeading: false, // Hide back button on main screen
         title: Text(
           'Profile',
           style: GoogleFonts.poppins(

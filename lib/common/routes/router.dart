@@ -31,6 +31,9 @@ import 'package:naijasingles/features/settings/notification_settings_screen.dart
 import 'package:naijasingles/features/settings/safety_center_screen.dart';
 import 'package:naijasingles/features/settings/help_center_screen.dart';
 import 'package:naijasingles/features/settings/feedback_screen.dart';
+import 'package:naijasingles/features/settings/language_settings_screen.dart';
+import 'package:naijasingles/features/settings/location_settings_screen.dart';
+import 'package:naijasingles/features/settings/account_deletion_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
@@ -128,6 +131,9 @@ abstract class AppRouter {
     RouteName.safetyCenter: (context) => const SafetyCenterScreen(),
     RouteName.helpCenter: (context) => const HelpCenterScreen(),
     RouteName.feedbackScreen: (context) => const FeedbackScreen(),
+    RouteName.languageSettings: (context) => const LanguageSettingsScreen(),
+    RouteName.locationSettings: (context) => const LocationSettingsScreen(),
+    RouteName.accountDeletion: (context) => const AccountDeletionScreen(),
 
     // Main navigation routes (consolidated - removed duplicates)
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),

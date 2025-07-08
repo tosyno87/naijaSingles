@@ -8,6 +8,7 @@ import 'dart:developer';
 import '../../common/constants/colors.dart'; // Import MVP colors
 import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
 import '../../models/user_model.dart'; // Import UserModel
+import '../../services/settings_service.dart'; // Import settings service for blocking
 import 'services/chat_service.dart';
 import 'message_model.dart';
 
@@ -831,50 +832,149 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   }
 
   // Show block user dialog
+  // Show MVP-styled block user dialog
   void _showBlockUserDialog() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Block ${widget.userName}?',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-        content: Text(
-          'You won\'t be able to see each other\'s profiles or send messages.',
-          style: GoogleFonts.montserrat(
-            color: textSecondary,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
+        contentPadding: const EdgeInsets.all(24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Warning icon with MVP styling
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _showComingSoonSnackBar('Block feature coming soon!');
-            },
-            child: Text(
-              'Block',
-              style: GoogleFonts.montserrat(
+              child: const Icon(
+                Icons.block,
                 color: Colors.red,
-                fontWeight: FontWeight.w600,
+                size: 30,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            
+            // Title with Poppins font
+            Text(
+              'Block ${widget.userName}?',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2D3748),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            
+            // Description with MVP colors
+            Text(
+              'This will remove them from your matches, delete this conversation, and prevent future contact.',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: const Color(0xFF718096),
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            
+            // MVP-styled action buttons
+            Row(
+              children: [
+                // Cancel button with border
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFFE2E8F0),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF718096),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                
+                // Block button with gradient and shadow
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFE53E3E), Color(0xFFC53030)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE53E3E).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _blockUser();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Block',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            
+            // Info text
+            Text(
+              'You can unblock them later in Settings',
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: const Color(0xFFA0AEC0),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1010,5 +1110,125 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         duration: const Duration(seconds: 4),
       ),
     );
+  }
+
+  // Block the user (called after confirmation from _showBlockUserDialog)
+  Future<void> _blockUser() async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (widget.otherUserId == null || currentUserId == null) return;
+
+    // Show MVP-styled loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        contentPadding: const EdgeInsets.all(32),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Loading indicator with MVP primary color
+            Container(
+              width: 50,
+              height: 50,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Blocking user...',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF2D3748),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // Block the user using settings service
+      final success = await SettingsService.blockUser(
+        currentUserId,
+        widget.otherUserId!,
+        reason: 'Blocked from chat',
+      );
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+
+        if (success) {
+          // Show MVP-styled success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Container(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.green,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '${widget.userName} has been blocked',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          
+          // Navigate back to messages list after a short delay
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) {
+              Navigator.pop(context); // Go back to messages list
+            }
+          });
+        } else {
+          _showErrorSnackBar('Failed to block user. Please try again.');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error blocking user: $e');
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        _showErrorSnackBar('An error occurred while blocking the user.');
+      }
+    }
   }
 }

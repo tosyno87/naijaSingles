@@ -86,25 +86,17 @@ class SettingsService {
 
       final batch = _firestore.batch();
 
-      // Add to current user's blocked list
+      // Add to current user's blocked list only (can't write to other user's collection due to security rules)
       batch.set(
         _usersCollection.doc(userId).collection('blockedlist').doc(blockedUserId),
         {
           'blockedAt': FieldValue.serverTimestamp(),
           'reason': reason ?? 'User blocked',
+          'blockedUserId': blockedUserId,
         },
       );
 
-      // Add to blocked user's blocked by list (for mutual blocking)
-      batch.set(
-        _usersCollection.doc(blockedUserId).collection('blockedlist').doc(userId),
-        {
-          'blockedAt': FieldValue.serverTimestamp(),
-          'reason': 'Mutually blocked',
-        },
-      );
-
-      // Remove any existing matches
+      // Remove any existing matches where both users are involved
       final matchQuery = await _firestore
           .collection('matches')
           .where('users', arrayContains: userId)
@@ -118,13 +110,14 @@ class SettingsService {
         }
       }
 
-      // Remove from each other's liked lists
-      batch.delete(_usersCollection.doc(userId).collection('LikedBy').doc(blockedUserId));
-      batch.delete(_usersCollection.doc(blockedUserId).collection('LikedBy').doc(userId));
-
-      // Remove from checked users so they don't appear in discovery
-      batch.delete(_usersCollection.doc(userId).collection('CheckedUser').doc(blockedUserId));
-      batch.delete(_usersCollection.doc(blockedUserId).collection('CheckedUser').doc(userId));
+      // Remove from each other's liked lists (only if we have permission)
+      try {
+        batch.delete(_usersCollection.doc(userId).collection('LikedBy').doc(blockedUserId));
+        batch.delete(_usersCollection.doc(userId).collection('CheckedUser').doc(blockedUserId));
+      } catch (e) {
+        debugPrint('⚠️ Could not remove from liked/checked lists: $e');
+        // Continue with blocking even if this fails
+      }
 
       await batch.commit();
 
@@ -143,11 +136,8 @@ class SettingsService {
 
       final batch = _firestore.batch();
 
-      // Remove from current user's blocked list
+      // Remove from current user's blocked list only
       batch.delete(_usersCollection.doc(userId).collection('blockedlist').doc(blockedUserId));
-
-      // Remove from blocked user's blocked by list
-      batch.delete(_usersCollection.doc(blockedUserId).collection('blockedlist').doc(userId));
 
       await batch.commit();
 

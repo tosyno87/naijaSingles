@@ -11,8 +11,9 @@ service cloud.firestore {
       return true;
     }
 
-    // Helper function to check if user is blocked
+    // Helper function to check if user is blocked (one-way blocking)
     function isUserBlocked(userId, blockedUserId) {
+      // Check if userId has blocked blockedUserId OR if blockedUserId has blocked userId
       return exists(/databases/$(database)/documents/users/$(userId)/blockedlist/$(blockedUserId)) ||
              exists(/databases/$(database)/documents/users/$(blockedUserId)/blockedlist/$(userId));
     }

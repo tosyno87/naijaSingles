@@ -75,7 +75,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       body: Stack(
         children: [
           // Main content
-          _pages[_validSelectedIndex],
+          Builder(
+            builder: (context) {
+              final page = _pages[_validSelectedIndex];
+              print('🎯 Displaying page at index $_validSelectedIndex: ${page.runtimeType}');
+              return page;
+            },
+          ),
 
           // Background task indicator
           if (_backgroundTasksRunning)
@@ -143,6 +149,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           setState(() {
             // Ensure index is within valid range
             _selectedIndex = index.clamp(0, _pages.length - 1);
+            print('🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex');
+            print('📱 Pages length: ${_pages.length}');
           });
         },
         backgroundColor: Colors.white,

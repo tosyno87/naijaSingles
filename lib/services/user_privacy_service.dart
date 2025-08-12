@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 class UserPrivacySettings {
   // Communication Settings
   final bool allowMessagesFromMatches;
-  final bool showReadReceipts;
+
 
   // Activity Status
   final bool showOnlineStatus;
@@ -25,7 +25,7 @@ class UserPrivacySettings {
   const UserPrivacySettings({
     // Communication defaults
     this.allowMessagesFromMatches = true,
-    this.showReadReceipts = true,
+
 
     // Activity defaults
     this.showOnlineStatus = true,
@@ -46,7 +46,7 @@ class UserPrivacySettings {
     return {
       // Communication
       'allowMessagesFromMatches': allowMessagesFromMatches,
-      'showReadReceipts': showReadReceipts,
+  
 
       // Activity Status
       'showOnlineStatus': showOnlineStatus,
@@ -70,7 +70,7 @@ class UserPrivacySettings {
     return UserPrivacySettings(
       // Communication
       allowMessagesFromMatches: map['allowMessagesFromMatches'] ?? true,
-      showReadReceipts: map['showReadReceipts'] ?? true,
+  
 
       // Activity Status
       showOnlineStatus: map['showOnlineStatus'] ?? true,
@@ -91,7 +91,7 @@ class UserPrivacySettings {
   UserPrivacySettings copyWith({
     // Communication
     bool? allowMessagesFromMatches,
-    bool? showReadReceipts,
+  
 
     // Activity Status
     bool? showOnlineStatus,
@@ -111,7 +111,7 @@ class UserPrivacySettings {
       // Communication
       allowMessagesFromMatches:
           allowMessagesFromMatches ?? this.allowMessagesFromMatches,
-      showReadReceipts: showReadReceipts ?? this.showReadReceipts,
+
 
       // Activity Status
       showOnlineStatus: showOnlineStatus ?? this.showOnlineStatus,

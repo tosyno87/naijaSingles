@@ -4,7 +4,7 @@ class RouteName {
   static const String loginScreen = '/login';
   static const String profileScreen = '/profile';
   static const String tabScreen = '/tabbar';
-  static const String voiceCallScreen = '/callScreen';
+
   static const String profilePicSetScreen = '/user_pic';
   static const String allowLocationScreen = '/allow_userLocation';
   static const String otpScreen = '/otp';

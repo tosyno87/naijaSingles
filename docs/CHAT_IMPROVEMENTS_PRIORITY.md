@@ -89,8 +89,8 @@
 **Changes implemented**:
 - ✅ Added profile info button to app bar
 - ✅ Modal bottom sheet with user details and avatar
-- ✅ Quick access to call, block, and report actions
-- ✅ Enhanced app bar with video call and menu options
+- ✅ Quick access to block and report actions
+- ✅ Enhanced app bar with menu options
 - ✅ Comprehensive action dialogs (block, report, clear chat)
 
 **User Benefits**:
@@ -117,7 +117,7 @@
 
 **Phase 3 (Low Priority)** - ✅ COMPLETED
 - Quick user profile view
-- Call options modal
+
 - Safety action dialogs
 
 ---

@@ -183,37 +183,8 @@ void main() {
       print('✅ Chat actions test completed');
     });
 
-    testWidgets('Typing indicators and online status', (WidgetTester tester) async {
-      print('🧪 Testing typing indicators and online status...');
 
-      app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
 
-      // Look for online status indicators
-      final onlineTexts = find.textContaining('Online');
-      final activeTexts = find.textContaining('Active');
-      
-      if (onlineTexts.evaluate().isNotEmpty || activeTexts.evaluate().isNotEmpty) {
-        print('✅ Found online status indicators');
-      }
-
-      // Look for typing indicators
-      final typingTexts = find.textContaining('typing');
-      if (typingTexts.evaluate().isNotEmpty) {
-        print('✅ Found typing indicators');
-      }
-
-      // Look for progress indicators (typing animation)
-      final progressIndicators = find.byType(CircularProgressIndicator);
-      final linearProgressIndicators = find.byType(LinearProgressIndicator);
-      
-      if (progressIndicators.evaluate().isNotEmpty || 
-          linearProgressIndicators.evaluate().isNotEmpty) {
-        print('✅ Found progress indicators');
-      }
-
-      print('✅ Typing indicators and online status test completed');
-    });
 
     testWidgets('Message delivery status', (WidgetTester tester) async {
       print('🧪 Testing message delivery status...');

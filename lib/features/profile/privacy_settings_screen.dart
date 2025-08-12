@@ -327,14 +327,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             }),
           ),
           _buildDivider(),
-          _buildToggleItem(
-            'Show Read Receipts',
-            'Let others know when you\'ve read their messages',
-            _settings.showReadReceipts,
-            (value) => setState(() {
-              _settings = _settings.copyWith(showReadReceipts: value);
-            }),
-          ),
+
         ],
       ),
     );

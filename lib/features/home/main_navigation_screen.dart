@@ -22,6 +22,9 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
+  
+  // Getter to ensure valid index
+  int get _validSelectedIndex => _selectedIndex.clamp(0, _pages.length - 1);
   late bool _backgroundTasksRunning;
 
   // Define the pages to be shown for each tab
@@ -41,6 +44,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void initState() {
     super.initState();
     _backgroundTasksRunning = widget.backgroundTasksRunning;
+    
+    // Ensure selected index is within valid range
+    _selectedIndex = _selectedIndex.clamp(0, _pages.length - 1);
 
     // Auto-hide the background task indicator after 10 seconds
     if (_backgroundTasksRunning) {
@@ -69,7 +75,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       body: Stack(
         children: [
           // Main content
-          _pages[_selectedIndex],
+          _pages[_validSelectedIndex],
 
           // Background task indicator
           if (_backgroundTasksRunning)
@@ -132,10 +138,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
       // SINGLE bottom navigation bar for the entire app
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
+        currentIndex: _validSelectedIndex,
         onTap: (index) {
           setState(() {
-            _selectedIndex = index;
+            // Ensure index is within valid range
+            _selectedIndex = index.clamp(0, _pages.length - 1);
           });
         },
         backgroundColor: Colors.white,

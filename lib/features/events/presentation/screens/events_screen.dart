@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../bloc/events_bloc.dart';
 import '../bloc/rsvp_bloc.dart';
 import '../widgets/event_card.dart';
 import '../widgets/event_filter_bar.dart';
 import '../widgets/events_loading_shimmer.dart';
 import '../../data/models/event_model.dart';
+import '../../data/repositories/events_repository.dart';
 import '../../data/services/eventbrite_service.dart';
 import '../../data/services/events_firestore_service.dart';
 
@@ -92,14 +94,16 @@ class _EventsScreenState extends State<EventsScreen> {
       providers: [
         BlocProvider(
           create: (context) => EventsBloc(
-            eventbriteService: EventbriteService(),
-            firestoreService: EventsFirestoreService(),
+            repository: EventsRepositoryImpl(
+              eventbriteService: EventbriteService(),
+              firestoreService: EventsFirestoreService(),
+            ),
           )..add(const LoadEventsEvent()),
         ),
         BlocProvider(
           create: (context) => RSVPBloc(
             firestoreService: EventsFirestoreService(),
-            currentUserId: 'current_user_id', // TODO: Get from auth service
+            currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
           ),
         ),
       ],

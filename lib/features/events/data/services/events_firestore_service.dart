@@ -228,7 +228,7 @@ class EventsFirestoreService {
       
       return querySnapshot.docs
           .map((doc) => RSVPModel.fromFirestoreJson(
-                doc.data(),
+                doc.data() as Map<String, dynamic>,
                 doc.id,
               ))
           .toList();
@@ -253,7 +253,7 @@ class EventsFirestoreService {
       final querySnapshot = await query.get();
       
       return querySnapshot.docs
-          .map((doc) => EventAttendeeModel.fromFirestoreJson(doc.data()))
+          .map((doc) => EventAttendeeModel.fromFirestoreJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
       log('Error fetching event attendees: $e', name: 'EventsFirestoreService');

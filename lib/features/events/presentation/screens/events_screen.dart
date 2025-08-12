@@ -8,6 +8,7 @@ import '../widgets/event_card.dart';
 import '../widgets/event_filter_bar.dart';
 import '../widgets/events_loading_shimmer.dart';
 import '../../data/models/event_model.dart';
+import '../../data/repositories/events_repository.dart';
 import '../../data/services/eventbrite_service.dart';
 import '../../data/services/events_firestore_service.dart';
 
@@ -92,8 +93,10 @@ class _EventsScreenState extends State<EventsScreen> {
       providers: [
         BlocProvider(
           create: (context) => EventsBloc(
-            eventbriteService: EventbriteService(),
-            firestoreService: EventsFirestoreService(),
+            repository: EventsRepositoryImpl(
+              eventbriteService: EventbriteService(),
+              firestoreService: EventsFirestoreService(),
+            ),
           )..add(const LoadEventsEvent()),
         ),
         BlocProvider(

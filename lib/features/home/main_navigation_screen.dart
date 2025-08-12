@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/messages/messages_screen.dart';
+import 'package:naijasingles/features/events/presentation/screens/events_screen.dart';
 import 'package:naijasingles/features/profile/profile_screen.dart';
 import 'package:naijasingles/debug/simple_debug.dart';
 
@@ -29,7 +30,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const ExploreScreen(
         showBackButton: false), // Tab 0: Explore - no back labelLarge
     const MessagesScreen(), // Tab 1: Messages
-    const ProfileScreen(), // Tab 2: Profile
+    const EventsScreen(), // Tab 2: Events
+    const ProfileScreen(), // Tab 3: Profile
   ];
 
   // Deep green color for accents
@@ -155,6 +157,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble_outline),
             label: 'Messages',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.event),
+            label: 'Events',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),

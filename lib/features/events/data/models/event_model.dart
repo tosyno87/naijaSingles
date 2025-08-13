@@ -1,5 +1,13 @@
 import 'package:equatable/equatable.dart';
 
+enum EventStatus {
+  draft,
+  published,
+  cancelled,
+  completed,
+  underReview,
+}
+
 class EventModel extends Equatable {
   final String id;
   final String eventbriteId;
@@ -16,6 +24,8 @@ class EventModel extends Equatable {
   final int rsvpCount;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final EventStatus status;
+  final bool isPublic;
 
   const EventModel({
     required this.id,
@@ -33,7 +43,42 @@ class EventModel extends Equatable {
     this.rsvpCount = 0,
     required this.createdAt,
     required this.updatedAt,
+    this.status = EventStatus.published,
+    this.isPublic = true,
   });
+
+  // Helper method to safely parse EventStatus from Firestore
+  static EventStatus _parseEventStatus(dynamic statusValue) {
+    if (statusValue == null) return EventStatus.published;
+    
+    // Handle string values (enum name)
+    if (statusValue is String) {
+      switch (statusValue.toLowerCase()) {
+        case 'draft':
+          return EventStatus.draft;
+        case 'published':
+          return EventStatus.published;
+        case 'cancelled':
+          return EventStatus.cancelled;
+        case 'completed':
+          return EventStatus.completed;
+        case 'underreview':
+        case 'under_review':
+          return EventStatus.underReview;
+        default:
+          return EventStatus.published;
+      }
+    }
+    
+    // Handle integer values (enum index) - for backward compatibility
+    if (statusValue is int) {
+      if (statusValue >= 0 && statusValue < EventStatus.values.length) {
+        return EventStatus.values[statusValue];
+      }
+    }
+    
+    return EventStatus.published;
+  }
 
   factory EventModel.fromEventbriteJson(Map<String, dynamic> json) {
     return EventModel(
@@ -52,6 +97,8 @@ class EventModel extends Equatable {
       rsvpCount: 0,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      status: EventStatus.published,
+      isPublic: true,
     );
   }
 
@@ -72,6 +119,8 @@ class EventModel extends Equatable {
       rsvpCount: json['rsvpCount'] ?? 0,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']?.millisecondsSinceEpoch ?? 0),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt']?.millisecondsSinceEpoch ?? 0),
+      status: _parseEventStatus(json['status']),
+      isPublic: json['isPublic'] ?? true,
     );
   }
 
@@ -91,6 +140,8 @@ class EventModel extends Equatable {
       'rsvpCount': rsvpCount,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'status': status.toString().split('.').last,
+      'isPublic': isPublic,
     };
   }
 
@@ -110,6 +161,8 @@ class EventModel extends Equatable {
     int? rsvpCount,
     DateTime? createdAt,
     DateTime? updatedAt,
+    EventStatus? status,
+    bool? isPublic,
   }) {
     return EventModel(
       id: id ?? this.id,
@@ -127,6 +180,8 @@ class EventModel extends Equatable {
       rsvpCount: rsvpCount ?? this.rsvpCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      status: status ?? this.status,
+      isPublic: isPublic ?? this.isPublic,
     );
   }
 
@@ -147,6 +202,8 @@ class EventModel extends Equatable {
         rsvpCount,
         createdAt,
         updatedAt,
+        status,
+        isPublic,
       ];
 }
 

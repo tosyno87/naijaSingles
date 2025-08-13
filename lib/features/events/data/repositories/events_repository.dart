@@ -32,6 +32,7 @@ abstract class EventsRepository {
 
 class EventsRepositoryImpl implements EventsRepository {
   final EventsFirestoreService _firestoreService;
+  final EventbriteService _eventbriteService;
   
   // Cache management
   final Map<String, List<EventModel>> _eventsCache = {};
@@ -40,7 +41,9 @@ class EventsRepositoryImpl implements EventsRepository {
 
   EventsRepositoryImpl({
     required EventsFirestoreService firestoreService,
-  })  : _firestoreService = firestoreService;
+    required EventbriteService eventbriteService,
+  })  : _firestoreService = firestoreService,
+        _eventbriteService = eventbriteService;
 
   @override
   Future<List<EventModel>> getEvents({

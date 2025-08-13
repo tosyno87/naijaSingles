@@ -220,20 +220,73 @@ class EnhancedEventModel extends Equatable {
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
       createdByUserId: json['createdByUserId'],
       isUserGenerated: json['isUserGenerated'] ?? false,
-      eventType: EventType.values.firstWhere(
-        (e) => e.toString() == 'EventType.${json['eventType']}',
-        orElse: () => EventType.eventbrite,
-      ),
-      status: EventStatus.values.firstWhere(
-        (e) => e.toString() == 'EventStatus.${json['status']}',
-        orElse: () => EventStatus.published,
-      ),
+      eventType: _parseEventType(json['eventType']),
+      status: _parseEventStatus(json['status']),
       isPromoted: json['isPromoted'] ?? false,
       promotionExpiry: json['promotionExpiry'] != null 
           ? (json['promotionExpiry'] as Timestamp).toDate() 
           : null,
       metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
     );
+  }
+
+  // Helper methods to safely parse enums from Firestore
+  static EventType _parseEventType(dynamic typeValue) {
+    if (typeValue == null) return EventType.eventbrite;
+    
+    if (typeValue is String) {
+      switch (typeValue.toLowerCase()) {
+        case 'usergenerated':
+        case 'user_generated':
+          return EventType.userGenerated;
+        case 'eventbrite':
+          return EventType.eventbrite;
+        case 'meetup':
+          return EventType.meetup;
+        case 'promoted':
+          return EventType.promoted;
+        default:
+          return EventType.eventbrite;
+      }
+    }
+    
+    if (typeValue is int) {
+      if (typeValue >= 0 && typeValue < EventType.values.length) {
+        return EventType.values[typeValue];
+      }
+    }
+    
+    return EventType.eventbrite;
+  }
+
+  static EventStatus _parseEventStatus(dynamic statusValue) {
+    if (statusValue == null) return EventStatus.published;
+    
+    if (statusValue is String) {
+      switch (statusValue.toLowerCase()) {
+        case 'draft':
+          return EventStatus.draft;
+        case 'published':
+          return EventStatus.published;
+        case 'cancelled':
+          return EventStatus.cancelled;
+        case 'completed':
+          return EventStatus.completed;
+        case 'underreview':
+        case 'under_review':
+          return EventStatus.underReview;
+        default:
+          return EventStatus.published;
+      }
+    }
+    
+    if (statusValue is int) {
+      if (statusValue >= 0 && statusValue < EventStatus.values.length) {
+        return EventStatus.values[statusValue];
+      }
+    }
+    
+    return EventStatus.published;
   }
 
   Map<String, dynamic> toFirestoreJson() {

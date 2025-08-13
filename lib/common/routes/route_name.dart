@@ -56,4 +56,9 @@ class RouteName {
   static const String locationSettings = '/location_settings';
   static const String accountDeletion = '/account_deletion';
   static const String feedbackScreen = '/feedback';
+
+  // Events routes
+  static const String myEvents = '/my_events';
+  static const String createEvent = '/create_event';
+  static const String eventDetails = '/event_details';
 }

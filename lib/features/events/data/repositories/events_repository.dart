@@ -31,7 +31,6 @@ abstract class EventsRepository {
 }
 
 class EventsRepositoryImpl implements EventsRepository {
-  final EventbriteService _eventbriteService;
   final EventsFirestoreService _firestoreService;
   
   // Cache management
@@ -40,10 +39,8 @@ class EventsRepositoryImpl implements EventsRepository {
   static const Duration _cacheExpiry = Duration(minutes: 15);
 
   EventsRepositoryImpl({
-    required EventbriteService eventbriteService,
     required EventsFirestoreService firestoreService,
-  })  : _eventbriteService = eventbriteService,
-        _firestoreService = firestoreService;
+  })  : _firestoreService = firestoreService;
 
   @override
   Future<List<EventModel>> getEvents({
@@ -83,20 +80,14 @@ class EventsRepositoryImpl implements EventsRepository {
         }
       }
       
-      // Fetch from Eventbrite API
-      events = await _eventbriteService.fetchAfrocentricEvents(
-        page: page,
-        limit: limit,
-      );
+      // Fetch from Firestore only (user-created events)
+      events = await _firestoreService.fetchEvents(limit: limit);
       
       if (events.isNotEmpty) {
-        // Cache in Firestore for future use
-        await _firestoreService.saveEvents(events);
-        
         // Update memory cache
         _updateCache(cacheKey, events);
         
-        log('Fetched ${events.length} events from Eventbrite API', name: 'EventsRepository');
+        log('Fetched ${events.length} events from Firestore', name: 'EventsRepository');
       }
       
       return events;
@@ -133,33 +124,13 @@ class EventsRepositoryImpl implements EventsRepository {
       // Search in Firestore first (faster)
       final firestoreResults = await _firestoreService.searchEvents(query);
       
-      // Search via Eventbrite API for comprehensive results
-      final apiResults = await _eventbriteService.searchEvents(query: query);
-      
-      // Combine and deduplicate results
-      final combinedResults = <String, EventModel>{};
-      
-      // Add Firestore results
-      for (final event in firestoreResults) {
-        combinedResults[event.eventbriteId] = event;
-      }
-      
-      // Add API results (will override if same event)
-      for (final event in apiResults) {
-        combinedResults[event.eventbriteId] = event;
-      }
-      
-      final searchResults = combinedResults.values.toList();
-      
-      // Cache new events from API
-      if (apiResults.isNotEmpty) {
-        await _firestoreService.saveEvents(apiResults);
-      }
+      // Use only Firestore results for user-created events
+      final searchResults = firestoreResults;
       
       // Update search cache
       _updateCache(cacheKey, searchResults);
       
-      log('Search for "$query" returned ${searchResults.length} results', name: 'EventsRepository');
+      log('Search for "$query" returned ${searchResults.length} results from Firestore', name: 'EventsRepository');
       return searchResults;
     } catch (e) {
       log('Error searching events: $e', name: 'EventsRepository');
@@ -190,26 +161,8 @@ class EventsRepositoryImpl implements EventsRepository {
         return firestoreEvents;
       }
       
-      // Fetch from API if not enough cached events
-      final apiEvents = await _eventbriteService.searchEvents(
-        query: _getCategorySearchQuery(category),
-        category: category,
-      );
-      
-      if (apiEvents.isNotEmpty) {
-        await _firestoreService.saveEvents(apiEvents);
-      }
-      
-      // Combine results
-      final allEvents = <String, EventModel>{};
-      for (final event in firestoreEvents) {
-        allEvents[event.eventbriteId] = event;
-      }
-      for (final event in apiEvents) {
-        allEvents[event.eventbriteId] = event;
-      }
-      
-      final categoryEvents = allEvents.values.toList();
+      // Use only Firestore results for user-created events
+      final categoryEvents = firestoreEvents;
       _updateCache(cacheKey, categoryEvents);
       
       return categoryEvents;

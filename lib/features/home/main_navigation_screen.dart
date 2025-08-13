@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/messages/messages_screen.dart';
-import 'package:naijasingles/features/events/presentation/screens/events_screen_simple.dart';
+import 'package:naijasingles/features/events/presentation/screens/events_screen.dart';
 import 'package:naijasingles/features/profile/profile_screen.dart';
 import 'package:naijasingles/debug/simple_debug.dart';
 
@@ -33,7 +33,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const ExploreScreen(
         showBackButton: false), // Tab 0: Explore - no back labelLarge
     const MessagesScreen(), // Tab 1: Messages
-    const EventsScreenSimple(), // Tab 2: Events
+    const EventsScreen(), // Tab 2: Events
     const ProfileScreen(), // Tab 3: Profile
   ];
 

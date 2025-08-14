@@ -444,8 +444,8 @@ class EnhancedEventCard extends StatelessWidget {
 
   Widget _buildActionButton() {
     if (event is EventModel) {
-      // Use existing RSVP button for external events
-      return RSVPButton(eventId: (event as EventModel).eventbriteId);
+      // Use event ID for RSVP button
+      return RSVPButton(eventId: (event as EventModel).id);
     } else {
       // Simple button for user-generated events
       return SizedBox(

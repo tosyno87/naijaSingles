@@ -1,7 +1,6 @@
 import 'dart:developer';
 import '../models/event_model.dart';
 import '../models/rsvp_model.dart';
-import '../services/eventbrite_service.dart';
 import '../services/events_firestore_service.dart';
 
 abstract class EventsRepository {
@@ -32,7 +31,6 @@ abstract class EventsRepository {
 
 class EventsRepositoryImpl implements EventsRepository {
   final EventsFirestoreService _firestoreService;
-  final EventbriteService _eventbriteService;
   
   // Cache management
   final Map<String, List<EventModel>> _eventsCache = {};
@@ -41,9 +39,7 @@ class EventsRepositoryImpl implements EventsRepository {
 
   EventsRepositoryImpl({
     required EventsFirestoreService firestoreService,
-    required EventbriteService eventbriteService,
-  })  : _firestoreService = firestoreService,
-        _eventbriteService = eventbriteService;
+  })  : _firestoreService = firestoreService;
 
   @override
   Future<List<EventModel>> getEvents({
@@ -186,7 +182,7 @@ class EventsRepositoryImpl implements EventsRepository {
       }
       
       // Try Eventbrite API
-      event = await _eventbriteService.fetchEventById(eventId);
+      // event = await _eventbriteService.fetchEventById(eventId); // This line is removed
       
       if (event != null) {
         // Cache the event
@@ -284,20 +280,20 @@ class EventsRepositoryImpl implements EventsRepository {
 
   Future<void> _fetchAndCacheInBackground(int page, int limit) async {
     try {
-      final freshEvents = await _eventbriteService.fetchAfrocentricEvents(
-        page: page,
-        limit: limit,
-      );
+      // final freshEvents = await _eventbriteService.fetchAfrocentricEvents( // This line is removed
+      //   page: page,
+      //   limit: limit,
+      // );
       
-      if (freshEvents.isNotEmpty) {
-        await _firestoreService.saveEvents(freshEvents);
+      // if (freshEvents.isNotEmpty) {
+      //   await _firestoreService.saveEvents(freshEvents);
         
-        // Update cache
-        final cacheKey = 'events_${page}_$limit';
-        _updateCache(cacheKey, freshEvents);
+      //   // Update cache
+      //   final cacheKey = 'events_${page}_$limit';
+      //   _updateCache(cacheKey, freshEvents);
         
-        log('Background cache updated with ${freshEvents.length} events', name: 'EventsRepository');
-      }
+      //   log('Background cache updated with ${freshEvents.length} events', name: 'EventsRepository');
+      // }
     } catch (e) {
       log('Background cache update failed: $e', name: 'EventsRepository');
     }
@@ -305,15 +301,15 @@ class EventsRepositoryImpl implements EventsRepository {
 
   Future<void> _fetchCategoryInBackground(String category) async {
     try {
-      final freshEvents = await _eventbriteService.searchEvents(
-        query: _getCategorySearchQuery(category),
-        category: category,
-      );
+      // final freshEvents = await _eventbriteService.searchEvents( // This line is removed
+      //   query: _getCategorySearchQuery(category),
+      //   category: category,
+      // );
       
-      if (freshEvents.isNotEmpty) {
-        await _firestoreService.saveEvents(freshEvents);
-        log('Background category cache updated with ${freshEvents.length} events', name: 'EventsRepository');
-      }
+      // if (freshEvents.isNotEmpty) {
+      //   await _firestoreService.saveEvents(freshEvents);
+      //   log('Background category cache updated with ${freshEvents.length} events', name: 'EventsRepository');
+      // }
     } catch (e) {
       log('Background category cache update failed: $e', name: 'EventsRepository');
     }

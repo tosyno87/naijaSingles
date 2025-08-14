@@ -17,7 +17,8 @@ class EventsFirestoreService {
       final batch = _firestore.batch();
       
       for (final event in events) {
-        final docRef = _eventsCollection.doc(event.eventbriteId);
+        // Use event.id instead of eventbriteId for user-generated events
+        final docRef = _eventsCollection.doc(event.id);
         batch.set(docRef, event.toFirestoreJson(), SetOptions(merge: true));
       }
       

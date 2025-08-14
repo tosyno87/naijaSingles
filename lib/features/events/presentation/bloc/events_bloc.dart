@@ -346,9 +346,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   String _getErrorMessage(dynamic error) {
-    if (error.toString().contains('EventbriteException')) {
-      return 'Failed to load events. Please check your internet connection and try again.';
-    } else if (error.toString().contains('FirestoreException')) {
+    if (error.toString().contains('FirestoreException')) {
       return 'Failed to save events. Please try again.';
     } else {
       return 'An unexpected error occurred. Please try again.';
@@ -356,8 +354,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   bool _isNetworkError(dynamic error) {
-    return error.toString().contains('EventbriteException') ||
-           error.toString().contains('SocketException') ||
+    return error.toString().contains('SocketException') ||
            error.toString().contains('TimeoutException');
   }
 }

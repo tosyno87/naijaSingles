@@ -11,7 +11,6 @@ import '../widgets/event_filter_bar.dart';
 import '../widgets/events_loading_shimmer.dart';
 import '../../data/models/event_model.dart';
 import '../../data/repositories/events_repository.dart';
-import '../../data/services/eventbrite_service.dart';
 import '../../data/services/events_firestore_service.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -97,7 +96,6 @@ class _EventsScreenState extends State<EventsScreen> {
           create: (context) => EventsBloc(
             repository: EventsRepositoryImpl(
               firestoreService: EventsFirestoreService(),
-              eventbriteService: EventbriteService(),
             ),
           )..add(const LoadEventsEvent()),
         ),

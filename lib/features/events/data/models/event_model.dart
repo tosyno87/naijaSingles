@@ -11,7 +11,7 @@ enum EventStatus {
 
 class EventModel extends Equatable {
   final String id;
-  final String eventbriteId;
+  final String? eventbriteId; // Made optional for user-generated events
   final String name;
   final String description;
   final DateTime startDate;
@@ -30,7 +30,7 @@ class EventModel extends Equatable {
 
   const EventModel({
     required this.id,
-    required this.eventbriteId,
+    this.eventbriteId, // Made optional
     required this.name,
     required this.description,
     required this.startDate,

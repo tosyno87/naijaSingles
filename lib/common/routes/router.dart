@@ -36,6 +36,13 @@ import 'package:naijasingles/features/settings/location_settings_screen.dart';
 import 'package:naijasingles/features/settings/account_deletion_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
+import 'package:naijasingles/features/events/presentation/screens/events_screen.dart';
+import 'package:naijasingles/features/events/presentation/screens/create_event_screen.dart';
+import 'package:naijasingles/features/events/presentation/screens/my_events_screen.dart';
+import 'package:naijasingles/features/events/presentation/screens/event_details_screen.dart';
+import 'package:naijasingles/features/events/presentation/bloc/event_creation_bloc.dart';
+import 'package:naijasingles/features/events/data/services/user_event_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
@@ -140,6 +147,19 @@ abstract class AppRouter {
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.home: (context) => const Tabbar(),
     RouteName.discover: (context) => const Tabbar(),
+
+    // Events routes
+    RouteName.eventsScreen: (context) => const EventsScreen(),
+    RouteName.createEvent: (context) => BlocProvider(
+      create: (context) => EventCreationBloc(
+        userEventService: UserEventService(),
+      ),
+      child: const CreateEventScreen(),
+    ),
+    RouteName.myEvents: (context) => const MyEventsScreen(),
+    RouteName.eventDetails: (context) => EventDetailsScreen(
+      event: ModalRoute.of(context)!.settings.arguments as dynamic,
+    ),
   };
 
   /// Generate route method for MaterialApp

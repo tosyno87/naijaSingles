@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/routes/route_name.dart';
 import '../bloc/events_bloc.dart';
 import '../bloc/rsvp_bloc.dart';
 import '../widgets/event_card.dart';
@@ -122,6 +123,21 @@ class _EventsScreenState extends State<EventsScreen> {
                 child: _buildEventsList(),
               ),
             ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.pushNamed(context, RouteName.createEvent);
+          },
+          backgroundColor: const Color(0xFF008037), // NaijaSingles green
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.add),
+          label: Text(
+            'Create Event',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/routes/route_name.dart';
 
 import 'edit_profile_screen.dart';
 import 'privacy_settings_screen.dart';
@@ -106,6 +107,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             onSelected: (value) {
               switch (value) {
+                case 'events':
+                  Navigator.pushNamed(context, RouteName.eventsScreen);
+                  break;
                 case 'privacy':
                   Navigator.push(
                     context,
@@ -125,6 +129,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
             },
             itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'events',
+                height: 56,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.event,
+                          color: primaryColor,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'Events',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               PopupMenuItem(
                 value: 'privacy',
                 height: 56,

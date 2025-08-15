@@ -41,6 +41,7 @@ class LargeImage extends StatelessWidget {
                         height: 20,
                       ),
                       FloatingActionButton(
+                          heroTag: "large_image_back_fab",
                           backgroundColor: primaryColor,
                           child: const Icon(Icons.arrow_back),
                           onPressed: () => Navigator.pop(context)),

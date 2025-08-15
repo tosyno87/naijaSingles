@@ -13,6 +13,7 @@ import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/routes/router.dart';
 import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
 import 'package:naijasingles/services/enhanced_notification_service.dart';
+import 'package:naijasingles/features/events/data/services/seed_events_service.dart';
 import 'package:provider/provider.dart';
 
 import 'common/constants/theme.dart';
@@ -36,6 +37,15 @@ Future<void> main() async {
     // Initialize Enhanced Notification Service
     await EnhancedNotificationService.initialize();
     log('🔔 Enhanced Notification Service initialized');
+
+    // Initialize seed events if database is empty
+    try {
+      final seedService = SeedEventsService();
+      await seedService.seedEventsIfEmpty();
+      log('🎉 Events seeding completed');
+    } catch (e) {
+      log('⚠️ Events seeding error: $e');
+    }
   } catch (e) {
     log('❌ Firebase initialization error: $e');
   }

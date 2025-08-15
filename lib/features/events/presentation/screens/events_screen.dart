@@ -27,6 +27,7 @@ class _EventsScreenState extends State<EventsScreen> {
   
   bool _isSearching = false;
   EventFilter _currentFilter = const EventFilter();
+  EventsBloc? _eventsBloc;
 
   @override
   void initState() {
@@ -43,8 +44,8 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   void _onScroll() {
-    if (_isBottom) {
-      context.read<EventsBloc>().add(LoadMoreEventsEvent());
+    if (_isBottom && _eventsBloc != null) {
+      _eventsBloc!.add(LoadMoreEventsEvent());
     }
   }
 
@@ -56,11 +57,15 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   void _onRefresh() {
-    context.read<EventsBloc>().add(RefreshEventsEvent());
+    if (_eventsBloc != null) {
+      _eventsBloc!.add(RefreshEventsEvent());
+    }
   }
 
   void _onLoading() {
-    context.read<EventsBloc>().add(LoadMoreEventsEvent());
+    if (_eventsBloc != null) {
+      _eventsBloc!.add(LoadMoreEventsEvent());
+    }
   }
 
   void _toggleSearch() {
@@ -68,16 +73,20 @@ class _EventsScreenState extends State<EventsScreen> {
       _isSearching = !_isSearching;
       if (!_isSearching) {
         _searchController.clear();
-        context.read<EventsBloc>().add(ClearSearchEvent());
+        if (_eventsBloc != null) {
+          _eventsBloc!.add(ClearSearchEvent());
+        }
       }
     });
   }
 
   void _onSearchChanged(String query) {
-    if (query.trim().isNotEmpty) {
-      context.read<EventsBloc>().add(SearchEventsEvent(query.trim()));
-    } else {
-      context.read<EventsBloc>().add(ClearSearchEvent());
+    if (_eventsBloc != null) {
+      if (query.trim().isNotEmpty) {
+        _eventsBloc!.add(SearchEventsEvent(query.trim()));
+      } else {
+        _eventsBloc!.add(ClearSearchEvent());
+      }
     }
   }
 
@@ -85,7 +94,9 @@ class _EventsScreenState extends State<EventsScreen> {
     setState(() {
       _currentFilter = filter;
     });
-    context.read<EventsBloc>().add(FilterEventsEvent(filter));
+    if (_eventsBloc != null) {
+      _eventsBloc!.add(FilterEventsEvent(filter));
+    }
   }
 
   @override
@@ -93,11 +104,14 @@ class _EventsScreenState extends State<EventsScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => EventsBloc(
-            repository: EventsRepositoryImpl(
-              firestoreService: EventsFirestoreService(),
-            ),
-          )..add(const LoadEventsEvent()),
+          create: (context) {
+            _eventsBloc = EventsBloc(
+              repository: EventsRepositoryImpl(
+                firestoreService: EventsFirestoreService(),
+              ),
+            )..add(const LoadEventsEvent());
+            return _eventsBloc!;
+          },
         ),
         BlocProvider(
           create: (context) => RSVPBloc(
@@ -106,38 +120,43 @@ class _EventsScreenState extends State<EventsScreen> {
           ),
         ),
       ],
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
-        body: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildSearchBar(),
-              EventFilterBar(
-                currentFilter: _currentFilter,
-                onFilterChanged: _onFilterChanged,
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            body: SafeArea(
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  _buildSearchBar(),
+                  EventFilterBar(
+                    currentFilter: _currentFilter,
+                    onFilterChanged: _onFilterChanged,
+                  ),
+                  Expanded(
+                    child: _buildEventsList(),
+                  ),
+                ],
               ),
-              Expanded(
-                child: _buildEventsList(),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.pushNamed(context, RouteName.createEvent);
-          },
-          backgroundColor: const Color(0xFF008037), // NaijaSingles green
-          foregroundColor: Colors.white,
-          icon: const Icon(Icons.add),
-          label: Text(
-            'Create Event',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
             ),
-          ),
-        ),
+            floatingActionButton: FloatingActionButton.extended(
+              heroTag: "events_screen_fab",
+              onPressed: () {
+                Navigator.pushNamed(context, RouteName.eventTemplateSelection);
+              },
+              backgroundColor: const Color(0xFF008037), // NaijaSingles green
+              foregroundColor: Colors.white,
+              icon: const Icon(Icons.add),
+              label: Text(
+                'Create Event',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -258,7 +277,11 @@ class _EventsScreenState extends State<EventsScreen> {
             title: 'Connection Error',
             message: state.message,
             icon: Icons.wifi_off,
-            onRetry: () => context.read<EventsBloc>().add(const LoadEventsEvent(forceRefresh: true)),
+            onRetry: () {
+              if (_eventsBloc != null) {
+                _eventsBloc!.add(const LoadEventsEvent(forceRefresh: true));
+              }
+            },
           );
         }
         
@@ -267,7 +290,11 @@ class _EventsScreenState extends State<EventsScreen> {
             title: 'Something went wrong',
             message: state.message,
             icon: Icons.error_outline,
-            onRetry: () => context.read<EventsBloc>().add(const LoadEventsEvent(forceRefresh: true)),
+            onRetry: () {
+              if (_eventsBloc != null) {
+                _eventsBloc!.add(const LoadEventsEvent(forceRefresh: true));
+              }
+            },
           );
         }
         
@@ -458,7 +485,9 @@ class _EventsScreenState extends State<EventsScreen> {
                     _currentFilter = const EventFilter();
                     _searchController.clear();
                   });
-                  context.read<EventsBloc>().add(ClearSearchEvent());
+                  if (_eventsBloc != null) {
+                    _eventsBloc!.add(ClearSearchEvent());
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF008037),

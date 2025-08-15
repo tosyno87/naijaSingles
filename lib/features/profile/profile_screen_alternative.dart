@@ -10,6 +10,7 @@ class ProfileScreenAlternative extends StatelessWidget {
     return Scaffold(
       // Floating action button for edit (like Instagram)
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: "profile_screen_fab",
         onPressed: () {
           // Navigate to edit profile
         },

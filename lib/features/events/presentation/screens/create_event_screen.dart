@@ -11,13 +11,16 @@ import '../widgets/create_event_steps/media_step.dart';
 import '../widgets/create_event_steps/ticketing_step.dart';
 import '../widgets/create_event_steps/preview_step.dart';
 import '../../data/models/enhanced_event_model.dart';
+import '../../data/services/event_templates_service.dart';
 
 class CreateEventScreen extends StatefulWidget {
   final EnhancedEventModel? existingEvent; // For editing existing events
+  final EventTemplate? template; // For template-based creation
 
   const CreateEventScreen({
     Key? key,
     this.existingEvent,
+    this.template,
   }) : super(key: key);
 
   @override
@@ -64,6 +67,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ..tags = List.from(event.tags)
         ..maxAttendees = event.maxAttendees
         ..metadata = Map.from(event.metadata);
+    } else if (widget.template != null) {
+      // Initialize with template data
+      final template = widget.template!;
+      final templateData = template.defaultData;
+      final now = DateTime.now();
+      
+      _eventData = EventCreationData()
+        ..name = templateData.name
+        ..description = templateData.description
+        ..category = templateData.category
+        ..tags = List.from(templateData.tags)
+        ..startDate = now.add(const Duration(days: 7)) // Default to next week
+        ..endDate = now.add(const Duration(days: 7)).add(template.suggestedDuration)
+        ..isFree = templateData.isFree;
     } else {
       _eventData = EventCreationData();
     }

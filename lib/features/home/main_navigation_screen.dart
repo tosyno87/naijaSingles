@@ -132,6 +132,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               top: MediaQuery.of(context).padding.top + 50,
               right: 16,
               child: FloatingActionButton(
+                heroTag: "debug_menu_fab",
                 mini: true,
                 backgroundColor: Colors.red.withOpacity(0.8),
                 child:

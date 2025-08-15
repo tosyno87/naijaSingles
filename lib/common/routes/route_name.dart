@@ -59,6 +59,7 @@ class RouteName {
 
   // Events routes
   static const String eventsScreen = '/events';
+  static const String eventTemplateSelection = '/event-template-selection';
   static const String myEvents = '/my_events';
   static const String createEvent = '/create_event';
   static const String eventDetails = '/event_details';

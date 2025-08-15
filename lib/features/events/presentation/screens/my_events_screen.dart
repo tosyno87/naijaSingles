@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import '../../../../common/routes/route_name.dart';
 import '../bloc/event_creation_bloc.dart';
 import '../widgets/my_event_card.dart';
 import '../../data/models/enhanced_event_model.dart';
@@ -719,7 +720,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   }
 
   void _createNewEvent() {
-    Navigator.pushNamed(context, '/create_event').then((_) {
+    Navigator.pushNamed(context, RouteName.createEvent).then((_) {
       // Refresh events list when returning from create screen
       if (_currentUserId != null) {
         context.read<EventCreationBloc>().add(
@@ -732,7 +733,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   void _editEvent(EnhancedEventModel event) {
     Navigator.pushNamed(
       context, 
-      '/create_event',
+      RouteName.createEvent,
       arguments: {'existingEvent': event},
     ).then((_) {
       // Refresh events list when returning from edit screen
@@ -953,7 +954,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   void _navigateToEventDetails(EnhancedEventModel event) {
     Navigator.pushNamed(
       context,
-      '/event_details',
+      RouteName.eventDetails,
       arguments: {'event': event},
     );
   }

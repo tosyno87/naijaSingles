@@ -37,6 +37,7 @@ import 'package:naijasingles/features/settings/account_deletion_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import 'package:naijasingles/features/events/presentation/screens/events_screen.dart';
+import 'package:naijasingles/features/events/presentation/screens/event_template_selection_screen.dart';
 import 'package:naijasingles/features/events/presentation/screens/create_event_screen.dart';
 import 'package:naijasingles/features/events/presentation/screens/my_events_screen.dart';
 import 'package:naijasingles/features/events/presentation/screens/event_details_screen.dart';
@@ -142,20 +143,21 @@ abstract class AppRouter {
     RouteName.locationSettings: (context) => const LocationSettingsScreen(),
     RouteName.accountDeletion: (context) => const AccountDeletionScreen(),
 
-    // Main navigation routes (consolidated - removed duplicates)
-    RouteName.mainNavigation: (context) => const MainNavigationScreen(),
-    RouteName.onboarding: (context) => const OnboardingMain(),
-    RouteName.home: (context) => const Tabbar(),
-    RouteName.discover: (context) => const Tabbar(),
-
     // Events routes
     RouteName.eventsScreen: (context) => const EventsScreen(),
-    RouteName.createEvent: (context) => BlocProvider(
-      create: (context) => EventCreationBloc(
-        userEventService: UserEventService(),
-      ),
-      child: const CreateEventScreen(),
-    ),
+    RouteName.eventTemplateSelection: (context) => const EventTemplateSelectionScreen(),
+    RouteName.createEvent: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      return BlocProvider(
+        create: (context) => EventCreationBloc(
+          userEventService: UserEventService(),
+        ),
+        child: CreateEventScreen(
+          existingEvent: args?['existingEvent'],
+          template: args?['template'],
+        ),
+      );
+    },
     RouteName.myEvents: (context) => const MyEventsScreen(),
     RouteName.eventDetails: (context) => EventDetailsScreen(
       event: ModalRoute.of(context)!.settings.arguments as dynamic,

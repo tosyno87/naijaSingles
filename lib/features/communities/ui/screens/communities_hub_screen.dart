@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../../../common/constants/app_icons.dart';
+import '../../../../common/widgets/custom_3d_icons.dart';
 
 class CommunitiesHubScreen extends StatefulWidget {
   const CommunitiesHubScreen({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         },
         backgroundColor: const Color(0xFF008037),
         foregroundColor: Colors.white,
-              icon: const Icon(AppIcons.createEvent),
+              icon: Custom3DIcons.createEvent(),
         label: Text(
           'Create Event',
           style: GoogleFonts.montserrat(
@@ -77,11 +77,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             onPressed: () {
               Navigator.pushNamed(context, RouteName.culturalProfile);
             },
-              icon: const Icon(
-                AppIcons.profile,
-                color: Color(0xFF008037),
-                size: 28,
-              ),
+              icon: Custom3DIcons.profile(size: 28),
             tooltip: 'Your Cultural Profile',
           ),
         ],
@@ -105,16 +101,16 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
       ),
       child: Row(
         children: [
-          _buildTab('discover', 'Discover', AppIcons.discover),
-          _buildTab('groups', 'Groups', AppIcons.groupsTab),
-          _buildTab('learning', 'Learning', AppIcons.learningTab),
-          _buildTab('networking', 'Network', AppIcons.networkingTab),
+          _buildTab('discover', 'Discover', Custom3DIcons.discover()),
+          _buildTab('groups', 'Groups', Custom3DIcons.groupsTab()),
+          _buildTab('learning', 'Learning', Custom3DIcons.learningTab()),
+          _buildTab('networking', 'Network', Custom3DIcons.networkingTab()),
         ],
       ),
     );
   }
 
-  Widget _buildTab(String tabId, String label, IconData icon) {
+  Widget _buildTab(String tabId, String label, Widget icon) {
     final isSelected = _selectedTab == tabId;
     return Expanded(
       child: GestureDetector(
@@ -132,11 +128,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                color: isSelected ? Colors.white : const Color(0xFF666666),
-                size: 20,
-              ),
+              icon,
               const SizedBox(height: 4),
               Text(
                 label,
@@ -191,10 +183,10 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             mainAxisSpacing: 12,
             childAspectRatio: 1.1, // Reduced from 1.2 to prevent overflow
             children: [
-                        _buildActionCard('Events', 'Cultural celebrations', AppIcons.events, const Color(0xFF008037)),
-                        _buildActionCard('Groups', 'Join communities', AppIcons.groups, const Color(0xFF6B46C1)),
-                        _buildActionCard('Learning', 'Cultural stories', AppIcons.learning, const Color(0xFF059669)),
-                        _buildActionCard('Network', 'Professional connections', AppIcons.networking, const Color(0xFFDC2626)),
+                        _buildActionCard('Events', 'Cultural celebrations', Custom3DIcons.events(), const Color(0xFF008037)),
+                        _buildActionCard('Groups', 'Join communities', Custom3DIcons.groups(), const Color(0xFF6B46C1)),
+                        _buildActionCard('Learning', 'Cultural stories', Custom3DIcons.learning(), const Color(0xFF059669)),
+                        _buildActionCard('Network', 'Professional connections', Custom3DIcons.networking(), const Color(0xFFDC2626)),
             ],
           ),
           const SizedBox(height: 20), // Add bottom padding
@@ -203,7 +195,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
     );
   }
 
-  Widget _buildActionCard(String title, String subtitle, IconData icon, Color color) {
+  Widget _buildActionCard(String title, String subtitle, Widget icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -226,7 +218,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color, size: 28),
+            child: icon,
           ),
           const SizedBox(height: 12),
           Text(

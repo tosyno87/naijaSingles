@@ -6,7 +6,7 @@ import 'package:naijasingles/features/messages/messages_screen.dart';
 import 'package:naijasingles/features/communities/ui/screens/communities_hub_screen.dart';
 import 'package:naijasingles/features/profile/cultural_profile_screen.dart';
 import 'package:naijasingles/debug/quick_analysis.dart';
-import 'package:naijasingles/common/constants/app_icons.dart';
+import 'package:naijasingles/common/widgets/custom_3d_icons.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final bool backgroundTasksRunning;
@@ -165,21 +165,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         unselectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
         ),
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(AppIcons.communities),
+                icon: Custom3DIcons.communities(),
                 label: 'Communities',
               ),
               BottomNavigationBarItem(
-                icon: Icon(AppIcons.connect),
+                icon: Custom3DIcons.connect(),
                 label: 'Connect',
               ),
               BottomNavigationBarItem(
-                icon: Icon(AppIcons.messages),
+                icon: Custom3DIcons.messages(),
                 label: 'Messages',
               ),
               BottomNavigationBarItem(
-                icon: Icon(AppIcons.profile),
+                icon: Custom3DIcons.profile(),
                 label: 'Profile',
               ),
             ],

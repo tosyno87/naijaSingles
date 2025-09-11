@@ -181,7 +181,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1.1, // Reduced from 1.2 to prevent overflow
+            childAspectRatio: 1.0, // Further reduced to accommodate 3D icons
             children: [
                         _buildActionCard('Events', 'Cultural celebrations', Custom3DIcons.events(), const Color(0xFF008037)),
                         _buildActionCard('Groups', 'Join communities', Custom3DIcons.groups(), const Color(0xFF6B46C1)),
@@ -197,7 +197,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
 
   Widget _buildActionCard(String title, String subtitle, Widget icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -213,14 +213,14 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: icon,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             title,
             style: GoogleFonts.montserrat(

@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Afropeep - Connect Your African Soul</title>
@@ -24,7 +22,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Montserrat:wght@300;400;500;600;700;800;900&amp;family=Playfair+Display:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -913,8 +911,88 @@
             transform: translateY(0);
         }
     </style>
+  
+  
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  
+  
+  
+  
+  <style id="splash-screen-style">
+    html {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background-color: #008037;
+          background-size: 100% 100%;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .contain {
+      display:block;
+      width:100%; height:100%;
+      object-fit: contain;
+    }
+
+    .stretch {
+      display:block;
+      width:100%; height:100%;
+    }
+
+    .cover {
+      display:block;
+      width:100%; height:100%;
+      object-fit: cover;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+    }
+
+    .bottomLeft {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .bottomRight {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <script id="splash-screen-script">
+    function removeSplashFromWeb() {
+      document.getElementById("splash")?.remove();
+      document.getElementById("splash-branding")?.remove();
+      document.body.style.background = "transparent";
+    }
+  </script>
 </head>
 <body>
+  <picture id="splash">
+      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
+      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
+      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
+  </picture>
+  
+  
+  
     <!-- Header -->
     <header class="header">
         <nav class="nav">
@@ -942,8 +1020,8 @@
                     <a href="#" class="download-btn app-store">
                         <div class="btn-content">
                             <div class="btn-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"></path>
                                 </svg>
                             </div>
                             <div class="btn-text">
@@ -955,11 +1033,11 @@
                     <a href="#" class="download-btn google-play">
                         <div class="btn-content">
                             <div class="btn-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M3.609 1.814L13.792 12L3.609 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L12.5 12l5.198-3.291zM5.864 2.658L16.802 8.99l-2.302 2.302-8.636-8.634z" fill="#EA4335"/>
-                                    <path d="M16.802 8.99L5.864 2.658l8.636 8.634 2.302-2.302z" fill="#FBBC04"/>
-                                    <path d="M12.5 12l5.198 3.291-2.808 1.626L12.5 12z" fill="#34A853"/>
-                                    <path d="M12.5 12l-5.198-3.291L5.864 2.658l8.636 8.634L12.5 12z" fill="#4285F4"/>
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3.609 1.814L13.792 12L3.609 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L12.5 12l5.198-3.291zM5.864 2.658L16.802 8.99l-2.302 2.302-8.636-8.634z" fill="#EA4335"></path>
+                                    <path d="M16.802 8.99L5.864 2.658l8.636 8.634 2.302-2.302z" fill="#FBBC04"></path>
+                                    <path d="M12.5 12l5.198 3.291-2.808 1.626L12.5 12z" fill="#34A853"></path>
+                                    <path d="M12.5 12l-5.198-3.291L5.864 2.658l8.636 8.634L12.5 12z" fill="#4285F4"></path>
                                 </svg>
                             </div>
                             <div class="btn-text">
@@ -978,14 +1056,10 @@
             
             <div class="hero-images">
                 <div class="hero-image main">
-                    <img src="hero-couple.jpg?v=2" 
-                         alt="Happy Black couple laughing and connecting" 
-                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                    <img src="hero-couple.jpg?v=2" alt="Happy Black couple laughing and connecting" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
                 </div>
                 <div class="hero-image secondary">
-                    <img src="promo-image.jpg?v=3" 
-                         alt="Beautiful Black woman smiling" 
-                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                    <img src="promo-image.jpg?v=3" alt="Beautiful Black woman smiling" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
                 </div>
             </div>
         </div>
@@ -999,9 +1073,7 @@
             <div class="features-grid">
                 <div class="feature-card scroll-reveal">
                     <div class="feature-image">
-                        <img src="authentic-connections.jpg" 
-                             alt="Authentic African connections and relationships" 
-                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                        <img src="authentic-connections.jpg" alt="Authentic African connections and relationships" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
                     </div>
                     <div class="feature-content">
                         <div class="feature-icon">
@@ -1015,7 +1087,7 @@
                     <div class="feature-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
-                    <h3>Safe & Secure</h3>
+                    <h3>Safe &amp; Secure</h3>
                     <p>Your privacy and safety are our top priorities. Advanced verification, photo verification, and 24/7 moderation keep our community secure and authentic.</p>
                 </div>
                 <div class="feature-card scroll-reveal">
@@ -1034,15 +1106,13 @@
                 </div>
                 <div class="feature-card scroll-reveal">
                     <div class="feature-image">
-                        <img src="events-meetups.jpg" 
-                             alt="African cultural events and meetups celebration" 
-                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                        <img src="events-meetups.jpg" alt="African cultural events and meetups celebration" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
                     </div>
                     <div class="feature-content">
                         <div class="feature-icon">
                             <i class="fas fa-calendar-alt"></i>
                         </div>
-                        <h3>Events & Meetups</h3>
+                        <h3>Events &amp; Meetups</h3>
                         <p>Discover and attend African cultural events, networking meetups, and social gatherings in your area. Build real connections beyond the app.</p>
                     </div>
                 </div>
@@ -1134,7 +1204,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2024 Afropeep. All rights reserved.</p>
+                <p>© 2024 Afropeep. All rights reserved.</p>
                 <p style="margin-top: 1rem;">
                     Made with <i class="fas fa-heart" style="color: #FF6B9D;"></i> for the African diaspora worldwide
                 </p>
@@ -1237,5 +1307,5 @@
             }
         });
     </script>
-</body>
-</html>
+
+</body></html>

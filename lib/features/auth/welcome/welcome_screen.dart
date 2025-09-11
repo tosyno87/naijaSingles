@@ -149,20 +149,20 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Spacer(flex: 1),
+                    const Spacer(flex: 2), // Reduced to shift content up
 
-                    // Enhanced Afropeep Logo with green glow and animation
+                    // Clean Afropeep Logo without glow - stands confidently on its own
                     AnimatedBuilder(
                       animation: _logoScale,
                       builder: (context, child) {
                         return Transform.scale(
                           scale: _logoScale.value,
-                          child: _buildEnhancedLogo(),
+                          child: _buildCleanLogo(),
                         );
                       },
                     ),
                     
-                    const SizedBox(height: 20), // Tightened spacing
+                    const SizedBox(height: 16), // Reduced spacing for better centering
                     
                     // Stylized Afropeep text with Montserrat and animation
                     AnimatedBuilder(
@@ -255,7 +255,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       },
                     ),
 
-                    const Spacer(flex: 2),
+                    const Spacer(flex: 2), // Reduced to shift content up
 
                     // Show loading indicator while checking auth status
                     if (_isLoading)
@@ -329,44 +329,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  // Enhanced logo with green glow effect
-  Widget _buildEnhancedLogo() {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            AppColors.primaryGreen.withOpacity(0.05),
-            AppColors.primaryGreen.withOpacity(0.02),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.6, 1.0],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryGreen.withOpacity(0.15),
-            blurRadius: 12,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Center(
-        child: Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.primaryGreen.withOpacity(0.2),
-              width: 2,
-            ),
-          ),
-          child: const AfropeepLogo(size: 60),
-        ),
-      ),
-    );
+  // Clean logo without glow - stands confidently on its own
+  Widget _buildCleanLogo() {
+    return const AfropeepLogo(size: 90); // Enlarged to 90px for iPhone screens
   }
 
   // Animated progress bar

@@ -149,7 +149,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Spacer(flex: 2), // Reduced to shift content up
+                    const Spacer(flex: 1), // Adjusted for massive logo
 
                     // Clean Afropeep Logo without glow - stands confidently on its own
                     AnimatedBuilder(
@@ -162,7 +162,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       },
                     ),
                     
-                    const SizedBox(height: 24), // Spacing after massive logo
+                    const SizedBox(height: 32), // Increased spacing for massive logo
 
                     // Animated progress bar instead of decorative line
                     AnimatedBuilder(
@@ -233,7 +233,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       },
                     ),
 
-                    const Spacer(flex: 2), // Reduced to shift content up
+                    const Spacer(flex: 1), // Adjusted for massive logo
 
                     // Show loading indicator while checking auth status
                     if (_isLoading)
@@ -309,7 +309,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   // Clean logo without glow - stands confidently on its own
   Widget _buildCleanLogo() {
-    return const AfropeepLogo(size: 140); // Massive logo that displaces text
+    return const AfropeepLogo(size: 280); // Doubled size - hero element
   }
 
   // Animated progress bar

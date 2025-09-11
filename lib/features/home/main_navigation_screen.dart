@@ -165,24 +165,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         unselectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
         ),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(AppIcons.communities),
-            label: 'Communities',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(AppIcons.connect),
-            label: 'Connect',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(AppIcons.messages),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(AppIcons.profile),
-            label: 'Profile',
-          ),
-        ],
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.communities),
+                label: 'Communities',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.connect),
+                label: 'Connect',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.messages),
+                label: 'Messages',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(AppIcons.profile),
+                label: 'Profile',
+              ),
+            ],
       ),
     );
   }

@@ -33,7 +33,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         },
         backgroundColor: const Color(0xFF008037),
         foregroundColor: Colors.white,
-        icon: const Icon(AppIcons.createEvent),
+              icon: const Icon(AppIcons.createEvent),
         label: Text(
           'Create Event',
           style: GoogleFonts.montserrat(
@@ -77,11 +77,11 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             onPressed: () {
               Navigator.pushNamed(context, RouteName.culturalProfile);
             },
-            icon: const Icon(
-              AppIcons.profile,
-              color: Color(0xFF008037),
-              size: 28,
-            ),
+              icon: const Icon(
+                AppIcons.profile,
+                color: Color(0xFF008037),
+                size: 28,
+              ),
             tooltip: 'Your Cultural Profile',
           ),
         ],
@@ -191,10 +191,10 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             mainAxisSpacing: 12,
             childAspectRatio: 1.1, // Reduced from 1.2 to prevent overflow
             children: [
-              _buildActionCard('Events', 'Cultural celebrations', AppIcons.events, const Color(0xFF008037)),
-              _buildActionCard('Groups', 'Join communities', AppIcons.groups, const Color(0xFF6B46C1)),
-              _buildActionCard('Learning', 'Cultural stories', AppIcons.learning, const Color(0xFF059669)),
-              _buildActionCard('Network', 'Professional connections', AppIcons.networking, const Color(0xFFDC2626)),
+                        _buildActionCard('Events', 'Cultural celebrations', AppIcons.events, const Color(0xFF008037)),
+                        _buildActionCard('Groups', 'Join communities', AppIcons.groups, const Color(0xFF6B46C1)),
+                        _buildActionCard('Learning', 'Cultural stories', AppIcons.learning, const Color(0xFF059669)),
+                        _buildActionCard('Network', 'Professional connections', AppIcons.networking, const Color(0xFFDC2626)),
             ],
           ),
           const SizedBox(height: 20), // Add bottom padding

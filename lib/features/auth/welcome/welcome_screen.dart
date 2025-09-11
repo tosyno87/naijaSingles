@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/routes/route_name.dart';
 import '../../../common/widgets/afropeep_logo.dart';
+import '../../../common/constants/app_colors.dart';
 import '../auth_method/auth_method_selection_screen.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
 import 'widgets/rotating_greeting_widget.dart';
@@ -50,134 +51,108 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       statusBarColor: Colors.transparent,
     ));
 
-    // Define colors
-    const Color backgroundColor = Colors.white; // Clean white
-    const Color primaryColor = Color(0xFF008037); // Deep Green
-    const Color accentColor = Color(0xFFEF476F); // Warm coral red
-    const Color textColor = Color(0xFF3E1F0D); // Deep brown
-
-    final screenSize = MediaQuery.of(context).size;
+    // final screenSize = MediaQuery.of(context).size; // Available for future use
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(flex: 1),
+      body: Container(
+        decoration: BoxDecoration(
+          // Subtle Afrocentric pattern background
+          color: AppColors.backgroundColor,
+          image: DecorationImage(
+            image: const AssetImage('assets/images/african_pattern.png'),
+            fit: BoxFit.cover,
+            opacity: 0.03, // Very subtle pattern
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(flex: 1),
 
-              // Afropeep Logo
-              const AfropeepLogo(size: 80),
-              
-              const SizedBox(height: 16),
-              
-              // Stylized Afropeep text
-              Text(
-                "Afropeep",
-                style: GoogleFonts.poppins(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF4E2600), // Deep brown
-                  letterSpacing: 1.2,
-                ),
-              ),
-
-              // African pattern decorative element
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                width: 180,
-                height: 4,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF008037).withValues(alpha: 0.3),
-                      const Color(0xFF008037),
-                      const Color(0xFFEF476F),
-                      const Color(0xFFEF476F).withValues(alpha: 0.3),
-                    ],
+                // Enhanced Afropeep Logo with green glow
+                _buildEnhancedLogo(),
+                
+                const SizedBox(height: 24),
+                
+                // Stylized Afropeep text with Montserrat
+                Text(
+                  "Afropeep",
+                  style: GoogleFonts.montserrat(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    letterSpacing: 1.2,
+                    height: 1.2,
                   ),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Tagline instead of app name
-              Text(
-                "Connect Your African Soul",
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  fontStyle: FontStyle.italic,
-                  color: textColor.withValues(alpha: 0.8),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // Rotating greeting in African languages
-              const RotatingGreetingWidget(),
-
-              const SizedBox(height: 16),
-
-              // Tagline
-              Text(
-                "Connect Your Tribe From Anywhere",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: textColor,
-                ),
-              ),
-
-              const Spacer(flex: 2),
-
-              // Show loading indicator while checking auth status
-              if (_isLoading)
-                const CircularProgressIndicator(
-                  color: primaryColor,
                 ),
 
-              // Show different labelLarges based on authentication status
-              if (!_isLoading) ...[
-                // Continue to App labelLarge for authenticated users
-                if (_isAuthenticated)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
+                const SizedBox(height: 16),
+
+                // Animated progress bar instead of decorative line
+                _buildAnimatedProgressBar(),
+
+                const SizedBox(height: 32),
+
+                // Welcome message
+                Text(
+                  "Welcome to Afropeep, your journey to meaningful connections starts here.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.italic,
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Rotating greeting in African languages
+                const RotatingGreetingWidget(),
+
+                const SizedBox(height: 24),
+
+                // Main tagline
+                Text(
+                  "Connect Your Tribe From Anywhere",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                    height: 1.3,
+                  ),
+                ),
+
+                const Spacer(flex: 2),
+
+                // Show loading indicator while checking auth status
+                if (_isLoading)
+                  const CircularProgressIndicator(
+                    color: AppColors.primaryGreen,
+                  ),
+
+                // Show different buttons based on authentication status
+                if (!_isLoading) ...[
+                  // Continue to App button for authenticated users
+                  if (_isAuthenticated)
+                    _buildGradientButton(
+                      text: "Continue to App",
                       onPressed: () {
                         Navigator.pushReplacementNamed(
                             context, RouteName.mainNavigation);
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 2,
-                      ),
-                      child: Text(
-                        "Continue to App",
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ),
-                  ),
 
-                // Create Account and Login labelLarges for unauthenticated users
-                if (!_isAuthenticated) ...[
-                  // Create Account Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
+                  // Create Account and Login buttons for unauthenticated users
+                  if (!_isAuthenticated) ...[
+                    // Create Account Button
+                    _buildGradientButton(
+                      text: "Create Account",
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -187,31 +162,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 2,
-                      ),
-                      child: Text(
-                        "Create Account",
-                        style: GoogleFonts.montserrat(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Login Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: OutlinedButton(
+                    // Login Button
+                    _buildOutlinedButton(
+                      text: "Login",
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -221,27 +178,159 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           ),
                         );
                       },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: primaryColor,
-                        side: const BorderSide(color: primaryColor, width: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        "Login",
-                        style: GoogleFonts.montserrat(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
 
-              const SizedBox(height: 32),
-            ],
+                const SizedBox(height: 32),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Enhanced logo with green glow effect
+  Widget _buildEnhancedLogo() {
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            AppColors.primaryGreen.withOpacity(0.1),
+            AppColors.primaryGreen.withOpacity(0.05),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.7, 1.0],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryGreen.withOpacity(0.3),
+            blurRadius: 20,
+            spreadRadius: 5,
+          ),
+        ],
+      ),
+      child: Center(
+        child: Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.primaryGreen.withOpacity(0.3),
+              width: 2,
+            ),
+          ),
+          child: const AfropeepLogo(size: 60),
+        ),
+      ),
+    );
+  }
+
+  // Animated progress bar
+  Widget _buildAnimatedProgressBar() {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(seconds: 2),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Container(
+          width: 200,
+          height: 4,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(2),
+            color: AppColors.primaryGreen.withOpacity(0.2),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: value,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Gradient button with shadow and pulse effect
+  Widget _buildGradientButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 1500),
+      tween: Tween(begin: 0.95, end: 1.0),
+      builder: (context, scale, child) {
+        return Transform.scale(
+          scale: scale,
+          child: Container(
+            width: double.infinity,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: AppColors.buttonShadow,
+            ),
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: AppColors.textOnPrimary,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              child: Text(
+                text,
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Outlined button with green border
+  Widget _buildOutlinedButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: AppColors.primaryGreen,
+          width: 2,
+        ),
+      ),
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primaryGreen,
+          side: BorderSide.none,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.montserrat(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

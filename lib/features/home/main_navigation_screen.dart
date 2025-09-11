@@ -6,6 +6,7 @@ import 'package:naijasingles/features/messages/messages_screen.dart';
 import 'package:naijasingles/features/communities/ui/screens/communities_hub_screen.dart';
 import 'package:naijasingles/features/profile/cultural_profile_screen.dart';
 import 'package:naijasingles/debug/quick_analysis.dart';
+import 'package:naijasingles/common/constants/app_icons.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final bool backgroundTasksRunning;
@@ -166,19 +167,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.celebration),
+            icon: Icon(AppIcons.communities),
             label: 'Communities',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.handshake),
+            icon: Icon(AppIcons.connect),
             label: 'Connect',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.forum),
+            icon: Icon(AppIcons.messages),
             label: 'Messages',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
+            icon: Icon(AppIcons.profile),
             label: 'Profile',
           ),
         ],

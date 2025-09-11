@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/constants/app_icons.dart';
 
 class CommunitiesHubScreen extends StatefulWidget {
   const CommunitiesHubScreen({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         },
         backgroundColor: const Color(0xFF008037),
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add),
+        icon: const Icon(AppIcons.createEvent),
         label: Text(
           'Create Event',
           style: GoogleFonts.montserrat(
@@ -77,7 +78,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
               Navigator.pushNamed(context, RouteName.culturalProfile);
             },
             icon: const Icon(
-              Icons.account_circle,
+              AppIcons.profile,
               color: Color(0xFF008037),
               size: 28,
             ),
@@ -104,10 +105,10 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
       ),
       child: Row(
         children: [
-          _buildTab('discover', 'Discover', Icons.explore),
-          _buildTab('groups', 'Groups', Icons.groups),
-          _buildTab('learning', 'Learning', Icons.school),
-          _buildTab('networking', 'Network', Icons.business),
+          _buildTab('discover', 'Discover', AppIcons.discover),
+          _buildTab('groups', 'Groups', AppIcons.groupsTab),
+          _buildTab('learning', 'Learning', AppIcons.learningTab),
+          _buildTab('networking', 'Network', AppIcons.networkingTab),
         ],
       ),
     );
@@ -188,14 +189,15 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1.2,
+            childAspectRatio: 1.1, // Reduced from 1.2 to prevent overflow
             children: [
-              _buildActionCard('Events', 'Cultural celebrations', Icons.celebration, const Color(0xFF008037)),
-              _buildActionCard('Groups', 'Join communities', Icons.groups, const Color(0xFF6B46C1)),
-              _buildActionCard('Learning', 'Cultural stories', Icons.school, const Color(0xFF059669)),
-              _buildActionCard('Network', 'Professional connections', Icons.business, const Color(0xFFDC2626)),
+              _buildActionCard('Events', 'Cultural celebrations', AppIcons.events, const Color(0xFF008037)),
+              _buildActionCard('Groups', 'Join communities', AppIcons.groups, const Color(0xFF6B46C1)),
+              _buildActionCard('Learning', 'Cultural stories', AppIcons.learning, const Color(0xFF059669)),
+              _buildActionCard('Network', 'Professional connections', AppIcons.networking, const Color(0xFFDC2626)),
             ],
           ),
+          const SizedBox(height: 20), // Add bottom padding
         ],
       ),
     );

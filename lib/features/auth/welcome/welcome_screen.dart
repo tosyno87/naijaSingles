@@ -17,14 +17,92 @@ class WelcomeScreen extends StatefulWidget {
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with TickerProviderStateMixin {
   bool _isAuthenticated = false;
   bool _isLoading = true;
+  
+  late AnimationController _logoController;
+  late AnimationController _textController;
+  late AnimationController _buttonController;
+  
+  late Animation<double> _logoScale;
+  late Animation<double> _textOpacity;
+  late Animation<Offset> _buttonSlide;
+  late Animation<double> _backgroundOpacity;
 
   @override
   void initState() {
     super.initState();
     _checkAuthStatus();
+    _initializeAnimations();
+  }
+
+  void _initializeAnimations() {
+    // Logo pulse animation
+    _logoController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _logoScale = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _logoController,
+      curve: Curves.elasticOut,
+    ));
+
+    // Text fade-in animation
+    _textController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _textOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Button slide-in animation
+    _buttonController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    _buttonSlide = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _buttonController,
+      curve: Curves.easeOutBack,
+    ));
+
+    // Background pattern fade-in animation
+    _backgroundOpacity = Tween<double>(
+      begin: 0.0,
+      end: 0.02,
+    ).animate(CurvedAnimation(
+      parent: _textController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Start animations with delays
+    _logoController.forward();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _textController.forward();
+    });
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _buttonController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    _textController.dispose();
+    _buttonController.dispose();
+    super.dispose();
   }
 
   Future<void> _checkAuthStatus() async {
@@ -51,142 +129,202 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       statusBarColor: Colors.transparent,
     ));
 
-    // final screenSize = MediaQuery.of(context).size; // Available for future use
-
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          // Subtle Afrocentric pattern background
-          color: AppColors.backgroundColor,
-          image: DecorationImage(
-            image: const AssetImage('assets/images/african_pattern.png'),
-            fit: BoxFit.cover,
-            opacity: 0.03, // Very subtle pattern
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(flex: 1),
-
-                // Enhanced Afropeep Logo with green glow
-                _buildEnhancedLogo(),
-                
-                const SizedBox(height: 24),
-                
-                // Stylized Afropeep text with Montserrat
-                Text(
-                  "Afropeep",
-                  style: GoogleFonts.montserrat(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                    letterSpacing: 1.2,
-                    height: 1.2,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Animated progress bar instead of decorative line
-                _buildAnimatedProgressBar(),
-
-                const SizedBox(height: 32),
-
-                // Welcome message
-                Text(
-                  "Welcome to Afropeep, your journey to meaningful connections starts here.",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.textSecondary,
-                    height: 1.4,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Rotating greeting in African languages
-                const RotatingGreetingWidget(),
-
-                const SizedBox(height: 24),
-
-                // Main tagline
-                Text(
-                  "Connect Your Tribe From Anywhere",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                    height: 1.3,
-                  ),
-                ),
-
-                const Spacer(flex: 2),
-
-                // Show loading indicator while checking auth status
-                if (_isLoading)
-                  const CircularProgressIndicator(
-                    color: AppColors.primaryGreen,
-                  ),
-
-                // Show different buttons based on authentication status
-                if (!_isLoading) ...[
-                  // Continue to App button for authenticated users
-                  if (_isAuthenticated)
-                    _buildGradientButton(
-                      text: "Continue to App",
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, RouteName.mainNavigation);
-                      },
-                    ),
-
-                  // Create Account and Login buttons for unauthenticated users
-                  if (!_isAuthenticated) ...[
-                    // Create Account Button
-                    _buildGradientButton(
-                      text: "Create Account",
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const AuthMethodSelectionScreen(),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Login Button
-                    _buildOutlinedButton(
-                      text: "Login",
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const SignInMethodSelectionScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ],
-
-                const SizedBox(height: 32),
-              ],
+      body: AnimatedBuilder(
+        animation: _backgroundOpacity,
+        builder: (context, child) {
+          return Container(
+            decoration: BoxDecoration(
+              // Improved accessibility with darker base background
+              color: const Color(0xFFFDF0D6), // Slightly darker cream for better contrast
+              image: DecorationImage(
+                image: const AssetImage('assets/images/african_pattern.png'),
+                fit: BoxFit.cover,
+                opacity: _backgroundOpacity.value, // Animated opacity for polish
+              ),
             ),
-          ),
-        ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(flex: 1),
+
+                    // Enhanced Afropeep Logo with green glow and animation
+                    AnimatedBuilder(
+                      animation: _logoScale,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _logoScale.value,
+                          child: _buildEnhancedLogo(),
+                        );
+                      },
+                    ),
+                    
+                    const SizedBox(height: 32), // Increased spacing
+                    
+                    // Stylized Afropeep text with Montserrat and animation
+                    AnimatedBuilder(
+                      animation: _textOpacity,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _textOpacity.value,
+                          child: Text(
+                            "Afropeep",
+                            style: GoogleFonts.montserrat(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                              letterSpacing: 1.2,
+                              height: 1.2,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24), // Increased spacing
+
+                    // Animated progress bar instead of decorative line
+                    AnimatedBuilder(
+                      animation: _textOpacity,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _textOpacity.value,
+                          child: _buildAnimatedProgressBar(),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 40), // Increased spacing
+
+                    // Welcome message with animation
+                    AnimatedBuilder(
+                      animation: _textOpacity,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _textOpacity.value,
+                          child: Text(
+                            "Welcome to Afropeep, your journey to meaningful connections starts here.",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.italic,
+                              color: AppColors.textSecondary,
+                              height: 1.4,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24), // Increased spacing
+
+                    // Rotating greeting in African languages with animation
+                    AnimatedBuilder(
+                      animation: _textOpacity,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _textOpacity.value,
+                          child: const RotatingGreetingWidget(),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 32), // Increased spacing
+
+                    // Main tagline with animation
+                    AnimatedBuilder(
+                      animation: _textOpacity,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _textOpacity.value,
+                          child: Text(
+                            "Connect Your Tribe From Anywhere",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textPrimary,
+                              height: 1.3,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const Spacer(flex: 2),
+
+                    // Show loading indicator while checking auth status
+                    if (_isLoading)
+                      const CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                      ),
+
+                    // Show different buttons based on authentication status
+                    if (!_isLoading) ...[
+                      // Continue to App button for authenticated users
+                      if (_isAuthenticated)
+                        SlideTransition(
+                          position: _buttonSlide,
+                          child: _buildGradientButton(
+                            text: "Continue to App",
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, RouteName.mainNavigation);
+                            },
+                          ),
+                        ),
+
+                      // Create Account and Login buttons for unauthenticated users
+                      if (!_isAuthenticated) ...[
+                        // Create Account Button
+                        SlideTransition(
+                          position: _buttonSlide,
+                          child: _buildGradientButton(
+                            text: "Create Account",
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AuthMethodSelectionScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 20), // Increased spacing
+
+                        // Login Button
+                        SlideTransition(
+                          position: _buttonSlide,
+                          child: _buildOutlinedButton(
+                            text: "Login",
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SignInMethodSelectionScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
+
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

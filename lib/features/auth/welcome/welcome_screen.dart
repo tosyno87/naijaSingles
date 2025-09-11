@@ -135,8 +135,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         builder: (context, child) {
           return Container(
             decoration: BoxDecoration(
-              // Improved accessibility with darker base background
-              color: const Color(0xFFFDF0D6), // Slightly darker cream for better contrast
+              // Clean white background
+              color: Colors.white,
               image: DecorationImage(
                 image: const AssetImage('assets/images/african_pattern.png'),
                 fit: BoxFit.cover,

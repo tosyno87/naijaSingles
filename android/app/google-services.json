@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "888697307756",
+    "project_id": "naijasingles-74a75",
+    "storage_bucket": "naijasingles-74a75.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888697307756:android:a62a339c4079bebc704e49",
+        "android_client_info": {
+          "package_name": "com.app.naijasingles"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX7hxCR3XPWOShZu-vundYxocvQj_zH48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

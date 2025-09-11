@@ -1,0 +1,152 @@
+name: naijasingles
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+
+  cached_network_image: ^3.4.1   # Updated to latest
+  cloud_firestore: ^6.0.0        # Updated to latest
+  # Events Feature Dependencies
+  dio: ^5.3.2                    # HTTP client for API calls
+  pull_to_refresh: ^2.0.0        # Pull to refresh functionality
+  
+  cloud_functions: ^6.0.0        # Updated to latest
+  country_code_picker: ^3.3.0    # Updated to latest
+  crop_image: ^1.0.16            # Updated to latest
+  cupertino_icons: ^1.0.8        # Updated to latest
+  easy_localization: ^3.0.7+1    # Updated to latest
+  equatable: ^2.0.7              # Updated to latest
+  firebase_auth: ^6.0.1          # Updated to latest
+  firebase_core: ^4.0.0         # Updated to latest
+  firebase_messaging: ^16.0.0    # Updated to latest
+  firebase_storage: ^13.0.0      # Updated to latest
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1           # Upgraded from 8.1.6
+  flutter_local_notifications: ^19.4.1 # Added for enhanced notifications
+  google_api_headers: ^4.5.2     # Updated to latest headers
+  flutter_flushbar: ^0.0.2       # Kept at 0.0.2
+  google_sign_in: ^6.1.6
+  animated_text_kit: ^4.2.2     # Added for rotating greetings
+  swipe_cards: ^2.0.0+1          # Added for Explore screen
+  flutter_image_compress: ^2.4.0 # Updated to latest
+  flutter_swiper_null_safety: ^1.0.2 # Kept at 1.0.2
+  fluttertoast: ^8.2.12          # Updated to latest
+  font_awesome_flutter: ^10.8.0  # Updated to latest
+  google_maps_flutter: ^2.12.2   # Updated to latest
+  image: ^4.5.4                  # Updated to latest
+  image_picker: ^1.1.2           # Updated to latest
+  image_cropper: ^9.1.0          # Added image_cropper
+  in_app_purchase: ^3.2.3        # Updated to latest
+  in_app_purchase_storekit: ^0.4.2 # Updated for latest iOS IAP
+  in_app_purchase_android: ^0.4.0+2 # Updated for latest Android IAP
+  intl: ^0.20.2                  # Latest stable
+  location: ^8.0.0               # Updated from 7.0.0
+  geolocator: ^14.0.2            # Added for GPS location
+  geocoding: ^4.0.0              # Added for address lookup
+  url_launcher: ^6.3.1           # Added for launching URLs and phone calls
+  rflutter_alert: ^2.0.7         # Kept at 2.0.7
+  otp_autofill: ^4.1.0           # Updated from 3.0.2
+  path_provider: ^2.1.5          # Updated to latest
+  permission_handler: ^12.0.1
+  flutter_secure_storage: ^9.2.2
+  pin_code_fields: ^8.0.1        # Kept at 8.0.1
+  provider: ^6.1.5               # Updated to latest
+  share_plus: ^11.0.0           # Updated to latest
+  shared_preferences: ^2.5.3     # Updated to latest
+  shimmer: ^3.0.0                # Kept at 3.0.0
+  swipable_stack: ^2.0.0         # Kept at 2.0.0
+  uuid: ^4.5.1                   # Updated to latest
+  webview_flutter: ^4.13.0       # Updated to latest
+  http: ^1.4.0
+  google_fonts: ^6.2.1
+  flutter_google_places_hoc081098: ^2.0.0
+  flutter_facebook_auth: ^7.1.2
+  flutter_svg: ^2.2.0
+
+dev_dependencies:
+  flutter_launcher_icons: "^0.14.4" # Updated launcher icons
+  flutter_lints: ^6.0.0
+  device_preview: ^1.2.0            # Upgraded from 1.1.0
+  flutter_native_splash: ^2.4.6     # Updated to latest
+  flutter_test:
+    sdk: flutter
+  bloc_test: ^10.0.0
+  integration_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  mockito: ^5.4.4                   # Added mockito
+  fake_cloud_firestore: ^4.0.0
+  firebase_auth_mocks: ^0.15.0
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "asset/Icon/icon.png"
+  min_sdk_android: 21
+
+flutter_native_splash:
+  color: "ff3a5a"
+  image: "asset/splash.png"
+
+dependency_overrides:
+  js: ^0.7.2
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+# The following section is specific to Flutter packages.
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  assets:
+    - asset/auth/
+    - asset/
+    - asset/Icon/
+    - asset/translation/
+    - asset/images/
+    - assets/images/
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro

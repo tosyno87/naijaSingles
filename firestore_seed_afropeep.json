@@ -1,0 +1,45 @@
+{
+  "chatThreads": {
+    "9b495eb4-297d-4dcc-a0f7-0c7234060ebf": {
+      "userIds": [
+        "test_user_1",
+        "test_user_2"
+      ],
+      "lastUpdated": "2025-06-22T20:07:42.906714Z",
+      "users": [
+        {
+          "id": "test_user_1",
+          "name": "Amahle Okoro",
+          "photoUrl": "https://example.com/photo1.jpg"
+        },
+        {
+          "id": "test_user_2",
+          "name": "Kwame Mensah",
+          "photoUrl": "https://example.com/photo2.jpg"
+        }
+      ]
+    }
+  },
+  "chatThreads/9b495eb4-297d-4dcc-a0f7-0c7234060ebf/messages": {
+    "27d29302-91e6-4e4d-9c62-ef995f2d4902": {
+      "senderId": "test_user_1",
+      "content": "Hey Kwame, how's your week going?",
+      "timestamp": "2025-06-22T20:02:42.906714Z"
+    },
+    "be759c60-5457-440b-81d3-7b551bbfd96e": {
+      "senderId": "test_user_2",
+      "content": "Hi Amahle! Busy but good. You?",
+      "timestamp": "2025-06-22T20:07:42.906714Z"
+    }
+  },
+  "users": {
+    "test_user_1": {
+      "name": "Amahle Okoro",
+      "photoUrl": "https://example.com/photo1.jpg"
+    },
+    "test_user_2": {
+      "name": "Kwame Mensah",
+      "photoUrl": "https://example.com/photo2.jpg"
+    }
+  }
+}

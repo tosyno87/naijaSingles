@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afropeep - Connect Your African Soul</title>
+    <meta name="description" content="Afropeep is the premier dating and networking platform for Africans worldwide. Connect your tribe from anywhere - Dating, Friendship, and Business networking.">
+    <meta name="keywords" content="African dating, Nigerian singles, African networking, dating app, friendship app, business networking">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Afropeep - Connect Your African Soul">
+    <meta property="og:description" content="The premier dating and networking platform for Africans worldwide. Connect your tribe from anywhere.">
+    <meta property="og:image" content="https://naijasingles-74a75.web.app/assets/afropeep-hero.jpg">
+    <meta property="og:url" content="https://naijasingles-74a75.web.app">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Afropeep - Connect Your African Soul">
+    <meta name="twitter:description" content="The premier dating and networking platform for Africans worldwide.">
+    <meta name="twitter:image" content="https://naijasingles-74a75.web.app/assets/afropeep-hero.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Afropeep Brand Colors from Cultural Guidelines */
+            --african-gold: #FFD700;
+            --african-green: #228B22;
+            --african-red: #DC143C;
+            --earth-brown: #8B4513;
+            --royal-purple: #663399;
+            --warm-orange: #FF8C00;
+            --deep-blue: #191970;
+            --cream-white: #FFF8DC;
+            
+            /* App Theme Colors */
+            --primary-green: #008037;
+            --accent-coral: #E74C3C;
+            --background-cream: #FFF6E5;
+            
+            /* Light Theme Colors for Cream Background */
+            --dark-bg: #0F0F23;
+            --card-bg: #FFF6E5;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border-color: rgba(0, 128, 55, 0.1);
+            
+            /* Afropeep Gradients */
+            --gradient-primary: linear-gradient(135deg, #008037 0%, #E74C3C 100%);
+            --gradient-african: linear-gradient(135deg, #228B22 0%, #FFD700 50%, #DC143C 100%);
+            --gradient-warm: linear-gradient(135deg, #FF8C00 0%, #FFD700 100%);
+            --gradient-dark: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--background-cream);
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: #FFF6E5;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(0, 128, 55, 0.1);
+            padding: 16px 32px;
+        }
+        
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #008037 0%, rgba(0, 128, 55, 0.3) 50%, #008037 100%);
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0;
+            min-height: 100px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            margin-right: 2rem;
+        }
+        
+        .logo img {
+            height: 72px;
+            width: auto;
+            object-fit: contain;
+            filter: none;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-text {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-afro {
+            background: var(--gradient-african);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .logo-peep {
+            background: var(--gradient-african);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .afropeep-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 128, 55, 0.3);
+        }
+        
+        .logo-footprint {
+            width: 18px;
+            height: 18px;
+            background: #000;
+            clip-path: polygon(
+                50% 0%, 60% 20%, 70% 30%, 75% 45%, 80% 60%, 75% 75%, 
+                70% 85%, 60% 90%, 50% 95%, 40% 90%, 30% 85%, 25% 75%, 
+                20% 60%, 25% 45%, 30% 30%, 40% 20%
+            );
+        }
+        
+        .logo-bubbles {
+            position: absolute;
+            top: -6px;
+            left: -8px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .bubble {
+            background: #90EE90;
+            border-radius: 50%;
+            opacity: 0.9;
+        }
+        
+        .bubble-1 {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .bubble-2 {
+            width: 4px;
+            height: 4px;
+        }
+        
+        .bubble-3 {
+            width: 3px;
+            height: 3px;
+        }
+        
+        .logo-text {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 600;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .logo-a, .logo-fr, .logo-o {
+            color: #9ACD32;
+            font-weight: 600;
+        }
+        
+        .logo-p, .logo-e, .logo-e2, .logo-p2 {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #008037;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: linear-gradient(135deg, #FFF6E5 0%, #FFF8F0 100%);
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23FF6B9D" stop-opacity="0.1"/><stop offset="100%" stop-color="%238B5CF6" stop-opacity="0.05"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23a)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-text {
+            max-width: 600px;
+        }
+        
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #008037 0%, #8B4513 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+        
+        .hero .tagline {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            line-height: 1.7;
+        }
+        
+        /* Download Buttons */
+        .download-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin: 3rem auto;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 400px;
+            padding: 0 1rem;
+        }
+        
+        .download-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            max-width: 200px;
+            min-height: 60px;
+            position: relative;
+            overflow: visible;
+            background: #000;
+            color: white;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            flex: 1;
+        }
+        
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .download-btn:hover::before {
+            left: 100%;
+        }
+        
+        .download-btn:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .download-btn.apple {
+            background: #000;
+            color: white;
+            border: 2px solid #333;
+        }
+        
+        .download-btn.google {
+            background: #4285F4;
+            color: white;
+            border: 2px solid #5A95F5;
+        }
+        
+        .download-btn.coming-soon {
+            background: linear-gradient(135deg, #374151 0%, #4B5563 100%);
+            color: var(--text-secondary);
+            border: 2px solid #6B7280;
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .download-btn.coming-soon::after {
+            content: 'Coming Soon';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            width: 100%;
+            justify-content: flex-start;
+        }
+        
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .btn-icon svg {
+            max-height: 24px;
+            max-width: 24px;
+            width: auto;
+            height: auto;
+        }
+        
+        .btn-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .btn-label {
+            font-size: 0.625rem;
+            opacity: 0.9;
+            line-height: 1;
+            margin-bottom: 0.1rem;
+            font-weight: 400;
+            letter-spacing: 0.025em;
+        }
+        
+        .btn-store {
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1;
+            letter-spacing: 0.025em;
+        }
+        
+        
+        .download-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .download-btn .btn-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .download-btn .btn-text .small {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .download-btn .btn-text .large {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        /* Hero Images */
+        .hero-images {
+            position: relative;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-image {
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 128, 55, 0.15);
+            background: transparent;
+        }
+        
+        .hero-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 128, 55, 0.25);
+        }
+        
+        .hero-image.main {
+            width: 400px;
+            height: 500px;
+            margin: 0 20px;
+        }
+        
+        .hero-image.secondary {
+            width: 300px;
+            height: 400px;
+            margin: 0 20px;
+        }
+        
+        .hero-image.tertiary {
+            width: 250px;
+            height: 350px;
+            margin: 0 20px;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 8rem 2rem;
+            background: var(--background-cream);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-african);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+        }
+        
+        .feature-card {
+            background: var(--card-bg);
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 128, 55, 0.08);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-african);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            border-color: var(--primary-pink);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-african);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+        
+        .feature-image {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-content {
+            padding: 0 2rem 2rem;
+        }
+        
+        /* Modes Section */
+        .modes {
+            padding: 8rem 2rem;
+            background: var(--background-cream);
+        }
+        
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+        
+        .mode-card {
+            background: var(--card-bg);
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 128, 55, 0.08);
+        }
+        
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-secondary);
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+        
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .mode-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .mode-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+
+        /* Stats Section */
+        .stats {
+            padding: 8rem 2rem;
+            background: var(--background-cream);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 2rem;
+        }
+        
+        .stat-item h3 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-item p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--background-cream);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            padding: 1rem;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .social-links a:hover {
+            color: var(--text-primary);
+            background: var(--gradient-primary);
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            /* Fix mobile scrolling issues */
+            html {
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
+            
+            body {
+                -webkit-overflow-scrolling: touch;
+                overflow-x: hidden;
+            }
+            
+            /* Improve touch scrolling */
+            .hero-images {
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+            }
+            
+            /* Disable hover effects on mobile */
+            .hero-image:hover {
+                transform: none;
+            }
+            
+            .feature-card:hover {
+                transform: none;
+            }
+            
+            .mode-card:hover {
+                transform: none;
+            }
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero .tagline {
+                font-size: 1.2rem;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                max-width: 300px;
+                margin: 2rem auto;
+            }
+            
+            .download-btn {
+                min-width: 160px;
+                max-width: 180px;
+                padding: 12px 1.25rem;
+                min-height: 52px;
+            }
+            
+            .btn-icon svg {
+                max-height: 20px;
+                max-width: 20px;
+            }
+            
+            .nav {
+                padding: 0;
+                min-height: 80px;
+            }
+            
+            .header {
+                padding: 12px 16px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .logo {
+                padding: 0.5rem 0.5rem;
+                margin-right: 1rem;
+            }
+            
+            .logo img {
+                height: 60px;
+                width: auto;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-images {
+                height: auto;
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px 0;
+            }
+            
+            .hero-image.main {
+                width: 100%;
+                max-width: 300px;
+                height: 300px;
+                margin: 0 auto;
+            }
+            
+            .hero-image.secondary {
+                width: 100%;
+                max-width: 280px;
+                height: 280px;
+                margin: 0 auto;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Scroll animations */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+        <div class="logo">
+            <img src="afropeep-logo.png" alt="Afropeep Logo" style="height: 100px; width: auto;">
+        </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#modes">Modes</a></li>
+                <li><a href="#stats">Community</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text fade-in-up">
+                <h1>Connect Your African Soul</h1>
+                <p class="tagline">Find Love, Build Friendships, Grow Your Network</p>
+                <p class="subtitle">Join thousands of Africans worldwide who are finding meaningful connections through Afropeep. Whether you're looking for romance, friendship, or business opportunities, your perfect match is waiting.</p>
+                
+                <div class="download-buttons">
+                    <a href="#" class="download-btn app-store">
+                        <div class="btn-content">
+                            <div class="btn-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                                </svg>
+                            </div>
+                            <div class="btn-text">
+                                <span class="btn-label">Download on the</span>
+                                <span class="btn-store">App Store</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="download-btn google-play">
+                        <div class="btn-content">
+                            <div class="btn-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3.609 1.814L13.792 12L3.609 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L12.5 12l5.198-3.291zM5.864 2.658L16.802 8.99l-2.302 2.302-8.636-8.634z" fill="#EA4335"/>
+                                    <path d="M16.802 8.99L5.864 2.658l8.636 8.634 2.302-2.302z" fill="#FBBC04"/>
+                                    <path d="M12.5 12l5.198 3.291-2.808 1.626L12.5 12z" fill="#34A853"/>
+                                    <path d="M12.5 12l-5.198-3.291L5.864 2.658l8.636 8.634L12.5 12z" fill="#4285F4"/>
+                                </svg>
+                            </div>
+                            <div class="btn-text">
+                                <span class="btn-label">GET IT ON</span>
+                                <span class="btn-store">Google Play</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    <i class="fas fa-rocket"></i> 
+                    Mobile app launching soon! Join our exclusive waitlist for early access.
+                </p>
+            </div>
+            
+            <div class="hero-images">
+                <div class="hero-image main">
+                    <img src="hero-couple.jpg?v=2" 
+                         alt="Happy Black couple laughing and connecting" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                </div>
+                <div class="hero-image secondary">
+                    <img src="promo-image.jpg?v=3" 
+                         alt="Beautiful Black woman smiling" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Why Choose Afropeep?</h2>
+            <p class="section-subtitle scroll-reveal">Experience the future of African social networking</p>
+            <div class="features-grid">
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-image">
+                        <img src="authentic-connections.jpg" 
+                             alt="Authentic African connections and relationships" 
+                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Authentic Connections</h3>
+                        <p>Connect with genuine African singles who share your values, culture, and aspirations. Our advanced matching algorithm ensures you meet people who truly understand your background.</p>
+                    </div>
+                </div>
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Safe & Secure</h3>
+                    <p>Your privacy and safety are our top priorities. Advanced verification, photo verification, and 24/7 moderation keep our community secure and authentic.</p>
+                </div>
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe-africa"></i>
+                    </div>
+                    <h3>Global Community</h3>
+                    <p>Connect with Africans worldwide - from Lagos to London, from Accra to Atlanta. Your tribe is everywhere, and we help you find them.</p>
+                </div>
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Modern Experience</h3>
+                    <p>Designed for modern mobile users with intuitive swiping, instant messaging, video calls, and real-time notifications that keep you connected.</p>
+                </div>
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-image">
+                        <img src="events-meetups.jpg" 
+                             alt="African cultural events and meetups celebration" 
+                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px;">
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3>Events & Meetups</h3>
+                        <p>Discover and attend African cultural events, networking meetups, and social gatherings in your area. Build real connections beyond the app.</p>
+                    </div>
+                </div>
+                <div class="feature-card scroll-reveal">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Premium Features</h3>
+                    <p>Unlock advanced filters, see who liked you, get priority in search results, and access exclusive events with our premium membership.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modes Section -->
+    <section class="modes" id="modes">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Three Ways to Connect</h2>
+            <p class="section-subtitle scroll-reveal">Choose your journey, find your people</p>
+            <div class="modes-grid">
+                <div class="mode-card scroll-reveal">
+                    <div class="mode-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Dating</h3>
+                    <p>Find your perfect match with our advanced compatibility algorithm. Swipe through profiles, send likes, and start meaningful conversations that could lead to lasting love.</p>
+                </div>
+                <div class="mode-card scroll-reveal">
+                    <div class="mode-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Friendship</h3>
+                    <p>Build lasting friendships with like-minded Africans. Share interests, attend events together, and expand your social circle with people who get you.</p>
+                </div>
+                <div class="mode-card scroll-reveal">
+                    <div class="mode-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3>Business</h3>
+                    <p>Network with African professionals and entrepreneurs. Find business partners, mentors, career opportunities, and grow your professional network.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Stats Section -->
+    <section class="stats" id="stats">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Join Our Growing Community</h2>
+            <div class="stats-grid">
+                <div class="stat-item scroll-reveal">
+                    <h3>25K+</h3>
+                    <p>Active Users</p>
+                </div>
+                <div class="stat-item scroll-reveal">
+                    <h3>50+</h3>
+                    <p>Countries</p>
+                </div>
+                <div class="stat-item scroll-reveal">
+                    <h3>5K+</h3>
+                    <p>Successful Matches</p>
+                </div>
+                <div class="stat-item scroll-reveal">
+                    <h3>200+</h3>
+                    <p>Events Hosted</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="#support">Support</a>
+                <a href="#about">About Us</a>
+                <a href="#careers">Careers</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Afropeep. All rights reserved.</p>
+                <p style="margin-top: 1rem;">
+                    Made with <i class="fas fa-heart" style="color: #FF6B9D;"></i> for the African diaspora worldwide
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect - optimized for mobile
+        let ticking = false;
+        function updateHeader() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            ticking = false;
+        }
+        
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(updateHeader);
+                ticking = true;
+            }
+        });
+
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add loading animation to buttons
+        document.querySelectorAll('.download-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (this.classList.contains('coming-soon')) {
+                    e.preventDefault();
+                    // Add a subtle animation to show it's coming soon
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+
+        // Add parallax effect to hero images - mobile optimized
+        let parallaxTicking = false;
+        function updateParallax() {
+            const scrolled = window.pageYOffset;
+            const heroImages = document.querySelectorAll('.hero-image');
+            
+            // Disable parallax on mobile for better performance
+            if (window.innerWidth <= 768) {
+                heroImages.forEach(img => {
+                    img.style.transform = 'none';
+                });
+                parallaxTicking = false;
+                return;
+            }
+            
+            heroImages.forEach((img, index) => {
+                const speed = 0.5 + (index * 0.1);
+                img.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+            parallaxTicking = false;
+        }
+        
+        window.addEventListener('scroll', function() {
+            if (!parallaxTicking) {
+                requestAnimationFrame(updateParallax);
+                parallaxTicking = true;
+            }
+        });
+    </script>
+</body>
+</html>

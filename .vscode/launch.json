@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Afropeep • iOS Simulator",
+        "type": "dart",
+        "request": "launch",
+        "program": "lib/main.dart",
+        "toolArgs": ["-d", "ios"]
+      },
+      {
+        "name": "Afropeep • Android Emulator",
+        "type": "dart",
+        "request": "launch",
+        "program": "lib/main.dart",
+        "toolArgs": ["-d", "android"]
+      },
+      {
+        "name": "Afropeep • iOS (Profile mode)",
+        "type": "dart",
+        "request": "launch",
+        "program": "lib/main.dart",
+        "toolArgs": ["-d", "ios"],
+        "flutterMode": "profile"
+      },
+      {
+        "name": "Afropeep • iOS (Release mode)",
+        "type": "dart",
+        "request": "launch",
+        "program": "lib/main.dart",
+        "toolArgs": ["-d", "ios"],
+        "flutterMode": "release"
+      }
+    ]
+  }

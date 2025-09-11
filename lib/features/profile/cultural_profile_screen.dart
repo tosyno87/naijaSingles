@@ -226,14 +226,17 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Custom3DIcons.culturalHeritage(size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  _userData?['culturalHeritage']?.toString() ?? 'Cultural Community Member',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                Custom3DIcons.culturalHeritage(size: 18),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    _userData?['culturalHeritage']?.toString() ?? 'Cultural Community Member',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

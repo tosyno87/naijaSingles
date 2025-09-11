@@ -16,7 +16,7 @@ class AfropeepLogo extends StatelessWidget {
       width: size,
       height: size,
       child: Image.asset(
-        'assets/images/logo.png', // Using transparent logo version
+        'assets/images/afropeep_logo_transparent.png', // Using correct transparent logo
         width: size,
         height: size,
         fit: BoxFit.contain,

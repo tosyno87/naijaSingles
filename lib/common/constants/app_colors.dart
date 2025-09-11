@@ -19,10 +19,10 @@ class AppColors {
   static const Color gradientDark = Color(0xFF006B2E);
 
   // 🎯 BACKGROUND COLORS
-  static const Color backgroundColor = Color(0xFFF8FAFC);
+  static const Color backgroundColor = Colors.white;
   static const Color surfaceColor = Colors.white;
   static const Color cardColor = Colors.white;
-  static const Color overlayColor = Color(0xFFF1F5F9);
+  static const Color overlayColor = Color(0xFFF8FAFC);
 
   // 📝 TEXT COLORS
   static const Color textPrimary = Color(0xFF1E293B);

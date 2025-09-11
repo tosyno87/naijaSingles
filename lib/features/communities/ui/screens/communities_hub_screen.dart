@@ -17,7 +17,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [

@@ -25,7 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // MVP color scheme (matching profile_screen.dart)
-  static const Color backgroundColor = Color(0xFFFDF1E7); // Warm cream
+  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor =
       Color(0xFF008037); // Deep green (afropeepGreen)
   static const Color cardColor = Color(0xFFFFFBF5); // Light cream for cards

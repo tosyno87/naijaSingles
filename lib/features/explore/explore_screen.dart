@@ -14,7 +14,7 @@ import 'package:naijasingles/services/super_like_service.dart';
 import 'package:naijasingles/services/undo_service.dart';
 
 // Afropeep MVP Color Scheme
-const Color kBackgroundColor = Color(0xFFFFF6E5); // Light cream
+const Color kBackgroundColor = Colors.white; // Clean white
 const Color kPrimaryColor = Color(0xFF008037); // Deep green
 const Color kTextPrimary = Color(0xFF5D4037); // Brown
 const Color kTextSecondary = Color(0xFF444444); // Dark gray

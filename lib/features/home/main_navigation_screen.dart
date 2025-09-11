@@ -73,6 +73,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       // The body will switch between screens based on the selected index
       body: Stack(
         children: [

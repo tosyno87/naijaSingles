@@ -47,7 +47,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
   ];
 
   // Afropeep colors
-  static const Color backgroundColor = Color(0xFFFFF6E5);
+  static const Color backgroundColor = Colors.white;
   static const Color primaryGreen = Color(0xFF008037);
   static const Color textGray = Color(0xFF666666);
   static const Color textDark = Color(0xFF333333);

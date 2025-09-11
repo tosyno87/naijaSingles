@@ -51,7 +51,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     ));
 
     // Define colors
-    const Color backgroundColor = Color(0xFFFFF6E5); // Warm cream/beige
+    const Color backgroundColor = Colors.white; // Clean white
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color accentColor = Color(0xFFEF476F); // Warm coral red
     const Color textColor = Color(0xFF3E1F0D); // Deep brown

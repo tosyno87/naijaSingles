@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 /// Shared styling constants for the onboarding flow
 class OnboardingStyles {
   // Colors
-  static const Color backgroundColor = Color(0xFFFDF6EC);
+  static const Color backgroundColor = Colors.white;
   static const Color primaryColor = Color(0xFF27AE60);
   static const Color accentColor = Color(0xFFE57C23);
   static const Color textDarkColor = Color(0xFF3C2A21);

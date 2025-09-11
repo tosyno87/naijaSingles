@@ -74,7 +74,7 @@ class _AdditionalPreferencesScreenState
     final isTablet = screenWidth > 600;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF1E7),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

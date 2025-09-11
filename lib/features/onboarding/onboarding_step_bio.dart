@@ -94,7 +94,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   // Show age picker modal
   void _showAgePickerModal(BuildContext context) {
     // Define the cream background color for consistency
-    const Color backgroundColor = Color(0xFFFDF6EC);
+    const Color backgroundColor = Colors.white;
     const Color deepGreen = Color(0xFF008037);
 
     showModalBottomSheet(

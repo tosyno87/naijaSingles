@@ -48,7 +48,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     // Define colors
-    const Color backgroundColor = Color(0xFFFFF6E5); // Warm cream/beige
+    const Color backgroundColor = Colors.white; // Clean white
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color accentColor = Color(0xFFE74C3C); // Coral Red
     const Color textColor = Color(0xFF333333);

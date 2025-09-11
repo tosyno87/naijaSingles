@@ -104,7 +104,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
   @override
   Widget build(BuildContext context) {
     // Background color for the dating screens
-    const Color backgroundColor = Color(0xFFFDF6EC);
+    const Color backgroundColor = Colors.white;
 
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);

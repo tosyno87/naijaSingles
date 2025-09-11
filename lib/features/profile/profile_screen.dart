@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       PageController(); // Control photo swiping
 
   // Afrocentric color scheme
-  static const Color backgroundColor = Color(0xFFFDF1E7); // Warm cream
+  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFBF5); // Light cream for cards
   static final Color textPrimary = Colors.brown.shade800;

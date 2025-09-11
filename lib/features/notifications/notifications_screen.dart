@@ -96,7 +96,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     // Background color for the app
-    const Color backgroundColor = Color(0xFFFDF6EC);
+    const Color backgroundColor = Colors.white;
 
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);

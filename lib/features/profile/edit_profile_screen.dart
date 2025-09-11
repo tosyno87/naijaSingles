@@ -89,7 +89,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   // Define colors based on Afropeep MVP
-  final Color backgroundColor = const Color(0xFFFDF1E7); // Cream background
+  final Color backgroundColor = Colors.white; // Clean white background
   final Color primaryColor = const Color(0xFF008037); // Afropeep green
   final Color textColor = Colors.black87;
   final Color errorColor = Colors.red.shade700;

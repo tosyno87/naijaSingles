@@ -112,7 +112,7 @@ class _OnboardingDataVerificationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF1E7),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'Onboarding Data Verification',

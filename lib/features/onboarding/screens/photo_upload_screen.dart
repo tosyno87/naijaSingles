@@ -13,7 +13,7 @@ class PhotoUploadScreen extends StatefulWidget {
 
 class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   // Afropeep MVP theme colors
-  static const Color backgroundColor = Color(0xFFFDF0E7);
+  static const Color backgroundColor = Colors.white;
   static const Color afropeepGreen = Color(0xFF007A33);
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);

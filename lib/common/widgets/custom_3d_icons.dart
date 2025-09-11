@@ -696,4 +696,71 @@ class Custom3DIcons {
       ),
     );
   }
+
+  // 🌍 CULTURAL & COMMUNITY ICONS
+  static Widget culture({double size = 24, Color? color}) => _build3DIcon(
+    Icons.public_rounded,
+    size: size,
+    color: color ?? const Color(0xFF8D6E63),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF8D6E63), Color(0xFF5D4037)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget translate({double size = 24, Color? color}) => _build3DIcon(
+    Icons.translate_rounded,
+    size: size,
+    color: color ?? const Color(0xFF2196F3),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget message({double size = 24, Color? color}) => _build3DIcon(
+    Icons.chat_bubble_outline_rounded,
+    size: size,
+    color: color ?? const Color(0xFF2196F3),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget save({double size = 24, Color? color}) => _build3DIcon(
+    Icons.bookmark_outline_rounded,
+    size: size,
+    color: color ?? const Color(0xFFFF9800),
+    gradient: const LinearGradient(
+      colors: [Color(0xFFFF9800), Color(0xFFF57C00)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget block({double size = 24, Color? color}) => _build3DIcon(
+    Icons.block_rounded,
+    size: size,
+    color: color ?? const Color(0xFFF44336),
+    gradient: const LinearGradient(
+      colors: [Color(0xFFF44336), Color(0xFFD32F2F)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget filter({double size = 24, Color? color}) => _build3DIcon(
+    Icons.tune_rounded,
+    size: size,
+    color: color ?? const Color(0xFF9E9E9E),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF9E9E9E), Color(0xFF757575)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
 }

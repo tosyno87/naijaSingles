@@ -162,7 +162,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       },
                     ),
                     
-                    const SizedBox(height: 32), // Increased spacing
+                    const SizedBox(height: 20), // Tightened spacing
                     
                     // Stylized Afropeep text with Montserrat and animation
                     AnimatedBuilder(
@@ -338,17 +338,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: [
-            AppColors.primaryGreen.withOpacity(0.1),
             AppColors.primaryGreen.withOpacity(0.05),
+            AppColors.primaryGreen.withOpacity(0.02),
             Colors.transparent,
           ],
-          stops: const [0.0, 0.7, 1.0],
+          stops: const [0.0, 0.6, 1.0],
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGreen.withOpacity(0.3),
-            blurRadius: 20,
-            spreadRadius: 5,
+            color: AppColors.primaryGreen.withOpacity(0.15),
+            blurRadius: 12,
+            spreadRadius: 2,
           ),
         ],
       ),
@@ -359,7 +359,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.primaryGreen.withOpacity(0.3),
+              color: AppColors.primaryGreen.withOpacity(0.2),
               width: 2,
             ),
           ),
@@ -377,10 +377,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       builder: (context, value, child) {
         return Container(
           width: 200,
-          height: 4,
+          height: 2,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(2),
-            color: AppColors.primaryGreen.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(1),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primaryGreen.withOpacity(0.1),
+                AppColors.primaryGreen.withOpacity(0.3),
+                AppColors.primaryGreen.withOpacity(0.1),
+              ],
+            ),
           ),
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
@@ -388,7 +394,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             child: Container(
               decoration: BoxDecoration(
                 gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(1),
               ),
             ),
           ),

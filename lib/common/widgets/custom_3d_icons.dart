@@ -175,6 +175,39 @@ class Custom3DIcons {
     ),
   );
 
+  static Widget edit({double size = 24, Color? color}) => _build3DIcon(
+    Icons.edit_rounded,
+    size: size,
+    color: color ?? const Color(0xFF2196F3),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget location({double size = 24, Color? color}) => _build3DIcon(
+    Icons.location_on_rounded,
+    size: size,
+    color: color ?? const Color(0xFF4CAF50),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget age({double size = 24, Color? color}) => _build3DIcon(
+    Icons.cake_rounded,
+    size: size,
+    color: color ?? const Color(0xFFE91E63),
+    gradient: const LinearGradient(
+      colors: [Color(0xFFE91E63), Color(0xFFC2185B)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
   static Widget notification({double size = 24, Color? color}) => _build3DIcon(
     Icons.notifications_rounded,
     size: size,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../common/widgets/custom_3d_icons.dart';
 
 class CulturalProfileScreen extends StatefulWidget {
   const CulturalProfileScreen({Key? key}) : super(key: key);
@@ -17,12 +18,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
 
-  // Afrocentric color scheme
-  static const Color backgroundColor = Color(0xFFFDF1E7);
+  // Modern Afrocentric color scheme
+  static const Color backgroundColor = Color(0xFFF8FAFC);
   static const Color primaryColor = Color(0xFF008037);
-  static const Color cardColor = Color(0xFFFFFBF5);
-  static final Color textPrimary = Colors.brown.shade800;
-  static final Color textSecondary = Colors.brown.shade600;
+  static const Color cardColor = Colors.white;
+  static const Color textPrimary = Color(0xFF1E293B);
+  static const Color textSecondary = Color(0xFF64748B);
+  static const Color gradientStart = Color(0xFF008037);
+  static const Color gradientEnd = Color(0xFF059669);
 
   @override
   void initState() {
@@ -56,24 +59,40 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [gradientStart, gradientEnd],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         title: Text(
           'Cultural Profile',
           style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(Icons.edit, color: textPrimary),
-            onPressed: () {
-              // Navigate to edit cultural profile
-            },
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: Custom3DIcons.edit(size: 20),
+              onPressed: () {
+                // Navigate to edit cultural profile
+              },
+            ),
           ),
         ],
       ),
@@ -124,21 +143,22 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     final mainPhoto = photos.isNotEmpty ? photos[0] : null;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            primaryColor.withOpacity(0.1),
-            const Color(0xFF8B4513).withOpacity(0.1),
-          ],
+          colors: [gradientStart, gradientEnd],
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: primaryColor.withOpacity(0.3),
-          width: 2,
-        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -149,14 +169,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: primaryColor,
+                color: Colors.white,
                 width: 4,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -167,22 +187,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: primaryColor.withOpacity(0.1),
-                          child: Icon(
-                            Icons.person,
-                            size: 60,
-                            color: primaryColor,
-                          ),
+                          color: Colors.white.withOpacity(0.2),
+                          child: Custom3DIcons.profile(size: 60),
                         );
                       },
                     )
                   : Container(
-                      color: primaryColor.withOpacity(0.1),
-                      child: Icon(
-                        Icons.person,
-                        size: 60,
-                        color: primaryColor,
-                      ),
+                      color: Colors.white.withOpacity(0.2),
+                      child: Custom3DIcons.profile(size: 60),
                     ),
             ),
           ),
@@ -194,26 +206,37 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: textPrimary,
+              color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // Cultural Heritage
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              color: primaryColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              _userData?['culturalHeritage']?.toString() ?? 'Cultural Community Member',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1,
               ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Custom3DIcons.culturalHeritage(size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  _userData?['culturalHeritage']?.toString() ?? 'Cultural Community Member',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 12),
@@ -222,18 +245,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.verified,
-                color: primaryColor,
-                size: 20,
-              ),
+              Custom3DIcons.verified(size: 20),
               const SizedBox(width: 8),
               Text(
                 'Community Verified',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: primaryColor,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -254,19 +273,16 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             : 'Diaspora';
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: primaryColor.withOpacity(0.2),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -275,11 +291,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.celebration,
-                color: primaryColor,
-                size: 24,
-              ),
+              Custom3DIcons.celebration(size: 24),
               const SizedBox(width: 12),
               Text(
                 'Cultural Identity',
@@ -297,7 +309,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           _buildInfoRow(
             'Heritage',
             heritage,
-            Icons.flag,
+            Custom3DIcons.traditions(size: 20),
           ),
           const SizedBox(height: 12),
 
@@ -305,7 +317,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           _buildInfoRow(
             'Languages',
             languages.join(', '),
-            Icons.translate,
+            Custom3DIcons.language(size: 20),
           ),
           const SizedBox(height: 12),
 
@@ -313,7 +325,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           _buildInfoRow(
             'Location',
             location,
-            Icons.location_on,
+            Custom3DIcons.location(size: 20),
           ),
         ],
       ),
@@ -347,11 +359,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.groups,
-                color: primaryColor,
-                size: 24,
-              ),
+              Custom3DIcons.groups(size: 24),
               const SizedBox(width: 12),
               Text(
                 'Community Involvement',
@@ -394,7 +402,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 child: _buildStatCard(
                   'Groups',
                   groupsJoined.length.toString(),
-                  Icons.group,
+                  Custom3DIcons.groups(size: 20),
                 ),
               ),
               const SizedBox(width: 12),
@@ -402,7 +410,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 child: _buildStatCard(
                   'Events',
                   eventsOrganized.length.toString(),
-                  Icons.event,
+                  Custom3DIcons.events(size: 20),
                 ),
               ),
             ],
@@ -440,11 +448,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.business,
-                color: primaryColor,
-                size: 24,
-              ),
+              Custom3DIcons.business(size: 24),
               const SizedBox(width: 12),
               Text(
                 'Professional Profile',
@@ -479,14 +483,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           _buildInfoRow(
             'Industry',
             industry,
-            Icons.work,
+            Custom3DIcons.work(size: 20),
           ),
           const SizedBox(height: 12),
 
           _buildInfoRow(
             'Position',
             position,
-            Icons.badge,
+            Custom3DIcons.skills(size: 20),
           ),
           const SizedBox(height: 12),
 
@@ -702,21 +706,21 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           _buildInfoRow(
             'Looking For',
             lookingFor,
-            Icons.search,
+            Custom3DIcons.search(size: 20),
           ),
           const SizedBox(height: 12),
 
           _buildInfoRow(
             'Age Range',
             ageRange,
-            Icons.cake,
+            Custom3DIcons.age(size: 20),
           ),
           const SizedBox(height: 12),
 
           _buildInfoRow(
             'Max Distance',
             maxDistance,
-            Icons.location_on,
+            Custom3DIcons.location(size: 20),
           ),
         ],
       ),
@@ -750,11 +754,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.star,
-                color: primaryColor,
-                size: 24,
-              ),
+              Custom3DIcons.star(size: 24),
               const SizedBox(width: 12),
               Text(
                 'Cultural Contributions',
@@ -774,7 +774,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 child: _buildStatCard(
                   'Stories',
                   storiesShared.length.toString(),
-                  Icons.book,
+                  Custom3DIcons.book(size: 20),
                 ),
               ),
               const SizedBox(width: 12),
@@ -782,7 +782,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 child: _buildStatCard(
                   'Events',
                   eventsCreated.length.toString(),
-                  Icons.event,
+                  Custom3DIcons.events(size: 20),
                 ),
               ),
               const SizedBox(width: 12),
@@ -790,7 +790,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 child: _buildStatCard(
                   'Mentorship',
                   mentorshipProvided.length.toString(),
-                  Icons.school,
+                  Custom3DIcons.school(size: 20),
                 ),
               ),
             ],
@@ -800,14 +800,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, IconData icon) {
+  Widget _buildInfoRow(String label, String value, Widget icon) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: primaryColor,
-          size: 20,
-        ),
+        icon,
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -836,7 +832,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon) {
+  Widget _buildStatCard(String label, String value, Widget icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -849,11 +845,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: primaryColor,
-            size: 24,
-          ),
+          icon,
           const SizedBox(height: 8),
           Text(
             value,

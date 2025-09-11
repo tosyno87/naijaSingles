@@ -63,4 +63,7 @@ class RouteName {
   static const String myEvents = '/my_events';
   static const String createEvent = '/create_event';
   static const String eventDetails = '/event_details';
+  
+  // Cultural Profile routes
+  static const String culturalProfile = '/cultural_profile';
 }

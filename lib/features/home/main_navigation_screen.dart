@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/messages/messages_screen.dart';
-import 'package:naijasingles/features/events/presentation/screens/events_screen.dart';
+import 'package:naijasingles/features/communities/ui/screens/communities_hub_screen.dart';
 import 'package:naijasingles/features/profile/cultural_profile_screen.dart';
-import 'package:naijasingles/debug/simple_debug.dart';
 import 'package:naijasingles/debug/quick_analysis.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -32,7 +30,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // Order matches the BottomNavigationBarItems below
   // NEW COMMUNITY-FIRST NAVIGATION
   final List<Widget> _pages = [
-    const EventsScreen(), // Tab 0: Communities (Events as primary community feature)
+    const CommunitiesHubScreen(), // Tab 0: Communities Hub (All community features)
     const ExploreScreen(
         showBackButton: false), // Tab 1: Connect (Dating/Friendship)
     const MessagesScreen(), // Tab 2: Messages

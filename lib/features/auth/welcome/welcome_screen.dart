@@ -162,29 +162,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       },
                     ),
                     
-                    const SizedBox(height: 16), // Reduced spacing for better centering
-                    
-                    // Stylized Afropeep text with Montserrat and animation
-                    AnimatedBuilder(
-                      animation: _textOpacity,
-                      builder: (context, child) {
-                        return Opacity(
-                          opacity: _textOpacity.value,
-                          child: Text(
-                            "Afropeep",
-                            style: GoogleFonts.montserrat(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                              letterSpacing: 1.2,
-                              height: 1.2,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 24), // Increased spacing
+                    const SizedBox(height: 24), // Spacing after massive logo
 
                     // Animated progress bar instead of decorative line
                     AnimatedBuilder(
@@ -331,7 +309,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   // Clean logo without glow - stands confidently on its own
   Widget _buildCleanLogo() {
-    return const AfropeepLogo(size: 90); // Enlarged to 90px for iPhone screens
+    return const AfropeepLogo(size: 140); // Massive logo that displaces text
   }
 
   // Animated progress bar

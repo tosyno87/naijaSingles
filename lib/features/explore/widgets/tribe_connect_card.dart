@@ -55,6 +55,8 @@ class TribeConnectCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 _buildInterests(),
                 const SizedBox(height: 12),
+                _buildMutualInterests(),
+                const SizedBox(height: 12),
                 _buildBio(),
                 const SizedBox(height: 16),
                 _buildActionButtons(),
@@ -126,6 +128,28 @@ class TribeConnectCard extends StatelessWidget {
                     color: AppColors.textSecondary,
                   ),
                 ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: AppColors.success,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _getLastSeenText(),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -153,25 +177,92 @@ class TribeConnectCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.culture.withOpacity(0.1),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.culture.withOpacity(0.1),
+            AppColors.heritage.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.culture.withOpacity(0.2),
-          width: 1,
+          color: AppColors.culture.withOpacity(0.3),
+          width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.culture.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Custom3DIcons.culture(size: 20),
-          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Custom3DIcons.culture(size: 16, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              'Heritage: ${_getHeritageText()}',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cultural Heritage',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.culture,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _getHeritageText(),
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Cultural verification badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.success.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppColors.success.withOpacity(0.3),
+                width: 1,
               ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.verified,
+                  size: 12,
+                  color: AppColors.success,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Verified',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.success,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -262,6 +353,59 @@ class TribeConnectCard extends StatelessWidget {
     );
   }
 
+  Widget _buildMutualInterests() {
+    final mutualInterests = _getMutualInterests();
+    if (mutualInterests.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.success.withOpacity(0.1),
+            AppColors.primaryGreen.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.success.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.handshake_outlined,
+                size: 16,
+                color: AppColors.success,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Shared Interests',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.success,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: mutualInterests.map((interest) => _buildMutualInterestTag(interest)).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInterestTag(String interest) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -284,33 +428,89 @@ class TribeConnectCard extends StatelessWidget {
     );
   }
 
+  Widget _buildMutualInterestTag(String interest) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.success.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.success.withOpacity(0.4),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.check_circle,
+            size: 12,
+            color: AppColors.success,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            interest,
+            style: GoogleFonts.montserrat(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.success,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBio() {
     if (user.bio?.isEmpty == true) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'About',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.overlayColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.border.withOpacity(0.3),
+          width: 1,
         ),
-        const SizedBox(height: 6),
-        Text(
-          user.bio ?? '',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textSecondary,
-            height: 1.4,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person_outline_rounded,
+                size: 16,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'About',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
+          const SizedBox(height: 8),
+          Text(
+            user.bio ?? '',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              fontStyle: FontStyle.italic,
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -322,7 +522,7 @@ class TribeConnectCard extends StatelessWidget {
             icon: Custom3DIcons.message(size: 20),
             label: 'Message',
             onPressed: onMessage,
-            color: AppColors.community,
+            color: AppColors.info,
           ),
         ),
         const SizedBox(width: 8),
@@ -341,7 +541,7 @@ class TribeConnectCard extends StatelessWidget {
             icon: Custom3DIcons.save(size: 20),
             label: 'Save',
             onPressed: onSave,
-            color: AppColors.business,
+            color: AppColors.warning,
           ),
         ),
         const SizedBox(width: 8),
@@ -351,6 +551,7 @@ class TribeConnectCard extends StatelessWidget {
             label: 'Block',
             onPressed: onBlock,
             color: AppColors.error,
+            isDestructive: true,
           ),
         ),
       ],
@@ -363,18 +564,32 @@ class TribeConnectCard extends StatelessWidget {
     required VoidCallback onPressed,
     required Color color,
     bool isPrimary = false,
+    bool isDestructive = false,
   }) {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isPrimary ? color : color.withOpacity(0.1),
+          color: isPrimary 
+              ? color 
+              : isDestructive 
+                  ? Colors.transparent
+                  : color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1,
+            color: isDestructive 
+                ? color.withOpacity(0.4)
+                : color.withOpacity(0.3),
+            width: isDestructive ? 1 : 1.5,
           ),
+          boxShadow: isPrimary ? [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
         ),
         child: Column(
           children: [
@@ -384,8 +599,12 @@ class TribeConnectCard extends StatelessWidget {
               label,
               style: GoogleFonts.montserrat(
                 fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: isPrimary ? Colors.white : color,
+                fontWeight: isPrimary ? FontWeight.w600 : FontWeight.w500,
+                color: isPrimary 
+                    ? Colors.white 
+                    : isDestructive 
+                        ? color.withOpacity(0.8)
+                        : color,
               ),
             ),
           ],
@@ -427,5 +646,31 @@ class TribeConnectCard extends StatelessWidget {
       return ['Culture', 'Music', 'Community'];
     }
     return interests.take(3).toList();
+  }
+
+  List<String> _getMutualInterests() {
+    // Simulate mutual interests - in real app, this would compare with current user
+    final allInterests = _getInterests();
+    if (allInterests.isEmpty) return [];
+    
+    // Return 1-2 random interests as "mutual"
+    final mutualCount = allInterests.length > 2 ? 2 : 1;
+    return allInterests.take(mutualCount).toList();
+  }
+
+  String _getLastSeenText() {
+    if (user.lastSeen == null) return 'Recently active';
+    
+    final now = DateTime.now();
+    final lastSeen = user.lastSeen!;
+    final difference = now.difference(lastSeen);
+    
+    if (difference.inMinutes < 60) {
+      return 'Active now';
+    } else if (difference.inHours < 24) {
+      return 'Active ${difference.inHours}h ago';
+    } else {
+      return 'Active ${difference.inDays}d ago';
+    }
   }
 }

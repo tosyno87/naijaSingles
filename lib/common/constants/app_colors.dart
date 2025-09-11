@@ -92,6 +92,7 @@ class AppColors {
   static const Color divider = Color(0xFFE2E8F0);
   static const Color shadow = Color(0x1A000000);
   static const Color disabled = Color(0xFF94A3B8);
+  static const Color overlayColor = Color(0xFFF8F9FA);
 
   // 📱 NAVIGATION COLORS
   static const Color navSelected = Color(0xFF008037);

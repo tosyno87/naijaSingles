@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'app_colors.dart';
 
-class AppColors {
-  static const Color primaryColor = Color(0xFF3C1361); // Deep purple
-  static const Color accentColor = Color(0xFFFFD700); // Vibrant yellow
-  static const Color secondaryColor = Color(0xFF00B140); // Vibrant green
-  static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFFE0E0E0);
-  static const Color errorColor = Color(0xFFFF5252);
-}
+// Using the new centralized AppColors from app_colors.dart
 
 class MyThemes {
   static final darkTheme = ThemeData(
-    scaffoldBackgroundColor: AppColors.primaryColor,
-    colorScheme: const ColorScheme.dark(
-      primary: AppColors.accentColor,
-      secondary: AppColors.secondaryColor,
-      error: AppColors.errorColor,
+    scaffoldBackgroundColor: AppColors.backgroundColor,
+    colorScheme: const ColorScheme.light(
+      primary: AppColors.primaryGreen,
+      secondary: AppColors.accentGreen,
+      error: AppColors.error,
     ),
     textTheme: GoogleFonts.montserratTextTheme(
       const TextTheme(
@@ -38,8 +32,8 @@ class MyThemes {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.accentColor,
-        foregroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.primaryGreen,
+        foregroundColor: AppColors.textOnPrimary,
         textStyle: const TextStyle(fontWeight: FontWeight.bold),
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
@@ -49,8 +43,8 @@ class MyThemes {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.accentColor,
-        side: const BorderSide(color: AppColors.accentColor, width: 2),
+        foregroundColor: AppColors.primaryGreen,
+        side: const BorderSide(color: AppColors.primaryGreen, width: 2),
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -71,18 +65,18 @@ class MyThemes {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.accentColor, width: 2),
+        borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.errorColor, width: 2),
+        borderSide: const BorderSide(color: AppColors.error, width: 2),
       ),
       labelStyle: const TextStyle(color: AppColors.textSecondary),
       hintStyle:
           TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       centerTitle: true,
       titleTextStyle: TextStyle(

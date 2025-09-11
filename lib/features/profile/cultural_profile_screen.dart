@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../common/widgets/custom_3d_icons.dart';
+import '../../common/constants/app_colors.dart';
 
 class CulturalProfileScreen extends StatefulWidget {
   const CulturalProfileScreen({Key? key}) : super(key: key);
@@ -18,14 +19,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
 
-  // Modern Afrocentric color scheme
-  static const Color backgroundColor = Color(0xFFF8FAFC);
-  static const Color primaryColor = Color(0xFF008037);
-  static const Color cardColor = Colors.white;
-  static const Color textPrimary = Color(0xFF1E293B);
-  static const Color textSecondary = Color(0xFF64748B);
-  static const Color gradientStart = Color(0xFF008037);
-  static const Color gradientEnd = Color(0xFF059669);
+  // Using centralized app colors
 
   @override
   void initState() {
@@ -57,18 +51,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [gradientStart, gradientEnd],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: AppColors.primaryGradient,
           ),
         ),
         title: Text(
@@ -97,7 +87,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: primaryColor))
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen))
           : SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
@@ -145,15 +135,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [gradientStart, gradientEnd],
-        ),
+        gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.3),
+            color: AppColors.primaryGreen.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: 0,
@@ -278,16 +264,9 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-        ],
+        boxShadow: AppColors.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +280,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -343,10 +322,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.2),
+          color: AppColors.primaryGreen.withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
@@ -369,7 +348,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -380,10 +359,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: AppColors.primaryGreen.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: primaryColor.withOpacity(0.3),
+                color: AppColors.primaryGreen.withOpacity(0.3),
                 width: 1,
               ),
             ),
@@ -392,7 +371,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
               ),
             ),
           ),
@@ -432,10 +411,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.2),
+          color: AppColors.primaryGreen.withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
@@ -458,7 +437,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
               if (isMentor) ...[
@@ -466,7 +445,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -503,7 +482,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: textPrimary,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -514,10 +493,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: primaryColor.withOpacity(0.3),
+                      color: AppColors.primaryGreen.withOpacity(0.3),
                       width: 1,
                     ),
                   ),
@@ -526,7 +505,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: primaryColor,
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 );
@@ -545,10 +524,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.2),
+          color: AppColors.primaryGreen.withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
@@ -566,7 +545,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             children: [
               Icon(
                 Icons.favorite,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
               const SizedBox(width: 12),
@@ -575,7 +554,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -588,7 +567,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: textPrimary,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -599,10 +578,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: primaryColor.withOpacity(0.3),
+                      color: AppColors.primaryGreen.withOpacity(0.3),
                       width: 1,
                     ),
                   ),
@@ -611,7 +590,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: primaryColor,
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                 );
@@ -626,7 +605,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: textPrimary,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -637,10 +616,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: textSecondary.withOpacity(0.1),
+                    color: AppColors.textSecondary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: textSecondary.withOpacity(0.3),
+                      color: AppColors.textSecondary.withOpacity(0.3),
                       width: 1,
                     ),
                   ),
@@ -649,7 +628,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: textSecondary,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 );
@@ -669,10 +648,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.2),
+          color: AppColors.primaryGreen.withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
@@ -690,7 +669,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             children: [
               Icon(
                 Icons.handshake,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
               const SizedBox(width: 12),
@@ -699,7 +678,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -738,10 +717,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: primaryColor.withOpacity(0.2),
+          color: AppColors.primaryGreen.withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
@@ -764,7 +743,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -817,7 +796,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: textSecondary,
+                  color: AppColors.textSecondary,
                 ),
               ),
               Text(
@@ -825,7 +804,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -839,10 +818,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.05),
+          color: AppColors.primaryGreen.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: primaryColor.withOpacity(0.2),
+          color: AppColors.primaryGreen.withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -855,7 +834,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: primaryColor,
+              color: AppColors.primaryGreen,
             ),
           ),
           Text(
@@ -863,7 +842,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: textSecondary,
+                color: AppColors.textSecondary,
             ),
           ),
         ],

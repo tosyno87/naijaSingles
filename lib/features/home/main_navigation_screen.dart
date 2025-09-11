@@ -7,6 +7,7 @@ import 'package:naijasingles/features/communities/ui/screens/communities_hub_scr
 import 'package:naijasingles/features/profile/cultural_profile_screen.dart';
 import 'package:naijasingles/debug/quick_analysis.dart';
 import 'package:naijasingles/common/widgets/custom_3d_icons.dart';
+import 'package:naijasingles/common/constants/app_colors.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final bool backgroundTasksRunning;
@@ -39,7 +40,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   ];
 
   // Deep green color for accents
-  static const Color deepGreen = Color(0xFF008037);
+  // Using centralized app colors
 
   @override
   void initState() {
@@ -93,7 +94,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: deepGreen.withValues(alpha: 0.9),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -155,7 +156,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           });
         },
         backgroundColor: Colors.white,
-        selectedItemColor: deepGreen,
+        selectedItemColor: AppColors.primaryGreen,
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: GoogleFonts.montserrat(

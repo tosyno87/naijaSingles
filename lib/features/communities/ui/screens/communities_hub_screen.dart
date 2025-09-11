@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_3d_icons.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class CommunitiesHubScreen extends StatefulWidget {
   const CommunitiesHubScreen({Key? key}) : super(key: key);
@@ -31,7 +32,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         onPressed: () {
           Navigator.pushNamed(context, RouteName.eventTemplateSelection);
         },
-        backgroundColor: const Color(0xFF008037),
+        backgroundColor: AppColors.primaryGreen,
         foregroundColor: Colors.white,
               icon: Custom3DIcons.createEvent(),
         label: Text(
@@ -122,7 +123,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF008037) : Colors.transparent,
+            color: isSelected ? AppColors.primaryGreen : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -183,10 +184,10 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             mainAxisSpacing: 12,
             childAspectRatio: 1.0, // Further reduced to accommodate 3D icons
             children: [
-                        _buildActionCard('Events', 'Cultural celebrations', Custom3DIcons.events(), const Color(0xFF008037)),
-                        _buildActionCard('Groups', 'Join communities', Custom3DIcons.groups(), const Color(0xFF6B46C1)),
-                        _buildActionCard('Learning', 'Cultural stories', Custom3DIcons.learning(), const Color(0xFF059669)),
-                        _buildActionCard('Network', 'Professional connections', Custom3DIcons.networking(), const Color(0xFFDC2626)),
+                        _buildActionCard('Events', 'Cultural celebrations', Custom3DIcons.events(), AppColors.primaryGreen),
+                        _buildActionCard('Groups', 'Join communities', Custom3DIcons.groups(), AppColors.culture),
+                        _buildActionCard('Learning', 'Cultural stories', Custom3DIcons.learning(), AppColors.primaryGreenLight),
+                        _buildActionCard('Network', 'Professional connections', Custom3DIcons.networking(), AppColors.business),
             ],
           ),
           const SizedBox(height: 20), // Add bottom padding

@@ -39,13 +39,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   void _initializeAnimations() {
-    // Logo pulse animation
+    // Logo bounce-in animation with fade
     _logoController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     );
     _logoScale = Tween<double>(
-      begin: 0.8,
+      begin: 0.3,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _logoController,
@@ -151,13 +151,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   children: [
                     const Spacer(flex: 1), // Adjusted for massive logo
 
-                    // Clean Afropeep Logo without glow - stands confidently on its own
+                    // Clean Afropeep Logo with bounce-in and fade animation
                     AnimatedBuilder(
                       animation: _logoScale,
                       builder: (context, child) {
                         return Transform.scale(
                           scale: _logoScale.value,
-                          child: _buildCleanLogo(),
+                          child: Opacity(
+                            opacity: _logoScale.value.clamp(0.0, 1.0),
+                            child: _buildCleanLogo(),
+                          ),
                         );
                       },
                     ),
@@ -366,7 +369,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               boxShadow: AppColors.buttonShadow,
             ),
             child: ElevatedButton(
-              onPressed: onPressed,
+              onPressed: () {
+                // Add gentle haptic feedback
+                HapticFeedback.lightImpact();
+                onPressed();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 foregroundColor: AppColors.textOnPrimary,

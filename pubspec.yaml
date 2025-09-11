@@ -112,8 +112,11 @@ flutter_icons:
   min_sdk_android: 21
 
 flutter_native_splash:
-  color: "ff3a5a"
-  image: "asset/splash.png"
+  color: "008037"  # Our green theme color
+  image: "assets/images/afropeep_logo_transparent.png"
+  android_12:
+    image: "assets/images/afropeep_logo_transparent.png"
+    color: "008037"
 
 dependency_overrides:
   js: ^0.7.2

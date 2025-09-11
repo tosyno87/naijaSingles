@@ -154,7 +154,7 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          initialRoute: RouteName.splashScreen,
+          initialRoute: RouteName.welcomeScreen,
           onGenerateRoute: AppRouter.generateRoute,
           // Add safety check for Navigator during hot reload
           builder: (context, child) {

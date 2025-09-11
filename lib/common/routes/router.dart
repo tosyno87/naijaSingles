@@ -50,12 +50,11 @@ import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
 import '../../features/auth/phone/ui/screens/otp_page.dart';
-import '../../features/home/ui/screens/splash.dart';
 
 abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
-    RouteName.splashScreen: (context) => const Splash(),
+    RouteName.welcomeScreen: (context) => const WelcomeScreen(),
     RouteName.loginScreen: (context) =>
         const EmailLoginScreen(), // Redirect to EmailLoginScreen
     RouteName.tabScreen: (context) => const Tabbar(),
@@ -90,7 +89,6 @@ abstract class AppRouter {
     RouteName.editProfileScreen: (context) => const EditProfileScreen(),
     RouteName.largeImageScreen: (context) => LargeImage(
         largeImage: ModalRoute.of(context)!.settings.arguments as String),
-    RouteName.welcomeScreen: (context) => const WelcomeScreen(),
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.updatePhoneScreen: (context) =>

@@ -119,7 +119,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   Widget _buildCulturalIdentityHeader() {
-    final name = _userData?['name'] ?? 'Cultural Community Member';
+    final name = _userData?['name']?.toString() ?? 'Cultural Community Member';
     final photos = _userData?['photos'] as List<dynamic>? ?? [];
     final mainPhoto = photos.isNotEmpty ? photos[0] : null;
 
@@ -208,7 +208,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              _userData?['culturalHeritage'] ?? 'Cultural Community Member',
+              _userData?['culturalHeritage']?.toString() ?? 'Cultural Community Member',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -244,9 +244,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   Widget _buildCulturalHeritageBadge() {
-    final heritage = _userData?['culturalHeritage'] ?? 'Mixed Heritage';
+    final heritage = _userData?['culturalHeritage']?.toString() ?? 'Mixed Heritage';
     final languages = _userData?['languages'] as List<dynamic>? ?? ['English'];
-    final location = _userData?['location'] ?? 'Diaspora';
+    final locationData = _userData?['location'];
+    final location = locationData is String
+        ? locationData
+        : locationData is Map
+            ? '${locationData['city'] ?? ''}, ${locationData['country'] ?? 'Diaspora'}'
+            : 'Diaspora';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -318,7 +323,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   Widget _buildCommunityInvolvement() {
     final groupsJoined = _userData?['groupsJoined'] as List<dynamic>? ?? [];
     final eventsOrganized = _userData?['eventsOrganized'] as List<dynamic>? ?? [];
-    final communityRole = _userData?['communityRole'] ?? 'Member';
+    final communityRole = _userData?['communityRole']?.toString() ?? 'Member';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -408,8 +413,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   Widget _buildProfessionalNetworking() {
-    final industry = _userData?['industry'] ?? 'Not specified';
-    final position = _userData?['position'] ?? 'Professional';
+    final industry = _userData?['industry']?.toString() ?? 'Not specified';
+    final position = _userData?['position']?.toString() ?? 'Professional';
     final skills = _userData?['skills'] as List<dynamic>? ?? [];
     final isMentor = _userData?['isMentor'] ?? false;
 
@@ -650,9 +655,9 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   Widget _buildConnectionPreferences() {
-    final lookingFor = _userData?['lookingFor'] ?? 'Friendship';
-    final ageRange = _userData?['ageRange'] ?? '18-35';
-    final maxDistance = _userData?['maxDistance'] ?? '50km';
+    final lookingFor = _userData?['lookingFor']?.toString() ?? 'Friendship';
+    final ageRange = _userData?['ageRange']?.toString() ?? '18-35';
+    final maxDistance = _userData?['maxDistance']?.toString() ?? '50km';
 
     return Container(
       padding: const EdgeInsets.all(20),

@@ -98,7 +98,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
           }
           
           return Scaffold(
-            backgroundColor: const Color(0xFFFFF6E5),
+            backgroundColor: Colors.white,
             body: CustomScrollView(
               controller: _scrollController,
               slivers: [

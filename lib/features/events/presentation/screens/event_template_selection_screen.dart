@@ -11,9 +11,9 @@ class EventTemplateSelectionScreen extends StatelessWidget {
     final templates = EventTemplatesService.getAfrocentricTemplates();
     
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFF6E5),
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Color(0xFF333333)),

@@ -102,7 +102,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+      backgroundColor: Colors.white,
       appBar: _buildAppBar(),
       body: BlocListener<EventCreationBloc, EventCreationState>(
         listener: _handleBlocState,
@@ -132,7 +132,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFFFFF6E5),
+      backgroundColor: Colors.white,
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.close, color: Color(0xFF333333)),

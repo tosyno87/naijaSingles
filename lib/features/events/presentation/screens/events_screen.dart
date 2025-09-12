@@ -128,7 +128,7 @@ class _EventsScreenState extends State<EventsScreen> {
       child: Builder(
         builder: (context) {
           return Scaffold(
-            backgroundColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            backgroundColor: Colors.white, // Updated to white background
             body: SafeArea(
               child: Column(
                 children: [

@@ -58,7 +58,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         userEventService: UserEventService(),
       )..add(LoadUserEventsEvent(_currentUserId!)),
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFF6E5),
+        backgroundColor: Colors.white,
         appBar: _buildAppBar(),
         body: Stack(
           children: [

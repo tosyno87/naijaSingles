@@ -36,6 +36,13 @@ class UserModel {
   final String? smokingStatus;
   final DateTime? lastSeen;
   final String? lookingFor; // What the user is looking for: Dating, Friendship, Networking
+  
+  // Cultural fields
+  final String? nationality;
+  final String? tribe;
+  final List<String>? languages;
+  final String? religion;
+  final String? occupation;
 
   List? imageUrl = [];
   int? distanceBW;
@@ -72,6 +79,12 @@ class UserModel {
     this.smokingStatus,
     this.lastSeen,
     this.lookingFor,
+    // Cultural fields
+    this.nationality,
+    this.tribe,
+    this.languages,
+    this.religion,
+    this.occupation,
   });
 
   @override
@@ -231,6 +244,18 @@ class UserModel {
                 : null,
         lookingFor: safeGet<String>('lookingFor') ?? 
             safeGetNested<String>('editInfo', 'lookingFor', 'Dating'),
+        // Cultural fields
+        nationality: safeGet<String>('nationality') ?? 
+            safeGetNested<String>('editInfo', 'nationality', ''),
+        tribe: safeGet<String>('tribe') ?? 
+            safeGetNested<String>('editInfo', 'tribe', ''),
+        languages: data.containsKey('languages') && data['languages'] is List
+            ? List<String>.from(data['languages'])
+            : [],
+        religion: safeGet<String>('religion') ?? 
+            safeGetNested<String>('editInfo', 'religion', ''),
+        occupation: safeGet<String>('occupation') ?? 
+            safeGetNested<String>('editInfo', 'occupation', ''),
       );
     } catch (e) {
       debugPrint('Error creating UserModel from document ${doc.id}: $e');
@@ -255,6 +280,12 @@ class UserModel {
         smokingStatus: '',
         lastSeen: null,
         lookingFor: 'Dating',
+        // Cultural fields
+        nationality: '',
+        tribe: '',
+        languages: [],
+        religion: '',
+        occupation: '',
       );
     }
   }
@@ -309,6 +340,14 @@ class UserModel {
               ? DateTime.tryParse(json['lastActive'].toString())
               : null,
       lookingFor: json['lookingFor'] ?? (json['editInfo'] != null ? json['editInfo']['lookingFor'] : 'Dating'),
+      // Cultural fields
+      nationality: json['nationality'] ?? (json['editInfo'] != null ? json['editInfo']['nationality'] : null),
+      tribe: json['tribe'] ?? (json['editInfo'] != null ? json['editInfo']['tribe'] : null),
+      languages: json['languages'] != null && json['languages'] is List
+          ? List<String>.from(json['languages'])
+          : [],
+      religion: json['religion'] ?? (json['editInfo'] != null ? json['editInfo']['religion'] : null),
+      occupation: json['occupation'] ?? (json['editInfo'] != null ? json['editInfo']['occupation'] : null),
     );
   }
 
@@ -353,6 +392,12 @@ class UserModel {
       'smokingStatus': smokingStatus,
       'lastSeen': lastSeen?.toIso8601String(),
       'lookingFor': lookingFor,
+      // Cultural fields
+      'nationality': nationality,
+      'tribe': tribe,
+      'languages': languages,
+      'religion': religion,
+      'occupation': occupation,
     };
   }
 
@@ -397,6 +442,12 @@ class UserModel {
           ? DateTime.tryParse(map['lastSeen'].toString())
           : null,
       lookingFor: map['lookingFor']?.toString() ?? 'Dating',
+      // Cultural fields
+      nationality: map['nationality']?.toString(),
+      tribe: map['tribe']?.toString(),
+      languages: map['languages'] is List ? List<String>.from(map['languages']) : [],
+      religion: map['religion']?.toString(),
+      occupation: map['occupation']?.toString(),
     );
   }
 

@@ -593,6 +593,13 @@ class OnboardingController extends ChangeNotifier {
       'dealbreakers': _dealbreakers,
       'drinkingPreference': _drinkingPreference,
       'smokingPreference': _smokingPreference,
+      
+      // Cultural fields for database consistency
+      'tribe': _tribe,
+      'nationality': _nationality,
+      'languages': _languages,
+      'religion': _religion,
+      'occupation': _occupation,
 
       // System fields
       'lastActive': DateTime.now().toIso8601String(),

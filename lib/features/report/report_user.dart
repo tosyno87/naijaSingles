@@ -26,8 +26,7 @@ class ReportUserState extends State<ReportUser> {
   String? title;
 
   Color get primaryColor {
-    final value = Theme.of(context).primaryColor;
-    return value;
+    return const Color(0xFF008037); // Deep green
   }
 
   String? get otherReason {
@@ -57,7 +56,7 @@ class ReportUserState extends State<ReportUser> {
               children: <Widget>[
                 Icon(
                   Icons.security,
-                  color: themeProvider.isDarkMode ? Colors.white : Colors.pink,
+                  color: themeProvider.isDarkMode ? Colors.white : primaryColor,
                   size: 35,
                 ),
                 Padding(
@@ -90,7 +89,7 @@ class ReportUserState extends State<ReportUser> {
                     leading: Icon(
                       Icons.sentiment_dissatisfied_outlined,
                       color:
-                          themeProvider.isDarkMode ? Colors.white : Colors.pink,
+                          themeProvider.isDarkMode ? Colors.white : primaryColor,
                     ),
                   ),
                 ),
@@ -104,7 +103,7 @@ class ReportUserState extends State<ReportUser> {
                     leading: Icon(
                       Icons.chat_bubble_outline,
                       color:
-                          themeProvider.isDarkMode ? Colors.white : Colors.pink,
+                          themeProvider.isDarkMode ? Colors.white : primaryColor,
                     ),
                   ),
                 ),
@@ -116,7 +115,7 @@ class ReportUserState extends State<ReportUser> {
                     leading: Icon(
                       Icons.report_problem_outlined,
                       color:
-                          themeProvider.isDarkMode ? Colors.white : Colors.pink,
+                          themeProvider.isDarkMode ? Colors.white : primaryColor,
                     ),
                   ),
                 ),
@@ -130,7 +129,7 @@ class ReportUserState extends State<ReportUser> {
                     leading: Icon(
                       Icons.flag_outlined,
                       color:
-                          themeProvider.isDarkMode ? Colors.white : Colors.pink,
+                          themeProvider.isDarkMode ? Colors.white : primaryColor,
                     ),
                   ),
                 ),
@@ -144,7 +143,7 @@ class ReportUserState extends State<ReportUser> {
                     leading: Icon(
                       Icons.image_outlined,
                       color:
-                          themeProvider.isDarkMode ? Colors.white : Colors.pink,
+                          themeProvider.isDarkMode ? Colors.white : primaryColor,
                     ),
                   ),
                 ),
@@ -156,7 +155,7 @@ class ReportUserState extends State<ReportUser> {
                     leading: Icon(
                       Icons.feedback_outlined,
                       color:
-                          themeProvider.isDarkMode ? Colors.white : Colors.pink,
+                          themeProvider.isDarkMode ? Colors.white : primaryColor,
                     ),
                     onTap: () => changeToDescription(
                         titleValue: 'Other'.tr().toString()),

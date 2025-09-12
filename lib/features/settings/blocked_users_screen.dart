@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../common/constants/colors.dart';
+import '../../common/constants/app_colors.dart';
 import '../../common/providers/theme_provider.dart';
 import '../../common/providers/user_provider.dart';
 import '../../services/settings_service.dart';
@@ -103,7 +103,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
           'Unblock User',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w600,
-            color: primaryColor,
+            color: AppColors.primaryGreen,
           ),
         ),
         content: Text(
@@ -121,7 +121,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
+              backgroundColor: AppColors.primaryGreen,
               foregroundColor: Colors.white,
             ),
             child: Text(
@@ -140,14 +140,14 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: AppColors.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -156,7 +156,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -204,14 +204,14 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -220,7 +220,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                       'To block someone, go to their profile and tap the block button.',
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                   ),
@@ -249,7 +249,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             children: [
               Icon(
                 Icons.info_outline,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -381,11 +381,11 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             TextButton(
               onPressed: () => _unblockUser(user),
               style: TextButton.styleFrom(
-                foregroundColor: primaryColor,
+                foregroundColor: AppColors.primaryGreen,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: primaryColor),
+                  side: BorderSide(color: AppColors.primaryGreen),
                 ),
               ),
               child: Text(

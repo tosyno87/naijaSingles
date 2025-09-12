@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../services/user_privacy_service.dart';
-import '../../common/constants/colors.dart';
+import '../../common/constants/app_colors.dart';
 
 class PrivacySettingsScreen extends StatefulWidget {
   const PrivacySettingsScreen({Key? key}) : super(key: key);
@@ -64,7 +64,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       SnackBar(
         content:
             Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -86,12 +86,12 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+          icon: Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -99,7 +99,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
         actions: [
@@ -118,7 +118,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               child: Text(
                 'Save',
                 style: GoogleFonts.montserrat(
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -193,7 +193,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           style: GoogleFonts.montserrat(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
@@ -201,7 +201,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           subtitle,
           style: GoogleFonts.montserrat(
             fontSize: 14,
-            color: textSecondary,
+            color: AppColors.textSecondary,
           ),
         ),
       ],
@@ -211,7 +211,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   Widget _buildProfileVisibilitySection() {
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -267,7 +267,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   Widget _buildLocationPrivacySection() {
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -306,7 +306,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   Widget _buildCommunicationSection() {
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -336,7 +336,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   Widget _buildActivitySection() {
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -392,7 +392,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                     fontWeight: FontWeight.w600,
                     color: isDestructive && value
                         ? Colors.red.shade700
-                        : textPrimary,
+                        : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -402,7 +402,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                     fontSize: 14,
                     color: isDestructive && value
                         ? Colors.red.shade500
-                        : textSecondary,
+                        : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -411,7 +411,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: isDestructive ? Colors.red.shade600 : primaryColor,
+            activeColor: isDestructive ? Colors.red.shade600 : AppColors.primaryGreen,
           ),
         ],
       ),
@@ -431,23 +431,23 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withValues(alpha: 0.1),
+        color: AppColors.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.privacy_tip, color: primaryColor, size: 20),
+              Icon(Icons.privacy_tip, color: AppColors.primaryGreen, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Privacy Summary',
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                 ),
               ),
             ],
@@ -457,7 +457,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             _privacyService.getPrivacySummary(_settings),
             style: GoogleFonts.montserrat(
               fontSize: 14,
-              color: textPrimary,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -465,7 +465,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             'Your privacy settings help control what information others can see about you. You can change these settings anytime.',
             style: GoogleFonts.montserrat(
               fontSize: 12,
-              color: textSecondary,
+              color: AppColors.textSecondary,
             ),
           ),
         ],

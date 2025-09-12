@@ -11,14 +11,14 @@ class LanguageSettingsScreen extends StatefulWidget {
 }
 
 class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
-  // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
+  // New Afropeep theme colors
+  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
-  static const Color cardColor = Color(0xFFFFFFFF); // White for cards
+  static const Color cardColor = Colors.white; // White cards with shadows
   static const Color successColor = Color(0xFF4CAF50); // Green for success
-  static final Color textPrimary = Colors.brown.shade800;
-  static final Color textSecondary = Colors.brown.shade600;
-  static final Color textLight = Colors.grey.shade600;
+  static const Color textPrimary = Color(0xFF3E1F0D); // Deep brown
+  static const Color textSecondary = Color(0xFF666666); // Medium gray
+  static const Color textLight = Color(0xFF999999); // Light gray
 
   String _selectedLanguage = 'en';
   bool _isLoading = true;

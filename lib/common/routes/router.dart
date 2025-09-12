@@ -54,6 +54,8 @@ import '../../features/auth/phone/ui/screens/otp_page.dart';
 abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
+    // Root route - redirect to welcome
+    '/': (context) => const WelcomeScreen(),
     RouteName.welcomeScreen: (context) => const WelcomeScreen(),
     RouteName.loginScreen: (context) =>
         const EmailLoginScreen(), // Redirect to EmailLoginScreen
@@ -177,21 +179,93 @@ abstract class AppRouter {
   /// Generate route method for MaterialApp
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final String routeName = settings.name ?? '';
+    
+    // Debug logging to help identify route issues
+    debugPrint('🔍 Router: Attempting to navigate to route: "$routeName"');
+    
     final WidgetBuilder? builder = allRoutes[routeName];
 
     if (builder != null) {
+      debugPrint('✅ Router: Found route "$routeName", navigating...');
       return MaterialPageRoute(
         builder: builder,
         settings: settings,
       );
     }
+    
+    debugPrint('❌ Router: Route "$routeName" not found, showing error page');
 
-    // Return a default route if the route is not found
+    // Return a user-friendly error page with navigation options
     return MaterialPageRoute(
       builder: (context) => Scaffold(
-        appBar: AppBar(title: const Text('Page Not Found')),
+        appBar: AppBar(
+          title: const Text('Page Not Found'),
+          backgroundColor: const Color(0xFF008037),
+          foregroundColor: Colors.white,
+        ),
         body: Center(
-          child: Text('Route "$routeName" not found'),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Color(0xFF008037),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Page Not Found',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: const Color(0xFF008037),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'The page you\'re looking for doesn\'t exist.',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Clear navigation stack and go to welcome
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      RouteName.welcomeScreen,
+                      (route) => false,
+                    );
+                  },
+                  icon: const Icon(Icons.home),
+                  label: const Text('Go to Home'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF008037),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    // Clear navigation stack and go to main app
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      RouteName.mainNavigation,
+                      (route) => false,
+                    );
+                  },
+                  child: const Text('Go to Main App'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       settings: settings,

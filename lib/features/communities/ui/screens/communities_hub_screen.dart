@@ -169,7 +169,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             childAspectRatio: 1.0, // Further reduced to accommodate 3D icons
             children: [
                         _buildActionCard('Events', 'Cultural celebrations', Custom3DIcons.events(), AppColors.primaryGreen, () {
-                          Navigator.pushNamed(context, RouteName.eventTemplateSelection);
+                          Navigator.pushNamed(context, RouteName.eventsScreen);
                         }),
                         _buildActionCard('Groups', 'Join communities', Custom3DIcons.groups(), AppColors.culture, () {
                           Navigator.pushNamed(context, RouteName.groupsScreen);

@@ -582,6 +582,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 if (selected) {
                   setState(() {
                     _interestedIn = option;
+                    _validateForm(); // Add form validation trigger
                   });
                 }
               },
@@ -1030,6 +1031,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         setState(() {
                           _heightFtIn = heightFtIn;
                           _heightCm = heightCm;
+                          _validateForm(); // Add form validation trigger
                         });
                       },
                     ),
@@ -1413,6 +1415,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             onChanged: (values) {
               setState(() {
                 _ageRange = values;
+                _validateForm(); // Add form validation trigger
               });
             },
           ),

@@ -27,22 +27,6 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: "communities_hub_fab",
-        onPressed: () {
-          Navigator.pushNamed(context, RouteName.eventTemplateSelection);
-        },
-        backgroundColor: AppColors.primaryGreen,
-        foregroundColor: Colors.white,
-              icon: Custom3DIcons.createEvent(),
-        label: Text(
-          'Create Event',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
     );
   }
 

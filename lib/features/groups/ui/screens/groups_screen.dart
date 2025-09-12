@@ -167,6 +167,9 @@ class _GroupsScreenState extends State<GroupsScreen>
           // Search Bar
           _buildSearchBar(),
           
+          // Create Group Button
+          _buildCreateGroupButton(),
+          
           // Category Filter
           _buildCategoryFilter(),
           
@@ -185,18 +188,6 @@ class _GroupsScreenState extends State<GroupsScreen>
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToCreateGroup,
-        backgroundColor: AppColors.primaryGreen,
-        foregroundColor: Colors.white,
-        icon: Custom3DIcons.add(size: 20),
-        label: Text(
-          'Create Group',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
       ),
     );
   }
@@ -242,6 +233,35 @@ class _GroupsScreenState extends State<GroupsScreen>
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 12,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreateGroupButton() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: ElevatedButton.icon(
+          onPressed: _navigateToCreateGroup,
+          icon: Custom3DIcons.add(size: 20),
+          label: Text(
+            'Create Group',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryGreen,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 2,
           ),
         ),
       ),

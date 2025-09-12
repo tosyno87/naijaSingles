@@ -81,7 +81,7 @@ class SplashState extends State<Splash> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Colors.white,
       body: BlocListener<AuthstatusBloc, AuthstatusState>(
         listener: (context, state) {
           log("Auth state changed in splash: $state");
@@ -135,7 +135,7 @@ class SplashState extends State<Splash> {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkMode ? Colors.white : Colors.white,
+                  color: const Color(0xFF1E293B), // Dark text on white background
                   letterSpacing: 1.2,
                 ),
               ),

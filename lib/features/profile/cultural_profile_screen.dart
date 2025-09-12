@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/routes/route_name.dart';
+import '../../services/region_detection_service.dart';
 
 class CulturalProfileScreen extends StatefulWidget {
   const CulturalProfileScreen({Key? key}) : super(key: key);
@@ -683,8 +684,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
   Widget _buildConnectionPreferences() {
     final lookingFor = _userData?['lookingFor']?.toString() ?? 'Friendship';
-    final ageRange = _userData?['ageRange']?.toString() ?? '18-35';
-    final maxDistance = _userData?['maxDistance']?.toString() ?? '50km';
+    final ageRangeText = _getAgeRangeText();
+    final maxDistanceText = _getMaxDistanceText();
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -735,14 +736,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
           _buildInfoRow(
             'Age Range',
-            ageRange,
+            ageRangeText,
             Custom3DIcons.age(size: 20),
           ),
           const SizedBox(height: 12),
 
           _buildInfoRow(
             'Max Distance',
-            maxDistance,
+            maxDistanceText,
             Custom3DIcons.location(size: 20),
           ),
         ],
@@ -936,5 +937,79 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     }
     
     return '🏛️ Yoruba'; // Default tribe for demo
+  }
+
+  /// Get formatted age range text from user preferences
+  String _getAgeRangeText() {
+    try {
+      // Check preferences.ageRange first (new format)
+      if (_userData?['preferences'] != null && _userData!['preferences'] is Map) {
+        final preferences = _userData!['preferences'] as Map;
+        if (preferences['ageRange'] != null && preferences['ageRange'] is List) {
+          final ageRange = preferences['ageRange'] as List;
+          if (ageRange.length >= 2) {
+            return '${ageRange[0]} - ${ageRange[1]} years';
+          }
+        }
+      }
+
+      // Check age_range field (alternative format)
+      if (_userData?['age_range'] != null && _userData!['age_range'] is Map) {
+        final ageRange = _userData!['age_range'] as Map;
+        final min = ageRange['min']?.toString() ?? '18';
+        final max = ageRange['max']?.toString() ?? '50';
+        return '$min - $max years';
+      }
+
+      // Check ageRange field (direct format)
+      if (_userData?['ageRange'] != null && _userData!['ageRange'] is Map) {
+        final ageRange = _userData!['ageRange'] as Map;
+        final min = ageRange['min']?.toString() ?? '18';
+        final max = ageRange['max']?.toString() ?? '50';
+        return '$min - $max years';
+      }
+
+      // Default fallback
+      return '18 - 50 years';
+    } catch (e) {
+      return '18 - 50 years'; // Safe fallback
+    }
+  }
+
+  /// Get formatted max distance text with proper unit conversion
+  String _getMaxDistanceText() {
+    try {
+      // Get user's location data for region detection
+      final locationData = _userData?['location'] as Map<String, dynamic>?;
+      
+      // Get max distance from various possible fields
+      double? distanceKm;
+      
+      // Check preferences.maxDistance first
+      if (_userData?['preferences'] != null && _userData!['preferences'] is Map) {
+        final preferences = _userData!['preferences'] as Map;
+        if (preferences['maxDistance'] != null) {
+          distanceKm = (preferences['maxDistance'] as num).toDouble();
+        }
+      }
+      
+      // Check maxDistance field directly
+      if (distanceKm == null && _userData?['maxDistance'] != null) {
+        distanceKm = (_userData!['maxDistance'] as num).toDouble();
+      }
+      
+      // Check max_distance field
+      if (distanceKm == null && _userData?['max_distance'] != null) {
+        distanceKm = (_userData!['max_distance'] as num).toDouble();
+      }
+      
+      // Default to 50km if no distance found
+      distanceKm ??= 50.0;
+      
+      // Format distance with proper unit based on region
+      return RegionDetectionService.formatDistance(distanceKm, locationData);
+    } catch (e) {
+      return '50 km'; // Safe fallback
+    }
   }
 }

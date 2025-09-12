@@ -184,10 +184,30 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             mainAxisSpacing: 12,
             childAspectRatio: 1.0, // Further reduced to accommodate 3D icons
             children: [
-                        _buildActionCard('Events', 'Cultural celebrations', Custom3DIcons.events(), AppColors.primaryGreen),
-                        _buildActionCard('Groups', 'Join communities', Custom3DIcons.groups(), AppColors.culture),
-                        _buildActionCard('Learning', 'Cultural stories', Custom3DIcons.learning(), AppColors.primaryGreenLight),
-                        _buildActionCard('Network', 'Professional connections', Custom3DIcons.networking(), AppColors.business),
+                        _buildActionCard('Events', 'Cultural celebrations', Custom3DIcons.events(), AppColors.primaryGreen, () {
+                          Navigator.pushNamed(context, RouteName.eventTemplateSelection);
+                        }),
+                        _buildActionCard('Groups', 'Join communities', Custom3DIcons.groups(), AppColors.culture, () {
+                          Navigator.pushNamed(context, RouteName.groupsScreen);
+                        }),
+                        _buildActionCard('Learning', 'Cultural stories', Custom3DIcons.learning(), AppColors.primaryGreenLight, () {
+                          // TODO: Navigate to Learning screen when implemented
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Learning feature coming soon!'),
+                              backgroundColor: AppColors.info,
+                            ),
+                          );
+                        }),
+                        _buildActionCard('Network', 'Professional connections', Custom3DIcons.networking(), AppColors.business, () {
+                          // TODO: Navigate to Networking screen when implemented
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Networking feature coming soon!'),
+                              backgroundColor: AppColors.info,
+                            ),
+                          );
+                        }),
             ],
           ),
           const SizedBox(height: 20), // Add bottom padding
@@ -196,59 +216,107 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
     );
   }
 
-  Widget _buildActionCard(String title, String subtitle, Widget icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
+  Widget _buildActionCard(String title, String subtitle, Widget icon, Color color, VoidCallback? onTap) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: icon,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: icon,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF333333),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: const Color(0xFF666666),
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF333333),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: const Color(0xFF666666),
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildGroupsTab() {
-    return const Center(child: Text('Groups Tab - Coming Soon'));
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Custom3DIcons.groups(size: 80),
+          const SizedBox(height: 24),
+          Text(
+            'Cultural Groups',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF333333),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Discover, join, and create cultural groups\nthat match your interests and heritage.',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              color: const Color(0xFF666666),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pushNamed(context, RouteName.groupsScreen);
+            },
+            icon: Custom3DIcons.groups(size: 20),
+            label: const Text('Explore Groups'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryGreen,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildLearningTab() {

@@ -763,4 +763,38 @@ class Custom3DIcons {
       end: Alignment.bottomRight,
     ),
   );
+
+  // ➕ ADDITIONAL ICONS FOR GROUPS FEATURE
+  static Widget add({double size = 24, Color? color}) => _build3DIcon(
+    Icons.add_rounded,
+    size: size,
+    color: color ?? const Color(0xFF4CAF50),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget public({double size = 24, Color? color}) => _build3DIcon(
+    Icons.public_rounded,
+    size: size,
+    color: color ?? const Color(0xFF2196F3),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
+
+  static Widget chat({double size = 24, Color? color}) => _build3DIcon(
+    Icons.chat_rounded,
+    size: size,
+    color: color ?? const Color(0xFF2196F3),
+    gradient: const LinearGradient(
+      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  );
 }

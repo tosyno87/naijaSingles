@@ -57,3 +57,5 @@ my_key.pub
 *.rej
 *~
 ios/build/
+ios/build/*.ipa
+ios/Runner.xcarchive/

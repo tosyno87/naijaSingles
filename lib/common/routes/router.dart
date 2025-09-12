@@ -35,6 +35,7 @@ import 'package:naijasingles/features/settings/feedback_screen.dart';
 import 'package:naijasingles/features/settings/language_settings_screen.dart';
 import 'package:naijasingles/features/settings/location_settings_screen.dart';
 import 'package:naijasingles/features/settings/account_deletion_screen.dart';
+import 'package:naijasingles/features/profile/settings_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 import '../../features/home/ui/screens/user_filter/settings.dart';
 import 'package:naijasingles/features/events/presentation/screens/events_screen.dart';
@@ -138,6 +139,7 @@ abstract class AppRouter {
     RouteName.groupsScreen: (context) => const GroupsScreen(),
 
     // Settings screens
+    RouteName.settingsScreen: (context) => const SettingsScreen(),
     RouteName.blockedUsers: (context) => const BlockedUsersScreen(),
     RouteName.notificationSettings: (context) => const NotificationSettingsScreen(),
     RouteName.safetyCenter: (context) => const SafetyCenterScreen(),

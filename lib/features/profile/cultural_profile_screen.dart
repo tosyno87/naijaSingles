@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../common/constants/app_colors.dart';
+import '../../common/routes/route_name.dart';
 
 class CulturalProfileScreen extends StatefulWidget {
   const CulturalProfileScreen({Key? key}) : super(key: key);
@@ -80,7 +81,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             child: IconButton(
               icon: Custom3DIcons.edit(size: 20),
               onPressed: () {
-                Navigator.pushNamed(context, '/settings');
+                Navigator.pushNamed(context, RouteName.settingsScreen);
               },
             ),
           ),

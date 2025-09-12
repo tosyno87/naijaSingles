@@ -40,6 +40,7 @@ class RouteName {
 
   // ===== SETTINGS ROUTES =====
   static const String settingPage = '/setting';
+  static const String settingsScreen = '/settings';
   static const String blockedUsers = '/blocked_users';
   static const String notificationSettings = '/notification_settings';
   static const String safetyCenter = '/safety_center';

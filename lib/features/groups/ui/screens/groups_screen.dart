@@ -146,9 +146,9 @@ class _GroupsScreenState extends State<GroupsScreen>
       appBar: AppBar(
         title: Text(
           'Cultural Groups',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 22,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
@@ -156,13 +156,29 @@ class _GroupsScreenState extends State<GroupsScreen>
         elevation: 0,
         actions: [
           Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: FloatingActionButton(
-              onPressed: _navigateToCreateGroup,
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
-              mini: true,
-              child: const Icon(Icons.add, size: 20),
+            margin: const EdgeInsets.only(right: 16),
+            child: Material(
+              color: const Color(0xFF008037), // Solid Deep Green
+              borderRadius: BorderRadius.circular(20),
+              elevation: 2,
+              child: InkWell(
+                onTap: _navigateToCreateGroup,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF008037), // Solid Deep Green
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: AppColors.buttonShadow,
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -171,9 +187,6 @@ class _GroupsScreenState extends State<GroupsScreen>
         children: [
           // Search Bar
           _buildSearchBar(),
-          
-          // Create Group Button
-          _buildCreateGroupButton(),
           
           // Category Filter
           _buildCategoryFilter(),
@@ -247,44 +260,6 @@ class _GroupsScreenState extends State<GroupsScreen>
     );
   }
 
-  Widget _buildCreateGroupButton() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: SizedBox(
-        width: double.infinity,
-        height: 48,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: AppColors.buttonShadow,
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _navigateToCreateGroup,
-              borderRadius: BorderRadius.circular(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Custom3DIcons.add(size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Create Group',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildCategoryFilter() {
     return Container(
@@ -342,19 +317,19 @@ class _GroupsScreenState extends State<GroupsScreen>
         controller: _tabController,
         indicator: UnderlineTabIndicator(
           borderSide: BorderSide(
-            color: AppColors.primaryGreen,
+            color: const Color(0xFF008037), // Deep Green
             width: 3,
           ),
           insets: const EdgeInsets.symmetric(horizontal: 16),
         ),
         indicatorSize: TabBarIndicatorSize.label,
-        labelColor: AppColors.primaryGreen,
+        labelColor: const Color(0xFF008037), // Deep Green
         unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: GoogleFonts.poppins(
-          fontWeight: FontWeight.w600,
+        labelStyle: GoogleFonts.montserrat(
+          fontWeight: FontWeight.bold,
           fontSize: 14,
         ),
-        unselectedLabelStyle: GoogleFonts.poppins(
+        unselectedLabelStyle: GoogleFonts.montserrat(
           fontWeight: FontWeight.w500,
           fontSize: 14,
         ),
@@ -383,15 +358,35 @@ class _GroupsScreenState extends State<GroupsScreen>
         subtitle: _isSearching
             ? 'Try adjusting your search terms to find cultural groups that match your interests.'
             : 'Be the first to create a cultural group in this category and start building your community!',
-        actionButton: _isSearching ? null : ElevatedButton.icon(
-          onPressed: _navigateToCreateGroup,
-          icon: Custom3DIcons.add(size: 18),
-          label: const Text('Create Group'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        actionButton: _isSearching ? null : Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF008037), // Solid Deep Green
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: AppColors.buttonShadow,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _navigateToCreateGroup,
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Custom3DIcons.add(size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Create Group',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -430,17 +425,37 @@ class _GroupsScreenState extends State<GroupsScreen>
         icon: Custom3DIcons.community(size: 64),
         title: 'No Groups Joined',
         subtitle: 'Discover and join cultural groups that match your heritage and interests!',
-        actionButton: ElevatedButton.icon(
-          onPressed: () {
-            _tabController.animateTo(0); // Switch to Discover tab
-          },
-          icon: Custom3DIcons.discover(size: 18),
-          label: const Text('Discover Groups'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        actionButton: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF008037), // Solid Deep Green
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: AppColors.buttonShadow,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                _tabController.animateTo(0); // Switch to Discover tab
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Custom3DIcons.discover(size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Discover Groups',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -484,15 +499,35 @@ class _GroupsScreenState extends State<GroupsScreen>
         icon: Custom3DIcons.community(size: 64),
         title: 'No Groups Created',
         subtitle: 'Create your first cultural group and start building your community! Share your heritage and connect with others.',
-        actionButton: ElevatedButton.icon(
-          onPressed: _navigateToCreateGroup,
-          icon: Custom3DIcons.add(size: 20),
-          label: const Text('Create Group'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        actionButton: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF008037), // Solid Deep Green
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: AppColors.buttonShadow,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _navigateToCreateGroup,
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Custom3DIcons.add(size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Create Group',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -531,33 +566,39 @@ class _GroupsScreenState extends State<GroupsScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
-                color: AppColors.culture.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.culture.withOpacity(0.2),
-                  width: 1,
-                ),
+                color: const Color(0xFFFFF6E5), // Soft cream background
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: icon,
+              child: Center(child: icon),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32), // More vertical spacing
             Text(
               title,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 22,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16), // More vertical spacing
             Text(
               subtitle,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
+                fontWeight: FontWeight.w400,
                 color: AppColors.textSecondary,
-                height: 1.4,
+                height: 1.3,
+                letterSpacing: 0.2,
               ),
               textAlign: TextAlign.center,
             ),

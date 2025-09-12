@@ -18,10 +18,40 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
+      appBar: AppBar(
+        title: Text(
+          'Communities',
+          style: GoogleFonts.montserrat(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.search,
+              color: AppColors.primaryGreen,
+            ),
+            onPressed: () {
+              // TODO: Navigate to search functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Search functionality coming soon!'),
+                  backgroundColor: AppColors.info,
+                ),
+              );
+            },
+            tooltip: 'Search Communities',
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            _buildSubtitle(),
             _buildTabBar(),
             Expanded(child: _buildTabContent()),
           ],
@@ -30,42 +60,15 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildSubtitle() {
     return Container(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Cultural Communities',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF333333),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Connect, learn, and grow within African cultural communities',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    color: const Color(0xFF666666),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, RouteName.culturalProfile);
-            },
-              icon: Custom3DIcons.profile(size: 28),
-            tooltip: 'Your Cultural Profile',
-          ),
-        ],
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      child: Text(
+        'Connect, learn, and grow within African cultural communities',
+        style: GoogleFonts.montserrat(
+          fontSize: 16,
+          color: AppColors.textSecondary,
+        ),
       ),
     );
   }

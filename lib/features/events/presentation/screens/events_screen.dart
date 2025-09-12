@@ -164,7 +164,7 @@ class _EventsScreenState extends State<EventsScreen> {
         onPressed: () => Navigator.pop(context),
         icon: const Icon(
           Icons.arrow_back,
-          color: Color(0xFF3E1F0D), // Dark brown
+          color: Color(0xFF3E1F0D), // Deep brown
         ),
       ),
       title: Text(
@@ -172,7 +172,7 @@ class _EventsScreenState extends State<EventsScreen> {
         style: GoogleFonts.poppins(
           fontSize: 24,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF3E1F0D), // Dark brown
+          color: const Color(0xFF3E1F0D), // Deep brown
         ),
       ),
       actions: [
@@ -199,6 +199,22 @@ class _EventsScreenState extends State<EventsScreen> {
           tooltip: _isSearching ? 'Close Search' : 'Search Events',
         ),
       ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(
+          height: 1,
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -272,11 +288,11 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   Widget _buildCategoryFilters() {
-    final categories = ['All', 'Music', 'Business', 'Community', 'Social', 'Cultural', 'Professional', 'Sports', 'Food', 'Art'];
+    final categories = ['All', 'Music', 'Business', 'Community', 'Social', 'Cultural'];
     
     return Container(
-      height: 50,
-      margin: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+      height: 40,
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
@@ -287,33 +303,43 @@ class _EventsScreenState extends State<EventsScreen> {
           
           return Container(
             margin: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(
-                category,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? Colors.white : const Color(0xFF008037),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  final newFilter = _currentFilter.copyWith(
+                    category: isSelected ? null : (category == 'All' ? null : category),
+                  );
+                  _onFilterChanged(newFilter);
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF008037) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
+                      width: 1,
+                    ),
+                    boxShadow: isSelected ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ] : null,
+                  ),
+                  child: Text(
+                    category,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color: isSelected ? Colors.white : const Color(0xFF008037),
+                    ),
+                  ),
                 ),
               ),
-              selected: isSelected,
-              onSelected: (selected) {
-                final newFilter = _currentFilter.copyWith(
-                  category: selected ? (category == 'All' ? null : category) : null,
-                );
-                _onFilterChanged(newFilter);
-              },
-              backgroundColor: Colors.white,
-              selectedColor: const Color(0xFF008037), // Deep green
-              side: BorderSide(
-                color: isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
-                width: 1,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              elevation: isSelected ? 2 : 0,
-              shadowColor: Colors.black.withOpacity(0.1),
             ),
           );
         },
@@ -325,7 +351,7 @@ class _EventsScreenState extends State<EventsScreen> {
     final dateRanges = ['All Time', 'Today', 'This Week', 'This Month'];
     
     return Container(
-      height: 50,
+      height: 40,
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -336,31 +362,41 @@ class _EventsScreenState extends State<EventsScreen> {
           
           return Container(
             margin: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(
-                dateRange,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? Colors.white : const Color(0xFF008037),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  final newFilter = _getDateRangeFilter(dateRange, !isSelected);
+                  _onFilterChanged(newFilter);
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF008037) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
+                      width: 1,
+                    ),
+                    boxShadow: isSelected ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ] : null,
+                  ),
+                  child: Text(
+                    dateRange,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color: isSelected ? Colors.white : const Color(0xFF008037),
+                    ),
+                  ),
                 ),
               ),
-              selected: isSelected,
-              onSelected: (selected) {
-                final newFilter = _getDateRangeFilter(dateRange, selected);
-                _onFilterChanged(newFilter);
-              },
-              backgroundColor: Colors.white,
-              selectedColor: const Color(0xFF008037), // Deep green
-              side: BorderSide(
-                color: isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
-                width: 1,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              elevation: isSelected ? 2 : 0,
-              shadowColor: Colors.black.withOpacity(0.1),
             ),
           );
         },
@@ -423,52 +459,50 @@ class _EventsScreenState extends State<EventsScreen> {
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       child: Row(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF008037), // Deep green
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // TODO: Implement advanced filter dialog
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Advanced filters coming soon!'),
-                      backgroundColor: Color(0xFF008037),
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.tune,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Advanced',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                // TODO: Implement advanced filter dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Advanced filters coming soon!'),
+                    backgroundColor: Color(0xFF008037),
                   ),
+                );
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF008037), // Deep green
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.tune,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Advanced',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -548,35 +582,35 @@ class _EventsScreenState extends State<EventsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 120,
-              height: 120,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF6E5), // Soft cream background
+                color: Colors.grey.withOpacity(0.1),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
+                    blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: const Icon(
-                Icons.event_note,
-                size: 60,
+                Icons.event_available,
+                size: 50,
                 color: Color(0xFF999999),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             Text(
               'No Events Found',
               style: GoogleFonts.poppins(
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF3E1F0D), // Dark brown
+                color: const Color(0xFF3E1F0D), // Deep brown
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               _currentFilter.hasActiveFilters || _searchController.text.isNotEmpty
                   ? 'Try adjusting your search or filters to find more events'
@@ -584,93 +618,88 @@ class _EventsScreenState extends State<EventsScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 color: const Color(0xFF666666),
-                height: 1.3,
-                letterSpacing: 0.2,
+                height: 1.4,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             if (_currentFilter.hasActiveFilters || _searchController.text.isNotEmpty)
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF008037), // Deep green
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _currentFilter = const EventFilter();
+                      _searchController.clear();
+                    });
+                    if (_eventsBloc != null) {
+                      _eventsBloc!.add(ClearSearchEvent());
+                    }
+                  },
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _currentFilter = const EventFilter();
-                        _searchController.clear();
-                      });
-                      if (_eventsBloc != null) {
-                        _eventsBloc!.add(ClearSearchEvent());
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      child: Text(
-                        'Clear Filters',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF008037), // Deep green
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
                         ),
+                      ],
+                    ),
+                    child: Text(
+                      'Clear Filters',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
               )
             else
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF008037), // Deep green
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, RouteName.eventTemplateSelection);
+                  },
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF008037), // Deep green
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, RouteName.eventTemplateSelection);
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.add,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Create Event',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
-                            size: 18,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Create Event',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -837,7 +866,7 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 80), // Bottom padding for FAB
               itemCount: state.events.length + (state.isLoadingMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index >= state.events.length) {

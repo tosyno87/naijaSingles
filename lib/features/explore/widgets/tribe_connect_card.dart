@@ -153,7 +153,7 @@ class TribeConnectCard extends StatelessWidget {
             ],
           ),
         ),
-        // Cultural Heritage Badge
+        // Nationality Badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -161,7 +161,7 @@ class TribeConnectCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            _getHeritageText(),
+            _getNationalityText(),
             style: GoogleFonts.montserrat(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -198,72 +198,88 @@ class TribeConnectCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Custom3DIcons.culture(size: 16, color: Colors.white),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Cultural Heritage',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.culture,
-                    letterSpacing: 0.5,
-                  ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  _getHeritageText(),
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Cultural verification badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.success.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.success.withOpacity(0.3),
-                width: 1,
+                child: Custom3DIcons.culture(size: 16, color: Colors.white),
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.verified,
-                  size: 12,
-                  color: AppColors.success,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Nationality & Tribe',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.culture,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _getNationalityText(),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (_getTribeText().isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        _getTribeText(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondary,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  'Verified',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.success,
+              ),
+              // Cultural verification badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.success.withOpacity(0.3),
+                    width: 1,
                   ),
                 ),
-              ],
-            ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.verified,
+                      size: 12,
+                      color: AppColors.success,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Verified',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -386,7 +402,7 @@ class TribeConnectCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Shared Interests',
+                'Cultural Connection',
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -613,12 +629,51 @@ class TribeConnectCard extends StatelessWidget {
     );
   }
 
-  String _getHeritageText() {
-    // Extract heritage from user data - using available fields
-    if (user.education?.isNotEmpty == true) {
-      return user.education!;
+  String _getNationalityText() {
+    // Extract nationality from user data - using available fields
+    if (user.living_in?.isNotEmpty == true) {
+      // If living_in contains country info, use it
+      final location = user.living_in!.toLowerCase();
+      if (location.contains('nigeria') || location.contains('lagos') || location.contains('abuja')) {
+        return 'Nigerian';
+      } else if (location.contains('ghana') || location.contains('accra')) {
+        return 'Ghanaian';
+      } else if (location.contains('kenya') || location.contains('nairobi')) {
+        return 'Kenyan';
+      } else if (location.contains('south africa') || location.contains('johannesburg') || location.contains('cape town')) {
+        return 'South African';
+      } else if (location.contains('uk') || location.contains('london') || location.contains('manchester')) {
+        return 'British-Nigerian';
+      } else if (location.contains('usa') || location.contains('america') || location.contains('new york') || location.contains('atlanta')) {
+        return 'American-Nigerian';
+      } else if (location.contains('canada') || location.contains('toronto') || location.contains('vancouver')) {
+        return 'Canadian-Nigerian';
+      }
     }
-    return 'African Heritage';
+    return 'Nigerian'; // Default to Nigerian for demo
+  }
+
+  String _getTribeText() {
+    // Extract tribe from user data - using available fields
+    if (user.profession?.isNotEmpty == true) {
+      final profession = user.profession!.toLowerCase();
+      // Check if profession field contains tribe info
+      if (profession.contains('yoruba') || profession.contains('igbo') || profession.contains('hausa')) {
+        return profession;
+      }
+    }
+    
+    // Simulate tribe based on name patterns (for demo purposes)
+    final name = user.name?.toLowerCase() ?? '';
+    if (name.contains('ade') || name.contains('tunde') || name.contains('kemi') || name.contains('yemi')) {
+      return 'Yoruba';
+    } else if (name.contains('chi') || name.contains('nkechi') || name.contains('chukwu') || name.contains('nnamdi')) {
+      return 'Igbo';
+    } else if (name.contains('ahmed') || name.contains('fatima') || name.contains('hassan') || name.contains('aisha')) {
+      return 'Hausa';
+    }
+    
+    return 'Yoruba'; // Default tribe for demo
   }
 
   String _getLanguagesText() {
@@ -649,13 +704,32 @@ class TribeConnectCard extends StatelessWidget {
   }
 
   List<String> _getMutualInterests() {
-    // Simulate mutual interests - in real app, this would compare with current user
-    final allInterests = _getInterests();
-    if (allInterests.isEmpty) return [];
+    // Simulate cultural connections - in real app, this would compare with current user
+    List<String> connections = [];
     
-    // Return 1-2 random interests as "mutual"
-    final mutualCount = allInterests.length > 2 ? 2 : 1;
-    return allInterests.take(mutualCount).toList();
+    // Add nationality connection
+    final nationality = _getNationalityText();
+    if (nationality.contains('Nigerian')) {
+      connections.add('🇳🇬 Nigerian');
+    } else if (nationality.contains('Ghanaian')) {
+      connections.add('🇬🇭 Ghanaian');
+    } else if (nationality.contains('Kenyan')) {
+      connections.add('🇰🇪 Kenyan');
+    }
+    
+    // Add tribe connection
+    final tribe = _getTribeText();
+    if (tribe.isNotEmpty) {
+      connections.add('🏛️ $tribe');
+    }
+    
+    // Add some common interests
+    final interests = _getInterests();
+    if (interests.isNotEmpty) {
+      connections.add('🎵 ${interests.first}');
+    }
+    
+    return connections.take(2).toList();
   }
 
   String _getLastSeenText() {

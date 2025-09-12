@@ -71,7 +71,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(scaffold.backgroundColor, const Color(0xFFFFF6E5));
+      expect(scaffold.backgroundColor, Colors.white);
     });
 
     testWidgets('should display loading state correctly', (WidgetTester tester) async {

@@ -62,7 +62,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           ),
         ),
         title: Text(
-          'Cultural Profile',
+          'Profile',
           style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             child: IconButton(
               icon: Custom3DIcons.edit(size: 20),
               onPressed: () {
-                // Navigate to edit cultural profile
+                Navigator.pushNamed(context, '/settings');
               },
             ),
           ),

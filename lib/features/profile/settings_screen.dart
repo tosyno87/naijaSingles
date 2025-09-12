@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:developer';
 
 import '../../common/routes/route_name.dart';
@@ -22,19 +21,16 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // MVP color scheme (matching profile_screen.dart)
+  // New Afropeep theme colors
   static const Color backgroundColor = Colors.white; // Clean white
-  static const Color primaryColor =
-      Color(0xFF008037); // Deep green (afropeepGreen)
-  static const Color cardColor = Color(0xFFFFFBF5); // Light cream for cards
-  static final Color textPrimary = Colors.brown.shade800;
-  static final Color textSecondary = Colors.brown.shade600;
+  static const Color primaryColor = Color(0xFF008037); // Deep green
+  static const Color cardColor = Colors.white; // White cards with shadows
+  static const Color textPrimary = Color(0xFF3E1F0D); // Deep brown
+  static const Color textSecondary = Color(0xFF666666); // Medium gray
 
   @override
   Widget build(BuildContext context) {
-    final user = _auth.currentUser;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -215,13 +211,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: ElevatedButton(
                   onPressed: () => _showSignOutDialog(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: cardColor,
+                    backgroundColor: Colors.white,
                     foregroundColor: Colors.red.shade700,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
                       side: BorderSide(color: Colors.red.shade300, width: 2),
                     ),
                     elevation: 2,
+                    shadowColor: Colors.black.withOpacity(0.1),
                   ),
                   child: Text(
                     'Sign Out',
@@ -246,22 +243,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: ElevatedButton(
                   onPressed: () => _showDeleteAccountDialog(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: cardColor, // Same as Sign Out button
+                    backgroundColor: Colors.white,
                     foregroundColor: Colors.red.shade700,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
                           color: Colors.red.shade300,
-                          width: 2), // Same border as Sign Out
+                          width: 2),
                     ),
-                    elevation: 2, // Same elevation as Sign Out
+                    elevation: 2,
+                    shadowColor: Colors.black.withOpacity(0.1),
                   ),
                   child: Text(
                     'Delete Account',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.red.shade700, // Same text color as Sign Out
+                      color: Colors.red.shade700,
                     ),
                   ),
                 ),
@@ -291,6 +289,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: primaryColor.withOpacity(0.1),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -380,7 +382,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: cardColor, // MVP background
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -479,7 +481,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: cardColor, // MVP background - same as sign-out dialog
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -686,7 +688,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: cardColor, // MVP background
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -832,19 +834,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '$feature coming soon!',
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
-        backgroundColor: primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
 }

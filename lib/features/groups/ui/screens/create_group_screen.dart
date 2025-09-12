@@ -112,170 +112,163 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         title: Text(
           'Create Group',
           style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
-        actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-            )
-          else
-            TextButton(
-              onPressed: _createGroup,
-              child: Text(
-                'Create',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryGreen,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Group Image Section
+                    _buildGroupImageSection(),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Group Name
+                    _buildTextField(
+                      controller: _nameController,
+                      label: 'Group Name',
+                      hint: 'Enter group name',
+                      icon: Icons.groups,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Group name is required';
+                        }
+                        if (value.trim().length < 3) {
+                          return 'Group name must be at least 3 characters';
+                        }
+                        if (value.trim().length > 50) {
+                          return 'Group name must be less than 50 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Description
+                    _buildTextField(
+                      controller: _descriptionController,
+                      label: 'Description',
+                      hint: 'Describe your group and its purpose',
+                      icon: Icons.edit,
+                      maxLines: 3,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Description is required';
+                        }
+                        if (value.trim().length < 10) {
+                          return 'Description must be at least 10 characters';
+                        }
+                        if (value.trim().length > 500) {
+                          return 'Description must be less than 500 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Category Selection
+                    _buildCategorySelection(),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Location
+                    _buildTextField(
+                      controller: _locationController,
+                      label: 'Location (Optional)',
+                      hint: 'City, Country',
+                      icon: Icons.location_on,
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Tags
+                    _buildTagsSection(),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Section Divider
+                    _buildSectionDivider('Group Settings'),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Group Settings
+                    _buildGroupSettings(),
+                    
+                    const SizedBox(height: 100), // Space for bottom button
+                  ],
                 ),
               ),
             ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Group Image Section
-              _buildGroupImageSection(),
-              
-              const SizedBox(height: 24),
-              
-              // Group Name
-              _buildTextField(
-                controller: _nameController,
-                label: 'Group Name',
-                hint: 'Enter group name',
-                icon: Custom3DIcons.groups(size: 20),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Group name is required';
-                  }
-                  if (value.trim().length < 3) {
-                    return 'Group name must be at least 3 characters';
-                  }
-                  if (value.trim().length > 50) {
-                    return 'Group name must be less than 50 characters';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Description
-              _buildTextField(
-                controller: _descriptionController,
-                label: 'Description',
-                hint: 'Describe your group and its purpose',
-                icon: Custom3DIcons.edit(size: 20),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Description is required';
-                  }
-                  if (value.trim().length < 10) {
-                    return 'Description must be at least 10 characters';
-                  }
-                  if (value.trim().length > 500) {
-                    return 'Description must be less than 500 characters';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Category Selection
-              _buildCategorySelection(),
-              
-              const SizedBox(height: 16),
-              
-              // Location
-              _buildTextField(
-                controller: _locationController,
-                label: 'Location (Optional)',
-                hint: 'City, Country',
-                icon: Custom3DIcons.location(size: 20),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Tags
-              _buildTagsSection(),
-              
-              const SizedBox(height: 16),
-              
-              // Group Settings
-              _buildGroupSettings(),
-              
-              const SizedBox(height: 32),
-              
-              // Create Button
-              _buildCreateButton(),
-            ],
           ),
-        ),
+          // Bottom Create Button
+          _buildCreateButton(),
+        ],
       ),
     );
   }
 
   Widget _buildGroupImageSection() {
     return Center(
-      child: Container(
-        width: 120,
-        height: 120,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: _getCategoryGradient(),
-          boxShadow: AppColors.cardShadow,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              // TODO: Implement image picker
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Image picker coming soon!'),
-                  backgroundColor: AppColors.info,
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Custom3DIcons.groups(size: 40, color: Colors.white),
-                const SizedBox(height: 8),
-                Text(
-                  'Add Photo',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
+      child: Stack(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: AppColors.border,
+            child: Icon(
+              Icons.groups,
+              size: 40,
+              color: AppColors.textSecondary,
             ),
           ),
-        ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen,
+                shape: BoxShape.circle,
+                boxShadow: AppColors.buttonShadow,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    // TODO: Implement image picker
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Image picker coming soon!'),
+                        backgroundColor: AppColors.info,
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -284,7 +277,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     required TextEditingController controller,
     required String label,
     required String hint,
-    required Widget icon,
+    required IconData icon,
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
@@ -294,40 +287,56 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         Text(
           label,
           style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: GoogleFonts.poppins(
-              color: AppColors.textSecondary,
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: AppColors.cardShadow,
+          ),
+          child: TextFormField(
+            controller: controller,
+            maxLines: maxLines,
+            validator: validator,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: GoogleFonts.poppins(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
+              prefixIcon: Icon(
+                icon,
+                color: AppColors.primaryGreen,
+                size: 20,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.error),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
             ),
-            prefixIcon: icon,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.error),
-            ),
-            filled: true,
-            fillColor: Colors.white,
           ),
         ),
       ],
@@ -341,8 +350,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         Text(
           'Category',
           style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
             color: AppColors.textPrimary,
           ),
         ),
@@ -351,17 +360,32 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            boxShadow: AppColors.cardShadow,
           ),
           child: DropdownButtonFormField<String>(
             value: _selectedCategory,
             decoration: InputDecoration(
-              border: InputBorder.none,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+              ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
-                vertical: 12,
+                vertical: 16,
               ),
-              prefixIcon: Custom3DIcons.filter(size: 20),
+              prefixIcon: Icon(
+                Icons.filter_list,
+                color: AppColors.primaryGreen,
+                size: 20,
+              ),
             ),
             items: GroupCategories.categories.map((category) {
               return DropdownMenuItem<String>(
@@ -374,6 +398,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       category,
                       style: GoogleFonts.poppins(
                         color: AppColors.textPrimary,
+                        fontSize: 14,
                       ),
                     ),
                   ],
@@ -385,7 +410,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             },
             icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
             dropdownColor: Colors.white,
-            style: GoogleFonts.poppins(color: AppColors.textPrimary),
+            style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
           ),
         ),
       ],
@@ -399,8 +424,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         Text(
           'Tags (${_tags.length}/5)',
           style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
             color: AppColors.textPrimary,
           ),
         ),
@@ -412,41 +437,33 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             spacing: 8,
             runSpacing: 8,
             children: _tags.map((tag) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.primaryGreen.withOpacity(0.3),
+              return Chip(
+                label: Text(
+                  tag,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryGreen,
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      tag,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryGreen,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () => _removeTag(tag),
-                      child: Icon(
-                        Icons.close,
-                        size: 16,
-                        color: AppColors.primaryGreen,
-                      ),
-                    ),
-                  ],
+                backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+                side: BorderSide(
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  width: 1,
                 ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                deleteIcon: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: AppColors.primaryGreen,
+                ),
+                onDeleted: () => _removeTag(tag),
               );
             }).toList(),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
         ],
         
         // Add Tag Input
@@ -454,49 +471,102 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           Row(
             children: [
               Expanded(
-                child: TextField(
-                  controller: _tagController,
-                  decoration: InputDecoration(
-                    hintText: 'Add tag...',
-                    hintStyle: GoogleFonts.poppins(
-                      color: AppColors.textSecondary,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: AppColors.cardShadow,
                   ),
-                  onSubmitted: (_) => _addTag(),
+                  child: TextField(
+                    controller: _tagController,
+                    decoration: InputDecoration(
+                      hintText: 'Add tag...',
+                      hintStyle: GoogleFonts.poppins(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.tag,
+                        color: AppColors.primaryGreen,
+                        size: 20,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                    ),
+                    onSubmitted: (_) => _addTag(),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: _addTag,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primaryGreen),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _addTag,
                     borderRadius: BorderRadius.circular(12),
+                    child: const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Icon(
+                        Icons.add,
+                        color: AppColors.primaryGreen,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
-                child: const Icon(Icons.add),
               ),
             ],
           ),
+      ],
+    );
+  }
+
+  Widget _buildSectionDivider(String title) {
+    return Row(
+      children: [
+        Expanded(
+          child: Divider(
+            color: AppColors.border,
+            thickness: 1,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Divider(
+            color: AppColors.border,
+            thickness: 1,
+          ),
+        ),
       ],
     );
   }
@@ -505,15 +575,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Group Settings',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 12),
         
         // Public/Private Toggle
         Container(
@@ -521,11 +582,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            boxShadow: AppColors.cardShadow,
           ),
           child: Row(
             children: [
-              Custom3DIcons.public(size: 20),
+              Icon(
+                Icons.public,
+                color: AppColors.primaryGreen,
+                size: 20,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -568,14 +633,18 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            boxShadow: AppColors.cardShadow,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Custom3DIcons.groups(size: 20),
+                  Icon(
+                    Icons.groups,
+                    color: AppColors.primaryGreen,
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     'Maximum Members',
@@ -613,28 +682,56 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   Widget _buildCreateButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _createGroup,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-          elevation: 4,
-        ),
-        child: _isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : Text(
-                'Create Group',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+        ],
+      ),
+      child: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: AppColors.buttonShadow,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _isLoading ? null : _createGroup,
+                borderRadius: BorderRadius.circular(12),
+                child: Center(
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Custom3DIcons.add(size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Create Group',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
+            ),
+          ),
+        ),
       ),
     );
   }

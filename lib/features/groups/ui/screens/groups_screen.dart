@@ -147,18 +147,23 @@ class _GroupsScreenState extends State<GroupsScreen>
         title: Text(
           'Cultural Groups',
           style: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         actions: [
-          IconButton(
-            onPressed: _navigateToCreateGroup,
-            icon: Custom3DIcons.add(size: 24),
-            tooltip: 'Create Group',
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: FloatingActionButton(
+              onPressed: _navigateToCreateGroup,
+              backgroundColor: AppColors.primaryGreen,
+              foregroundColor: Colors.white,
+              mini: true,
+              child: const Icon(Icons.add, size: 20),
+            ),
           ),
         ],
       ),
@@ -194,7 +199,7 @@ class _GroupsScreenState extends State<GroupsScreen>
 
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -212,10 +217,12 @@ class _GroupsScreenState extends State<GroupsScreen>
           hintText: 'Search groups...',
           hintStyle: GoogleFonts.poppins(
             color: AppColors.textSecondary,
+            fontSize: 14,
           ),
           prefixIcon: Icon(
             Icons.search,
             color: AppColors.primaryGreen,
+            size: 20,
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -226,13 +233,14 @@ class _GroupsScreenState extends State<GroupsScreen>
                   icon: Icon(
                     Icons.clear,
                     color: AppColors.textSecondary,
+                    size: 18,
                   ),
                 )
               : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 12,
+            vertical: 16,
           ),
         ),
       ),
@@ -241,27 +249,37 @@ class _GroupsScreenState extends State<GroupsScreen>
 
   Widget _buildCreateGroupButton() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: SizedBox(
         width: double.infinity,
         height: 48,
-        child: ElevatedButton.icon(
-          onPressed: _navigateToCreateGroup,
-          icon: Custom3DIcons.add(size: 20),
-          label: Text(
-            'Create Group',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: AppColors.buttonShadow,
           ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _navigateToCreateGroup,
               borderRadius: BorderRadius.circular(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Custom3DIcons.add(size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Create Group',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            elevation: 2,
           ),
         ),
       ),
@@ -271,7 +289,7 @@ class _GroupsScreenState extends State<GroupsScreen>
   Widget _buildCategoryFilter() {
     return Container(
       height: 50,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: GroupCategories.categories.length + 1,
@@ -281,12 +299,12 @@ class _GroupsScreenState extends State<GroupsScreen>
           
           return Container(
             margin: const EdgeInsets.only(right: 8),
-            child: FilterChip(
+            child: ChoiceChip(
               label: Text(
                 category,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color: isSelected ? Colors.white : AppColors.textPrimary,
                 ),
               ),
@@ -297,10 +315,14 @@ class _GroupsScreenState extends State<GroupsScreen>
               },
               backgroundColor: Colors.white,
               selectedColor: AppColors.primaryGreen,
-              checkmarkColor: Colors.white,
               side: BorderSide(
                 color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                width: 1,
               ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              labelPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             ),
           );
         },
@@ -310,7 +332,7 @@ class _GroupsScreenState extends State<GroupsScreen>
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -318,18 +340,22 @@ class _GroupsScreenState extends State<GroupsScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: AppColors.primaryGreen,
+        indicator: UnderlineTabIndicator(
+          borderSide: BorderSide(
+            color: AppColors.primaryGreen,
+            width: 3,
+          ),
+          insets: const EdgeInsets.symmetric(horizontal: 16),
         ),
-        labelColor: Colors.white,
+        indicatorSize: TabBarIndicatorSize.label,
+        labelColor: AppColors.primaryGreen,
         unselectedLabelColor: AppColors.textSecondary,
         labelStyle: GoogleFonts.poppins(
           fontWeight: FontWeight.w600,
           fontSize: 14,
         ),
         unselectedLabelStyle: GoogleFonts.poppins(
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
           fontSize: 14,
         ),
         tabs: const [
@@ -352,11 +378,23 @@ class _GroupsScreenState extends State<GroupsScreen>
 
     if (_groups.isEmpty) {
       return _buildEmptyState(
-        icon: Custom3DIcons.groups(size: 64),
+        icon: Custom3DIcons.community(size: 64),
         title: 'No Groups Found',
         subtitle: _isSearching
-            ? 'Try adjusting your search terms'
-            : 'Be the first to create a group in this category!',
+            ? 'Try adjusting your search terms to find cultural groups that match your interests.'
+            : 'Be the first to create a cultural group in this category and start building your community!',
+        actionButton: _isSearching ? null : ElevatedButton.icon(
+          onPressed: _navigateToCreateGroup,
+          icon: Custom3DIcons.add(size: 18),
+          label: const Text('Create Group'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryGreen,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
       );
     }
 
@@ -389,9 +427,23 @@ class _GroupsScreenState extends State<GroupsScreen>
 
     if (_userGroups.isEmpty) {
       return _buildEmptyState(
-        icon: Custom3DIcons.groups(size: 64),
+        icon: Custom3DIcons.community(size: 64),
         title: 'No Groups Joined',
-        subtitle: 'Discover and join cultural groups that interest you!',
+        subtitle: 'Discover and join cultural groups that match your heritage and interests!',
+        actionButton: ElevatedButton.icon(
+          onPressed: () {
+            _tabController.animateTo(0); // Switch to Discover tab
+          },
+          icon: Custom3DIcons.discover(size: 18),
+          label: const Text('Discover Groups'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryGreen,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
       );
     }
 
@@ -429,9 +481,9 @@ class _GroupsScreenState extends State<GroupsScreen>
 
     if (createdGroups.isEmpty) {
       return _buildEmptyState(
-        icon: Custom3DIcons.add(size: 64),
+        icon: Custom3DIcons.community(size: 64),
         title: 'No Groups Created',
-        subtitle: 'Create your first cultural group and start building your community!',
+        subtitle: 'Create your first cultural group and start building your community! Share your heritage and connect with others.',
         actionButton: ElevatedButton.icon(
           onPressed: _navigateToCreateGroup,
           icon: Custom3DIcons.add(size: 20),
@@ -439,6 +491,9 @@ class _GroupsScreenState extends State<GroupsScreen>
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryGreen,
             foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
       );
@@ -475,27 +530,39 @@ class _GroupsScreenState extends State<GroupsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            icon,
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.culture.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.culture.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: icon,
+            ),
             const SizedBox(height: 24),
             Text(
               title,
               style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               subtitle,
               style: GoogleFonts.poppins(
-                fontSize: 14,
+                fontSize: 16,
                 color: AppColors.textSecondary,
+                height: 1.4,
               ),
               textAlign: TextAlign.center,
             ),
             if (actionButton != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               actionButton,
             ],
           ],

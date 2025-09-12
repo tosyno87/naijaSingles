@@ -198,7 +198,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Cultural Heritage
+          // Nationality & Tribe
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
@@ -212,11 +212,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Custom3DIcons.culturalHeritage(size: 18),
+                Custom3DIcons.culture(size: 18),
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    _userData?['culturalHeritage']?.toString() ?? 'Cultural Community Member',
+                    _getNationalityText(),
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -228,6 +228,36 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 8),
+          
+          // Tribe Badge
+          if (_getTribeText().isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Custom3DIcons.traditions(size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    _getTribeText(),
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           const SizedBox(height: 12),
 
           // Verification Status
@@ -252,7 +282,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   Widget _buildCulturalHeritageBadge() {
-    final heritage = _userData?['culturalHeritage']?.toString() ?? 'Mixed Heritage';
+    final nationality = _getNationalityText();
+    final tribe = _getTribeText();
     final languages = _userData?['languages'] as List<dynamic>? ?? ['English'];
     final locationData = _userData?['location'];
     final location = locationData is String
@@ -273,10 +304,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Custom3DIcons.celebration(size: 24),
+              Custom3DIcons.culture(size: 24),
               const SizedBox(width: 12),
               Text(
-                'Cultural Identity',
+                'Nationality & Tribe',
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -287,19 +318,28 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Heritage
+          // Nationality
           _buildInfoRow(
-            'Heritage',
-            heritage,
-            Custom3DIcons.traditions(size: 20),
+            'Nationality',
+            nationality,
+            Custom3DIcons.culture(size: 20),
           ),
           const SizedBox(height: 12),
+
+          // Tribe
+          if (tribe.isNotEmpty)
+            _buildInfoRow(
+              'Tribe',
+              tribe,
+              Custom3DIcons.traditions(size: 20),
+            ),
+          if (tribe.isNotEmpty) const SizedBox(height: 12),
 
           // Languages
           _buildInfoRow(
             'Languages',
             languages.join(', '),
-            Custom3DIcons.language(size: 20),
+            Custom3DIcons.translate(size: 20),
           ),
           const SizedBox(height: 12),
 
@@ -848,5 +888,52 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         ],
       ),
     );
+  }
+
+  String _getNationalityText() {
+    // Extract nationality from user data - using available fields
+    if (_userData?['living_in']?.isNotEmpty == true) {
+      // If living_in contains country info, use it
+      final location = _userData!['living_in'].toString().toLowerCase();
+      if (location.contains('nigeria') || location.contains('lagos') || location.contains('abuja')) {
+        return '🇳🇬 Nigerian';
+      } else if (location.contains('ghana') || location.contains('accra')) {
+        return '🇬🇭 Ghanaian';
+      } else if (location.contains('kenya') || location.contains('nairobi')) {
+        return '🇰🇪 Kenyan';
+      } else if (location.contains('south africa') || location.contains('johannesburg') || location.contains('cape town')) {
+        return '🇿🇦 South African';
+      } else if (location.contains('uk') || location.contains('london') || location.contains('manchester')) {
+        return '🇬🇧 British-Nigerian';
+      } else if (location.contains('usa') || location.contains('america') || location.contains('new york') || location.contains('atlanta')) {
+        return '🇺🇸 American-Nigerian';
+      } else if (location.contains('canada') || location.contains('toronto') || location.contains('vancouver')) {
+        return '🇨🇦 Canadian-Nigerian';
+      }
+    }
+    return '🇳🇬 Nigerian'; // Default to Nigerian for demo
+  }
+
+  String _getTribeText() {
+    // Extract tribe from user data - using available fields
+    if (_userData?['profession']?.isNotEmpty == true) {
+      final profession = _userData!['profession'].toString().toLowerCase();
+      // Check if profession field contains tribe info
+      if (profession.contains('yoruba') || profession.contains('igbo') || profession.contains('hausa')) {
+        return profession;
+      }
+    }
+    
+    // Simulate tribe based on name patterns (for demo purposes)
+    final name = _userData?['name']?.toString().toLowerCase() ?? '';
+    if (name.contains('ade') || name.contains('tunde') || name.contains('kemi') || name.contains('yemi')) {
+      return '🏛️ Yoruba';
+    } else if (name.contains('chi') || name.contains('nkechi') || name.contains('chukwu') || name.contains('nnamdi')) {
+      return '🏛️ Igbo';
+    } else if (name.contains('ahmed') || name.contains('fatima') || name.contains('hassan') || name.contains('aisha')) {
+      return '🏛️ Hausa';
+    }
+    
+    return '🏛️ Yoruba'; // Default tribe for demo
   }
 }

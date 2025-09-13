@@ -2,8 +2,16 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/features/home/bloc/swipebloc_bloc.dart';
 import 'package:naijasingles/models/user_model.dart';
+import '../helpers/firebase_test_setup.dart';
 
 void main() {
+  setUpAll(() async {
+    await FirebaseTestSetup.setupFirebase();
+  });
+
+  tearDownAll(() {
+    FirebaseTestSetup.cleanup();
+  });
   group('SwipeBloc', () {
     final currentUser = UserModel(id: '1');
     final selectedUser = UserModel(id: '2');

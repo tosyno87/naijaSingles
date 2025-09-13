@@ -1,15 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/models/user_model.dart';
-import '../helpers/firebase_test_setup.dart';
 
 void main() {
-  setUpAll(() async {
-    await FirebaseTestSetup.setupFirebase();
-  });
-
-  tearDownAll(() {
-    FirebaseTestSetup.cleanup();
-  });
 
   group('Delete Conversation Tests', () {
     test('should remove match records from all collections', () {

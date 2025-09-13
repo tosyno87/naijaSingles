@@ -20,6 +20,8 @@ void main() {
     test('returns true when there is a current user', () async {
       final mockAuth = MockFirebaseAuth();
       final repo = PhoneAuthRepository();
+      
+      // Mock the auth property before calling isSignedIn
       repo.auth = mockAuth;
       when(() => mockAuth.currentUser).thenReturn(MockUser());
 
@@ -31,6 +33,8 @@ void main() {
     test('returns false when there is no current user', () async {
       final mockAuth = MockFirebaseAuth();
       final repo = PhoneAuthRepository();
+      
+      // Mock the auth property before calling isSignedIn
       repo.auth = mockAuth;
       when(() => mockAuth.currentUser).thenReturn(null);
 

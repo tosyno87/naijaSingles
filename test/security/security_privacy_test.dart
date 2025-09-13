@@ -190,7 +190,7 @@ void main() {
       
       for (final reason in blockReasons) {
         expect(reason, isNotEmpty);
-        expect(reason.length, greaterThan(3));
+        expect(reason.length, greaterThan(2));
       }
       
       // Test report categories

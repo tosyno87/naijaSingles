@@ -1,12 +1,65 @@
-# Fastfile for Afropeep iOS deployment
+# Fastfile for NaijaSingles - African Diaspora Dating App
 # Install: gem install fastlane
-# Usage: fastlane ios deploy
+# Usage: 
+#   fastlane ios deploy          # Deploy to App Store
+#   fastlane ios testflight     # Deploy to TestFlight
+#   fastlane android deploy     # Deploy to Google Play
+#   fastlane test               # Run comprehensive tests
+#   fastlane beta               # Deploy to beta testing
 
 default_platform(:ios)
+
+# Global lanes (available for all platforms)
+desc "Run comprehensive test suite for African diaspora dating app"
+lane :test do
+  UI.message "🧪 Running comprehensive test suite for NaijaSingles..."
+  
+  # Run Flutter tests with coverage
+  sh("flutter test --coverage")
+  
+  # Generate test report
+  sh("./scripts/generate_test_report.sh")
+  
+  UI.success "✅ All tests passed! Ready for African diaspora community beta testing."
+end
+
+desc "Deploy to beta testing (TestFlight + Internal Testing)"
+lane :beta do
+  UI.message "🚀 Deploying NaijaSingles to beta testing..."
+  
+  # Run tests first
+  test
+  
+  # Deploy to iOS TestFlight
+  ios_testflight
+  
+  # Deploy to Android Internal Testing
+  android_internal_testing
+  
+  UI.success "🎉 NaijaSingles beta deployment complete! Ready for African diaspora community testing."
+end
+
+desc "Full deployment to production stores"
+lane :deploy do
+  UI.message "🌍 Deploying NaijaSingles to production stores..."
+  
+  # Run comprehensive tests
+  test
+  
+  # Deploy to iOS App Store
+  ios_deploy
+  
+  # Deploy to Google Play Store
+  android_deploy
+  
+  UI.success "🎉 NaijaSingles production deployment complete! Connecting African diaspora communities worldwide!"
+end
 
 platform :ios do
   desc "Deploy to App Store Connect"
   lane :deploy do
+    UI.message "📱 Deploying NaijaSingles to iOS App Store..."
+    
     # Increment build number
     increment_build_number(xcodeproj: "ios/Runner.xcodeproj")
     
@@ -30,13 +83,17 @@ platform :ios do
     
     # Send notification
     notification(
-      title: "Afropeep Deployment",
-      message: "Successfully uploaded to App Store Connect!"
+      title: "NaijaSingles iOS Deployment",
+      message: "Successfully uploaded to App Store Connect! Ready for African diaspora community."
     )
+    
+    UI.success "✅ NaijaSingles iOS deployment complete!"
   end
   
   desc "Build and upload to TestFlight"
   lane :testflight do
+    UI.message "📱 Deploying NaijaSingles to TestFlight..."
+    
     # Increment build number
     increment_build_number(xcodeproj: "ios/Runner.xcodeproj")
     
@@ -51,5 +108,65 @@ platform :ios do
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )
+    
+    # Send notification
+    notification(
+      title: "NaijaSingles TestFlight",
+      message: "Successfully uploaded to TestFlight! Ready for African diaspora beta testing."
+    )
+    
+    UI.success "✅ NaijaSingles TestFlight deployment complete!"
+  end
+end
+
+platform :android do
+  desc "Deploy to Google Play Store"
+  lane :deploy do
+    UI.message "🤖 Deploying NaijaSingles to Google Play Store..."
+    
+    # Build release APK
+    sh("flutter build apk --release")
+    
+    # Upload to Google Play Store
+    upload_to_play_store(
+      track: "production",
+      aab: "build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    # Send notification
+    notification(
+      title: "NaijaSingles Android Deployment",
+      message: "Successfully uploaded to Google Play Store! Ready for African diaspora community."
+    )
+    
+    UI.success "✅ NaijaSingles Android deployment complete!"
+  end
+  
+  desc "Deploy to Google Play Internal Testing"
+  lane :internal_testing do
+    UI.message "🤖 Deploying NaijaSingles to Google Play Internal Testing..."
+    
+    # Build release APK
+    sh("flutter build apk --release")
+    
+    # Upload to Internal Testing
+    upload_to_play_store(
+      track: "internal",
+      apk: "build/app/outputs/flutter-apk/app-release.apk",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    # Send notification
+    notification(
+      title: "NaijaSingles Android Internal Testing",
+      message: "Successfully uploaded to Internal Testing! Ready for African diaspora beta testing."
+    )
+    
+    UI.success "✅ NaijaSingles Android Internal Testing deployment complete!"
   end
 end

@@ -315,11 +315,47 @@ jobs:
         name: test-summary
         path: test_summary.md
 
+  # Fastlane Integration Job
+  fastlane-deploy:
+    name: Fastlane Deployment
+    runs-on: ubuntu-latest
+    needs: [test-summary]
+    if: github.ref == 'refs/heads/main' && needs.test-summary.result == 'success'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.3'
+        channel: 'stable'
+        
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        
+    - name: Install Fastlane
+      run: gem install fastlane
+      
+    - name: Install dependencies
+      run: flutter pub get
+      
+    - name: Run Fastlane Beta Deployment
+      run: fastlane beta
+      env:
+        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+        FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+        FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+        GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+
   # Notification Job
   notify-results:
     name: Notify Test Results
     runs-on: ubuntu-latest
-    needs: [test-summary]
+    needs: [test-summary, fastlane-deploy]
     if: always()
     
     steps:
@@ -332,6 +368,10 @@ jobs:
         echo "⚡ Performance benchmarks met"
         echo "♿ Accessibility standards verified"
         echo "🌍 Diaspora-specific features tested"
+        if [ "${{ needs.fastlane-deploy.result }}" == "success" ]; then
+          echo "🚀 Beta deployment to TestFlight and Google Play complete!"
+          echo "📱 Ready for African diaspora community beta testing!"
+        fi
         
     - name: Notify Failure
       if: needs.test-summary.result == 'failure'

@@ -1,0 +1,11 @@
+# Android Appfile for NaijaSingles - African Diaspora Dating App
+
+# Google Play Console
+package_name("com.naijasingles.app") # The package name of your app
+
+# App information
+app_name("NaijaSingles")
+app_version("1.0.0")
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

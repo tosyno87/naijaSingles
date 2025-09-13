@@ -63,7 +63,7 @@ jobs:
       run: flutter test integration_test/
       
     - name: Upload integration test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: integration-test-results
@@ -92,7 +92,7 @@ jobs:
       run: flutter test test/cultural/
       
     - name: Upload cultural test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: cultural-test-results
@@ -121,7 +121,7 @@ jobs:
       run: flutter test test/security/
       
     - name: Upload security test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-test-results
@@ -150,7 +150,7 @@ jobs:
       run: flutter test test/performance/
       
     - name: Upload performance test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: performance-test-results
@@ -179,7 +179,7 @@ jobs:
       run: flutter test test/accessibility/
       
     - name: Upload accessibility test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: accessibility-test-results
@@ -269,7 +269,7 @@ jobs:
       run: flutter test integration_test/diaspora_messaging_flow_test.dart
       
     - name: Upload diaspora test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: diaspora-integration-results
@@ -310,7 +310,7 @@ jobs:
         echo "- Target Market: US & International" >> test_summary.md
         
     - name: Upload test summary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-summary
         path: test_summary.md

@@ -219,7 +219,7 @@ void main() {
         nationality: ['Nigeria', 'Ghana', 'Ethiopia', 'Kenya', 'South Africa'][index % 5],
         tribe: ['Yoruba', 'Akan', 'Amhara', 'Kikuyu', 'Zulu'][index % 5],
         religion: ['Christian', 'Muslim', 'Traditional', 'Other'][index % 4],
-        languages: ['English', 'Yoruba', 'Swahili', 'Amharic'][index % 4],
+        languages: [['English', 'Yoruba'], ['English', 'Swahili'], ['English', 'Amharic'], ['English', 'French']][index % 4],
       ));
       
       // Test cultural filtering

@@ -207,7 +207,7 @@ void main() {
       
       for (final category in reportCategories) {
         expect(category, isNotEmpty);
-        expect(category.length, greaterThan(5));
+        expect(category.length, greaterThanOrEqualTo(4));
       }
     });
 

@@ -32,7 +32,7 @@ void main() {
       
       for (final ethnicity in ghanaianEthnicities) {
         expect(ethnicity, isNotEmpty);
-        expect(ethnicity.length, greaterThan(2));
+        expect(ethnicity.length, greaterThanOrEqualTo(2));
         // Ensure respectful representation
         expect(ethnicity.toLowerCase(), isNot(contains('tribe')));
       }

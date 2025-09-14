@@ -1182,7 +1182,7 @@ class UnifiedGroup {
       description: data['description'] ?? '',
       type: GroupType.values.firstWhere(
         (e) => e.name == data['type'],
-        orElse: () => GroupType.custom,
+        orElse: () => GroupType.local,
       ),
       imageUrl: data['imageUrl'],
       location: data['location'],

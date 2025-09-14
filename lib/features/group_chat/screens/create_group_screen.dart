@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/services/group_chat_service.dart';
+import 'package:naijasingles/services/unified_group_service.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
 

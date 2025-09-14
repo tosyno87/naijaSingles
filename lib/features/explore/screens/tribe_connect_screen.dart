@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/widgets/custom_3d_icons.dart';
+import '../../../common/routes/route_name.dart';
 import '../../../models/user_model.dart';
 import '../widgets/horizontal_profile_viewer.dart';
 import '../widgets/match_confirmation_modal.dart';
@@ -250,7 +251,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     // Navigate to user detail screen
     Navigator.pushNamed(
       context,
-      '/user_detail',
+      RouteName.userDetailScreen,
       arguments: user,
     );
   }

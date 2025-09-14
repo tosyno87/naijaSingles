@@ -84,24 +84,24 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                   
                   // Profile information
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Name, age, and active status
                         _buildNameAndStatus(),
                         
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         
                         // Nationality & Tribe tags
                         _buildNationalityTribeTags(),
                         
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         
                         // Interests badges
                         _buildInterestsBadges(),
                         
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         
                         // Connect button
                         _buildConnectButton(),
@@ -119,7 +119,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
 
   Widget _buildHeroPhoto(String? photoUrl, int photoCount) {
     return Container(
-      height: 300,
+      height: 250,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),

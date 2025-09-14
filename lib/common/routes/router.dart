@@ -51,6 +51,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
+import 'package:naijasingles/features/dating/screens/user_detail_screen.dart';
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 
 abstract class AppRouter {
@@ -176,6 +177,21 @@ abstract class AppRouter {
       } else {
         // Fallback for any other type - this shouldn't happen but provides safety
         throw ArgumentError('Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}');
+      }
+    },
+    
+    // User detail route
+    RouteName.userDetailScreen: (context) {
+      final arguments = ModalRoute.of(context)!.settings.arguments;
+      if (arguments is UserModel) {
+        return UserDetailScreen(user: arguments);
+      } else if (arguments is Map && arguments['user'] is UserModel) {
+        return UserDetailScreen(
+          user: arguments['user'] as UserModel,
+          selectedMode: arguments['selectedMode'] as String?,
+        );
+      } else {
+        throw ArgumentError('Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}');
       }
     },
   };

@@ -131,7 +131,7 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
         // Action buttons
         _buildActionButtons(),
         
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -163,7 +163,7 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
     if (_remainingUsers.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [

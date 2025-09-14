@@ -2,15 +2,11 @@
 
 # iOS App Store Connect
 app_identifier("com.naijasingles.app") # The bundle identifier of your app
-apple_id("your-apple-id@example.com") # Your Apple email address
+apple_id("bbtnd_tosin@yahoo.com") # Your Apple email address
 team_id("M7HY7333KT") # Your Apple Developer Portal team ID
 
 # Google Play Console
 package_name("com.naijasingles.app") # The package name of your app
-
-# App information
-app_name("NaijaSingles")
-app_version("1.0.0")
 
 # For more information about the Appfile, see:
 #     https://docs.fastlane.tools/advanced/#appfile

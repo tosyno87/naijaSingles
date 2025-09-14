@@ -20,6 +20,7 @@ class MediaStep extends StatefulWidget {
 class _MediaStepState extends State<MediaStep> {
   final ImagePicker _picker = ImagePicker();
   List<File> _selectedImages = [];
+  bool _isProcessingImage = false;
 
   @override
   Widget build(BuildContext context) {
@@ -101,26 +102,50 @@ class _MediaStepState extends State<MediaStep> {
           ),
           const SizedBox(height: 12),
           ElevatedButton(
-            onPressed: _selectImages,
+            onPressed: _isProcessingImage ? null : _selectImages,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF008037),
+              backgroundColor: _isProcessingImage 
+                  ? const Color(0xFF008037).withOpacity(0.6)
+                  : const Color(0xFF008037),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text(
-              'Choose Photos',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: _isProcessingImage
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Processing...',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    'Choose Photos',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
           const SizedBox(height: 6),
           Text(
-            'Supports JPG, PNG (Max 10 photos)',
+            'Supports JPG, PNG (Max 10 photos) • ${widget.eventData.imageUrls.length}/10 used',
             style: GoogleFonts.montserrat(
               fontSize: 11,
               color: const Color(0xFF999999),
@@ -397,12 +422,14 @@ class _MediaStepState extends State<MediaStep> {
               children: [
                 // Crop button
                 GestureDetector(
-                  onTap: () => _cropImage(index),
+                  onTap: _isProcessingImage ? null : () => _cropImage(index),
                   child: Container(
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF008037),
+                      color: _isProcessingImage 
+                          ? const Color(0xFF008037).withOpacity(0.6)
+                          : const Color(0xFF008037),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -461,6 +488,11 @@ class _MediaStepState extends State<MediaStep> {
   }
 
   Future<void> _cropImage(int index) async {
+    if (index < 0 || index >= widget.eventData.imageUrls.length) {
+      _showErrorSnackBar('Invalid image index.');
+      return;
+    }
+
     try {
       final imagePath = widget.eventData.imageUrls[index];
       if (imagePath.startsWith('http')) {
@@ -468,83 +500,149 @@ class _MediaStepState extends State<MediaStep> {
         return;
       }
 
+      // Show loading indicator
+      _showLoadingSnackBar('Cropping image...');
+
       // Use image_cropper to crop the image
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: imagePath,
-run      );
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Event Photo',
+            toolbarColor: const Color(0xFF008037),
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+          ),
+          IOSUiSettings(
+            title: 'Crop Event Photo',
+            minimumAspectRatio: 1.0,
+          ),
+        ],
+      );
+
+      // Hide loading indicator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (croppedFile != null) {
         setState(() {
-          _selectedImages[index] = File(croppedFile.path);
+          if (index < _selectedImages.length) {
+            _selectedImages[index] = File(croppedFile.path);
+          }
           widget.eventData.imageUrls[index] = croppedFile.path;
         });
         _showSuccessSnackBar('Image cropped successfully!');
+      } else {
+        _showErrorSnackBar('Image cropping was cancelled.');
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to crop image. Please try again.');
+      // Hide loading indicator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      _showErrorSnackBar('Failed to crop image: ${e.toString()}');
     }
   }
 
   void _removeImage(int index) {
-    setState(() {
-      if (index < _selectedImages.length) {
-        _selectedImages.removeAt(index);
-      }
-      if (index < widget.eventData.imageUrls.length) {
-        widget.eventData.imageUrls.removeAt(index);
-      }
-    });
-    _showSuccessSnackBar('Photo removed successfully!');
+    if (index < 0 || index >= widget.eventData.imageUrls.length) {
+      _showErrorSnackBar('Invalid image index.');
+      return;
+    }
+
+    // Show confirmation dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Remove Photo',
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          'Are you sure you want to remove this photo?',
+          style: GoogleFonts.montserrat(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(color: Colors.grey),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                if (index < _selectedImages.length) {
+                  _selectedImages.removeAt(index);
+                }
+                if (index < widget.eventData.imageUrls.length) {
+                  widget.eventData.imageUrls.removeAt(index);
+                }
+              });
+              _showSuccessSnackBar('Photo removed successfully!');
+            },
+            child: Text(
+              'Remove',
+              style: GoogleFonts.montserrat(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _selectImages() async {
+    if (_isProcessingImage) return;
+
     try {
+      setState(() {
+        _isProcessingImage = true;
+      });
+
+      // Check if already at maximum limit
+      if (widget.eventData.imageUrls.length >= 10) {
+        _showErrorSnackBar('Maximum 10 photos allowed. Please remove some photos first.');
+        return;
+      }
+
       // Show options for camera or gallery
       final source = await _showImageSourceDialog();
       if (source == null) return;
 
-      if (source == ImageSource.gallery) {
-        // Select image from gallery with high quality for posters
-        final XFile? image = await _picker.pickImage(
-          source: ImageSource.gallery,
-          maxWidth: 2048, // Increased for better poster quality
-          maxHeight: 2048, // Square aspect ratio support
-          imageQuality: 95, // Higher quality for posters
-          preferredCameraDevice: CameraDevice.rear,
-        );
-        
-        if (image != null) {
-          // Check if adding this image would exceed the limit
-          if (_selectedImages.length >= 10) {
-            _showErrorSnackBar('Maximum 10 photos allowed.');
-            return;
-          }
+      // Show loading indicator
+      _showLoadingSnackBar('Selecting image...');
 
-          // Show cropping dialog for new images
-          _showCropDialogForNewImage(image.path);
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 2048, // High quality for event photos
+        maxHeight: 2048,
+        imageQuality: 95, // High quality
+        preferredCameraDevice: CameraDevice.rear,
+      );
+
+      // Hide loading indicator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (image != null) {
+        // Double-check limit before adding
+        if (widget.eventData.imageUrls.length >= 10) {
+          _showErrorSnackBar('Maximum 10 photos allowed.');
+          return;
         }
-      } else {
-        // Take photo with camera with high quality for posters
-        final XFile? image = await _picker.pickImage(
-          source: ImageSource.camera,
-          maxWidth: 2048, // Increased for better poster quality
-          maxHeight: 2048, // Square aspect ratio support
-          imageQuality: 95, // Higher quality for posters
-          preferredCameraDevice: CameraDevice.rear,
-        );
 
-        if (image != null) {
-          if (_selectedImages.length >= 10) {
-            _showErrorSnackBar('Maximum 10 photos allowed.');
-            return;
-          }
-
-          // Show cropping dialog for new images
-          _showCropDialogForNewImage(image.path);
-        }
+        // Show cropping dialog for new images
+        await _showCropDialogForNewImage(image.path);
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to select images. Please try again.');
+      // Hide loading indicator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      _showErrorSnackBar('Failed to select images: ${e.toString()}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessingImage = false;
+        });
+      }
     }
   }
 
@@ -577,20 +675,51 @@ run      );
 
   Future<void> _showCropDialogForNewImage(String imagePath) async {
     try {
+      // Validate image file first
+      if (!_isValidImageFile(imagePath)) {
+        return;
+      }
+
+      // Show loading indicator
+      _showLoadingSnackBar('Cropping image...');
+
       // Use image_cropper to crop the new image
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: imagePath,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Event Photo',
+            toolbarColor: const Color(0xFF008037),
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+          ),
+          IOSUiSettings(
+            title: 'Crop Event Photo',
+            minimumAspectRatio: 1.0,
+          ),
+        ],
       );
 
+      // Hide loading indicator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
       if (croppedFile != null) {
-        setState(() {
-          _selectedImages.add(File(croppedFile.path));
-          widget.eventData.imageUrls.add(croppedFile.path);
-        });
-        _showSuccessSnackBar('Photo cropped and added successfully!');
+        // Validate the cropped file as well
+        if (_isValidImageFile(croppedFile.path)) {
+          setState(() {
+            _selectedImages.add(File(croppedFile.path));
+            widget.eventData.imageUrls.add(croppedFile.path);
+          });
+          _showSuccessSnackBar('Photo cropped and added successfully!');
+        }
+      } else {
+        _showErrorSnackBar('Image cropping was cancelled.');
       }
     } catch (e) {
-      _showErrorSnackBar('Failed to crop image. Please try again.');
+      // Hide loading indicator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      _showErrorSnackBar('Failed to crop image: ${e.toString()}');
     }
   }
 
@@ -625,4 +754,61 @@ run      );
       ),
     );
   }
+
+  void _showLoadingSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              message,
+              style: GoogleFonts.montserrat(color: Colors.white),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF008037),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 30), // Long duration for loading
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  /// Validate if the image file is valid and supported
+  bool _isValidImageFile(String filePath) {
+    final file = File(filePath);
+    if (!file.existsSync()) {
+      return false;
+    }
+
+    final extension = filePath.toLowerCase().split('.').last;
+    final supportedExtensions = ['jpg', 'jpeg', 'png'];
+    
+    if (!supportedExtensions.contains(extension)) {
+      return false;
+    }
+
+    // Check file size (max 10MB)
+    final fileSize = file.lengthSync();
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    
+    if (fileSize > maxSize) {
+      _showErrorSnackBar('Image file is too large. Maximum size is 10MB.');
+      return false;
+    }
+
+    return true;
+  }
+
 }

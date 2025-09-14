@@ -1,8 +1,10 @@
-import '../screens/match_profile_screen.dart';
 import '../../user/controllers/onboarding_controller.dart';
+import '../models/matched_user_model.dart';
 
+/// Service for managing match-related operations including personalized matching,
+/// category-based filtering, and match scoring algorithms.
 class MatchService {
-  // Sample data for all potential matches
+  /// Sample data for all potential matches - in production this would come from Firestore
   static final List<MatchedUser> _allPotentialMatches = [
     MatchedUser(
       id: '1',
@@ -136,15 +138,26 @@ class MatchService {
     ),
   ];
 
-  // Get personalized matches based on user preferences
+  /// Get personalized matches based on user preferences
+  /// 
+  /// [controller] - The onboarding controller containing user preferences
+  /// [limit] - Maximum number of matches to return (default: 5)
+  /// 
+  /// Returns a list of MatchedUser objects sorted by compatibility
   static List<MatchedUser> getPersonalizedMatches(
-      OnboardingController controller,
-      {int limit = 5}) {
+    OnboardingController controller, {
+    int limit = 5,
+  }) {
+    // Validate input parameters
+    if (limit <= 0) {
+      throw ArgumentError('Limit must be greater than 0');
+    }
+
     // Create a copy of all matches to work with
-    List<MatchedUser> filteredMatches = List.from(_allPotentialMatches);
+    final List<MatchedUser> filteredMatches = List.from(_allPotentialMatches);
 
     // Apply filters based on user preferences
-    if (controller.tribe != null) {
+    if (controller.tribe != null && controller.tribe!.isNotEmpty) {
       // Prioritize matches from the same tribe but don't exclude others
       filteredMatches.sort((a, b) {
         if (a.tribe == controller.tribe && b.tribe != controller.tribe) {
@@ -180,9 +193,9 @@ class MatchService {
       // Calculate interest match score for each potential match
       final Map<String, int> matchScores = {};
 
-      for (var match in filteredMatches) {
+      for (final match in filteredMatches) {
         int score = 0;
-        for (var interest in match.interests) {
+        for (final interest in match.interests) {
           if (controller.genres.contains(interest)) {
             score++;
           }
@@ -202,10 +215,26 @@ class MatchService {
     return filteredMatches.take(limit).toList();
   }
 
-  // Get matches based on specific criteria (for Friendship/Networking tabs)
+  /// Get matches based on specific criteria (for Friendship/Networking tabs)
+  /// 
+  /// [category] - The category to filter by (nearby, same_tribe, shared_interests)
+  /// [controller] - The onboarding controller containing user preferences
+  /// [limit] - Maximum number of matches to return (default: 5)
+  /// 
+  /// Returns a list of MatchedUser objects filtered by the specified category
   static List<MatchedUser> getMatchesByCategory(
-      String category, OnboardingController controller,
-      {int limit = 5}) {
+    String category,
+    OnboardingController controller, {
+    int limit = 5,
+  }) {
+    // Validate input parameters
+    if (limit <= 0) {
+      throw ArgumentError('Limit must be greater than 0');
+    }
+    if (category.isEmpty) {
+      throw ArgumentError('Category cannot be empty');
+    }
+
     List<MatchedUser> matches = [];
 
     switch (category) {
@@ -222,7 +251,7 @@ class MatchService {
 
       case 'same_tribe':
         // Get matches from the same tribe
-        if (controller.tribe != null) {
+        if (controller.tribe != null && controller.tribe!.isNotEmpty) {
           matches = _allPotentialMatches
               .where((match) => match.tribe == controller.tribe)
               .toList();
@@ -233,7 +262,7 @@ class MatchService {
         // Get matches with shared interests
         if (controller.genres.isNotEmpty) {
           matches = _allPotentialMatches.where((match) {
-            for (var interest in match.interests) {
+            for (final interest in match.interests) {
               if (controller.genres.contains(interest)) {
                 return true;
               }
@@ -258,5 +287,69 @@ class MatchService {
     }
 
     return matches.take(limit).toList();
+  }
+
+  /// Get all available match categories
+  static List<String> getAvailableCategories() {
+    return ['nearby', 'same_tribe', 'shared_interests'];
+  }
+
+  /// Calculate match compatibility score between two users
+  static double calculateMatchScore(
+    MatchedUser user1,
+    MatchedUser user2,
+  ) {
+    double score = 0.0;
+    int factors = 0;
+
+    // Location compatibility (30% weight)
+    if (user1.location == user2.location) {
+      score += 0.3;
+    }
+    factors++;
+
+    // Tribe compatibility (20% weight)
+    if (user1.tribe == user2.tribe && user1.tribe != null) {
+      score += 0.2;
+    }
+    factors++;
+
+    // Interest compatibility (40% weight)
+    final commonInterests = user1.interests
+        .where((interest) => user2.interests.contains(interest))
+        .length;
+    final maxInterests = [user1.interests.length, user2.interests.length]
+        .reduce((a, b) => a > b ? a : b);
+    if (maxInterests > 0) {
+      score += 0.4 * (commonInterests / maxInterests);
+    }
+    factors++;
+
+    // Age compatibility (10% weight)
+    final ageDiff = (user1.age - user2.age).abs();
+    if (ageDiff <= 5) {
+      score += 0.1;
+    } else if (ageDiff <= 10) {
+      score += 0.05;
+    }
+    factors++;
+
+    return factors > 0 ? score : 0.0;
+  }
+
+  /// Get match statistics for analytics
+  static Map<String, dynamic> getMatchStatistics() {
+    final totalMatches = _allPotentialMatches.length;
+    final tribes = _allPotentialMatches.map((m) => m.tribe).toSet();
+    final locations = _allPotentialMatches.map((m) => m.location).toSet();
+    
+    return {
+      'totalMatches': totalMatches,
+      'uniqueTribes': tribes.length,
+      'uniqueLocations': locations.length,
+      'averageAge': _allPotentialMatches
+          .map((m) => m.age)
+          .reduce((a, b) => a + b) / totalMatches,
+    };
   }
 }

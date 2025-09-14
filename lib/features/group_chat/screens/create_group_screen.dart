@@ -13,7 +13,7 @@ class CreateGroupScreen extends StatefulWidget {
 }
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
-  final GroupChatService _groupChatService = GroupChatService();
+  final UnifiedGroupService _groupService = UnifiedGroupService();
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -403,12 +403,12 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     });
 
     try {
-      final group = await _groupChatService.createGroup(
+      final group = await _groupService.createUnifiedGroup(
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
-        memberIds: _selectedMembers,
         type: _selectedType,
         location: _selectedLocation,
+        initialMembers: _selectedMembers,
       );
 
       if (mounted) {

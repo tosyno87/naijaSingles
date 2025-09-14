@@ -3,11 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
-import '../widgets/tribe_connect_card.dart';
-import '../widgets/modern_profile_card.dart';
+import '../widgets/horizontal_profile_viewer.dart';
 import '../widgets/match_confirmation_modal.dart';
 import '../../../common/data/repo/user_search_repo.dart';
-import '../../../services/super_like_service.dart';
 
 class TribeConnectScreen extends StatefulWidget {
   final UserModel currentUser;
@@ -62,21 +60,26 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       return _buildEmptyState();
     }
 
-    return RefreshIndicator(
-      onRefresh: _refreshUsers,
-      color: AppColors.primaryGreen,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: widget.users.length,
-        itemBuilder: (context, index) {
-          final user = widget.users[index];
-          return ModernProfileCard(
-            user: user,
-            onConnect: () => _handleConnect(user),
-            onTap: () => _handleViewProfile(user),
-          );
-        },
-      ),
+    return HorizontalProfileViewer(
+      users: widget.users,
+      currentUser: widget.currentUser,
+      onConnect: _handleConnect,
+      onPass: _handlePass,
+      onViewProfile: _handleViewProfile,
+      onAllProfilesViewed: () {
+        // Handle when all profiles are viewed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('You\'ve seen all available profiles! Check back later for new connections.'),
+            backgroundColor: AppColors.primaryGreen,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -234,6 +237,15 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     }
   }
 
+  Future<void> _handlePass(UserModel user) async {
+    try {
+      await UserSearchRepo.leftSwipe(widget.currentUser, user);
+      _showPassConfirmation(user);
+    } catch (e) {
+      _showError('Failed to pass. Please try again.');
+    }
+  }
+
   void _handleViewProfile(UserModel user) {
     // Navigate to user detail screen
     Navigator.pushNamed(
@@ -243,38 +255,6 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     );
   }
 
-  void _handleMessage(UserModel user) {
-    // Navigate to message screen or show profile preview
-    Navigator.pushNamed(
-      context,
-      '/user_detail',
-      arguments: user,
-    );
-  }
-
-  Future<void> _handleSave(UserModel user) async {
-    try {
-      await SuperLikeService().sendSuperLike(
-        fromUserId: widget.currentUser.id ?? '',
-        toUserId: user.id ?? '',
-      );
-      _showSuccess('${user.name} saved to your favorites!');
-    } catch (e) {
-      _showError('Failed to save user. Please try again.');
-    }
-  }
-
-  Future<void> _handleBlock(UserModel user) async {
-    final confirmed = await _showBlockConfirmation(user);
-    if (confirmed == true) {
-      try {
-        await UserSearchRepo.leftSwipe(widget.currentUser, user);
-        _showSuccess('${user.name} has been blocked.');
-      } catch (e) {
-        _showError('Failed to block user. Please try again.');
-      }
-    }
-  }
 
   void _showMatchConfirmation(UserModel user) {
     showDialog(
@@ -304,67 +284,11 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     );
   }
 
-  Future<bool?> _showBlockConfirmation(UserModel user) {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Block ${user.name}?',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        content: Text(
-          'This will prevent ${user.name} from appearing in your feed and block all communication.',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.montserrat(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(
-              'Block',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSuccess(String message) {
+  void _showPassConfirmation(UserModel user) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.success,
+        content: Text('Passed on ${user.name}'),
+        backgroundColor: Colors.grey[600],
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -373,6 +297,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       ),
     );
   }
+
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

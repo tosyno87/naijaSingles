@@ -71,6 +71,8 @@ dependencies:
   geolocator: ^14.0.2            # Added for GPS location
   geocoding: ^4.0.0              # Added for address lookup
   url_launcher: ^6.3.1           # Added for launching URLs and phone calls
+  contacts_service: ^0.6.3       # Added for phone contact access
+  email_validator: ^3.0.0        # Added for email validation
   rflutter_alert: ^2.0.7         # Kept at 2.0.7
   otp_autofill: ^4.1.0           # Updated from 3.0.2
   path_provider: ^2.1.5          # Updated to latest

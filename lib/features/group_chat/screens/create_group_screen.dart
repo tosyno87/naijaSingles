@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/services/unified_group_service.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
+import 'package:naijasingles/features/groups/widgets/contact_picker_widget.dart';
 
 /// Screen for creating new group chats
 class CreateGroupScreen extends StatefulWidget {
@@ -217,24 +218,60 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
         const SizedBox(height: 12),
         if (_selectedMembers.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[200]!),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.people_outline, color: Colors.grey[400]),
-                const SizedBox(width: 12),
-                Text(
-                  'No members selected',
-                  style: GoogleFonts.montserrat(
-                    color: Colors.grey[600],
-                  ),
+          GestureDetector(
+            onTap: _selectMembers,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  style: BorderStyle.solid,
                 ),
-              ],
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.contacts_outlined,
+                    size: 48,
+                    color: AppColors.primaryGreen.withOpacity(0.7),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Add Members from Contacts',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Invite friends from your phone contacts or by email',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Select Contacts',
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           )
         else
@@ -452,15 +489,26 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   void _selectMembers() {
-    // In a real app, you'd show a user selection screen
-    // For now, we'll add some dummy members
-    setState(() {
-      _selectedMembers.addAll([
-        'user1',
-        'user2',
-        'user3',
-      ]);
-    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactPickerWidget(
+          groupName: _nameController.text.isNotEmpty 
+              ? _nameController.text 
+              : 'New Group',
+          groupId: '', // Will be set after group creation
+          onInvitationsSent: (invitations) {
+            // Handle sent invitations
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${invitations.length} invitations sent!'),
+                backgroundColor: AppColors.primaryGreen,
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
   void _removeMember(String memberId) {

@@ -90,9 +90,9 @@ dependencies:
   flutter_svg: ^2.2.0
   
   # Industry Standard Features Dependencies
-  local_auth: ^2.3.0                    # Biometric authentication
-  local_auth_android: ^1.0.0           # Android biometric support
-  local_auth_ios: ^1.0.0               # iOS biometric support
+  # local_auth: ^2.3.0                    # Biometric authentication (temporarily disabled due to intl conflict)
+  # local_auth_android: ^1.0.0           # Android biometric support (temporarily disabled)
+  # local_auth_ios: ^1.0.12              # iOS biometric support (temporarily disabled)
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4" # Updated launcher icons

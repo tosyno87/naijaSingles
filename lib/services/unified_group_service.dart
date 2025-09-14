@@ -556,6 +556,517 @@ class UnifiedGroupService {
       log('❌ Error notifying group members: $e');
     }
   }
+
+  /// Add member to group (admin/creator only)
+  Future<bool> addMemberToGroup({
+    required String groupId,
+    required String userId,
+    String? invitedBy,
+  }) async {
+    try {
+      log('👥 Adding member to group: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if current user has permission to add members
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final adminIds = List<String>.from(groupData['adminIds'] ?? []);
+      final creatorId = groupData['creatorId'] as String?;
+      
+      if (creatorId != currentUserId && !adminIds.contains(currentUserId)) {
+        throw Exception('Only group creators and admins can add members');
+      }
+
+      // Check if user is already a member
+      final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+      if (memberIds.contains(userId)) {
+        throw Exception('User is already a member of this group');
+      }
+
+      // Check group capacity
+      final maxMembers = groupData['maxMembers'] as int? ?? 100;
+      if (memberIds.length >= maxMembers) {
+        throw Exception('Group has reached maximum capacity');
+      }
+
+      // Add user to group
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'memberIds': FieldValue.arrayUnion([userId]),
+        'memberCount': FieldValue.increment(1),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to the new member
+      await _firestore.collection('notifications').add({
+        'userId': userId,
+        'type': 'group_invitation',
+        'title': 'Added to Group',
+        'message': 'You were added to "${groupData['name']}"',
+        'groupId': groupId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+      });
+
+      // Notify other group members
+      await _notifyGroupMembers(groupId, 'A new member joined the group', excludeUserId: userId);
+
+      log('✅ Successfully added member to group: $groupId');
+      return true;
+    } catch (e) {
+      log('❌ Error adding member to group: $e');
+      rethrow;
+    }
+  }
+
+  /// Remove member from group (admin/creator only)
+  Future<bool> removeMemberFromGroup({
+    required String groupId,
+    required String userId,
+    String? reason,
+  }) async {
+    try {
+      log('👥 Removing member from group: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if current user has permission to remove members
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final adminIds = List<String>.from(groupData['adminIds'] ?? []);
+      final creatorId = groupData['creatorId'] as String?;
+      
+      if (creatorId != currentUserId && !adminIds.contains(currentUserId)) {
+        throw Exception('Only group creators and admins can remove members');
+      }
+
+      // Check if user is a member
+      final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+      if (!memberIds.contains(userId)) {
+        throw Exception('User is not a member of this group');
+      }
+
+      // Remove user from group
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'memberIds': FieldValue.arrayRemove([userId]),
+        'adminIds': FieldValue.arrayRemove([userId]), // Also remove from admins if they were one
+        'memberCount': FieldValue.increment(-1),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to the removed member
+      await _firestore.collection('notifications').add({
+        'userId': userId,
+        'type': 'group_removal',
+        'title': 'Removed from Group',
+        'message': 'You were removed from "${groupData['name']}"${reason != null ? ': $reason' : ''}',
+        'groupId': groupId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+      });
+
+      // Notify other group members
+      await _notifyGroupMembers(groupId, 'A member left the group', excludeUserId: userId);
+
+      log('✅ Successfully removed member from group: $groupId');
+      return true;
+    } catch (e) {
+      log('❌ Error removing member from group: $e');
+      rethrow;
+    }
+  }
+
+  /// Promote member to admin (creator only)
+  Future<bool> promoteMemberToAdmin({
+    required String groupId,
+    required String userId,
+  }) async {
+    try {
+      log('👑 Promoting member to admin: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if current user is the creator
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final creatorId = groupData['creatorId'] as String?;
+      
+      if (creatorId != currentUserId) {
+        throw Exception('Only group creators can promote members to admin');
+      }
+
+      // Check if user is a member
+      final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+      if (!memberIds.contains(userId)) {
+        throw Exception('User is not a member of this group');
+      }
+
+      // Check if user is already an admin
+      final adminIds = List<String>.from(groupData['adminIds'] ?? []);
+      if (adminIds.contains(userId)) {
+        throw Exception('User is already an admin');
+      }
+
+      // Promote user to admin
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'adminIds': FieldValue.arrayUnion([userId]),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to the promoted member
+      await _firestore.collection('notifications').add({
+        'userId': userId,
+        'type': 'group_promotion',
+        'title': 'Promoted to Admin',
+        'message': 'You were promoted to admin in "${groupData['name']}"',
+        'groupId': groupId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+      });
+
+      // Notify other group members
+      await _notifyGroupMembers(groupId, 'A member was promoted to admin', excludeUserId: userId);
+
+      log('✅ Successfully promoted member to admin: $groupId');
+      return true;
+    } catch (e) {
+      log('❌ Error promoting member to admin: $e');
+      rethrow;
+    }
+  }
+
+  /// Demote admin to member (creator only)
+  Future<bool> demoteAdminToMember({
+    required String groupId,
+    required String userId,
+  }) async {
+    try {
+      log('👑 Demoting admin to member: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if current user is the creator
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final creatorId = groupData['creatorId'] as String?;
+      
+      if (creatorId != currentUserId) {
+        throw Exception('Only group creators can demote admins');
+      }
+
+      // Check if user is an admin
+      final adminIds = List<String>.from(groupData['adminIds'] ?? []);
+      if (!adminIds.contains(userId)) {
+        throw Exception('User is not an admin');
+      }
+
+      // Don't allow demoting the creator
+      if (creatorId == userId) {
+        throw Exception('Cannot demote the group creator');
+      }
+
+      // Demote admin to member
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'adminIds': FieldValue.arrayRemove([userId]),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to the demoted member
+      await _firestore.collection('notifications').add({
+        'userId': userId,
+        'type': 'group_demotion',
+        'title': 'Demoted from Admin',
+        'message': 'You were demoted from admin in "${groupData['name']}"',
+        'groupId': groupId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+      });
+
+      // Notify other group members
+      await _notifyGroupMembers(groupId, 'An admin was demoted to member', excludeUserId: userId);
+
+      log('✅ Successfully demoted admin to member: $groupId');
+      return true;
+    } catch (e) {
+      log('❌ Error demoting admin to member: $e');
+      rethrow;
+    }
+  }
+
+  /// Search users for group invitation
+  Future<List<Map<String, dynamic>>> searchUsersForInvitation({
+    required String query,
+    required String groupId,
+    int limit = 20,
+  }) async {
+    try {
+      log('🔍 Searching users for group invitation: $query');
+
+      // Get current group members to exclude them from search
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+
+      // Search users by name, email, or username
+      final usersQuery = await _firestore
+          .collection('users')
+          .where('displayName', isGreaterThanOrEqualTo: query)
+          .where('displayName', isLessThan: query + 'z')
+          .limit(limit)
+          .get();
+
+      final users = <Map<String, dynamic>>[];
+      
+      for (final doc in usersQuery.docs) {
+        final userData = doc.data();
+        final userId = doc.id;
+        
+        // Skip if user is already a member
+        if (memberIds.contains(userId)) continue;
+        
+        users.add({
+          'id': userId,
+          'displayName': userData['displayName'] ?? 'Unknown User',
+          'email': userData['email'] ?? '',
+          'photoUrl': userData['photoUrl'] ?? '',
+          'isOnline': userData['isOnline'] ?? false,
+          'lastSeen': userData['lastSeen'],
+        });
+      }
+
+      log('✅ Found ${users.length} users for invitation');
+      return users;
+    } catch (e) {
+      log('❌ Error searching users for invitation: $e');
+      rethrow;
+    }
+  }
+
+  /// Send group invitation
+  Future<bool> sendGroupInvitation({
+    required String groupId,
+    required String userId,
+    String? message,
+  }) async {
+    try {
+      log('📧 Sending group invitation: $groupId to $userId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if current user has permission to send invitations
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final adminIds = List<String>.from(groupData['adminIds'] ?? []);
+      final creatorId = groupData['creatorId'] as String?;
+      
+      if (creatorId != currentUserId && !adminIds.contains(currentUserId)) {
+        throw Exception('Only group creators and admins can send invitations');
+      }
+
+      // Check if user is already a member
+      final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+      if (memberIds.contains(userId)) {
+        throw Exception('User is already a member of this group');
+      }
+
+      // Create invitation
+      await _firestore.collection('groupInvitations').add({
+        'groupId': groupId,
+        'invitedUserId': userId,
+        'invitedByUserId': currentUserId,
+        'message': message ?? 'You are invited to join "${groupData['name']}"',
+        'status': 'pending', // pending, accepted, declined
+        'createdAt': FieldValue.serverTimestamp(),
+        'expiresAt': FieldValue.serverTimestamp() + const Duration(days: 7),
+      });
+
+      // Send notification to the invited user
+      await _firestore.collection('notifications').add({
+        'userId': userId,
+        'type': 'group_invitation',
+        'title': 'Group Invitation',
+        'message': message ?? 'You are invited to join "${groupData['name']}"',
+        'groupId': groupId,
+        'invitationId': '', // Will be set when we get the doc ID
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+      });
+
+      log('✅ Successfully sent group invitation');
+      return true;
+    } catch (e) {
+      log('❌ Error sending group invitation: $e');
+      rethrow;
+    }
+  }
+
+  /// Accept group invitation
+  Future<bool> acceptGroupInvitation(String invitationId) async {
+    try {
+      log('✅ Accepting group invitation: $invitationId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Get invitation
+      final invitationDoc = await _firestore.collection('groupInvitations').doc(invitationId).get();
+      if (!invitationDoc.exists) {
+        throw Exception('Invitation not found');
+      }
+
+      final invitationData = invitationDoc.data()!;
+      final groupId = invitationData['groupId'] as String;
+      final invitedUserId = invitationData['invitedUserId'] as String;
+      final status = invitationData['status'] as String;
+
+      // Check if invitation is for current user
+      if (invitedUserId != currentUserId) {
+        throw Exception('This invitation is not for you');
+      }
+
+      // Check if invitation is still pending
+      if (status != 'pending') {
+        throw Exception('This invitation has already been ${status}');
+      }
+
+      // Check if invitation has expired
+      final expiresAt = invitationData['expiresAt'] as Timestamp?;
+      if (expiresAt != null && expiresAt.toDate().isBefore(DateTime.now())) {
+        throw Exception('This invitation has expired');
+      }
+
+      // Update invitation status
+      await _firestore.collection('groupInvitations').doc(invitationId).update({
+        'status': 'accepted',
+        'acceptedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Add user to group
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'memberIds': FieldValue.arrayUnion([currentUserId]),
+        'memberCount': FieldValue.increment(1),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to group members
+      await _notifyGroupMembers(groupId, 'A new member joined the group');
+
+      log('✅ Successfully accepted group invitation');
+      return true;
+    } catch (e) {
+      log('❌ Error accepting group invitation: $e');
+      rethrow;
+    }
+  }
+
+  /// Decline group invitation
+  Future<bool> declineGroupInvitation(String invitationId) async {
+    try {
+      log('❌ Declining group invitation: $invitationId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Get invitation
+      final invitationDoc = await _firestore.collection('groupInvitations').doc(invitationId).get();
+      if (!invitationDoc.exists) {
+        throw Exception('Invitation not found');
+      }
+
+      final invitationData = invitationDoc.data()!;
+      final invitedUserId = invitationData['invitedUserId'] as String;
+      final status = invitationData['status'] as String;
+
+      // Check if invitation is for current user
+      if (invitedUserId != currentUserId) {
+        throw Exception('This invitation is not for you');
+      }
+
+      // Check if invitation is still pending
+      if (status != 'pending') {
+        throw Exception('This invitation has already been ${status}');
+      }
+
+      // Update invitation status
+      await _firestore.collection('groupInvitations').doc(invitationId).update({
+        'status': 'declined',
+        'declinedAt': FieldValue.serverTimestamp(),
+      });
+
+      log('✅ Successfully declined group invitation');
+      return true;
+    } catch (e) {
+      log('❌ Error declining group invitation: $e');
+      rethrow;
+    }
+  }
+
+  /// Get user's pending group invitations
+  Stream<List<Map<String, dynamic>>> getUserInvitations() {
+    final currentUserId = _auth.currentUser?.uid;
+    if (currentUserId == null) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('groupInvitations')
+        .where('invitedUserId', isEqualTo: currentUserId)
+        .where('status', isEqualTo: 'pending')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          ...data,
+        };
+      }).toList();
+    });
+  }
 }
 
 /// Unified group types that combine cultural and chat functionality

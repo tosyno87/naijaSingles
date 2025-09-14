@@ -595,6 +595,33 @@ service cloud.firestore {
       allow read: if request.auth != null;
     }
 
+    // Group Invitations collection - for managing group invitations
+    match /groupInvitations/{invitationId} {
+      // Users can read invitations sent to them
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.invitedUserId;
+      
+      // Users can read invitations they sent
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.invitedByUserId;
+      
+      // Group creators and admins can create invitations
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.invitedByUserId &&
+                     request.resource.data.keys().hasAll(['groupId', 'invitedUserId', 'invitedByUserId', 'status', 'createdAt']) &&
+                     request.resource.data.status == 'pending';
+      
+      // Invited users can update invitation status
+      allow update: if request.auth != null && 
+                     request.auth.uid == resource.data.invitedUserId &&
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'acceptedAt', 'declinedAt']) &&
+                     resource.data.status == 'pending';
+      
+      // Group creators and admins can delete invitations
+      allow delete: if request.auth != null && 
+                     request.auth.uid == resource.data.invitedByUserId;
+    }
+
     // Block any other access not explicitly allowed above
     match /{document=**} {
       allow read, write: if false;

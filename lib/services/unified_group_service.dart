@@ -39,6 +39,8 @@ class UnifiedGroupService {
       if (!allMembers.contains(currentUserId)) {
         allMembers.add(currentUserId);
       }
+      
+      log('👥 createUnifiedGroup: Creator $currentUserId added to members: $allMembers');
 
       // Create unified group document
       final groupData = {
@@ -106,6 +108,7 @@ class UnifiedGroupService {
       );
 
       log('✅ Unified group created successfully: $groupId');
+      log('📊 Group data: memberIds=${groupData['memberIds']}, isActive=${groupData['isActive']}');
       return group;
     } catch (e) {
       log('❌ Error creating unified group: $e');
@@ -303,24 +306,33 @@ class UnifiedGroupService {
   Stream<List<UnifiedGroup>> getUserGroups() {
     final currentUserId = _auth.currentUser?.uid;
     if (currentUserId == null) {
+      log('⚠️ getUserGroups: No current user');
       return Stream.value([]);
     }
+
+    log('🔍 getUserGroups: Loading groups for user: $currentUserId');
 
     return _firestore
         .collection('unifiedGroups')
         .where('memberIds', arrayContains: currentUserId)
         .snapshots()
         .map((snapshot) {
+      log('📊 getUserGroups: Found ${snapshot.docs.length} groups in query');
+      
       // Filter and sort in memory to avoid complex index requirements
       final groups = snapshot.docs.map((doc) {
-        return UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+        final data = doc.data() as Map<String, dynamic>;
+        log('📋 getUserGroups: Group ${doc.id} - isActive: ${data['isActive']}, memberIds: ${data['memberIds']}');
+        return UnifiedGroup.fromMap(doc.id, data);
       }).toList();
       
       // Filter active groups and sort by last activity
-      groups.removeWhere((group) => !group.isActive);
-      groups.sort((a, b) => b.lastActivityAt.compareTo(a.lastActivityAt));
+      final activeGroups = groups.where((group) => group.isActive).toList();
+      log('✅ getUserGroups: ${activeGroups.length} active groups after filtering');
       
-      return groups;
+      activeGroups.sort((a, b) => b.lastActivityAt.compareTo(a.lastActivityAt));
+      
+      return activeGroups;
     });
   }
 

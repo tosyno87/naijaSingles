@@ -70,7 +70,7 @@ jobs:
       run: flutter test
       
     - name: Build iOS (no signing)
-      run: flutter build ios --no-codesign
+      run: flutter build ios --debug
       
     - name: Archive iOS build
       run: |

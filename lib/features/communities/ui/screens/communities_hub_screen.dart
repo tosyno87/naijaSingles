@@ -125,12 +125,12 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             const SizedBox(width: 16),
             Expanded(
               child: _buildActionCard(
-                'Groups',
+                'Group Chats',
                 'Join communities and connect with people',
                 Custom3DIcons.groups(),
                 const Color(0xFF008037), // Green accent
                 () {
-                  Navigator.pushNamed(context, RouteName.groupsScreen);
+                  Navigator.pushNamed(context, RouteName.groupChatsScreen);
                 },
               ),
             ),

@@ -9,6 +9,7 @@ import 'package:naijasingles/features/auth/email_password/ui/screens/email_login
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_password_reset_screen.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/groups/ui/screens/groups_screen.dart';
+import 'package:naijasingles/features/group_chat/screens/group_list_screen.dart';
 import 'package:naijasingles/features/home/main_navigation_screen.dart';
 import 'package:naijasingles/features/onboarding/onboarding_main.dart';
 import 'package:naijasingles/features/profile/edit_profile_screen.dart';
@@ -138,6 +139,7 @@ abstract class AppRouter {
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(showBackButton: false), // No back button by default
     RouteName.groupsScreen: (context) => const GroupsScreen(),
+    RouteName.groupChatsScreen: (context) => const GroupListScreen(),
 
     // Settings screens
     RouteName.settingsScreen: (context) => const SettingsScreen(),

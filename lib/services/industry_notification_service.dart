@@ -6,7 +6,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:naijasingles/services/industry_standard_image_service.dart';
 
 /// Industry-standard notification service following Hinge/Bumble/Tinder best practices
 /// 
@@ -164,7 +163,7 @@ class IndustryNotificationService {
   /// Request notification permissions with proper handling
   Future<bool> _requestPermissions() async {
     // Request FCM permissions
-    final FirebaseNotificationSettings fcmSettings = await _messaging.requestPermission(
+    final settings = await _messaging.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -183,7 +182,7 @@ class IndustryNotificationService {
           sound: true,
         );
 
-    final bool fcmAuthorized = fcmSettings.authorizationStatus == AuthorizationStatus.authorized;
+    final bool fcmAuthorized = settings.authorizationStatus == AuthorizationStatus.authorized;
     final bool localAuthorized = localPermission ?? false;
 
     return fcmAuthorized && localAuthorized;

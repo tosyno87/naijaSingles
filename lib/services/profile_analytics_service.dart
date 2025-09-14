@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 /// Industry-standard profile analytics service
 /// Features:
@@ -16,7 +15,6 @@ class ProfileAnalyticsService {
   ProfileAnalyticsService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Track profile view
   Future<void> trackProfileView(String profileId, String viewerId) async {
@@ -426,10 +424,12 @@ class ProfileAnalyticsService {
       double score = 0.0;
       
       // Profile completeness (30%)
-      score += 0.3 * _calculateProfileCompleteness(userId);
+      final profileCompleteness = await _calculateProfileCompleteness(userId);
+      score += 0.3 * profileCompleteness;
       
       // Activity level (25%)
-      score += 0.25 * _calculateActivityLevel(userId);
+      final activityLevel = await _calculateActivityLevel(userId);
+      score += 0.25 * activityLevel;
       
       // Response rate (25%)
       score += 0.25 * analytics.matchRate / 100;

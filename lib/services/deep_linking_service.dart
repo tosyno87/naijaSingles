@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:developer';
@@ -175,7 +174,7 @@ class DeepLinkingService {
   }
 
   /// Launch URL (fallback to web)
-  Future<bool> launchUrl(String url) async {
+  Future<bool> launchExternalUrl(String url) async {
     try {
       final Uri uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {

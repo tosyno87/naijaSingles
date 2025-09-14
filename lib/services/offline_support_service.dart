@@ -48,8 +48,24 @@ class OfflineSupportService {
     try {
       final prefs = await SharedPreferences.getInstance();
       
-      // Convert profiles to JSON
-      final profilesJson = profiles.map((profile) => profile.toJson()).toList();
+      // Convert profiles to JSON using basic serialization
+      final profilesJson = profiles.map((profile) => {
+        'id': profile.id,
+        'name': profile.name,
+        'userGender': profile.userGender,
+        'age': profile.age,
+        'showGender': profile.showGender,
+        'maxDistance': profile.maxDistance,
+        'latitude': profile.latitude,
+        'longitude': profile.longitude,
+        'imageUrl': profile.imageUrl,
+        'bio': profile.bio,
+        'nationality': profile.nationality,
+        'tribe': profile.tribe,
+        'occupation': profile.occupation,
+        'languages': profile.languages,
+        'religion': profile.religion,
+      }).toList();
       final jsonString = jsonEncode(profilesJson);
       
       // Store in cache
@@ -85,8 +101,17 @@ class OfflineSupportService {
     try {
       final prefs = await SharedPreferences.getInstance();
       
-      // Convert messages to JSON
-      final messagesJson = messages.map((message) => message.toJson()).toList();
+      // Convert messages to JSON using basic serialization
+      final messagesJson = messages.map((message) => {
+        'threadId': message.threadId,
+        'otherUserId': message.otherUserId,
+        'otherUserName': message.otherUserName,
+        'lastMessage': message.lastMessage,
+        'lastMessageSenderId': message.lastMessageSenderId,
+        'timestamp': message.timestamp.toIso8601String(),
+        'unread': message.unread,
+        'avatarUrl': message.avatarUrl,
+      }).toList();
       final jsonString = jsonEncode(messagesJson);
       
       // Store in cache with thread ID
@@ -107,7 +132,19 @@ class OfflineSupportService {
       if (jsonString == null) return [];
 
       final List<dynamic> messagesJson = jsonDecode(jsonString);
-      final messages = messagesJson.map((json) => MessageThreadInfo.fromJson(json)).toList();
+      final messages = messagesJson.map((json) {
+        final data = json as Map<String, dynamic>;
+        return MessageThreadInfo(
+          threadId: data['threadId'] as String,
+          otherUserId: data['otherUserId'] as String,
+          otherUserName: data['otherUserName'] as String,
+          lastMessage: data['lastMessage'] as String,
+          lastMessageSenderId: data['lastMessageSenderId'] as String?,
+          timestamp: DateTime.parse(data['timestamp'] as String),
+          unread: data['unread'] as bool,
+          avatarUrl: data['avatarUrl'] as String?,
+        );
+      }).toList();
       
       log('📱 Retrieved ${messages.length} cached messages for thread $threadId');
       return messages;
@@ -121,7 +158,27 @@ class OfflineSupportService {
   Future<void> cacheUserProfile(UserModel profile) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(profile.toJson());
+      
+      // Convert profile to JSON using basic serialization
+      final profileJson = {
+        'id': profile.id,
+        'name': profile.name,
+        'userGender': profile.userGender,
+        'age': profile.age,
+        'showGender': profile.showGender,
+        'maxDistance': profile.maxDistance,
+        'latitude': profile.latitude,
+        'longitude': profile.longitude,
+        'imageUrl': profile.imageUrl,
+        'bio': profile.bio,
+        'nationality': profile.nationality,
+        'tribe': profile.tribe,
+        'occupation': profile.occupation,
+        'languages': profile.languages,
+        'religion': profile.religion,
+      };
+      
+      final jsonString = jsonEncode(profileJson);
       await prefs.setString(_cachedUserProfileKey, jsonString);
       
       log('💾 Cached user profile for offline viewing');
@@ -201,11 +258,6 @@ class OfflineSupportService {
     }
   }
 
-  /// Handle connectivity changes (simplified)
-  Future<void> _onConnectivityChanged() async {
-    log('🌐 Connectivity changed, starting sync...');
-    await _startBackgroundSync();
-  }
 
   /// Start background sync
   Future<void> _startBackgroundSync() async {

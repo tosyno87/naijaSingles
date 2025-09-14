@@ -53,7 +53,7 @@ class AdvancedSearchService {
       
       // Convert to UserModel list
       final List<UserModel> users = snapshot.docs
-          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
           .toList();
 
       // Apply additional filtering (for complex criteria)
@@ -172,8 +172,6 @@ class AdvancedSearchService {
       case SearchSortBy.age:
         query = query.orderBy('age', descending: false);
         break;
-      default:
-        query = query.orderBy('lastActive', descending: true);
     }
 
     return query;

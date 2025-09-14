@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -162,7 +163,7 @@ class BackgroundSyncService {
         
         if (localMessages != null) {
           final localMessagesList = List<Map<String, dynamic>>.from(
-            Map<String, dynamic>.from(localMessages as Map)
+            localMessages as List
           );
           allMessages.addAll(localMessagesList);
         }
@@ -381,8 +382,9 @@ class BackgroundSyncService {
       final tasksJson = prefs.getString('sync_queue');
 
       if (tasksJson != null) {
+        final tasksData = jsonDecode(tasksJson);
         final tasksList = List<Map<String, dynamic>>.from(
-          Map<String, dynamic>.from(tasksJson as Map)
+          tasksData as List
         );
         
         for (final taskMap in tasksList) {

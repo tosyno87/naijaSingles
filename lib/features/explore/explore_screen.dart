@@ -26,11 +26,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
   List<UserModel> _users = [];
   bool _isLoading = true;
   String? _error;
+  bool _disposed = false;
 
   @override
   void initState() {
     super.initState();
     _loadCurrentUser();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -39,46 +46,58 @@ class _ExploreScreenState extends State<ExploreScreen> {
       final user = userProvider.currentUser;
       
       if (user != null) {
-        setState(() {
-          _currentUser = user;
-        });
+        if (mounted && !_disposed) {
+          setState(() {
+            _currentUser = user;
+          });
+        }
         await _loadUsers();
       } else {
-        setState(() {
-          _error = 'Please log in to explore profiles';
-          _isLoading = false;
-        });
+        if (mounted && !_disposed) {
+          setState(() {
+            _error = 'Please log in to explore profiles';
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
       log('Error loading current user: $e');
-      setState(() {
-        _error = 'Failed to load user data';
-        _isLoading = false;
-      });
+      if (mounted && !_disposed) {
+        setState(() {
+          _error = 'Failed to load user data';
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _loadUsers() async {
-    if (_currentUser == null) return;
+    if (_currentUser == null || _disposed) return;
 
     try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
+      if (mounted && !_disposed) {
+        setState(() {
+          _isLoading = true;
+          _error = null;
+        });
+      }
 
       final users = await UserSearchRepo.getUserList(_currentUser!);
       
-      setState(() {
-        _users = users;
-        _isLoading = false;
-      });
+      if (mounted && !_disposed) {
+        setState(() {
+          _users = users;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       log('Error loading users: $e');
-      setState(() {
-        _error = 'Failed to load profiles';
-        _isLoading = false;
-      });
+      if (mounted && !_disposed) {
+        setState(() {
+          _error = 'Failed to load profiles';
+          _isLoading = false;
+        });
+      }
     }
   }
 

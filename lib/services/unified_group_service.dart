@@ -321,7 +321,7 @@ class UnifiedGroupService {
       
       // Filter and sort in memory to avoid complex index requirements
       final groups = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         log('📋 getUserGroups: Group ${doc.id} - isActive: ${data['isActive']}, memberIds: ${data['memberIds']}');
         return UnifiedGroup.fromMap(doc.id, data);
       }).toList();

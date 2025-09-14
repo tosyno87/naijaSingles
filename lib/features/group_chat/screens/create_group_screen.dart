@@ -292,7 +292,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   Widget _buildLocationSection() {
-    if (_selectedType != GroupType.location) return const SizedBox.shrink();
+    if (_selectedType != GroupType.local) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

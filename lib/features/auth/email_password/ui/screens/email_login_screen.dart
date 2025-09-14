@@ -20,11 +20,11 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  // Define colors based on the African-themed design guidelines
-  static const Color backgroundColor = Color(0xFFFFF6E5); // Warm cream/beige
-  static const Color primaryColor = Color(0xFF008037); // Deep Green
-  static const Color accentColor = Color(0xFFEF476F); // Warm coral red
-  static const Color textColor = Color(0xFF3E1F0D); // Deep brown
+  // Define colors based on the Afrocentric design guidelines
+  static const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+  static const Color primaryColor = Color(0xFF008037); // Green accent
+  static const Color accentColor = Color(0xFF008037); // Use green for consistency
+  static const Color textColor = Color(0xFF2D2D2D); // Dark text
 
   @override
   void dispose() {
@@ -87,17 +87,17 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           const SizedBox(width: 8),
                           Text(
                             "Afropeep",
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 36,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF4E2600), // Deep brown
+                              color: const Color(0xFF2D2D2D), // Dark text
                               letterSpacing: 1.2,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Icon(
                             Icons.auto_awesome,
-                            color: const Color(0xFFEF476F), // Coral accent
+                            color: const Color(0xFF008037), // Green accent
                             size: 32,
                           ),
                         ],
@@ -125,7 +125,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
                       Text(
                         "Welcome Back",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: textColor,
@@ -136,7 +136,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
                       Text(
                         "Sign in to continue",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           color: textColor.withValues(alpha: 0.7),
                         ),
@@ -159,7 +159,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                               Expanded(
                                 child: Text(
                                   state.error,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     color: accentColor,
                                     fontSize: 14,
                                   ),
@@ -225,7 +225,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           ),
                           child: Text(
                             "Forgot Password?",
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -273,7 +273,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 )
                               : Text(
                                   "Sign In",
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -296,7 +296,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
                               "OR",
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 14,
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w500,
@@ -320,7 +320,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                         children: [
                           Text(
                             "Don't have an account? ",
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 14,
                               color: textColor,
                             ),
@@ -337,7 +337,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                             },
                             child: Text(
                               "Sign Up",
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: primaryColor,
@@ -393,13 +393,13 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
           }
           return null;
         },
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.montserrat(
           fontSize: 16,
-          color: const Color(0xFF3E1F0D),
+          color: const Color(0xFF2D2D2D),
         ),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: GoogleFonts.poppins(
+          hintStyle: GoogleFonts.montserrat(
             color: Colors.grey.shade400,
           ),
           prefixIcon: Icon(

@@ -4,6 +4,7 @@ import '../../../common/constants/app_colors.dart';
 import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
 import '../widgets/tribe_connect_card.dart';
+import '../widgets/modern_profile_card.dart';
 import '../widgets/match_confirmation_modal.dart';
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../services/super_like_service.dart';
@@ -69,12 +70,10 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         itemCount: widget.users.length,
         itemBuilder: (context, index) {
           final user = widget.users[index];
-          return TribeConnectCard(
+          return ModernProfileCard(
             user: user,
             onConnect: () => _handleConnect(user),
-            onMessage: () => _handleMessage(user),
-            onSave: () => _handleSave(user),
-            onBlock: () => _handleBlock(user),
+            onTap: () => _handleViewProfile(user),
           );
         },
       ),
@@ -233,6 +232,15 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     } catch (e) {
       _showError('Failed to connect. Please try again.');
     }
+  }
+
+  void _handleViewProfile(UserModel user) {
+    // Navigate to user detail screen
+    Navigator.pushNamed(
+      context,
+      '/user_detail',
+      arguments: user,
+    );
   }
 
   void _handleMessage(UserModel user) {

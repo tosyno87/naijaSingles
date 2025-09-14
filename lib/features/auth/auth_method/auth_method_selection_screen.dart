@@ -18,14 +18,14 @@ class AuthMethodSelectionScreen extends StatelessWidget {
       statusBarColor: Colors.transparent,
     ));
 
-    // Define colors based on MVP styling
+    // Define colors based on Afrocentric design guidelines
     const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
-    const Color primaryColor = Color(0xFF008037); // Green
-    const Color accentColor = Color(0xFFEF476F); // Pink/Coral
+    const Color primaryColor = Color(0xFF008037); // Green accent
+    const Color accentColor = Color(0xFF008037); // Use green for consistency
     const Color googleBlue = Color(0xFF3B82F6); // Google blue
     const Color appleBlack = Color(0xFF000000); // Apple black
-    const Color textColor = Color(0xFF3B3B3B); // Text dark gray
-    const Color textLightBrown = Color(0xFF8B6C59); // Light brown for subtitle
+    const Color textColor = Color(0xFF2D2D2D); // Dark text
+    const Color textLightBrown = Color(0xFF666666); // Light gray for subtitle
 
     return Scaffold(
       backgroundColor: backgroundColor,

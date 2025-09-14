@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/features/explore/screens/tribe_connect_screen.dart';
+import 'package:naijasingles/features/explore/widgets/modern_profile_card.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:naijasingles/common/data/repo/user_search_repo.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';

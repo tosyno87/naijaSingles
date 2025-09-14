@@ -21,6 +21,7 @@ import 'common/data/repo/phone_auth_repo.dart';
 import 'common/providers/theme_provider.dart';
 import 'common/utils/observer.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
+import 'debug/auto_login_service.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -61,6 +62,13 @@ Future<void> main() async {
       log("❌ Auth state error: $error");
     },
   );
+
+  // Auto-login for testing in debug mode
+  try {
+    await AutoLoginService.autoLoginForTesting();
+  } catch (e) {
+    log('⚠️ Auto-login error: $e');
+  }
 
   Bloc.observer = SimpleBlocObserver();
   SystemChrome.setPreferredOrientations([

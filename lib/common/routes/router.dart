@@ -9,6 +9,7 @@ import 'package:naijasingles/features/auth/email_password/ui/screens/email_login
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_password_reset_screen.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/groups/ui/screens/groups_screen.dart';
+import 'package:naijasingles/features/group_chat/screens/group_list_screen.dart';
 import 'package:naijasingles/features/home/main_navigation_screen.dart';
 import 'package:naijasingles/features/onboarding/onboarding_main.dart';
 import 'package:naijasingles/features/profile/edit_profile_screen.dart';
@@ -51,6 +52,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
 import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
 import 'package:naijasingles/features/user/ui/screens/user_name.dart';
+import 'package:naijasingles/features/dating/screens/user_detail_screen.dart';
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 
 abstract class AppRouter {
@@ -137,6 +139,7 @@ abstract class AppRouter {
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(showBackButton: false), // No back button by default
     RouteName.groupsScreen: (context) => const GroupsScreen(),
+    RouteName.groupChatsScreen: (context) => const GroupListScreen(),
 
     // Settings screens
     RouteName.settingsScreen: (context) => const SettingsScreen(),
@@ -176,6 +179,21 @@ abstract class AppRouter {
       } else {
         // Fallback for any other type - this shouldn't happen but provides safety
         throw ArgumentError('Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}');
+      }
+    },
+    
+    // User detail route
+    RouteName.userDetailScreen: (context) {
+      final arguments = ModalRoute.of(context)!.settings.arguments;
+      if (arguments is UserModel) {
+        return UserDetailScreen(user: arguments);
+      } else if (arguments is Map && arguments['user'] is UserModel) {
+        return UserDetailScreen(
+          user: arguments['user'] as UserModel,
+          selectedMode: arguments['selectedMode'] as String?,
+        );
+      } else {
+        throw ArgumentError('Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}');
       }
     },
   };

@@ -474,7 +474,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           try {
             final ref =
                 _storage.ref().child('profile_photos/${user.uid}/photo_$i.jpg');
-            final uploadTask = await ref.putFile(photo);
+            await ref.putFile(photo);
             final url = await ref.getDownloadURL();
             photoUrls.add(url);
             log('Successfully uploaded photo $i to: profile_photos/${user.uid}/photo_$i.jpg');
@@ -921,6 +921,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
+      floatingActionButton: _formValid && !_isUploading
+          ? FloatingActionButton.extended(
+              onPressed: _saveProfile,
+              backgroundColor: primaryColor,
+              icon: const Icon(Icons.save, color: Colors.white),
+              label: Text(
+                'Save',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : null,
       body: _isUploading
           ? Center(
               child: Column(
@@ -1049,30 +1063,93 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     _buildAgeRangeSelector(),
                     const SizedBox(height: 32),
 
-                    // Save labelLarge
-                    SizedBox(
+                    // Save button with better visibility and feedback
+                    Container(
                       width: double.infinity,
-                      height: 50,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _formValid 
+                                ? primaryColor.withValues(alpha: 0.3)
+                                : Colors.grey.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
                       child: ElevatedButton(
                         onPressed: _formValid ? _saveProfile : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
+                          backgroundColor: _formValid ? primaryColor : Colors.grey.shade400,
                           disabledBackgroundColor: Colors.grey.shade400,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          elevation: 2,
+                          elevation: 0, // Using custom shadow instead
                         ),
-                        child: Text(
-                          'Save Profile',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _formValid ? Icons.save : Icons.lock,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _formValid ? 'Save Profile' : 'Complete Required Fields',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                    
+                    // Form validation status
+                    if (!_formValid) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.orange.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Colors.orange.shade700,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Complete these requirements to save:',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            _buildValidationRequirements(),
+                          ],
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -1421,6 +1498,80 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildValidationRequirements() {
+    List<Widget> requirements = [];
+    
+    // Check photo count
+    int photoCount = _photos.where((photo) => photo != null).length;
+    if (photoCount < 3) {
+      requirements.add(_buildRequirementItem(
+        'Upload at least 3 photos',
+        Icons.photo_camera,
+        photoCount >= 3,
+      ));
+    }
+    
+    // Check bio length
+    bool validBioLength = _bioController.text.trim().length >= 20;
+    if (!validBioLength) {
+      requirements.add(_buildRequirementItem(
+        'Write a bio (minimum 20 characters)',
+        Icons.description,
+        validBioLength,
+      ));
+    }
+    
+    // Check age
+    bool isAdult = _age >= 18;
+    if (!isAdult) {
+      requirements.add(_buildRequirementItem(
+        'You must be 18+ years old',
+        Icons.cake,
+        isAdult,
+      ));
+    }
+    
+    // Check form validation
+    bool formValid = _formKey.currentState?.validate() ?? false;
+    if (!formValid) {
+      requirements.add(_buildRequirementItem(
+        'Complete all required fields',
+        Icons.check_circle,
+        formValid,
+      ));
+    }
+    
+    return Column(
+      children: requirements,
+    );
+  }
+  
+  Widget _buildRequirementItem(String text, IconData icon, bool isCompleted) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(
+            isCompleted ? Icons.check_circle : icon,
+            color: isCompleted ? Colors.green : Colors.orange.shade700,
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: isCompleted ? Colors.green.shade700 : Colors.orange.shade700,
+                fontWeight: isCompleted ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

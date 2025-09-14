@@ -463,9 +463,163 @@ service cloud.firestore {
       allow create, update: if request.auth != null;
     }
 
+    // Unified Groups collection - for the new unified group system
+    match /unifiedGroups/{groupId} {
+      // Users can read public groups
+      allow read: if request.auth != null && 
+                   resource.data.isPublic == true;
+      
+      // Users can read groups they're members of
+      allow read: if request.auth != null && 
+                   request.auth.uid in resource.data.memberIds;
+      
+      // Users can create groups
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.creatorId &&
+                     request.resource.data.keys().hasAll(['name', 'description', 'type', 'creatorId', 'memberIds', 'isActive']) &&
+                     request.resource.data.name is string &&
+                     request.resource.data.name.size() > 0 &&
+                     request.resource.data.description is string &&
+                     request.resource.data.description.size() > 0;
+      
+      // Group creators and admins can update group settings
+      allow update: if request.auth != null && 
+                     request.auth.uid in resource.data.adminIds &&
+                     // Prevent changing critical fields
+                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['creatorId', 'createdAt']);
+      
+      // Group creators can delete groups
+      allow delete: if request.auth != null && 
+                     request.auth.uid == resource.data.creatorId;
+      
+      // Messages subcollection within unified groups
+      match /messages/{messageId} {
+        // Group members can read messages
+        allow read: if request.auth != null && 
+                     exists(/databases/$(database)/documents/unifiedGroups/$(groupId)) &&
+                     request.auth.uid in get(/databases/$(database)/documents/unifiedGroups/$(groupId)).data.memberIds;
+        
+        // Group members can create messages
+        allow create: if request.auth != null && 
+                       exists(/databases/$(database)/documents/unifiedGroups/$(groupId)) &&
+                       request.auth.uid in get(/databases/$(database)/documents/unifiedGroups/$(groupId)).data.memberIds &&
+                       request.resource.data.senderId == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['senderId', 'text', 'timestamp']) &&
+                       request.resource.data.text is string &&
+                       request.resource.data.text.size() > 0 &&
+                       request.resource.data.text.size() <= 1000;
+        
+        // Group members can update messages for read status
+        allow update: if request.auth != null && 
+                       exists(/databases/$(database)/documents/unifiedGroups/$(groupId)) &&
+                       request.auth.uid in get(/databases/$(database)/documents/unifiedGroups/$(groupId)).data.memberIds &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readBy']);
+        
+        // Group members can delete their own messages
+        allow delete: if request.auth != null && 
+                       exists(/databases/$(database)/documents/unifiedGroups/$(groupId)) &&
+                       request.auth.uid in get(/databases/$(database)/documents/unifiedGroups/$(groupId)).data.memberIds &&
+                       resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    // Legacy Groups collection - for backward compatibility
+    match /groups/{groupId} {
+      // Users can read public groups
+      allow read: if request.auth != null && 
+                   resource.data.isPublic == true;
+      
+      // Users can read groups they're members of
+      allow read: if request.auth != null && 
+                   request.auth.uid in resource.data.memberIds;
+      
+      // Users can create groups
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.creatorId;
+      
+      // Group creators and admins can update groups
+      allow update: if request.auth != null && 
+                     request.auth.uid in resource.data.adminIds;
+      
+      // Group creators can delete groups
+      allow delete: if request.auth != null && 
+                     request.auth.uid == resource.data.creatorId;
+    }
+
+    // Group Chats collection - for the original group chat system
+    match /groupChats/{groupId} {
+      // Users can read groups they're members of
+      allow read: if request.auth != null && 
+                   request.auth.uid in resource.data.memberIds;
+      
+      // Users can create groups
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.creatorId;
+      
+      // Group creators and admins can update groups
+      allow update: if request.auth != null && 
+                     request.auth.uid in resource.data.adminIds;
+      
+      // Group creators can delete groups
+      allow delete: if request.auth != null && 
+                     request.auth.uid == resource.data.creatorId;
+      
+      // Messages subcollection within group chats
+      match /messages/{messageId} {
+        // Group members can read messages
+        allow read: if request.auth != null && 
+                     exists(/databases/$(database)/documents/groupChats/$(groupId)) &&
+                     request.auth.uid in get(/databases/$(database)/documents/groupChats/$(groupId)).data.memberIds;
+        
+        // Group members can create messages
+        allow create: if request.auth != null && 
+                       exists(/databases/$(database)/documents/groupChats/$(groupId)) &&
+                       request.auth.uid in get(/databases/$(database)/documents/groupChats/$(groupId)).data.memberIds &&
+                       request.resource.data.senderId == request.auth.uid;
+        
+        // Group members can update messages for read status
+        allow update: if request.auth != null && 
+                       exists(/databases/$(database)/documents/groupChats/$(groupId)) &&
+                       request.auth.uid in get(/databases/$(database)/documents/groupChats/$(groupId)).data.memberIds;
+        
+        // Group members can delete their own messages
+        allow delete: if request.auth != null && 
+                       exists(/databases/$(database)/documents/groupChats/$(groupId)) &&
+                       request.auth.uid in get(/databases/$(database)/documents/groupChats/$(groupId)).data.memberIds &&
+                       resource.data.senderId == request.auth.uid;
+      }
+    }
+
     // Item access collection (for app configuration)
     match /Item_access/{itemId} {
       allow read: if request.auth != null;
+    }
+
+    // Group Invitations collection - for managing group invitations
+    match /groupInvitations/{invitationId} {
+      // Users can read invitations sent to them
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.invitedUserId;
+      
+      // Users can read invitations they sent
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.invitedByUserId;
+      
+      // Group creators and admins can create invitations
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.invitedByUserId &&
+                     request.resource.data.keys().hasAll(['groupId', 'invitedUserId', 'invitedByUserId', 'status', 'createdAt']) &&
+                     request.resource.data.status == 'pending';
+      
+      // Invited users can update invitation status
+      allow update: if request.auth != null && 
+                     request.auth.uid == resource.data.invitedUserId &&
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'acceptedAt', 'declinedAt']) &&
+                     resource.data.status == 'pending';
+      
+      // Group creators and admins can delete invitations
+      allow delete: if request.auth != null && 
+                     request.auth.uid == resource.data.invitedByUserId;
     }
 
     // Block any other access not explicitly allowed above

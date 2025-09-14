@@ -46,9 +46,9 @@ class ProfileImageCropperService {
           ),
         ],
         compressFormat: ImageCompressFormat.jpg,
-        compressQuality: 90,
-        maxWidth: 1200,
-        maxHeight: 1200,
+        compressQuality: 85, // Reduced from 90 for better file size
+        maxWidth: 1080, // Industry standard for mobile
+        maxHeight: 1080,
       );
 
       return croppedFile != null ? File(croppedFile.path) : null;
@@ -83,9 +83,9 @@ class ProfileImageCropperService {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
         source: source,
-        maxWidth: 2000,
-        maxHeight: 2000,
-        imageQuality: 95,
+        maxWidth: 1920, // Industry standard for mobile
+        maxHeight: 1920,
+        imageQuality: 90, // Reduced from 95 for better performance
       );
 
       if (image == null) return null;

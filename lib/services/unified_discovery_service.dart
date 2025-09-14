@@ -325,21 +325,6 @@ class UnifiedDiscoveryService {
     }
   }
 
-  /// Get gender variants for better matching
-  static List<String> _getGenderVariants(String gender) {
-    switch (gender.toLowerCase()) {
-      case 'men':
-      case 'male':
-        return ['men', 'male', 'Male', 'Men'];
-      case 'women':
-      case 'female':
-        return ['women', 'female', 'Female', 'Women'];
-      case 'everyone':
-        return ['everyone', 'men', 'women', 'male', 'female'];
-      default:
-        return [gender];
-    }
-  }
 
   /// Apply smart matching with mode-specific compatibility
   static Future<List<UserModel>> _applySmartMatching(

@@ -338,6 +338,52 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
         const SizedBox(height: 12),
 
+        // Cultural information tags
+        if (widget.user.nationality != null || widget.user.tribe != null) ...[
+          Row(
+            children: [
+              if (widget.user.nationality != null) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: afropeepGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    '🇳🇬 ${widget.user.nationality}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: afropeepGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              if (widget.user.tribe != null) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: afropeepGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    '🏛️ ${widget.user.tribe}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: afropeepGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
+
         // Location and distance
         Row(
           children: [
@@ -381,6 +427,52 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             ],
           ],
         ),
+
+        // Additional details
+        if (widget.user.profession != null || widget.user.education != null) ...[
+          const SizedBox(height: 12),
+          if (widget.user.profession != null) ...[
+            Row(
+              children: [
+                Icon(
+                  Icons.work,
+                  size: 18,
+                  color: textLightBrown,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  widget.user.profession!,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: textLightBrown,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (widget.user.education != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.school,
+                  size: 18,
+                  color: textLightBrown,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  widget.user.education!,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: textLightBrown,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
       ],
     );
   }
@@ -578,17 +670,48 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   }
 
   String _getBio() {
-    return widget.user.editInfo?['userBio']?.toString() ?? '';
+    // Try multiple sources for bio data
+    if (widget.user.bio != null && widget.user.bio!.isNotEmpty) {
+      return widget.user.bio!;
+    }
+    if (widget.user.editInfo?['userBio'] != null && 
+        widget.user.editInfo!['userBio'].toString().isNotEmpty) {
+      return widget.user.editInfo!['userBio'].toString();
+    }
+    return '';
   }
 
   List<String> _getInterests() {
+    List<String> interests = [];
+    
     // Try to get interests from different possible fields
     if (widget.user.editInfo?['interests'] is List) {
-      return List<String>.from(widget.user.editInfo!['interests']);
+      interests.addAll(List<String>.from(widget.user.editInfo!['interests']));
     }
-
-    // Add more interest extraction logic based on your data structure
-    return [];
+    
+    // Add cultural information as interests
+    if (widget.user.nationality != null && widget.user.nationality!.isNotEmpty) {
+      interests.add('🇳🇬 ${widget.user.nationality}');
+    }
+    if (widget.user.tribe != null && widget.user.tribe!.isNotEmpty) {
+      interests.add('🏛️ ${widget.user.tribe}');
+    }
+    if (widget.user.languages != null && widget.user.languages!.isNotEmpty) {
+      interests.addAll(widget.user.languages!.map((lang) => '🗣️ $lang'));
+    }
+    if (widget.user.religion != null && widget.user.religion!.isNotEmpty) {
+      interests.add('🙏 ${widget.user.religion}');
+    }
+    if (widget.user.occupation != null && widget.user.occupation!.isNotEmpty) {
+      interests.add('💼 ${widget.user.occupation}');
+    }
+    
+    // Add default interests if none found
+    if (interests.isEmpty) {
+      interests.addAll(['Dating', 'Music', 'Travel']);
+    }
+    
+    return interests;
   }
 }
 

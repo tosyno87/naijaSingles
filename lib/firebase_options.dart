@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart'
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'config/secure_config.dart';
 
 /// Default Firebase configuration options for the current platform
 class DefaultFirebaseOptions {
@@ -36,44 +37,44 @@ class DefaultFirebaseOptions {
   }
 
   // Web configuration
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
-    appId: '1:888697307756:web:95ea92b8c7288e31704e49',
-    messagingSenderId: '888697307756',
-    projectId: 'naijasingles-74a75',
-    authDomain: 'naijasingles-74a75.firebaseapp.com',
-    storageBucket: 'naijasingles-74a75.appspot.com',
+  static FirebaseOptions get web => FirebaseOptions(
+    apiKey: SecureConfig.firebaseWebApiKey,
+    appId: '1:${SecureConfig.firebaseMessagingSenderId}:web:95ea92b8c7288e31704e49',
+    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+    projectId: SecureConfig.firebaseProjectId,
+    authDomain: SecureConfig.firebaseAuthDomain,
+    storageBucket: SecureConfig.firebaseStorageBucket,
   );
 
   // Android configuration
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBX7hxCR3XPWOShZu-vundYxocvQj_zH48',
-    appId: '1:888697307756:android:a62a339c4079bebc704e49',
-    messagingSenderId: '888697307756',
-    projectId: 'naijasingles-74a75',
-    storageBucket: 'naijasingles-74a75.appspot.com',
+  static FirebaseOptions get android => FirebaseOptions(
+    apiKey: SecureConfig.firebaseAndroidApiKey,
+    appId: '1:${SecureConfig.firebaseMessagingSenderId}:android:a62a339c4079bebc704e49',
+    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+    projectId: SecureConfig.firebaseProjectId,
+    storageBucket: SecureConfig.firebaseStorageBucket,
   );
 
   // iOS configuration
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
-    appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
-    messagingSenderId: '888697307756',
-    projectId: 'naijasingles-74a75',
-    storageBucket: 'naijasingles-74a75.appspot.com',
-    iosClientId: '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
-    iosBundleId: 'com.app.naijasingles',
+  static FirebaseOptions get ios => FirebaseOptions(
+    apiKey: SecureConfig.firebaseIosApiKey,
+    appId: '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
+    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+    projectId: SecureConfig.firebaseProjectId,
+    storageBucket: SecureConfig.firebaseStorageBucket,
+    iosClientId: SecureConfig.firebaseIosClientId,
+    iosBundleId: SecureConfig.firebaseIosBundleId,
   );
 
   // macOS configuration
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
-    appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
-    messagingSenderId: '888697307756',
-    projectId: 'naijasingles-74a75',
-    storageBucket: 'naijasingles-74a75.appspot.com',
-    iosClientId: '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
-    iosBundleId: 'com.app.naijasingles',
+  static FirebaseOptions get macos => FirebaseOptions(
+    apiKey: SecureConfig.firebaseIosApiKey,
+    appId: '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
+    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+    projectId: SecureConfig.firebaseProjectId,
+    storageBucket: SecureConfig.firebaseStorageBucket,
+    iosClientId: SecureConfig.firebaseIosClientId,
+    iosBundleId: SecureConfig.firebaseIosBundleId,
   );
 }
 

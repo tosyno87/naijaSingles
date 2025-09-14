@@ -35,8 +35,10 @@ class RouteName {
   // ===== DISCOVERY & MATCHING ROUTES =====
   static const String exploreScreen = '/explore';
   static const String groupsScreen = '/groups';
+  static const String groupChatsScreen = '/group_chats';
   static const String matchPage = '/match';
   static const String chatPageScreen = '/chat_page';
+  static const String userDetailScreen = '/user_detail';
 
   // ===== SETTINGS ROUTES =====
   static const String settingPage = '/setting';

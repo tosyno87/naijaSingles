@@ -159,7 +159,7 @@ class EnhancedNotificationService {
                   Duration(seconds: 2 * _retryCount), () => _updateFCMToken(token));
               return;
             } else {
-              debugPrint('⚠️ APNS token not available after $_maxRetries retries, skipping');
+              debugPrint('⚠️ APNS token not available after $_maxRetries retries, skipping (this is normal in simulator)');
               _retryCount = 0; // Reset for future attempts
               // Continue without APNS token for now
             }

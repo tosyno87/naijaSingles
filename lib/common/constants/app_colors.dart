@@ -18,18 +18,18 @@ class AppColors {
   static const Color gradientLight = Color(0xFF10B981);
   static const Color gradientDark = Color(0xFF006B2E);
 
-  // 🎯 BACKGROUND COLORS
-  static const Color backgroundColor = Colors.white;
-  static const Color surfaceColor = Colors.white;
-  static const Color cardColor = Colors.white;
+  // 🎯 BACKGROUND COLORS - Afrocentric Theme
+  static const Color backgroundColor = Colors.white; // White background
+  static const Color surfaceColor = Colors.white; // White surface
+  static const Color cardColor = Colors.white; // White cards
   static const Color overlayColor = Color(0xFFF8FAFC);
 
-  // 📝 TEXT COLORS
-  static const Color textPrimary = Color(0xFF1E293B);
-  static const Color textSecondary = Color(0xFF64748B);
+  // 📝 TEXT COLORS - Afrocentric Theme
+  static const Color textPrimary = Color(0xFF2D2D2D); // Dark text for white background
+  static const Color textSecondary = Color(0xFF666666); // Medium grey
   static const Color textTertiary = Color(0xFF94A3B8);
-  static const Color textOnPrimary = Colors.white;
-  static const Color textOnSurface = Color(0xFF1E293B);
+  static const Color textOnPrimary = Colors.white; // White text on green
+  static const Color textOnSurface = Color(0xFF2D2D2D); // Dark text on white
 
   // 🎨 ACCENT COLORS
   static const Color success = Color(0xFF10B981);
@@ -93,10 +93,10 @@ class AppColors {
   static const Color shadow = Color(0x1A000000);
   static const Color disabled = Color(0xFF94A3B8);
 
-  // 📱 NAVIGATION COLORS
-  static const Color navSelected = Color(0xFF008037);
-  static const Color navUnselected = Color(0xFF64748B);
-  static const Color navBackground = Colors.white;
+  // 📱 NAVIGATION COLORS - Afrocentric Theme
+  static const Color navSelected = Color(0xFF008037); // Green for active
+  static const Color navUnselected = Color(0xFF666666); // Grey for inactive
+  static const Color navBackground = Colors.white; // White nav bar
 
   // 🎨 GRADIENT DEFINITIONS
   static const LinearGradient primaryGradient = LinearGradient(
@@ -145,7 +145,7 @@ class AppColors {
     ),
   ];
 
-  // 🎯 THEME DATA
+  // 🎯 THEME DATA - Afrocentric Theme
   static ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(

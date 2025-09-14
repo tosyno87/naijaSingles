@@ -60,18 +60,18 @@ class EventTemplatesService {
       ),
       
       EventTemplate(
-        id: 'networking_meetup',
-        name: 'Networking Meetup',
+        id: 'networking_event',
+        name: 'Networking Event',
         description: 'Connect with the African diaspora community',
         category: 'Professional Networking',
         icon: '🤝',
         color: 0xFF1E88E5,
         suggestedDuration: const Duration(hours: 3),
         defaultData: _createEventData(
-          name: 'Diaspora Connect Meetup',
+          name: 'Diaspora Connect Event',
           description: 'Network with fellow Africans and friends of Africa. Share experiences, build connections, and strengthen our community bonds.',
           category: 'Professional Networking',
-          tags: ['networking', 'diaspora', 'community', 'professional', 'meetup'],
+          tags: ['networking', 'diaspora', 'community', 'professional', 'event'],
           isFree: false,
           ticketPrice: 10.0, // $10 for networking event
           maxAttendees: 80,

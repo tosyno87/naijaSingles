@@ -21,11 +21,24 @@ import 'common/data/repo/phone_auth_repo.dart';
 import 'common/providers/theme_provider.dart';
 import 'common/utils/observer.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
+import 'debug/auto_login_service.dart';
 import 'firebase_options.dart';
+import 'config/secure_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  // Initialize Secure Configuration first
+  try {
+    await SecureConfig.initialize();
+    SecureConfig.validate();
+    log('🔒 Secure configuration loaded successfully');
+  } catch (e) {
+    log('❌ Secure configuration error: $e');
+    log('💡 Make sure you have created a .env file with your Firebase configuration');
+    // Continue anyway in development mode
+  }
 
   // Initialize Firebase with error handling
   try {
@@ -61,6 +74,13 @@ Future<void> main() async {
       log("❌ Auth state error: $error");
     },
   );
+
+  // Auto-login for testing in debug mode
+  try {
+    await AutoLoginService.autoLoginForTesting();
+  } catch (e) {
+    log('⚠️ Auto-login error: $e');
+  }
 
   Bloc.observer = SimpleBlocObserver();
   SystemChrome.setPreferredOrientations([

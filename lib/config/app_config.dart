@@ -1,3 +1,5 @@
+import 'secure_config.dart';
+
 // App Configuration Constants
 class AppConfig {
   // App Information
@@ -29,11 +31,11 @@ const String privacyUrl =
     "https://naijasingles.com/privacy";
 
 // Add google map key for google places search
-const googleMapsKey = 'AIzaSyCDhfoQyJeKhBluyuXHV7mvwxbxMQozdx8';
+String get googleMapsKey => SecureConfig.googleMapsApiKey ?? '';
 //for support to user add you mail
 const adminMail = "support@naijasingles.com";
 // add bucket id from firebase or google-services-json
-const String bucketId = "naijasingles-74a75.appspot.com";
+String get bucketId => SecureConfig.firebaseStorageBucket;
 //for pagination set limit
 
 const int perPageData = 20;

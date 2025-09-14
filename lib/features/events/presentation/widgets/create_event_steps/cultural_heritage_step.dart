@@ -548,7 +548,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         'ageGroup': 'Family Friendly',
       },
       {
-        'name': 'Language Exchange Meetup',
+        'name': 'Language Exchange Event',
         'icon': Icons.translate,
         'description': 'Practice African languages together',
         'heritage': 'Diaspora',

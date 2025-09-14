@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:crop_image/crop_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CropMedia extends StatefulWidget {
@@ -35,7 +36,18 @@ class CropMediaState extends State<CropMedia>
   @override
   void initState() {
     super.initState();
-    controller = CropController(aspectRatio: 1);
+    
+    // Set aspect ratio based on checktype for better user experience
+    double aspectRatio = 1.0; // Default square
+    if (widget.checktype == 'profile') {
+      aspectRatio = 1.0; // Square for profile photos
+    } else if (widget.checktype == 'fullbody') {
+      aspectRatio = 0.75; // 3:4 for full body photos
+    } else if (widget.checktype == 'activity') {
+      aspectRatio = 1.33; // 4:3 for activity photos
+    }
+    
+    controller = CropController(aspectRatio: aspectRatio);
 
     // Initialize animation controller
     _animationController = AnimationController(
@@ -252,17 +264,64 @@ class CropMediaState extends State<CropMedia>
   }
 
   Future<void> _finished() async {
-    final image = await controller.croppedBitmap();
-    final data = await image.toByteData(format: ImageByteFormat.png);
-    final bytes = data!.buffer.asUint8List();
-    Directory tempDir = await getTemporaryDirectory();
-    String tempPath = tempDir.path;
-    Random random = Random();
-    int randomNumber = random.nextInt(1000);
-    var filePath = '$tempPath/$randomNumber.png';
-    File file = await File(filePath).writeAsBytes(bytes);
-
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context, file);
+    try {
+      final image = await controller.croppedBitmap();
+      
+      // Use JPEG format for better compression and smaller file sizes
+      final data = await image.toByteData(format: ImageByteFormat.rawRgba);
+      if (data == null) {
+        throw Exception('Failed to get image data');
+      }
+      
+      // Convert to JPEG for better compression
+      final bytes = data.buffer.asUint8List();
+      Directory tempDir = await getTemporaryDirectory();
+      String tempPath = tempDir.path;
+      Random random = Random();
+      int randomNumber = random.nextInt(1000);
+      var filePath = '$tempPath/cropped_${DateTime.now().millisecondsSinceEpoch}_$randomNumber.jpg';
+      
+      // Write as JPEG with proper quality
+      final file = File(filePath);
+      await file.writeAsBytes(bytes);
+      
+      // Compress the final image for optimal size
+      final compressedFile = await _compressImage(file);
+      
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context, compressedFile);
+    } catch (e) {
+      debugPrint('Error in _finished: $e');
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+    }
+  }
+  
+  /// Compress the cropped image to optimal size
+  Future<File> _compressImage(File imageFile) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final compressedPath = '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      
+      // Use flutter_image_compress for better compression
+      final compressedFile = await FlutterImageCompress.compressAndGetFile(
+        imageFile.absolute.path,
+        compressedPath,
+        quality: 85, // High quality for profile photos
+        minWidth: 400,
+        minHeight: 400,
+        format: CompressFormat.jpeg,
+        keepExif: false, // Remove EXIF data for privacy
+      );
+      
+      if (compressedFile != null) {
+        return File(compressedFile.path);
+      } else {
+        return imageFile; // Return original if compression fails
+      }
+    } catch (e) {
+      debugPrint('Error compressing image: $e');
+      return imageFile; // Return original if compression fails
+    }
   }
 }

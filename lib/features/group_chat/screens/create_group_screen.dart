@@ -403,7 +403,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     });
 
     try {
-      final group = await _groupService.createUnifiedGroup(
+      final group = await _groupService.createGroup(
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
         type: _selectedType,

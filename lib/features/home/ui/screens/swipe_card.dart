@@ -23,6 +23,9 @@ class UsersList extends StatefulWidget {
 
   final SwipableStackController? stackController;
   final Function(int, SwipeDirection) onswiped;
+  
+  // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they are not typical in dating apps
+  // and can create pressure or anxiety for users
 
   const UsersList(
       {super.key,

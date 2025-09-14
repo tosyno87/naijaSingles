@@ -12,6 +12,26 @@
 .swiftpm/
 migrate_working_dir/
 
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Generated files
+*.generated.*
+*.g.dart
+*.freezed.dart
+*.gr.dart
+
 # IntelliJ related
 *.iml
 *.ipr

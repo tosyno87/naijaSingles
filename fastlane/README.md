@@ -37,6 +37,22 @@ Generate screenshots for App Store
 
 Deploy to beta testing (TestFlight + Internal Testing)
 
+### ios_deploy_testflight
+
+```sh
+[bundle exec] fastlane ios_deploy_testflight
+```
+
+Deploy to iOS TestFlight
+
+### android_internal_testing
+
+```sh
+[bundle exec] fastlane android_internal_testing
+```
+
+Deploy to Google Play Internal Testing
+
 ### deploy
 
 ```sh
@@ -45,47 +61,21 @@ Deploy to beta testing (TestFlight + Internal Testing)
 
 Full deployment to production stores
 
-----
-
-
-## iOS
-
-### ios deploy
+### ios_deploy
 
 ```sh
-[bundle exec] fastlane ios deploy
+[bundle exec] fastlane ios_deploy
 ```
 
-Deploy to App Store Connect
+Deploy to iOS App Store
 
-### ios deploy_testflight
-
-```sh
-[bundle exec] fastlane ios deploy_testflight
-```
-
-Build and upload to TestFlight
-
-----
-
-
-## Android
-
-### android deploy
+### android_deploy
 
 ```sh
-[bundle exec] fastlane android deploy
+[bundle exec] fastlane android_deploy
 ```
 
 Deploy to Google Play Store
-
-### android internal_testing
-
-```sh
-[bundle exec] fastlane android internal_testing
-```
-
-Deploy to Google Play Internal Testing
 
 ----
 

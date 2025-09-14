@@ -818,46 +818,157 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
   String _getTypeLabel(GroupType type) {
     switch (type) {
-      case GroupType.cultural:
-        return 'Cultural';
-      case GroupType.interest:
-        return 'Interest';
-      case GroupType.location:
-        return 'Location';
-      case GroupType.event:
-        return 'Event';
-      case GroupType.custom:
-        return 'Custom';
+      // Interest & Hobby Groups
+      case GroupType.music:
+        return 'Music';
+      case GroupType.sports:
+        return 'Sports';
+      case GroupType.travel:
+        return 'Travel';
+      case GroupType.food:
+        return 'Food';
+      case GroupType.art:
+        return 'Art';
+      
+      // Lifestyle & Career Groups
+      case GroupType.career:
+        return 'Career';
+      case GroupType.fitness:
+        return 'Fitness';
+      case GroupType.gaming:
+        return 'Gaming';
+      case GroupType.reading:
+        return 'Reading';
+      case GroupType.movies:
+        return 'Movies';
+      
+      // Social & Community Groups
+      case GroupType.events:
+        return 'Events';
+      case GroupType.networking:
+        return 'Networking';
+      case GroupType.support:
+        return 'Support';
+      case GroupType.study:
+        return 'Study';
+      case GroupType.local:
+        return 'Local';
+      
+      // Special Interest Groups
+      case GroupType.tech:
+        return 'Technology';
+      case GroupType.fashion:
+        return 'Fashion';
+      case GroupType.pets:
+        return 'Pets';
+      case GroupType.parenting:
+        return 'Parenting';
+      case GroupType.seniors:
+        return 'Seniors';
     }
   }
 
   Color _getTypeColor(GroupType type) {
     switch (type) {
-      case GroupType.cultural:
+      // Interest & Hobby Groups
+      case GroupType.music:
         return Colors.purple;
-      case GroupType.interest:
-        return Colors.blue;
-      case GroupType.location:
-        return Colors.green;
-      case GroupType.event:
+      case GroupType.sports:
         return Colors.orange;
-      case GroupType.custom:
-        return AppColors.primaryGreen;
+      case GroupType.travel:
+        return Colors.blue;
+      case GroupType.food:
+        return Colors.red;
+      case GroupType.art:
+        return Colors.pink;
+      
+      // Lifestyle & Career Groups
+      case GroupType.career:
+        return Colors.indigo;
+      case GroupType.fitness:
+        return Colors.green;
+      case GroupType.gaming:
+        return Colors.deepPurple;
+      case GroupType.reading:
+        return Colors.brown;
+      case GroupType.movies:
+        return Colors.teal;
+      
+      // Social & Community Groups
+      case GroupType.events:
+        return Colors.amber;
+      case GroupType.networking:
+        return Colors.cyan;
+      case GroupType.support:
+        return Colors.lightBlue;
+      case GroupType.study:
+        return Colors.deepOrange;
+      case GroupType.local:
+        return Colors.lightGreen;
+      
+      // Special Interest Groups
+      case GroupType.tech:
+        return Colors.blueGrey;
+      case GroupType.fashion:
+        return Colors.pinkAccent;
+      case GroupType.pets:
+        return Colors.amberAccent;
+      case GroupType.parenting:
+        return Colors.lightGreenAccent;
+      case GroupType.seniors:
+        return Colors.grey;
     }
   }
 
   IconData _getTypeIcon(GroupType type) {
     switch (type) {
-      case GroupType.cultural:
-        return Icons.flag;
-      case GroupType.interest:
-        return Icons.favorite;
-      case GroupType.location:
-        return Icons.location_on;
-      case GroupType.event:
+      // Interest & Hobby Groups
+      case GroupType.music:
+        return Icons.music_note;
+      case GroupType.sports:
+        return Icons.sports_soccer;
+      case GroupType.travel:
+        return Icons.travel_explore;
+      case GroupType.food:
+        return Icons.restaurant;
+      case GroupType.art:
+        return Icons.palette;
+      
+      // Lifestyle & Career Groups
+      case GroupType.career:
+        return Icons.work;
+      case GroupType.fitness:
+        return Icons.fitness_center;
+      case GroupType.gaming:
+        return Icons.sports_esports;
+      case GroupType.reading:
+        return Icons.menu_book;
+      case GroupType.movies:
+        return Icons.movie;
+      
+      // Social & Community Groups
+      case GroupType.events:
         return Icons.event;
-      case GroupType.custom:
-        return Icons.group;
+      case GroupType.networking:
+        return Icons.people;
+      case GroupType.support:
+        return Icons.support_agent;
+      case GroupType.study:
+        return Icons.school;
+      case GroupType.local:
+        return Icons.location_on;
+      
+      // Special Interest Groups
+      case GroupType.tech:
+        return Icons.computer;
+      case GroupType.fashion:
+        return Icons.checkroom;
+      case GroupType.pets:
+        return Icons.pets;
+      case GroupType.parenting:
+        return Icons.child_care;
+      case GroupType.seniors:
+        return Icons.elderly;
     }
   }
 

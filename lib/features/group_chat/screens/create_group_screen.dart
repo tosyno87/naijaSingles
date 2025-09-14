@@ -18,7 +18,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   
-  GroupType _selectedType = GroupType.custom;
+  GroupType _selectedType = GroupType.music;
   String? _selectedLocation;
   List<String> _selectedMembers = [];
   bool _isCreating = false;
@@ -349,31 +349,105 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
   String _getGroupTypeLabel(GroupType type) {
     switch (type) {
-      case GroupType.custom:
-        return 'Custom';
-      case GroupType.event:
-        return 'Event';
-      case GroupType.interest:
-        return 'Interest';
-      case GroupType.location:
-        return 'Location';
-      case GroupType.cultural:
-        return 'Cultural';
+      // Interest & Hobby Groups
+      case GroupType.music:
+        return 'Music';
+      case GroupType.sports:
+        return 'Sports';
+      case GroupType.travel:
+        return 'Travel';
+      case GroupType.food:
+        return 'Food';
+      case GroupType.art:
+        return 'Art';
+      
+      // Lifestyle & Career Groups
+      case GroupType.career:
+        return 'Career';
+      case GroupType.fitness:
+        return 'Fitness';
+      case GroupType.gaming:
+        return 'Gaming';
+      case GroupType.reading:
+        return 'Reading';
+      case GroupType.movies:
+        return 'Movies';
+      
+      // Social & Community Groups
+      case GroupType.events:
+        return 'Events';
+      case GroupType.networking:
+        return 'Networking';
+      case GroupType.support:
+        return 'Support';
+      case GroupType.study:
+        return 'Study';
+      case GroupType.local:
+        return 'Local';
+      
+      // Special Interest Groups
+      case GroupType.tech:
+        return 'Technology';
+      case GroupType.fashion:
+        return 'Fashion';
+      case GroupType.pets:
+        return 'Pets';
+      case GroupType.parenting:
+        return 'Parenting';
+      case GroupType.seniors:
+        return 'Seniors';
     }
   }
 
   IconData _getGroupTypeIcon(GroupType type) {
     switch (type) {
-      case GroupType.custom:
-        return Icons.group;
-      case GroupType.event:
+      // Interest & Hobby Groups
+      case GroupType.music:
+        return Icons.music_note;
+      case GroupType.sports:
+        return Icons.sports_soccer;
+      case GroupType.travel:
+        return Icons.travel_explore;
+      case GroupType.food:
+        return Icons.restaurant;
+      case GroupType.art:
+        return Icons.palette;
+      
+      // Lifestyle & Career Groups
+      case GroupType.career:
+        return Icons.work;
+      case GroupType.fitness:
+        return Icons.fitness_center;
+      case GroupType.gaming:
+        return Icons.sports_esports;
+      case GroupType.reading:
+        return Icons.menu_book;
+      case GroupType.movies:
+        return Icons.movie;
+      
+      // Social & Community Groups
+      case GroupType.events:
         return Icons.event;
-      case GroupType.interest:
-        return Icons.favorite;
-      case GroupType.location:
+      case GroupType.networking:
+        return Icons.people;
+      case GroupType.support:
+        return Icons.support_agent;
+      case GroupType.study:
+        return Icons.school;
+      case GroupType.local:
         return Icons.location_on;
-      case GroupType.cultural:
-        return Icons.flag;
+      
+      // Special Interest Groups
+      case GroupType.tech:
+        return Icons.computer;
+      case GroupType.fashion:
+        return Icons.checkroom;
+      case GroupType.pets:
+        return Icons.pets;
+      case GroupType.parenting:
+        return Icons.child_care;
+      case GroupType.seniors:
+        return Icons.elderly;
     }
   }
 

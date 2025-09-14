@@ -1084,13 +1084,35 @@ class UnifiedGroupService {
   }
 }
 
-/// Unified group types that combine cultural and chat functionality
+/// Industry-standard group types for better user experience
 enum GroupType {
-  cultural,    // Cultural/tribal groups
-  interest,    // Interest-based groups
-  location,    // Location-based groups
-  event,       // Event-based groups
-  custom,      // Custom groups
+  // Interest & Hobby Groups
+  music,       // Music lovers, artists, concerts
+  sports,      // Sports fans, fitness, teams
+  travel,      // Travelers, explorers, destinations
+  food,        // Foodies, cooking, restaurants
+  art,         // Artists, creators, galleries
+  
+  // Lifestyle & Career Groups
+  career,      // Professional networking, job opportunities
+  fitness,     // Workout buddies, health, wellness
+  gaming,      // Gamers, esports, tournaments
+  reading,     // Book clubs, literature, authors
+  movies,      // Film buffs, cinema, streaming
+  
+  // Social & Community Groups
+  events,      // Local events, meetups, parties
+  networking,  // Business networking, connections
+  support,     // Help groups, advice, mentorship
+  study,       // Study groups, education, learning
+  local,       // Neighborhood, city, regional
+  
+  // Special Interest Groups
+  tech,        // Technology, startups, innovation
+  fashion,     // Style, trends, shopping
+  pets,        // Pet owners, animal lovers
+  parenting,   // Parents, family, children
+  seniors,     // Older adults, retirement
 }
 
 /// Message types
@@ -1204,16 +1226,53 @@ class UnifiedGroup {
   /// Get group type display name
   String get typeDisplayName {
     switch (type) {
-      case GroupType.cultural:
-        return 'Cultural Group';
-      case GroupType.interest:
-        return 'Interest Group';
-      case GroupType.location:
-        return 'Location Group';
-      case GroupType.event:
-        return 'Event Group';
-      case GroupType.custom:
-        return 'Custom Group';
+      // Interest & Hobby Groups
+      case GroupType.music:
+        return 'Music';
+      case GroupType.sports:
+        return 'Sports';
+      case GroupType.travel:
+        return 'Travel';
+      case GroupType.food:
+        return 'Food';
+      case GroupType.art:
+        return 'Art';
+      
+      // Lifestyle & Career Groups
+      case GroupType.career:
+        return 'Career';
+      case GroupType.fitness:
+        return 'Fitness';
+      case GroupType.gaming:
+        return 'Gaming';
+      case GroupType.reading:
+        return 'Reading';
+      case GroupType.movies:
+        return 'Movies';
+      
+      // Social & Community Groups
+      case GroupType.events:
+        return 'Events';
+      case GroupType.networking:
+        return 'Networking';
+      case GroupType.support:
+        return 'Support';
+      case GroupType.study:
+        return 'Study';
+      case GroupType.local:
+        return 'Local';
+      
+      // Special Interest Groups
+      case GroupType.tech:
+        return 'Technology';
+      case GroupType.fashion:
+        return 'Fashion';
+      case GroupType.pets:
+        return 'Pets';
+      case GroupType.parenting:
+        return 'Parenting';
+      case GroupType.seniors:
+        return 'Seniors';
     }
   }
 

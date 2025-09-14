@@ -240,7 +240,7 @@ jobs:
       
     - name: Build iOS
       if: matrix.platform == 'ios'
-      run: flutter build ios --release --no-codesign
+      run: flutter build ios --no-codesign
 
   # Diaspora-Specific Integration Tests Job - Temporarily disabled due to iOS code signing issues
   # diaspora-integration-tests:

@@ -35,7 +35,7 @@ class UnifiedGroupService {
       }
 
       // Ensure creator is included in members
-      final allMembers = [...(initialMembers ?? [])];
+      final allMembers = <String>[...(initialMembers ?? [])];
       if (!allMembers.contains(currentUserId)) {
         allMembers.add(currentUserId);
       }

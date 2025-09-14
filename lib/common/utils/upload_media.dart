@@ -119,13 +119,28 @@ class _SelectMedia extends StatelessWidget {
       return file;
     }
     final dir = await path_provider.getTemporaryDirectory();
-    final targetPath = "${dir.absolute.path}/temp.jpg";
+    final targetPath = "${dir.absolute.path}/temp_${DateTime.now().millisecondsSinceEpoch}.jpg";
+    
+    // Improved compression with industry standards
+    int quality;
+    if (imageSize > 5) {
+      quality = 40; // Very large images
+    } else if (imageSize > 3) {
+      quality = 50; // Large images
+    } else if (imageSize > 2) {
+      quality = 60; // Medium images
+    } else {
+      quality = 70; // Small images
+    }
+    
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,
-      quality: imageSize > 2
-          ? 30
-          : 50, //If image size is >2 MB the compress 70 % else 50 %
+      quality: quality,
+      minWidth: 400, // Minimum width for profile photos
+      minHeight: 400, // Minimum height for profile photos
+      format: CompressFormat.jpeg,
+      keepExif: false, // Remove EXIF data for privacy
     );
 
     log("Image Size after Compression in MB ${await getImageSize(File(result!.path))}");

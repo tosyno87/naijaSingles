@@ -34,11 +34,11 @@ class UnifiedGroupService {
         throw Exception('User not authenticated');
       }
 
-      // Ensure creator is included in members
-      final allMembers = <String>[...(initialMembers ?? [])];
-      if (!allMembers.contains(currentUserId)) {
-        allMembers.add(currentUserId);
-      }
+      // Ensure creator is included in members and remove duplicates
+      final allMembers = <String>{
+        ...(initialMembers ?? []),
+        currentUserId,
+      }.toList();
       
       log('👥 createUnifiedGroup: Creator $currentUserId added to members: $allMembers');
 

@@ -1,12 +1,12 @@
 # Appfile for NaijaSingles - African Diaspora Dating App
 
 # iOS App Store Connect
-app_identifier("com.naijasingles.app") # The bundle identifier of your app
+app_identifier("com.app.naijasingles") # The bundle identifier of your app
 apple_id("bbtnd_tosin@yahoo.com") # Your Apple email address
 team_id("M7HY7333KT") # Your Apple Developer Portal team ID
 
 # Google Play Console
-package_name("com.naijasingles.app") # The package name of your app
+package_name("com.app.naijasingles") # The package name of your app
 
 # For more information about the Appfile, see:
 #     https://docs.fastlane.tools/advanced/#appfile

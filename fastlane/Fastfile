@@ -8,7 +8,34 @@
 #   fastlane screenshots        # Generate App Store screenshots
 #   fastlane beta               # Deploy to beta testing
 
+# Set default platform to iOS for global lanes
 default_platform(:ios)
+
+# iOS platform
+platform :ios do
+  desc "Deploy to iOS TestFlight"
+  lane :testflight_deploy do
+    ios_deploy_testflight
+  end
+
+  desc "Deploy to iOS App Store"
+  lane :deploy do
+    ios_deploy
+  end
+end
+
+# Android platform
+platform :android do
+  desc "Deploy to Google Play Internal Testing"
+  lane :internal do
+    android_internal_testing
+  end
+
+  desc "Deploy to Google Play Store"
+  lane :deploy do
+    android_deploy
+  end
+end
 
 # Global lanes (available for all platforms)
 desc "Run comprehensive test suite for African diaspora dating app"
@@ -86,14 +113,17 @@ desc "Deploy to iOS TestFlight"
 lane :ios_deploy_testflight do
   UI.message "📱 Deploying NaijaSingles to TestFlight..."
   
-  # Check if we can build iOS first
   begin
     UI.message "🔍 Checking iOS build environment..."
+    
+    # Clean Flutter project
+    sh("flutter clean")
+    sh("flutter pub get")
     
     # Increment build number
     increment_build_number(xcodeproj: "ios/Runner.xcodeproj")
     
-    # Build the app with CodeSign disabled for testing
+    # Build the app
     build_app(
       workspace: "ios/Runner.xcworkspace",
       scheme: "Runner",
@@ -103,14 +133,16 @@ lane :ios_deploy_testflight do
         signingStyle: "automatic",
         teamID: "M7HY7333KT"
       },
-      xcargs: "CODE_SIGNING_ALLOWED=NO"
+      clean: true,
+      output_directory: "./build/ios"
     )
     
     UI.message "✅ iOS build successful, uploading to TestFlight..."
     
     # Upload to TestFlight
     upload_to_testflight(
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: true,
+      skip_submission: true
     )
     
     UI.success "✅ NaijaSingles TestFlight deployment complete!"
@@ -122,6 +154,7 @@ lane :ios_deploy_testflight do
     UI.message "   2. Verify team ID in Xcode project settings"
     UI.message "   3. Ensure proper provisioning profiles"
     UI.message "   4. Run: fastlane match appstore (if using match)"
+    UI.message "   5. Check bundle identifier matches Appfile"
     raise ex
   end
 end
@@ -131,19 +164,41 @@ desc "Deploy to Google Play Internal Testing"
 lane :android_internal_testing do
   UI.message "🤖 Deploying NaijaSingles to Google Play Internal Testing..."
   
-  # Build release APK
-  sh("flutter build apk --release")
-  
-  # Upload to Internal Testing
-  upload_to_play_store(
-    track: "internal",
-    apk: "build/app/outputs/flutter-apk/app-release.apk",
-    skip_upload_metadata: true,
-    skip_upload_images: true,
-    skip_upload_screenshots: true
-  )
-  
-  UI.success "✅ NaijaSingles Android Internal Testing deployment complete!"
+  begin
+    # Clean and build release APK
+    sh("flutter clean")
+    sh("flutter pub get")
+    sh("flutter build apk --release")
+    
+    # Verify APK exists
+    apk_path = "build/app/outputs/flutter-apk/app-release.apk"
+    unless File.exist?(apk_path)
+      UI.error "❌ APK not found at #{apk_path}"
+      raise "Failed to build APK"
+    end
+    
+    UI.message "📱 APK built successfully: #{apk_path}"
+    
+    # Upload to Internal Testing
+    upload_to_play_store(
+      track: "internal",
+      apk: apk_path,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_apk: false
+    )
+    
+    UI.success "✅ NaijaSingles Android Internal Testing deployment complete!"
+    
+  rescue => ex
+    UI.error "❌ Android deployment failed: #{ex.message}"
+    UI.message "🔧 Common fixes for Android deployment:"
+    UI.message "   1. Check Google Play Console API access"
+    UI.message "   2. Verify package name matches Appfile"
+    UI.message "   3. Ensure proper signing configuration"
+    raise ex
+  end
 end
 
 desc "Full deployment to production stores"
@@ -167,28 +222,48 @@ desc "Deploy to iOS App Store"
 lane :ios_deploy do
   UI.message "📱 Deploying NaijaSingles to iOS App Store..."
   
-  # Increment build number
-  increment_build_number(xcodeproj: "ios/Runner.xcodeproj")
-  
-  # Build the app
-  build_app(
-    workspace: "ios/Runner.xcworkspace",
-    scheme: "Runner",
-    export_method: "app-store",
-    export_options: {
-      method: "app-store",
-      teamID: "M7HY7333KT"
-    }
-  )
-  
-  # Upload to App Store Connect
-  upload_to_app_store(
-    skip_metadata: true,
-    skip_screenshots: true,
-    force: true
-  )
-  
-  UI.success "✅ NaijaSingles iOS deployment complete!"
+  begin
+    # Clean Flutter project
+    sh("flutter clean")
+    sh("flutter pub get")
+    
+    # Increment build number
+    increment_build_number(xcodeproj: "ios/Runner.xcodeproj")
+    
+    # Build the app
+    build_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        signingStyle: "automatic",
+        teamID: "M7HY7333KT"
+      },
+      clean: true,
+      output_directory: "./build/ios"
+    )
+    
+    # Upload to App Store Connect
+    upload_to_app_store(
+      skip_metadata: true,
+      skip_screenshots: true,
+      force: true,
+      skip_binary_upload: false
+    )
+    
+    UI.success "✅ NaijaSingles iOS deployment complete!"
+    
+  rescue => ex
+    UI.error "❌ iOS App Store deployment failed: #{ex.message}"
+    UI.message "🔧 Common fixes for iOS App Store deployment:"
+    UI.message "   1. Check Apple Developer account access"
+    UI.message "   2. Verify team ID in Xcode project settings"
+    UI.message "   3. Ensure proper provisioning profiles"
+    UI.message "   4. Check app store listing requirements"
+    UI.message "   5. Verify bundle identifier matches Appfile"
+    raise ex
+  end
 end
 
 # Android Google Play Store deployment lane
@@ -196,19 +271,42 @@ desc "Deploy to Google Play Store"
 lane :android_deploy do
   UI.message "🤖 Deploying NaijaSingles to Google Play Store..."
   
-  # Build release APK
-  sh("flutter build apk --release")
-  
-  # Upload to Google Play Store
-  upload_to_play_store(
-    track: "production",
-    aab: "build/app/outputs/bundle/release/app-release.aab",
-    skip_upload_metadata: true,
-    skip_upload_images: true,
-    skip_upload_screenshots: true
-  )
-  
-  UI.success "✅ NaijaSingles Android deployment complete!"
+  begin
+    # Clean and build release AAB (preferred for Play Store)
+    sh("flutter clean")
+    sh("flutter pub get")
+    sh("flutter build appbundle --release")
+    
+    # Verify AAB exists
+    aab_path = "build/app/outputs/bundle/release/app-release.aab"
+    unless File.exist?(aab_path)
+      UI.error "❌ AAB not found at #{aab_path}"
+      raise "Failed to build AAB"
+    end
+    
+    UI.message "📱 AAB built successfully: #{aab_path}"
+    
+    # Upload to Google Play Store
+    upload_to_play_store(
+      track: "production",
+      aab: aab_path,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_apk: true
+    )
+    
+    UI.success "✅ NaijaSingles Android deployment complete!"
+    
+  rescue => ex
+    UI.error "❌ Android production deployment failed: #{ex.message}"
+    UI.message "🔧 Common fixes for Android production deployment:"
+    UI.message "   1. Check Google Play Console API access"
+    UI.message "   2. Verify package name matches Appfile"
+    UI.message "   3. Ensure proper signing configuration"
+    UI.message "   4. Check app store listing requirements"
+    raise ex
+  end
 end
 
 # Android-only deployment (for when iOS has issues)

@@ -420,15 +420,28 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
         title: 'No Groups Joined',
         subtitle: 'Discover and join communities that match your interests!',
-        actionButton: ElevatedButton.icon(
-          onPressed: () {
-            _tabController.animateTo(0); // Switch to Discover tab
-          },
-          icon: const Icon(Icons.explore),
-          label: const Text('Discover Groups'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: Colors.white,
+        actionButton: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              _tabController.animateTo(0); // Switch to Discover tab
+            },
+            icon: const Icon(Icons.explore, size: 18),
+            label: Text(
+              'Discover Groups',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryGreen,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ),
       );
@@ -642,16 +655,25 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   }
 
   Widget _buildCreateButton() {
-    return ElevatedButton.icon(
-      onPressed: _navigateToCreateGroup,
-      icon: const Icon(Icons.add),
-      label: const Text('Create Community'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryGreen,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: _navigateToCreateGroup,
+        icon: const Icon(Icons.add, size: 18),
+        label: Text(
+          'Create Community',
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryGreen,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );

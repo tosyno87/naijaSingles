@@ -357,8 +357,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return 'Interest';
       case GroupType.location:
         return 'Location';
-      case GroupType.tribe:
-        return 'Tribe';
+      case GroupType.cultural:
+        return 'Cultural';
     }
   }
 
@@ -372,7 +372,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return Icons.favorite;
       case GroupType.location:
         return Icons.location_on;
-      case GroupType.tribe:
+      case GroupType.cultural:
         return Icons.flag;
     }
   }

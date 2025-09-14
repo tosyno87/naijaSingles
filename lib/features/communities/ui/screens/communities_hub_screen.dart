@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../common/constants/app_colors.dart';
+import '../../../groups/screens/unified_groups_screen.dart';
 
 class CommunitiesHubScreen extends StatefulWidget {
   const CommunitiesHubScreen({Key? key}) : super(key: key);
@@ -125,12 +126,17 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             const SizedBox(width: 16),
             Expanded(
               child: _buildActionCard(
-                'Group Chats',
+                'Communities',
                 'Join communities and connect with people',
                 Custom3DIcons.groups(),
                 const Color(0xFF008037), // Green accent
                 () {
-                  Navigator.pushNamed(context, RouteName.groupChatsScreen);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UnifiedGroupsScreen(),
+                    ),
+                  );
                 },
               ),
             ),

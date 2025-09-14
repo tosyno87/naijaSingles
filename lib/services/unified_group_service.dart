@@ -1,0 +1,748 @@
+import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+/// Unified Group Service that combines Cultural Groups and Group Chats
+/// This eliminates redundancy and creates synergy between features
+class UnifiedGroupService {
+  static final UnifiedGroupService _instance = UnifiedGroupService._internal();
+  factory UnifiedGroupService() => _instance;
+  UnifiedGroupService._internal();
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  /// Create a unified group that supports both cultural community and chat functionality
+  Future<UnifiedGroup> createGroup({
+    required String name,
+    required String description,
+    required GroupType type,
+    String? imageUrl,
+    String? location,
+    List<String> tags = const [],
+    Map<String, dynamic>? culturalInfo,
+    bool enableChat = true,
+    bool isPublic = true,
+    int maxMembers = 100,
+    List<String>? initialMembers,
+  }) async {
+    try {
+      log('🏘️ Creating unified group: $name');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Ensure creator is included in members
+      final allMembers = [...(initialMembers ?? [])];
+      if (!allMembers.contains(currentUserId)) {
+        allMembers.add(currentUserId);
+      }
+
+      // Create unified group document
+      final groupData = {
+        'name': name,
+        'description': description,
+        'type': type.name,
+        'imageUrl': imageUrl,
+        'location': location,
+        'tags': tags,
+        'culturalInfo': culturalInfo,
+        'creatorId': currentUserId,
+        'adminIds': [currentUserId],
+        'memberIds': allMembers,
+        'memberCount': allMembers.length,
+        'maxMembers': maxMembers,
+        'isPublic': isPublic,
+        'enableChat': enableChat,
+        'isActive': true,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+        'lastMessageAt': enableChat ? FieldValue.serverTimestamp() : null,
+        'lastMessageText': enableChat ? 'Group "$name" was created' : null,
+        'lastMessageSenderId': enableChat ? currentUserId : null,
+      };
+
+      final docRef = await _firestore.collection('unifiedGroups').add(groupData);
+      final groupId = docRef.id;
+
+      // Create initial chat message if chat is enabled
+      if (enableChat) {
+        await _sendGroupMessage(
+          groupId: groupId,
+          text: 'Group "$name" was created',
+          messageType: MessageType.system,
+        );
+      }
+
+      // Send notifications to members
+      await _notifyGroupMembers(groupId, 'You were added to group "$name"');
+
+      final group = UnifiedGroup(
+        id: groupId,
+        name: name,
+        description: description,
+        type: type,
+        imageUrl: imageUrl,
+        location: location,
+        tags: tags,
+        culturalInfo: culturalInfo,
+        creatorId: currentUserId,
+        adminIds: [currentUserId],
+        memberIds: allMembers,
+        memberCount: allMembers.length,
+        maxMembers: maxMembers,
+        isPublic: isPublic,
+        enableChat: enableChat,
+        isActive: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        lastActivityAt: DateTime.now(),
+        lastMessageAt: enableChat ? DateTime.now() : null,
+        lastMessageText: enableChat ? 'Group "$name" was created' : null,
+        lastMessageSenderId: enableChat ? currentUserId : null,
+      );
+
+      log('✅ Unified group created successfully: $groupId');
+      return group;
+    } catch (e) {
+      log('❌ Error creating unified group: $e');
+      rethrow;
+    }
+  }
+
+  /// Join a group
+  Future<void> joinGroup(String groupId) async {
+    try {
+      log('👥 Joining group: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Add user to group members
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'memberIds': FieldValue.arrayUnion([currentUserId]),
+        'memberCount': FieldValue.increment(1),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send join message if chat is enabled
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (groupDoc.exists) {
+        final groupData = groupDoc.data()!;
+        final enableChat = groupData['enableChat'] ?? false;
+        
+        if (enableChat) {
+          await _sendGroupMessage(
+            groupId: groupId,
+            text: 'joined the group',
+            messageType: MessageType.system,
+          );
+        }
+      }
+
+      // Notify group members
+      await _notifyGroupMembers(groupId, 'A new member joined the group');
+
+      log('✅ Successfully joined group: $groupId');
+    } catch (e) {
+      log('❌ Error joining group: $e');
+      rethrow;
+    }
+  }
+
+  /// Leave a group
+  Future<void> leaveGroup(String groupId) async {
+    try {
+      log('👥 Leaving group: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Remove user from group members
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'memberIds': FieldValue.arrayRemove([currentUserId]),
+        'adminIds': FieldValue.arrayRemove([currentUserId]),
+        'memberCount': FieldValue.increment(-1),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send leave message if chat is enabled
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (groupDoc.exists) {
+        final groupData = groupDoc.data()!;
+        final enableChat = groupData['enableChat'] ?? false;
+        
+        if (enableChat) {
+          await _sendGroupMessage(
+            groupId: groupId,
+            text: 'left the group',
+            messageType: MessageType.system,
+          );
+        }
+      }
+
+      log('✅ Successfully left group: $groupId');
+    } catch (e) {
+      log('❌ Error leaving group: $e');
+      rethrow;
+    }
+  }
+
+  /// Send message to group (if chat is enabled)
+  Future<GroupMessage?> sendGroupMessage({
+    required String groupId,
+    required String text,
+    MessageType messageType = MessageType.text,
+    String? mediaUrl,
+    String? mediaType,
+    String? replyToMessageId,
+  }) async {
+    try {
+      log('💬 Sending group message: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if group exists and chat is enabled
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final enableChat = groupData['enableChat'] ?? false;
+      
+      if (!enableChat) {
+        throw Exception('Chat is not enabled for this group');
+      }
+
+      final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+      
+      if (!memberIds.contains(currentUserId)) {
+        throw Exception('You are not a member of this group');
+      }
+
+      // Create message
+      final messageData = {
+        'groupId': groupId,
+        'senderId': currentUserId,
+        'text': text,
+        'messageType': messageType.name,
+        'mediaUrl': mediaUrl,
+        'mediaType': mediaType,
+        'replyToMessageId': replyToMessageId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'readBy': [currentUserId],
+      };
+
+      final docRef = await _firestore
+          .collection('unifiedGroups')
+          .doc(groupId)
+          .collection('messages')
+          .add(messageData);
+
+      // Update group last message info
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'lastMessageAt': FieldValue.serverTimestamp(),
+        'lastMessageText': text,
+        'lastMessageSenderId': currentUserId,
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      });
+
+      // Send notifications to other members
+      await _notifyGroupMembers(groupId, text, excludeUserId: currentUserId);
+
+      final message = GroupMessage(
+        id: docRef.id,
+        groupId: groupId,
+        senderId: currentUserId,
+        text: text,
+        messageType: messageType,
+        mediaUrl: mediaUrl,
+        mediaType: mediaType,
+        replyToMessageId: replyToMessageId,
+        timestamp: DateTime.now(),
+        isRead: false,
+        readBy: [currentUserId],
+      );
+
+      log('✅ Group message sent successfully: ${docRef.id}');
+      return message;
+    } catch (e) {
+      log('❌ Error sending group message: $e');
+      rethrow;
+    }
+  }
+
+  /// Get group messages (if chat is enabled)
+  Stream<List<GroupMessage>> getGroupMessages(String groupId) {
+    return _firestore
+        .collection('unifiedGroups')
+        .doc(groupId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return GroupMessage.fromMap(doc.id, doc.data());
+      }).toList();
+    });
+  }
+
+  /// Get user's groups
+  Stream<List<UnifiedGroup>> getUserGroups() {
+    final currentUserId = _auth.currentUser?.uid;
+    if (currentUserId == null) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('unifiedGroups')
+        .where('memberIds', arrayContains: currentUserId)
+        .where('isActive', isEqualTo: true)
+        .orderBy('lastActivityAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
+
+  /// Get public groups for discovery
+  Stream<List<UnifiedGroup>> getPublicGroups({
+    GroupType? type,
+    String? location,
+    List<String>? tags,
+  }) {
+    Query query = _firestore
+        .collection('unifiedGroups')
+        .where('isPublic', isEqualTo: true)
+        .where('isActive', isEqualTo: true);
+
+    if (type != null) {
+      query = query.where('type', isEqualTo: type.name);
+    }
+
+    if (location != null) {
+      query = query.where('location', isEqualTo: location);
+    }
+
+    return query
+        .orderBy('lastActivityAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
+
+  /// Search groups
+  Future<List<UnifiedGroup>> searchGroups({
+    required String query,
+    GroupType? type,
+    String? location,
+  }) async {
+    try {
+      final groups = await _firestore
+          .collection('unifiedGroups')
+          .where('isPublic', isEqualTo: true)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      final results = groups.docs
+          .map((doc) => UnifiedGroup.fromMap(doc.id, doc.data()))
+          .where((group) {
+        final matchesQuery = group.name.toLowerCase().contains(query.toLowerCase()) ||
+            group.description.toLowerCase().contains(query.toLowerCase()) ||
+            group.tags.any((tag) => tag.toLowerCase().contains(query.toLowerCase()));
+
+        final matchesType = type == null || group.type == type;
+        final matchesLocation = location == null || group.location == location;
+
+        return matchesQuery && matchesType && matchesLocation;
+      }).toList();
+
+      return results;
+    } catch (e) {
+      log('❌ Error searching groups: $e');
+      return [];
+    }
+  }
+
+  /// Get group details
+  Future<UnifiedGroup?> getGroupDetails(String groupId) async {
+    try {
+      final doc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!doc.exists) return null;
+
+      return UnifiedGroup.fromMap(doc.id, doc.data()!);
+    } catch (e) {
+      log('❌ Error getting group details: $e');
+      return null;
+    }
+  }
+
+  /// Update group settings
+  Future<void> updateGroupSettings({
+    required String groupId,
+    String? name,
+    String? description,
+    String? imageUrl,
+    List<String>? tags,
+    Map<String, dynamic>? culturalInfo,
+    bool? enableChat,
+    bool? isPublic,
+    int? maxMembers,
+  }) async {
+    try {
+      log('⚙️ Updating group settings: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if user is admin
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final adminIds = List<String>.from(groupData['adminIds'] ?? []);
+      
+      if (!adminIds.contains(currentUserId)) {
+        throw Exception('Only admins can update group settings');
+      }
+
+      // Update group settings
+      final updateData = <String, dynamic>{
+        'updatedAt': FieldValue.serverTimestamp(),
+        'lastActivityAt': FieldValue.serverTimestamp(),
+      };
+      
+      if (name != null) updateData['name'] = name;
+      if (description != null) updateData['description'] = description;
+      if (imageUrl != null) updateData['imageUrl'] = imageUrl;
+      if (tags != null) updateData['tags'] = tags;
+      if (culturalInfo != null) updateData['culturalInfo'] = culturalInfo;
+      if (enableChat != null) updateData['enableChat'] = enableChat;
+      if (isPublic != null) updateData['isPublic'] = isPublic;
+      if (maxMembers != null) updateData['maxMembers'] = maxMembers;
+
+      await _firestore.collection('unifiedGroups').doc(groupId).update(updateData);
+
+      log('✅ Group settings updated successfully: $groupId');
+    } catch (e) {
+      log('❌ Error updating group settings: $e');
+      rethrow;
+    }
+  }
+
+  /// Delete group
+  Future<void> deleteGroup(String groupId) async {
+    try {
+      log('🗑️ Deleting group: $groupId');
+
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Check if user is creator
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw Exception('Group not found');
+      }
+
+      final groupData = groupDoc.data()!;
+      final creatorId = groupData['creatorId'] as String?;
+      
+      if (creatorId != currentUserId) {
+        throw Exception('Only the group creator can delete the group');
+      }
+
+      // Mark group as inactive
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
+        'isActive': false,
+        'deletedAt': FieldValue.serverTimestamp(),
+        'deletedBy': currentUserId,
+      });
+
+      log('✅ Group deleted successfully: $groupId');
+    } catch (e) {
+      log('❌ Error deleting group: $e');
+      rethrow;
+    }
+  }
+
+  /// Send group message (internal method)
+  Future<void> _sendGroupMessage({
+    required String groupId,
+    required String text,
+    required MessageType messageType,
+    String? targetUserId,
+  }) async {
+    try {
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) return;
+
+      final messageData = {
+        'groupId': groupId,
+        'senderId': currentUserId,
+        'text': text,
+        'messageType': messageType.name,
+        'targetUserId': targetUserId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'readBy': [currentUserId],
+      };
+
+      await _firestore
+          .collection('unifiedGroups')
+          .doc(groupId)
+          .collection('messages')
+          .add(messageData);
+    } catch (e) {
+      log('❌ Error sending group message: $e');
+    }
+  }
+
+  /// Notify group members (internal method)
+  Future<void> _notifyGroupMembers(String groupId, String message, {String? excludeUserId}) async {
+    try {
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) return;
+
+      final groupData = groupDoc.data()!;
+      final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+      final groupName = groupData['name'] as String? ?? 'Group';
+
+      // Send notifications to all members except excluded user
+      for (final memberId in memberIds) {
+        if (memberId != excludeUserId) {
+          await _firestore.collection('notifications').add({
+            'userId': memberId,
+            'type': 'group_activity',
+            'title': groupName,
+            'message': message,
+            'groupId': groupId,
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+          });
+        }
+      }
+    } catch (e) {
+      log('❌ Error notifying group members: $e');
+    }
+  }
+}
+
+/// Unified group types that combine cultural and chat functionality
+enum GroupType {
+  cultural,    // Cultural/tribal groups
+  interest,    // Interest-based groups
+  location,    // Location-based groups
+  event,       // Event-based groups
+  custom,      // Custom groups
+}
+
+/// Message types
+enum MessageType {
+  text,
+  image,
+  video,
+  audio,
+  file,
+  system,
+}
+
+/// Unified Group model that combines cultural groups and chat functionality
+class UnifiedGroup {
+  final String id;
+  final String name;
+  final String description;
+  final GroupType type;
+  final String? imageUrl;
+  final String? location;
+  final List<String> tags;
+  final Map<String, dynamic>? culturalInfo;
+  final String creatorId;
+  final List<String> adminIds;
+  final List<String> memberIds;
+  final int memberCount;
+  final int maxMembers;
+  final bool isPublic;
+  final bool enableChat;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime lastActivityAt;
+  final DateTime? lastMessageAt;
+  final String? lastMessageText;
+  final String? lastMessageSenderId;
+
+  const UnifiedGroup({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.type,
+    this.imageUrl,
+    this.location,
+    required this.tags,
+    this.culturalInfo,
+    required this.creatorId,
+    required this.adminIds,
+    required this.memberIds,
+    required this.memberCount,
+    required this.maxMembers,
+    required this.isPublic,
+    required this.enableChat,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.lastActivityAt,
+    this.lastMessageAt,
+    this.lastMessageText,
+    this.lastMessageSenderId,
+  });
+
+  factory UnifiedGroup.fromMap(String id, Map<String, dynamic> data) {
+    return UnifiedGroup(
+      id: id,
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      type: GroupType.values.firstWhere(
+        (e) => e.name == data['type'],
+        orElse: () => GroupType.custom,
+      ),
+      imageUrl: data['imageUrl'],
+      location: data['location'],
+      tags: List<String>.from(data['tags'] ?? []),
+      culturalInfo: data['culturalInfo'],
+      creatorId: data['creatorId'] ?? '',
+      adminIds: List<String>.from(data['adminIds'] ?? []),
+      memberIds: List<String>.from(data['memberIds'] ?? []),
+      memberCount: data['memberCount'] ?? 0,
+      maxMembers: data['maxMembers'] ?? 100,
+      isPublic: data['isPublic'] ?? true,
+      enableChat: data['enableChat'] ?? true,
+      isActive: data['isActive'] ?? true,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastActivityAt: (data['lastActivityAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastMessageAt: (data['lastMessageAt'] as Timestamp?)?.toDate(),
+      lastMessageText: data['lastMessageText'],
+      lastMessageSenderId: data['lastMessageSenderId'],
+    );
+  }
+
+  /// Check if user is admin
+  bool isAdmin(String userId) {
+    return adminIds.contains(userId);
+  }
+
+  /// Check if user is member
+  bool isMember(String userId) {
+    return memberIds.contains(userId);
+  }
+
+  /// Check if user is creator
+  bool isCreator(String userId) {
+    return creatorId == userId;
+  }
+
+  /// Check if group has chat enabled
+  bool get hasChat => enableChat;
+
+  /// Get group type display name
+  String get typeDisplayName {
+    switch (type) {
+      case GroupType.cultural:
+        return 'Cultural Group';
+      case GroupType.interest:
+        return 'Interest Group';
+      case GroupType.location:
+        return 'Location Group';
+      case GroupType.event:
+        return 'Event Group';
+      case GroupType.custom:
+        return 'Custom Group';
+    }
+  }
+
+  @override
+  String toString() {
+    return 'UnifiedGroup($name: $memberCount/$maxMembers members, ${enableChat ? 'with chat' : 'no chat'})';
+  }
+}
+
+/// Group message model
+class GroupMessage {
+  final String id;
+  final String groupId;
+  final String senderId;
+  final String text;
+  final MessageType messageType;
+  final String? mediaUrl;
+  final String? mediaType;
+  final String? replyToMessageId;
+  final DateTime timestamp;
+  final bool isRead;
+  final List<String> readBy;
+
+  const GroupMessage({
+    required this.id,
+    required this.groupId,
+    required this.senderId,
+    required this.text,
+    required this.messageType,
+    this.mediaUrl,
+    this.mediaType,
+    this.replyToMessageId,
+    required this.timestamp,
+    required this.isRead,
+    required this.readBy,
+  });
+
+  factory GroupMessage.fromMap(String id, Map<String, dynamic> data) {
+    return GroupMessage(
+      id: id,
+      groupId: data['groupId'] ?? '',
+      senderId: data['senderId'] ?? '',
+      text: data['text'] ?? '',
+      messageType: MessageType.values.firstWhere(
+        (e) => e.name == data['messageType'],
+        orElse: () => MessageType.text,
+      ),
+      mediaUrl: data['mediaUrl'],
+      mediaType: data['mediaType'],
+      replyToMessageId: data['replyToMessageId'],
+      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      isRead: data['isRead'] ?? false,
+      readBy: List<String>.from(data['readBy'] ?? []),
+    );
+  }
+
+  /// Check if message is read by user
+  bool isReadBy(String userId) {
+    return readBy.contains(userId);
+  }
+
+  @override
+  String toString() {
+    return 'GroupMessage($text: ${messageType.name})';
+  }
+}

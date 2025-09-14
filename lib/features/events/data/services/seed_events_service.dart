@@ -110,7 +110,7 @@ class SeedEventsService {
 
       EventModel(
         id: '',
-        name: 'Diaspora Connect Meetup',
+        name: 'Diaspora Connect Event',
         description: 'Connect with fellow Nigerians living abroad and locals. Share experiences, network, and build lasting friendships in the diaspora community.',
         startDate: now.add(const Duration(days: 10)),
         endDate: now.add(const Duration(days: 10, hours: 4)),

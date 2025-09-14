@@ -118,7 +118,7 @@ class NotificationService {
       ),
       AppNotification(
         id: '7',
-        title: 'You were invited to Lagos Tech Meetup',
+        title: 'You were invited to Lagos Tech Event',
         message: 'Join other tech enthusiasts this weekend',
         timestamp: now.subtract(const Duration(days: 4)),
         type: 'invite',

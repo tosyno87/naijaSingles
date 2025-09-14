@@ -1152,7 +1152,7 @@ enum GroupType {
   movies,      // Film buffs, cinema, streaming
   
   // Social & Community Groups
-  events,      // Local events, meetups, parties
+  events,      // Local events, parties
   networking,  // Business networking, connections
   support,     // Help groups, advice, mentorship
   study,       // Study groups, education, learning

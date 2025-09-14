@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// - Group messaging with media sharing
 /// - Group settings and permissions
 /// - Group moderation and reporting
-/// - Group events and meetups
+/// - Group events
 class GroupChatService {
   static final GroupChatService _instance = GroupChatService._internal();
   factory GroupChatService() => _instance;

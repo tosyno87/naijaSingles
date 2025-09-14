@@ -5,7 +5,6 @@ import 'event_model.dart' as event_model;
 enum EventType { 
   userGenerated, 
   external, 
-  meetup, 
   promoted 
 }
 
@@ -242,8 +241,6 @@ class EnhancedEventModel extends Equatable {
           return EventType.userGenerated;
         case 'external':
           return EventType.external;
-        case 'meetup':
-          return EventType.meetup;
         case 'promoted':
           return EventType.promoted;
         default:

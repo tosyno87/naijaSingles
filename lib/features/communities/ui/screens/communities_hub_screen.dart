@@ -115,7 +115,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             Expanded(
               child: _buildActionCard(
                 'Events',
-                'Find parties, celebrations, and local meetups',
+                'Find parties, celebrations, and local events',
                 Custom3DIcons.events(),
                 const Color(0xFF008037), // Green accent
                 () {

@@ -357,7 +357,7 @@ class ModeSpecificProfileSections extends StatelessWidget {
   String _getHobbies() => ''; // This would come from user data
   String _getFriendGroupSize() => 'Small groups (3-5)'; // This would come from user data
   String _getActivityLevel() => 'Moderate'; // This would come from user data
-  String _getMeetingStyle() => 'Casual meetups'; // This would come from user data
+  String _getMeetingStyle() => 'Casual gatherings'; // This would come from user data
   
   String _getIndustry() => user.job_title ?? 'Not specified';
   String _getCareerLevel() => 'Mid-level'; // This would come from user data

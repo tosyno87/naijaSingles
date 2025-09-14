@@ -1,8 +1,9 @@
 # Fastfile for NaijaSingles - African Diaspora Dating App
+# iPhone-only mobile app (excludes iPad)
 # Install: gem install fastlane
 # Usage: 
-#   fastlane ios deploy          # Deploy to App Store
-#   fastlane ios testflight     # Deploy to TestFlight
+#   fastlane ios deploy          # Deploy to App Store (iPhone only)
+#   fastlane ios testflight     # Deploy to TestFlight (iPhone only)
 #   fastlane android deploy     # Deploy to Google Play
 #   fastlane test               # Run comprehensive tests
 #   fastlane screenshots        # Generate App Store screenshots
@@ -11,14 +12,14 @@
 # Set default platform to iOS for global lanes
 default_platform(:ios)
 
-# iOS platform
+# iOS platform (iPhone only)
 platform :ios do
-  desc "Deploy to iOS TestFlight"
+  desc "Deploy to iOS TestFlight (iPhone only)"
   lane :testflight_deploy do
     ios_deploy_testflight
   end
 
-  desc "Deploy to iOS App Store"
+  desc "Deploy to iOS App Store (iPhone only)"
   lane :deploy do
     ios_deploy
   end
@@ -109,9 +110,9 @@ lane :beta do
 end
 
 # iOS TestFlight deployment lane
-desc "Deploy to iOS TestFlight"
+desc "Deploy to iOS TestFlight (iPhone only)"
 lane :ios_deploy_testflight do
-  UI.message "📱 Deploying NaijaSingles to TestFlight..."
+  UI.message "📱 Deploying NaijaSingles to TestFlight (iPhone only)..."
   
   begin
     UI.message "🔍 Checking iOS build environment..."
@@ -218,9 +219,9 @@ lane :deploy do
 end
 
 # iOS App Store deployment lane
-desc "Deploy to iOS App Store"
+desc "Deploy to iOS App Store (iPhone only)"
 lane :ios_deploy do
-  UI.message "📱 Deploying NaijaSingles to iOS App Store..."
+  UI.message "📱 Deploying NaijaSingles to iOS App Store (iPhone only)..."
   
   begin
     # Clean Flutter project

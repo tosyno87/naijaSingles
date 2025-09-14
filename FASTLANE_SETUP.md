@@ -2,6 +2,8 @@
 
 This guide helps you set up and use fastlane for automated deployment of the NaijaSingles app.
 
+**Note**: This app is configured for iPhone-only deployment (excludes iPad support).
+
 ## 🚀 Quick Setup
 
 ### 1. Install Dependencies
@@ -43,9 +45,9 @@ fastlane android internal --dry_run
 - `fastlane beta` - Deploy to beta testing
 - `fastlane deploy` - Production deployment
 
-### iOS Commands
-- `fastlane ios testflight` - Deploy to TestFlight
-- `fastlane ios deploy` - Deploy to App Store
+### iOS Commands (iPhone Only)
+- `fastlane ios testflight_deploy` - Deploy to TestFlight (iPhone only)
+- `fastlane ios deploy` - Deploy to App Store (iPhone only)
 
 ### Android Commands
 - `fastlane android internal` - Deploy to Internal Testing
@@ -57,6 +59,11 @@ fastlane android internal --dry_run
 - **iOS Bundle ID**: `com.app.naijasingles`
 - **Android Package**: `com.app.naijasingles`
 - **Team ID**: `M7HY7333KT`
+
+### Device Targeting
+- **iOS**: iPhone only (`TARGETED_DEVICE_FAMILY = "1"`)
+- **Android**: All supported devices
+- **Excluded**: iPad support (optimized for mobile dating experience)
 
 ### Fastfile
 - Platform-specific lanes for iOS and Android

@@ -69,7 +69,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
             borderRadius: BorderRadius.circular(24),
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF6E5), // Cream background
+                color: Colors.white, // White background
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: const Color(0xFF008037).withOpacity(0.1),

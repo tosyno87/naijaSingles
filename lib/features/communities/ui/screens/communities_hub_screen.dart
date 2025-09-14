@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_3d_icons.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class CommunitiesHubScreen extends StatefulWidget {
   const CommunitiesHubScreen({Key? key}) : super(key: key);
@@ -14,24 +15,24 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5), // Cream background
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
           'Communities',
           style: GoogleFonts.montserrat(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF2D2D2D),
+            color: AppColors.textPrimary,
           ),
         ),
-        backgroundColor: const Color(0xFFFFF6E5),
+        backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(
               Icons.search_rounded,
-              color: Color(0xFF008037), // Green accent
+              color: AppColors.primaryGreen,
               size: 28,
             ),
             onPressed: () {
@@ -41,7 +42,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                     'Search functionality coming soon!',
                     style: GoogleFonts.montserrat(),
                   ),
-                  backgroundColor: const Color(0xFF008037),
+                  backgroundColor: AppColors.primaryGreen,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -78,7 +79,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
           style: GoogleFonts.montserrat(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF2D2D2D),
+            color: AppColors.textPrimary,
             height: 1.2,
           ),
         ),
@@ -87,7 +88,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
           'Connect with amazing people and discover exciting events in your community',
           style: GoogleFonts.montserrat(
             fontSize: 16,
-            color: const Color(0xFF666666),
+            color: AppColors.textSecondary,
             height: 1.4,
           ),
         ),
@@ -104,7 +105,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
           style: GoogleFonts.montserrat(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF2D2D2D),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 20),

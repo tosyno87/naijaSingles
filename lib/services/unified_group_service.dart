@@ -309,13 +309,18 @@ class UnifiedGroupService {
     return _firestore
         .collection('unifiedGroups')
         .where('memberIds', arrayContains: currentUserId)
-        .where('isActive', isEqualTo: true)
-        .orderBy('lastActivityAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
+      // Filter and sort in memory to avoid complex index requirements
+      final groups = snapshot.docs.map((doc) {
         return UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>);
       }).toList();
+      
+      // Filter active groups and sort by last activity
+      groups.removeWhere((group) => !group.isActive);
+      groups.sort((a, b) => b.lastActivityAt.compareTo(a.lastActivityAt));
+      
+      return groups;
     });
   }
 
@@ -327,8 +332,7 @@ class UnifiedGroupService {
   }) {
     Query query = _firestore
         .collection('unifiedGroups')
-        .where('isPublic', isEqualTo: true)
-        .where('isActive', isEqualTo: true);
+        .where('isPublic', isEqualTo: true);
 
     if (type != null) {
       query = query.where('type', isEqualTo: type.name);
@@ -338,13 +342,17 @@ class UnifiedGroupService {
       query = query.where('location', isEqualTo: location);
     }
 
-    return query
-        .orderBy('lastActivityAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
+    return query.snapshots().map((snapshot) {
+      // Filter and sort in memory to avoid complex index requirements
+      final groups = snapshot.docs.map((doc) {
         return UnifiedGroup.fromMap(doc.id, doc.data() as Map<String, dynamic>);
       }).toList();
+      
+      // Filter active groups and sort by last activity
+      groups.removeWhere((group) => !group.isActive);
+      groups.sort((a, b) => b.lastActivityAt.compareTo(a.lastActivityAt));
+      
+      return groups;
     });
   }
 

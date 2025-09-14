@@ -1,6 +1,5 @@
 import 'dart:developer' as dev;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'dart:math';
 
@@ -18,7 +17,6 @@ class SmartMatchingService {
   SmartMatchingService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Calculate compatibility score between two users
   Future<MatchScore> calculateCompatibilityScore(String userId1, String userId2) async {
@@ -40,8 +38,8 @@ class SmartMatchingService {
       );
       }
 
-      final user1 = UserModel.fromMap(user1Doc.data()!);
-      final user2 = UserModel.fromMap(user2Doc.data()!);
+      final user1 = UserModel.fromMap(user1Doc.data()!, userId1);
+      final user2 = UserModel.fromMap(user2Doc.data()!, userId2);
 
       // Calculate individual factor scores
       final factors = <String, double>{};
@@ -106,7 +104,7 @@ class SmartMatchingService {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists) return [];
 
-      final user = UserModel.fromMap(userDoc.data()!);
+      final user = UserModel.fromMap(userDoc.data()!, userId);
       
       // Get potential matches based on basic criteria
       final potentialMatches = await _getPotentialMatches(user);
@@ -115,7 +113,7 @@ class SmartMatchingService {
       final List<SmartMatch> smartMatches = [];
       
       for (final potentialMatch in potentialMatches) {
-        final matchScore = await calculateCompatibilityScore(userId, potentialMatch.id);
+        final matchScore = await calculateCompatibilityScore(userId, potentialMatch.id ?? '');
         
         if (matchScore.overallScore > 0.3) { // Only include matches with decent compatibility
           smartMatches.add(SmartMatch(
@@ -165,10 +163,10 @@ class SmartMatchingService {
       }
 
       // Exclude current user
-      query = query.where(FieldPath.documentId, isNotEqualTo: user.id);
+      query = query.where(FieldPath.documentId, isNotEqualTo: user.id ?? '');
 
       // Exclude already swiped users
-      final swipedUsers = await _getSwipedUsers(user.id);
+      final swipedUsers = await _getSwipedUsers(user.id ?? '');
       if (swipedUsers.isNotEmpty) {
         query = query.where(FieldPath.documentId, whereNotIn: swipedUsers);
       }
@@ -177,7 +175,7 @@ class SmartMatchingService {
       query = query.limit(100);
 
       final snapshot = await query.get();
-      return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+      return snapshot.docs.map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id)).toList();
     } catch (e) {
       dev.log('❌ Error getting potential matches: $e');
       return [];
@@ -204,7 +202,7 @@ class SmartMatchingService {
       if (user1.latitude != null && user1.longitude != null &&
           user2.latitude != null && user2.longitude != null) {
         
-        final distance = _calculateDistance(user1, user2);
+        final distance = await _calculateDistance(user1, user2);
         
         if (distance <= 5) return 1.0;      // Same city
         if (distance <= 25) return 0.8;    // Nearby
@@ -444,7 +442,7 @@ class SmartMatchingService {
       
       return earthRadius * c;
     } catch (e) {
-      log('❌ Error calculating distance: $e');
+      dev.log('❌ Error calculating distance: $e');
       return 0.0;
     }
   }
@@ -457,7 +455,7 @@ class SmartMatchingService {
       
       return interests1.where((interest) => interests2.contains(interest)).toList();
     } catch (e) {
-      log('❌ Error getting common interests: $e');
+      dev.log('❌ Error getting common interests: $e');
       return [];
     }
   }

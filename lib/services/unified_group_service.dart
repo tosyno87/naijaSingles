@@ -909,6 +909,9 @@ class UnifiedGroupService {
       }
 
       // Create invitation
+      final now = DateTime.now();
+      final expiresAt = now.add(const Duration(days: 7));
+      
       await _firestore.collection('groupInvitations').add({
         'groupId': groupId,
         'invitedUserId': userId,
@@ -916,7 +919,7 @@ class UnifiedGroupService {
         'message': message ?? 'You are invited to join "${groupData['name']}"',
         'status': 'pending', // pending, accepted, declined
         'createdAt': FieldValue.serverTimestamp(),
-        'expiresAt': FieldValue.serverTimestamp() + const Duration(days: 7),
+        'expiresAt': Timestamp.fromDate(expiresAt),
       });
 
       // Send notification to the invited user

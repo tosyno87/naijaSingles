@@ -322,7 +322,23 @@ class UnifiedGroupService {
       // Filter and sort in memory to avoid complex index requirements
       final groups = snapshot.docs.map((doc) {
         final data = doc.data();
-        log('📋 getUserGroups: Group ${doc.id} - isActive: ${data['isActive']}, memberIds: ${data['memberIds']}');
+        final memberIds = List<String>.from(data['memberIds'] ?? []);
+        
+        // Check for duplicates and clean up if found
+        final uniqueMembers = <String>[];
+        for (final member in memberIds) {
+          if (!uniqueMembers.contains(member)) {
+            uniqueMembers.add(member);
+          }
+        }
+        
+        if (uniqueMembers.length != memberIds.length) {
+          log('🧹 Found duplicates in group ${doc.id}, cleaning up...');
+          // Clean up duplicates asynchronously
+          cleanupDuplicateMembers(doc.id);
+        }
+        
+        log('📋 getUserGroups: Group ${doc.id} - isActive: ${data['isActive']}, memberIds: $uniqueMembers');
         return UnifiedGroup.fromMap(doc.id, data);
       }).toList();
       
@@ -411,6 +427,41 @@ class UnifiedGroupService {
     } catch (e) {
       log('❌ Error getting group details: $e');
       return null;
+    }
+  }
+
+  /// Clean up duplicate members in a group (one-time fix)
+  Future<void> cleanupDuplicateMembers(String groupId) async {
+    try {
+      log('🧹 Cleaning up duplicate members in group: $groupId');
+      
+      final doc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!doc.exists) return;
+
+      final data = doc.data()!;
+      final memberIds = List<String>.from(data['memberIds'] ?? []);
+      
+      // Remove duplicates while preserving order
+      final uniqueMembers = <String>[];
+      for (final member in memberIds) {
+        if (!uniqueMembers.contains(member)) {
+          uniqueMembers.add(member);
+        }
+      }
+
+      if (uniqueMembers.length != memberIds.length) {
+        log('🔧 Found ${memberIds.length - uniqueMembers.length} duplicate members, cleaning up...');
+        
+        await _firestore.collection('unifiedGroups').doc(groupId).update({
+          'memberIds': uniqueMembers,
+          'memberCount': uniqueMembers.length,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        
+        log('✅ Cleaned up duplicate members: ${uniqueMembers.length} unique members');
+      }
+    } catch (e) {
+      log('❌ Error cleaning up duplicate members: $e');
     }
   }
 

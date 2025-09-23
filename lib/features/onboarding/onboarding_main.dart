@@ -283,63 +283,6 @@ class _OnboardingMainState extends State<OnboardingMain> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: _currentPage < _totalPages - 1
-                ? () {
-                    // Skip to main app
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(
-                          "Skip Onboarding?",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        content: Text(
-                          "You can always complete your profile later, but a complete profile gets more matches!",
-                          style: GoogleFonts.poppins(),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              "Continue Setup",
-                              style: GoogleFonts.poppins(
-                                color: primaryColor,
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _completeOnboarding();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: accentColor,
-                            ),
-                            child: Text(
-                              "Skip",
-                              style: GoogleFonts.poppins(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                : null,
-            child: Text(
-              "Skip",
-              style: GoogleFonts.poppins(
-                color: _currentPage < _totalPages - 1
-                    ? accentColor
-                    : Colors.transparent,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
       ),
       body: Stack(
         children: [

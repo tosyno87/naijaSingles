@@ -114,7 +114,6 @@ class _LocationScreenState extends State<LocationScreen> {
 
         setState(() {
           _currentLocation = location;
-          _cityController.text = location;
           _isLoadingLocation = false;
         });
 

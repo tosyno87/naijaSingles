@@ -397,3 +397,4 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       },
     );
   }
+}

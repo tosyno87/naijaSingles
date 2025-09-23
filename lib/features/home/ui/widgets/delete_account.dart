@@ -26,6 +26,13 @@ class DeleteAccountWidget extends StatefulWidget {
 class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   final FirebaseAuth _auth = firebaseAuthInstance;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+  final TextEditingController _confirmationController = TextEditingController();
+
+  @override
+  void dispose() {
+    _confirmationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,190 +68,9 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    final User? user = _auth.currentUser;
-                    if (user == null) return;
-                    await user.delete().then((_) async {
-                      // Delete user data from Firestore collections
-                      await PhoneAuthRepository().deleteUser(user);
-                      await PhoneAuthRepository().signOut();
-                      if (context.mounted) {
-                        // Show success message
-                        CustomSnackbar.showSnackBarSimple(
-                          "Account deleted Successfully".tr().toString(),
-                          context,
-                        );
-                        // Navigate to login screen
-                        Navigator.pushReplacementNamed(
-                                context, RouteName.loginScreen)
-                            .then((value) {
-                          // Update user provider
-                          Provider.of<UserProvider>(context, listen: false)
-                              .currentUser = null;
-                        });
-                      }
-                    }).catchError((e) {
-                      log("error in deleting user ${e.toString()}");
-
-                      // for handling the recent login error
-                      if (e is FirebaseAuthException &&
-                          e.code == 'requires-recent-login') {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Dialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                      'Recent Login Required'.tr().toString(),
-                                      style: TextStyle(
-                                          fontSize: 18, color: primaryColor),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      'To ensure the security of your account, we require you to log in again for verification purposes. Please log in again and then delete account.'
-                                          .tr()
-                                          .toString(),
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text(
-                                            'Close'.tr().toString(),
-                                            style:
-                                                TextStyle(color: primaryColor),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () async {
-                                            // Check if user has logged in with Facebook
-                                            if (_auth.currentUser!.providerData
-                                                .any((userInfo) =>
-                                                    userInfo.providerId ==
-                                                    'facebook.com')) {
-                                              try {
-                                                // Perform Facebook re-authentication
-                                                final User? fbUser =
-                                                    await FaceBookLoginRepositoryImpl()
-                                                        .signInWithFacebook();
-
-                                                if (fbUser != null) {
-                                                  // Facebook re-authentication successful
-                                                  log('Facebook re-authentication successful');
-
-                                                  await fbUser
-                                                      .delete()
-                                                      .then((_) async {
-                                                    // Delete user data from Firestore collections
-                                                    await PhoneAuthRepository()
-                                                        .deleteUser(fbUser);
-                                                    await PhoneAuthRepository()
-                                                        .signOut();
-                                                    if (context.mounted) {
-                                                      // Show success message
-                                                      CustomSnackbar
-                                                          .showSnackBarSimple(
-                                                        "Account deleted Successfully"
-                                                            .tr()
-                                                            .toString(),
-                                                        context,
-                                                      );
-
-                                                      // Navigate to login screen
-                                                      Navigator.pushReplacementNamed(
-                                                              context,
-                                                              RouteName
-                                                                  .loginScreen)
-                                                          .then((value) async {
-                                                        // Update user provider
-                                                        Provider.of<UserProvider>(
-                                                                context,
-                                                                listen: false)
-                                                            .currentUser = null;
-                                                      });
-                                                    }
-                                                  });
-                                                } else {
-                                                  // Handle Facebook re-authentication failure
-                                                  log('Facebook re-authentication failed');
-                                                  if (context.mounted) {
-                                                    CustomSnackbar
-                                                        .showSnackBarSimple(
-                                                      "Something Went Wrong"
-                                                          .tr()
-                                                          .toString(),
-                                                      context,
-                                                    );
-                                                  }
-                                                }
-                                              } catch (e) {
-                                                log('Error re-authenticating with Facebook: $e');
-                                                // Handle re-authentication error
-                                              }
-                                            } else {
-                                              await _auth.verifyPhoneNumber(
-                                                phoneNumber: _auth
-                                                    .currentUser?.phoneNumber,
-                                                verificationCompleted:
-                                                    (PhoneAuthCredential
-                                                        credential) {},
-                                                verificationFailed:
-                                                    (FirebaseAuthException e) {
-                                                  log('Verification failed: ${e.message}');
-                                                  CustomSnackbar.showSnackBarSimple(
-                                                      e.message ??
-                                                          "Something Went Wrong"
-                                                              .tr()
-                                                              .toString(),
-                                                      context);
-                                                },
-                                                codeSent:
-                                                    (String verificationId,
-                                                        int? resendToken) {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return ReAuthDialog(
-                                                            auth: _auth,
-                                                            verificationId:
-                                                                verificationId);
-                                                      });
-                                                },
-                                                codeAutoRetrievalTimeout:
-                                                    (String verificationId) {},
-                                              );
-                                            }
-                                          },
-                                          child: Text(
-                                            'Yes'.tr().toString(),
-                                            style:
-                                                TextStyle(color: primaryColor),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    });
+                    Navigator.of(context).pop();
+                    // Show final confirmation dialog with DELETE input
+                    _showFinalConfirmationDialog();
                   },
                   child: Text('Yes'.tr().toString(),
                       style: TextStyle(color: primaryColor)),
@@ -257,4 +83,317 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       icon: Icons.delete_forever_outlined,
     );
   }
-}
+
+  void _showFinalConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Final Confirmation',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Type "DELETE" to confirm account deletion:',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _confirmationController,
+                decoration: InputDecoration(
+                  hintText: 'Type DELETE here',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.red, width: 2),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {});
+                },
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '⚠️ This action cannot be undone. All your data will be permanently deleted.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                _confirmationController.clear();
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: _confirmationController.text.trim().toUpperCase() == 'DELETE'
+                  ? () {
+                      Navigator.of(context).pop();
+                      _confirmationController.clear();
+                      _performAccountDeletion();
+                    }
+                  : null,
+              child: Text(
+                'Confirm Delete',
+                style: TextStyle(
+                  color: _confirmationController.text.trim().toUpperCase() == 'DELETE'
+                      ? Colors.red
+                      : Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _performAccountDeletion() async {
+    final User? user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      // Check authentication method and handle accordingly
+      final providerData = user.providerData;
+      bool isGoogleUser = providerData.any((info) => info.providerId == 'google.com');
+      bool isFacebookUser = providerData.any((info) => info.providerId == 'facebook.com');
+      bool isPhoneUser = providerData.any((info) => info.providerId == 'phone');
+
+      if (isGoogleUser) {
+        // For Google users, try direct deletion first
+        await _deleteGoogleUser(user);
+      } else if (isFacebookUser) {
+        // For Facebook users, try direct deletion first
+        await _deleteFacebookUser(user);
+      } else if (isPhoneUser) {
+        // For phone users, try direct deletion first
+        await _deletePhoneUser(user);
+      } else {
+        // Fallback for other auth methods
+        await _deleteUserWithReauth(user);
+      }
+    } catch (e) {
+      log("Error in account deletion: ${e.toString()}");
+      if (context.mounted) {
+        CustomSnackbar.showSnackBarSimple(
+          "Failed to delete account. Please try again.".tr().toString(),
+          context,
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteGoogleUser(User user) async {
+    try {
+      await user.delete();
+      await _cleanupUserData(user);
+      await _showSuccessAndNavigate();
+    } catch (e) {
+      if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
+        // Show Google re-auth dialog
+        _showGoogleReauthDialog();
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  Future<void> _deleteFacebookUser(User user) async {
+    try {
+      await user.delete();
+      await _cleanupUserData(user);
+      await _showSuccessAndNavigate();
+    } catch (e) {
+      if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
+        // Show Facebook re-auth dialog
+        _showFacebookReauthDialog();
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  Future<void> _deletePhoneUser(User user) async {
+    try {
+      await user.delete();
+      await _cleanupUserData(user);
+      await _showSuccessAndNavigate();
+    } catch (e) {
+      if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
+        // Show phone re-auth dialog
+        _showPhoneReauthDialog();
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  Future<void> _deleteUserWithReauth(User user) async {
+    try {
+      await user.delete();
+      await _cleanupUserData(user);
+      await _showSuccessAndNavigate();
+    } catch (e) {
+      if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
+        // Show generic re-auth dialog
+        _showGenericReauthDialog();
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  Future<void> _cleanupUserData(User user) async {
+    await PhoneAuthRepository().deleteUser(user);
+    await PhoneAuthRepository().signOut();
+  }
+
+  Future<void> _showSuccessAndNavigate() async {
+    if (context.mounted) {
+      CustomSnackbar.showSnackBarSimple(
+        "Account deleted successfully".tr().toString(),
+        context,
+      );
+      Navigator.pushReplacementNamed(context, RouteName.loginScreen).then((value) {
+        Provider.of<UserProvider>(context, listen: false).currentUser = null;
+      });
+    }
+  }
+
+  void _showGoogleReauthDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Re-authentication Required'),
+          content: Text('Please sign in with Google again to confirm account deletion.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                // Implement Google re-auth here
+                // This would require Google Sign-In re-authentication
+                CustomSnackbar.showSnackBarSimple(
+                  "Google re-authentication not yet implemented",
+                  context,
+                );
+              },
+              child: Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFacebookReauthDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Re-authentication Required'),
+          content: Text('Please sign in with Facebook again to confirm account deletion.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                try {
+                  final User? fbUser = await FaceBookLoginRepositoryImpl().signInWithFacebook();
+                  if (fbUser != null) {
+                    await fbUser.delete();
+                    await _cleanupUserData(fbUser);
+                    await _showSuccessAndNavigate();
+                  }
+                } catch (e) {
+                  CustomSnackbar.showSnackBarSimple(
+                    "Facebook re-authentication failed",
+                    context,
+                  );
+                }
+              },
+              child: Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPhoneReauthDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Re-authentication Required'),
+          content: Text('Please verify your phone number again to confirm account deletion.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                // Implement phone re-auth here
+                CustomSnackbar.showSnackBarSimple(
+                  "Phone re-authentication not yet implemented",
+                  context,
+                );
+              },
+              child: Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showGenericReauthDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Re-authentication Required'),
+          content: Text('Please sign in again to confirm account deletion.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+  }

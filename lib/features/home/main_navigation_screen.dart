@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/features/explore/explore_screen.dart';
 import 'package:naijasingles/features/messages/messages_screen.dart';
 import 'package:naijasingles/features/communities/ui/screens/communities_hub_screen.dart';
-import 'package:naijasingles/features/profile/cultural_profile_screen.dart';
+import 'package:naijasingles/features/profile/profile_screen.dart';
 import 'package:naijasingles/debug/quick_analysis.dart';
 import 'package:naijasingles/common/widgets/custom_3d_icons.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
@@ -36,7 +36,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const ExploreScreen(
         showBackButton: false), // Tab 1: Connect (Dating/Friendship)
     const MessagesScreen(), // Tab 2: Messages
-        const CulturalProfileScreen(), // Tab 3: Profile
+        const ProfileScreen(), // Tab 3: Profile
   ];
 
   // Deep green color for accents

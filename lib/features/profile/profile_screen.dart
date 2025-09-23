@@ -514,8 +514,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSimplifiedLocation() {
-    final location = _userData?['location'] ?? '';
-    final nationality = _userData?['nationality'] ?? '';
+    // Handle both String and Map types for location and nationality
+    String location = '';
+    String nationality = '';
+    
+    if (_userData?['location'] != null) {
+      if (_userData!['location'] is String) {
+        location = _userData!['location'] as String;
+      } else if (_userData!['location'] is Map) {
+        location = _userData!['location']['name'] ?? _userData!['location']['city'] ?? '';
+      }
+    }
+    
+    if (_userData?['nationality'] != null) {
+      if (_userData!['nationality'] is String) {
+        nationality = _userData!['nationality'] as String;
+      } else if (_userData!['nationality'] is Map) {
+        nationality = _userData!['nationality']['name'] ?? _userData!['nationality']['country'] ?? '';
+      }
+    }
 
     return Card(
       color: cardColor,

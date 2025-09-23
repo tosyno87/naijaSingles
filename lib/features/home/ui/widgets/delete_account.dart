@@ -85,7 +85,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                 ),
               ],
             );
-              );          },
+          },
         );
       },
       icon: Icons.delete_forever_outlined,
@@ -180,7 +180,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
             ),
           ],
         );
-          );      },
+      },
     );
   }
 

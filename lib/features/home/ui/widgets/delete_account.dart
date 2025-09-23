@@ -52,7 +52,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
               child: AlertDialog(
                 backgroundColor: Colors.white,
                 title: Text('Delete Account'.tr().toString()),
-              content: Column(
+                content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -84,8 +84,9 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                       style: TextStyle(color: primaryColor)),
                 ),
               ],
-            );
-          },
+            ),
+          );
+        },
         );
       },
       icon: Icons.delete_forever_outlined,
@@ -179,8 +180,9 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
               ),
             ),
           ],
-        );
-      },
+        ),
+      );
+    },
     );
   }
 

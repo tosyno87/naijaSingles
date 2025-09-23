@@ -169,6 +169,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     
                     // Simplified Interests
                     _buildSimplifiedInterests(),
+                    const SizedBox(height: 16),
+                    
+                    // Simplified Location (includes nationality)
+                    _buildSimplifiedLocation(),
                     const SizedBox(height: 32),
                     
                     // Single Edit Button
@@ -506,6 +510,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSimplifiedLocation() {
+    final location = _userData?['location'] ?? '';
+    final nationality = _userData?['nationality'] ?? '';
+
+    return Card(
+      color: cardColor,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  color: primaryColor,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Location',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (location.isNotEmpty)
+              _buildLocationRow(Icons.location_on, 'Location', location),
+            if (nationality.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildLocationRow(Icons.public, 'Nationality', nationality),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: textSecondary,
+          size: 20,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            '$label: $value',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: textPrimary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

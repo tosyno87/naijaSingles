@@ -144,12 +144,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
             child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(flex: 1), // Adjusted for massive logo
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 40), // Fixed spacing instead of Spacer
 
                     // Clean Afropeep Logo with bounce-in and fade animation
                     AnimatedBuilder(
@@ -236,7 +237,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       },
                     ),
 
-                    const Spacer(flex: 1), // Adjusted for massive logo
+                    const SizedBox(height: 40), // Fixed spacing instead of Spacer
 
                     // Show loading indicator while checking auth status
                     if (_isLoading)
@@ -304,7 +305,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 ),
               ),
             ),
-          );
+          ),          );
         },
       ),
     );

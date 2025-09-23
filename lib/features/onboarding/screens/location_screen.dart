@@ -13,12 +13,9 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _zipController = TextEditingController();
   String? _currentLocation;
   bool _isLoadingLocation = false;
   bool _locationPermissionDenied = false;
-  bool _useZipCode = false;
 
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
@@ -40,7 +37,6 @@ class _LocationScreenState extends State<LocationScreen> {
           controller.locationName!.isNotEmpty) {
         setState(() {
           _currentLocation = controller.locationName;
-          _cityController.text = controller.locationName!;
         });
       }
     });
@@ -48,8 +44,6 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   void dispose() {
-    _cityController.dispose();
-    _zipController.dispose();
     super.dispose();
   }
 
@@ -140,84 +134,6 @@ class _LocationScreenState extends State<LocationScreen> {
       });
       print('Error getting location: $e');
     }
-  }
-
-  Future<void> _searchLocationByZip(String zipCode) async {
-    if (zipCode.trim().isEmpty) return;
-
-    setState(() {
-      _isLoadingLocation = true;
-    });
-
-    try {
-      // Get location from zip code
-      List<Location> locations = await locationFromAddress(zipCode);
-
-      if (locations.isNotEmpty) {
-        Location location = locations[0];
-
-        // Get address details from coordinates
-        List<Placemark> placemarks = await placemarkFromCoordinates(
-          location.latitude,
-          location.longitude,
-        );
-
-        if (placemarks.isNotEmpty) {
-          Placemark place = placemarks[0];
-          String locationString = '';
-
-          // Format location based on country
-          if (place.country == 'United States') {
-            locationString = '${place.locality}, ${place.administrativeArea}';
-          } else if (place.country == 'Canada') {
-            locationString = '${place.locality}, ${place.administrativeArea}';
-          } else {
-            locationString = '${place.locality}, ${place.country}';
-          }
-
-          setState(() {
-            _currentLocation = locationString;
-            _cityController.text = locationString;
-            _isLoadingLocation = false;
-          });
-
-          // Save to controller
-          final controller =
-              Provider.of<OnboardingController>(context, listen: false);
-          controller.setLocationName(locationString);
-
-          print(
-              '🔍 LocationScreen: Zip code location set to "$locationString"');
-        }
-      }
-    } catch (e) {
-      setState(() {
-        _isLoadingLocation = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Could not find location for zip code: $zipCode')),
-      );
-      print('Error searching by zip: $e');
-    }
-  }
-
-  void _searchLocationByCity(String city) {
-    if (city.trim().isEmpty) return;
-
-    setState(() {
-      _currentLocation = city.trim();
-    });
-
-    // Save to controller - CRITICAL FOR DISCOVERY
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    controller.setLocationName(city.trim());
-    // Set default coordinates for manual location (Lagos, Nigeria)
-    controller.setLocationCoordinates(6.5244, 3.3792);
-
-    print('🔍 LocationScreen: Manual location set to "$city"');
-    print('🔍 LocationScreen: Default coordinates set to 6.5244, 3.3792');
   }
 
   void _showLocationServiceDialog() {
@@ -334,161 +250,7 @@ class _LocationScreenState extends State<LocationScreen> {
             ),
           ),
 
-          const SizedBox(height: 24),
-
-          // Divider
-          Row(
-            children: [
-              Expanded(child: Divider(color: Colors.grey.shade300)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  'OR',
-                  style: GoogleFonts.poppins(
-                    color: textLightBrown,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              Expanded(child: Divider(color: Colors.grey.shade300)),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // Manual input toggle
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _useZipCode = false),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: !_useZipCode ? afropeepGreen : cardBackground,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color:
-                            !_useZipCode ? afropeepGreen : Colors.grey.shade300,
-                      ),
-                    ),
-                    child: Text(
-                      'Enter City',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        color: !_useZipCode ? Colors.white : textDarkBrown,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _useZipCode = true),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: _useZipCode ? afropeepGreen : cardBackground,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color:
-                            _useZipCode ? afropeepGreen : Colors.grey.shade300,
-                      ),
-                    ),
-                    child: Text(
-                      'Enter Zip Code',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        color: _useZipCode ? Colors.white : textDarkBrown,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Manual input field
-          if (!_useZipCode) ...[
-            TextField(
-              controller: _cityController,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: textDarkBrown,
-              ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: cardBackground,
-                hintText: "e.g., New York, NY or London, UK",
-                hintStyle: GoogleFonts.poppins(
-                  color: textLightBrown,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: afropeepGreen, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () => _searchLocationByCity(_cityController.text),
-                  icon: Icon(Icons.search, color: afropeepGreen),
-                ),
-              ),
-              onSubmitted: _searchLocationByCity,
-              onChanged: (value) {
-                if (value.trim().isNotEmpty) {
-                  _searchLocationByCity(value);
-                }
-              },
-            ),
-          ] else ...[
-            TextField(
-              controller: _zipController,
-              keyboardType: TextInputType.number,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: textDarkBrown,
-              ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: cardBackground,
-                hintText: "e.g., 10001 or M5V 3A8",
-                hintStyle: GoogleFonts.poppins(
-                  color: textLightBrown,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: afropeepGreen, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () => _searchLocationByZip(_zipController.text),
-                  icon: Icon(Icons.search, color: afropeepGreen),
-                ),
-              ),
-              onSubmitted: _searchLocationByZip,
-            ),
-          ],
-
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
           // Current location display
           if (_currentLocation != null) ...[

@@ -42,9 +42,16 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              title: Text('Delete Account'.tr().toString()),
+            return Theme(
+              data: Theme.of(context).copyWith(
+                dialogBackgroundColor: Colors.white,
+                colorScheme: Theme.of(context).colorScheme.copyWith(
+                  surface: Colors.white,
+                ),
+              ),
+              child: AlertDialog(
+                backgroundColor: Colors.white,
+                title: Text('Delete Account'.tr().toString()),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -78,7 +85,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                 ),
               ],
             );
-          },
+              );          },
         );
       },
       icon: Icons.delete_forever_outlined,
@@ -89,10 +96,17 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: Text(
-            'Final Confirmation',
+        return Theme(
+          data: Theme.of(context).copyWith(
+            dialogBackgroundColor: Colors.white,
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              surface: Colors.white,
+            ),
+          ),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            title: Text(
+              'Final Confirmation',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -166,7 +180,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
             ),
           ],
         );
-      },
+          );      },
     );
   }
 

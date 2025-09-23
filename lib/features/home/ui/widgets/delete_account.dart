@@ -43,6 +43,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               title: Text('Delete Account'.tr().toString()),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -89,6 +90,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text(
             'Final Confirmation',
             style: TextStyle(
@@ -285,6 +287,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text('Re-authentication Required'),
           content: Text('Please sign in with Google again to confirm account deletion.'),
           actions: [
@@ -315,6 +318,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text('Re-authentication Required'),
           content: Text('Please sign in with Facebook again to confirm account deletion.'),
           actions: [
@@ -352,6 +356,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text('Re-authentication Required'),
           content: Text('Please verify your phone number again to confirm account deletion.'),
           actions: [
@@ -381,6 +386,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text('Re-authentication Required'),
           content: Text('Please sign in again to confirm account deletion.'),
           actions: [

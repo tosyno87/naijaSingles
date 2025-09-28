@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:naijasingles/models/group_join_exception.dart';
 
 /// Unified Group Service that combines Cultural Groups and Group Chats
 /// This eliminates redundancy and creates synergy between features
@@ -116,45 +117,74 @@ class UnifiedGroupService {
     }
   }
 
-  /// Join a group
-  Future<void> joinGroup(String groupId) async {
+  /// Join a group with enhanced validation and error handling
+  Future<GroupJoinResult> joinGroup(String groupId) async {
     try {
       log('👥 Joining group: $groupId');
 
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) {
-        throw Exception('User not authenticated');
+        throw GroupJoinException('User not authenticated', GroupJoinErrorType.notAuthenticated);
       }
 
-      // Add user to group members
+      // Pre-join validation
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        throw GroupJoinException('Group not found', GroupJoinErrorType.groupNotFound);
+      }
+
+      final groupData = groupDoc.data()!;
+      
+      // Check if user is already a member
+      if (groupData['memberIds']?.contains(currentUserId) == true) {
+        throw GroupJoinException('Already a member', GroupJoinErrorType.alreadyMember);
+      }
+
+      // Check group capacity
+      final memberCount = groupData['memberCount'] ?? 0;
+      final maxMembers = groupData['maxMembers'] ?? 1000;
+      if (memberCount >= maxMembers) {
+        throw GroupJoinException('Group is full', GroupJoinErrorType.groupFull);
+      }
+
+      // Check if group is active
+      if (groupData['isActive'] != true) {
+        throw GroupJoinException('Group is not active', GroupJoinErrorType.groupInactive);
+      }
+
+      // Perform join operation
       await _firestore.collection('unifiedGroups').doc(groupId).update({
         'memberIds': FieldValue.arrayUnion([currentUserId]),
         'memberCount': FieldValue.increment(1),
         'lastActivityAt': FieldValue.serverTimestamp(),
       });
 
-      // Send join message if chat is enabled
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
-      if (groupDoc.exists) {
-        final groupData = groupDoc.data()!;
-        final enableChat = groupData['enableChat'] ?? false;
-        
-        if (enableChat) {
-          await _sendGroupMessage(
-            groupId: groupId,
-            text: 'joined the group',
-            messageType: MessageType.system,
-          );
-        }
+      // Send system message if chat is enabled
+      if (groupData['enableChat'] == true) {
+        await _sendGroupMessage(
+          groupId: groupId,
+          text: 'joined the group',
+          messageType: MessageType.system,
+        );
       }
 
       // Notify group members
       await _notifyGroupMembers(groupId, 'A new member joined the group');
 
       log('✅ Successfully joined group: $groupId');
+      return GroupJoinResult.success(groupData['name'] ?? 'Unknown Group');
     } catch (e) {
       log('❌ Error joining group: $e');
-      rethrow;
+      if (e is GroupJoinException) rethrow;
+      
+      // Handle Firebase-specific errors
+      if (e.toString().contains('permission-denied')) {
+        throw GroupJoinException('Permission denied', GroupJoinErrorType.permissionDenied);
+      } else if (e.toString().contains('network')) {
+        throw GroupJoinException('Network error', GroupJoinErrorType.networkError);
+      } else {
+        throw GroupJoinException('Failed to join group', GroupJoinErrorType.unknown);
+      }
     }
   }
 

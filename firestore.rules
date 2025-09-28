@@ -473,6 +473,9 @@ service cloud.firestore {
       allow read: if request.auth != null && 
                    request.auth.uid in resource.data.memberIds;
       
+      // Users can read group details for any group (needed for join validation)
+      allow read: if request.auth != null;
+      
       // Users can create groups
       allow create: if request.auth != null && 
                      request.auth.uid == request.resource.data.creatorId &&
@@ -484,11 +487,15 @@ service cloud.firestore {
       
       // Group creators and admins can update group settings
       // Users can update memberIds to join/leave groups
+      // Allow member cleanup operations
       allow update: if request.auth != null && 
                      (request.auth.uid in resource.data.adminIds ||
                       // Allow users to join/leave groups by updating memberIds
-                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt']) &&
-                       request.auth.uid in request.resource.data.memberIds)) &&
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt']) &&
+                       request.auth.uid in request.resource.data.memberIds) ||
+                      // Allow member cleanup operations (removing duplicates)
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'updatedAt']) &&
+                       request.resource.data.memberIds.size() <= resource.data.memberIds.size())) &&
                      // Prevent changing critical fields
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['creatorId', 'createdAt']);
       
@@ -537,17 +544,24 @@ service cloud.firestore {
       allow read: if request.auth != null && 
                    request.auth.uid in resource.data.memberIds;
       
+      // Users can read group details for any group (needed for join validation)
+      allow read: if request.auth != null;
+      
       // Users can create groups
       allow create: if request.auth != null && 
                      request.auth.uid == request.resource.data.creatorId;
       
       // Group creators and admins can update groups
       // Users can update memberIds to join/leave groups
+      // Allow member cleanup operations
       allow update: if request.auth != null && 
                      (request.auth.uid in resource.data.adminIds ||
                       // Allow users to join/leave groups by updating memberIds
-                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt']) &&
-                       request.auth.uid in request.resource.data.memberIds));
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt']) &&
+                       request.auth.uid in request.resource.data.memberIds) ||
+                      // Allow member cleanup operations (removing duplicates)
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'updatedAt']) &&
+                       request.resource.data.memberIds.size() <= resource.data.memberIds.size()));
       
       // Group creators can delete groups
       allow delete: if request.auth != null && 
@@ -560,17 +574,24 @@ service cloud.firestore {
       allow read: if request.auth != null && 
                    request.auth.uid in resource.data.memberIds;
       
+      // Users can read group details for any group (needed for join validation)
+      allow read: if request.auth != null;
+      
       // Users can create groups
       allow create: if request.auth != null && 
                      request.auth.uid == request.resource.data.creatorId;
       
       // Group creators and admins can update groups
       // Users can update memberIds to join/leave groups
+      // Allow member cleanup operations
       allow update: if request.auth != null && 
                      (request.auth.uid in resource.data.adminIds ||
                       // Allow users to join/leave groups by updating memberIds
-                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt']) &&
-                       request.auth.uid in request.resource.data.memberIds));
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt']) &&
+                       request.auth.uid in request.resource.data.memberIds) ||
+                      // Allow member cleanup operations (removing duplicates)
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'updatedAt']) &&
+                       request.resource.data.memberIds.size() <= resource.data.memberIds.size()));
       
       // Group creators can delete groups
       allow delete: if request.auth != null && 

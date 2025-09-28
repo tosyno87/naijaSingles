@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naijasingles/services/unified_group_service.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
 import 'package:naijasingles/features/group_chat/screens/create_group_screen.dart';
+import 'package:naijasingles/features/groups/screens/group_details_screen.dart';
 
 /// Unified Groups Screen that combines Cultural Groups and Group Chats
 /// This eliminates redundancy and creates synergy between features
@@ -129,18 +129,23 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   }
 
   void _navigateToGroupDetails(UnifiedGroup group) {
-    if (group.enableChat) {
-      // Navigate to group chat if chat is enabled
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => GroupChatScreen(groupId: group.id),
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final isMember = group.isMember(currentUserId);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GroupDetailsScreen(
+          group: group,
+          isMember: isMember,
         ),
-      );
-    } else {
-      // Navigate to group details for non-chat groups
-      _showGroupInfo(group);
-    }
+      ),
+    ).then((result) {
+      // Refresh groups if user joined or left a group
+      if (result == true) {
+        _loadGroups();
+      }
+    });
   }
 
   void _navigateToCreateGroup() {

@@ -430,9 +430,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   Widget _buildActionButtons() {
-    print('🔍 Building action buttons - isMember: ${widget.isMember}');
-    print('🔍 Group enableChat: ${widget.group.enableChat}');
-    
     if (!widget.isMember) {
       return _buildJoinButton();
     }
@@ -505,10 +502,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            print('🔍 Primary button tapped: $text');
-            onPressed();
-          },
+          onTap: onPressed,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -613,25 +607,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   // Action methods
   void _openGroupChat() {
-    print('🔍 Opening group chat for group: ${widget.group.id}');
-    print('🔍 Group enableChat: ${widget.group.enableChat}');
-    
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GroupChatScreen(groupId: widget.group.id),
       ),
-    ).then((result) {
-      print('🔍 Group chat navigation completed with result: $result');
-    }).catchError((error) {
-      print('❌ Error navigating to group chat: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error opening chat: $error'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    });
+    );
   }
 
   void _inviteMembers() {

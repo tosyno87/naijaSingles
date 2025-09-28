@@ -597,8 +597,19 @@ class UnifiedGroupService {
     String? targetUserId,
   }) async {
     try {
+      log('💬 Sending group message: $groupId');
       final currentUserId = _auth.currentUser?.uid;
-      if (currentUserId == null) return;
+      if (currentUserId == null) {
+        log('❌ User not authenticated for sending message');
+        return;
+      }
+
+      // First check if the group exists
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        log('❌ Group not found: $groupId');
+        throw Exception('Group not found');
+      }
 
       final messageData = {
         'groupId': groupId,
@@ -616,8 +627,11 @@ class UnifiedGroupService {
           .doc(groupId)
           .collection('messages')
           .add(messageData);
+
+      log('✅ Group message sent successfully: $groupId');
     } catch (e) {
       log('❌ Error sending group message: $e');
+      rethrow;
     }
   }
 

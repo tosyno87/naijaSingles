@@ -78,12 +78,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       body: Stack(
         children: [
           // Main content
-          Builder(
-            builder: (context) {
-              final page = _pages[_validSelectedIndex];
-              print('🎯 Displaying page at index $_validSelectedIndex: ${page.runtimeType}');
-              return page;
-            },
+          IndexedStack(
+            index: _validSelectedIndex,
+            children: _pages,
           ),
 
           // Background task indicator

@@ -419,8 +419,31 @@ class GroupChatService {
   /// Get group details
   Future<GroupChat?> getGroupDetails(String groupId) async {
     try {
+      log('🔍 GroupChatService: Looking for group in groupChats collection: $groupId');
       final doc = await _firestore.collection('groupChats').doc(groupId).get();
-      if (!doc.exists) return null;
+      if (!doc.exists) {
+        log('🔍 GroupChatService: Group not found in groupChats, trying unifiedGroups');
+        // Try unifiedGroups collection as fallback
+        final unifiedDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+        if (!unifiedDoc.exists) {
+          log('❌ GroupChatService: Group not found in either collection');
+          return null;
+        }
+        
+        // Convert UnifiedGroup to GroupChat format
+        final data = unifiedDoc.data()!;
+        return GroupChat.fromMap(unifiedDoc.id, {
+          'name': data['name'],
+          'description': data['description'],
+          'creatorId': data['creatorId'],
+          'memberIds': data['memberIds'],
+          'memberCount': data['memberCount'],
+          'isActive': data['isActive'],
+          'createdAt': data['createdAt'],
+          'updatedAt': data['updatedAt'],
+          'lastActivityAt': data['lastActivityAt'],
+        });
+      }
 
       return GroupChat.fromMap(doc.id, doc.data()!);
     } catch (e) {

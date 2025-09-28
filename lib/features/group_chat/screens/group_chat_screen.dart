@@ -37,19 +37,24 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   Future<void> _loadGroupDetails() async {
     try {
+      print('🔍 GroupChatScreen: Loading group details for: ${widget.groupId}');
       final group = await _groupChatService.getGroupDetails(widget.groupId);
+      print('🔍 GroupChatScreen: Group loaded: ${group?.name}');
+      
       if (mounted) {
         setState(() {
           _group = group;
           _isLoading = false;
         });
+        print('🔍 GroupChatScreen: State updated, group: ${_group?.name}');
       }
     } catch (e) {
+      print('❌ GroupChatScreen: Error loading group details: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        _showErrorSnackBar('Failed to load group details');
+        _showErrorSnackBar('Failed to load group details: $e');
       }
     }
   }
@@ -80,7 +85,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('🔍 GroupChatScreen: Building with isLoading: $_isLoading, group: ${_group?.name}');
+    
     if (_isLoading) {
+      print('🔍 GroupChatScreen: Showing loading screen');
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
@@ -94,6 +102,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     }
 
     if (_group == null) {
+      print('🔍 GroupChatScreen: Showing group not found screen');
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(

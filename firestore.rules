@@ -483,8 +483,12 @@ service cloud.firestore {
                      request.resource.data.description.size() > 0;
       
       // Group creators and admins can update group settings
+      // Users can update memberIds to join/leave groups
       allow update: if request.auth != null && 
-                     request.auth.uid in resource.data.adminIds &&
+                     (request.auth.uid in resource.data.adminIds ||
+                      // Allow users to join/leave groups by updating memberIds
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt']) &&
+                       request.auth.uid in request.resource.data.memberIds)) &&
                      // Prevent changing critical fields
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['creatorId', 'createdAt']);
       
@@ -538,8 +542,12 @@ service cloud.firestore {
                      request.auth.uid == request.resource.data.creatorId;
       
       // Group creators and admins can update groups
+      // Users can update memberIds to join/leave groups
       allow update: if request.auth != null && 
-                     request.auth.uid in resource.data.adminIds;
+                     (request.auth.uid in resource.data.adminIds ||
+                      // Allow users to join/leave groups by updating memberIds
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt']) &&
+                       request.auth.uid in request.resource.data.memberIds));
       
       // Group creators can delete groups
       allow delete: if request.auth != null && 
@@ -557,8 +565,12 @@ service cloud.firestore {
                      request.auth.uid == request.resource.data.creatorId;
       
       // Group creators and admins can update groups
+      // Users can update memberIds to join/leave groups
       allow update: if request.auth != null && 
-                     request.auth.uid in resource.data.adminIds;
+                     (request.auth.uid in resource.data.adminIds ||
+                      // Allow users to join/leave groups by updating memberIds
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt']) &&
+                       request.auth.uid in request.resource.data.memberIds));
       
       // Group creators can delete groups
       allow delete: if request.auth != null && 

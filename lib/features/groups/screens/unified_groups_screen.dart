@@ -118,13 +118,75 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       }
     } catch (e) {
       if (mounted) {
+        String message;
+        if (e.toString().contains('Already a member')) {
+          message = 'You are already a member of ${group.name}';
+        } else if (e.toString().contains('Group is full')) {
+          message = '${group.name} is full. Try another group.';
+        } else if (e.toString().contains('Group not found')) {
+          message = 'This group no longer exists.';
+        } else if (e.toString().contains('Group is not active')) {
+          message = '${group.name} is currently inactive.';
+        } else if (e.toString().contains('Permission denied')) {
+          message = 'You don\'t have permission to join this group.';
+        } else {
+          message = 'Unable to join ${group.name}. Please try again.';
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to join group: $e'),
+            content: Text(message),
             backgroundColor: AppColors.error,
           ),
         );
       }
+    }
+  }
+
+  Widget _buildActionButton(UnifiedGroup group) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final isMember = group.isMember(currentUserId);
+    
+    if (isMember) {
+      // User is already a member - show "Open Chat" or "View Group"
+      return ElevatedButton(
+        onPressed: () => _navigateToGroupDetails(group),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          group.enableChat ? 'Open Chat' : 'View Group',
+          style: GoogleFonts.montserrat(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    } else {
+      // User is not a member - show "Join"
+      return ElevatedButton(
+        onPressed: () => _joinGroup(group),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryGreen,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          'Join',
+          style: GoogleFonts.montserrat(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
     }
   }
 
@@ -601,24 +663,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           ],
         ),
         trailing: showJoinButton
-            ? ElevatedButton(
-                onPressed: () => _joinGroup(group),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'Join',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              )
+            ? _buildActionButton(group)
             : null,
         onTap: () => _navigateToGroupDetails(group),
       ),

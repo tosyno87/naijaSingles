@@ -634,6 +634,62 @@ service cloud.firestore {
                      request.auth.uid == resource.data.invitedByUserId;
     }
 
+    // User Group Notifications collection - for group mute/unmute preferences
+    match /user_group_notifications/{notificationId} {
+      // Users can read and write their own group notification preferences
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == resource.data.userId;
+      
+      // Users can create their own notification preferences
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.userId &&
+                     request.resource.data.keys().hasAll(['userId', 'groupId', 'isMuted', 'updatedAt']);
+    }
+
+    // Group Unread Counts collection - for tracking unread messages per group
+    match /group_unread_counts/{countId} {
+      // Users can read and write their own unread counts
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == resource.data.userId;
+      
+      // Users can create their own unread count records
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.userId &&
+                     request.resource.data.keys().hasAll(['userId', 'groupId', 'count', 'updatedAt']);
+      
+      // System can update unread counts (for message sending)
+      allow update: if request.auth != null;
+    }
+
+    // Group Reports collection - for group abuse reports
+    match /group_reports/{reportId} {
+      // Users can create reports
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.reporterId &&
+                     request.resource.data.keys().hasAll(['groupId', 'reporterId', 'reason', 'status', 'createdAt']) &&
+                     request.resource.data.status == 'pending';
+      
+      // Users can read their own reports
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.reporterId;
+      
+      // Group creators and admins can read reports for their groups
+      allow read: if request.auth != null && 
+                   exists(/databases/$(database)/documents/unifiedGroups/$(resource.data.groupId)) &&
+                   (request.auth.uid == get(/databases/$(database)/documents/unifiedGroups/$(resource.data.groupId)).data.creatorId ||
+                    request.auth.uid in get(/databases/$(database)/documents/unifiedGroups/$(resource.data.groupId)).data.adminIds);
+    }
+
+    // Security Logs collection - for monitoring and analytics
+    match /security_logs/{logId} {
+      // System can create security logs
+      allow create: if request.auth != null;
+      
+      // Users can read logs related to their reports
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.reporterId;
+    }
+
     // Block any other access not explicitly allowed above
     match /{document=**} {
       allow read, write: if false;

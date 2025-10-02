@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/features/user/ui/widgets/user_info.dart';
 import 'package:provider/provider.dart';
 import 'package:swipable_stack/swipable_stack.dart';
@@ -82,18 +83,19 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-                Text(
-                  "There's no one new around you.".tr().toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: themeProvider.isDarkMode
-                          ? Colors.white
-                          : Colors.black54,
-                      fontStyle: FontStyle.normal,
-                      letterSpacing: 1,
-                      decoration: TextDecoration.none,
-                      fontSize: 20),
-                )
+                        Text(
+                          "There's no one new around you.".tr().toString(),
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.montserrat(
+                            color: themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black54,
+                            fontStyle: FontStyle.normal,
+                            letterSpacing: 1,
+                            decoration: TextDecoration.none,
+                            fontSize: 20,
+                          ),
+                        )
               ],
             ),
           )
@@ -172,17 +174,17 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                             child: ListTile(
                               title: Row(
                                 children: [
-                                  Text(
-                                    "${widget.users[itemIndex].name}, ${widget.users[itemIndex].editInfo!['showMyAge'] != null ? !widget.users[itemIndex].editInfo!['showMyAge'] ? widget.users[itemIndex].age : "" : widget.users[itemIndex].age}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
+                                  Expanded(
+                                    child: Text(
+                                      "${widget.users[itemIndex].name}, ${widget.users[itemIndex].editInfo!['showMyAge'] != null ? !widget.users[itemIndex].editInfo!['showMyAge'] ? widget.users[itemIndex].age : "" : widget.users[itemIndex].age}",
+                                      style: GoogleFonts.montserrat(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
+                                  const SizedBox(width: 5),
                                   widget.users[itemIndex]
                                               .editInfo!['showOnProfile'] ??
                                           false
@@ -196,12 +198,50 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                               ),
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Text(
-                                  "${widget.users[itemIndex].address}",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Tribe/Nationality
+                                    if (widget.users[itemIndex].tribe != null && 
+                                        widget.users[itemIndex].tribe!.isNotEmpty)
+                                      Text(
+                                        widget.users[itemIndex].tribe!,
+                                        style: GoogleFonts.montserrat(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      )
+                                    else if (widget.users[itemIndex].nationality != null && 
+                                             widget.users[itemIndex].nationality!.isNotEmpty)
+                                      Text(
+                                        widget.users[itemIndex].nationality!,
+                                        style: GoogleFonts.montserrat(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    // Distance
+                                    if (widget.users[itemIndex].distanceBW != null)
+                                      Text(
+                                        "${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away",
+                                        style: GoogleFonts.montserrat(
+                                          color: Colors.white.withOpacity(0.9),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      )
+                                    else if (widget.users[itemIndex].address != null)
+                                      Text(
+                                        widget.users[itemIndex].address!,
+                                        style: GoogleFonts.montserrat(
+                                          color: Colors.white.withOpacity(0.9),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                               trailing: IconButton(

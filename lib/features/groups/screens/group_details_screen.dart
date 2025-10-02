@@ -11,6 +11,12 @@ import 'package:naijasingles/features/groups/widgets/message_shimmer.dart';
 import 'package:naijasingles/models/group_join_exception.dart';
 import 'package:naijasingles/widgets/full_screen_image_viewer.dart';
 import 'package:naijasingles/widgets/group_info_modal.dart';
+import 'package:naijasingles/widgets/group_notification_toggle.dart';
+import 'package:naijasingles/widgets/group_report_modal.dart';
+import 'package:naijasingles/features/groups/screens/group_settings_screen.dart';
+import 'package:naijasingles/services/group_notification_service.dart';
+import 'package:naijasingles/services/group_unread_service.dart';
+import 'package:naijasingles/widgets/unread_badge.dart';
 
 /// Enhanced Group Details Screen for members
 /// Provides comprehensive group information and member-specific actions
@@ -31,6 +37,8 @@ class GroupDetailsScreen extends StatefulWidget {
 class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final UserService _userService = UserService();
+  final GroupNotificationService _notificationService = GroupNotificationService();
+  final GroupUnreadService _unreadService = GroupUnreadService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -370,9 +378,16 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         'senderId': currentUser.uid,
         'senderName': currentUser.displayName ?? 'You',
         'timestamp': FieldValue.serverTimestamp(),
+        'groupId': widget.group.id,
+        'readBy': {currentUser.uid: true}, // Mark as read by sender
+        'readAt': {currentUser.uid: FieldValue.serverTimestamp()},
       });
 
+      // Increment unread count for other members
+      await _unreadService.incrementUnreadCount(widget.group.id, excludeUserId: currentUser.uid);
+
       _messageController.clear();
+      setState(() {}); // Update send button state
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1086,7 +1101,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               title: Text('Group Settings'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement group settings
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GroupSettingsScreen(group: widget.group),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -1094,7 +1114,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               title: Text('Notification Settings'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement notification settings
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => GroupNotificationToggle(
+                    groupId: widget.group.id,
+                    groupName: widget.group.name,
+                  ),
+                );
               },
             ),
             ListTile(
@@ -1102,7 +1130,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               title: Text('Report Group'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement report group
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => GroupReportModal(
+                    groupId: widget.group.id,
+                    groupName: widget.group.name,
+                  ),
+                );
               },
             ),
           ],

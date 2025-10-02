@@ -6,6 +6,7 @@ import 'package:naijasingles/services/unified_group_service.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
 import 'package:naijasingles/features/groups/widgets/message_bubble.dart';
+import 'package:naijasingles/features/groups/widgets/message_shimmer.dart';
 import 'package:naijasingles/models/group_join_exception.dart';
 
 /// Enhanced Group Details Screen for members
@@ -41,6 +42,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
           widget.group.name,
@@ -175,10 +177,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
-            ),
+          return ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: 3, // Show 3 shimmer messages
+            itemBuilder: (context, index) {
+              return MessageShimmer(
+                isCurrentUser: index % 2 == 0, // Alternate between user and other
+              );
+            },
           );
         }
 
@@ -248,15 +255,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         }
 
         // Auto-scroll to bottom when new messages arrive
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-            );
-          }
-        });
+        if (messages.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            }
+          });
+        }
 
         return ListView.builder(
           controller: _scrollController,
@@ -271,7 +280,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               messageId: messageDoc.id,
               text: messageData['text'] ?? '',
               senderId: messageData['senderId'] ?? '',
-              senderName: messageData['senderName'] ?? 'Unknown',
+              senderName: messageData['senderId'] == currentUserId 
+                  ? (FirebaseAuth.instance.currentUser?.displayName ?? 'You')
+                  : (messageData['senderName'] ?? 'Unknown'),
               timestamp: (messageData['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
               isCurrentUser: messageData['senderId'] == currentUserId,
             );
@@ -324,6 +335,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               style: GoogleFonts.montserrat(),
               maxLines: null,
               textCapitalization: TextCapitalization.sentences,
+              onChanged: (value) {
+                setState(() {}); // Rebuild to update send button state
+              },
             ),
           ),
           const SizedBox(width: 8),
@@ -333,7 +347,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               borderRadius: BorderRadius.circular(24),
             ),
             child: IconButton(
-              onPressed: _sendMessage,
+              onPressed: _messageController.text.trim().isEmpty ? null : _sendMessage,
               icon: const Icon(
                 Icons.send,
                 color: Colors.white,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
 
 /// Message bubble widget for group chat messages
@@ -94,7 +96,7 @@ class MessageBubble extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _formatTimestamp(timestamp),
+                    timeago.format(timestamp),
                     style: GoogleFonts.montserrat(
                       fontSize: 10,
                       color: isCurrentUser 
@@ -112,7 +114,9 @@ class MessageBubble extends StatelessWidget {
               radius: 16,
               backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
               child: Text(
-                'You'[0].toUpperCase(),
+                (FirebaseAuth.instance.currentUser?.displayName ?? 'You').isNotEmpty 
+                    ? (FirebaseAuth.instance.currentUser?.displayName ?? 'You')[0].toUpperCase()
+                    : '?',
                 style: GoogleFonts.montserrat(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -124,22 +128,5 @@ class MessageBubble extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inMinutes < 1) {
-      return 'now';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else {
-      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
-    }
   }
 }

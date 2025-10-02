@@ -142,6 +142,9 @@ class GroupChatService {
       }
 
       // Remove user from group members
+      log('🔍 Attempting to leave group: $groupId');
+      log('🔍 Current user: $currentUserId');
+      
       await _firestore.collection('unifiedGroups').doc(groupId).update({
         'memberIds': FieldValue.arrayRemove([currentUserId]),
         'adminIds': FieldValue.arrayRemove([currentUserId]),
@@ -324,6 +327,10 @@ class GroupChatService {
 
       final groupData = groupDoc.data()!;
       final memberIds = List<String>.from(groupData['memberIds'] ?? []);
+      
+      log('🔍 Group memberIds: $memberIds');
+      log('🔍 Current user: $currentUserId');
+      log('🔍 Is user member: ${memberIds.contains(currentUserId)}');
       
       if (!memberIds.contains(currentUserId)) {
         throw Exception('You are not a member of this group');

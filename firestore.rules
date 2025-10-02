@@ -518,7 +518,14 @@ service cloud.firestore {
                        request.resource.data.keys().hasAll(['senderId', 'text', 'timestamp']) &&
                        request.resource.data.text is string &&
                        request.resource.data.text.size() > 0 &&
-                       request.resource.data.text.size() <= 1000;
+                       request.resource.data.text.size() <= 1000 &&
+                       // Allow additional optional fields
+                       (!('messageType' in request.resource.data) || request.resource.data.messageType is string) &&
+                       (!('mediaUrl' in request.resource.data) || request.resource.data.mediaUrl is string) &&
+                       (!('mediaType' in request.resource.data) || request.resource.data.mediaType is string) &&
+                       (!('replyToMessageId' in request.resource.data) || request.resource.data.replyToMessageId is string) &&
+                       (!('isRead' in request.resource.data) || request.resource.data.isRead is bool) &&
+                       (!('readBy' in request.resource.data) || request.resource.data.readBy is list);
         
         // Group members can update messages for read status
         allow update: if request.auth != null && 

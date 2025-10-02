@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:io';
 import 'package:naijasingles/services/unified_group_service.dart';
+import 'package:naijasingles/services/image_upload_service.dart';
+import 'package:naijasingles/services/validation_service.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
 import 'package:naijasingles/features/groups/widgets/contact_picker_widget.dart';
+import 'package:naijasingles/widgets/tag_input_widget.dart';
+import 'package:naijasingles/widgets/group_avatar_picker.dart';
+import 'package:naijasingles/widgets/success_dialog.dart';
 
 /// Screen for creating new group chats
 class CreateGroupScreen extends StatefulWidget {
@@ -15,6 +21,7 @@ class CreateGroupScreen extends StatefulWidget {
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final UnifiedGroupService _groupService = UnifiedGroupService();
+  final ImageUploadService _imageService = ImageUploadService();
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -22,7 +29,17 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   GroupType _selectedType = GroupType.music;
   String? _selectedLocation;
   List<String> _selectedMembers = [];
+  List<String> _tags = [];
+  File? _selectedImage;
   bool _isCreating = false;
+
+  // Popular tag suggestions
+  final List<String> _tagSuggestions = [
+    'music', 'nigerian', 'afrobeats', 'lagos', 'abuja', 'community',
+    'friends', 'networking', 'events', 'culture', 'food', 'travel',
+    'sports', 'fitness', 'gaming', 'art', 'fashion', 'tech',
+    'business', 'career', 'study', 'support', 'local', 'international',
+  ];
 
   @override
   void dispose() {
@@ -66,9 +83,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildAvatarSection(),
+              const SizedBox(height: 24),
               _buildGroupTypeSection(),
               const SizedBox(height: 24),
               _buildGroupInfoSection(),
+              const SizedBox(height: 24),
+              _buildTagsSection(),
               const SizedBox(height: 24),
               _buildMembersSection(),
               const SizedBox(height: 24),
@@ -82,6 +103,69 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     );
   }
 
+  Widget _buildAvatarSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Group Photo',
+          style: GoogleFonts.montserrat(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Center(
+          child: GroupAvatarPicker(
+            selectedImage: _selectedImage,
+            onImageSelected: (image) {
+              setState(() {
+                _selectedImage = image;
+              });
+            },
+            size: 120,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTagsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Tags',
+          style: GoogleFonts.montserrat(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Add tags to help others discover your group',
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 12),
+        TagInputWidget(
+          tags: _tags,
+          onTagsChanged: (tags) {
+            setState(() {
+              _tags = tags;
+            });
+          },
+          maxTags: 5,
+          hintText: 'e.g., music, nigerian, afrobeats',
+          suggestions: _tagSuggestions,
+        ),
+      ],
+    );
+  }
   Widget _buildGroupTypeSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,15 +245,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ),
             prefixIcon: const Icon(Icons.group),
           ),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Please enter a group name';
-            }
-            if (value.trim().length < 3) {
-              return 'Group name must be at least 3 characters';
-            }
-            return null;
-          },
+          validator: ValidationService.validateGroupName,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -183,12 +259,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             prefixIcon: const Icon(Icons.description),
           ),
           maxLines: 3,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Please enter a description';
-            }
-            return null;
-          },
+          validator: ValidationService.validateGroupDescription,
         ),
       ],
     );
@@ -520,28 +591,75 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   Future<void> _createGroup() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Show loading dialog
+    LoadingDialog.show(
+      context: context,
+      message: 'Creating group...',
+    );
+
     setState(() {
       _isCreating = true;
     });
 
     try {
+      String? imageUrl;
+
+      // Upload image if selected
+      if (_selectedImage != null) {
+        try {
+          imageUrl = await _imageService.uploadCompressedImage(
+            imageFile: _selectedImage!,
+            path: 'group_avatars',
+            quality: 85,
+            maxWidth: 800,
+            maxHeight: 800,
+          );
+        } catch (e) {
+          // Continue without image if upload fails
+          print('Image upload failed: $e');
+        }
+      }
+
+      // Create group
       final group = await _groupService.createGroup(
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
         type: _selectedType,
         location: _selectedLocation,
         initialMembers: _selectedMembers,
+        imageUrl: imageUrl,
+        tags: _tags,
       );
 
+      // Hide loading dialog
+      LoadingDialog.hide(context);
+
+      // Show success dialog
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GroupChatScreen(groupId: group.id),
-          ),
+        await SuccessDialog.show(
+          context: context,
+          title: 'Group Created!',
+          message: 'Your group "${_nameController.text.trim()}" has been created successfully!',
+          actionText: 'Open Group',
+          onAction: () {
+            Navigator.pop(context); // Close dialog
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GroupChatScreen(groupId: group.id),
+              ),
+            );
+          },
+          onClose: () {
+            Navigator.pop(context); // Close dialog
+            Navigator.pop(context); // Go back to previous screen
+          },
         );
       }
     } catch (e) {
+      // Hide loading dialog
+      LoadingDialog.hide(context);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

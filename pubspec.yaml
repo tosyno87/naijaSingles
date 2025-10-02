@@ -61,7 +61,7 @@ dependencies:
   font_awesome_flutter: ^10.8.0  # Updated to latest
   google_maps_flutter: ^2.12.2   # Updated to latest
   image: ^4.5.4                  # Updated to latest
-  image_picker: ^1.1.2           # Updated to latest
+  image_picker: ^1.2.0           # Updated to latest
   image_cropper: ^9.1.0          # Added image_cropper
   in_app_purchase: ^3.2.3        # Updated to latest
   in_app_purchase_storekit: ^0.4.2 # Updated for latest iOS IAP

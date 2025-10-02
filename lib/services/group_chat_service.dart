@@ -317,7 +317,7 @@ class GroupChatService {
       }
 
       // Check if user is member of group
-      final groupDoc = await _firestore.collection('groupChats').doc(groupId).get();
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
@@ -344,13 +344,13 @@ class GroupChatService {
       };
 
       final docRef = await _firestore
-          .collection('groupChats')
+          .collection('unifiedGroups')
           .doc(groupId)
           .collection('messages')
           .add(messageData);
 
       // Update group last message info
-      await _firestore.collection('groupChats').doc(groupId).update({
+      await _firestore.collection('unifiedGroups').doc(groupId).update({
         'lastMessageAt': FieldValue.serverTimestamp(),
         'lastMessageText': text,
         'lastMessageSenderId': currentUserId,
@@ -383,8 +383,9 @@ class GroupChatService {
 
   /// Get group messages
   Stream<List<GroupMessage>> getGroupMessages(String groupId) {
+    // Use unifiedGroups collection since that's where our groups are stored
     return _firestore
-        .collection('groupChats')
+        .collection('unifiedGroups')
         .doc(groupId)
         .collection('messages')
         .orderBy('timestamp', descending: true)
@@ -569,7 +570,7 @@ class GroupChatService {
   /// Notify group members (internal method)
   Future<void> _notifyGroupMembers(String groupId, String message, {String? excludeUserId}) async {
     try {
-      final groupDoc = await _firestore.collection('groupChats').doc(groupId).get();
+      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) return;
 
       final groupData = groupDoc.data()!;

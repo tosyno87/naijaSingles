@@ -37,7 +37,7 @@ class _DistanceWidgetState extends State<DistanceWidget> {
                 fontWeight: FontWeight.w500),
           ),
           trailing: Text(
-            "${widget.currentUser.maxDistance} Km.",
+            "${(widget.currentUser.maxDistance! * 0.621371).round()} mi.",
             style: const TextStyle(fontSize: 16),
           ),
           subtitle: Slider(

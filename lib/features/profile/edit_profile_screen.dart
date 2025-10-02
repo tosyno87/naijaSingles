@@ -1022,7 +1022,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 24),
 
                     // Tribe selection - only editable during onboarding
-                    _buildSectionTitle('Tribe/Ethnicity'),
+                    _buildSectionTitle('Tribe/Ethnicity (Optional)'),
                     const SizedBox(height: 8),
                     _hasCompletedOnboarding
                         ? _buildReadOnlyField(
@@ -1364,7 +1364,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               border: InputBorder.none,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              hintText: 'Select your tribe/ethnicity',
+              hintText: 'Select your tribe/ethnicity (optional)',
               hintStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
               prefixIcon: Icon(Icons.people, color: primaryColor),
             ),
@@ -1384,9 +1384,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               });
             },
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please select your tribe/ethnicity';
-              }
+              // Tribe is now optional - no validation required
               return null;
             },
             icon: Icon(Icons.arrow_drop_down, color: primaryColor),
@@ -1409,10 +1407,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             style: GoogleFonts.poppins(),
             validator: (value) {
-              if (_selectedTribe == 'Other' &&
-                  (value == null || value.isEmpty)) {
-                return 'Please specify your tribe/ethnicity';
-              }
+              // Tribe is now optional - no validation required even for "Other"
               return null;
             },
             onChanged: (_) => _validateForm(),

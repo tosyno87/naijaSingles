@@ -228,7 +228,7 @@ class PaginatedUserService {
       final maxDistance = currentUser.distanceRange ?? MAX_DISTANCE_KM;
 
       debugPrint(
-          '📍 Distance to ${targetUser.name}: ${distanceKm.toStringAsFixed(1)}km (max: ${maxDistance}km)');
+          '📍 Distance to ${targetUser.name}: ${(distanceKm * 0.621371).toStringAsFixed(1)} miles (max: ${(maxDistance * 0.621371).round()} miles)');
 
       return distanceKm <= maxDistance;
     } catch (e) {

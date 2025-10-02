@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:naijasingles/common/utils/distance.dart' as distance;
@@ -16,7 +15,7 @@ class CompatibilityEngine {
   // Scoring parameters
   static const int IDEAL_AGE_DIFFERENCE = 3; // Years
   static const int MAX_AGE_DIFFERENCE = 10; // Years
-  static const double MAX_DISTANCE_KM = 50.0; // Kilometers
+  static const double MAX_DISTANCE_MILES = 31.0; // Miles (converted from 50km)
   static const int ACTIVITY_THRESHOLD_DAYS = 7; // Days
 
   /// Calculate overall compatibility score between two users
@@ -111,12 +110,12 @@ class CompatibilityEngine {
       // Calculate distance between users
       final distanceKm = distance.calculateDistance(lat1, lng1, lat2, lng2);
 
-      if (distanceKm <= 5.0) {
-        return 1.0; // Perfect score for very close users (within 5km)
-      } else if (distanceKm <= MAX_DISTANCE_KM) {
+      if (distanceKm <= 3.1) {
+        return 1.0; // Perfect score for very close users (within 3.1 miles)
+      } else if (distanceKm <= MAX_DISTANCE_MILES) {
         // Linear decrease from 1.0 to 0.2 as distance increases
         final score =
-            1.0 - ((distanceKm - 5.0) / (MAX_DISTANCE_KM - 5.0)) * 0.8;
+            1.0 - ((distanceKm - 3.1) / (MAX_DISTANCE_MILES - 3.1)) * 0.8;
         return score.clamp(0.2, 1.0);
       } else {
         return 0.1; // Very low score for distant users

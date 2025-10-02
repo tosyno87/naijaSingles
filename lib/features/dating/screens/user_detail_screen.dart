@@ -416,7 +416,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   border: Border.all(color: afropeepGreen.withOpacity(0.3)),
                 ),
                 child: Text(
-                  '${widget.user.distanceBW} km away',
+                  '${widget.user.distanceBW} miles away',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: afropeepGreen,

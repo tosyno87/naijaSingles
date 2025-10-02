@@ -13,6 +13,7 @@ import '../../../../common/widgets/image_widget.dart';
 import '../../../../models/user_model.dart';
 import '../../../user/ui/widgets/card_level.dart';
 import '../../../user/ui/widgets/gender_sign.dart';
+import '../../../dating/screens/user_detail_screen.dart';
 
 // import 'MatchedAnimation.dart';
 
@@ -52,6 +53,16 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
     });
 
     super.initState();
+  }
+
+  // Navigate to user profile when card is tapped
+  void _navigateToUserProfile(UserModel user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserDetailScreen(user: user),
+      ),
+    );
   }
 
   @override
@@ -130,25 +141,28 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
 
               return Stack(
                 children: <Widget>[
-                  ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      child: Container(
-                        padding: const EdgeInsets.all(15),
-                        height: MediaQuery.of(context).size.height * .80,
-                        width: MediaQuery.of(context).size.width,
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                          child: Container(
-                            color: Colors.white,
-                            child: CustomCNImage(
-                              imageUrl:
-                                  widget.users[itemIndex].imageUrl!.first ?? "",
-                              fit: BoxFit.cover,
+                  GestureDetector(
+                    onTap: () => _navigateToUserProfile(widget.users[itemIndex]),
+                    child: ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        child: Container(
+                          padding: const EdgeInsets.all(15),
+                          height: MediaQuery.of(context).size.height * .80,
+                          width: MediaQuery.of(context).size.width,
+                          child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
+                            child: Container(
+                              color: Colors.white,
+                              child: CustomCNImage(
+                                imageUrl:
+                                    widget.users[itemIndex].imageUrl!.first ?? "",
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                      )),
+                        )),
+                  ),
                   Padding(
                     padding:
                         const EdgeInsets.only(bottom: 10, left: 15, right: 15),

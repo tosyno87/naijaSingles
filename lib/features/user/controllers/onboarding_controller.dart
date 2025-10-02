@@ -637,8 +637,8 @@ class OnboardingController extends ChangeNotifier {
         'min': _ageRange[0].toString(),
         'max': _ageRange[1].toString(),
       },
-      'maximum_distance': 100, // Increased from 50 to 100km for better discovery
-      'maxDistance': 100, // Alternative field name for compatibility
+      'maximum_distance': 62, // 100km = 62 miles for better discovery
+      'maxDistance': 62, // Alternative field name for compatibility
 
       // Location information - CRITICAL FOR DISCOVERY
       'location': {
@@ -672,7 +672,7 @@ class OnboardingController extends ChangeNotifier {
     print('   Interested in: $_interestedIn');
     print('   Age range: $_ageRange');
     print('   Show gender: $_interestedIn');
-    print('   Maximum distance: 100km');
+    print('   Maximum distance: 62 miles');
     print('   Additional fields:');
     print('     Education: $_education');
     print('     Occupation: $_occupation');

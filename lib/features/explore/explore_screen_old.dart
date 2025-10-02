@@ -1094,7 +1094,7 @@ class _ProfileCardState extends State<ProfileCard>
                                   Border.all(color: kPrimaryColor, width: 1.5),
                             ),
                             child: Text(
-                              '${widget.user.distanceBW} km away',
+                              '${widget.user.distanceBW} miles away',
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
                                 color: kPrimaryColor,

@@ -63,7 +63,7 @@ class ModeSpecificFilteringService {
     //   // Reduce max distance for dating (more local matches)
     //   final datingMaxDistance = (currentUser.maxDistance! * 0.8).round();
     //   query = query.where('maxDistance', isGreaterThanOrEqualTo: datingMaxDistance);
-    //   debugPrint('💕 Dating distance filter: ${datingMaxDistance}km');
+    //   debugPrint('💕 Dating distance filter: ${(datingMaxDistance * 0.621371).round()} miles');
     // }
     
     // TEMPORARILY DISABLED: lookingFor filter (field might not exist or have different name)
@@ -109,7 +109,7 @@ class ModeSpecificFilteringService {
       // Expand max distance for friendship
       final friendshipMaxDistance = (currentUser.maxDistance! * 1.5).round();
       query = query.where('maxDistance', isGreaterThanOrEqualTo: friendshipMaxDistance);
-      debugPrint('🤝 Friendship distance filter: ${friendshipMaxDistance}km');
+      debugPrint('🤝 Friendship distance filter: ${(friendshipMaxDistance * 0.621371).round()} miles');
     }
     
     // Filter for users looking for friendship
@@ -145,7 +145,7 @@ class ModeSpecificFilteringService {
     if (currentUser.maxDistance != null) {
       // Keep original distance for networking
       query = query.where('maxDistance', isGreaterThanOrEqualTo: currentUser.maxDistance!);
-      debugPrint('💼 Networking distance filter: ${currentUser.maxDistance}km');
+      debugPrint('💼 Networking distance filter: ${(currentUser.maxDistance! * 0.621371).round()} miles');
     }
     
     // Filter for users looking for networking

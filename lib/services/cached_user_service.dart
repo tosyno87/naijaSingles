@@ -247,7 +247,7 @@ class CachedUserService {
       currentUser.id ?? 'unknown',
       currentUser.showGender ?? 'everyone',
       '${currentUser.ageRangeMin ?? 18}-${currentUser.ageRangeMax ?? 100}',
-      '${currentUser.distanceRange ?? 100}km',
+      '${((currentUser.distanceRange ?? 100) * 0.621371).round()} miles',
     ];
 
     // Add intent filter to cache key if specified

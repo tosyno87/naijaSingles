@@ -33,7 +33,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
   bool _preciseLocationEnabled = true;
   bool _showLocationInProfile = true;
   bool _allowLocationBasedMatching = true;
-  double _maxDistance = 50.0; // km
+  double _maxDistance = 31.0; // miles (converted from 50km)
   String _currentLocation = 'Unknown';
   Position? _currentPosition;
 
@@ -53,7 +53,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
       _preciseLocationEnabled = prefs.getBool('precise_location_enabled') ?? true;
       _showLocationInProfile = prefs.getBool('show_location_in_profile') ?? true;
       _allowLocationBasedMatching = prefs.getBool('allow_location_matching') ?? true;
-      _maxDistance = prefs.getDouble('max_distance') ?? 50.0;
+      _maxDistance = prefs.getDouble('max_distance') ?? 31.0;
 
       // Load current location
       await _getCurrentLocation();
@@ -499,7 +499,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                 child: Slider(
                   value: _maxDistance,
                   min: 1.0,
-                  max: 100.0,
+                  max: 62.0, // 100km = 62 miles
                   divisions: 99,
                   activeColor: primaryColor,
                   inactiveColor: primaryColor.withOpacity(0.3),
@@ -517,7 +517,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${_maxDistance.round()} km',
+                  '${_maxDistance.round()} mi',
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -528,7 +528,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
             ],
           ),
           Text(
-            'Show potential matches within ${_maxDistance.round()} kilometers of your location',
+            'Show potential matches within ${_maxDistance.round()} miles of your location',
             style: GoogleFonts.montserrat(
               fontSize: 12,
               color: textSecondary,

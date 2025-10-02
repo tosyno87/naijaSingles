@@ -29,7 +29,7 @@ class UnifiedDiscoveryService {
       debugPrint('   - Intent filter: $intentFilter');
       debugPrint('   - Gender preference: ${currentUser.showGender}');
       debugPrint('   - Age range: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}');
-      debugPrint('   - Max distance: ${currentUser.maxDistance}km');
+      debugPrint('   - Max distance: ${(currentUser.maxDistance! * 0.621371).round()} miles');
       
       // Get already checked users
       final checkedUserIds = await _getCheckedUserIds(currentUser.id!);
@@ -90,7 +90,7 @@ class UnifiedDiscoveryService {
             }
           }
           
-          debugPrint('✅ Adding user: ${user.name} (${user.distanceBW ?? 'unknown'}km away)');
+          debugPrint('✅ Adding user: ${user.name} (${user.distanceBW ?? 'unknown'} miles away)');
           userList.add(user);
           
         } catch (e) {

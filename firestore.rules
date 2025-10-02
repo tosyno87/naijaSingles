@@ -490,8 +490,18 @@ service cloud.firestore {
       // Allow member cleanup operations
       allow update: if request.auth != null && 
                      (request.auth.uid in resource.data.adminIds ||
-                      // Allow any authenticated user to update memberIds (simplified)
-                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt'])) &&
+                      // Allow users to join groups (user must be in new memberIds)
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt']) &&
+                       request.auth.uid in request.resource.data.memberIds &&
+                       request.resource.data.memberIds.size() > resource.data.memberIds.size()) ||
+                      // Allow users to leave groups (user must be in current memberIds but not in new memberIds)
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt']) &&
+                       request.auth.uid in resource.data.memberIds &&
+                       !(request.auth.uid in request.resource.data.memberIds) &&
+                       request.resource.data.memberIds.size() < resource.data.memberIds.size()) ||
+                      // Allow member cleanup operations (removing duplicates)
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'updatedAt']) &&
+                       request.resource.data.memberIds.size() <= resource.data.memberIds.size())) &&
                      // Prevent changing critical fields
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['creatorId', 'createdAt']);
       

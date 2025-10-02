@@ -160,7 +160,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           ),
         ),
         child: Text(
-          group.enableChat ? 'Open Chat' : 'View Group',
+          group.enableChat ? 'Enter Chat' : 'View Group',
           style: GoogleFonts.montserrat(
             fontSize: 12,
             fontWeight: FontWeight.w600,

@@ -147,47 +147,34 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final isMember = group.isMember(currentUserId);
     
-    if (isMember) {
-      // User is already a member - show "Open Chat" or "View Group"
-      return ElevatedButton(
-        onPressed: () => _navigateToGroupDetails(group),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+    return ElevatedButton(
+      onPressed: () async {
+        if (isMember) {
+          // User is already a member - navigate to chat
+          _navigateToGroupDetails(group);
+        } else {
+          // User is not a member - join the group
+          await _joinGroup(group);
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isMember ? Colors.blue : AppColors.primaryGreen,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(
-          group.enableChat ? 'Enter Chat' : 'View Group',
-          style: GoogleFonts.montserrat(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+      ),
+      child: Text(
+        isMember 
+          ? (group.enableChat ? 'Enter Chat' : 'View Group')
+          : 'Join',
+        style: GoogleFonts.montserrat(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
         ),
-      );
-    } else {
-      // User is not a member - show "Join"
-      return ElevatedButton(
-        onPressed: () => _joinGroup(group),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: Text(
-          'Join',
-          style: GoogleFonts.montserrat(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 
   void _navigateToGroupDetails(UnifiedGroup group) {

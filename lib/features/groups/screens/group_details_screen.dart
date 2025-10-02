@@ -3,11 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naijasingles/services/unified_group_service.dart';
+import 'package:naijasingles/services/user_service.dart';
 import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
 import 'package:naijasingles/features/groups/widgets/message_bubble.dart';
 import 'package:naijasingles/features/groups/widgets/message_shimmer.dart';
 import 'package:naijasingles/models/group_join_exception.dart';
+import 'package:naijasingles/widgets/full_screen_image_viewer.dart';
+import 'package:naijasingles/widgets/group_info_modal.dart';
 
 /// Enhanced Group Details Screen for members
 /// Provides comprehensive group information and member-specific actions
@@ -27,6 +30,7 @@ class GroupDetailsScreen extends StatefulWidget {
 
 class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   final UnifiedGroupService _groupService = UnifiedGroupService();
+  final UserService _userService = UserService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -146,17 +150,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             ),
           ),
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GroupDetailsScreen(
-                    group: widget.group,
-                    isMember: widget.isMember,
-                  ),
-                ),
-              );
-            },
+            onPressed: () => _showGroupInfoModal(),
             icon: Icon(
               Icons.info_outline,
               color: AppColors.primaryGreen,
@@ -451,27 +445,30 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   Widget _buildGroupAvatar() {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-          width: 2,
+    return GestureDetector(
+      onTap: () => _showGroupImageOptions(),
+      child: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.3),
+            width: 2,
+          ),
         ),
+        child: widget.group.imageUrl != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.network(
+                  widget.group.imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+                ),
+              )
+            : _buildDefaultAvatar(),
       ),
-      child: widget.group.imageUrl != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: Image.network(
-                widget.group.imageUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
-              ),
-            )
-          : _buildDefaultAvatar(),
     );
   }
 
@@ -711,62 +708,80 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     final isCreator = memberId == widget.group.creatorId;
     final isAdmin = widget.group.adminIds.contains(memberId);
 
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
-        backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
-        child: Icon(
-          Icons.person,
-          color: AppColors.primaryGreen,
-          size: 20,
-        ),
-      ),
-      title: Text(
-        isCurrentUser ? 'You' : 'Member',
-        style: GoogleFonts.montserrat(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-      ),
-      subtitle: Row(
-        children: [
-          if (isCreator)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'CREATOR',
-                style: GoogleFonts.montserrat(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+    return FutureBuilder<UserProfile?>(
+      future: _userService.getUserProfile(memberId),
+      builder: (context, snapshot) {
+        final userProfile = snapshot.data;
+        final displayName = userProfile?.displayName ?? (isCurrentUser ? 'You' : 'Member');
+        final avatarUrl = userProfile?.avatarUrl;
+        final initials = userProfile?.initials ?? (isCurrentUser ? 'Y' : 'M');
+
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: CircleAvatar(
+            radius: 20,
+            backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
+            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+            child: avatarUrl == null
+                ? Text(
+                    initials,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryGreen,
+                    ),
+                  )
+                : null,
+          ),
+          title: Text(
+            displayName,
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
             ),
-          if (isAdmin && !isCreator) ...[
-            const SizedBox(width: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'ADMIN',
-                style: GoogleFonts.montserrat(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          ),
+          subtitle: Row(
+            children: [
+              if (isCreator)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'CREATOR',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ],
-      ),
+              if (isAdmin && !isCreator) ...[
+                const SizedBox(width: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'ADMIN',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          onTap: () => _navigateToMemberProfile(memberId),
+        );
+      },
     );
   }
 
@@ -1125,6 +1140,136 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showGroupInfoModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GroupInfoModal(group: widget.group),
+    );
+  }
+
+  void _showGroupImageOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.group.imageUrl != null) ...[
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.visibility,
+                    color: AppColors.primaryGreen,
+                    size: 24,
+                  ),
+                ),
+                title: Text(
+                  'View Full Image',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  FullScreenImageViewer.show(
+                    context: context,
+                    imageUrl: widget.group.imageUrl!,
+                    title: widget.group.name,
+                  );
+                },
+              ),
+            ],
+            if (widget.isMember && _canEditGroup()) ...[
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.edit,
+                    color: AppColors.primaryGreen,
+                    size: 24,
+                  ),
+                ),
+                title: Text(
+                  widget.group.imageUrl != null ? 'Change Group Photo' : 'Add Group Photo',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editGroupPhoto();
+                },
+              ),
+            ],
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.close,
+                  color: Colors.grey[600],
+                  size: 24,
+                ),
+              ),
+              title: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                ),
+              ),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool _canEditGroup() {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    return currentUserId == widget.group.creatorId || 
+           widget.group.adminIds.contains(currentUserId);
+  }
+
+  void _editGroupPhoto() {
+    // TODO: Implement group photo editing
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Group photo editing coming soon!'),
+        backgroundColor: AppColors.primaryGreen,
+      ),
+    );
+  }
+
+  void _navigateToMemberProfile(String memberId) {
+    // TODO: Implement member profile navigation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Member profile navigation coming soon!'),
+        backgroundColor: AppColors.primaryGreen,
       ),
     );
   }

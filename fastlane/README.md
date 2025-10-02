@@ -43,7 +43,7 @@ Deploy to beta testing (TestFlight + Internal Testing)
 [bundle exec] fastlane ios_deploy_testflight
 ```
 
-Deploy to iOS TestFlight
+Deploy to iOS TestFlight (iPhone only)
 
 ### android_internal_testing
 
@@ -67,12 +67,62 @@ Full deployment to production stores
 [bundle exec] fastlane ios_deploy
 ```
 
-Deploy to iOS App Store
+Deploy to iOS App Store (iPhone only)
 
 ### android_deploy
 
 ```sh
 [bundle exec] fastlane android_deploy
+```
+
+Deploy to Google Play Store
+
+### android_only
+
+```sh
+[bundle exec] fastlane android_only
+```
+
+Deploy Android only (when iOS has CodeSign issues)
+
+----
+
+
+## iOS
+
+### ios testflight_deploy
+
+```sh
+[bundle exec] fastlane ios testflight_deploy
+```
+
+Deploy to iOS TestFlight (iPhone only)
+
+### ios deploy
+
+```sh
+[bundle exec] fastlane ios deploy
+```
+
+Deploy to iOS App Store (iPhone only)
+
+----
+
+
+## Android
+
+### android internal
+
+```sh
+[bundle exec] fastlane android internal
+```
+
+Deploy to Google Play Internal Testing
+
+### android deploy
+
+```sh
+[bundle exec] fastlane android deploy
 ```
 
 Deploy to Google Play Store

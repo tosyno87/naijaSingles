@@ -1,6 +1,11 @@
 {
+  "projects": {
+    "default": "naijasingles-dev",
+    "staging": "naijasingles-staging", 
+    "production": "naijasingles-prod2"
+  },
   "hosting": {
-    "public": "web",
+    "public": "build/web",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -8,8 +13,8 @@
     ],
     "rewrites": [
       {
-        "source": "/app",
-        "destination": "/flutter-app.html"
+        "source": "**",
+        "destination": "/index.html"
       }
     ]
   },

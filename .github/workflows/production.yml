@@ -1,0 +1,153 @@
+name: Production Deployment
+
+on:
+  push:
+    branches: [ release/* ]
+  pull_request:
+    branches: [ release/* ]
+
+env:
+  FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID_PROD || secrets.FIREBASE_PROJECT_ID_PROD }}
+  FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN_PROD }}
+  FLAVOR_DEFINES: -DFLAVOR=production -DDART_DEFINES=FLAVOR=production
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Run Flutter analyzer
+        run: flutter analyze
+        
+      - name: Run tests
+        run: flutter test --coverage
+        
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+
+  build-and-deploy:
+    name: Build and Deploy Production
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref_type != 'pull_request'
+    permissions:
+      contents: read
+      id-token: write
+      deployments: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            /tmp/flutter_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+            
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_PROD }}
+          
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        
+      - name: Configure Firebase
+        run: |
+          echo "Firebase Project ID: ${{ env.FIREBASE_PROJECT_ID }}"
+          firebase use ${{ env.FIREBASE_PROJECT_ID }} --token ${{ env.FIREBASE_TOKEN }}
+          
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GH_TOKEN }}
+          channelId: live
+          firebaseServiceAccount: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_PROD }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          ciToken: ${{ env.FIREBASE_TOKEN }}
+          
+      - name: Build Web Release
+        run: |
+          flutter build web \
+            --release \
+            --no-pub \
+            --dart-define=FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }} \
+            --dart-define=FLAVOR=production \
+            --web-renderer html \
+            --base-href "/"
+            
+      - name: Deploy Web Assets
+        run: |
+          firebase deploy \
+            --project ${{ env.FIREBASE_PROJECT_ID }} \
+            --only hosting \
+            --token ${{ env.FIREBASE_TOKEN }}
+            
+      - name: Create Deployment Record
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'production',
+              description: 'Production deployment via release branch ${{ github.ref_name }}'
+            });
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Run security audit
+        run: flutter pub audit

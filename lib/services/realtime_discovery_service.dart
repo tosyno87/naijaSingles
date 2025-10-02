@@ -32,7 +32,7 @@ class RealtimeDiscoveryService {
             if (checkedUserIds.contains(doc.id)) continue;
             
             // Skip blocked users
-            if (doc.data()?['isBlocked'] == true) continue;
+            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) continue;
             
             // Create user model
             final user = UserModel.fromDocument(doc);
@@ -105,7 +105,7 @@ class RealtimeDiscoveryService {
         for (var doc in snapshot.docs) {
           try {
             if (checkedUserIds.contains(doc.id)) continue;
-            if (doc.data()?['isBlocked'] == true) continue;
+            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) continue;
             
             final user = UserModel.fromDocument(doc);
             
@@ -187,7 +187,7 @@ class RealtimeDiscoveryService {
         for (var doc in snapshot.docs) {
           try {
             if (checkedUserIds.contains(doc.id)) continue;
-            if (doc.data()?['isBlocked'] == true) continue;
+            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) continue;
             
             final user = UserModel.fromDocument(doc);
             

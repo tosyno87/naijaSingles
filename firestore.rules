@@ -490,18 +490,8 @@ service cloud.firestore {
       // Allow member cleanup operations
       allow update: if request.auth != null && 
                      (request.auth.uid in resource.data.adminIds ||
-                      // Allow users to join groups (user must be in new memberIds)
-                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt']) &&
-                       request.auth.uid in request.resource.data.memberIds &&
-                       request.resource.data.memberIds.size() > resource.data.memberIds.size()) ||
-                      // Allow users to leave groups (user must be in current memberIds but not in new memberIds)
-                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt']) &&
-                       request.auth.uid in resource.data.memberIds &&
-                       !(request.auth.uid in request.resource.data.memberIds) &&
-                       request.resource.data.memberIds.size() < resource.data.memberIds.size()) ||
-                      // Allow member cleanup operations (removing duplicates)
-                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'updatedAt']) &&
-                       request.resource.data.memberIds.size() <= resource.data.memberIds.size())) &&
+                      // Allow any authenticated user to update memberIds (simplified)
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'memberCount', 'lastActivityAt', 'updatedAt'])) &&
                      // Prevent changing critical fields
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['creatorId', 'createdAt']);
       
@@ -516,22 +506,11 @@ service cloud.firestore {
                      exists(/databases/$(database)/documents/unifiedGroups/$(groupId)) &&
                      request.auth.uid in get(/databases/$(database)/documents/unifiedGroups/$(groupId)).data.memberIds;
         
-        // Group members can create messages
+        // Group members can create messages - simplified rule
         allow create: if request.auth != null && 
                        exists(/databases/$(database)/documents/unifiedGroups/$(groupId)) &&
                        request.auth.uid in get(/databases/$(database)/documents/unifiedGroups/$(groupId)).data.memberIds &&
-                       request.resource.data.senderId == request.auth.uid &&
-                       request.resource.data.keys().hasAll(['senderId', 'text', 'timestamp']) &&
-                       request.resource.data.text is string &&
-                       request.resource.data.text.size() > 0 &&
-                       request.resource.data.text.size() <= 1000 &&
-                       // Allow additional optional fields
-                       (!('messageType' in request.resource.data) || request.resource.data.messageType is string) &&
-                       (!('mediaUrl' in request.resource.data) || request.resource.data.mediaUrl is string) &&
-                       (!('mediaType' in request.resource.data) || request.resource.data.mediaType is string) &&
-                       (!('replyToMessageId' in request.resource.data) || request.resource.data.replyToMessageId is string) &&
-                       (!('isRead' in request.resource.data) || request.resource.data.isRead is bool) &&
-                       (!('readBy' in request.resource.data) || request.resource.data.readBy is list);
+                       request.resource.data.senderId == request.auth.uid;
         
         // Group members can update messages for read status
         allow update: if request.auth != null && 

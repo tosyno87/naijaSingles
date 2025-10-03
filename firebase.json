@@ -1,8 +1,8 @@
 {
   "projects": {
-    "default": "naijasingles-dev",
-    "staging": "naijasingles-staging", 
-    "production": "naijasingles-prod2"
+    "default": "naijasingles-74a75",
+    "staging": "naijasingles-74a75", 
+    "production": "naijasingles-74a75"
   },
   "hosting": {
     "public": "build/web",

@@ -8,7 +8,7 @@ class StagingConfig {
   static const String environment = 'staging';
   
   // Firebase project ID for staging
-  static const String firebaseProjectId = 'naijasingles-74a75';
+  static const String firebaseProjectId = 'naijasingles-staging';
   
   // App identifiers with staging suffix
   static const String applicationIdSuffix = '.staging';

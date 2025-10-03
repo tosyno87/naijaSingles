@@ -90,7 +90,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_google_places_hoc081098: ^2.0.0
   flutter_facebook_auth: ^7.1.2
-  flutter_svg: ^2.2.0
+  flutter_svg: ^2.1.9
   timeago: ^3.7.1
   
   # Industry Standard Features Dependencies

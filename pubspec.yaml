@@ -90,7 +90,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_google_places_hoc081098: ^2.0.0
   flutter_facebook_auth: ^7.1.2
-  flutter_svg: ^2.2.0
+  flutter_svg: ^2.1.9
   timeago: ^3.7.1
   
   # Industry Standard Features Dependencies
@@ -100,9 +100,9 @@ dependencies:
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4" # Updated launcher icons
-  flutter_lints: ^6.0.0
+  flutter_lints: ^5.0.0
   device_preview: ^1.2.0            # Upgraded from 1.1.0
-  flutter_native_splash: ^2.4.6     # Updated to latest
+  flutter_native_splash: ^2.3.8     # Compatible with Flutter 3.24.5
   flutter_test:
     sdk: flutter
   bloc_test: ^10.0.0

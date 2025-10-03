@@ -100,7 +100,7 @@ dependencies:
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.4" # Updated launcher icons
-  flutter_lints: ^6.0.0
+  flutter_lints: ^5.0.0
   device_preview: ^1.2.0            # Upgraded from 1.1.0
   flutter_native_splash: ^2.3.8     # Compatible with Flutter 3.24.5
   flutter_test:

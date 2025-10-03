@@ -30,6 +30,22 @@ jobs:
           channel: 'stable'
           cache: true
           
+      - name: Create .env file for CI
+        run: |
+          cat > .env << EOF
+          FIREBASE_WEB_API_KEY=dummy_key_for_ci
+          FIREBASE_ANDROID_API_KEY=dummy_key_for_ci
+          FIREBASE_IOS_API_KEY=dummy_key_for_ci
+          FIREBASE_PROJECT_ID=naijasingles-74a75
+          FIREBASE_MESSAGING_SENDER_ID=dummy_sender_id
+          FIREBASE_STORAGE_BUCKET=naijasingles-74a75.appspot.com
+          FIREBASE_AUTH_DOMAIN=naijasingles-74a75.firebaseapp.com
+          FIREBASE_IOS_CLIENT_ID=dummy_client_id
+          FIREBASE_IOS_BUNDLE_ID=com.naijasingles.app
+          GOOGLE_MAPS_API_KEY=dummy_maps_key
+          APP_ENVIRONMENT=production
+          EOF
+          
       - name: Install dependencies
         run: flutter pub get
         

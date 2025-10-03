@@ -26,9 +26,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.5'
+          flutter-version: '3.24.5'
           channel: 'stable'
-          cache: true
           
       - name: Install dependencies
         run: flutter pub get
@@ -61,9 +60,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.5'
+          flutter-version: '3.24.5'
           channel: 'stable'
-          cache: true
           
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -146,7 +144,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.5'
+          flutter-version: '3.24.5'
           
       - name: Install dependencies
         run: flutter pub get

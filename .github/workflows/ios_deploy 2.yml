@@ -1,0 +1,85 @@
+name: iOS TestFlight Deploy
+
+on:
+  workflow_dispatch:  # Manual trigger
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'testflight'
+        type: choice
+        options:
+          - testflight
+          - appstore
+  push:
+    tags:
+      - 'v*'  # Auto-deploy on version tags
+
+jobs:
+  deploy-ios:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.3'
+          channel: 'stable'
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          
+      - name: Setup Ruby for Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+      
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          rm -rf Pods Podfile.lock build
+          pod install --repo-update
+      
+      - name: Clean Flutter build
+        run: |
+          flutter clean
+          flutter pub get
+      
+      - name: Run tests
+        run: flutter test
+      
+      - name: Import Apple certificates
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.IOS_CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.IOS_CERTIFICATES_PASSWORD }}
+      
+      - name: Install provisioning profile
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+      
+      - name: Deploy to TestFlight
+        env:
+          FASTLANE_APPLE_ID: ${{ secrets.APPLE_ID }}
+          FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          FASTLANE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+        run: |
+          cd fastlane
+          bundle exec fastlane ios testflight_deploy
+      
+      - name: Upload build artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: |
+            ~/Library/Logs/gym/
+            fastlane/report.xml
+

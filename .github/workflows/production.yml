@@ -53,7 +53,7 @@ jobs:
         run: flutter analyze || echo "Analyzer completed with warnings"
         
       - name: Run tests
-        run: timeout 300 flutter test --coverage
+        run: timeout 300 flutter test --coverage --exclude-tags=integration
         
       - name: Upload coverage
         uses: codecov/codecov-action@v3

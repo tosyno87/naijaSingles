@@ -104,6 +104,18 @@ jobs:
           sudo gem install cocoapods
           cd ios && pod install
           
+      - name: Setup Code Signing
+        run: |
+          # Create keychain for code signing
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          
+          # Import provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp ios/Afropeep.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          
       - name: Build iOS Release
         run: |
           flutter build ios \

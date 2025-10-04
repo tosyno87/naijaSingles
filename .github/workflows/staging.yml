@@ -93,7 +93,7 @@ jobs:
           flutter build web \
             --release \
             --no-pub \
-            --dart-define=FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID:-naijasingles-dev }} \
+            --dart-define=FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID || 'naijasingles-dev' }} \
             --dart-define=FLAVOR=staging \
             --web-renderer html \
             --base-href "/"

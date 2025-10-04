@@ -104,7 +104,10 @@ jobs:
           sudo gem install cocoapods
           cd ios && pod install
           
-      - name: Setup Code Signing
+      - name: Setup Code Signing with Fastlane Match
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
         run: |
           # Create keychain for code signing
           security create-keychain -p "" build.keychain
@@ -112,13 +115,9 @@ jobs:
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
           
-          # Import provisioning profile with correct UUID
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp ios/Afropeep.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/c6389a34-a226-4a07-910f-8dd756377a8f.mobileprovision
-          
-          # Set code signing settings for Release configuration (use automatic signing)
+          # Use Fastlane Match for code signing (best practice)
           cd ios
-          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER \"\"" Runner.xcodeproj/project.pbxproj
+          fastlane match appstore --readonly
           
       - name: Build iOS Release
         run: |

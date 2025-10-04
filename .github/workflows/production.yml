@@ -81,11 +81,10 @@ jobs:
           channel: 'stable'
           cache: true
           
-      - name: Setup Java
-        uses: actions/setup-java@v3
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
         with:
-          distribution: 'zulu'
-          java-version: 17
+          xcode-version: latest-stable
           
       - name: Install dependencies
         run: flutter pub get
@@ -100,46 +99,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-flutter-
             
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_PROD }}
-          
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-        
-      - name: Configure Firebase
+      - name: Install CocoaPods
         run: |
-          echo "Firebase Project ID: ${{ env.FIREBASE_PROJECT_ID }}"
-          firebase use ${{ env.FIREBASE_PROJECT_ID }} --token ${{ env.FIREBASE_TOKEN }}
+          sudo gem install cocoapods
+          cd ios && pod install
           
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GH_TOKEN }}
-          channelId: live
-          firebaseServiceAccount: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_PROD }}
-          projectId: ${{ env.FIREBASE_PROJECT_ID }}
-          
-      - name: Build Web Release
+      - name: Build iOS Release
         run: |
-          flutter build web \
+          flutter build ios \
             --release \
             --no-pub \
             --dart-define=FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }} \
             --dart-define=FLAVOR=production \
-            --web-renderer html \
-            --base-href "/"
+            --export-options-plist=ios/ExportOptions.plist
             
-      - name: Deploy Web Assets
-        run: |
-          firebase deploy \
-            --project ${{ env.FIREBASE_PROJECT_ID }} \
-            --only hosting \
-            --token ${{ env.FIREBASE_TOKEN }}
+      - name: Deploy to App Store Connect
+        uses: apple-actions/upload-app-store@v1
+        with:
+          app-path: build/ios/ipa/naijasingles.ipa
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-issuer-id: ${{ secrets.APPSTORE_API_ISSUER_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
             
       - name: Create Deployment Record
         uses: actions/github-script@v7

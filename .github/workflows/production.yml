@@ -110,8 +110,7 @@ jobs:
             --release \
             --no-pub \
             --dart-define=FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }} \
-            --dart-define=FLAVOR=production \
-            --export-options-plist=ios/ExportOptions.plist
+            --dart-define=FLAVOR=production
             
       - name: Install Fastlane
         run: gem install fastlane

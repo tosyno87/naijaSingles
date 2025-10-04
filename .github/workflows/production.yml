@@ -126,7 +126,7 @@ jobs:
           
           # Use Fastlane Match for code signing (best practice for CI)
           cd ios
-          fastlane match appstore --readonly --keychain_name build.keychain --keychain_password ""
+          fastlane match appstore --readonly --keychain_name build.keychain --keychain_password=""
           
           # Configure Xcode project for manual signing
           /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj

@@ -117,12 +117,10 @@ jobs:
           security set-keychain-settings -t 3600 -u build.keychain
           
           # Configure git authentication for certificates repo
-          git config --global url."https://x-access-token:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
           
           # Use Fastlane Match for code signing (best practice)
           cd ios
-          # Set the git URL directly in the environment for Fastlane Match
-          export MATCH_GIT_URL="https://x-access-token:$GITHUB_TOKEN@github.com/tosyno87/naijaSingles-ios-certificates.git"
           fastlane match appstore --readonly
           
       - name: Build iOS Release

@@ -116,6 +116,9 @@ jobs:
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
           
+          # Set keychain password for Fastlane Match
+          security set-keychain-password -p "" build.keychain
+          
           # Configure git authentication for certificates repo
           git config --global url."https://$PAT_TOKEN@github.com/".insteadOf "https://github.com/"
           git config --global credential.helper store
@@ -123,12 +126,15 @@ jobs:
           
           # Use Fastlane Match for code signing (best practice for CI)
           cd ios
-          fastlane match appstore --readonly
+          fastlane match appstore --readonly --keychain_name build.keychain --keychain_password ""
           
           # Configure Xcode project for manual signing
           /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
+          
+          # Verify certificate is available
+          security find-identity -v -p codesigning
           
       - name: Build iOS Release
         run: |

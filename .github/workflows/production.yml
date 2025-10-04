@@ -108,7 +108,7 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # Create keychain for code signing
           security create-keychain -p "" build.keychain
@@ -117,9 +117,9 @@ jobs:
           security set-keychain-settings -t 3600 -u build.keychain
           
           # Configure git authentication for certificates repo
-          git config --global url."https://$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://$PAT_TOKEN@github.com/".insteadOf "https://github.com/"
           git config --global credential.helper store
-          echo "https://$GITHUB_TOKEN@github.com" > ~/.git-credentials
+          echo "https://$PAT_TOKEN@github.com" > ~/.git-credentials
           
           # Use Fastlane Match for code signing (best practice)
           cd ios

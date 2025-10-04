@@ -118,6 +118,8 @@ jobs:
           
           # Configure git authentication for certificates repo
           git config --global url."https://$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
+          git config --global credential.helper store
+          echo "https://$GITHUB_TOKEN@github.com" > ~/.git-credentials
           
           # Use Fastlane Match for code signing (best practice)
           cd ios

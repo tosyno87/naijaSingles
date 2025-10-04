@@ -113,13 +113,18 @@ jobs:
             --dart-define=FLAVOR=production \
             --export-options-plist=ios/ExportOptions.plist
             
+      - name: Install Fastlane
+        run: gem install fastlane
+        
       - name: Deploy to App Store Connect
-        uses: apple-actions/upload-app-store@v1
-        with:
-          app-path: build/ios/ipa/naijasingles.ipa
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-issuer-id: ${{ secrets.APPSTORE_API_ISSUER_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        env:
+          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
+          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        run: |
+          echo "$APPSTORE_API_PRIVATE_KEY" > fastlane/AuthKey.p8
+          cd ios
+          fastlane deliver --api_key_path=../fastlane/AuthKey.p8 --api_key_id=$APPSTORE_API_KEY_ID --api_issuer=$APPSTORE_API_ISSUER_ID
             
       - name: Create Deployment Record
         uses: actions/github-script@v7

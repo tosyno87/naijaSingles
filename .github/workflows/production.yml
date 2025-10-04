@@ -101,7 +101,7 @@ jobs:
             
       - name: Install CocoaPods
         run: |
-          sudo gem install cocoapods --version 1.16.3
+          sudo gem install cocoapods
           cd ios && pod install
           
       - name: Build iOS Release

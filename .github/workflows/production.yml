@@ -104,11 +104,11 @@ jobs:
           sudo gem install cocoapods
           cd ios && pod install
           
-      - name: Setup Code Signing with Fastlane Match
+      - name: Setup Code Signing (Automatic)
         env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
+          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
         run: |
           # Create keychain for code signing
           security create-keychain -p "" build.keychain
@@ -116,14 +116,9 @@ jobs:
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
           
-          # Configure git authentication for certificates repo
-          git config --global url."https://$PAT_TOKEN@github.com/".insteadOf "https://github.com/"
-          git config --global credential.helper store
-          echo "https://$PAT_TOKEN@github.com" > ~/.git-credentials
-          
-          # Use Fastlane Match for code signing (best practice)
-          cd ios
-          fastlane match appstore --readonly
+          # Setup App Store Connect API key for automatic signing
+          echo "$APPSTORE_API_PRIVATE_KEY" > fastlane/AuthKey.p8
+          chmod 600 fastlane/AuthKey.p8
           
       - name: Build iOS Release
         run: |
@@ -142,7 +137,6 @@ jobs:
           APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
           APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
         run: |
-          echo "$APPSTORE_API_PRIVATE_KEY" > fastlane/AuthKey.p8
           cd ios
           fastlane deliver --api_key_path=../fastlane/AuthKey.p8 --api_key_id=$APPSTORE_API_KEY_ID --api_issuer=$APPSTORE_API_ISSUER_ID
             

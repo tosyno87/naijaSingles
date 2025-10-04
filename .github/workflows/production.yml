@@ -104,11 +104,11 @@ jobs:
           sudo gem install cocoapods
           cd ios && pod install
           
-      - name: Setup Code Signing (Automatic)
+      - name: Setup Code Signing with Fastlane Match
         env:
-          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
-          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           # Create keychain for code signing
           security create-keychain -p "" build.keychain
@@ -116,9 +116,18 @@ jobs:
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
           
-          # Setup App Store Connect API key for automatic signing
-          echo "$APPSTORE_API_PRIVATE_KEY" > fastlane/AuthKey.p8
-          chmod 600 fastlane/AuthKey.p8
+          # Configure git authentication for certificates repo
+          git config --global url."https://$PAT_TOKEN@github.com/".insteadOf "https://github.com/"
+          git config --global credential.helper store
+          echo "https://$PAT_TOKEN@github.com" > ~/.git-credentials
+          
+          # Use Fastlane Match for code signing (best practice for CI)
+          cd ios
+          fastlane match appstore --readonly
+          
+          # Configure Xcode project for manual signing
+          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
           
       - name: Build iOS Release
         run: |

@@ -116,11 +116,9 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp ios/Afropeep.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/c6389a34-a226-4a07-910f-8dd756377a8f.mobileprovision
           
-          # Set code signing settings
+          # Set code signing settings for Release configuration
           cd ios
-          /usr/libexec/PlistBuddy -c "Set :objects:97C146ED1CF9000F007C117D:buildSettings:CODE_SIGN_STYLE Automatic" Runner.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:97C146ED1CF9000F007C117D:buildSettings:DEVELOPMENT_TEAM M7HY7333KT" Runner.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:97C146ED1CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER Afropeep" Runner.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER Afropeep" Runner.xcodeproj/project.pbxproj
           
       - name: Build iOS Release
         run: |

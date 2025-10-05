@@ -115,7 +115,10 @@ jobs:
         run: |
           sudo gem install cocoapods
           cd ios && pod install
-          
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
       - name: Setup Code Signing with Fastlane Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
@@ -140,18 +143,14 @@ jobs:
           cd ios
           fastlane match appstore --readonly --verbose
           
-          # Configure Xcode project for manual signing with Match profile
-          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
+          # Fastlane Match automatically sets environment variables for signing
+          # These are available as: sigh_com.app.naijasingles_appstore_*
+          # The build_app lane in Fastfile will use these automatically
           
       - name: Build iOS Release with Fastlane
         run: |
           cd ios
           fastlane build_app
-            
-      - name: Install Fastlane
-        run: gem install fastlane
         
       - name: Deploy to App Store Connect
         env:
@@ -161,11 +160,12 @@ jobs:
         run: |
           # Create App Store Connect API key JSON file
           mkdir -p fastlane
-          printf '{
-            "key_id": "%s",
-            "issuer_id": "%s",
-            "key": "%s"
-          }' "$APPSTORE_API_KEY_ID" "$APPSTORE_API_ISSUER_ID" "$APPSTORE_API_PRIVATE_KEY" > fastlane/AuthKey.json
+          # Use jq to properly escape JSON, including newlines in the private key
+          jq -n \
+            --arg key_id "$APPSTORE_API_KEY_ID" \
+            --arg issuer_id "$APPSTORE_API_ISSUER_ID" \
+            --arg key "$APPSTORE_API_PRIVATE_KEY" \
+            '{key_id: $key_id, issuer_id: $issuer_id, key: $key}' > fastlane/AuthKey.json
           chmod 600 fastlane/AuthKey.json
           
           cd ios

@@ -23,7 +23,7 @@ platform :ios do
       sh("flutter clean")
       sh("flutter pub get")
       
-      # Build the app using Fastlane Gym
+      # Build the app using Fastlane Gym with Match environment variables
       build_app(
         workspace: "ios/Runner.xcworkspace",
         scheme: "Runner",
@@ -33,7 +33,7 @@ platform :ios do
           signingStyle: "manual",
           teamID: "M7HY7333KT",
           provisioningProfiles: {
-            "com.app.naijasingles" => "match AppStore com.app.naijasingles"
+            "com.app.naijasingles" => ENV["sigh_com.app.naijasingles_appstore_profile-name"]
           }
         },
         clean: true,

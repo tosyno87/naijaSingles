@@ -202,9 +202,9 @@ jobs:
           chmod 600 fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8
           
           # Find the IPA file
-          IPA_FILE=$(find ios/build -name "*.ipa" | head -1)
+          IPA_FILE=$(find . -name "*.ipa" | head -1)
           if [ -z "$IPA_FILE" ]; then
-            echo "❌ No IPA file found in ios/build"
+            echo "❌ No IPA file found"
             exit 1
           fi
           

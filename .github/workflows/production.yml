@@ -161,7 +161,7 @@ jobs:
             fi
             
             # Get all config IDs from the list (look for buildConfigurations section)
-            CONFIG_IDS=$(awk "/$CONFIG_LIST_ID.*=.*{/,/);/" ../ios/Runner.xcodeproj/project.pbxproj | grep -A 10 "buildConfigurations" | grep "[A-Z0-9]\{24\}" | grep -v "$CONFIG_LIST_ID")
+            CONFIG_IDS=$(awk "/$CONFIG_LIST_ID.*=.*{/,/);/" ../ios/Runner.xcodeproj/project.pbxproj | grep -A 10 "buildConfigurations" | grep -E "^[[:space:]]*[A-Z0-9]{24}" | awk '{print $1}')
             
             for CONFIG_ID in $CONFIG_IDS; do
               echo "🛠️ Updating build config: $CONFIG_ID"

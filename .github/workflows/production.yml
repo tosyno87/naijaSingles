@@ -144,15 +144,21 @@ jobs:
           fastlane match appstore --readonly --verbose
           
           # Configure Xcode project for manual signing with Match profile
-          # Find the correct target ID by looking for the Runner app target (not test targets)
-          TARGET_ID=$(grep -A 5 "name = Runner;" ../ios/Runner.xcodeproj/project.pbxproj | grep -B 2 "productType = \"com.apple.product-type.application\"" | grep -o "[A-Z0-9]\{24\}" | head -1)
+          # Find the correct target ID by matching the Runner.app product reference (most reliable)
+          TARGET_ID=$(grep -B 1 'productReference = .*Runner\.app' ../ios/Runner.xcodeproj/project.pbxproj | grep '^\s*[A-Z0-9]\{24\}' | awk '{print $1}')
           
           if [ -n "$TARGET_ID" ]; then
             echo "✅ Found Runner app target ID: $TARGET_ID"
             
-            # Get the buildConfigurationList ID
-            CONFIG_LIST_ID=$(grep -B 2 "$TARGET_ID" ../ios/Runner.xcodeproj/project.pbxproj | grep buildConfigurationList | awk '{print $3}' | tr -d ";")
+            # Get the buildConfigurationList ID from the target (more future-proof)
+            CONFIG_LIST_ID=$(awk "/$TARGET_ID/,/}/" ../ios/Runner.xcodeproj/project.pbxproj | grep buildConfigurationList | awk '{print $3}' | tr -d ";")
             echo "🔍 Found buildConfigurationList ID: $CONFIG_LIST_ID"
+            
+            # Validate buildConfigurationList was found
+            if [ -z "$CONFIG_LIST_ID" ]; then
+              echo "❌ Could not find buildConfigurationList for target: $TARGET_ID"
+              exit 1
+            fi
             
             # Get all config IDs from the list
             CONFIG_IDS=$(awk "/$CONFIG_LIST_ID/,/);/" ../ios/Runner.xcodeproj/project.pbxproj | grep "[A-Z0-9]\{24\}" | grep -v "$CONFIG_LIST_ID")

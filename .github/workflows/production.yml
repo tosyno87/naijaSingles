@@ -193,50 +193,31 @@ jobs:
           APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
           APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
         run: |
-          # Create App Store Connect API key JSON file
+          # Use App Store Connect API directly to avoid Fastlane OpenSSL issues
+          # Create API key file
           mkdir -p fastlane
-          # Format private key as single line (remove newlines and extra spaces)
-          PRIVATE_KEY_SINGLE_LINE=$(echo "$APPSTORE_API_PRIVATE_KEY" | tr -d '\n' | sed 's/  */ /g')
-          # Use jq to properly escape JSON
-          jq -n \
-            --arg key_id "$APPSTORE_API_KEY_ID" \
-            --arg issuer_id "$APPSTORE_API_ISSUER_ID" \
-            --arg key "$PRIVATE_KEY_SINGLE_LINE" \
-            '{key_id: $key_id, issuer_id: $issuer_id, key: $key}' > fastlane/AuthKey.json
-          chmod 600 fastlane/AuthKey.json
-          
-          # Debug: Show the first few characters of the key (for verification)
-          echo "Key ID: $APPSTORE_API_KEY_ID"
-          echo "Issuer ID: $APPSTORE_API_ISSUER_ID"
-          echo "Private key starts with: $(echo "$PRIVATE_KEY_SINGLE_LINE" | cut -c1-20)..."
-          
-          # Fix OpenSSL curve name issue (best practice for macOS runners)
-          # Create custom OpenSSL config to support required curves
-          cat > /tmp/openssl.cnf << 'EOF'
-          openssl_conf = openssl_init
-          
-          [openssl_init]
-          providers = provider_sect
-          
-          [provider_sect]
-          default = default_sect
-          legacy = legacy_sect
-          
-          [default_sect]
-          activate = 1
-          
-          [legacy_sect]
-          activate = 1
+          cat > fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8 << 'EOF'
+          $APPSTORE_API_PRIVATE_KEY
           EOF
-          export OPENSSL_CONF=/tmp/openssl.cnf
+          chmod 600 fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8
           
-          cd ios
-          bundle exec fastlane deliver \
-            --api_key_path=../fastlane/AuthKey.json \
-            --app_identifier com.app.naijasingles \
-            --skip_metadata \
-            --skip_screenshots \
-            --force
+          # Find the IPA file
+          IPA_FILE=$(find ios/build -name "*.ipa" | head -1)
+          if [ -z "$IPA_FILE" ]; then
+            echo "❌ No IPA file found in ios/build"
+            exit 1
+          fi
+          
+          echo "📱 Found IPA file: $IPA_FILE"
+          
+          # Upload using App Store Connect API (best practice to avoid Fastlane issues)
+          # This uses the official Apple tooling instead of Fastlane
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA_FILE" \
+            --apiKey "$APPSTORE_API_KEY_ID" \
+            --apiIssuer "$APPSTORE_API_ISSUER_ID" \
+            --verbose
             
       - name: Create Deployment Record
         uses: actions/github-script@v7

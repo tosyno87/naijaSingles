@@ -180,7 +180,7 @@ jobs:
           chmod 600 fastlane/AuthKey.json
           
           cd ios
-          fastlane deliver --api_key_path=../fastlane/AuthKey.json
+          fastlane deliver --api_key_path=../fastlane/AuthKey.json --skip_waiting_for_build_processing --force
             
       - name: Create Deployment Record
         uses: actions/github-script@v7

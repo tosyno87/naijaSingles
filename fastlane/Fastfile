@@ -31,7 +31,10 @@ platform :ios do
         export_options: {
           method: "app-store",
           signingStyle: "manual",
-          teamID: "M7HY7333KT"
+          teamID: "M7HY7333KT",
+          provisioningProfiles: {
+            "com.app.naijasingles" => "match AppStore com.app.naijasingles"
+          }
         },
         clean: true,
         output_directory: "./build/ios"

@@ -196,8 +196,10 @@ jobs:
           # Use App Store Connect API directly to avoid Fastlane OpenSSL issues
           # Create API key file in the expected location for altool
           mkdir -p ~/.appstoreconnect/private_keys
-          cat > ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8 << 'EOF'
-          $APPSTORE_API_PRIVATE_KEY
+          
+          # Create the AuthKey file (unquoted EOF to enable variable interpolation)
+          cat > ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8 <<EOF
+          ${APPSTORE_API_PRIVATE_KEY}
           EOF
           chmod 600 ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
           

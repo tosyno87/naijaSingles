@@ -144,16 +144,16 @@ jobs:
           fastlane match appstore --readonly --verbose
           
           # Configure Xcode project for manual signing with Match profile
-          # Find the correct target ID dynamically by looking for the Runner target
-          TARGET_ID=$(grep -A 10 -B 5 "name = Runner" ../ios/Runner.xcodeproj/project.pbxproj | grep -o "[0-9A-F]\{24\}" | head -1)
+          # Find the correct target ID by looking for the Runner app target (not test targets)
+          TARGET_ID=$(grep -A 15 -B 5 "name = Runner" ../ios/Runner.xcodeproj/project.pbxproj | grep -B 15 "productType = \"com.apple.product-type.application\"" | grep -o "[0-9A-F]\{24\}" | head -1)
           if [ -n "$TARGET_ID" ]; then
-            echo "✅ Found Runner target ID: $TARGET_ID"
+            echo "✅ Found Runner app target ID: $TARGET_ID"
             /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
             /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
             /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
             echo "✅ Configured Xcode project for manual signing with Match profile"
           else
-            echo "❌ Could not find Runner target ID in Xcode project"
+            echo "❌ Could not find Runner app target ID in Xcode project"
             exit 1
           fi
           

@@ -14,6 +14,37 @@ default_platform(:ios)
 
 # iOS platform (iPhone only)
 platform :ios do
+  desc "Build iOS app for CI/CD"
+  lane :build_app do
+    UI.message "📱 Building NaijaSingles iOS app for CI/CD..."
+    
+    begin
+      # Clean Flutter project
+      sh("flutter clean")
+      sh("flutter pub get")
+      
+      # Build the app using Fastlane Gym
+      build_app(
+        workspace: "ios/Runner.xcworkspace",
+        scheme: "Runner",
+        export_method: "app-store",
+        export_options: {
+          method: "app-store",
+          signingStyle: "manual",
+          teamID: "M7HY7333KT"
+        },
+        clean: true,
+        output_directory: "./build/ios"
+      )
+      
+      UI.success "✅ iOS build successful!"
+      
+    rescue => ex
+      UI.error "❌ iOS build failed: #{ex.message}"
+      raise ex
+    end
+  end
+
   desc "Deploy to iOS TestFlight (iPhone only)"
   lane :testflight_deploy do
     ios_deploy_testflight

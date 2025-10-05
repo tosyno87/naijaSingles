@@ -140,13 +140,10 @@ jobs:
           cd ios
           fastlane match appstore --readonly --verbose
           
-      - name: Build iOS Release
+      - name: Build iOS Release with Fastlane
         run: |
-          flutter build ios \
-            --release \
-            --no-pub \
-            --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PROD }} \
-            --dart-define=FLAVOR=production
+          cd ios
+          fastlane build_app
             
       - name: Install Fastlane
         run: gem install fastlane

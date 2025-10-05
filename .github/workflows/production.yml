@@ -219,6 +219,7 @@ jobs:
             --file "$IPA_FILE" \
             --apiKey "$APPSTORE_API_KEY_ID" \
             --apiIssuer "$APPSTORE_API_ISSUER_ID" \
+            --bundle-id "com.app.naijasingles" \
             --verbose
             
       - name: Create Deployment Record

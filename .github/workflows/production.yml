@@ -204,6 +204,9 @@ jobs:
           echo "Issuer ID: $APPSTORE_API_ISSUER_ID"
           echo "Private key starts with: $(echo "$PRIVATE_KEY_SINGLE_LINE" | cut -c1-20)..."
           
+          # Fix OpenSSL curve name issue (best practice for macOS runners)
+          export OPENSSL_CONF=/dev/null
+          
           cd ios
           fastlane deliver \
             --api_key_path=../fastlane/AuthKey.json \

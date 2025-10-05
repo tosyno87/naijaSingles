@@ -145,7 +145,7 @@ jobs:
           
           # Configure Xcode project for manual signing with Match profile
           # Find the correct target ID by matching the Runner.app product reference (most reliable)
-          TARGET_ID=$(grep -B 1 'productReference = .*Runner\.app' ../ios/Runner.xcodeproj/project.pbxproj | grep '^\s*[A-Z0-9]\{24\}' | awk '{print $1}')
+          TARGET_ID=$(grep -B 20 'productReference = .*Runner\.app' ../ios/Runner.xcodeproj/project.pbxproj | grep '^\s*[A-Z0-9]\{24\}' | head -1 | awk '{print $1}')
           
           if [ -n "$TARGET_ID" ]; then
             echo "✅ Found Runner app target ID: $TARGET_ID"

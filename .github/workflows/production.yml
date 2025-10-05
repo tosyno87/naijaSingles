@@ -143,9 +143,18 @@ jobs:
           cd ios
           fastlane match appstore --readonly --verbose
           
-          # Fastlane Match automatically sets environment variables for signing
-          # These are available as: sigh_com.app.naijasingles_appstore_*
-          # The build_app lane in Fastfile will use these automatically
+          # Configure Xcode project for manual signing with Match profile
+          # Use xcodeproj to find the correct target ID dynamically
+          TARGET_ID=$(grep -A 5 -B 5 "name = Runner" ../ios/Runner.xcodeproj/project.pbxproj | grep -o "97C147[0-9A-F]*" | head -1)
+          if [ -n "$TARGET_ID" ]; then
+            /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
+            /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
+            /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
+            echo "✅ Configured Xcode project for manual signing with Match profile"
+          else
+            echo "❌ Could not find Runner target ID in Xcode project"
+            exit 1
+          fi
           
       - name: Build iOS Release with Fastlane
         run: |

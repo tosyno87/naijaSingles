@@ -212,18 +212,25 @@ jobs:
           
           echo "📱 Found IPA file: $IPA_FILE"
           
-          # Upload using App Store Connect API (best practice to avoid Fastlane issues)
-          # This uses the official Apple tooling instead of Fastlane
-          xcrun altool --upload-app \
-            --type ios \
-            --file "$IPA_FILE" \
-            --apiKey "$APPSTORE_API_KEY_ID" \
-            --apiIssuer "$APPSTORE_API_ISSUER_ID" \
-            --bundle-id "com.app.naijasingles" \
-            --apple-id "6752229227" \
-            --bundle-version "1.0.0" \
-            --bundle-short-version-string "1.0.0" \
-            --verbose
+          # Upload using Fastlane Deliver (more reliable than altool)
+          # Create API key file for Fastlane
+          mkdir -p fastlane
+          cat > fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8 <<EOF
+          ${APPSTORE_API_PRIVATE_KEY}
+          EOF
+          chmod 600 fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8
+          
+          # Upload using Fastlane Deliver
+          cd ios
+          bundle exec fastlane deliver \
+            --ipa "../$IPA_FILE" \
+            --api_key_path "../fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8" \
+            --api_key_id "$APPSTORE_API_KEY_ID" \
+            --api_key_issuer_id "$APPSTORE_API_ISSUER_ID" \
+            --app_identifier "com.app.naijasingles" \
+            --skip_metadata \
+            --skip_screenshots \
+            --force
             
       - name: Create Deployment Record
         uses: actions/github-script@v7

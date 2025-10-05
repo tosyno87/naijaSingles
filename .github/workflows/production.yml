@@ -140,6 +140,11 @@ jobs:
           cd ios
           fastlane match appstore --readonly --verbose
           
+          # Configure Xcode project for manual signing with Match profile
+          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
+          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
+          
       - name: Build iOS Release with Fastlane
         run: |
           cd ios

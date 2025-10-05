@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ release/* ]
 
-env:
-  FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID_PROD || secrets.FIREBASE_PROJECT_ID_PROD }}
-  FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN_PROD }}
-  FLAVOR_DEFINES: -DFLAVOR=production -DDART_DEFINES=FLAVOR=production
 
 permissions:
   contents: read
@@ -33,16 +29,16 @@ jobs:
       - name: Create .env file for CI
         run: |
           cat > .env << EOF
-          FIREBASE_WEB_API_KEY=dummy_key_for_ci
-          FIREBASE_ANDROID_API_KEY=dummy_key_for_ci
-          FIREBASE_IOS_API_KEY=dummy_key_for_ci
-          FIREBASE_PROJECT_ID=naijasingles-74a75
-          FIREBASE_MESSAGING_SENDER_ID=dummy_sender_id
-          FIREBASE_STORAGE_BUCKET=naijasingles-74a75.appspot.com
-          FIREBASE_AUTH_DOMAIN=naijasingles-74a75.firebaseapp.com
-          FIREBASE_IOS_CLIENT_ID=dummy_client_id
-          FIREBASE_IOS_BUNDLE_ID=com.naijasingles.app
-          GOOGLE_MAPS_API_KEY=dummy_maps_key
+          FIREBASE_WEB_API_KEY=${{ secrets.FIREBASE_WEB_API_KEY_PROD }}
+          FIREBASE_ANDROID_API_KEY=${{ secrets.FIREBASE_ANDROID_API_KEY_PROD }}
+          FIREBASE_IOS_API_KEY=${{ secrets.FIREBASE_IOS_API_KEY_PROD }}
+          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PROD }}
+          FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID_PROD }}
+          FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PROD }}
+          FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PROD }}
+          FIREBASE_IOS_CLIENT_ID=${{ secrets.FIREBASE_IOS_CLIENT_ID_PROD }}
+          FIREBASE_IOS_BUNDLE_ID=com.app.naijasingles
+          GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY_PROD }}
           APP_ENVIRONMENT=production
           EOF
           
@@ -89,16 +85,16 @@ jobs:
       - name: Create .env file for CI
         run: |
           cat > .env << EOF
-          FIREBASE_WEB_API_KEY=dummy_key_for_ci
-          FIREBASE_ANDROID_API_KEY=dummy_key_for_ci
-          FIREBASE_IOS_API_KEY=dummy_key_for_ci
-          FIREBASE_PROJECT_ID=naijasingles-74a75
-          FIREBASE_MESSAGING_SENDER_ID=dummy_sender_id
-          FIREBASE_STORAGE_BUCKET=naijasingles-74a75.appspot.com
-          FIREBASE_AUTH_DOMAIN=naijasingles-74a75.firebaseapp.com
-          FIREBASE_IOS_CLIENT_ID=dummy_client_id
-          FIREBASE_IOS_BUNDLE_ID=com.naijasingles.app
-          GOOGLE_MAPS_API_KEY=dummy_maps_key
+          FIREBASE_WEB_API_KEY=${{ secrets.FIREBASE_WEB_API_KEY_PROD }}
+          FIREBASE_ANDROID_API_KEY=${{ secrets.FIREBASE_ANDROID_API_KEY_PROD }}
+          FIREBASE_IOS_API_KEY=${{ secrets.FIREBASE_IOS_API_KEY_PROD }}
+          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PROD }}
+          FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID_PROD }}
+          FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET_PROD }}
+          FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN_PROD }}
+          FIREBASE_IOS_CLIENT_ID=${{ secrets.FIREBASE_IOS_CLIENT_ID_PROD }}
+          FIREBASE_IOS_BUNDLE_ID=com.app.naijasingles
+          GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY_PROD }}
           APP_ENVIRONMENT=production
           EOF
           
@@ -142,22 +138,14 @@ jobs:
           
           # Use Fastlane Match for code signing (best practice for CI)
           cd ios
-          fastlane match appstore --readonly
-          
-          # Configure Xcode project for manual signing
-          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
-          /usr/libexec/PlistBuddy -c "Set :objects:97C147071CF9000F007C117D:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
-          
-          # Verify certificate is available
-          security find-identity -v -p codesigning
+          fastlane match appstore --readonly --verbose
           
       - name: Build iOS Release
         run: |
           flutter build ios \
             --release \
             --no-pub \
-            --dart-define=FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }} \
+            --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID_PROD }} \
             --dart-define=FLAVOR=production
             
       - name: Install Fastlane
@@ -170,6 +158,7 @@ jobs:
           APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
         run: |
           # Create App Store Connect API key JSON file
+          mkdir -p fastlane
           cat > fastlane/AuthKey.json << EOF
           {
             "key_id": "$APPSTORE_API_KEY_ID",
@@ -180,7 +169,12 @@ jobs:
           chmod 600 fastlane/AuthKey.json
           
           cd ios
-          fastlane deliver --api_key_path=../fastlane/AuthKey.json --skip_waiting_for_build_processing --force
+          fastlane deliver \
+            --api_key_path=../fastlane/AuthKey.json \
+            --app_identifier com.app.naijasingles \
+            --skip_metadata \
+            --skip_screenshots \
+            --force
             
       - name: Create Deployment Record
         uses: actions/github-script@v7
@@ -212,3 +206,6 @@ jobs:
         
       - name: Run security audit
         run: flutter pub audit
+
+      - name: Check for outdated packages
+        run: flutter pub outdated || true

@@ -117,7 +117,9 @@ jobs:
           cd ios && pod install
 
       - name: Install Fastlane
-        run: gem install fastlane
+        run: |
+          # Install specific Fastlane version to avoid OpenSSL curve issues
+          gem install fastlane -v 2.220.0
 
       - name: Setup Code Signing with Fastlane Match
         env:
@@ -205,7 +207,24 @@ jobs:
           echo "Private key starts with: $(echo "$PRIVATE_KEY_SINGLE_LINE" | cut -c1-20)..."
           
           # Fix OpenSSL curve name issue (best practice for macOS runners)
-          export OPENSSL_CONF=/dev/null
+          # Create custom OpenSSL config to support required curves
+          cat > /tmp/openssl.cnf << 'EOF'
+          openssl_conf = openssl_init
+          
+          [openssl_init]
+          providers = provider_sect
+          
+          [provider_sect]
+          default = default_sect
+          legacy = legacy_sect
+          
+          [default_sect]
+          activate = 1
+          
+          [legacy_sect]
+          activate = 1
+          EOF
+          export OPENSSL_CONF=/tmp/openssl.cnf
           
           cd ios
           fastlane deliver \

@@ -118,8 +118,12 @@ jobs:
 
       - name: Install Fastlane
         run: |
-          # Install specific Fastlane version to avoid OpenSSL curve issues
-          gem install fastlane -v 2.220.0
+          # Create Gemfile to pin Fastlane version and avoid OpenSSL curve issues
+          cat > Gemfile << 'EOF'
+          source "https://rubygems.org"
+          gem "fastlane", "2.220.0"
+          EOF
+          bundle install
 
       - name: Setup Code Signing with Fastlane Match
         env:
@@ -141,9 +145,9 @@ jobs:
           git config --global credential.helper store
           echo "https://$PAT_TOKEN@github.com" > ~/.git-credentials
           
-          # Use Fastlane Match for code signing (best practice for CI)
-          cd ios
-          fastlane match appstore --readonly --verbose
+                 # Use Fastlane Match for code signing (best practice for CI)
+                 cd ios
+                 bundle exec fastlane match appstore --readonly --verbose
           
           # Configure Xcode project for manual signing with Match profile
           # Find the correct target ID by matching the Runner.app product reference (most reliable)
@@ -181,7 +185,7 @@ jobs:
       - name: Build iOS Release with Fastlane
         run: |
           cd ios
-          fastlane build_app
+          bundle exec fastlane build_app
         
       - name: Deploy to App Store Connect
         env:
@@ -227,7 +231,7 @@ jobs:
           export OPENSSL_CONF=/tmp/openssl.cnf
           
           cd ios
-          fastlane deliver \
+          bundle exec fastlane deliver \
             --api_key_path=../fastlane/AuthKey.json \
             --app_identifier com.app.naijasingles \
             --skip_metadata \

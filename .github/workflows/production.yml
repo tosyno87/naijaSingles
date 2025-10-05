@@ -161,13 +161,11 @@ jobs:
         run: |
           # Create App Store Connect API key JSON file
           mkdir -p fastlane
-          cat > fastlane/AuthKey.json << EOF
-          {
-            "key_id": "$APPSTORE_API_KEY_ID",
-            "issuer_id": "$APPSTORE_API_ISSUER_ID",
-            "key": "$APPSTORE_API_PRIVATE_KEY"
-          }
-          EOF
+          printf '{
+            "key_id": "%s",
+            "issuer_id": "%s",
+            "key": "%s"
+          }' "$APPSTORE_API_KEY_ID" "$APPSTORE_API_ISSUER_ID" "$APPSTORE_API_PRIVATE_KEY" > fastlane/AuthKey.json
           chmod 600 fastlane/AuthKey.json
           
           cd ios

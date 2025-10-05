@@ -145,15 +145,28 @@ jobs:
           
           # Configure Xcode project for manual signing with Match profile
           # Find the correct target ID by looking for the Runner app target (not test targets)
-          TARGET_ID=$(grep -A 15 -B 5 "name = Runner" ../ios/Runner.xcodeproj/project.pbxproj | grep -B 15 "productType = \"com.apple.product-type.application\"" | grep -o "[0-9A-F]\{24\}" | head -1)
+          TARGET_ID=$(grep -A 5 "name = Runner;" ../ios/Runner.xcodeproj/project.pbxproj | grep -B 2 "productType = \"com.apple.product-type.application\"" | grep -o "[A-Z0-9]\{24\}" | head -1)
+          
           if [ -n "$TARGET_ID" ]; then
             echo "✅ Found Runner app target ID: $TARGET_ID"
-            /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
-            /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
-            /usr/libexec/PlistBuddy -c "Set :objects:${TARGET_ID}:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
-            echo "✅ Configured Xcode project for manual signing with Match profile"
+            
+            # Get the buildConfigurationList ID
+            CONFIG_LIST_ID=$(grep -B 2 "$TARGET_ID" ../ios/Runner.xcodeproj/project.pbxproj | grep buildConfigurationList | awk '{print $3}' | tr -d ";")
+            echo "🔍 Found buildConfigurationList ID: $CONFIG_LIST_ID"
+            
+            # Get all config IDs from the list
+            CONFIG_IDS=$(awk "/$CONFIG_LIST_ID/,/);/" ../ios/Runner.xcodeproj/project.pbxproj | grep "[A-Z0-9]\{24\}" | grep -v "$CONFIG_LIST_ID")
+            
+            for CONFIG_ID in $CONFIG_IDS; do
+              echo "🛠️ Updating build config: $CONFIG_ID"
+              /usr/libexec/PlistBuddy -c "Set :objects:$CONFIG_ID:buildSettings:CODE_SIGN_STYLE Manual" ../ios/Runner.xcodeproj/project.pbxproj
+              /usr/libexec/PlistBuddy -c "Set :objects:$CONFIG_ID:buildSettings:CODE_SIGN_IDENTITY 'Apple Distribution'" ../ios/Runner.xcodeproj/project.pbxproj
+              /usr/libexec/PlistBuddy -c "Set :objects:$CONFIG_ID:buildSettings:PROVISIONING_PROFILE_SPECIFIER 'match AppStore com.app.naijasingles'" ../ios/Runner.xcodeproj/project.pbxproj
+            done
+            
+            echo "✅ Successfully set manual signing for all build configs"
           else
-            echo "❌ Could not find Runner app target ID in Xcode project"
+            echo "❌ Could not find Runner target ID"
             exit 1
           fi
           

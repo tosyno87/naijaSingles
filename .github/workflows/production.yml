@@ -220,17 +220,17 @@ jobs:
           EOF
           chmod 600 fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8
           
-          # Upload using Fastlane Deliver
-          cd ios
-          bundle exec fastlane deliver \
-            --ipa "../$IPA_FILE" \
-            --api_key_path "../fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8" \
-            --api_key_id "$APPSTORE_API_KEY_ID" \
-            --api_key_issuer_id "$APPSTORE_API_ISSUER_ID" \
-            --app_identifier "com.app.naijasingles" \
-            --skip_metadata \
-            --skip_screenshots \
-            --force
+             # Upload using Fastlane Deliver
+             cd ios
+             bundle exec fastlane deliver \
+               --ipa "../$IPA_FILE" \
+               --api_key_path "../fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8" \
+               --api-key "$APPSTORE_API_KEY_ID" \
+               --api_key_issuer_id "$APPSTORE_API_ISSUER_ID" \
+               --app_identifier "com.app.naijasingles" \
+               --skip_metadata \
+               --skip_screenshots \
+               --force
             
       - name: Create Deployment Record
         uses: actions/github-script@v7

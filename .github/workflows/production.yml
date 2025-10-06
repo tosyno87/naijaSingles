@@ -224,8 +224,8 @@ jobs:
              cd ios
              bundle exec fastlane deliver \
                --ipa "../$IPA_FILE" \
-               --api_key_path "../fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8" \
-               --api-key "$APPSTORE_API_KEY_ID" \
+               --api-key-path "../fastlane/AuthKey_$APPSTORE_API_KEY_ID.p8" \
+               --api-key-id "$APPSTORE_API_KEY_ID" \
                --api-key-issuer-id "$APPSTORE_API_ISSUER_ID" \
                --app_identifier "com.app.naijasingles" \
                --skip_metadata \

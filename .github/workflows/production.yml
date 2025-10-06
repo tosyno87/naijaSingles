@@ -195,13 +195,20 @@ jobs:
         run: |
           # Create Fastlane API key in JSON format
           mkdir -p fastlane
-          cat > fastlane/AuthKey.json <<EOF
-          {
-            "key_id": "$APPSTORE_API_KEY_ID",
-            "issuer_id": "$APPSTORE_API_ISSUER_ID",
-            "key": "$APPSTORE_API_PRIVATE_KEY"
-          }
-          EOF
+          
+          # Escape the private key for JSON (replace newlines with \n)
+          ESCAPED_KEY=$(echo "$APPSTORE_API_PRIVATE_KEY" | sed 's/$/\\n/' | tr -d '\n' | sed 's/\\n$//')
+          
+          # Create JSON file using jq for proper escaping
+          jq -n \
+            --arg key_id "$APPSTORE_API_KEY_ID" \
+            --arg issuer_id "$APPSTORE_API_ISSUER_ID" \
+            --arg key "$ESCAPED_KEY" \
+            '{key_id: $key_id, issuer_id: $issuer_id, key: $key}' > fastlane/AuthKey.json
+          
+          # Verify JSON is valid
+          jq . fastlane/AuthKey.json
+          
           chmod 600 fastlane/AuthKey.json
 
           # Find the IPA file

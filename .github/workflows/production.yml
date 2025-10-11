@@ -247,7 +247,7 @@ jobs:
             --apiKey "$APPSTORE_API_KEY_ID" \
             --apiIssuer "$APPSTORE_API_ISSUER_ID" \
             --bundle-id "com.app.naijasingles" \
-            --apple-id "6752229227" \
+            --apple-id "bbtnd_tosin@yahoo.com" \
             --bundle-version "1.0.0" \
             --bundle-short-version-string "1.0.0" \
             --verbose

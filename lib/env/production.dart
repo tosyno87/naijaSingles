@@ -9,7 +9,7 @@ class ProductionConfig {
   static const String environment = 'production';
   
   // Firebase project ID for production
-  static const String firebaseProjectId = 'naijasingles-prod2';
+  static const String firebaseProjectId = 'naijasingles-74a75';
   
   // App identifiers
   static const String applicationIdSuffix = '';

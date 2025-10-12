@@ -8,7 +8,7 @@ class DevelopmentConfig {
   static const String environment = 'development';
   
   // Firebase project ID for development (use emulator or dev project)
-  static const String firebaseProjectId = 'naijasingles-dev';
+  static const String firebaseProjectId = 'naijasingles-74a75';
   
   // App identifiers with dev suffix
   static const String applicationIdSuffix = '.dev';

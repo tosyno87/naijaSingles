@@ -143,7 +143,7 @@ class TestDataGeneratorService {
   /// Generate realistic user data
   static Map<String, dynamic> _generateUserData({
     required String gender,
-    required Map<String, double> city,
+    required Map<String, dynamic> city,
     required String cityKey,
     required Random random,
   }) {

@@ -182,8 +182,74 @@ jobs:
             exit 1
           fi
           
+      - name: Auto-increment Build Number
+        env:
+          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
+          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        run: |
+          echo "🔍 Fetching latest build number from App Store Connect..."
+          
+          # Install jq for JSON parsing (if not already installed)
+          brew install jq || true
+          
+          # Create JWT token for App Store Connect API
+          # Create API key file
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf "%s\n" "$APPSTORE_API_PRIVATE_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
+          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
+          
+          # Generate JWT token (valid for 20 minutes)
+          ISSUED_AT=$(date +%s)
+          EXP=$((ISSUED_AT + 1200))
+          
+          # Create JWT header
+          HEADER=$(echo -n '{"alg":"ES256","kid":"'$APPSTORE_API_KEY_ID'","typ":"JWT"}' | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          
+          # Create JWT payload
+          PAYLOAD=$(echo -n '{"iss":"'$APPSTORE_API_ISSUER_ID'","iat":'$ISSUED_AT',"exp":'$EXP',"aud":"appstoreconnect-v1"}' | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          
+          # Create signature
+          SIGNATURE=$(echo -n "$HEADER.$PAYLOAD" | openssl dgst -sha256 -sign ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8 -binary | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          
+          JWT="$HEADER.$PAYLOAD.$SIGNATURE"
+          
+          echo "✅ JWT token generated"
+          
+          # Get app ID from bundle identifier
+          APP_RESPONSE=$(curl -s -H "Authorization: Bearer $JWT" \
+            "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=com.app.naijasingles")
+          
+          APP_ID=$(echo "$APP_RESPONSE" | jq -r '.data[0].id')
+          echo "📱 App ID: $APP_ID"
+          
+          # Get latest build for this app
+          if [ "$APP_ID" != "null" ] && [ -n "$APP_ID" ]; then
+            BUILDS_RESPONSE=$(curl -s -H "Authorization: Bearer $JWT" \
+              "https://api.appstoreconnect.apple.com/v1/builds?filter[app]=$APP_ID&sort=-uploadedDate&limit=1")
+            
+            CURRENT_BUILD=$(echo "$BUILDS_RESPONSE" | jq -r '.data[0].attributes.version // "0"')
+            echo "📊 Current build in App Store Connect: $CURRENT_BUILD"
+          else
+            echo "ℹ️ App not found or no builds yet, starting from build 1"
+            CURRENT_BUILD=0
+          fi
+          
+          # Increment build number
+          NEW_BUILD=$((CURRENT_BUILD + 1))
+          echo "🚀 New build number will be: $NEW_BUILD"
+          
+          # Update pubspec.yaml with new build number
+          CURRENT_VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: \(.*\)+.*/\1/')
+          sed -i.bak "s/version: .*+.*/version: ${CURRENT_VERSION}+${NEW_BUILD}/" pubspec.yaml
+          
+          echo "✅ Updated pubspec.yaml to: $(grep 'version:' pubspec.yaml)"
+          
       - name: Build iOS Release with Fastlane
         run: |
+          # Re-run pub get to pick up version changes
+          flutter pub get
+          
           cd ios
           bundle exec fastlane build_app
         
@@ -246,10 +312,6 @@ jobs:
             --file "$IPA_FILE" \
             --apiKey "$APPSTORE_API_KEY_ID" \
             --apiIssuer "$APPSTORE_API_ISSUER_ID" \
-            --bundle-id "com.app.naijasingles" \
-            --apple-id "6752229227" \
-            --bundle-version "1.0.0" \
-            --bundle-short-version-string "1.0.0" \
             --verbose
           
           UPLOAD_RESULT=$?

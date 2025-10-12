@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +8,7 @@ import '../../../../common/routes/route_name.dart';
 import 'edit_profile_screen.dart';
 import 'privacy_settings_screen.dart';
 import 'settings_screen.dart';
+import '../admin/test_data_management_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -111,6 +113,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   );
                   break;
+                case 'test_data':
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const TestDataManagementScreen(),
+                    ),
+                  );
+                  break;
               }
             },
             itemBuilder: (context) => [
@@ -144,6 +154,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
+              if (kDebugMode)
+                PopupMenuItem(
+                  value: 'test_data',
+                  child: Row(
+                    children: [
+                      Icon(Icons.science_outlined, color: Colors.purple),
+                      const SizedBox(width: 12),
+                      Text('Test Data Manager'),
+                    ],
+                  ),
+                ),
             ],
           ),
         ],

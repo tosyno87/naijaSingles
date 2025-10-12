@@ -79,27 +79,27 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             // Warning Header
             _buildWarningHeader(),
             const SizedBox(height: 24),
-            
+
             // What Gets Deleted
             _buildWhatGetsDeletedSection(),
             const SizedBox(height: 24),
-            
+
             // Deletion Reason
             _buildDeletionReasonSection(),
             const SizedBox(height: 24),
-            
+
             // Password Confirmation
             _buildPasswordConfirmationSection(),
             const SizedBox(height: 24),
-            
+
             // Confirmation Checkboxes
             _buildConfirmationSection(),
             const SizedBox(height: 24),
-            
+
             // Delete Button
             _buildDeleteButton(),
             const SizedBox(height: 16),
-            
+
             // Alternative Options
             _buildAlternativeOptionsSection(),
           ],
@@ -278,7 +278,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          ..._deletionReasons.map((reason) => _buildReasonTile(reason)).toList(),
+          ..._deletionReasons
+              .map((reason) => _buildReasonTile(reason))
+              .toList(),
           if (_selectedReason == 'Other') ...[
             const SizedBox(height: 16),
             TextFormField(
@@ -307,14 +309,15 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   Widget _buildReasonTile(String reason) {
     final isSelected = _selectedReason == reason;
-    
+
     return GestureDetector(
       onTap: () => setState(() => _selectedReason = reason),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+          color:
+              isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? primaryColor : Colors.grey.shade300,
@@ -403,14 +406,16 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: primaryColor, width: 2),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               prefixIcon: Icon(Icons.lock, color: primaryColor),
               suffixIcon: IconButton(
                 icon: Icon(
                   _passwordVisible ? Icons.visibility : Icons.visibility_off,
                   color: textLight,
                 ),
-                onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+                onPressed: () =>
+                    setState(() => _passwordVisible = !_passwordVisible),
               ),
             ),
             style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
@@ -448,14 +453,16 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           const SizedBox(height: 16),
           _buildCheckboxTile(
             value: _understandConsequences,
-            onChanged: (value) => setState(() => _understandConsequences = value ?? false),
+            onChanged: (value) =>
+                setState(() => _understandConsequences = value ?? false),
             title: 'I understand that this action cannot be undone',
             subtitle: 'All my data will be permanently deleted',
           ),
           const SizedBox(height: 12),
           _buildCheckboxTile(
             value: _confirmDeletion,
-            onChanged: (value) => setState(() => _confirmDeletion = value ?? false),
+            onChanged: (value) =>
+                setState(() => _confirmDeletion = value ?? false),
             title: 'I want to permanently delete my account',
             subtitle: 'I confirm that I want to proceed with deletion',
           ),
@@ -583,7 +590,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildAlternativeItem('📴 Temporarily deactivate your account instead'),
+          _buildAlternativeItem(
+              '📴 Temporarily deactivate your account instead'),
           _buildAlternativeItem('🔒 Update your privacy settings'),
           _buildAlternativeItem('⚙️ Adjust your matching preferences'),
           _buildAlternativeItem('💬 Contact support for help with issues'),
@@ -628,7 +636,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         'userId': user.uid,
         'email': user.email,
         'reason': _selectedReason,
-        'customReason': _selectedReason == 'Other' ? _reasonController.text : null,
+        'customReason':
+            _selectedReason == 'Other' ? _reasonController.text : null,
         'requestedAt': FieldValue.serverTimestamp(),
         'status': 'pending',
       });
@@ -649,7 +658,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           barrierDismissible: false,
           builder: (context) => AlertDialog(
             backgroundColor: cardColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 8,
             contentPadding: const EdgeInsets.all(24),
             title: Column(
@@ -661,7 +671,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                     color: primaryColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.check_circle, color: primaryColor, size: 40),
+                  child:
+                      Icon(Icons.check_circle, color: primaryColor, size: 40),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -752,7 +763,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     } catch (e) {
       log('Error deleting account: $e');
       setState(() => _isDeleting = false);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

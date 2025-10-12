@@ -21,7 +21,7 @@ class GroupReportModal extends StatefulWidget {
 class _GroupReportModalState extends State<GroupReportModal> {
   final GroupReportingService _reportingService = GroupReportingService();
   final TextEditingController _detailsController = TextEditingController();
-  
+
   String? _selectedReason;
   bool _isSubmitting = false;
   bool _hasUserReported = false;
@@ -40,7 +40,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
 
   Future<void> _checkIfUserReported() async {
     try {
-      final hasReported = await _reportingService.hasUserReportedGroup(widget.groupId);
+      final hasReported =
+          await _reportingService.hasUserReportedGroup(widget.groupId);
       if (mounted) {
         setState(() {
           _hasUserReported = hasReported;
@@ -77,7 +78,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Report submitted successfully. Thank you for helping keep our community safe.'),
+            content: Text(
+                'Report submitted successfully. Thank you for helping keep our community safe.'),
             backgroundColor: AppColors.primaryGreen,
             duration: const Duration(seconds: 4),
           ),
@@ -126,7 +128,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              
+
               // Header
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -179,11 +181,13 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         decoration: BoxDecoration(
                           color: Colors.orange.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                          border:
+                              Border.all(color: Colors.orange.withOpacity(0.3)),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                            Icon(Icons.info_outline,
+                                color: Colors.orange, size: 20),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -218,21 +222,24 @@ class _GroupReportModalState extends State<GroupReportModal> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     ...GroupReportingService.reportReasons.map((reason) {
                       return RadioListTile<String>(
                         value: reason,
                         groupValue: _selectedReason,
-                        onChanged: _hasUserReported ? null : (value) {
-                          setState(() {
-                            _selectedReason = value;
-                          });
-                        },
+                        onChanged: _hasUserReported
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  _selectedReason = value;
+                                });
+                              },
                         title: Text(
                           reason,
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
-                            color: _hasUserReported ? Colors.grey : Colors.black87,
+                            color:
+                                _hasUserReported ? Colors.grey : Colors.black87,
                           ),
                         ),
                         activeColor: AppColors.primaryGreen,
@@ -257,7 +264,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                       enabled: !_hasUserReported,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        hintText: 'Provide any additional information that might help us review this report...',
+                        hintText:
+                            'Provide any additional information that might help us review this report...',
                         hintStyle: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: Colors.grey[500],
@@ -285,7 +293,9 @@ class _GroupReportModalState extends State<GroupReportModal> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _hasUserReported || _isSubmitting ? null : _submitReport,
+                        onPressed: _hasUserReported || _isSubmitting
+                            ? null
+                            : _submitReport,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                           foregroundColor: Colors.white,
@@ -301,11 +311,14 @@ class _GroupReportModalState extends State<GroupReportModal> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                 ),
                               )
                             : Text(
-                                _hasUserReported ? 'Already Reported' : 'Submit Report',
+                                _hasUserReported
+                                    ? 'Already Reported'
+                                    : 'Submit Report',
                                 style: GoogleFonts.montserrat(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

@@ -158,19 +158,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Simplified Photo Section
                     _buildSimplifiedPhotoSection(),
                     const SizedBox(height: 24),
-                    
+
                     // Simplified Basic Info
                     _buildSimplifiedBasicInfo(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified About Section
                     _buildSimplifiedAbout(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified Interests
                     _buildSimplifiedInterests(),
                     const SizedBox(height: 32),
-                    
+
                     // Single Edit Button
                     _buildEditButton(),
                     const SizedBox(height: 32),
@@ -269,7 +269,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               top: 16,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(20),
@@ -474,7 +475,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 runSpacing: 8,
                 children: interests.take(6).map((interest) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),

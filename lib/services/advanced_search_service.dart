@@ -12,7 +12,8 @@ import 'package:naijasingles/models/user_model.dart';
 /// - Saved searches
 /// - Real-time search suggestions
 class AdvancedSearchService {
-  static final AdvancedSearchService _instance = AdvancedSearchService._internal();
+  static final AdvancedSearchService _instance =
+      AdvancedSearchService._internal();
   factory AdvancedSearchService() => _instance;
   AdvancedSearchService._internal();
 
@@ -50,14 +51,16 @@ class AdvancedSearchService {
 
       // Execute query
       final QuerySnapshot snapshot = await query.get();
-      
+
       // Convert to UserModel list
       final List<UserModel> users = snapshot.docs
-          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+          .map((doc) =>
+              UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
           .toList();
 
       // Apply additional filtering (for complex criteria)
-      final List<UserModel> filteredUsers = _applyAdditionalFilters(users, criteria);
+      final List<UserModel> filteredUsers =
+          _applyAdditionalFilters(users, criteria);
 
       log('🔍 Found ${filteredUsers.length} users matching criteria');
       return filteredUsers;
@@ -71,7 +74,8 @@ class AdvancedSearchService {
   Query _applyFilters(Query query, SearchCriteria criteria) {
     // Age range filter
     if (criteria.ageRange != null) {
-      query = query.where('age', isGreaterThanOrEqualTo: criteria.ageRange!.min);
+      query =
+          query.where('age', isGreaterThanOrEqualTo: criteria.ageRange!.min);
       query = query.where('age', isLessThanOrEqualTo: criteria.ageRange!.max);
     }
 
@@ -112,13 +116,17 @@ class AdvancedSearchService {
 
     // Height range filter
     if (criteria.heightRange != null) {
-      query = query.where('height', isGreaterThanOrEqualTo: criteria.heightRange!.min);
-      query = query.where('height', isLessThanOrEqualTo: criteria.heightRange!.max);
+      query = query.where('height',
+          isGreaterThanOrEqualTo: criteria.heightRange!.min);
+      query =
+          query.where('height', isLessThanOrEqualTo: criteria.heightRange!.max);
     }
 
     // Relationship intent filter
-    if (criteria.relationshipIntent != null && criteria.relationshipIntent!.isNotEmpty) {
-      query = query.where('relationshipIntent', isEqualTo: criteria.relationshipIntent);
+    if (criteria.relationshipIntent != null &&
+        criteria.relationshipIntent!.isNotEmpty) {
+      query = query.where('relationshipIntent',
+          isEqualTo: criteria.relationshipIntent);
     }
 
     // Looking for filter
@@ -145,7 +153,7 @@ class AdvancedSearchService {
   Query _applyLocationFilter(Query query, LocationCriteria location) {
     // This is a simplified version. In production, you'd use GeoFirestore
     // or implement proper geospatial queries
-    
+
     if (location.city != null && location.city!.isNotEmpty) {
       query = query.where('locationName', isEqualTo: location.city);
     }
@@ -178,11 +186,13 @@ class AdvancedSearchService {
   }
 
   /// Apply additional filters that can't be done in Firestore
-  List<UserModel> _applyAdditionalFilters(List<UserModel> users, SearchCriteria criteria) {
+  List<UserModel> _applyAdditionalFilters(
+      List<UserModel> users, SearchCriteria criteria) {
     return users.where((user) {
       // Interest matching
       if (criteria.interests != null && criteria.interests!.isNotEmpty) {
-        final userInterests = user.editInfo?['interests'] as List<String>? ?? [];
+        final userInterests =
+            user.editInfo?['interests'] as List<String>? ?? [];
         final hasMatchingInterest = criteria.interests!.any(
           (interest) => userInterests.contains(interest),
         );
@@ -240,7 +250,7 @@ class AdvancedSearchService {
       for (final doc in interestQuery.docs) {
         final interests = List<String>.from(doc.data()['interests'] ?? []);
         suggestions.addAll(
-          interests.where((interest) => 
+          interests.where((interest) =>
               interest.toLowerCase().contains(query.toLowerCase())),
         );
       }
@@ -294,7 +304,8 @@ class AdvancedSearchService {
           id: doc.id,
           name: data['name'] ?? '',
           criteria: SearchCriteria.fromMap(data['criteria'] ?? {}),
-          createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          createdAt:
+              (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         );
       }).toList();
     } catch (e) {
@@ -342,7 +353,8 @@ class AdvancedSearchService {
           id: doc.id,
           query: data['query'] ?? '',
           resultCount: data['resultCount'] ?? 0,
-          searchedAt: (data['searchedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          searchedAt:
+              (data['searchedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         );
       }).toList();
     } catch (e) {
@@ -457,7 +469,8 @@ class SearchCriteria {
 
   factory SearchCriteria.fromMap(Map<String, dynamic> map) {
     return SearchCriteria(
-      ageRange: map['ageRange'] != null ? AgeRange.fromMap(map['ageRange']) : null,
+      ageRange:
+          map['ageRange'] != null ? AgeRange.fromMap(map['ageRange']) : null,
       gender: map['gender'],
       interestedIn: map['interestedIn'],
       tribe: map['tribe'],
@@ -465,13 +478,17 @@ class SearchCriteria {
       religion: map['religion'],
       education: map['education'],
       occupation: map['occupation'],
-      heightRange: map['heightRange'] != null ? HeightRange.fromMap(map['heightRange']) : null,
+      heightRange: map['heightRange'] != null
+          ? HeightRange.fromMap(map['heightRange'])
+          : null,
       relationshipIntent: map['relationshipIntent'],
       lookingFor: map['lookingFor'],
       interests: List<String>.from(map['interests'] ?? []),
       languages: List<String>.from(map['languages'] ?? []),
       bioKeywords: List<String>.from(map['bioKeywords'] ?? []),
-      location: map['location'] != null ? LocationCriteria.fromMap(map['location']) : null,
+      location: map['location'] != null
+          ? LocationCriteria.fromMap(map['location'])
+          : null,
       sortBy: SearchSortBy.values.firstWhere(
         (e) => e.name == map['sortBy'],
         orElse: () => SearchSortBy.lastActive,
@@ -534,12 +551,12 @@ class LocationCriteria {
   });
 
   Map<String, dynamic> toMap() => {
-    'city': city,
-    'country': country,
-    'latitude': latitude,
-    'longitude': longitude,
-    'radiusKm': radiusKm,
-  };
+        'city': city,
+        'country': country,
+        'latitude': latitude,
+        'longitude': longitude,
+        'radiusKm': radiusKm,
+      };
 
   factory LocationCriteria.fromMap(Map<String, dynamic> map) =>
       LocationCriteria(

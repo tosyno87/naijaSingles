@@ -2,19 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'event_model.dart' as event_model;
 
-enum EventType { 
-  userGenerated, 
-  external, 
-  promoted 
-}
+enum EventType { userGenerated, external, promoted }
 
-enum EventStatus { 
-  draft, 
-  published, 
-  cancelled, 
-  completed,
-  underReview 
-}
+enum EventStatus { draft, published, cancelled, completed, underReview }
 
 class EnhancedEventModel extends Equatable {
   final String id;
@@ -35,7 +25,7 @@ class EnhancedEventModel extends Equatable {
   final int maxAttendees; // Capacity limit
   final DateTime createdAt;
   final DateTime updatedAt;
-  
+
   // User-generated event fields
   final String? createdByUserId; // User who created the event
   final bool isUserGenerated; // Distinguish from external APIs
@@ -88,7 +78,8 @@ class EnhancedEventModel extends Equatable {
     String category = 'General',
     List<String> tags = const [],
     int maxAttendees = 100,
-    EventStatus status = EventStatus.published, // Changed from underReview to published
+    EventStatus status =
+        EventStatus.published, // Changed from underReview to published
     Map<String, dynamic> metadata = const {},
   }) {
     final now = DateTime.now();
@@ -126,7 +117,7 @@ class EnhancedEventModel extends Equatable {
 
   // Check if event has available spots
   bool get hasAvailableSpots => attendeeCount < maxAttendees;
-  
+
   // Check if event is happening soon (within 24 hours)
   bool get isHappeningSoon {
     final now = DateTime.now();
@@ -144,7 +135,8 @@ class EnhancedEventModel extends Equatable {
       startDate: startDate,
       endDate: endDate,
       imageUrl: imageUrls.isNotEmpty ? imageUrls.first : null,
-      location: event_model.EventLocation.fromJson(location.toJson()), // Convert location
+      location: event_model.EventLocation.fromJson(
+          location.toJson()), // Convert location
       ticketUrl: ticketUrl,
       isFree: isFree,
       category: category,
@@ -159,7 +151,8 @@ class EnhancedEventModel extends Equatable {
   }
 
   // Convert EnhancedEventModel status to EventModel status
-  event_model.EventStatus _convertToEventModelStatus(EventStatus enhancedStatus) {
+  event_model.EventStatus _convertToEventModelStatus(
+      EventStatus enhancedStatus) {
     switch (enhancedStatus) {
       case EventStatus.draft:
         return event_model.EventStatus.draft;
@@ -198,7 +191,8 @@ class EnhancedEventModel extends Equatable {
     );
   }
 
-  factory EnhancedEventModel.fromFirestoreJson(Map<String, dynamic> json, String docId) {
+  factory EnhancedEventModel.fromFirestoreJson(
+      Map<String, dynamic> json, String docId) {
     return EnhancedEventModel(
       id: docId,
       externalId: json['externalId'],
@@ -223,8 +217,8 @@ class EnhancedEventModel extends Equatable {
       eventType: _parseEventType(json['eventType']),
       status: _parseEventStatus(json['status']),
       isPromoted: json['isPromoted'] ?? false,
-      promotionExpiry: json['promotionExpiry'] != null 
-          ? (json['promotionExpiry'] as Timestamp).toDate() 
+      promotionExpiry: json['promotionExpiry'] != null
+          ? (json['promotionExpiry'] as Timestamp).toDate()
           : null,
       metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
     );
@@ -233,7 +227,7 @@ class EnhancedEventModel extends Equatable {
   // Helper methods to safely parse enums from Firestore
   static EventType _parseEventType(dynamic typeValue) {
     if (typeValue == null) return EventType.userGenerated;
-    
+
     if (typeValue is String) {
       switch (typeValue.toLowerCase()) {
         case 'usergenerated':
@@ -247,19 +241,19 @@ class EnhancedEventModel extends Equatable {
           return EventType.userGenerated;
       }
     }
-    
+
     if (typeValue is int) {
       if (typeValue >= 0 && typeValue < EventType.values.length) {
         return EventType.values[typeValue];
       }
     }
-    
+
     return EventType.userGenerated;
   }
 
   static EventStatus _parseEventStatus(dynamic statusValue) {
     if (statusValue == null) return EventStatus.published;
-    
+
     if (statusValue is String) {
       switch (statusValue.toLowerCase()) {
         case 'draft':
@@ -277,13 +271,13 @@ class EnhancedEventModel extends Equatable {
           return EventStatus.published;
       }
     }
-    
+
     if (statusValue is int) {
       if (statusValue >= 0 && statusValue < EventStatus.values.length) {
         return EventStatus.values[statusValue];
       }
     }
-    
+
     return EventStatus.published;
   }
 
@@ -311,9 +305,8 @@ class EnhancedEventModel extends Equatable {
       'eventType': eventType.toString().split('.').last,
       'status': status.toString().split('.').last,
       'isPromoted': isPromoted,
-      'promotionExpiry': promotionExpiry != null 
-          ? Timestamp.fromDate(promotionExpiry!) 
-          : null,
+      'promotionExpiry':
+          promotionExpiry != null ? Timestamp.fromDate(promotionExpiry!) : null,
       'metadata': metadata,
     };
   }
@@ -384,47 +377,50 @@ class EnhancedEventModel extends Equatable {
     if (status == EventStatus.cancelled || status == EventStatus.completed) {
       return false;
     }
-    
+
     // Don't allow editing if event starts within 1 hour
     final now = DateTime.now();
     final timeUntilStart = startDate.difference(now);
     if (timeUntilStart.inHours <= 1 && timeUntilStart.inMinutes > 0) {
       return false;
     }
-    
+
     // Allow editing for draft, underReview, and published events
-    return status == EventStatus.draft || status == EventStatus.underReview || status == EventStatus.published;
+    return status == EventStatus.draft ||
+        status == EventStatus.underReview ||
+        status == EventStatus.published;
   }
+
   bool get isCapacityFull => attendeeCount >= maxAttendees;
-  
+
   @override
   List<Object?> get props => [
-    id,
-    externalId,
-    name,
-    description,
-    startDate,
-    endDate,
-    imageUrls,
-    location,
-    ticketUrl,
-    isFree,
-    ticketPrice,
-    category,
-    tags,
-    attendeeCount,
-    rsvpCount,
-    maxAttendees,
-    createdAt,
-    updatedAt,
-    createdByUserId,
-    isUserGenerated,
-    eventType,
-    status,
-    isPromoted,
-    promotionExpiry,
-    metadata,
-  ];
+        id,
+        externalId,
+        name,
+        description,
+        startDate,
+        endDate,
+        imageUrls,
+        location,
+        ticketUrl,
+        isFree,
+        ticketPrice,
+        category,
+        tags,
+        attendeeCount,
+        rsvpCount,
+        maxAttendees,
+        createdAt,
+        updatedAt,
+        createdByUserId,
+        isUserGenerated,
+        eventType,
+        status,
+        isPromoted,
+        promotionExpiry,
+        metadata,
+      ];
 }
 
 // Enhanced EventLocation with additional fields
@@ -461,7 +457,7 @@ class EventLocation extends Equatable {
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
       placeId: json['placeId'],
-      additionalInfo: json['additionalInfo'] != null 
+      additionalInfo: json['additionalInfo'] != null
           ? Map<String, dynamic>.from(json['additionalInfo'])
           : null,
     );
@@ -499,16 +495,16 @@ class EventLocation extends Equatable {
 
   @override
   List<Object?> get props => [
-    name, 
-    address, 
-    city, 
-    state, 
-    country, 
-    latitude, 
-    longitude, 
-    placeId,
-    additionalInfo,
-  ];
+        name,
+        address,
+        city,
+        state,
+        country,
+        latitude,
+        longitude,
+        placeId,
+        additionalInfo,
+      ];
 }
 
 // Event creation data transfer object
@@ -560,13 +556,13 @@ class EventCreationData {
 
   bool get isValid {
     return name.isNotEmpty &&
-           description.isNotEmpty &&
-           category.isNotEmpty &&
-           startDate != null &&
-           endDate != null &&
-           location != null &&
-           startDate!.isBefore(endDate!) &&
-           startDate!.isAfter(DateTime.now());
+        description.isNotEmpty &&
+        category.isNotEmpty &&
+        startDate != null &&
+        endDate != null &&
+        location != null &&
+        startDate!.isBefore(endDate!) &&
+        startDate!.isAfter(DateTime.now());
   }
 
   EnhancedEventModel toEventModel(String id, String createdByUserId) {

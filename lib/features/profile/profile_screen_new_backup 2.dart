@@ -19,8 +19,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final ProfileVerificationService _verificationService = ProfileVerificationService();
-  final ContentModerationService _moderationService = ContentModerationService();
+  final ProfileVerificationService _verificationService =
+      ProfileVerificationService();
+  final ContentModerationService _moderationService =
+      ContentModerationService();
 
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
@@ -51,7 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Available fields: ${data?.keys.toList()}');
           print('   Name: ${data?['name']}');
           print('   Interests: ${data?['interests']}');
-          print('   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
+          print(
+              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
           print('   Looking for: ${data?['lookingFor']}');
           print('   Bio length: ${(data?['bio'] ?? '').length} characters');
           print('   Photos field: ${data?['photos']}');
@@ -59,8 +62,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Profile photos: ${data?['profilePhotos']}');
 
           // Load verification status
-          final verificationStatus = await _verificationService.getUserVerificationStatus(user.uid);
-          
+          final verificationStatus =
+              await _verificationService.getUserVerificationStatus(user.uid);
+
           setState(() {
             _userData = data;
             _verificationStatus = verificationStatus;
@@ -247,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildPhotoSection() {
     // Try multiple possible photo field names
     List<dynamic> photos = [];
-    
+
     // Check different possible field names for photos
     if (_userData?['photos'] != null) {
       photos = List<dynamic>.from(_userData!['photos']);
@@ -262,7 +266,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     // Filter out null/empty photos
-    photos = photos.where((photo) => photo != null && photo.toString().isNotEmpty).toList();
+    photos = photos
+        .where((photo) => photo != null && photo.toString().isNotEmpty)
+        .toList();
 
     print('📸 Found ${photos.length} photos: $photos');
 
@@ -291,7 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
-          
+
           // Instagram-style grid
           Container(
             height: 300,
@@ -303,7 +309,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 mainAxisSpacing: 4,
                 childAspectRatio: 1,
               ),
-              itemCount: photos.length > 6 ? 6 : photos.length, // Show max 6 photos
+              itemCount:
+                  photos.length > 6 ? 6 : photos.length, // Show max 6 photos
               itemBuilder: (context, index) {
                 if (index == 0 && photos.length > 1) {
                   // First photo takes up 2x2 space (spans 2 columns and 2 rows)
@@ -459,7 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
           ),
-          
+
           // Show more photos indicator
           if (photos.length > 6)
             Padding(
@@ -567,7 +574,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             const SizedBox(height: 4),
-            if (_userData?['heightDisplay'] != null || _userData?['height_ft_in'] != null)
+            if (_userData?['heightDisplay'] != null ||
+                _userData?['height_ft_in'] != null)
               Text(
                 _userData?['heightDisplay'] ?? _userData?['height_ft_in'] ?? '',
                 style: GoogleFonts.poppins(
@@ -738,7 +746,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           reporterId: currentUserId,
           reason: 'Inappropriate profile content',
         );
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Profile reported successfully'),
@@ -873,7 +881,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (result) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${type.toString().split('.').last.toUpperCase()} verification requested'),
+              content: Text(
+                  '${type.toString().split('.').last.toUpperCase()} verification requested'),
               backgroundColor: Colors.green,
             ),
           );
@@ -904,11 +913,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case VerificationType.phone:
         return {'phone': _userData?['phone'] ?? ''};
       case VerificationType.photo:
-        return {'photos': ['photo1.jpg', 'photo2.jpg'], 'selfie': 'selfie.jpg'};
+        return {
+          'photos': ['photo1.jpg', 'photo2.jpg'],
+          'selfie': 'selfie.jpg'
+        };
       case VerificationType.identity:
-        return {'idType': 'passport', 'idNumber': 'A1234567', 'idPhoto': 'id.jpg'};
+        return {
+          'idType': 'passport',
+          'idNumber': 'A1234567',
+          'idPhoto': 'id.jpg'
+        };
       case VerificationType.employment:
-        return {'company': 'Tech Company', 'position': 'Developer', 'email': 'work@company.com'};
+        return {
+          'company': 'Tech Company',
+          'position': 'Developer',
+          'email': 'work@company.com'
+        };
     }
   }
 
@@ -947,7 +967,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildInterestsSection() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
-    
+
     if (interests.isEmpty) return const SizedBox.shrink();
 
     return Card(
@@ -973,7 +993,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               runSpacing: 8,
               children: interests.map((interest) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: primaryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -998,7 +1019,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildLookingForSection() {
     final lookingFor = _userData?['lookingFor'];
-    
+
     if (lookingFor == null) return const SizedBox.shrink();
 
     return Card(

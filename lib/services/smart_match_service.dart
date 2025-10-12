@@ -83,14 +83,15 @@ class SmartMatchService {
           '🎯 Calculating compatibility for ${targetUsers.length} users');
 
       final results = <UserCompatibility>[];
-      
+
       for (final user in targetUsers) {
-        final score = ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+        final score =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
           currentUser,
           user,
           mode,
         );
-        
+
         results.add(UserCompatibility(
           user: user,
           compatibilityScore: score,

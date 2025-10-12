@@ -14,7 +14,7 @@ class UserService {
   Future<UserProfile?> getUserProfile(String userId) async {
     try {
       final doc = await _firestore.collection('users').doc(userId).get();
-      
+
       if (doc.exists) {
         return UserProfile.fromMap(doc.data()!, doc.id);
       }
@@ -32,8 +32,11 @@ class UserService {
 
       final futures = userIds.map((id) => getUserProfile(id));
       final results = await Future.wait(futures);
-      
-      return results.where((profile) => profile != null).cast<UserProfile>().toList();
+
+      return results
+          .where((profile) => profile != null)
+          .cast<UserProfile>()
+          .toList();
     } catch (e) {
       print('Error getting user profiles: $e');
       return [];
@@ -44,7 +47,7 @@ class UserService {
   Future<UserProfile?> getCurrentUserProfile() async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) return null;
-    
+
     return await getUserProfile(currentUser.uid);
   }
 

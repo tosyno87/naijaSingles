@@ -344,7 +344,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             children: [
               if (widget.user.nationality != null) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: afropeepGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -363,7 +364,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               ],
               if (widget.user.tribe != null) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: afropeepGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -429,7 +431,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
         ),
 
         // Additional details
-        if (widget.user.profession != null || widget.user.education != null) ...[
+        if (widget.user.profession != null ||
+            widget.user.education != null) ...[
           const SizedBox(height: 12),
           if (widget.user.profession != null) ...[
             Row(
@@ -674,7 +677,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     if (widget.user.bio != null && widget.user.bio!.isNotEmpty) {
       return widget.user.bio!;
     }
-    if (widget.user.editInfo?['userBio'] != null && 
+    if (widget.user.editInfo?['userBio'] != null &&
         widget.user.editInfo!['userBio'].toString().isNotEmpty) {
       return widget.user.editInfo!['userBio'].toString();
     }
@@ -683,14 +686,15 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
 
   List<String> _getInterests() {
     List<String> interests = [];
-    
+
     // Try to get interests from different possible fields
     if (widget.user.editInfo?['interests'] is List) {
       interests.addAll(List<String>.from(widget.user.editInfo!['interests']));
     }
-    
+
     // Add cultural information as interests
-    if (widget.user.nationality != null && widget.user.nationality!.isNotEmpty) {
+    if (widget.user.nationality != null &&
+        widget.user.nationality!.isNotEmpty) {
       interests.add('🇳🇬 ${widget.user.nationality}');
     }
     if (widget.user.tribe != null && widget.user.tribe!.isNotEmpty) {
@@ -705,12 +709,12 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     if (widget.user.occupation != null && widget.user.occupation!.isNotEmpty) {
       interests.add('💼 ${widget.user.occupation}');
     }
-    
+
     // Add default interests if none found
     if (interests.isEmpty) {
       interests.addAll(['Dating', 'Music', 'Travel']);
     }
-    
+
     return interests;
   }
 }

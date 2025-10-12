@@ -59,7 +59,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
               ),
-            
+
             // Primary photo badge
             Positioned(
               top: 0,

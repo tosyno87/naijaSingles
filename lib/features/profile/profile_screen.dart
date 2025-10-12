@@ -158,23 +158,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Simplified Photo Section
                     _buildSimplifiedPhotoSection(),
                     const SizedBox(height: 24),
-                    
+
                     // Simplified Basic Info
                     _buildSimplifiedBasicInfo(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified About Section
                     _buildSimplifiedAbout(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified Interests
                     _buildSimplifiedInterests(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified Location (includes nationality)
                     _buildSimplifiedLocation(),
                     const SizedBox(height: 32),
-                    
+
                     // Single Edit Button
                     _buildEditButton(),
                     const SizedBox(height: 32),
@@ -273,7 +273,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               top: 16,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(20),
@@ -478,7 +479,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 runSpacing: 8,
                 children: interests.take(6).map((interest) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -517,20 +519,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Handle both String and Map types for location and nationality
     String location = '';
     String nationality = '';
-    
+
     if (_userData?['location'] != null) {
       if (_userData!['location'] is String) {
         location = _userData!['location'] as String;
       } else if (_userData!['location'] is Map) {
-        location = _userData!['location']['name'] ?? _userData!['location']['city'] ?? '';
+        location = _userData!['location']['name'] ??
+            _userData!['location']['city'] ??
+            '';
       }
     }
-    
+
     if (_userData?['nationality'] != null) {
       if (_userData!['nationality'] is String) {
         nationality = _userData!['nationality'] as String;
       } else if (_userData!['nationality'] is Map) {
-        nationality = _userData!['nationality']['name'] ?? _userData!['nationality']['country'] ?? '';
+        nationality = _userData!['nationality']['name'] ??
+            _userData!['nationality']['country'] ??
+            '';
       }
     }
 

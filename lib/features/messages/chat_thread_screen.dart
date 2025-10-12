@@ -806,7 +806,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Title with Poppins font
             Text(
               'Block ${widget.userName}?',
@@ -818,7 +818,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            
+
             // Description with MVP colors
             Text(
               'This will remove them from your matches, delete this conversation, and prevent future contact.',
@@ -830,7 +830,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            
+
             // MVP-styled action buttons
             Row(
               children: [
@@ -864,7 +864,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                
+
                 // Block button with gradient and shadow
                 Expanded(
                   child: Container(
@@ -908,7 +908,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Info text
             Text(
               'You can unblock them later in Settings',
@@ -1157,7 +1157,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               duration: const Duration(seconds: 3),
             ),
           );
-          
+
           // Navigate back to messages list after a short delay
           Future.delayed(const Duration(seconds: 1), () {
             if (mounted) {

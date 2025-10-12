@@ -82,14 +82,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       final template = widget.template!;
       final templateData = template.defaultData;
       final now = DateTime.now();
-      
+
       _eventData = EventCreationData()
         ..name = templateData.name
         ..description = templateData.description
         ..category = templateData.category
         ..tags = List.from(templateData.tags)
         ..startDate = now.add(const Duration(days: 7)) // Default to next week
-        ..endDate = now.add(const Duration(days: 7)).add(template.suggestedDuration)
+        ..endDate =
+            now.add(const Duration(days: 7)).add(template.suggestedDuration)
         ..isFree = templateData.isFree
         ..ticketPrice = templateData.ticketPrice
         ..maxAttendees = templateData.maxAttendees;
@@ -97,7 +98,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       _eventData = EventCreationData();
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -187,14 +187,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             children: List.generate(_stepTitles.length, (index) {
               final isActive = index == _currentStep;
               final isCompleted = index < _currentStep;
-              
+
               return Expanded(
                 child: Container(
                   height: 4,
-                  margin: EdgeInsets.only(right: index < _stepTitles.length - 1 ? 8 : 0),
+                  margin: EdgeInsets.only(
+                      right: index < _stepTitles.length - 1 ? 8 : 0),
                   decoration: BoxDecoration(
-                    color: isCompleted || isActive 
-                        ? const Color(0xFF008037) 
+                    color: isCompleted || isActive
+                        ? const Color(0xFF008037)
                         : const Color(0xFFE0E0E0),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -258,7 +259,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               builder: (context, state) {
                 final isLoading = state is EventCreationLoading;
                 final isDisabled = isLoading || _isSubmitting;
-                
+
                 return ElevatedButton(
                   onPressed: isDisabled ? null : _handleNextStep,
                   style: ElevatedButton.styleFrom(
@@ -304,7 +305,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   void _handleNextStep() {
     // Prevent multiple rapid calls
     if (_isSubmitting) return;
-    
+
     if (_currentStep < _stepTitles.length - 1) {
       _nextStep();
     } else {
@@ -366,12 +367,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   bool _validateCulturalHeritage() {
-    if (_eventData.metadata['culturalHeritage'] == null || 
+    if (_eventData.metadata['culturalHeritage'] == null ||
         _eventData.metadata['culturalHeritage'].toString().trim().isEmpty) {
       _showError('Please select a cultural heritage');
       return false;
     }
-    if (_eventData.metadata['ageGroup'] == null || 
+    if (_eventData.metadata['ageGroup'] == null ||
         _eventData.metadata['ageGroup'].toString().trim().isEmpty) {
       _showError('Please select a target age group');
       return false;
@@ -388,7 +389,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       _showError('Please select an end date and time');
       return false;
     }
-    if (_eventData.startDate!.isBefore(DateTime.now().add(const Duration(hours: 1)))) {
+    if (_eventData.startDate!
+        .isBefore(DateTime.now().add(const Duration(hours: 1)))) {
       _showError('Event must start at least 1 hour from now');
       return false;
     }
@@ -409,7 +411,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   bool _validateAdvancedSettings() {
     // Advanced settings are optional, but validate if user has made changes
-    if (!_eventData.isFree && (_eventData.ticketPrice == null || _eventData.ticketPrice! <= 0)) {
+    if (!_eventData.isFree &&
+        (_eventData.ticketPrice == null || _eventData.ticketPrice! <= 0)) {
       _showError('Please enter a valid ticket price for paid events');
       return false;
     }
@@ -423,18 +426,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   void _submitEvent() {
     // Prevent multiple submissions
     if (_isSubmitting) return;
-    
+
     // Cancel any existing timer
     _debounceTimer?.cancel();
-    
+
     setState(() {
       _isSubmitting = true;
     });
-    
+
     // Add a small delay to prevent rapid successive calls
     _debounceTimer = Timer(const Duration(milliseconds: 100), () {
       final bloc = context.read<EventCreationBloc>();
-      
+
       if (_isEditing) {
         bloc.add(UpdateEventEvent(widget.existingEvent!.id, _eventData));
       } else {
@@ -461,7 +464,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-
   void _saveAsDraft() {
     final bloc = context.read<EventCreationBloc>();
     bloc.add(SaveEventAsDraftEvent(_eventData));
@@ -475,7 +477,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         _isSubmitting = false;
       });
     }
-    
+
     if (state is EventCreationSuccess) {
       _showSuccessDialog(state.message, state.eventId);
     } else if (state is EventCreationError) {
@@ -498,7 +500,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           children: [
             const Icon(Icons.check_circle, color: Color(0xFF008037), size: 28),
             const SizedBox(width: 12),
-            Expanded( // Prevent text overflow
+            Expanded(
+              // Prevent text overflow
               child: Text(
                 'Success!',
                 style: GoogleFonts.montserrat(
@@ -553,7 +556,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       // Close the dialog first
                       Navigator.of(context).pop();
                       print('[DEBUG] Dialog closed, navigating to My Events');
-                      
+
                       // Navigate to My Events page
                       _navigateToMyEvents();
                     },
@@ -602,11 +605,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void _navigateToMyEvents() async {
     print('[DEBUG] _navigateToMyEvents called');
-    
+
     // Get context references before async operations
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
+
     try {
       print('[DEBUG] Attempting to navigate to My Events screen');
       // Replace the current create event screen with My Events screen
@@ -621,7 +624,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         (route) => false,
       );
     }
-    
+
     // Show success message after navigation
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -668,7 +671,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
               Container(
@@ -711,7 +715,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 Navigator.of(context).pop(); // Close screen
               },
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -732,7 +737,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008037),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -752,5 +758,4 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       Navigator.of(context).pop();
     }
   }
-
 }

@@ -31,7 +31,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -103,7 +102,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.block_outlined,
                 title: 'Blocked Users',
                 subtitle: 'Manage blocked accounts',
-                onTap: () => Navigator.pushNamed(context, RouteName.blockedUsers),
+                onTap: () =>
+                    Navigator.pushNamed(context, RouteName.blockedUsers),
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -132,7 +132,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.notifications_outlined,
                 title: 'Notifications',
                 subtitle: 'Manage your notification preferences',
-                onTap: () => Navigator.pushNamed(context, RouteName.notificationSettings),
+                onTap: () => Navigator.pushNamed(
+                    context, RouteName.notificationSettings),
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -247,9 +248,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     foregroundColor: Colors.red.shade700,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                          color: Colors.red.shade300,
-                          width: 2),
+                      side: BorderSide(color: Colors.red.shade300, width: 2),
                     ),
                     elevation: 2,
                     shadowColor: Colors.black.withOpacity(0.1),
@@ -833,5 +832,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
 }

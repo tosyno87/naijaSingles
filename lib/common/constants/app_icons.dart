@@ -124,7 +124,8 @@ class AppIcons {
   static const IconData mentor = Icons.supervisor_account_rounded;
   static const IconData mentee = Icons.school_rounded;
   static const IconData collaboration = Icons.group_work_rounded;
-  static const IconData professionalNetworking = Icons.connect_without_contact_rounded;
+  static const IconData professionalNetworking =
+      Icons.connect_without_contact_rounded;
 
   // 🎓 LEARNING ICONS - Education and growth
   static const IconData book = Icons.book_rounded;

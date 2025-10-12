@@ -33,10 +33,10 @@ class ModeActionButtons extends StatelessWidget {
           onTap: onPass,
           tooltip: 'Pass',
         ),
-        
+
         // Mode-specific primary action
         _buildModeSpecificAction(),
-        
+
         // Super like button (same for all modes)
         _buildActionButton(
           icon: Icons.star_rounded,
@@ -57,7 +57,7 @@ class ModeActionButtons extends StatelessWidget {
           onTap: onLike,
           tooltip: 'Like',
         );
-      
+
       case 'Friendship':
         return _buildActionButton(
           icon: Icons.people,
@@ -65,7 +65,7 @@ class ModeActionButtons extends StatelessWidget {
           onTap: onLike,
           tooltip: 'Connect',
         );
-      
+
       case 'Networking':
         return _buildActionButton(
           icon: Icons.handshake,
@@ -73,7 +73,7 @@ class ModeActionButtons extends StatelessWidget {
           onTap: onLike,
           tooltip: 'Network',
         );
-      
+
       default:
         return _buildActionButton(
           icon: Icons.favorite,
@@ -127,7 +127,7 @@ class EnhancedModeActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _getModeConfig();
-    
+
     return Material(
       elevation: isEnabled ? 8 : 2,
       shape: const CircleBorder(),
@@ -170,21 +170,21 @@ class EnhancedModeActionButton extends StatelessWidget {
           color: Colors.pink,
           label: 'Like',
         );
-      
+
       case 'Friendship':
         return _ModeConfig(
           icon: Icons.people,
           color: Colors.green,
           label: 'Connect',
         );
-      
+
       case 'Networking':
         return _ModeConfig(
           icon: Icons.handshake,
           color: Colors.orange,
           label: 'Network',
         );
-      
+
       default:
         return _ModeConfig(
           icon: Icons.favorite,
@@ -240,7 +240,7 @@ class ModeActionSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Mode-specific content
           Padding(
             padding: const EdgeInsets.all(20),
@@ -300,7 +300,7 @@ class ModeActionSheet extends StatelessWidget {
             onTap: () => _handleDatingAction(context, 'interest'),
           ),
         ];
-      
+
       case 'Friendship':
         return [
           _buildActionTile(
@@ -322,7 +322,7 @@ class ModeActionSheet extends StatelessWidget {
             onTap: () => _handleFriendshipAction(context, 'friendship'),
           ),
         ];
-      
+
       case 'Networking':
         return [
           _buildActionTile(
@@ -344,7 +344,7 @@ class ModeActionSheet extends StatelessWidget {
             onTap: () => _handleNetworkingAction(context, 'collaborate'),
           ),
         ];
-      
+
       default:
         return [];
     }

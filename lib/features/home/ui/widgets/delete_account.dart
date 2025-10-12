@@ -46,47 +46,47 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
               data: Theme.of(context).copyWith(
                 dialogBackgroundColor: Colors.white,
                 colorScheme: Theme.of(context).colorScheme.copyWith(
-                  surface: Colors.white,
-                ),
+                      surface: Colors.white,
+                    ),
               ),
               child: AlertDialog(
                 backgroundColor: Colors.white,
                 title: Text('Delete Account'.tr().toString()),
                 content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Do you want to delete your account?'.tr().toString()),
-                  const SizedBox(
-                    height: 8,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Do you want to delete your account?'.tr().toString()),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                        "We're sorry to see you go, but we understand your decision. Deleting your account will permanently remove all your personal information and data associated with it."
+                            .tr()
+                            .toString()),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('No'.tr().toString(),
+                        style: TextStyle(color: primaryColor)),
                   ),
-                  Text(
-                      "We're sorry to see you go, but we understand your decision. Deleting your account will permanently remove all your personal information and data associated with it."
-                          .tr()
-                          .toString()),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      // Show final confirmation dialog with DELETE input
+                      _showFinalConfirmationDialog();
+                    },
+                    child: Text('Yes'.tr().toString(),
+                        style: TextStyle(color: primaryColor)),
+                  ),
                 ],
               ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text('No'.tr().toString(),
-                      style: TextStyle(color: primaryColor)),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    // Show final confirmation dialog with DELETE input
-                    _showFinalConfirmationDialog();
-                  },
-                  child: Text('Yes'.tr().toString(),
-                      style: TextStyle(color: primaryColor)),
-                ),
-              ],
-            ),
-          );
-        },
+            );
+          },
         );
       },
       icon: Icons.delete_forever_outlined,
@@ -101,88 +101,90 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           data: Theme.of(context).copyWith(
             dialogBackgroundColor: Colors.white,
             colorScheme: Theme.of(context).colorScheme.copyWith(
-              surface: Colors.white,
-            ),
+                  surface: Colors.white,
+                ),
           ),
           child: AlertDialog(
             backgroundColor: Colors.white,
             title: Text(
               'Final Confirmation',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Type "DELETE" to confirm account deletion:',
-                style: TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _confirmationController,
-                decoration: InputDecoration(
-                  hintText: 'Type DELETE here',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Type "DELETE" to confirm account deletion:',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _confirmationController,
+                  decoration: InputDecoration(
+                    hintText: 'Type DELETE here',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.red, width: 2),
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.red, width: 2),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '⚠️ This action cannot be undone. All your data will be permanently deleted.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onChanged: (value) {
-                  setState(() {});
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  _confirmationController.clear();
+                  Navigator.of(context).pop();
                 },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                '⚠️ This action cannot be undone. All your data will be permanently deleted.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.red,
-                  fontWeight: FontWeight.w500,
+              TextButton(
+                onPressed: _confirmationController.text.trim().toUpperCase() ==
+                        'DELETE'
+                    ? () {
+                        Navigator.of(context).pop();
+                        _confirmationController.clear();
+                        _performAccountDeletion();
+                      }
+                    : null,
+                child: Text(
+                  'Confirm Delete',
+                  style: TextStyle(
+                    color: _confirmationController.text.trim().toUpperCase() ==
+                            'DELETE'
+                        ? Colors.red
+                        : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _confirmationController.clear();
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            TextButton(
-              onPressed: _confirmationController.text.trim().toUpperCase() == 'DELETE'
-                  ? () {
-                      Navigator.of(context).pop();
-                      _confirmationController.clear();
-                      _performAccountDeletion();
-                    }
-                  : null,
-              child: Text(
-                'Confirm Delete',
-                style: TextStyle(
-                  color: _confirmationController.text.trim().toUpperCase() == 'DELETE'
-                      ? Colors.red
-                      : Colors.grey,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
+        );
+      },
     );
   }
 
@@ -193,8 +195,10 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
     try {
       // Check authentication method and handle accordingly
       final providerData = user.providerData;
-      bool isGoogleUser = providerData.any((info) => info.providerId == 'google.com');
-      bool isFacebookUser = providerData.any((info) => info.providerId == 'facebook.com');
+      bool isGoogleUser =
+          providerData.any((info) => info.providerId == 'google.com');
+      bool isFacebookUser =
+          providerData.any((info) => info.providerId == 'facebook.com');
       bool isPhoneUser = providerData.any((info) => info.providerId == 'phone');
 
       if (isGoogleUser) {
@@ -292,7 +296,8 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         "Account deleted successfully".tr().toString(),
         context,
       );
-      Navigator.pushReplacementNamed(context, RouteName.loginScreen).then((value) {
+      Navigator.pushReplacementNamed(context, RouteName.loginScreen)
+          .then((value) {
         Provider.of<UserProvider>(context, listen: false).currentUser = null;
       });
     }
@@ -305,7 +310,8 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         return AlertDialog(
           backgroundColor: Colors.white,
           title: Text('Re-authentication Required'),
-          content: Text('Please sign in with Google again to confirm account deletion.'),
+          content: Text(
+              'Please sign in with Google again to confirm account deletion.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -336,7 +342,8 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         return AlertDialog(
           backgroundColor: Colors.white,
           title: Text('Re-authentication Required'),
-          content: Text('Please sign in with Facebook again to confirm account deletion.'),
+          content: Text(
+              'Please sign in with Facebook again to confirm account deletion.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -346,7 +353,8 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
               onPressed: () async {
                 Navigator.pop(context);
                 try {
-                  final User? fbUser = await FaceBookLoginRepositoryImpl().signInWithFacebook();
+                  final User? fbUser =
+                      await FaceBookLoginRepositoryImpl().signInWithFacebook();
                   if (fbUser != null) {
                     await fbUser.delete();
                     await _cleanupUserData(fbUser);
@@ -374,7 +382,8 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         return AlertDialog(
           backgroundColor: Colors.white,
           title: Text('Re-authentication Required'),
-          content: Text('Please verify your phone number again to confirm account deletion.'),
+          content: Text(
+              'Please verify your phone number again to confirm account deletion.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),

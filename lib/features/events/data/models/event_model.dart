@@ -58,10 +58,11 @@ class EventModel extends Equatable {
 
   // Helper method to safely parse EventStatus from Firestore
   static EventStatus _parseEventStatus(dynamic statusValue) {
-    print('🔄 Parsing EventStatus from: $statusValue (type: ${statusValue.runtimeType})');
-    
+    print(
+        '🔄 Parsing EventStatus from: $statusValue (type: ${statusValue.runtimeType})');
+
     if (statusValue == null) return EventStatus.published;
-    
+
     // Handle string values (enum name)
     if (statusValue is String) {
       switch (statusValue.toLowerCase()) {
@@ -77,26 +78,28 @@ class EventModel extends Equatable {
         case 'under_review':
           return EventStatus.underReview;
         default:
-          print('⚠️ Unknown EventStatus string: $statusValue, defaulting to published');
+          print(
+              '⚠️ Unknown EventStatus string: $statusValue, defaulting to published');
           return EventStatus.published;
       }
     }
-    
+
     // Handle integer values (enum index) - for backward compatibility
     if (statusValue is int) {
       if (statusValue >= 0 && statusValue < EventStatus.values.length) {
         return EventStatus.values[statusValue];
       }
     }
-    
-    print('⚠️ Could not parse EventStatus: $statusValue, defaulting to published');
+
+    print(
+        '⚠️ Could not parse EventStatus: $statusValue, defaulting to published');
     return EventStatus.published;
   }
 
   // Helper method to safely parse DateTime from Firestore
   static DateTime _parseDateTime(dynamic dateValue) {
     if (dateValue == null) return DateTime.now();
-    
+
     // Handle Timestamp objects (Firestore native)
     if (dateValue is Timestamp) {
       try {
@@ -105,12 +108,12 @@ class EventModel extends Equatable {
         return DateTime.now();
       }
     }
-    
+
     // Handle DateTime objects
     if (dateValue is DateTime) {
       return dateValue;
     }
-    
+
     // Handle milliseconds since epoch (int)
     if (dateValue is int) {
       try {
@@ -119,7 +122,7 @@ class EventModel extends Equatable {
         return DateTime.now();
       }
     }
-    
+
     // Handle string representations
     if (dateValue is String) {
       try {
@@ -128,30 +131,32 @@ class EventModel extends Equatable {
         return DateTime.now();
       }
     }
-    
+
     // Handle objects with millisecondsSinceEpoch property
     if (dateValue is Map && dateValue.containsKey('millisecondsSinceEpoch')) {
       try {
-        return DateTime.fromMillisecondsSinceEpoch(dateValue['millisecondsSinceEpoch']);
+        return DateTime.fromMillisecondsSinceEpoch(
+            dateValue['millisecondsSinceEpoch']);
       } catch (e) {
         return DateTime.now();
       }
     }
-    
+
     return DateTime.now();
   }
 
-
-  factory EventModel.fromFirestoreJson(Map<String, dynamic> json, String docId) {
+  factory EventModel.fromFirestoreJson(
+      Map<String, dynamic> json, String docId) {
     try {
       // Handle both imageUrl (singular) and imageUrls (plural) for backward compatibility
       String? imageUrl;
       if (json['imageUrl'] != null) {
         imageUrl = json['imageUrl'];
-      } else if (json['imageUrls'] != null && (json['imageUrls'] as List).isNotEmpty) {
+      } else if (json['imageUrls'] != null &&
+          (json['imageUrls'] as List).isNotEmpty) {
         imageUrl = (json['imageUrls'] as List).first;
       }
-      
+
       return EventModel(
         id: docId,
         externalId: json['externalId'] ?? '',
@@ -257,28 +262,28 @@ class EventModel extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    externalId,
-    name,
-    description,
-    startDate,
-    endDate,
-    imageUrl,
-    location,
-    ticketUrl,
-    isFree,
-    ticketPrice,
-    category,
-    tags,
-    attendeeCount,
-    rsvpCount,
-    createdAt,
-    updatedAt,
-    status,
-    isPublic,
-    createdByUserId,
-    distanceFromUser,
-  ];
+        id,
+        externalId,
+        name,
+        description,
+        startDate,
+        endDate,
+        imageUrl,
+        location,
+        ticketUrl,
+        isFree,
+        ticketPrice,
+        category,
+        tags,
+        attendeeCount,
+        rsvpCount,
+        createdAt,
+        updatedAt,
+        status,
+        isPublic,
+        createdByUserId,
+        distanceFromUser,
+      ];
 }
 
 class EventLocation extends Equatable {
@@ -303,12 +308,12 @@ class EventLocation extends Equatable {
   factory EventLocation.fromJson(Map<String, dynamic> json) {
     try {
       print('🌍 Parsing EventLocation from: $json');
-      
+
       return EventLocation(
         name: json['name'],
         // Handle both nested (Eventbrite) and flat (Firestore) address formats
-        address: json['address'] is String 
-            ? json['address'] 
+        address: json['address'] is String
+            ? json['address']
             : json['address']?['localized_address_display'],
         city: json['city'] ?? json['address']?['city'],
         state: json['state'] ?? json['address']?['region'],
@@ -345,5 +350,6 @@ class EventLocation extends Equatable {
   }
 
   @override
-  List<Object?> get props => [name, address, city, state, country, latitude, longitude];
+  List<Object?> get props =>
+      [name, address, city, state, country, latitude, longitude];
 }

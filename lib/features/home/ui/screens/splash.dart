@@ -36,7 +36,8 @@ class SplashState extends State<Splash> {
       if (!mounted || _hasNavigated) return;
 
       // Safety check for Navigator state during hot reload
-      if (!Navigator.canPop(context) && Navigator.of(context).widget.initialRoute == null) {
+      if (!Navigator.canPop(context) &&
+          Navigator.of(context).widget.initialRoute == null) {
         log("Navigator state issue detected, skipping navigation");
         return;
       }
@@ -91,7 +92,8 @@ class SplashState extends State<Splash> {
           if (!mounted || _hasNavigated) return;
 
           // Safety check for Navigator state during hot reload
-          if (!Navigator.canPop(context) && Navigator.of(context).widget.initialRoute == null) {
+          if (!Navigator.canPop(context) &&
+              Navigator.of(context).widget.initialRoute == null) {
             log("Navigator state issue detected in listener, skipping navigation");
             return;
           }
@@ -135,7 +137,8 @@ class SplashState extends State<Splash> {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B), // Dark text on white background
+                  color:
+                      const Color(0xFF1E293B), // Dark text on white background
                   letterSpacing: 1.2,
                 ),
               ),

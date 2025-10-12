@@ -14,7 +14,8 @@ void main() {
       await _testCulturalMatching(tester);
     });
 
-    testWidgets('Cross-cultural matching between African ethnicities', (tester) async {
+    testWidgets('Cross-cultural matching between African ethnicities',
+        (tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -28,7 +29,8 @@ void main() {
       await _testProfessionalMatching(tester);
     });
 
-    testWidgets('US city-based matching for diaspora communities', (tester) async {
+    testWidgets('US city-based matching for diaspora communities',
+        (tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -48,7 +50,7 @@ Future<void> _testCulturalMatching(WidgetTester tester) async {
     // Check if cultural information is displayed
     expect(find.textContaining('Nigeria'), findsWidgets);
     expect(find.textContaining('Yoruba'), findsWidgets);
-    
+
     // Test right swipe (like)
     await tester.drag(swipeCard, const Offset(300, 0));
     await tester.pumpAndSettle();
@@ -94,21 +96,21 @@ Future<void> _testCrossCulturalMatching(WidgetTester tester) async {
 
   // Test matching with different African ethnicities
   final profileCards = find.byType(Card);
-  
+
   for (int i = 0; i < 3 && i < profileCards.evaluate().length; i++) {
     final card = profileCards.at(i);
-    
+
     // Check for different African backgrounds
     final cardWidget = tester.widget<Card>(card);
-    
+
     // Simulate viewing profiles from different countries
     // Nigeria, Ghana, Ethiopia, Kenya, etc.
     await tester.tap(card);
     await tester.pumpAndSettle();
-    
+
     // Check if cross-cultural information is displayed
     expect(find.textContaining('African'), findsWidgets);
-    
+
     // Go back to matching
     final backButton = find.byIcon(Icons.arrow_back);
     if (backButton.evaluate().isNotEmpty) {

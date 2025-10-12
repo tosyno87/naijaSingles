@@ -140,10 +140,7 @@ class EnhancedChatService {
       if (currentUserId == null) return;
 
       // Update typing status
-      await _firestore
-          .collection('chatThreads')
-          .doc(threadId)
-          .update({
+      await _firestore.collection('chatThreads').doc(threadId).update({
         'typingUsers': FieldValue.arrayUnion([currentUserId]),
         'typingUpdatedAt': FieldValue.serverTimestamp(),
       });
@@ -171,10 +168,7 @@ class EnhancedChatService {
       _typingTimers.remove(threadId);
 
       // Update typing status
-      await _firestore
-          .collection('chatThreads')
-          .doc(threadId)
-          .update({
+      await _firestore.collection('chatThreads').doc(threadId).update({
         'typingUsers': FieldValue.arrayRemove([currentUserId]),
         'typingUpdatedAt': FieldValue.serverTimestamp(),
       });
@@ -197,16 +191,17 @@ class EnhancedChatService {
 
       final currentUserId = _auth.currentUser?.uid;
       final typingUsers = List<String>.from(data['typingUsers'] ?? []);
-      
+
       // Remove current user from typing list
       typingUsers.remove(currentUserId);
-      
+
       return typingUsers;
     });
   }
 
   /// Add reaction to message
-  Future<void> addReaction(String threadId, String messageId, String emoji) async {
+  Future<void> addReaction(
+      String threadId, String messageId, String emoji) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return;
@@ -227,7 +222,8 @@ class EnhancedChatService {
   }
 
   /// Remove reaction from message
-  Future<void> removeReaction(String threadId, String messageId, String emoji) async {
+  Future<void> removeReaction(
+      String threadId, String messageId, String emoji) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return;
@@ -248,7 +244,8 @@ class EnhancedChatService {
   }
 
   /// Edit message
-  Future<void> editMessage(String threadId, String messageId, String newText) async {
+  Future<void> editMessage(
+      String threadId, String messageId, String newText) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return;
@@ -299,10 +296,7 @@ class EnhancedChatService {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return;
 
-      await _firestore
-          .collection('users')
-          .doc(currentUserId)
-          .update({
+      await _firestore.collection('users').doc(currentUserId).update({
         'isOnline': isOnline,
         'lastSeen': FieldValue.serverTimestamp(),
       });
@@ -315,11 +309,7 @@ class EnhancedChatService {
 
   /// Get user online status
   Stream<bool> getUserOnlineStatus(String userId) {
-    return _firestore
-        .collection('users')
-        .doc(userId)
-        .snapshots()
-        .map((doc) {
+    return _firestore.collection('users').doc(userId).snapshots().map((doc) {
       final data = doc.data();
       if (data == null) return false;
 
@@ -341,10 +331,7 @@ class EnhancedChatService {
   /// Get last seen time
   Future<DateTime?> getLastSeen(String userId) async {
     try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(userId)
-          .get();
+      final doc = await _firestore.collection('users').doc(userId).get();
 
       final data = doc.data();
       if (data == null) return null;
@@ -358,12 +345,10 @@ class EnhancedChatService {
   }
 
   /// Update thread metadata
-  Future<void> _updateThreadMetadata(String threadId, String text, String senderId) async {
+  Future<void> _updateThreadMetadata(
+      String threadId, String text, String senderId) async {
     try {
-      await _firestore
-          .collection('chatThreads')
-          .doc(threadId)
-          .update({
+      await _firestore.collection('chatThreads').doc(threadId).update({
         'lastMessageText': text,
         'lastMessageSenderId': senderId,
         'lastUpdated': FieldValue.serverTimestamp(),
@@ -377,10 +362,8 @@ class EnhancedChatService {
   Future<void> _updateThreadUnreadCount(String threadId) async {
     try {
       // Get thread data
-      final threadDoc = await _firestore
-          .collection('chatThreads')
-          .doc(threadId)
-          .get();
+      final threadDoc =
+          await _firestore.collection('chatThreads').doc(threadId).get();
 
       final data = threadDoc.data();
       if (data == null) return;
@@ -389,10 +372,7 @@ class EnhancedChatService {
 
       // Update unread count for current user
       if (currentUserId != null) {
-        await _firestore
-            .collection('chatThreads')
-            .doc(threadId)
-            .update({
+        await _firestore.collection('chatThreads').doc(threadId).update({
           'unreadCount.$currentUserId': 0,
         });
       }
@@ -405,10 +385,8 @@ class EnhancedChatService {
   Future<void> _sendMessageNotification(String threadId, String text) async {
     try {
       // Get thread data
-      final threadDoc = await _firestore
-          .collection('chatThreads')
-          .doc(threadId)
-          .get();
+      final threadDoc =
+          await _firestore.collection('chatThreads').doc(threadId).get();
 
       final data = threadDoc.data();
       if (data == null) return;
@@ -419,9 +397,7 @@ class EnhancedChatService {
       // Send notification to other users
       for (final userId in userIds) {
         if (userId != currentUserId) {
-          await _firestore
-              .collection('notifications')
-              .add({
+          await _firestore.collection('notifications').add({
             'userId': userId,
             'type': 'message',
             'title': 'New Message',

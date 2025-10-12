@@ -15,11 +15,13 @@ class GroupNotificationToggle extends StatefulWidget {
   });
 
   @override
-  State<GroupNotificationToggle> createState() => _GroupNotificationToggleState();
+  State<GroupNotificationToggle> createState() =>
+      _GroupNotificationToggleState();
 }
 
 class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
-  final GroupNotificationService _notificationService = GroupNotificationService();
+  final GroupNotificationService _notificationService =
+      GroupNotificationService();
   bool _isMuted = false;
   bool _isLoading = true;
 
@@ -71,9 +73,9 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _isMuted 
-                ? 'Notifications muted for ${widget.groupName}'
-                : 'Notifications enabled for ${widget.groupName}',
+              _isMuted
+                  ? 'Notifications muted for ${widget.groupName}'
+                  : 'Notifications enabled for ${widget.groupName}',
             ),
             backgroundColor: AppColors.primaryGreen,
           ),
@@ -159,7 +161,9 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _isMuted ? 'Notifications Muted' : 'Notifications Enabled',
+                        _isMuted
+                            ? 'Notifications Muted'
+                            : 'Notifications Enabled',
                         style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -168,9 +172,9 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _isMuted 
-                          ? 'You won\'t receive push notifications for this group'
-                          : 'You\'ll receive push notifications for new messages',
+                        _isMuted
+                            ? 'You won\'t receive push notifications for this group'
+                            : 'You\'ll receive push notifications for new messages',
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: Colors.grey[600],

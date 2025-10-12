@@ -59,7 +59,8 @@ class GroupChatService {
         'lastMessageSenderId': currentUserId,
       };
 
-      final docRef = await _firestore.collection('unifiedGroups').add(groupData);
+      final docRef =
+          await _firestore.collection('unifiedGroups').add(groupData);
       final groupId = docRef.id;
 
       // Create initial message
@@ -144,7 +145,7 @@ class GroupChatService {
       // Remove user from group members
       log('🔍 Attempting to leave group: $groupId');
       log('🔍 Current user: $currentUserId');
-      
+
       await _firestore.collection('unifiedGroups').doc(groupId).update({
         'memberIds': FieldValue.arrayRemove([currentUserId]),
         'adminIds': FieldValue.arrayRemove([currentUserId]),
@@ -176,14 +177,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can invite users');
       }
@@ -225,14 +227,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can remove users');
       }
@@ -270,14 +273,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can promote users');
       }
@@ -320,18 +324,19 @@ class GroupChatService {
       }
 
       // Check if user is member of group
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final memberIds = List<String>.from(groupData['memberIds'] ?? []);
-      
+
       log('🔍 Group memberIds: $memberIds');
       log('🔍 Current user: $currentUserId');
       log('🔍 Is user member: ${memberIds.contains(currentUserId)}');
-      
+
       if (!memberIds.contains(currentUserId)) {
         throw Exception('You are not a member of this group');
       }
@@ -428,7 +433,8 @@ class GroupChatService {
   Future<GroupChat?> getGroupDetails(String groupId) async {
     try {
       log('🔍 GroupChatService: Looking for group in unifiedGroups collection: $groupId');
-      final doc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final doc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!doc.exists) {
         log('❌ GroupChatService: Group not found in unifiedGroups');
         return null;
@@ -470,14 +476,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can update group settings');
       }
@@ -489,7 +496,10 @@ class GroupChatService {
       if (isActive != null) updateData['isActive'] = isActive;
 
       if (updateData.isNotEmpty) {
-        await _firestore.collection('unifiedGroups').doc(groupId).update(updateData);
+        await _firestore
+            .collection('unifiedGroups')
+            .doc(groupId)
+            .update(updateData);
       }
 
       log('✅ Group settings updated successfully: $groupId');
@@ -510,14 +520,15 @@ class GroupChatService {
       }
 
       // Check if user is creator
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final creatorId = groupData['creatorId'] as String?;
-      
+
       if (creatorId != currentUserId) {
         throw Exception('Only the group creator can delete the group');
       }
@@ -569,9 +580,11 @@ class GroupChatService {
   }
 
   /// Notify group members (internal method)
-  Future<void> _notifyGroupMembers(String groupId, String message, {String? excludeUserId}) async {
+  Future<void> _notifyGroupMembers(String groupId, String message,
+      {String? excludeUserId}) async {
     try {
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) return;
 
       final groupData = groupDoc.data()!;
@@ -670,7 +683,8 @@ class GroupChat {
       memberCount: data['memberCount'] ?? 0,
       isActive: data['isActive'] ?? true,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastMessageAt: (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastMessageAt:
+          (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       lastMessageText: data['lastMessageText'] ?? '',
       lastMessageSenderId: data['lastMessageSenderId'] ?? '',
     );

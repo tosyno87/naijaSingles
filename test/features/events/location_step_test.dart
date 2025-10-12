@@ -21,7 +21,8 @@ void main() {
       );
     }
 
-    testWidgets('should display location step with correct structure', (WidgetTester tester) async {
+    testWidgets('should display location step with correct structure',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -29,7 +30,8 @@ void main() {
       expect(find.text('Help people find your event location'), findsOneWidget);
     });
 
-    testWidgets('should display venue name input field', (WidgetTester tester) async {
+    testWidgets('should display venue name input field',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -37,7 +39,8 @@ void main() {
       expect(find.byType(TextFormField), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should display street address input field', (WidgetTester tester) async {
+    testWidgets('should display street address input field',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -53,7 +56,8 @@ void main() {
       expect(find.byType(TextFormField), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should display state input field', (WidgetTester tester) async {
+    testWidgets('should display state input field',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -61,7 +65,8 @@ void main() {
       expect(find.byType(TextFormField), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should display form field hints correctly', (WidgetTester tester) async {
+    testWidgets('should display form field hints correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -69,37 +74,41 @@ void main() {
       expect(find.text('e.g., Lagos Continental Hotel'), findsOneWidget);
       expect(find.text('e.g., 52A Kofo Abayomi Street'), findsOneWidget);
       expect(find.text('e.g., Lagos'), findsOneWidget);
-      expect(find.text('Enter state (e.g., Lagos, Abuja, Kano)'), findsOneWidget);
+      expect(
+          find.text('Enter state (e.g., Lagos, Abuja, Kano)'), findsOneWidget);
     });
 
-    testWidgets('should accept African location inputs', (WidgetTester tester) async {
+    testWidgets('should accept African location inputs',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
       // Find and fill venue name
       final venueField = find.byWidgetPredicate(
-        (widget) => widget is TextFormField && 
-                    widget.controller?.text == '',
+        (widget) => widget is TextFormField && widget.controller?.text == '',
       );
-      
+
       if (venueField.evaluate().isNotEmpty) {
         await tester.enterText(venueField.first, 'Lagos Social Club');
         await tester.pumpAndSettle();
-        
+
         expect(find.text('Lagos Social Club'), findsOneWidget);
       }
     });
 
-    testWidgets('should handle empty input fields', (WidgetTester tester) async {
+    testWidgets('should handle empty input fields',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
       // Check that TextFormFields exist and are empty
       final textFields = find.byType(TextFormField);
-      expect(textFields, findsAtLeastNWidgets(5)); // Venue, Address, City, State, Country
+      expect(textFields,
+          findsAtLeastNWidgets(5)); // Venue, Address, City, State, Country
     });
 
-    testWidgets('should display correct background colors', (WidgetTester tester) async {
+    testWidgets('should display correct background colors',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -107,7 +116,8 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsOneWidget);
     });
 
-    testWidgets('should display required field indicators', (WidgetTester tester) async {
+    testWidgets('should display required field indicators',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 

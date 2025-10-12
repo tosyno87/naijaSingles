@@ -91,6 +91,8 @@ class FloatingButton extends StatelessWidget {
             alignment: Alignment.bottomRight,
             child: FloatingActionButton(
                 heroTag: UniqueKey(),
-                backgroundColor: Colors.white, onPressed: onTap, child: icon)));
+                backgroundColor: Colors.white,
+                onPressed: onTap,
+                child: icon)));
   }
 }

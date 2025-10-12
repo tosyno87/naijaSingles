@@ -81,7 +81,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                 children: [
                   // Hero-style full-width photo
                   _buildHeroPhoto(primaryPhoto, photos.length),
-                  
+
                   // Profile information
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -90,19 +90,19 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                       children: [
                         // Name, age, and active status
                         _buildNameAndStatus(),
-                        
+
                         const SizedBox(height: 8),
-                        
+
                         // Nationality & Tribe tags
                         _buildNationalityTribeTags(),
-                        
+
                         const SizedBox(height: 8),
-                        
+
                         // Interests badges
                         _buildInterestsBadges(),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Connect button
                         _buildConnectButton(),
                       ],
@@ -142,7 +142,8 @@ class _ModernProfileCardState extends State<ModernProfileCard>
               top: 16,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(16),
@@ -168,7 +169,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                 ),
               ),
             ),
-          
+
           // Tap to view indicator
           Positioned(
             bottom: 16,
@@ -193,7 +194,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
               ),
             ),
           ),
-          
+
           // Photo dots indicator
           if (photoCount > 1)
             Positioned(
@@ -271,7 +272,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
   Widget _buildNationalityTribeTags() {
     final nationality = widget.user.nationality ?? 'Nigerian';
     final tribe = widget.user.tribe ?? 'Yoruba';
-    
+
     return Row(
       children: [
         Container(
@@ -320,7 +321,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
   Widget _buildInterestsBadges() {
     // Extract interests from user data
     final interests = <String>[];
-    
+
     // Add default interests or extract from user data
     if (widget.user.editInfo != null) {
       final userBio = widget.user.editInfo!['userBio']?.toString() ?? '';
@@ -328,12 +329,12 @@ class _ModernProfileCardState extends State<ModernProfileCard>
       if (userBio.toLowerCase().contains('travel')) interests.add('Travel');
       if (userBio.toLowerCase().contains('food')) interests.add('Food');
     }
-    
+
     // Add default interests if none found
     if (interests.isEmpty) {
       interests.addAll(['Dating', 'Music', 'Travel']);
     }
-    
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,

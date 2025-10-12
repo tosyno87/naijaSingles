@@ -105,10 +105,12 @@ class SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     freeR = widget.items['free_radius'] != null
-        ? (int.parse(widget.items['free_radius']) * 0.621371).round() // Convert km to miles
+        ? (int.parse(widget.items['free_radius']) * 0.621371)
+            .round() // Convert km to miles
         : 248; // 400km = 248 miles
     paidR = widget.items['paid_radius'] != null
-        ? (int.parse(widget.items['paid_radius']) * 0.621371).round() // Convert km to miles
+        ? (int.parse(widget.items['paid_radius']) * 0.621371)
+            .round() // Convert km to miles
         : 248; // 400km = 248 miles
     setState(() {
       if (!widget.isPurchased && widget.currentUser.maxDistance! > freeR) {

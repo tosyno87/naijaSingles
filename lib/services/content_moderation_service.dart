@@ -11,7 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// - User reporting system
 /// - Automated moderation actions
 class ContentModerationService {
-  static final ContentModerationService _instance = ContentModerationService._internal();
+  static final ContentModerationService _instance =
+      ContentModerationService._internal();
   factory ContentModerationService() => _instance;
   ContentModerationService._internal();
 
@@ -20,14 +21,32 @@ class ContentModerationService {
 
   // Inappropriate words/phrases (simplified list)
   static const List<String> _inappropriateWords = [
-    'spam', 'scam', 'fake', 'bot', 'hate', 'abuse', 'harassment',
-    'inappropriate', 'offensive', 'explicit', 'adult', 'nsfw',
+    'spam',
+    'scam',
+    'fake',
+    'bot',
+    'hate',
+    'abuse',
+    'harassment',
+    'inappropriate',
+    'offensive',
+    'explicit',
+    'adult',
+    'nsfw',
   ];
 
   // Spam patterns
   static const List<String> _spamPatterns = [
-    'click here', 'free money', 'win now', 'urgent', 'limited time',
-    'act now', 'guaranteed', 'no risk', 'instant', 'immediate',
+    'click here',
+    'free money',
+    'win now',
+    'urgent',
+    'limited time',
+    'act now',
+    'guaranteed',
+    'no risk',
+    'instant',
+    'immediate',
   ];
 
   /// Moderate text content
@@ -36,14 +55,15 @@ class ContentModerationService {
       log('🔍 Moderating text content...');
 
       final issues = <ModerationIssue>[];
-      
+
       // Check for inappropriate words
       final inappropriateWords = _checkInappropriateWords(text);
       if (inappropriateWords.isNotEmpty) {
         issues.add(ModerationIssue(
           type: ModerationIssueType.inappropriateContent,
           severity: ModerationSeverity.high,
-          description: 'Contains inappropriate words: ${inappropriateWords.join(', ')}',
+          description:
+              'Contains inappropriate words: ${inappropriateWords.join(', ')}',
           confidence: 0.9,
         ));
       }
@@ -85,7 +105,8 @@ class ContentModerationService {
         issues.add(ModerationIssue(
           type: ModerationIssueType.personalInformation,
           severity: ModerationSeverity.high,
-          description: 'Contains personal information: ${personalInfo.join(', ')}',
+          description:
+              'Contains personal information: ${personalInfo.join(', ')}',
           confidence: 0.8,
         ));
       }
@@ -115,10 +136,10 @@ class ContentModerationService {
       await Future.delayed(const Duration(seconds: 2));
 
       final issues = <ModerationIssue>[];
-      
+
       // Simulate different image analysis results
       final random = DateTime.now().millisecondsSinceEpoch % 100;
-      
+
       if (random < 5) {
         // 5% chance of inappropriate content
         issues.add(ModerationIssue(
@@ -162,12 +183,14 @@ class ContentModerationService {
       if (!userDoc.exists) {
         return ModerationResult(
           action: ModerationAction.reject,
-          issues: [ModerationIssue(
-            type: ModerationIssueType.inappropriateContent,
-            severity: ModerationSeverity.high,
-            description: 'User profile not found',
-            confidence: 1.0,
-          )],
+          issues: [
+            ModerationIssue(
+              type: ModerationIssueType.inappropriateContent,
+              severity: ModerationSeverity.high,
+              description: 'User profile not found',
+              confidence: 1.0,
+            )
+          ],
           confidence: 1.0,
           moderatedAt: DateTime.now(),
         );
@@ -275,9 +298,11 @@ class ContentModerationService {
             orElse: () => ModerationAction.approve,
           ),
           issues: (data['issues'] as List<dynamic>?)
-              ?.map((issue) => ModerationIssue.fromMap(issue))
-              .toList() ?? [],
-          moderatedAt: (data['moderatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+                  ?.map((issue) => ModerationIssue.fromMap(issue))
+                  .toList() ??
+              [],
+          moderatedAt:
+              (data['moderatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         );
       }).toList();
     } catch (e) {
@@ -295,18 +320,20 @@ class ContentModerationService {
   /// Check spam patterns
   List<String> _checkSpamPatterns(String text) {
     final lowerText = text.toLowerCase();
-    return _spamPatterns.where((pattern) => lowerText.contains(pattern)).toList();
+    return _spamPatterns
+        .where((pattern) => lowerText.contains(pattern))
+        .toList();
   }
 
   /// Check for excessive repetition
   bool _checkExcessiveRepetition(String text) {
     final words = text.toLowerCase().split(RegExp(r'\s+'));
     final wordCounts = <String, int>{};
-    
+
     for (final word in words) {
       wordCounts[word] = (wordCounts[word] ?? 0) + 1;
     }
-    
+
     // Check if any word appears more than 3 times
     return wordCounts.values.any((count) => count > 3);
   }
@@ -314,29 +341,32 @@ class ContentModerationService {
   /// Check for all caps
   bool _checkAllCaps(String text) {
     final words = text.split(RegExp(r'\s+'));
-    final capsWords = words.where((word) => word == word.toUpperCase() && word.length > 2).length;
+    final capsWords = words
+        .where((word) => word == word.toUpperCase() && word.length > 2)
+        .length;
     return capsWords > words.length * 0.5; // More than 50% caps
   }
 
   /// Check for personal information
   List<String> _checkPersonalInformation(String text) {
     final issues = <String>[];
-    
+
     // Check for phone numbers
     if (RegExp(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b').hasMatch(text)) {
       issues.add('phone number');
     }
-    
+
     // Check for email addresses
-    if (RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b').hasMatch(text)) {
+    if (RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
+        .hasMatch(text)) {
       issues.add('email address');
     }
-    
+
     // Check for social security numbers
     if (RegExp(r'\b\d{3}-?\d{2}-?\d{4}\b').hasMatch(text)) {
       issues.add('social security number');
     }
-    
+
     return issues;
   }
 
@@ -345,16 +375,16 @@ class ContentModerationService {
     // Simple heuristics for fake profile detection
     final bio = userData['bio'] as String? ?? '';
     final photos = userData['photos'] as List<dynamic>? ?? [];
-    
+
     // Check for very short bio
     if (bio.length < 10) return true;
-    
+
     // Check for no photos
     if (photos.isEmpty) return true;
-    
+
     // Check for suspicious bio content
     if (_checkSpamPatterns(bio).isNotEmpty) return true;
-    
+
     return false;
   }
 
@@ -370,7 +400,9 @@ class ContentModerationService {
     }
 
     // Check for high severity issues
-    final highSeverityIssues = issues.where((issue) => issue.severity == ModerationSeverity.high).length;
+    final highSeverityIssues = issues
+        .where((issue) => issue.severity == ModerationSeverity.high)
+        .length;
     if (highSeverityIssues > 0) {
       return ModerationResult(
         action: ModerationAction.reject,
@@ -381,7 +413,9 @@ class ContentModerationService {
     }
 
     // Check for medium severity issues
-    final mediumSeverityIssues = issues.where((issue) => issue.severity == ModerationSeverity.medium).length;
+    final mediumSeverityIssues = issues
+        .where((issue) => issue.severity == ModerationSeverity.medium)
+        .length;
     if (mediumSeverityIssues > 1) {
       return ModerationResult(
         action: ModerationAction.reject,
@@ -392,7 +426,9 @@ class ContentModerationService {
     }
 
     // Check for multiple low severity issues
-    final lowSeverityIssues = issues.where((issue) => issue.severity == ModerationSeverity.low).length;
+    final lowSeverityIssues = issues
+        .where((issue) => issue.severity == ModerationSeverity.low)
+        .length;
     if (lowSeverityIssues > 2) {
       return ModerationResult(
         action: ModerationAction.review,
@@ -411,7 +447,8 @@ class ContentModerationService {
   }
 
   /// Save moderation result
-  Future<void> _saveModerationResult(String userId, String contentType, String contentId, ModerationResult result) async {
+  Future<void> _saveModerationResult(String userId, String contentType,
+      String contentId, ModerationResult result) async {
     try {
       await _firestore.collection('moderation_history').add({
         'userId': userId,

@@ -62,7 +62,8 @@ class CulturalStoryCard extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: const Color(0xFF008037),
                     borderRadius: BorderRadius.circular(12),
@@ -79,7 +80,8 @@ class CulturalStoryCard extends StatelessWidget {
                 const Spacer(),
                 if (isVerified)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(12),
@@ -107,7 +109,7 @@ class CulturalStoryCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Content
           Padding(
             padding: const EdgeInsets.all(16),
@@ -123,9 +125,9 @@ class CulturalStoryCard extends StatelessWidget {
                     color: const Color(0xFF333333),
                   ),
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Author and country
                 Row(
                   children: [
@@ -159,9 +161,9 @@ class CulturalStoryCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Content preview
                 Text(
                   content,
@@ -173,9 +175,9 @@ class CulturalStoryCard extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Footer with stats and actions
                 Row(
                   children: [
@@ -183,7 +185,8 @@ class CulturalStoryCard extends StatelessWidget {
                     GestureDetector(
                       onTap: onLike,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: const Color(0xFF008037).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -209,12 +212,13 @@ class CulturalStoryCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(width: 12),
-                    
+
                     // Comments
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(16),
@@ -239,9 +243,9 @@ class CulturalStoryCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     const Spacer(),
-                    
+
                     // Read more button
                     TextButton(
                       onPressed: () {

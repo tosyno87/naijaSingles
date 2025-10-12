@@ -7,7 +7,6 @@ class UserPrivacySettings {
   // Communication Settings
   final bool allowMessagesFromMatches;
 
-
   // Activity Status
   final bool showOnlineStatus;
   final bool showLastActive;
@@ -25,7 +24,6 @@ class UserPrivacySettings {
   const UserPrivacySettings({
     // Communication defaults
     this.allowMessagesFromMatches = true,
-
 
     // Activity defaults
     this.showOnlineStatus = true,
@@ -46,7 +44,6 @@ class UserPrivacySettings {
     return {
       // Communication
       'allowMessagesFromMatches': allowMessagesFromMatches,
-  
 
       // Activity Status
       'showOnlineStatus': showOnlineStatus,
@@ -70,7 +67,6 @@ class UserPrivacySettings {
     return UserPrivacySettings(
       // Communication
       allowMessagesFromMatches: map['allowMessagesFromMatches'] ?? true,
-  
 
       // Activity Status
       showOnlineStatus: map['showOnlineStatus'] ?? true,
@@ -91,7 +87,6 @@ class UserPrivacySettings {
   UserPrivacySettings copyWith({
     // Communication
     bool? allowMessagesFromMatches,
-  
 
     // Activity Status
     bool? showOnlineStatus,
@@ -111,7 +106,6 @@ class UserPrivacySettings {
       // Communication
       allowMessagesFromMatches:
           allowMessagesFromMatches ?? this.allowMessagesFromMatches,
-
 
       // Activity Status
       showOnlineStatus: showOnlineStatus ?? this.showOnlineStatus,

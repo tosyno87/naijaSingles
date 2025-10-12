@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 /// Industry-standard image cropping service for profile photos
 /// Implements Hinge/Bumble-style cropping with proper aspect ratios
 class ProfileImageCropperService {
-  
   /// Crop image with industry-standard settings for profile photos
   static Future<File?> cropImage({
     required String imagePath,
@@ -215,8 +214,8 @@ class ProfileImageCropperService {
 
 /// Crop type enum for different photo types
 enum CropType {
-  square,     // 1:1 - Main profile photo
-  portrait,   // 3:4 - Full body photos
-  landscape,  // 4:3 - Activity photos
-  freeform,   // No fixed ratio - Lifestyle photos
+  square, // 1:1 - Main profile photo
+  portrait, // 3:4 - Full body photos
+  landscape, // 4:3 - Activity photos
+  freeform, // No fixed ratio - Lifestyle photos
 }

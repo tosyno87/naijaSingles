@@ -48,7 +48,7 @@ class GroupService {
       );
 
       final docRef = await _firestore.collection('groups').add(group.toMap());
-      
+
       debugPrint('✅ Group created successfully: ${docRef.id}');
       return docRef.id;
     } catch (e) {
@@ -79,9 +79,8 @@ class GroupService {
       }
 
       final snapshot = await query.get();
-      final groups = snapshot.docs
-          .map((doc) => GroupModel.fromDocument(doc))
-          .toList();
+      final groups =
+          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
 
       debugPrint('✅ Retrieved ${groups.length} public groups');
       return groups;
@@ -104,9 +103,8 @@ class GroupService {
           .orderBy('updatedAt', descending: true)
           .get();
 
-      final groups = snapshot.docs
-          .map((doc) => GroupModel.fromDocument(doc))
-          .toList();
+      final groups =
+          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
 
       debugPrint('✅ Retrieved ${groups.length} user groups');
       return groups;
@@ -129,9 +127,8 @@ class GroupService {
           .orderBy('createdAt', descending: true)
           .get();
 
-      final groups = snapshot.docs
-          .map((doc) => GroupModel.fromDocument(doc))
-          .toList();
+      final groups =
+          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
 
       debugPrint('✅ Retrieved ${groups.length} user created groups');
       return groups;
@@ -149,17 +146,17 @@ class GroupService {
       }
 
       final groupRef = _firestore.collection('groups').doc(groupId);
-      
+
       // Use transaction to ensure atomicity
       await _firestore.runTransaction((transaction) async {
         final groupDoc = await transaction.get(groupRef);
-        
+
         if (!groupDoc.exists) {
           throw Exception('Group not found');
         }
 
         final group = GroupModel.fromDocument(groupDoc);
-        
+
         if (group.isMember(currentUserId!)) {
           throw Exception('User is already a member');
         }
@@ -194,17 +191,17 @@ class GroupService {
       }
 
       final groupRef = _firestore.collection('groups').doc(groupId);
-      
+
       // Use transaction to ensure atomicity
       await _firestore.runTransaction((transaction) async {
         final groupDoc = await transaction.get(groupRef);
-        
+
         if (!groupDoc.exists) {
           throw Exception('Group not found');
         }
 
         final group = GroupModel.fromDocument(groupDoc);
-        
+
         if (!group.isMember(currentUserId!)) {
           throw Exception('User is not a member');
         }
@@ -251,7 +248,7 @@ class GroupService {
   Future<GroupModel?> getGroup(String groupId) async {
     try {
       final doc = await _firestore.collection('groups').doc(groupId).get();
-      
+
       if (!doc.exists) {
         return null;
       }
@@ -271,7 +268,7 @@ class GroupService {
       }
 
       final groupRef = _firestore.collection('groups').doc(groupId);
-      
+
       // Check if user has permission to update
       final group = await getGroup(groupId);
       if (group == null) {
@@ -286,7 +283,7 @@ class GroupService {
       updates['updatedAt'] = Timestamp.fromDate(DateTime.now());
 
       await groupRef.update(updates);
-      
+
       debugPrint('✅ Group updated successfully: $groupId');
       return true;
     } catch (e) {
@@ -312,7 +309,7 @@ class GroupService {
       }
 
       await _firestore.collection('groups').doc(groupId).delete();
-      
+
       debugPrint('✅ Group deleted successfully: $groupId');
       return true;
     } catch (e) {
@@ -338,16 +335,15 @@ class GroupService {
       }
 
       final snapshot = await firestoreQuery.get();
-      final allGroups = snapshot.docs
-          .map((doc) => GroupModel.fromDocument(doc))
-          .toList();
+      final allGroups =
+          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
 
       // Filter by search query (Firestore doesn't support full-text search)
       final filteredGroups = allGroups.where((group) {
         final searchLower = query.toLowerCase();
         return group.name.toLowerCase().contains(searchLower) ||
-               group.description.toLowerCase().contains(searchLower) ||
-               group.tags.any((tag) => tag.toLowerCase().contains(searchLower));
+            group.description.toLowerCase().contains(searchLower) ||
+            group.tags.any((tag) => tag.toLowerCase().contains(searchLower));
       }).toList();
 
       debugPrint('✅ Found ${filteredGroups.length} groups matching "$query"');
@@ -368,9 +364,10 @@ class GroupService {
 
       // Get user details for each member
       final members = <Map<String, dynamic>>[];
-      
+
       for (final memberId in group.memberIds) {
-        final userDoc = await _firestore.collection('users').doc(memberId).get();
+        final userDoc =
+            await _firestore.collection('users').doc(memberId).get();
         if (userDoc.exists) {
           final userData = userDoc.data()!;
           members.add({
@@ -379,7 +376,8 @@ class GroupService {
             'imageUrl': userData['profilePicture'] ?? userData['photos']?[0],
             'isAdmin': group.isAdmin(memberId),
             'isCreator': group.isCreator(memberId),
-            'joinedAt': userData['createdAt'] ?? DateTime.now().toIso8601String(),
+            'joinedAt':
+                userData['createdAt'] ?? DateTime.now().toIso8601String(),
           });
         }
       }

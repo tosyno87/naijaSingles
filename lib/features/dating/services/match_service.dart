@@ -139,10 +139,10 @@ class MatchService {
   ];
 
   /// Get personalized matches based on user preferences
-  /// 
+  ///
   /// [controller] - The onboarding controller containing user preferences
   /// [limit] - Maximum number of matches to return (default: 5)
-  /// 
+  ///
   /// Returns a list of MatchedUser objects sorted by compatibility
   static List<MatchedUser> getPersonalizedMatches(
     OnboardingController controller, {
@@ -216,11 +216,11 @@ class MatchService {
   }
 
   /// Get matches based on specific criteria (for Friendship/Networking tabs)
-  /// 
+  ///
   /// [category] - The category to filter by (nearby, same_tribe, shared_interests)
   /// [controller] - The onboarding controller containing user preferences
   /// [limit] - Maximum number of matches to return (default: 5)
-  /// 
+  ///
   /// Returns a list of MatchedUser objects filtered by the specified category
   static List<MatchedUser> getMatchesByCategory(
     String category,
@@ -342,14 +342,14 @@ class MatchService {
     final totalMatches = _allPotentialMatches.length;
     final tribes = _allPotentialMatches.map((m) => m.tribe).toSet();
     final locations = _allPotentialMatches.map((m) => m.location).toSet();
-    
+
     return {
       'totalMatches': totalMatches,
       'uniqueTribes': tribes.length,
       'uniqueLocations': locations.length,
-      'averageAge': _allPotentialMatches
-          .map((m) => m.age)
-          .reduce((a, b) => a + b) / totalMatches,
+      'averageAge':
+          _allPotentialMatches.map((m) => m.age).reduce((a, b) => a + b) /
+              totalMatches,
     };
   }
 }

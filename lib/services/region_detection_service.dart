@@ -16,12 +16,12 @@ class RegionDetectionService {
   /// Detect if user is in a miles-using country based on location data
   static bool isMilesCountry(Map<String, dynamic>? locationData) {
     if (locationData == null) return false;
-    
+
     try {
       final country = locationData['countryName']?.toString() ?? '';
       final countryCode = locationData['countryCode']?.toString() ?? '';
       final placeName = locationData['PlaceName']?.toString() ?? '';
-      
+
       // Check country name
       for (final milesCountry in _milesCountries) {
         if (country.toLowerCase().contains(milesCountry.toLowerCase()) ||
@@ -30,14 +30,14 @@ class RegionDetectionService {
           return true;
         }
       }
-      
+
       // Check for US state abbreviations in place name
       if (placeName.toLowerCase().contains('usa') ||
           placeName.toLowerCase().contains('united states') ||
           placeName.toLowerCase().contains('america')) {
         return true;
       }
-      
+
       return false;
     } catch (e) {
       log('Error detecting miles country: $e');
@@ -56,10 +56,11 @@ class RegionDetectionService {
   }
 
   /// Format distance with appropriate unit based on region
-  static String formatDistance(double distanceKm, Map<String, dynamic>? locationData) {
+  static String formatDistance(
+      double distanceKm, Map<String, dynamic>? locationData) {
     try {
       final isMiles = isMilesCountry(locationData);
-      
+
       if (isMiles) {
         final miles = kilometersToMiles(distanceKm);
         return '${miles.round()} miles';

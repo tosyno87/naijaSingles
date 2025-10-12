@@ -121,10 +121,12 @@ class _LocationScreenState extends State<LocationScreen> {
         final controller =
             Provider.of<OnboardingController>(context, listen: false);
         controller.setLocationName(location);
-        controller.setLocationCoordinates(position.latitude, position.longitude);
+        controller.setLocationCoordinates(
+            position.latitude, position.longitude);
 
         print('🔍 LocationScreen: GPS location set to "$location"');
-        print('🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}');
+        print(
+            '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}');
       }
     } catch (e) {
       setState(() {

@@ -19,9 +19,9 @@ class ModeSpecificProfileSections extends StatelessWidget {
       children: [
         // Mode-specific header
         _buildModeHeader(),
-        
+
         const SizedBox(height: 16),
-        
+
         // Mode-specific content sections
         ..._buildModeSpecificSections(),
       ],
@@ -30,7 +30,7 @@ class ModeSpecificProfileSections extends StatelessWidget {
 
   Widget _buildModeHeader() {
     final config = _getModeConfig();
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -98,7 +98,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           _buildInfoRow('Lifestyle', _getLifestyle()),
         ],
       ),
-      
       if (_getDealbreakers().isNotEmpty) ...[
         const SizedBox(height: 16),
         _buildSection(
@@ -110,7 +109,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           ],
         ),
       ],
-      
       const SizedBox(height: 16),
       _buildSection(
         title: 'Personality',
@@ -137,7 +135,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           _buildInfoRow('Availability', _getAvailability()),
         ],
       ),
-      
       if (_getHobbies().isNotEmpty) ...[
         const SizedBox(height: 16),
         _buildSection(
@@ -149,7 +146,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           ],
         ),
       ],
-      
       const SizedBox(height: 16),
       _buildSection(
         title: 'Friendship Goals',
@@ -176,7 +172,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           _buildInfoRow('Company', _getCompany()),
         ],
       ),
-      
       if (_getSkills().isNotEmpty) ...[
         const SizedBox(height: 16),
         _buildSection(
@@ -188,7 +183,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           ],
         ),
       ],
-      
       const SizedBox(height: 16),
       _buildSection(
         title: 'Networking Goals',
@@ -197,7 +191,8 @@ class ModeSpecificProfileSections extends StatelessWidget {
         children: [
           _buildInfoRow('Professional Focus', _getProfessionalFocus()),
           _buildInfoRow('Collaboration Style', _getCollaborationStyle()),
-          _buildInfoRow('Networking Availability', _getNetworkingAvailability()),
+          _buildInfoRow(
+              'Networking Availability', _getNetworkingAvailability()),
         ],
       ),
     ];
@@ -248,7 +243,7 @@ class ModeSpecificProfileSections extends StatelessWidget {
 
   Widget _buildInfoRow(String label, String value) {
     if (value.isEmpty) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -281,7 +276,7 @@ class ModeSpecificProfileSections extends StatelessWidget {
 
   Widget _buildTagsList(List<String> tags) {
     if (tags.isEmpty) return const SizedBox.shrink();
-    
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -350,22 +345,28 @@ class ModeSpecificProfileSections extends StatelessWidget {
   String _getCommunicationStyle() => 'Direct'; // This would come from user data
   String _getSocialEnergy() => 'Balanced'; // This would come from user data
   String _getLoveLanguage() => 'Quality Time'; // This would come from user data
-  
-  String _getGroupActivities() => 'Sports, Movies, Dining'; // This would come from user data
+
+  String _getGroupActivities() =>
+      'Sports, Movies, Dining'; // This would come from user data
   String _getSocialStyle() => 'Outgoing'; // This would come from user data
   String _getAvailability() => 'Weekends'; // This would come from user data
   String _getHobbies() => ''; // This would come from user data
-  String _getFriendGroupSize() => 'Small groups (3-5)'; // This would come from user data
+  String _getFriendGroupSize() =>
+      'Small groups (3-5)'; // This would come from user data
   String _getActivityLevel() => 'Moderate'; // This would come from user data
-  String _getMeetingStyle() => 'Casual gatherings'; // This would come from user data
-  
+  String _getMeetingStyle() =>
+      'Casual gatherings'; // This would come from user data
+
   String _getIndustry() => user.job_title ?? 'Not specified';
   String _getCareerLevel() => 'Mid-level'; // This would come from user data
   String _getCompany() => user.company ?? 'Not specified';
   String _getSkills() => ''; // This would come from user data
-  String _getProfessionalFocus() => 'Technology'; // This would come from user data
-  String _getCollaborationStyle() => 'Team player'; // This would come from user data
-  String _getNetworkingAvailability() => 'Business hours'; // This would come from user data
+  String _getProfessionalFocus() =>
+      'Technology'; // This would come from user data
+  String _getCollaborationStyle() =>
+      'Team player'; // This would come from user data
+  String _getNetworkingAvailability() =>
+      'Business hours'; // This would come from user data
 
   List<String> _getDealbreakersList() {
     // This would return actual dealbreakers from user data

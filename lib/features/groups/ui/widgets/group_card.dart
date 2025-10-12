@@ -45,7 +45,7 @@ class GroupCard extends StatelessWidget {
                     // Group Image
                     _buildGroupImage(),
                     const SizedBox(width: 12),
-                    
+
                     // Group Info
                     Expanded(
                       child: Column(
@@ -80,14 +80,14 @@ class GroupCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // Join Button
                     if (showJoinButton) _buildJoinButton(),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Description
                 Text(
                   group.description,
@@ -99,27 +99,27 @@ class GroupCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Footer Row
                 Row(
                   children: [
                     // Cultural Info
                     if (group.culturalInfo != null) _buildCulturalInfo(),
-                    
+
                     const Spacer(),
-                    
+
                     // Member Count
                     _buildMemberCount(),
-                    
+
                     const SizedBox(width: 8),
-                    
+
                     // Location
                     if (group.location != null) _buildLocation(),
                   ],
                 ),
-                
+
                 // Tags
                 if (group.tags.isNotEmpty) ...[
                   const SizedBox(height: 12),

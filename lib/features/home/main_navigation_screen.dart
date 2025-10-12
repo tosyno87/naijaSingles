@@ -23,7 +23,7 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
-  
+
   // Getter to ensure valid index
   int get _validSelectedIndex => _selectedIndex.clamp(0, _pages.length - 1);
   late bool _backgroundTasksRunning;
@@ -36,7 +36,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const ExploreScreen(
         showBackButton: false), // Tab 1: Connect (Dating/Friendship)
     const MessagesScreen(), // Tab 2: Messages
-        const ProfileScreen(), // Tab 3: Profile
+    const ProfileScreen(), // Tab 3: Profile
   ];
 
   // Deep green color for accents
@@ -46,7 +46,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void initState() {
     super.initState();
     _backgroundTasksRunning = widget.backgroundTasksRunning;
-    
+
     // Ensure selected index is within valid range
     _selectedIndex = _selectedIndex.clamp(0, _pages.length - 1);
 
@@ -135,7 +135,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 heroTag: "analysis_fab",
                 mini: true,
                 backgroundColor: Colors.blue.withOpacity(0.8),
-                child: const Icon(Icons.analytics, color: Colors.white, size: 16),
+                child:
+                    const Icon(Icons.analytics, color: Colors.white, size: 16),
                 onPressed: () => _runUserAnalysis(context),
               ),
             ),
@@ -149,7 +150,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           setState(() {
             // Ensure index is within valid range
             _selectedIndex = index.clamp(0, _pages.length - 1);
-            print('🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex');
+            print(
+                '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex');
             print('📱 Pages length: ${_pages.length}');
           });
         },
@@ -164,24 +166,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         unselectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
         ),
-            items: [
-              BottomNavigationBarItem(
-                icon: Custom3DIcons.communities(),
-                label: 'Communities',
-              ),
-              BottomNavigationBarItem(
-                icon: Custom3DIcons.connect(),
-                label: 'Connect',
-              ),
-              BottomNavigationBarItem(
-                icon: Custom3DIcons.messages(),
-                label: 'Messages',
-              ),
-              BottomNavigationBarItem(
-                icon: Custom3DIcons.profile(),
-                label: 'Profile',
-              ),
-            ],
+        items: [
+          BottomNavigationBarItem(
+            icon: Custom3DIcons.communities(),
+            label: 'Communities',
+          ),
+          BottomNavigationBarItem(
+            icon: Custom3DIcons.connect(),
+            label: 'Connect',
+          ),
+          BottomNavigationBarItem(
+            icon: Custom3DIcons.messages(),
+            label: 'Messages',
+          ),
+          BottomNavigationBarItem(
+            icon: Custom3DIcons.profile(),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
@@ -210,7 +212,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('Analysis complete! Check console for results.')),
+                        content: Text(
+                            'Analysis complete! Check console for results.')),
                   );
                 }
               },
@@ -224,7 +227,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('Cleanup complete! Check console for results.')),
+                        content: Text(
+                            'Cleanup complete! Check console for results.')),
                   );
                 }
               },

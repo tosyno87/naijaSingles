@@ -36,13 +36,10 @@ class _DateTimeStepState extends State<DateTimeStep> {
             ),
           ),
           const SizedBox(height: 32),
-          
           _buildStartDateTimeSection(),
           const SizedBox(height: 32),
-          
           _buildEndDateTimeSection(),
           const SizedBox(height: 32),
-          
           _buildDurationInfo(),
           const SizedBox(height: 40),
         ],
@@ -74,7 +71,6 @@ class _DateTimeStepState extends State<DateTimeStep> {
           ),
         ),
         const SizedBox(height: 16),
-        
         Row(
           children: [
             Expanded(
@@ -86,7 +82,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
                   setState(() {
                     if (widget.eventData.startDate != null) {
                       // Preserve the time when changing date
-                      final time = TimeOfDay.fromDateTime(widget.eventData.startDate!);
+                      final time =
+                          TimeOfDay.fromDateTime(widget.eventData.startDate!);
                       widget.eventData.startDate = DateTime(
                         date.year,
                         date.month,
@@ -97,11 +94,13 @@ class _DateTimeStepState extends State<DateTimeStep> {
                     } else {
                       widget.eventData.startDate = date;
                     }
-                    
+
                     // Adjust end date if it's before start date
                     if (widget.eventData.endDate != null &&
-                        widget.eventData.endDate!.isBefore(widget.eventData.startDate!)) {
-                      widget.eventData.endDate = widget.eventData.startDate!.add(
+                        widget.eventData.endDate!
+                            .isBefore(widget.eventData.startDate!)) {
+                      widget.eventData.endDate =
+                          widget.eventData.startDate!.add(
                         const Duration(hours: 2),
                       );
                     }
@@ -127,11 +126,13 @@ class _DateTimeStepState extends State<DateTimeStep> {
                       time.hour,
                       time.minute,
                     );
-                    
+
                     // Adjust end date if it's before start date
                     if (widget.eventData.endDate != null &&
-                        widget.eventData.endDate!.isBefore(widget.eventData.startDate!)) {
-                      widget.eventData.endDate = widget.eventData.startDate!.add(
+                        widget.eventData.endDate!
+                            .isBefore(widget.eventData.startDate!)) {
+                      widget.eventData.endDate =
+                          widget.eventData.startDate!.add(
                         const Duration(hours: 2),
                       );
                     }
@@ -158,7 +159,6 @@ class _DateTimeStepState extends State<DateTimeStep> {
           ),
         ),
         const SizedBox(height: 16),
-        
         Row(
           children: [
             Expanded(
@@ -170,7 +170,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
                   setState(() {
                     if (widget.eventData.endDate != null) {
                       // Preserve the time when changing date
-                      final time = TimeOfDay.fromDateTime(widget.eventData.endDate!);
+                      final time =
+                          TimeOfDay.fromDateTime(widget.eventData.endDate!);
                       widget.eventData.endDate = DateTime(
                         date.year,
                         date.month,
@@ -195,8 +196,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
                     : null,
                 onTimeSelected: (time) {
                   setState(() {
-                    final selectedDate = widget.eventData.endDate ?? 
-                        widget.eventData.startDate ?? 
+                    final selectedDate = widget.eventData.endDate ??
+                        widget.eventData.startDate ??
                         DateTime.now();
                     widget.eventData.endDate = DateTime(
                       selectedDate.year,
@@ -234,7 +235,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: () => _selectDate(context, selectedDate, onDateSelected, minDate),
+          onTap: () =>
+              _selectDate(context, selectedDate, onDateSelected, minDate),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -242,7 +244,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
               color: const Color(0xFFFFF6E5), // NaijaSingles cream background
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
@@ -263,7 +266,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
                       fontSize: 16,
                       color: selectedDate != null
                           ? const Color(0xFF333333)
-                          : const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+                          : const Color(0xFF008037)
+                              .withOpacity(0.7), // NaijaSingles green hint
                     ),
                   ),
                 ),
@@ -301,7 +305,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
               color: const Color(0xFFFFF6E5), // NaijaSingles cream background
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
@@ -322,7 +327,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
                       fontSize: 16,
                       color: selectedTime != null
                           ? const Color(0xFF333333)
-                          : const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+                          : const Color(0xFF008037)
+                              .withOpacity(0.7), // NaijaSingles green hint
                     ),
                   ),
                 ),
@@ -335,11 +341,13 @@ class _DateTimeStepState extends State<DateTimeStep> {
   }
 
   Widget _buildDurationInfo() {
-    if (widget.eventData.startDate == null || widget.eventData.endDate == null) {
+    if (widget.eventData.startDate == null ||
+        widget.eventData.endDate == null) {
       return const SizedBox.shrink();
     }
 
-    final duration = widget.eventData.endDate!.difference(widget.eventData.startDate!);
+    final duration =
+        widget.eventData.endDate!.difference(widget.eventData.startDate!);
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
 

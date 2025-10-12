@@ -39,13 +39,9 @@ class _MediaStepState extends State<MediaStep> {
             ),
           ),
           const SizedBox(height: 32),
-          
           _buildImageUploadSection(),
           const SizedBox(height: 32),
-          
-          if (widget.eventData.imageUrls.isNotEmpty)
-            _buildImagePreview(),
-          
+          if (widget.eventData.imageUrls.isNotEmpty) _buildImagePreview(),
           const SizedBox(height: 40),
         ],
       ),
@@ -104,7 +100,7 @@ class _MediaStepState extends State<MediaStep> {
           ElevatedButton(
             onPressed: _isProcessingImage ? null : _selectImages,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isProcessingImage 
+              backgroundColor: _isProcessingImage
                   ? const Color(0xFF008037).withOpacity(0.6)
                   : const Color(0xFF008037),
               foregroundColor: Colors.white,
@@ -122,7 +118,8 @@ class _MediaStepState extends State<MediaStep> {
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -177,12 +174,12 @@ class _MediaStepState extends State<MediaStep> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Card preview showing how image will be cropped
         _buildCardPreview(),
-        
+
         const SizedBox(height: 24),
-        
+
         // Grid of selected images
         Text(
           'Selected Photos (${widget.eventData.imageUrls.length})',
@@ -200,7 +197,8 @@ class _MediaStepState extends State<MediaStep> {
             crossAxisCount: 3,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
-            childAspectRatio: 1.2, // Slightly rectangular to better show landscape images
+            childAspectRatio:
+                1.2, // Slightly rectangular to better show landscape images
           ),
           itemCount: widget.eventData.imageUrls.length,
           itemBuilder: (context, index) {
@@ -213,7 +211,7 @@ class _MediaStepState extends State<MediaStep> {
 
   Widget _buildCardPreview() {
     if (widget.eventData.imageUrls.isEmpty) return const SizedBox.shrink();
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -267,13 +265,14 @@ class _MediaStepState extends State<MediaStep> {
                     },
                   ),
                 ),
-                
+
                 // Preview overlay
                 Positioned(
                   top: 12,
                   left: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: const Color(0xFF008037),
                       borderRadius: BorderRadius.circular(12),
@@ -288,13 +287,14 @@ class _MediaStepState extends State<MediaStep> {
                     ),
                   ),
                 ),
-                
+
                 // Crop indicator
                 Positioned(
                   bottom: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(12),
@@ -322,7 +322,7 @@ class _MediaStepState extends State<MediaStep> {
               ],
             ),
           ),
-          
+
           // Sample event details
           Padding(
             padding: const EdgeInsets.all(16),
@@ -330,7 +330,9 @@ class _MediaStepState extends State<MediaStep> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.eventData.name.isNotEmpty ? widget.eventData.name : 'Your Event Name',
+                  widget.eventData.name.isNotEmpty
+                      ? widget.eventData.name
+                      : 'Your Event Name',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -412,7 +414,7 @@ class _MediaStepState extends State<MediaStep> {
                     ),
             ),
           ),
-          
+
           // Action buttons overlay
           Positioned(
             top: 4,
@@ -427,7 +429,7 @@ class _MediaStepState extends State<MediaStep> {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: _isProcessingImage 
+                      color: _isProcessingImage
                           ? const Color(0xFF008037).withOpacity(0.6)
                           : const Color(0xFF008037),
                       borderRadius: BorderRadius.circular(12),
@@ -460,7 +462,7 @@ class _MediaStepState extends State<MediaStep> {
               ],
             ),
           ),
-          
+
           // Primary image indicator
           if (index == 0)
             Positioned(
@@ -496,7 +498,8 @@ class _MediaStepState extends State<MediaStep> {
     try {
       final imagePath = widget.eventData.imageUrls[index];
       if (imagePath.startsWith('http')) {
-        _showErrorSnackBar('Cannot crop uploaded images. Please select a new image.');
+        _showErrorSnackBar(
+            'Cannot crop uploaded images. Please select a new image.');
         return;
       }
 
@@ -601,7 +604,8 @@ class _MediaStepState extends State<MediaStep> {
 
       // Check if already at maximum limit
       if (widget.eventData.imageUrls.length >= 10) {
-        _showErrorSnackBar('Maximum 10 photos allowed. Please remove some photos first.');
+        _showErrorSnackBar(
+            'Maximum 10 photos allowed. Please remove some photos first.');
         return;
       }
 
@@ -658,7 +662,8 @@ class _MediaStepState extends State<MediaStep> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Color(0xFF008037)),
+              leading:
+                  const Icon(Icons.photo_library, color: Color(0xFF008037)),
               title: Text('Gallery', style: GoogleFonts.montserrat()),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
@@ -794,7 +799,7 @@ class _MediaStepState extends State<MediaStep> {
 
     final extension = filePath.toLowerCase().split('.').last;
     final supportedExtensions = ['jpg', 'jpeg', 'png'];
-    
+
     if (!supportedExtensions.contains(extension)) {
       return false;
     }
@@ -802,7 +807,7 @@ class _MediaStepState extends State<MediaStep> {
     // Check file size (max 10MB)
     final fileSize = file.lengthSync();
     const maxSize = 10 * 1024 * 1024; // 10MB
-    
+
     if (fileSize > maxSize) {
       _showErrorSnackBar('Image file is too large. Maximum size is 10MB.');
       return false;
@@ -810,5 +815,4 @@ class _MediaStepState extends State<MediaStep> {
 
     return true;
   }
-
 }

@@ -4,28 +4,29 @@ import 'package:flutter/foundation.dart';
 import 'package:naijasingles/services/performance_monitor.dart';
 
 /// Undo service that allows users to reverse their last PASS action only
-/// 
+///
 /// IMPORTANT: Following proper dating app business logic:
 /// ✅ LEFT SWIPES (passes) can be undone - prevents accidental rejections
 /// ❌ RIGHT SWIPES (likes) cannot be undone - maintains commitment and trust
 /// ❌ SUPER LIKES cannot be undone - premium actions should be final
-/// 
+///
 /// LIMITS (like Tinder/Bumble):
 /// 🆓 Free users: 1 undo per day
 /// 💎 Premium users: 5 undos per day
 /// ⏰ Must undo within 10 seconds of the pass
-/// 
+///
 /// This prevents users from:
 /// - Taking back likes after seeing if someone likes them back
 /// - Breaking established matches by undoing likes
 /// - Gaming the system with unlimited undos
 /// - Overusing the undo feature (scarcity creates value)
-/// 
+///
 /// Implements Priority 3: User Experience Enhancements
 class UndoService {
   static const Duration UNDO_WINDOW = Duration(seconds: 10);
   static const int MAX_UNDO_HISTORY = 3; // Keep last 3 swipes for undo
-  static const int DAILY_UNDO_LIMIT = 1; // Free users get 1 undo per day (like Tinder)
+  static const int DAILY_UNDO_LIMIT =
+      1; // Free users get 1 undo per day (like Tinder)
   static const int PREMIUM_UNDO_LIMIT = 5; // Premium users get 5 undos per day
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -99,14 +100,16 @@ class UndoService {
       // ✅ ONLY allow undoing LEFT swipes (passes)
       // This follows proper dating app logic - likes should be permanent
       if (lastSwipe.direction != SwipeDirection.left) {
-        debugPrint('⚠️ Cannot undo ${lastSwipe.direction.name} swipe - only passes can be undone');
+        debugPrint(
+            '⚠️ Cannot undo ${lastSwipe.direction.name} swipe - only passes can be undone');
         return false;
       }
 
       // Check if within undo window
       final timeSinceSwipe = DateTime.now().difference(lastSwipe.timestamp);
       if (timeSinceSwipe > UNDO_WINDOW) {
-        debugPrint('⚠️ Undo window expired for user $userId (${timeSinceSwipe.inSeconds}s > ${UNDO_WINDOW.inSeconds}s)');
+        debugPrint(
+            '⚠️ Undo window expired for user $userId (${timeSinceSwipe.inSeconds}s > ${UNDO_WINDOW.inSeconds}s)');
         return false;
       }
 
@@ -128,7 +131,8 @@ class UndoService {
         return false;
       }
 
-      debugPrint('✅ User $userId can undo last pass (${timeSinceSwipe.inSeconds}s ago)');
+      debugPrint(
+          '✅ User $userId can undo last pass (${timeSinceSwipe.inSeconds}s ago)');
       return true;
     } catch (e) {
       debugPrint('❌ Error checking undo availability: $e');
@@ -175,13 +179,13 @@ class UndoService {
           final undoCount = await getDailyUndoCount(userId);
           final isPremiun = await _isPremiuUser(userId);
           final limit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
-          
+
           if (undoCount >= limit) {
             final limitText = isPremiun ? "premium daily limit" : "daily limit";
             return UndoResult.failed(
                 'You\'ve used your $limitText ($undoCount/$limit undos). Try again tomorrow!');
           }
-          
+
           return UndoResult.failed(
               'Cannot undo: only passes can be undone within ${UNDO_WINDOW.inSeconds} seconds');
         }
@@ -193,7 +197,8 @@ class UndoService {
 
         // Double-check it's a left swipe (pass)
         if (lastSwipe.direction != SwipeDirection.left) {
-          return UndoResult.failed('Can only undo passes, not likes or super likes');
+          return UndoResult.failed(
+              'Can only undo passes, not likes or super likes');
         }
 
         // Perform the undo operation
@@ -234,7 +239,8 @@ class UndoService {
         await _undoLeftSwipe(swipeAction, batch);
       } else {
         // This should never happen due to our checks above
-        debugPrint('❌ Attempted to undo non-pass swipe: ${swipeAction.direction}');
+        debugPrint(
+            '❌ Attempted to undo non-pass swipe: ${swipeAction.direction}');
         return false;
       }
 

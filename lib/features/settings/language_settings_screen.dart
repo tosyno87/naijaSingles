@@ -79,7 +79,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final savedLanguage = prefs.getString('selected_language') ?? 'en';
-      
+
       setState(() {
         _selectedLanguage = savedLanguage;
         _isLoading = false;
@@ -111,7 +111,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
 
       // Show success message
       if (mounted) {
-        final language = _languages.firstWhere((lang) => lang['code'] == languageCode);
+        final language =
+            _languages.firstWhere((lang) => lang['code'] == languageCode);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -130,11 +131,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       // Note: In a full implementation, you would trigger app-wide language change here
       // For now, we'll show a restart dialog
       _showRestartDialog();
-
     } catch (e) {
       log('Error changing language: $e');
       setState(() => _isSaving = false);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -286,15 +286,15 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   // Header Section
                   _buildHeaderSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Available Languages
                   _buildAvailableLanguagesSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Coming Soon Languages
                   _buildComingSoonLanguagesSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Language Info
                   _buildLanguageInfoSection(),
                 ],
@@ -380,8 +380,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   }
 
   Widget _buildAvailableLanguagesSection() {
-    final availableLanguages = _languages.where((lang) => lang['isAvailable'] == true).toList();
-    
+    final availableLanguages =
+        _languages.where((lang) => lang['isAvailable'] == true).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -394,16 +395,19 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ...availableLanguages.map((language) => _buildLanguageCard(language, true)).toList(),
+        ...availableLanguages
+            .map((language) => _buildLanguageCard(language, true))
+            .toList(),
       ],
     );
   }
 
   Widget _buildComingSoonLanguagesSection() {
-    final comingSoonLanguages = _languages.where((lang) => lang['isAvailable'] == false).toList();
-    
+    final comingSoonLanguages =
+        _languages.where((lang) => lang['isAvailable'] == false).toList();
+
     if (comingSoonLanguages.isEmpty) return const SizedBox.shrink();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -416,14 +420,16 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ...comingSoonLanguages.map((language) => _buildLanguageCard(language, false)).toList(),
+        ...comingSoonLanguages
+            .map((language) => _buildLanguageCard(language, false))
+            .toList(),
       ],
     );
   }
 
   Widget _buildLanguageCard(Map<String, dynamic> language, bool isAvailable) {
     final isSelected = _selectedLanguage == language['code'];
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -455,7 +461,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isAvailable ? Colors.transparent : Colors.grey.shade100,
+                    color:
+                        isAvailable ? Colors.transparent : Colors.grey.shade100,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -469,7 +476,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                
+
                 // Language Info
                 Expanded(
                   child: Column(
@@ -494,7 +501,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       if (!isAvailable) ...[
                         const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -512,7 +520,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                     ],
                   ),
                 ),
-                
+
                 // Selection Indicator
                 if (isAvailable) ...[
                   if (_isSaving && isSelected)
@@ -543,7 +551,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300, width: 2),
+                        border:
+                            Border.all(color: Colors.grey.shade300, width: 2),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -582,9 +591,12 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildInfoItem('🇳🇬 Nigerian languages are prioritized for local users'),
-          _buildInfoItem('🔄 App restart may be required for full language change'),
-          _buildInfoItem('📱 More languages will be added based on user demand'),
+          _buildInfoItem(
+              '🇳🇬 Nigerian languages are prioritized for local users'),
+          _buildInfoItem(
+              '🔄 App restart may be required for full language change'),
+          _buildInfoItem(
+              '📱 More languages will be added based on user demand'),
           _buildInfoItem('🌍 Help us translate by sending feedback'),
         ],
       ),

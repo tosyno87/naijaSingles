@@ -72,7 +72,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
         Provider.of<OnboardingController>(context, listen: false);
     await controller.pickProfilePhoto(source, index);
 
-
     setState(() {});
   }
 
@@ -140,7 +139,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       ),
     );
   }
-
 
   void _showImageSourceDialog(int index) {
     final guidance = photoGuidance[index]!;
@@ -298,7 +296,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                 fit: BoxFit.contain,
               ),
             ),
-          
+
           // Container for empty state and borders
           Container(
             width: double.infinity,
@@ -359,7 +357,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               child: PhotoTypeIndicator(type: guidance.type),
             ),
 
-
           // Remove button if photo exists
           if (photo != null)
             Positioned(
@@ -388,7 +385,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       ),
     );
   }
-
 
   IconData _getPhotoTypeIcon(PhotoType type) {
     switch (type) {
@@ -688,13 +684,16 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
             margin: const EdgeInsets.only(bottom: 24),
             child: ElevatedButton.icon(
               onPressed: () async {
-                final controller = Provider.of<OnboardingController>(context, listen: false);
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
                 await controller.pickMultiplePhotos(context);
                 setState(() {});
               },
               icon: Icon(Icons.photo_library, color: Colors.white),
               label: Text(
-                uploadedCount == 0 ? 'Select Multiple Photos' : 'Add More Photos',
+                uploadedCount == 0
+                    ? 'Select Multiple Photos'
+                    : 'Add More Photos',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

@@ -17,17 +17,19 @@ class ModernNotificationSettings extends StatefulWidget {
   const ModernNotificationSettings({Key? key}) : super(key: key);
 
   @override
-  State<ModernNotificationSettings> createState() => _ModernNotificationSettingsState();
+  State<ModernNotificationSettings> createState() =>
+      _ModernNotificationSettingsState();
 }
 
 class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService = IndustryNotificationService();
-  
+  final IndustryNotificationService _notificationService =
+      IndustryNotificationService();
+
   NotificationSettings? _settings;
   bool _isLoading = true;
   bool _isSaving = false;
-  
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -51,30 +53,30 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
 
   Future<void> _loadSettings() async {
     setState(() => _isLoading = true);
-    
+
     // Simulate loading settings
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     setState(() {
       _settings = NotificationSettings.defaultSettings();
       _isLoading = false;
     });
-    
+
     _animationController.forward();
   }
 
   Future<void> _updateSetting(NotificationSettings newSettings) async {
     setState(() => _isSaving = true);
-    
+
     try {
       await _notificationService.updateSettings(newSettings);
       setState(() {
         _settings = newSettings;
       });
-      
+
       // Haptic feedback
       HapticFeedback.lightImpact();
-      
+
       _showSnackBar('Settings updated', isError: false);
     } catch (e) {
       _showSnackBar('Failed to update settings', isError: true);
@@ -124,7 +126,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
               ),
             ),
           ),
@@ -167,33 +170,23 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           children: [
             _buildHeaderCard(),
             const SizedBox(height: 24),
-            
             _buildSectionTitle('Push Notifications'),
             const SizedBox(height: 16),
             _buildNotificationToggles(),
-            
             const SizedBox(height: 32),
-            
             _buildSectionTitle('Sound & Vibration'),
             const SizedBox(height: 16),
             _buildSoundVibrationToggles(),
-            
             const SizedBox(height: 32),
-            
             _buildSectionTitle('Quiet Hours'),
             const SizedBox(height: 16),
             _buildQuietHoursSection(),
-            
             const SizedBox(height: 32),
-            
             _buildSectionTitle('Notification Frequency'),
             const SizedBox(height: 16),
             _buildFrequencySection(),
-            
             const SizedBox(height: 32),
-            
             _buildTestNotificationSection(),
-            
             const SizedBox(height: 32),
           ],
         ),
@@ -283,28 +276,32 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           subtitle: 'Get notified when you have a new match',
           icon: Icons.favorite,
           value: _settings!.matchNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(matchNotifications: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(matchNotifications: value)),
         ),
         _buildSettingTile(
           title: 'New Messages',
           subtitle: 'Get notified when someone sends you a message',
           icon: Icons.chat_bubble_outline,
           value: _settings!.messageNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(messageNotifications: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(messageNotifications: value)),
         ),
         _buildSettingTile(
           title: 'Profile Likes',
           subtitle: 'Get notified when someone likes your profile',
           icon: Icons.thumb_up,
           value: _settings!.likeNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(likeNotifications: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(likeNotifications: value)),
         ),
         _buildSettingTile(
           title: 'Super Likes',
           subtitle: 'Get notified when someone super likes you',
           icon: Icons.star,
           value: _settings!.superLikeNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(superLikeNotifications: value)),
+          onChanged: (value) => _updateSetting(
+              _settings!.copyWith(superLikeNotifications: value)),
         ),
       ],
     );
@@ -318,14 +315,16 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           subtitle: 'Play sound for notifications',
           icon: Icons.volume_up,
           value: _settings!.soundEnabled,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(soundEnabled: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(soundEnabled: value)),
         ),
         _buildSettingTile(
           title: 'Vibration',
           subtitle: 'Vibrate for notifications',
           icon: Icons.vibration,
           value: _settings!.vibrationEnabled,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
         ),
       ],
     );
@@ -339,9 +338,9 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           subtitle: 'Pause notifications during specified hours',
           icon: Icons.bedtime,
           value: _settings!.quietHoursEnabled,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
         ),
-        
         if (_settings!.quietHoursEnabled) ...[
           const SizedBox(height: 16),
           _buildTimeSetting(
@@ -405,7 +404,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildFrequencyOption('Medium', 'Balanced notifications'),
+                child:
+                    _buildFrequencyOption('Medium', 'Balanced notifications'),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -648,7 +648,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   }
 
   Future<void> _showTimePicker(bool isStartTime) async {
-    final currentTime = _parseTime(isStartTime ? _settings!.quietHoursStart : _settings!.quietHoursEnd);
+    final currentTime = _parseTime(
+        isStartTime ? _settings!.quietHoursStart : _settings!.quietHoursEnd);
 
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -673,7 +674,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       final newSettings = isStartTime
           ? _settings!.copyWith(quietHoursStart: timeString)
           : _settings!.copyWith(quietHoursEnd: timeString);
-      
+
       _updateSetting(newSettings);
     }
   }

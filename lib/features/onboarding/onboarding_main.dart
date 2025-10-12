@@ -46,7 +46,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
     // Debug: Print current controller state
     debugPrint('🔍 OnboardingMain: Current page: $_currentPage');
-    debugPrint('🔍 OnboardingMain: Controller instance: ${controller.hashCode}');
+    debugPrint(
+        '🔍 OnboardingMain: Controller instance: ${controller.hashCode}');
     debugPrint('🔍 OnboardingMain: Controller state:');
     debugPrint(
         '   Name: "${controller.fullName}" (length: ${controller.fullName.length})');
@@ -56,7 +57,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
     debugPrint('   Location: "${controller.locationName ?? 'Not set'}"');
     debugPrint(
         '   Tribe: "${controller.tribe}" (length: ${controller.tribe.length})');
-    debugPrint('   Bio: "${controller.bio}" (length: ${controller.bio.length})');
+    debugPrint(
+        '   Bio: "${controller.bio}" (length: ${controller.bio.length})');
     debugPrint('   Interests: ${controller.interests}');
     debugPrint(
         '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5');
@@ -381,7 +383,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                           '🔍 Continue labelLarge state for page $_currentPage:');
                       debugPrint('   canContinue: $canContinue');
                       if (_currentPage == 5) {
-                        debugPrint('   interestedIn: "${controller.interestedIn}"');
+                        debugPrint(
+                            '   interestedIn: "${controller.interestedIn}"');
                         debugPrint('   ageRange: ${controller.ageRange}');
                       } else if (_currentPage == 6) {
                         debugPrint('   height: ${controller.height}');

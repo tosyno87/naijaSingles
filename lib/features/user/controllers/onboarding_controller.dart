@@ -46,7 +46,7 @@ class OnboardingController extends ChangeNotifier {
   String _lookingFor = 'Dating'; // Dating, Friendship, Networking
   String _relationshipIntent =
       'Not sure yet'; // Short-term, Long-term, Casual, Not sure yet
-  
+
   // Location coordinates - CRITICAL FOR DISCOVERY
   double? _latitude;
   double? _longitude;
@@ -63,7 +63,7 @@ class OnboardingController extends ChangeNotifier {
   String get bio => _bio;
   List<String> get interests => _interests;
   List<File?> get profilePhotos => _profilePhotos;
-  
+
   // Location getters - CRITICAL FOR DISCOVERY
   double? get latitude => _latitude;
   double? get longitude => _longitude;
@@ -328,7 +328,7 @@ class OnboardingController extends ChangeNotifier {
     _smokingPreference = preference;
     notifyListeners();
   }
-  
+
   // Location setters - CRITICAL FOR DISCOVERY
   void setLocationCoordinates(double latitude, double longitude) {
     _latitude = latitude;
@@ -374,7 +374,7 @@ class OnboardingController extends ChangeNotifier {
       // Determine crop type based on photo index
       CropType cropType;
       String title;
-      
+
       switch (index) {
         case 0:
           cropType = CropType.square; // Main photo - square crop
@@ -402,7 +402,8 @@ class OnboardingController extends ChangeNotifier {
       }
 
       // Pick and crop image with industry-standard settings
-      final File? croppedImage = await ProfileImageCropperService.pickAndCropImage(
+      final File? croppedImage =
+          await ProfileImageCropperService.pickAndCropImage(
         source: source,
         cropType: cropType,
         title: title,
@@ -422,7 +423,8 @@ class OnboardingController extends ChangeNotifier {
   Future<void> pickMultiplePhotos(BuildContext context) async {
     try {
       // Pick multiple photos at once
-      final List<File> selectedPhotos = await BulkPhotoPickerService.pickMultiplePhotos(
+      final List<File> selectedPhotos =
+          await BulkPhotoPickerService.pickMultiplePhotos(
         context: context,
         maxPhotos: 5,
       );
@@ -430,13 +432,16 @@ class OnboardingController extends ChangeNotifier {
       if (selectedPhotos.isEmpty) return;
 
       // Crop each photo individually
-      final List<File> croppedPhotos = await BulkPhotoPickerService.cropSelectedPhotos(
+      final List<File> croppedPhotos =
+          await BulkPhotoPickerService.cropSelectedPhotos(
         selectedPhotos: selectedPhotos,
         context: context,
       );
 
       // Add cropped photos to profile photos
-      for (int i = 0; i < croppedPhotos.length && i < _profilePhotos.length; i++) {
+      for (int i = 0;
+          i < croppedPhotos.length && i < _profilePhotos.length;
+          i++) {
         _profilePhotos[i] = croppedPhotos[i];
       }
 
@@ -593,7 +598,7 @@ class OnboardingController extends ChangeNotifier {
       'dealbreakers': _dealbreakers,
       'drinkingPreference': _drinkingPreference,
       'smokingPreference': _smokingPreference,
-      
+
       // Cultural fields for database consistency
       'tribe': _tribe,
       'nationality': _nationality,
@@ -630,7 +635,7 @@ class OnboardingController extends ChangeNotifier {
         'min': _ageRange[0].toString(),
         'max': _ageRange[1].toString(),
       },
-      
+
       // Additional discovery fields - CRITICAL FOR USER DISCOVERY
       'userGender': _gender, // Required for gender filtering
       'age_range': {
@@ -662,7 +667,8 @@ class OnboardingController extends ChangeNotifier {
     print('   Age: $age');
     print('   Gender: $_gender');
     print('   Location: ${_locationName ?? 'Not set'}');
-    print('   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}');
+    print(
+        '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}');
     print('   Tribe: $_tribe');
     print('   Bio: ${_bio.length} characters');
     print('   Interests: ${_interests.length} items - $_interests');
@@ -824,7 +830,7 @@ class OnboardingController extends ChangeNotifier {
       missingFields.add('Location');
       isValid = false;
     }
-    
+
     // Location coordinates validation - CRITICAL FOR DISCOVERY
     if (_latitude == null || _longitude == null) {
       missingFields.add('Location Coordinates');

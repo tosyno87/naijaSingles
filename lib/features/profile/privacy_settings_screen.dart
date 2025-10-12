@@ -327,7 +327,6 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             }),
           ),
           _buildDivider(),
-
         ],
       ),
     );
@@ -411,7 +410,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: isDestructive ? Colors.red.shade600 : AppColors.primaryGreen,
+            activeColor:
+                isDestructive ? Colors.red.shade600 : AppColors.primaryGreen,
           ),
         ],
       ),
@@ -433,7 +433,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       decoration: BoxDecoration(
         color: AppColors.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+        border:
+            Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

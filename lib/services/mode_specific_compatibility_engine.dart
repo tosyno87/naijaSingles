@@ -5,14 +5,10 @@ import 'package:naijasingles/services/compatibility_engine.dart';
 /// Mode-specific compatibility engine that calculates different scores based on relationship intent
 /// Implements Priority 2: Enhanced Matching Algorithm with mode differentiation
 class ModeSpecificCompatibilityEngine {
-  
   /// Calculate compatibility score based on the selected mode
   /// Returns a score between 0.0 (no compatibility) and 1.0 (perfect match)
   static double calculateModeCompatibility(
-    UserModel user1, 
-    UserModel user2, 
-    String mode
-  ) {
+      UserModel user1, UserModel user2, String mode) {
     try {
       switch (mode) {
         case 'Dating':
@@ -32,7 +28,8 @@ class ModeSpecificCompatibilityEngine {
 
   /// Calculate dating-specific compatibility
   /// Focuses on romantic compatibility factors
-  static double _calculateDatingCompatibility(UserModel user1, UserModel user2) {
+  static double _calculateDatingCompatibility(
+      UserModel user1, UserModel user2) {
     double totalScore = 0.0;
 
     // Age compatibility (30% - more important for dating)
@@ -67,7 +64,8 @@ class ModeSpecificCompatibilityEngine {
 
   /// Calculate friendship-specific compatibility
   /// Focuses on social compatibility factors
-  static double _calculateFriendshipCompatibility(UserModel user1, UserModel user2) {
+  static double _calculateFriendshipCompatibility(
+      UserModel user1, UserModel user2) {
     double totalScore = 0.0;
 
     // Social activity alignment (35% - most important for friendship)
@@ -102,7 +100,8 @@ class ModeSpecificCompatibilityEngine {
 
   /// Calculate networking-specific compatibility
   /// Focuses on professional compatibility factors
-  static double _calculateNetworkingCompatibility(UserModel user1, UserModel user2) {
+  static double _calculateNetworkingCompatibility(
+      UserModel user1, UserModel user2) {
     double totalScore = 0.0;
 
     // Professional alignment (40% - most important for networking)
@@ -135,8 +134,10 @@ class ModeSpecificCompatibilityEngine {
 
   static double _calculateLocationScore(UserModel user1, UserModel user2) {
     try {
-      if (user1.coordinates == null || user2.coordinates == null ||
-          user1.coordinates!.isEmpty || user2.coordinates!.isEmpty) {
+      if (user1.coordinates == null ||
+          user2.coordinates == null ||
+          user1.coordinates!.isEmpty ||
+          user2.coordinates!.isEmpty) {
         return 0.5; // Neutral score if location data is missing
       }
 
@@ -150,7 +151,8 @@ class ModeSpecificCompatibilityEngine {
       }
 
       // Calculate distance (simplified - you might want to use a proper distance calculation)
-      final distance = ((lat1 - lat2).abs() + (lng1 - lng2).abs()) * 111; // Rough km conversion
+      final distance = ((lat1 - lat2).abs() + (lng1 - lng2).abs()) *
+          111; // Rough km conversion
 
       if (distance <= 5.0) {
         return 1.0; // Perfect score for very close users
@@ -165,7 +167,8 @@ class ModeSpecificCompatibilityEngine {
     }
   }
 
-  static double _calculateLifestyleCompatibility(UserModel user1, UserModel user2) {
+  static double _calculateLifestyleCompatibility(
+      UserModel user1, UserModel user2) {
     try {
       // This would compare lifestyle factors like:
       // - Drinking habits
@@ -173,7 +176,7 @@ class ModeSpecificCompatibilityEngine {
       // - Fitness level
       // - Sleep schedule
       // - Social preferences
-      
+
       // For now, return a neutral score
       // In a real implementation, you'd compare these fields from user profiles
       return 0.7; // Default good compatibility
@@ -183,14 +186,15 @@ class ModeSpecificCompatibilityEngine {
     }
   }
 
-  static double _calculateSocialCompatibility(UserModel user1, UserModel user2) {
+  static double _calculateSocialCompatibility(
+      UserModel user1, UserModel user2) {
     try {
       // This would compare social factors like:
       // - Group activity preferences
       // - Social energy level
       // - Meeting style preferences
       // - Friend group size preferences
-      
+
       // For now, return a neutral score
       return 0.7; // Default good compatibility
     } catch (e) {
@@ -199,14 +203,15 @@ class ModeSpecificCompatibilityEngine {
     }
   }
 
-  static double _calculateProfessionalCompatibility(UserModel user1, UserModel user2) {
+  static double _calculateProfessionalCompatibility(
+      UserModel user1, UserModel user2) {
     try {
       // This would compare professional factors like:
       // - Career level compatibility
       // - Professional goals alignment
       // - Collaboration style
       // - Networking preferences
-      
+
       // For now, return a neutral score
       return 0.7; // Default good compatibility
     } catch (e) {
@@ -215,29 +220,56 @@ class ModeSpecificCompatibilityEngine {
     }
   }
 
-  static double _calculateIndustryCompatibility(UserModel user1, UserModel user2) {
+  static double _calculateIndustryCompatibility(
+      UserModel user1, UserModel user2) {
     try {
       // Compare job titles and industries
       final job1 = user1.job_title?.toLowerCase() ?? '';
       final job2 = user2.job_title?.toLowerCase() ?? '';
-      
+
       if (job1.isEmpty || job2.isEmpty) {
         return 0.5; // Neutral if no job info
       }
 
       // Simple keyword matching for now
-      final techKeywords = ['engineer', 'developer', 'programmer', 'tech', 'software', 'it'];
-      final businessKeywords = ['manager', 'director', 'executive', 'business', 'sales', 'marketing'];
-      final creativeKeywords = ['designer', 'artist', 'creative', 'writer', 'photographer'];
+      final techKeywords = [
+        'engineer',
+        'developer',
+        'programmer',
+        'tech',
+        'software',
+        'it'
+      ];
+      final businessKeywords = [
+        'manager',
+        'director',
+        'executive',
+        'business',
+        'sales',
+        'marketing'
+      ];
+      final creativeKeywords = [
+        'designer',
+        'artist',
+        'creative',
+        'writer',
+        'photographer'
+      ];
 
       final isTech1 = techKeywords.any((keyword) => job1.contains(keyword));
       final isTech2 = techKeywords.any((keyword) => job2.contains(keyword));
-      final isBusiness1 = businessKeywords.any((keyword) => job1.contains(keyword));
-      final isBusiness2 = businessKeywords.any((keyword) => job2.contains(keyword));
-      final isCreative1 = creativeKeywords.any((keyword) => job1.contains(keyword));
-      final isCreative2 = creativeKeywords.any((keyword) => job2.contains(keyword));
+      final isBusiness1 =
+          businessKeywords.any((keyword) => job1.contains(keyword));
+      final isBusiness2 =
+          businessKeywords.any((keyword) => job2.contains(keyword));
+      final isCreative1 =
+          creativeKeywords.any((keyword) => job1.contains(keyword));
+      final isCreative2 =
+          creativeKeywords.any((keyword) => job2.contains(keyword));
 
-      if ((isTech1 && isTech2) || (isBusiness1 && isBusiness2) || (isCreative1 && isCreative2)) {
+      if ((isTech1 && isTech2) ||
+          (isBusiness1 && isBusiness2) ||
+          (isCreative1 && isCreative2)) {
         return 1.0; // Same industry
       } else if ((isTech1 && isBusiness2) || (isBusiness1 && isTech2)) {
         return 0.8; // Complementary industries
@@ -309,14 +341,12 @@ class ModeSpecificCompatibilityEngine {
 
   /// Get compatibility breakdown for debugging
   static Map<String, double> getCompatibilityBreakdown(
-    UserModel user1, 
-    UserModel user2, 
-    String mode
-  ) {
+      UserModel user1, UserModel user2, String mode) {
     switch (mode) {
       case 'Dating':
         return {
-          'age': CompatibilityEngine.calculateCompatibility(user1, user2) * 0.30,
+          'age':
+              CompatibilityEngine.calculateCompatibility(user1, user2) * 0.30,
           'location': _calculateLocationScore(user1, user2) * 0.25,
           'lifestyle': _calculateLifestyleCompatibility(user1, user2) * 0.20,
           'interest': _calculateInterestScore(user1, user2) * 0.15,
@@ -332,7 +362,8 @@ class ModeSpecificCompatibilityEngine {
         };
       case 'Networking':
         return {
-          'professional': _calculateProfessionalCompatibility(user1, user2) * 0.40,
+          'professional':
+              _calculateProfessionalCompatibility(user1, user2) * 0.40,
           'industry': _calculateIndustryCompatibility(user1, user2) * 0.25,
           'location': _calculateLocationScore(user1, user2) * 0.20,
           'completeness': _calculateCompletenessScore(user1, user2) * 0.15,

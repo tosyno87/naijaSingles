@@ -21,7 +21,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     with TickerProviderStateMixin {
   final GroupService _groupService = GroupService();
   late TabController _tabController;
-  
+
   List<Map<String, dynamic>> _members = [];
   bool _isLoading = false;
   bool _isMember = false;
@@ -55,7 +55,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   Future<void> _loadMembers() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final members = await _groupService.getGroupMembers(widget.group.id!);
       setState(() {
@@ -77,7 +77,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   Future<void> _joinGroup() async {
     final success = await _groupService.joinGroup(widget.group.id!);
-    
+
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -99,7 +99,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   Future<void> _leaveGroup() async {
     final success = await _groupService.leaveGroup(widget.group.id!);
-    
+
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -126,13 +126,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         slivers: [
           // App Bar
           _buildSliverAppBar(),
-          
+
           // Group Info
           _buildGroupInfo(),
-          
+
           // Tab Bar
           _buildTabBar(),
-          
+
           // Tab Content
           _buildTabContent(),
         ],
@@ -165,7 +165,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 )
               else
                 _buildDefaultBackground(),
-              
+
               // Overlay
               Positioned.fill(
                 child: Container(
@@ -181,7 +181,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   ),
                 ),
               ),
-              
+
               // Group Name
               Positioned(
                 bottom: 16,
@@ -283,7 +283,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             Row(
               children: [
                 _buildInfoChip(
-                  icon: GroupCategories.categoryIcons[widget.group.category] ?? '🌟',
+                  icon: GroupCategories.categoryIcons[widget.group.category] ??
+                      '🌟',
                   label: widget.group.categoryDisplay,
                   color: AppColors.primaryGreen,
                 ),
@@ -296,9 +297,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Description
             Text(
               widget.group.description,
@@ -308,16 +309,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 height: 1.5,
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Stats Row
             Row(
               children: [
                 _buildStatItem(
                   icon: Icons.people,
                   label: 'Members',
-                  value: '${widget.group.memberCount}/${widget.group.maxMembers}',
+                  value:
+                      '${widget.group.memberCount}/${widget.group.maxMembers}',
                 ),
                 const SizedBox(width: 24),
                 if (widget.group.location != null)
@@ -334,9 +336,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Action Buttons
             _buildActionButtons(),
           ],
@@ -558,9 +560,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 ? Custom3DIcons.profile(size: 24)
                 : null,
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           // Member Info
           Expanded(
             child: Column(
@@ -594,9 +596,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
               ],
             ),
           ),
-          
+
           // Actions
-          if (_isAdmin && !member['isCreator'] && member['id'] != _groupService.currentUserId)
+          if (_isAdmin &&
+              !member['isCreator'] &&
+              member['id'] != _groupService.currentUserId)
             PopupMenuButton<String>(
               onSelected: (value) {
                 switch (value) {
@@ -640,7 +644,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                     children: [
                       Icon(Icons.person_remove, color: Colors.red),
                       SizedBox(width: 8),
-                      Text('Remove Member', style: TextStyle(color: Colors.red)),
+                      Text('Remove Member',
+                          style: TextStyle(color: Colors.red)),
                     ],
                   ),
                 ),
@@ -769,7 +774,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Group'),
-        content: Text('Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -799,7 +805,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 365) {
       return '${(difference.inDays / 365).floor()} year${(difference.inDays / 365).floor() == 1 ? '' : 's'} ago';
     } else if (difference.inDays > 30) {

@@ -53,11 +53,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           if (state is RSVPInitial) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               context.read<RSVPBloc>().add(LoadEventAttendeesEvent(
-                eventId: widget.event.id,
-              ));
+                    eventId: widget.event.id,
+                  ));
             });
           }
-          
+
           return Scaffold(
             backgroundColor: Colors.white,
             body: CustomScrollView(
@@ -101,7 +101,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.white, size: 20),
+            icon:
+                const Icon(Icons.share_outlined, color: Colors.white, size: 20),
             onPressed: _shareEvent,
           ),
         ),
@@ -112,7 +113,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.white, size: 20),
+            icon: const Icon(Icons.favorite_border,
+                color: Colors.white, size: 20),
             onPressed: _toggleFavorite,
           ),
         ),
@@ -133,7 +135,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         ),
                       ),
                     ),
-                    errorWidget: (context, url, error) => _buildPlaceholderImage(),
+                    errorWidget: (context, url, error) =>
+                        _buildPlaceholderImage(),
                   )
                 : _buildPlaceholderImage(),
             Container(
@@ -171,7 +174,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     children: [
                       // Category chip
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: const Color(0xFF008037),
                           borderRadius: BorderRadius.circular(16),
@@ -188,9 +192,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       const SizedBox(width: 8),
                       // Paid/Free chip
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: widget.event.isFree 
+                          color: widget.event.isFree
                               ? Colors.grey.withOpacity(0.8)
                               : const Color(0xFFEF476F).withOpacity(0.9),
                           borderRadius: BorderRadius.circular(16),
@@ -267,8 +272,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     );
   }
 
-
-
   Widget _buildStatsRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -287,7 +290,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           ),
           _buildStatItem(
             icon: Icons.share,
-            value: '${(widget.event.rsvpCount * 0.3).round()}', // Mock share count
+            value:
+                '${(widget.event.rsvpCount * 0.3).round()}', // Mock share count
             label: 'Shares',
           ),
         ],
@@ -435,7 +439,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        widget.event.location.displayAddress.isNotEmpty 
+                        widget.event.location.displayAddress.isNotEmpty
                             ? widget.event.location.displayAddress
                             : 'Location TBA',
                         style: GoogleFonts.poppins(
@@ -460,10 +464,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     );
   }
 
-
   Widget _buildEventDescription() {
     if (widget.event.description.isEmpty) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -536,7 +539,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       ),
     );
   }
-
 
   Widget _buildEventAttendees() {
     return Padding(
@@ -664,7 +666,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         if (state is EventRSVPStatusLoaded) {
           isGoing = state.status == RSVPStatus.going;
         }
-        
+
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -699,9 +701,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     onTap: () {
                       // Trigger RSVP action
                       context.read<RSVPBloc>().add(RSVPToEventEvent(
-                        eventId: widget.event.id,
-                        status: isGoing ? RSVPStatus.notGoing : RSVPStatus.going,
-                      ));
+                            eventId: widget.event.id,
+                            status: isGoing
+                                ? RSVPStatus.notGoing
+                                : RSVPStatus.going,
+                          ));
                     },
                     borderRadius: BorderRadius.circular(20),
                     child: Center(
@@ -761,14 +765,16 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   String _formatEventDateTime() {
-    final startDate = DateFormat('EEEE, MMMM d, yyyy').format(widget.event.startDate);
+    final startDate =
+        DateFormat('EEEE, MMMM d, yyyy').format(widget.event.startDate);
     final startTime = DateFormat('h:mm a').format(widget.event.startDate);
-    
+
     if (widget.event.startDate.day == widget.event.endDate.day) {
       final endTime = DateFormat('h:mm a').format(widget.event.endDate);
       return '$startDate\n$startTime - $endTime';
     } else {
-      final endDate = DateFormat('EEEE, MMMM d, yyyy').format(widget.event.endDate);
+      final endDate =
+          DateFormat('EEEE, MMMM d, yyyy').format(widget.event.endDate);
       final endTime = DateFormat('h:mm a').format(widget.event.endDate);
       return '$startDate at $startTime\nto $endDate at $endTime';
     }
@@ -809,20 +815,23 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
   }
 
   void _openMaps() async {
-    if (widget.event.location.latitude != null && widget.event.location.longitude != null) {
-      final url = 'https://www.google.com/maps/search/?api=1&query=${widget.event.location.latitude},${widget.event.location.longitude}';
+    if (widget.event.location.latitude != null &&
+        widget.event.location.longitude != null) {
+      final url =
+          'https://www.google.com/maps/search/?api=1&query=${widget.event.location.latitude},${widget.event.location.longitude}';
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
       }
     } else if (widget.event.location.displayAddress.isNotEmpty) {
-      final encodedAddress = Uri.encodeComponent(widget.event.location.displayAddress);
-      final url = 'https://www.google.com/maps/search/?api=1&query=$encodedAddress';
+      final encodedAddress =
+          Uri.encodeComponent(widget.event.location.displayAddress);
+      final url =
+          'https://www.google.com/maps/search/?api=1&query=$encodedAddress';
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
       }
     }
   }
-
 
   void _showAllAttendees() {
     showModalBottomSheet(

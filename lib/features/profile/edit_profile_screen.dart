@@ -1071,7 +1071,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: _formValid 
+                            color: _formValid
                                 ? primaryColor.withValues(alpha: 0.3)
                                 : Colors.grey.withValues(alpha: 0.2),
                             blurRadius: 8,
@@ -1082,7 +1082,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: ElevatedButton(
                         onPressed: _formValid ? _saveProfile : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _formValid ? primaryColor : Colors.grey.shade400,
+                          backgroundColor:
+                              _formValid ? primaryColor : Colors.grey.shade400,
                           disabledBackgroundColor: Colors.grey.shade400,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -1099,7 +1100,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              _formValid ? 'Save Profile' : 'Complete Required Fields',
+                              _formValid
+                                  ? 'Save Profile'
+                                  : 'Complete Required Fields',
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -1110,7 +1113,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    
+
                     // Form validation status
                     if (!_formValid) ...[
                       const SizedBox(height: 16),
@@ -1498,7 +1501,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildValidationRequirements() {
     List<Widget> requirements = [];
-    
+
     // Check photo count
     int photoCount = _photos.where((photo) => photo != null).length;
     if (photoCount < 3) {
@@ -1508,7 +1511,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         photoCount >= 3,
       ));
     }
-    
+
     // Check bio length
     bool validBioLength = _bioController.text.trim().length >= 20;
     if (!validBioLength) {
@@ -1518,7 +1521,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         validBioLength,
       ));
     }
-    
+
     // Check age
     bool isAdult = _age >= 18;
     if (!isAdult) {
@@ -1528,7 +1531,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         isAdult,
       ));
     }
-    
+
     // Check form validation
     bool formValid = _formKey.currentState?.validate() ?? false;
     if (!formValid) {
@@ -1538,12 +1541,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         formValid,
       ));
     }
-    
+
     return Column(
       children: requirements,
     );
   }
-  
+
   Widget _buildRequirementItem(String text, IconData icon, bool isCompleted) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1560,7 +1563,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               text,
               style: GoogleFonts.poppins(
                 fontSize: 13,
-                color: isCompleted ? Colors.green.shade700 : Colors.orange.shade700,
+                color: isCompleted
+                    ? Colors.green.shade700
+                    : Colors.orange.shade700,
                 fontWeight: isCompleted ? FontWeight.w500 : FontWeight.normal,
               ),
             ),

@@ -16,16 +16,16 @@ void main() {
       // Look for swipeable cards
       final gestureDetectors = find.byType(GestureDetector);
       final dismissibles = find.byType(Dismissible);
-      
+
       if (gestureDetectors.evaluate().isNotEmpty) {
         print('✅ Found interactive gesture elements');
-        
+
         // Test swipe gesture
         if (gestureDetectors.evaluate().isNotEmpty) {
           await tester.drag(gestureDetectors.first, Offset(-300, 0));
           await tester.pumpAndSettle();
           print('✅ Left swipe gesture executed');
-          
+
           await tester.drag(gestureDetectors.first, Offset(300, 0));
           await tester.pumpAndSettle();
           print('✅ Right swipe gesture executed');
@@ -54,12 +54,14 @@ void main() {
       bool foundLikeButton = false;
       bool foundDislikeButton = false;
 
-      if (heartIcons.evaluate().isNotEmpty || thumbUpIcons.evaluate().isNotEmpty) {
+      if (heartIcons.evaluate().isNotEmpty ||
+          thumbUpIcons.evaluate().isNotEmpty) {
         print('✅ Found like button');
         foundLikeButton = true;
       }
 
-      if (closeIcons.evaluate().isNotEmpty || thumbDownIcons.evaluate().isNotEmpty) {
+      if (closeIcons.evaluate().isNotEmpty ||
+          thumbDownIcons.evaluate().isNotEmpty) {
         print('✅ Found dislike button');
         foundDislikeButton = true;
       }
@@ -89,15 +91,16 @@ void main() {
       // Look for match-related UI elements
       final matchTexts = find.textContaining('Match');
       final congratsTexts = find.textContaining('Congrat');
-      
-      if (matchTexts.evaluate().isNotEmpty || congratsTexts.evaluate().isNotEmpty) {
+
+      if (matchTexts.evaluate().isNotEmpty ||
+          congratsTexts.evaluate().isNotEmpty) {
         print('✅ Found match-related text elements');
       }
 
       // Look for match dialog or popup
       final dialogs = find.byType(Dialog);
       final alertDialogs = find.byType(AlertDialog);
-      
+
       if (dialogs.evaluate().isNotEmpty || alertDialogs.evaluate().isNotEmpty) {
         print('✅ Found dialog elements (possible match popup)');
       }
@@ -114,7 +117,7 @@ void main() {
       // Look for profile images
       final images = find.byType(Image);
       final circleAvatars = find.byType(CircleAvatar);
-      
+
       if (images.evaluate().isNotEmpty) {
         print('✅ Found image elements');
       }
@@ -126,7 +129,7 @@ void main() {
       // Look for user information
       final listTiles = find.byType(ListTile);
       final cards = find.byType(Card);
-      
+
       if (listTiles.evaluate().isNotEmpty || cards.evaluate().isNotEmpty) {
         print('✅ Found structured information elements');
       }
@@ -152,11 +155,11 @@ void main() {
       final settingsIcons = find.byIcon(Icons.settings);
       final tuneIcons = find.byIcon(Icons.tune);
 
-      if (filterIcons.evaluate().isNotEmpty || 
-          settingsIcons.evaluate().isNotEmpty || 
+      if (filterIcons.evaluate().isNotEmpty ||
+          settingsIcons.evaluate().isNotEmpty ||
           tuneIcons.evaluate().isNotEmpty) {
         print('✅ Found filter/settings elements');
-        
+
         // Test filter interaction
         if (filterIcons.evaluate().isNotEmpty) {
           await tester.tap(filterIcons.first);
@@ -168,7 +171,7 @@ void main() {
       // Look for sliders (age range, distance)
       final sliders = find.byType(Slider);
       final rangeSliders = find.byType(RangeSlider);
-      
+
       if (sliders.evaluate().isNotEmpty || rangeSliders.evaluate().isNotEmpty) {
         print('✅ Found slider elements for preferences');
       }

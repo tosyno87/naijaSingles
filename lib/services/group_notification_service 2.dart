@@ -5,7 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// Service for managing group notification preferences
 /// Handles mute/unmute functionality per group
 class GroupNotificationService {
-  static final GroupNotificationService _instance = GroupNotificationService._internal();
+  static final GroupNotificationService _instance =
+      GroupNotificationService._internal();
   factory GroupNotificationService() => _instance;
   GroupNotificationService._internal();
 

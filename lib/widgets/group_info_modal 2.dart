@@ -39,7 +39,7 @@ class GroupInfoModal extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              
+
               // Header
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -62,7 +62,7 @@ class GroupInfoModal extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Content
               Expanded(
                 child: SingleChildScrollView(
@@ -115,14 +115,15 @@ class GroupInfoModal extends StatelessWidget {
                   child: Image.network(
                     group.imageUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildDefaultAvatar(),
                   ),
                 )
               : _buildDefaultAvatar(),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Group info
         Expanded(
           child: Column(

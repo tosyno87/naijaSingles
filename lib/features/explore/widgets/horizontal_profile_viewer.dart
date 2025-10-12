@@ -21,7 +21,8 @@ class HorizontalProfileViewer extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<HorizontalProfileViewer> createState() => _HorizontalProfileViewerState();
+  State<HorizontalProfileViewer> createState() =>
+      _HorizontalProfileViewerState();
 }
 
 class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
@@ -61,9 +62,10 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
 
     setState(() {
       _remainingUsers.removeAt(_currentIndex);
-      
+
       // Adjust current index if needed
-      if (_currentIndex >= _remainingUsers.length && _remainingUsers.isNotEmpty) {
+      if (_currentIndex >= _remainingUsers.length &&
+          _remainingUsers.isNotEmpty) {
         _currentIndex = _remainingUsers.length - 1;
       }
     });
@@ -103,7 +105,7 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
       children: [
         // Profile counter
         _buildProfileCounter(),
-        
+
         // PageView for horizontal scrolling
         Expanded(
           child: PageView.builder(
@@ -127,10 +129,10 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
             },
           ),
         ),
-        
+
         // Action buttons
         _buildActionButtons(),
-        
+
         const SizedBox(height: 10),
       ],
     );
@@ -177,7 +179,7 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
               }
             },
           ),
-          
+
           // Connect button
           _buildActionButton(
             icon: Icons.favorite,

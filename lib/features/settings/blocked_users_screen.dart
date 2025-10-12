@@ -39,7 +39,8 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final blockedUsers = await SettingsService.getBlockedUsers(_currentUserId!);
+      final blockedUsers =
+          await SettingsService.getBlockedUsers(_currentUserId!);
       if (mounted) {
         setState(() {
           _blockedUsers = blockedUsers;
@@ -71,17 +72,18 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     );
 
     try {
-      final success = await SettingsService.unblockUser(_currentUserId!, user.id);
-      
+      final success =
+          await SettingsService.unblockUser(_currentUserId!, user.id);
+
       if (mounted) {
         Navigator.pop(context); // Close loading dialog
-        
+
         if (success) {
           // Remove from local list
           setState(() {
             _blockedUsers.removeWhere((u) => u.id == user.id);
           });
-          
+
           _showSnackBar('${user.name} has been unblocked', isError: false);
         } else {
           _showSnackBar('Failed to unblock ${user.name}', isError: true);
@@ -97,41 +99,42 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
 
   Future<bool> _showUnblockConfirmation(String userName) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Unblock User',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryGreen,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to unblock $userName? They will be able to see your profile and message you again.',
-          style: GoogleFonts.poppins(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.poppins(color: Colors.grey[600]),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              'Unblock User',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryGreen,
+              ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
+            content: Text(
+              'Are you sure you want to unblock $userName? They will be able to see your profile and message you again.',
+              style: GoogleFonts.poppins(),
             ),
-            child: Text(
-              'Unblock',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.poppins(color: Colors.grey[600]),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(
+                  'Unblock',
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   @override
@@ -382,7 +385,8 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               onPressed: () => _unblockUser(user),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryGreen,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                   side: BorderSide(color: AppColors.primaryGreen),

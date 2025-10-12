@@ -18,9 +18,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _tagController = TextEditingController();
-  
+
   final GroupService _groupService = GroupService();
-  
+
   String _selectedCategory = 'Cultural';
   bool _isPublic = true;
   int _maxMembers = 100;
@@ -48,8 +48,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         category: _selectedCategory,
         isPublic: _isPublic,
         maxMembers: _maxMembers,
-        location: _locationController.text.trim().isEmpty 
-            ? null 
+        location: _locationController.text.trim().isEmpty
+            ? null
             : _locationController.text.trim(),
         tags: _tags,
         culturalInfo: {
@@ -66,7 +66,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       if (groupId != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Group "${_nameController.text.trim()}" created successfully!'),
+            content: Text(
+                'Group "${_nameController.text.trim()}" created successfully!'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -132,9 +133,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   children: [
                     // Group Image Section
                     _buildGroupImageSection(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Group Name
                     _buildTextField(
                       controller: _nameController,
@@ -154,9 +155,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Description
                     _buildTextField(
                       controller: _descriptionController,
@@ -177,14 +178,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Category Selection
                     _buildCategorySelection(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Location
                     _buildTextField(
                       controller: _locationController,
@@ -192,22 +193,22 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       hint: 'City, Country',
                       icon: Icons.location_on,
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Tags
                     _buildTagsSection(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Section Divider
                     _buildSectionDivider('Group Settings'),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Group Settings
                     _buildGroupSettings(),
-                    
+
                     const SizedBox(height: 100), // Space for bottom button
                   ],
                 ),
@@ -410,7 +411,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             },
             icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
             dropdownColor: Colors.white,
-            style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
+            style:
+                GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
           ),
         ),
       ],
@@ -430,7 +432,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Tags Display
         if (_tags.isNotEmpty) ...[
           Wrap(
@@ -465,7 +467,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
           const SizedBox(height: 12),
         ],
-        
+
         // Add Tag Input
         if (_tags.length < 5)
           Row(
@@ -500,7 +502,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+                        borderSide:
+                            BorderSide(color: AppColors.primaryGreen, width: 2),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -575,7 +578,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
         // Public/Private Toggle
         Container(
           padding: const EdgeInsets.all(16),
@@ -624,9 +626,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Max Members
         Container(
           padding: const EdgeInsets.all(16),

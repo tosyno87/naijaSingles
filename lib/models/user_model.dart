@@ -35,8 +35,9 @@ class UserModel {
   final String? drinkingStatus;
   final String? smokingStatus;
   final DateTime? lastSeen;
-  final String? lookingFor; // What the user is looking for: Dating, Friendship, Networking
-  
+  final String?
+      lookingFor; // What the user is looking for: Dating, Friendship, Networking
+
   // Cultural fields
   final String? nationality;
   final String? tribe;
@@ -226,35 +227,35 @@ class UserModel {
             : data.containsKey('Pictures') && data['Pictures'] is List
                 ? List<String>.from(data['Pictures'])
                 : [],
-        bio: safeGet<String>('bio') ?? 
+        bio: safeGet<String>('bio') ??
             safeGetNested<String>('editInfo', 'bio', ''),
-        profession: safeGet<String>('profession') ?? 
+        profession: safeGet<String>('profession') ??
             safeGetNested<String>('editInfo', 'profession', '') ??
             safeGetNested<String>('editInfo', 'job_title', ''),
-        education: safeGet<String>('education') ?? 
+        education: safeGet<String>('education') ??
             safeGetNested<String>('editInfo', 'education', ''),
-        drinkingStatus: safeGet<String>('drinkingStatus') ?? 
+        drinkingStatus: safeGet<String>('drinkingStatus') ??
             safeGetNested<String>('editInfo', 'drinkingStatus', ''),
-        smokingStatus: safeGet<String>('smokingStatus') ?? 
+        smokingStatus: safeGet<String>('smokingStatus') ??
             safeGetNested<String>('editInfo', 'smokingStatus', ''),
         lastSeen: data.containsKey('lastSeen') && data['lastSeen'] is Timestamp
             ? (data['lastSeen'] as Timestamp).toDate()
             : data.containsKey('lastActive') && data['lastActive'] is Timestamp
                 ? (data['lastActive'] as Timestamp).toDate()
                 : null,
-        lookingFor: safeGet<String>('lookingFor') ?? 
+        lookingFor: safeGet<String>('lookingFor') ??
             safeGetNested<String>('editInfo', 'lookingFor', 'Dating'),
         // Cultural fields
-        nationality: safeGet<String>('nationality') ?? 
+        nationality: safeGet<String>('nationality') ??
             safeGetNested<String>('editInfo', 'nationality', ''),
-        tribe: safeGet<String>('tribe') ?? 
+        tribe: safeGet<String>('tribe') ??
             safeGetNested<String>('editInfo', 'tribe', ''),
         languages: data.containsKey('languages') && data['languages'] is List
             ? List<String>.from(data['languages'])
             : [],
-        religion: safeGet<String>('religion') ?? 
+        religion: safeGet<String>('religion') ??
             safeGetNested<String>('editInfo', 'religion', ''),
-        occupation: safeGet<String>('occupation') ?? 
+        occupation: safeGet<String>('occupation') ??
             safeGetNested<String>('editInfo', 'occupation', ''),
       );
     } catch (e) {
@@ -329,25 +330,39 @@ class UserModel {
           ? (json['distanceBW'] as num).round()
           : null,
       isBot: json['isBot'] ?? false,
-      bio: json['bio'] ?? (json['editInfo'] != null ? json['editInfo']['bio'] : null),
-      profession: json['profession'] ?? (json['editInfo'] != null ? json['editInfo']['profession'] : null),
-      education: json['education'] ?? (json['editInfo'] != null ? json['editInfo']['education'] : null),
-      drinkingStatus: json['drinkingStatus'] ?? (json['editInfo'] != null ? json['editInfo']['drinkingStatus'] : null),
-      smokingStatus: json['smokingStatus'] ?? (json['editInfo'] != null ? json['editInfo']['smokingStatus'] : null),
-      lastSeen: json['lastSeen'] != null 
+      bio: json['bio'] ??
+          (json['editInfo'] != null ? json['editInfo']['bio'] : null),
+      profession: json['profession'] ??
+          (json['editInfo'] != null ? json['editInfo']['profession'] : null),
+      education: json['education'] ??
+          (json['editInfo'] != null ? json['editInfo']['education'] : null),
+      drinkingStatus: json['drinkingStatus'] ??
+          (json['editInfo'] != null
+              ? json['editInfo']['drinkingStatus']
+              : null),
+      smokingStatus: json['smokingStatus'] ??
+          (json['editInfo'] != null ? json['editInfo']['smokingStatus'] : null),
+      lastSeen: json['lastSeen'] != null
           ? DateTime.tryParse(json['lastSeen'].toString())
           : json['lastActive'] != null
               ? DateTime.tryParse(json['lastActive'].toString())
               : null,
-      lookingFor: json['lookingFor'] ?? (json['editInfo'] != null ? json['editInfo']['lookingFor'] : 'Dating'),
+      lookingFor: json['lookingFor'] ??
+          (json['editInfo'] != null
+              ? json['editInfo']['lookingFor']
+              : 'Dating'),
       // Cultural fields
-      nationality: json['nationality'] ?? (json['editInfo'] != null ? json['editInfo']['nationality'] : null),
-      tribe: json['tribe'] ?? (json['editInfo'] != null ? json['editInfo']['tribe'] : null),
+      nationality: json['nationality'] ??
+          (json['editInfo'] != null ? json['editInfo']['nationality'] : null),
+      tribe: json['tribe'] ??
+          (json['editInfo'] != null ? json['editInfo']['tribe'] : null),
       languages: json['languages'] != null && json['languages'] is List
           ? List<String>.from(json['languages'])
           : [],
-      religion: json['religion'] ?? (json['editInfo'] != null ? json['editInfo']['religion'] : null),
-      occupation: json['occupation'] ?? (json['editInfo'] != null ? json['editInfo']['occupation'] : null),
+      religion: json['religion'] ??
+          (json['editInfo'] != null ? json['editInfo']['religion'] : null),
+      occupation: json['occupation'] ??
+          (json['editInfo'] != null ? json['editInfo']['occupation'] : null),
     );
   }
 
@@ -438,14 +453,15 @@ class UserModel {
       education: map['education']?.toString(),
       drinkingStatus: map['drinkingStatus']?.toString(),
       smokingStatus: map['smokingStatus']?.toString(),
-      lastSeen: map['lastSeen'] != null 
+      lastSeen: map['lastSeen'] != null
           ? DateTime.tryParse(map['lastSeen'].toString())
           : null,
       lookingFor: map['lookingFor']?.toString() ?? 'Dating',
       // Cultural fields
       nationality: map['nationality']?.toString(),
       tribe: map['tribe']?.toString(),
-      languages: map['languages'] is List ? List<String>.from(map['languages']) : [],
+      languages:
+          map['languages'] is List ? List<String>.from(map['languages']) : [],
       religion: map['religion']?.toString(),
       occupation: map['occupation']?.toString(),
     );

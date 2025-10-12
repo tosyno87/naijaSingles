@@ -126,7 +126,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           author: 'Amina Okafor',
           country: 'Nigeria',
           category: 'Food',
-          content: 'Discover the secrets behind Nigeria\'s most beloved dish. From the perfect rice-to-tomato ratio to the traditional cooking methods passed down through generations...',
+          content:
+              'Discover the secrets behind Nigeria\'s most beloved dish. From the perfect rice-to-tomato ratio to the traditional cooking methods passed down through generations...',
           likesCount: 234,
           commentsCount: 45,
           isVerified: true,
@@ -145,7 +146,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           author: 'Kwame Asante',
           country: 'Ghana',
           category: 'Traditions',
-          content: 'Learn about the ancient art of Kente weaving, its cultural significance, and the stories woven into each pattern. A journey through Ghana\'s textile heritage...',
+          content:
+              'Learn about the ancient art of Kente weaving, its cultural significance, and the stories woven into each pattern. A journey through Ghana\'s textile heritage...',
           likesCount: 189,
           commentsCount: 32,
           isVerified: true,
@@ -164,7 +166,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           author: 'Naisula Lekishon',
           country: 'Kenya',
           category: 'Art',
-          content: 'Explore the intricate world of Maasai beadwork, where every color and pattern tells a story of community, age, and social status...',
+          content:
+              'Explore the intricate world of Maasai beadwork, where every color and pattern tells a story of community, age, and social status...',
           likesCount: 156,
           commentsCount: 28,
           isVerified: false,
@@ -192,7 +195,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           country: 'Nigeria',
           city: 'Lagos',
           proficiency: 'Advanced',
-          description: 'Native Yoruba speaker looking to help others learn while improving my English. Love discussing culture and traditions!',
+          description:
+              'Native Yoruba speaker looking to help others learn while improving my English. Love discussing culture and traditions!',
           isOnline: true,
           isInPerson: false,
           onConnect: () {
@@ -212,7 +216,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           country: 'USA',
           city: 'New York',
           proficiency: 'Beginner',
-          description: 'American learning Swahili for travel to East Africa. Would love to practice with native speakers and learn about the culture.',
+          description:
+              'American learning Swahili for travel to East Africa. Would love to practice with native speakers and learn about the culture.',
           isOnline: true,
           isInPerson: true,
           onConnect: () {
@@ -232,7 +237,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           country: 'Ghana',
           city: 'Accra',
           proficiency: 'Intermediate',
-          description: 'Ghanaian Twi speaker learning French for business opportunities. Happy to share Twi culture and language in exchange.',
+          description:
+              'Ghanaian Twi speaker learning French for business opportunities. Happy to share Twi culture and language in exchange.',
           isOnline: true,
           isInPerson: false,
           onConnect: () {

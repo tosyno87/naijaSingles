@@ -7,7 +7,6 @@ import 'package:naijasingles/services/profile_image_cropper_service.dart';
 /// Hinge-style bulk photo picker service
 /// Allows users to select multiple photos at once, then crop them individually
 class BulkPhotoPickerService {
-  
   /// Pick multiple photos at once (Hinge style)
   static Future<List<File>> pickMultiplePhotos({
     required BuildContext context,
@@ -32,7 +31,8 @@ class BulkPhotoPickerService {
       final limitedImages = images.take(maxPhotos).toList();
 
       // Convert to File objects
-      final List<File> files = limitedImages.map((image) => File(image.path)).toList();
+      final List<File> files =
+          limitedImages.map((image) => File(image.path)).toList();
 
       return files;
     } catch (e) {
@@ -42,7 +42,8 @@ class BulkPhotoPickerService {
   }
 
   /// Show bulk photo source selection dialog
-  static Future<ImageSource?> _showBulkPhotoSourceDialog(BuildContext context) async {
+  static Future<ImageSource?> _showBulkPhotoSourceDialog(
+      BuildContext context) async {
     return showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: Colors.white,
@@ -163,14 +164,14 @@ class BulkPhotoPickerService {
     required BuildContext context,
   }) async {
     final List<File> croppedPhotos = [];
-    
+
     for (int i = 0; i < selectedPhotos.length; i++) {
       final photo = selectedPhotos[i];
-      
+
       // Determine crop type based on photo index
       CropType cropType;
       String title;
-      
+
       switch (i) {
         case 0:
           cropType = CropType.square; // Main photo - square crop

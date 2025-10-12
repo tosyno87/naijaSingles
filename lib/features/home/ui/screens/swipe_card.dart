@@ -25,7 +25,7 @@ class UsersList extends StatefulWidget {
 
   final SwipableStackController? stackController;
   final Function(int, SwipeDirection) onswiped;
-  
+
   // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they are not typical in dating apps
   // and can create pressure or anxiety for users
 
@@ -94,19 +94,19 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-                        Text(
-                          "There's no one new around you.".tr().toString(),
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.montserrat(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.black54,
-                            fontStyle: FontStyle.normal,
-                            letterSpacing: 1,
-                            decoration: TextDecoration.none,
-                            fontSize: 20,
-                          ),
-                        )
+                Text(
+                  "There's no one new around you.".tr().toString(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    color: themeProvider.isDarkMode
+                        ? Colors.white
+                        : Colors.black54,
+                    fontStyle: FontStyle.normal,
+                    letterSpacing: 1,
+                    decoration: TextDecoration.none,
+                    fontSize: 20,
+                  ),
+                )
               ],
             ),
           )
@@ -142,9 +142,11 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
               return Stack(
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () => _navigateToUserProfile(widget.users[itemIndex]),
+                    onTap: () =>
+                        _navigateToUserProfile(widget.users[itemIndex]),
                     child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
                         child: Container(
                           padding: const EdgeInsets.all(15),
                           height: MediaQuery.of(context).size.height * .80,
@@ -156,7 +158,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                               color: Colors.white,
                               child: CustomCNImage(
                                 imageUrl:
-                                    widget.users[itemIndex].imageUrl!.first ?? "",
+                                    widget.users[itemIndex].imageUrl!.first ??
+                                        "",
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -216,8 +219,9 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // Tribe/Nationality
-                                    if (widget.users[itemIndex].tribe != null && 
-                                        widget.users[itemIndex].tribe!.isNotEmpty)
+                                    if (widget.users[itemIndex].tribe != null &&
+                                        widget
+                                            .users[itemIndex].tribe!.isNotEmpty)
                                       Text(
                                         widget.users[itemIndex].tribe!,
                                         style: GoogleFonts.montserrat(
@@ -226,8 +230,11 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       )
-                                    else if (widget.users[itemIndex].nationality != null && 
-                                             widget.users[itemIndex].nationality!.isNotEmpty)
+                                    else if (widget
+                                                .users[itemIndex].nationality !=
+                                            null &&
+                                        widget.users[itemIndex].nationality!
+                                            .isNotEmpty)
                                       Text(
                                         widget.users[itemIndex].nationality!,
                                         style: GoogleFonts.montserrat(
@@ -237,7 +244,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                         ),
                                       ),
                                     // Distance
-                                    if (widget.users[itemIndex].distanceBW != null)
+                                    if (widget.users[itemIndex].distanceBW !=
+                                        null)
                                       Text(
                                         "${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away",
                                         style: GoogleFonts.montserrat(
@@ -246,7 +254,8 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                           fontWeight: FontWeight.w400,
                                         ),
                                       )
-                                    else if (widget.users[itemIndex].address != null)
+                                    else if (widget.users[itemIndex].address !=
+                                        null)
                                       Text(
                                         widget.users[itemIndex].address!,
                                         style: GoogleFonts.montserrat(

@@ -17,7 +17,8 @@ import 'dart:developer';
 /// - Quality optimization
 /// - Size-based compression
 class ImageOptimizationService {
-  static final ImageOptimizationService _instance = ImageOptimizationService._internal();
+  static final ImageOptimizationService _instance =
+      ImageOptimizationService._internal();
   factory ImageOptimizationService() => _instance;
   ImageOptimizationService._internal();
 
@@ -77,8 +78,9 @@ class ImageOptimizationService {
         originalHeight: imageInfo.height,
       );
 
-      final compressedFile = await _compressImage(imageFile, compressionSettings);
-      
+      final compressedFile =
+          await _compressImage(imageFile, compressionSettings);
+
       log('✅ Image optimized for web: ${compressedFile.path}');
       return compressedFile;
     } catch (e) {
@@ -93,7 +95,8 @@ class ImageOptimizationService {
       log('🖼️ Generating thumbnail...');
 
       final tempDir = await getTemporaryDirectory();
-      final thumbnailPath = '${tempDir.path}/thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final thumbnailPath =
+          '${tempDir.path}/thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         imageFile.absolute.path,
@@ -118,10 +121,12 @@ class ImageOptimizationService {
   }
 
   /// Compress image with smart settings
-  Future<File> _compressImage(File imageFile, CompressionSettings settings) async {
+  Future<File> _compressImage(
+      File imageFile, CompressionSettings settings) async {
     try {
       final tempDir = await getTemporaryDirectory();
-      final compressedPath = '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.${settings.format.name}';
+      final compressedPath =
+          '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.${settings.format.name}';
 
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         imageFile.absolute.path,
@@ -216,7 +221,7 @@ class ImageOptimizationService {
     try {
       final bytes = await imageFile.readAsBytes();
       final image = img.decodeImage(bytes);
-      
+
       if (image == null) {
         throw Exception('Failed to decode image');
       }
@@ -241,9 +246,16 @@ class ImageOptimizationService {
 
     // Check for common image formats
     if (bytes[0] == 0xFF && bytes[1] == 0xD8) return ImageFormat.jpeg;
-    if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) return ImageFormat.png;
-    if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46) return ImageFormat.gif;
-    if (bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46) return ImageFormat.webp;
+    if (bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47) return ImageFormat.png;
+    if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46)
+      return ImageFormat.gif;
+    if (bytes[0] == 0x52 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46 &&
+        bytes[3] == 0x46) return ImageFormat.webp;
 
     return ImageFormat.unknown;
   }
@@ -268,12 +280,17 @@ class ImageOptimizationService {
           optimizedFile = await optimizeForWeb(imageFile);
           break;
         case ImageType.fullSize:
-          optimizedFile = await _compressImage(imageFile, _getCompressionSettings(
-            imageType: imageType,
-            originalSize: await _getImageInfo(imageFile).then((info) => info.sizeInMB),
-            originalWidth: await _getImageInfo(imageFile).then((info) => info.width),
-            originalHeight: await _getImageInfo(imageFile).then((info) => info.height),
-          ));
+          optimizedFile = await _compressImage(
+              imageFile,
+              _getCompressionSettings(
+                imageType: imageType,
+                originalSize: await _getImageInfo(imageFile)
+                    .then((info) => info.sizeInMB),
+                originalWidth:
+                    await _getImageInfo(imageFile).then((info) => info.width),
+                originalHeight:
+                    await _getImageInfo(imageFile).then((info) => info.height),
+              ));
           break;
         case ImageType.thumbnail:
           optimizedFile = await generateThumbnail(imageFile);
@@ -302,7 +319,7 @@ class ImageOptimizationService {
       log('🔄 Batch optimizing ${imageFiles.length} images...');
 
       final List<File> optimizedFiles = [];
-      
+
       for (int i = 0; i < imageFiles.length; i++) {
         try {
           File optimizedFile;
@@ -314,12 +331,17 @@ class ImageOptimizationService {
               optimizedFile = await optimizeForWeb(imageFiles[i]);
               break;
             case ImageType.fullSize:
-              optimizedFile = await _compressImage(imageFiles[i], _getCompressionSettings(
-                imageType: imageType,
-                originalSize: await _getImageInfo(imageFiles[i]).then((info) => info.sizeInMB),
-                originalWidth: await _getImageInfo(imageFiles[i]).then((info) => info.width),
-                originalHeight: await _getImageInfo(imageFiles[i]).then((info) => info.height),
-              ));
+              optimizedFile = await _compressImage(
+                  imageFiles[i],
+                  _getCompressionSettings(
+                    imageType: imageType,
+                    originalSize: await _getImageInfo(imageFiles[i])
+                        .then((info) => info.sizeInMB),
+                    originalWidth: await _getImageInfo(imageFiles[i])
+                        .then((info) => info.width),
+                    originalHeight: await _getImageInfo(imageFiles[i])
+                        .then((info) => info.height),
+                  ));
               break;
             case ImageType.thumbnail:
               optimizedFile = await generateThumbnail(imageFiles[i]);
@@ -341,12 +363,15 @@ class ImageOptimizationService {
   }
 
   /// Get optimized image size info
-  Future<OptimizationResult> getOptimizationResult(File originalFile, File optimizedFile) async {
+  Future<OptimizationResult> getOptimizationResult(
+      File originalFile, File optimizedFile) async {
     try {
       final originalInfo = await _getImageInfo(originalFile);
       final optimizedInfo = await _getImageInfo(optimizedFile);
 
-      final sizeReduction = ((originalInfo.sizeInMB - optimizedInfo.sizeInMB) / originalInfo.sizeInMB) * 100;
+      final sizeReduction = ((originalInfo.sizeInMB - optimizedInfo.sizeInMB) /
+              originalInfo.sizeInMB) *
+          100;
 
       return OptimizationResult(
         originalSize: originalInfo.sizeInMB,

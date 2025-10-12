@@ -8,9 +8,12 @@ class SettingsService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Collection references
-  static CollectionReference get _usersCollection => _firestore.collection('users');
-  static CollectionReference get _reportsCollection => _firestore.collection('reports');
-  static CollectionReference get _feedbackCollection => _firestore.collection('feedback');
+  static CollectionReference get _usersCollection =>
+      _firestore.collection('users');
+  static CollectionReference get _reportsCollection =>
+      _firestore.collection('reports');
+  static CollectionReference get _feedbackCollection =>
+      _firestore.collection('feedback');
 
   /// Get current user ID
   static String? get _currentUserId => _auth.currentUser?.uid;
@@ -20,10 +23,8 @@ class SettingsService {
   /// Get list of blocked user IDs for current user
   static Future<List<String>> getBlockedUserIds(String userId) async {
     try {
-      final blockedSnapshot = await _usersCollection
-          .doc(userId)
-          .collection('blockedlist')
-          .get();
+      final blockedSnapshot =
+          await _usersCollection.doc(userId).collection('blockedlist').get();
 
       return blockedSnapshot.docs.map((doc) => doc.id).toList();
     } catch (e) {
@@ -46,7 +47,7 @@ class SettingsService {
           final userDoc = await _usersCollection.doc(blockedId).get();
           if (userDoc.exists) {
             final userData = userDoc.data() as Map<String, dynamic>;
-            
+
             // Get block timestamp
             final blockDoc = await _usersCollection
                 .doc(userId)
@@ -55,7 +56,9 @@ class SettingsService {
                 .get();
 
             final blockData = blockDoc.data() as Map<String, dynamic>?;
-            final blockedAt = (blockData?['blockedAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+            final blockedAt =
+                (blockData?['blockedAt'] as Timestamp?)?.toDate() ??
+                    DateTime.now();
 
             blockedUsers.add(BlockedUser(
               id: blockedId,
@@ -80,7 +83,8 @@ class SettingsService {
   }
 
   /// Block a user
-  static Future<bool> blockUser(String userId, String blockedUserId, {String? reason}) async {
+  static Future<bool> blockUser(String userId, String blockedUserId,
+      {String? reason}) async {
     try {
       debugPrint('🚫 Blocking user: $userId blocks $blockedUserId');
 
@@ -88,7 +92,10 @@ class SettingsService {
 
       // Add to current user's blocked list only (can't write to other user's collection due to security rules)
       batch.set(
-        _usersCollection.doc(userId).collection('blockedlist').doc(blockedUserId),
+        _usersCollection
+            .doc(userId)
+            .collection('blockedlist')
+            .doc(blockedUserId),
         {
           'blockedAt': FieldValue.serverTimestamp(),
           'reason': reason ?? 'User blocked',
@@ -112,8 +119,14 @@ class SettingsService {
 
       // Remove from each other's liked lists (only if we have permission)
       try {
-        batch.delete(_usersCollection.doc(userId).collection('LikedBy').doc(blockedUserId));
-        batch.delete(_usersCollection.doc(userId).collection('CheckedUser').doc(blockedUserId));
+        batch.delete(_usersCollection
+            .doc(userId)
+            .collection('LikedBy')
+            .doc(blockedUserId));
+        batch.delete(_usersCollection
+            .doc(userId)
+            .collection('CheckedUser')
+            .doc(blockedUserId));
       } catch (e) {
         debugPrint('⚠️ Could not remove from liked/checked lists: $e');
         // Continue with blocking even if this fails
@@ -137,7 +150,10 @@ class SettingsService {
       final batch = _firestore.batch();
 
       // Remove from current user's blocked list only
-      batch.delete(_usersCollection.doc(userId).collection('blockedlist').doc(blockedUserId));
+      batch.delete(_usersCollection
+          .doc(userId)
+          .collection('blockedlist')
+          .doc(blockedUserId));
 
       await batch.commit();
 
@@ -168,12 +184,11 @@ class SettingsService {
   // NOTIFICATION SETTINGS
 
   /// Get notification settings for a user
-  static Future<NotificationSettings> getNotificationSettings(String userId) async {
+  static Future<NotificationSettings> getNotificationSettings(
+      String userId) async {
     try {
-      final settingsDoc = await _firestore
-          .collection('notificationSettings')
-          .doc(userId)
-          .get();
+      final settingsDoc =
+          await _firestore.collection('notificationSettings').doc(userId).get();
 
       if (settingsDoc.exists) {
         return NotificationSettings.fromMap(settingsDoc.data()!);
@@ -188,7 +203,8 @@ class SettingsService {
   }
 
   /// Update notification settings
-  static Future<bool> updateNotificationSettings(String userId, NotificationSettings settings) async {
+  static Future<bool> updateNotificationSettings(
+      String userId, NotificationSettings settings) async {
     try {
       await _firestore
           .collection('notificationSettings')
@@ -260,7 +276,8 @@ class SettingsService {
   // ACCOUNT MANAGEMENT
 
   /// Get account deletion eligibility
-  static Future<AccountDeletionInfo> getAccountDeletionInfo(String userId) async {
+  static Future<AccountDeletionInfo> getAccountDeletionInfo(
+      String userId) async {
     try {
       // Check for active subscriptions, pending matches, etc.
       final userDoc = await _usersCollection.doc(userId).get();
@@ -273,7 +290,7 @@ class SettingsService {
 
       final userData = userDoc.data() as Map<String, dynamic>;
       final isPremium = userData['isPremium'] == true;
-      
+
       // Check for active matches
       final matchesQuery = await _firestore
           .collection('matches')
@@ -441,7 +458,8 @@ class NotificationSettings {
       matchNotifications: matchNotifications ?? this.matchNotifications,
       messageNotifications: messageNotifications ?? this.messageNotifications,
       likeNotifications: likeNotifications ?? this.likeNotifications,
-      superLikeNotifications: superLikeNotifications ?? this.superLikeNotifications,
+      superLikeNotifications:
+          superLikeNotifications ?? this.superLikeNotifications,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
       quietHoursStart: quietHoursStart ?? this.quietHoursStart,

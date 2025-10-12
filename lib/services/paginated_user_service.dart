@@ -53,7 +53,8 @@ class PaginatedUserService {
       for (final doc in querySnapshot.docs) {
         try {
           final userData = doc.data() as Map<String, dynamic>;
-          debugPrint('👤 Processing user: ${doc.id} - ${userData['name'] ?? 'No name'}');
+          debugPrint(
+              '👤 Processing user: ${doc.id} - ${userData['name'] ?? 'No name'}');
 
           // Skip excluded users
           if (excludedUserIds.contains(doc.id)) {
@@ -69,7 +70,8 @@ class PaginatedUserService {
           if (intentFilter != null && intentFilter.isNotEmpty) {
             final userIntent = user.lookingFor ?? 'Dating';
             if (userIntent != intentFilter) {
-              debugPrint('🎯 Skipping user ${user.name} - intent mismatch (user: $userIntent, filter: $intentFilter)');
+              debugPrint(
+                  '🎯 Skipping user ${user.name} - intent mismatch (user: $userIntent, filter: $intentFilter)');
               continue;
             }
           }
@@ -77,7 +79,8 @@ class PaginatedUserService {
           // Apply distance filter if location is available
           // Temporarily disable distance filter for testing
           users.add(user);
-          debugPrint('✅ Added user to results: ${user.name} (intent: ${user.lookingFor})');
+          debugPrint(
+              '✅ Added user to results: ${user.name} (intent: ${user.lookingFor})');
         } catch (e) {
           debugPrint('❌ Error processing user ${doc.id}: $e');
           continue;

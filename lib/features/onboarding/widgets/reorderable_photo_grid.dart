@@ -170,7 +170,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                   fit: BoxFit.contain,
                 ),
               ),
-            
+
             // Primary photo badge
             if (isPrimary)
               Positioned(

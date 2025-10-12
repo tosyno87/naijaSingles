@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// Service for handling group reporting functionality
 class GroupReportingService {
-  static final GroupReportingService _instance = GroupReportingService._internal();
+  static final GroupReportingService _instance =
+      GroupReportingService._internal();
   factory GroupReportingService() => _instance;
   GroupReportingService._internal();
 
@@ -34,10 +35,8 @@ class GroupReportingService {
       if (currentUserId == null) throw Exception('User not authenticated');
 
       // Get group details
-      final groupDoc = await _firestore
-          .collection('unifiedGroups')
-          .doc(groupId)
-          .get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
 
       if (!groupDoc.exists) {
         throw Exception('Group not found');
@@ -79,16 +78,16 @@ class GroupReportingService {
       if (currentUserId == null) return [];
 
       // Check if user is group creator or admin
-      final groupDoc = await _firestore
-          .collection('unifiedGroups')
-          .doc(groupId)
-          .get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
 
       if (!groupDoc.exists) return [];
 
       final groupData = groupDoc.data()!;
       final isCreator = groupData['creatorId'] == currentUserId;
-      final isAdmin = (groupData['adminIds'] as List<dynamic>?)?.contains(currentUserId) ?? false;
+      final isAdmin =
+          (groupData['adminIds'] as List<dynamic>?)?.contains(currentUserId) ??
+              false;
 
       if (!isCreator && !isAdmin) {
         throw Exception('Unauthorized to view group reports');
@@ -150,10 +149,7 @@ class GroupReportingService {
       // For now, allowing any authenticated user to update status
       // In production, this should check user roles
 
-      await _firestore
-          .collection('group_reports')
-          .doc(reportId)
-          .update({
+      await _firestore.collection('group_reports').doc(reportId).update({
         'status': status,
         'adminNotes': adminNotes,
         'reviewedBy': currentUserId,

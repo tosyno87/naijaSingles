@@ -21,10 +21,11 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  
+
   bool _isSearching = false;
   EventFilter _currentFilter = const EventFilter();
   EventsBloc? _eventsBloc;
@@ -236,13 +237,13 @@ class _EventsScreenState extends State<EventsScreen> {
       children: [
         // Search Bar (when searching)
         if (_isSearching) _buildSearchBar(),
-        
+
         // Category Filters
         _buildCategoryFilters(),
-        
+
         // Date Range Filters
         _buildDateRangeFilters(),
-        
+
         // Advanced Filter Button
         _buildAdvancedFilterButton(),
       ],
@@ -288,8 +289,15 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   Widget _buildCategoryFilters() {
-    final categories = ['All', 'Music', 'Business', 'Community', 'Social', 'Cultural'];
-    
+    final categories = [
+      'All',
+      'Music',
+      'Business',
+      'Community',
+      'Social',
+      'Cultural'
+    ];
+
     return Container(
       height: 40,
       margin: const EdgeInsets.fromLTRB(20, 12, 20, 8),
@@ -298,9 +306,9 @@ class _EventsScreenState extends State<EventsScreen> {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          final isSelected = _currentFilter.category == category || 
-                            (_currentFilter.category == null && category == 'All');
-          
+          final isSelected = _currentFilter.category == category ||
+              (_currentFilter.category == null && category == 'All');
+
           return Container(
             margin: const EdgeInsets.only(right: 8),
             child: Material(
@@ -308,34 +316,43 @@ class _EventsScreenState extends State<EventsScreen> {
               child: InkWell(
                 onTap: () {
                   final newFilter = _currentFilter.copyWith(
-                    category: isSelected ? null : (category == 'All' ? null : category),
+                    category: isSelected
+                        ? null
+                        : (category == 'All' ? null : category),
                   );
                   _onFilterChanged(newFilter);
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected ? const Color(0xFF008037) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
+                      color: isSelected
+                          ? const Color(0xFF008037)
+                          : const Color(0xFFE0E0E0),
                       width: 1,
                     ),
-                    boxShadow: isSelected ? [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ] : null,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Text(
                     category,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      color: isSelected ? Colors.white : const Color(0xFF008037),
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF008037),
                     ),
                   ),
                 ),
@@ -349,7 +366,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   Widget _buildDateRangeFilters() {
     final dateRanges = ['All Time', 'Today', 'This Week', 'This Month'];
-    
+
     return Container(
       height: 40,
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
@@ -359,7 +376,7 @@ class _EventsScreenState extends State<EventsScreen> {
         itemBuilder: (context, index) {
           final dateRange = dateRanges[index];
           final isSelected = _isDateRangeSelected(dateRange);
-          
+
           return Container(
             margin: const EdgeInsets.only(right: 8),
             child: Material(
@@ -371,28 +388,35 @@ class _EventsScreenState extends State<EventsScreen> {
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected ? const Color(0xFF008037) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
+                      color: isSelected
+                          ? const Color(0xFF008037)
+                          : const Color(0xFFE0E0E0),
                       width: 1,
                     ),
-                    boxShadow: isSelected ? [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ] : null,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Text(
                     dateRange,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      color: isSelected ? Colors.white : const Color(0xFF008037),
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF008037),
                     ),
                   ),
                 ),
@@ -408,20 +432,24 @@ class _EventsScreenState extends State<EventsScreen> {
     if (dateRange == 'All Time') {
       return _currentFilter.startDate == null && _currentFilter.endDate == null;
     }
-    
+
     final now = DateTime.now();
     switch (dateRange) {
       case 'Today':
         return _currentFilter.startDate?.day == now.day &&
-               _currentFilter.startDate?.month == now.month &&
-               _currentFilter.startDate?.year == now.year;
+            _currentFilter.startDate?.month == now.month &&
+            _currentFilter.startDate?.year == now.year;
       case 'This Week':
         final weekStart = now.subtract(Duration(days: now.weekday - 1));
-        return _currentFilter.startDate?.isAfter(weekStart.subtract(const Duration(days: 1))) == true &&
-               _currentFilter.startDate?.isBefore(weekStart.add(const Duration(days: 7))) == true;
+        return _currentFilter.startDate
+                    ?.isAfter(weekStart.subtract(const Duration(days: 1))) ==
+                true &&
+            _currentFilter.startDate
+                    ?.isBefore(weekStart.add(const Duration(days: 7))) ==
+                true;
       case 'This Month':
         return _currentFilter.startDate?.month == now.month &&
-               _currentFilter.startDate?.year == now.year;
+            _currentFilter.startDate?.year == now.year;
       default:
         return false;
     }
@@ -431,11 +459,11 @@ class _EventsScreenState extends State<EventsScreen> {
     if (!selected || dateRange == 'All Time') {
       return _currentFilter.copyWith(startDate: null, endDate: null);
     }
-    
+
     final now = DateTime.now();
     DateTime? startDate;
     DateTime? endDate;
-    
+
     switch (dateRange) {
       case 'Today':
         startDate = DateTime(now.year, now.month, now.day);
@@ -443,14 +471,15 @@ class _EventsScreenState extends State<EventsScreen> {
         break;
       case 'This Week':
         startDate = now.subtract(Duration(days: now.weekday - 1));
-        endDate = startDate.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+        endDate = startDate
+            .add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
         break;
       case 'This Month':
         startDate = DateTime(now.year, now.month, 1);
         endDate = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
         break;
     }
-    
+
     return _currentFilter.copyWith(startDate: startDate, endDate: endDate);
   }
 
@@ -473,7 +502,8 @@ class _EventsScreenState extends State<EventsScreen> {
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF008037), // Deep green
                   borderRadius: BorderRadius.circular(20),
@@ -511,7 +541,6 @@ class _EventsScreenState extends State<EventsScreen> {
       ),
     );
   }
-
 
   Widget _buildErrorState({
     required String title,
@@ -555,7 +584,8 @@ class _EventsScreenState extends State<EventsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008037),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -612,7 +642,8 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              _currentFilter.hasActiveFilters || _searchController.text.isNotEmpty
+              _currentFilter.hasActiveFilters ||
+                      _searchController.text.isNotEmpty
                   ? 'Try adjusting your search or filters to find more events'
                   : 'Be the first to create an event and start bringing people together!',
               style: GoogleFonts.poppins(
@@ -623,7 +654,8 @@ class _EventsScreenState extends State<EventsScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            if (_currentFilter.hasActiveFilters || _searchController.text.isNotEmpty)
+            if (_currentFilter.hasActiveFilters ||
+                _searchController.text.isNotEmpty)
               Material(
                 color: Colors.transparent,
                 child: InkWell(
@@ -638,7 +670,8 @@ class _EventsScreenState extends State<EventsScreen> {
                   },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFF008037), // Deep green
                       borderRadius: BorderRadius.circular(20),
@@ -666,11 +699,13 @@ class _EventsScreenState extends State<EventsScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, RouteName.eventTemplateSelection);
+                    Navigator.pushNamed(
+                        context, RouteName.eventTemplateSelection);
                   },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFF008037), // Deep green
                       borderRadius: BorderRadius.circular(20),
@@ -764,7 +799,7 @@ class _EventsScreenState extends State<EventsScreen> {
           _refreshController.refreshFailed();
           _refreshController.loadFailed();
           _isLoadingMore = false; // Reset loading state on error
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -784,7 +819,7 @@ class _EventsScreenState extends State<EventsScreen> {
         if (state is EventsLoading) {
           return const EventsLoadingShimmer();
         }
-        
+
         if (state is EventsError && state.isNetworkError) {
           return _buildErrorState(
             title: 'Connection Error',
@@ -797,7 +832,7 @@ class _EventsScreenState extends State<EventsScreen> {
             },
           );
         }
-        
+
         if (state is EventsError) {
           return _buildErrorState(
             title: 'Something went wrong',
@@ -810,16 +845,16 @@ class _EventsScreenState extends State<EventsScreen> {
             },
           );
         }
-        
+
         if (state is EventsSearching) {
           return _buildSearchingState(state.query);
         }
-        
+
         if (state is EventsLoaded) {
           if (state.events.isEmpty) {
             return _buildEmptyState();
           }
-          
+
           return SmartRefresher(
             controller: _refreshController,
             enablePullDown: true,
@@ -836,7 +871,8 @@ class _EventsScreenState extends State<EventsScreen> {
                 if (mode == LoadStatus.idle) {
                   body = Text(
                     "Pull up to load more",
-                    style: GoogleFonts.montserrat(color: const Color(0xFF666666)),
+                    style:
+                        GoogleFonts.montserrat(color: const Color(0xFF666666)),
                   );
                 } else if (mode == LoadStatus.loading) {
                   body = const CircularProgressIndicator(
@@ -850,12 +886,14 @@ class _EventsScreenState extends State<EventsScreen> {
                 } else if (mode == LoadStatus.canLoading) {
                   body = Text(
                     "Release to load more",
-                    style: GoogleFonts.montserrat(color: const Color(0xFF666666)),
+                    style:
+                        GoogleFonts.montserrat(color: const Color(0xFF666666)),
                   );
                 } else {
                   body = Text(
                     "No more events",
-                    style: GoogleFonts.montserrat(color: const Color(0xFF666666)),
+                    style:
+                        GoogleFonts.montserrat(color: const Color(0xFF666666)),
                   );
                 }
                 return Container(
@@ -866,7 +904,8 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 80), // Bottom padding for FAB
+              padding: const EdgeInsets.fromLTRB(
+                  20, 0, 20, 80), // Bottom padding for FAB
               itemCount: state.events.length + (state.isLoadingMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index >= state.events.length) {
@@ -879,7 +918,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     ),
                   );
                 }
-                
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: EventCard(
@@ -891,7 +930,7 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
           );
         }
-        
+
         return const SizedBox.shrink();
       },
     );

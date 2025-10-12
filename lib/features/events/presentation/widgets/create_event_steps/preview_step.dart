@@ -28,10 +28,8 @@ class PreviewStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          
           _buildEventPreviewCard(context),
           const SizedBox(height: 32),
-          
           _buildSubmissionNote(),
           const SizedBox(height: 40),
         ],
@@ -125,7 +123,8 @@ class PreviewStep extends StatelessWidget {
                       top: 12,
                       right: 12,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(12),
@@ -242,7 +241,7 @@ class PreviewStep extends StatelessWidget {
 
     final dateFormat = DateFormat('MMM dd, yyyy');
     final timeFormat = DateFormat('hh:mm a');
-    
+
     return Row(
       children: [
         Icon(
@@ -403,7 +402,7 @@ class PreviewStep extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  eventData.isFree 
+                  eventData.isFree
                       ? 'No charge for attendees'
                       : '₦${eventData.ticketPrice?.toStringAsFixed(2) ?? '0.00'} per ticket',
                   style: GoogleFonts.montserrat(

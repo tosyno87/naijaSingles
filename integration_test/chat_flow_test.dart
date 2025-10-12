@@ -90,13 +90,14 @@ void main() {
 
       // Look for message input field
       final textFields = find.byWidgetPredicate(
-        (widget) => widget is TextField && 
-                   widget.keyboardType == TextInputType.multiline,
+        (widget) =>
+            widget is TextField &&
+            widget.keyboardType == TextInputType.multiline,
       );
 
       if (textFields.evaluate().isNotEmpty) {
         print('✅ Found message input field');
-        
+
         // Test message input
         await tester.enterText(textFields.first, 'Test message');
         await tester.pump();
@@ -107,7 +108,7 @@ void main() {
       final sendIcons = find.byIcon(Icons.send);
       if (sendIcons.evaluate().isNotEmpty) {
         print('✅ Found send button');
-        
+
         // Test send button tap
         await tester.tap(sendIcons.first);
         await tester.pumpAndSettle();
@@ -132,7 +133,7 @@ void main() {
       // Look for message text
       final richTexts = find.byType(RichText);
       final texts = find.byType(Text);
-      
+
       if (richTexts.evaluate().isNotEmpty || texts.evaluate().isNotEmpty) {
         print('✅ Found text elements (messages)');
       }
@@ -155,18 +156,18 @@ void main() {
       // Look for more options or menu
       final moreIcons = find.byIcon(Icons.more_vert);
       final menuIcons = find.byIcon(Icons.menu);
-      
+
       if (moreIcons.evaluate().isNotEmpty) {
         await tester.tap(moreIcons.first);
         await tester.pumpAndSettle();
         print('✅ More options menu opened');
-        
+
         // Look for delete option
         final deleteTexts = find.textContaining('Delete');
         if (deleteTexts.evaluate().isNotEmpty) {
           print('✅ Found delete option');
         }
-        
+
         // Look for block option
         final blockTexts = find.textContaining('Block');
         if (blockTexts.evaluate().isNotEmpty) {
@@ -183,9 +184,6 @@ void main() {
       print('✅ Chat actions test completed');
     });
 
-
-
-
     testWidgets('Message delivery status', (WidgetTester tester) async {
       print('🧪 Testing message delivery status...');
 
@@ -195,7 +193,7 @@ void main() {
       // Look for delivery status icons
       final checkIcons = find.byIcon(Icons.check);
       final doneAllIcons = find.byIcon(Icons.done_all);
-      
+
       if (checkIcons.evaluate().isNotEmpty) {
         print('✅ Found check icons (delivery status)');
       }
@@ -208,9 +206,9 @@ void main() {
       final sentTexts = find.textContaining('Sent');
       final deliveredTexts = find.textContaining('Delivered');
       final readTexts = find.textContaining('Read');
-      
-      if (sentTexts.evaluate().isNotEmpty || 
-          deliveredTexts.evaluate().isNotEmpty || 
+
+      if (sentTexts.evaluate().isNotEmpty ||
+          deliveredTexts.evaluate().isNotEmpty ||
           readTexts.evaluate().isNotEmpty) {
         print('✅ Found delivery status text');
       }

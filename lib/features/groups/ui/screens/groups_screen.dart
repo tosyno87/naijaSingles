@@ -19,13 +19,13 @@ class _GroupsScreenState extends State<GroupsScreen>
     with TickerProviderStateMixin {
   final GroupService _groupService = GroupService();
   final TextEditingController _searchController = TextEditingController();
-  
+
   List<GroupModel> _groups = [];
   List<GroupModel> _userGroups = [];
   bool _isLoading = false;
   bool _isSearching = false;
   String _selectedCategory = 'All';
-  
+
   late TabController _tabController;
 
   @override
@@ -44,13 +44,13 @@ class _GroupsScreenState extends State<GroupsScreen>
 
   Future<void> _loadGroups() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final publicGroups = await _groupService.getPublicGroups(
         category: _selectedCategory == 'All' ? null : _selectedCategory,
       );
       final userGroups = await _groupService.getUserGroups();
-      
+
       setState(() {
         _groups = publicGroups;
         _userGroups = userGroups;
@@ -76,13 +76,13 @@ class _GroupsScreenState extends State<GroupsScreen>
     }
 
     setState(() => _isSearching = true);
-    
+
     try {
       final searchResults = await _groupService.searchGroups(
         query: _searchController.text.trim(),
         category: _selectedCategory == 'All' ? null : _selectedCategory,
       );
-      
+
       setState(() {
         _groups = searchResults;
         _isSearching = false;
@@ -102,7 +102,7 @@ class _GroupsScreenState extends State<GroupsScreen>
 
   Future<void> _joinGroup(GroupModel group) async {
     final success = await _groupService.joinGroup(group.id!);
-    
+
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -187,13 +187,13 @@ class _GroupsScreenState extends State<GroupsScreen>
         children: [
           // Search Bar
           _buildSearchBar(),
-          
+
           // Category Filter
           _buildCategoryFilter(),
-          
+
           // Tab Bar
           _buildTabBar(),
-          
+
           // Tab Content
           Expanded(
             child: TabBarView(
@@ -260,7 +260,6 @@ class _GroupsScreenState extends State<GroupsScreen>
     );
   }
 
-
   Widget _buildCategoryFilter() {
     return Container(
       height: 50,
@@ -269,9 +268,10 @@ class _GroupsScreenState extends State<GroupsScreen>
         scrollDirection: Axis.horizontal,
         itemCount: GroupCategories.categories.length + 1,
         itemBuilder: (context, index) {
-          final category = index == 0 ? 'All' : GroupCategories.categories[index - 1];
+          final category =
+              index == 0 ? 'All' : GroupCategories.categories[index - 1];
           final isSelected = _selectedCategory == category;
-          
+
           return Container(
             margin: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
@@ -297,7 +297,8 @@ class _GroupsScreenState extends State<GroupsScreen>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              labelPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              labelPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             ),
           );
         },
@@ -358,38 +359,41 @@ class _GroupsScreenState extends State<GroupsScreen>
         subtitle: _isSearching
             ? 'Try adjusting your search terms to find cultural groups that match your interests.'
             : 'Be the first to create a cultural group in this category and start building your community!',
-        actionButton: _isSearching ? null : Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF008037), // Solid Deep Green
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: AppColors.buttonShadow,
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _navigateToCreateGroup,
-              borderRadius: BorderRadius.circular(20),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Custom3DIcons.add(size: 18),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Create Group',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+        actionButton: _isSearching
+            ? null
+            : Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF008037), // Solid Deep Green
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: AppColors.buttonShadow,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _navigateToCreateGroup,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Custom3DIcons.add(size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Create Group',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
       );
     }
 
@@ -424,7 +428,8 @@ class _GroupsScreenState extends State<GroupsScreen>
       return _buildEmptyState(
         icon: Custom3DIcons.community(size: 64),
         title: 'No Groups Joined',
-        subtitle: 'Discover and join cultural groups that match your heritage and interests!',
+        subtitle:
+            'Discover and join cultural groups that match your heritage and interests!',
         actionButton: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF008037), // Solid Deep Green
@@ -439,7 +444,8 @@ class _GroupsScreenState extends State<GroupsScreen>
               },
               borderRadius: BorderRadius.circular(20),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -498,7 +504,8 @@ class _GroupsScreenState extends State<GroupsScreen>
       return _buildEmptyState(
         icon: Custom3DIcons.community(size: 64),
         title: 'No Groups Created',
-        subtitle: 'Create your first cultural group and start building your community! Share your heritage and connect with others.',
+        subtitle:
+            'Create your first cultural group and start building your community! Share your heritage and connect with others.',
         actionButton: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF008037), // Solid Deep Green
@@ -511,7 +518,8 @@ class _GroupsScreenState extends State<GroupsScreen>
               onTap: _navigateToCreateGroup,
               borderRadius: BorderRadius.circular(20),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

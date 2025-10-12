@@ -6,14 +6,14 @@ class MeetupService {
   static const String _baseUrl = 'https://api.meetup.com';
   // You'll get this from: https://secure.meetup.com/meetup_api/key/
   static const String _apiKey = 'YOUR_MEETUP_API_KEY_HERE';
-  
+
   final Dio _dio;
 
   MeetupService() : _dio = Dio() {
     _dio.options.baseUrl = _baseUrl;
     _dio.options.connectTimeout = const Duration(seconds: 10);
     _dio.options.receiveTimeout = const Duration(seconds: 10);
-    
+
     // Add interceptor for logging
     _dio.interceptors.add(LogInterceptor(
       requestBody: true,
@@ -39,32 +39,37 @@ class MeetupService {
         endDate: endDate,
       );
 
-      log('🔍 Fetching Meetup events with params: $queryParams', name: 'MeetupService');
-      
+      log('🔍 Fetching Meetup events with params: $queryParams',
+          name: 'MeetupService');
+
       // Meetup API endpoint for finding events
-      final response = await _dio.get('/find/events', queryParameters: queryParams);
-      
+      final response =
+          await _dio.get('/find/events', queryParameters: queryParams);
+
       if (response.statusCode == 200) {
         final data = response.data;
         final events = (data as List<dynamic>?)
-            ?.map((eventJson) => _convertMeetupToEventModel(eventJson))
-            .where((event) => event != null)
-            .cast<EventModel>()
-            .toList() ?? [];
-        
-        log('✅ Fetched ${events.length} Afrocentric events from Meetup', name: 'MeetupService');
+                ?.map((eventJson) => _convertMeetupToEventModel(eventJson))
+                .where((event) => event != null)
+                .cast<EventModel>()
+                .toList() ??
+            [];
+
+        log('✅ Fetched ${events.length} Afrocentric events from Meetup',
+            name: 'MeetupService');
         return events;
       } else {
         throw MeetupException('Failed to fetch events: ${response.statusCode}');
       }
     } catch (e) {
       log('❌ Error fetching events from Meetup: $e', name: 'MeetupService');
-      
+
       if (e is DioException) {
-        log('🔄 API not configured, returning empty list', name: 'MeetupService');
+        log('🔄 API not configured, returning empty list',
+            name: 'MeetupService');
         return [];
       }
-      
+
       throw MeetupException('Failed to fetch events: $e');
     }
   }
@@ -75,18 +80,22 @@ class MeetupService {
       final venue = meetupEvent['venue'] as Map<String, dynamic>?;
       final group = meetupEvent['group'] as Map<String, dynamic>?;
       final fee = meetupEvent['fee'] as Map<String, dynamic>?;
-      
+
       return EventModel(
         id: 'meetup_${meetupEvent['id']}',
         externalId: meetupEvent['id']?.toString() ?? '',
         name: meetupEvent['name'] as String? ?? 'Untitled Event',
-        description: meetupEvent['description'] as String? ?? 'No description available',
+        description:
+            meetupEvent['description'] as String? ?? 'No description available',
         startDate: DateTime.fromMillisecondsSinceEpoch(
-          (meetupEvent['time'] as int?) ?? DateTime.now().millisecondsSinceEpoch,
+          (meetupEvent['time'] as int?) ??
+              DateTime.now().millisecondsSinceEpoch,
         ),
         endDate: DateTime.fromMillisecondsSinceEpoch(
-          ((meetupEvent['time'] as int?) ?? DateTime.now().millisecondsSinceEpoch) + 
-          ((meetupEvent['duration'] as int?) ?? 3600000), // Default 1 hour if no duration
+          ((meetupEvent['time'] as int?) ??
+                  DateTime.now().millisecondsSinceEpoch) +
+              ((meetupEvent['duration'] as int?) ??
+                  3600000), // Default 1 hour if no duration
         ),
         imageUrl: _extractImageUrl(meetupEvent),
         location: _extractLocation(venue),
@@ -96,10 +105,12 @@ class MeetupService {
         attendeeCount: (meetupEvent['yes_rsvp_count'] as int?) ?? 0,
         rsvpCount: (meetupEvent['rsvp_limit'] as int?) ?? 0,
         createdAt: DateTime.fromMillisecondsSinceEpoch(
-          (meetupEvent['created'] as int?) ?? DateTime.now().millisecondsSinceEpoch,
+          (meetupEvent['created'] as int?) ??
+              DateTime.now().millisecondsSinceEpoch,
         ),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(
-          (meetupEvent['updated'] as int?) ?? DateTime.now().millisecondsSinceEpoch,
+          (meetupEvent['updated'] as int?) ??
+              DateTime.now().millisecondsSinceEpoch,
         ),
         status: EventStatus.published,
         isPublic: true,
@@ -115,21 +126,22 @@ class MeetupService {
   String _extractImageUrl(Map<String, dynamic> meetupEvent) {
     // Try different image sources
     if (meetupEvent['featured_photo'] != null) {
-      final featuredPhoto = meetupEvent['featured_photo'] as Map<String, dynamic>?;
+      final featuredPhoto =
+          meetupEvent['featured_photo'] as Map<String, dynamic>?;
       return featuredPhoto?['photo_link'] ?? '';
     }
-    
+
     if (meetupEvent['photo_url'] != null) {
       return meetupEvent['photo_url'] as String? ?? '';
     }
-    
+
     // Fallback to group photo
     final group = meetupEvent['group'] as Map<String, dynamic>?;
     if (group != null && group['group_photo'] != null) {
       final groupPhoto = group['group_photo'] as Map<String, dynamic>?;
       return groupPhoto?['photo_link'] ?? '';
     }
-    
+
     // Default fallback image
     return 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800';
   }
@@ -166,9 +178,9 @@ class MeetupService {
   /// Map Meetup categories to our app categories
   String _mapMeetupCategory(String? meetupCategory) {
     if (meetupCategory == null) return 'Community';
-    
+
     final category = meetupCategory.toLowerCase();
-    
+
     if (category.contains('music') || category.contains('arts')) {
       return 'Music';
     } else if (category.contains('food') || category.contains('dining')) {
@@ -201,7 +213,8 @@ class MeetupService {
     };
 
     // Afrocentric search terms
-    params['text'] = 'african OR afrobeats OR afrocentric OR "black culture" OR "african diaspora" OR nigerian OR ghanaian OR kenyan OR "african music" OR "african food"';
+    params['text'] =
+        'african OR afrobeats OR afrocentric OR "black culture" OR "african diaspora" OR nigerian OR ghanaian OR kenyan OR "african music" OR "african food"';
 
     // Location filtering
     if (location != null && location.isNotEmpty) {
@@ -213,13 +226,12 @@ class MeetupService {
 
     // Date filtering
     if (startDate != null) {
-      params['time'] = '${startDate.millisecondsSinceEpoch},${endDate?.millisecondsSinceEpoch ?? (startDate.add(const Duration(days: 365)).millisecondsSinceEpoch)}';
+      params['time'] =
+          '${startDate.millisecondsSinceEpoch},${endDate?.millisecondsSinceEpoch ?? (startDate.add(const Duration(days: 365)).millisecondsSinceEpoch)}';
     }
 
     return params;
   }
-
-
 
   /// Search events by query
   Future<List<EventModel>> searchEvents({
@@ -242,22 +254,27 @@ class MeetupService {
         queryParams['location'] = 'New York, NY';
       }
 
-      log('🔍 Searching Meetup events with query: $query', name: 'MeetupService');
-      
-      final response = await _dio.get('/find/events', queryParameters: queryParams);
-      
+      log('🔍 Searching Meetup events with query: $query',
+          name: 'MeetupService');
+
+      final response =
+          await _dio.get('/find/events', queryParameters: queryParams);
+
       if (response.statusCode == 200) {
         final data = response.data;
         final events = (data as List<dynamic>?)
-            ?.map((eventJson) => _convertMeetupToEventModel(eventJson))
-            .where((event) => event != null)
-            .cast<EventModel>()
-            .toList() ?? [];
-        
-        log('✅ Found ${events.length} events for query: $query', name: 'MeetupService');
+                ?.map((eventJson) => _convertMeetupToEventModel(eventJson))
+                .where((event) => event != null)
+                .cast<EventModel>()
+                .toList() ??
+            [];
+
+        log('✅ Found ${events.length} events for query: $query',
+            name: 'MeetupService');
         return events;
       } else {
-        throw MeetupException('Failed to search events: ${response.statusCode}');
+        throw MeetupException(
+            'Failed to search events: ${response.statusCode}');
       }
     } catch (e) {
       log('❌ Error searching events: $e', name: 'MeetupService');
@@ -270,7 +287,7 @@ class MeetupService {
     try {
       // Extract Meetup ID from our event ID format
       final meetupId = eventId.replaceFirst('meetup_', '');
-      
+
       final response = await _dio.get(
         '/events/$meetupId',
         queryParameters: {
@@ -279,7 +296,7 @@ class MeetupService {
           'photo-host': 'public',
         },
       );
-      
+
       if (response.statusCode == 200) {
         return _convertMeetupToEventModel(response.data);
       }
@@ -350,9 +367,9 @@ class MeetupService {
 
 class MeetupException implements Exception {
   final String message;
-  
+
   const MeetupException(this.message);
-  
+
   @override
   String toString() => 'MeetupException: $message';
 }

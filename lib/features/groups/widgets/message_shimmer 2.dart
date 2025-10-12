@@ -14,9 +14,8 @@ class MessageShimmer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isCurrentUser 
-            ? MainAxisAlignment.end 
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isCurrentUser) ...[

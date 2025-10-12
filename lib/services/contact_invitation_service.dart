@@ -11,7 +11,8 @@ import 'package:flutter/material.dart';
 /// - Contact validation and formatting
 /// - Privacy-compliant contact handling
 class ContactInvitationService {
-  static final ContactInvitationService _instance = ContactInvitationService._internal();
+  static final ContactInvitationService _instance =
+      ContactInvitationService._internal();
   factory ContactInvitationService() => _instance;
   ContactInvitationService._internal();
 
@@ -19,25 +20,25 @@ class ContactInvitationService {
   Future<bool> requestContactPermission() async {
     try {
       dev.log('📱 Requesting contact permission');
-      
+
       final status = await Permission.contacts.status;
-      
+
       if (status.isGranted) {
         dev.log('✅ Contact permission already granted');
         return true;
       }
-      
+
       if (status.isDenied) {
         dev.log('🔒 Contact permission denied, requesting...');
         final result = await Permission.contacts.request();
         return result.isGranted;
       }
-      
+
       if (status.isPermanentlyDenied) {
         dev.log('❌ Contact permission permanently denied');
         return false;
       }
-      
+
       return false;
     } catch (e) {
       dev.log('❌ Error requesting contact permission: $e');
@@ -49,7 +50,7 @@ class ContactInvitationService {
   Future<List<Contact>> getPhoneContacts() async {
     try {
       dev.log('📞 Getting phone contacts');
-      
+
       final hasPermission = await requestContactPermission();
       if (!hasPermission) {
         dev.log('❌ No contact permission');
@@ -60,7 +61,7 @@ class ContactInvitationService {
         withThumbnails: false,
         photoHighResolution: false,
       );
-      
+
       dev.log('📱 Retrieved ${contacts.length} contacts');
       return contacts;
     } catch (e) {
@@ -73,14 +74,17 @@ class ContactInvitationService {
   Future<List<Contact>> searchContacts(String query) async {
     try {
       if (query.isEmpty) return await getPhoneContacts();
-      
+
       final contacts = await getPhoneContacts();
       final lowercaseQuery = query.toLowerCase();
-      
+
       return contacts.where((contact) {
         final name = contact.displayName?.toLowerCase() ?? '';
-        final phones = contact.phones?.map((p) => p.value?.toLowerCase() ?? '').join(' ') ?? '';
-        
+        final phones = contact.phones
+                ?.map((p) => p.value?.toLowerCase() ?? '')
+                .join(' ') ??
+            '';
+
         return name.contains(lowercaseQuery) || phones.contains(lowercaseQuery);
       }).toList();
     } catch (e) {
@@ -97,10 +101,9 @@ class ContactInvitationService {
   /// Format contact for display
   String formatContactDisplay(Contact contact) {
     final name = contact.displayName ?? 'Unknown';
-    final phone = contact.phones?.isNotEmpty == true 
-        ? contact.phones!.first.value 
-        : null;
-    
+    final phone =
+        contact.phones?.isNotEmpty == true ? contact.phones!.first.value : null;
+
     if (phone != null) {
       return '$name ($phone)';
     }
@@ -110,7 +113,7 @@ class ContactInvitationService {
   /// Get primary phone number from contact
   String? getPrimaryPhone(Contact contact) {
     if (contact.phones?.isEmpty == true) return null;
-    
+
     // Return the first phone number
     return contact.phones!.first.value;
   }
@@ -118,7 +121,7 @@ class ContactInvitationService {
   /// Get primary email from contact
   String? getPrimaryEmail(Contact contact) {
     if (contact.emails?.isEmpty == true) return null;
-    
+
     // Return the first email
     return contact.emails!.first.value;
   }
@@ -132,7 +135,7 @@ class ContactInvitationService {
   }) {
     final phone = getPrimaryPhone(contact);
     final email = getPrimaryEmail(contact);
-    
+
     return {
       'contactName': contact.displayName ?? 'Unknown',
       'phone': phone,

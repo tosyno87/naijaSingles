@@ -5,23 +5,23 @@ import 'package:integration_test/integration_test.dart';
 /// Configuration for African diaspora integration testing
 class DiasporaTestConfig {
   static const String testEnvironment = 'integration_test';
-  
+
   /// US phone numbers for testing diaspora registration
   static const Map<String, String> testPhoneNumbers = {
-    'atlanta': '+1 404 555 0123',      // Atlanta, GA
+    'atlanta': '+1 404 555 0123', // Atlanta, GA
     'washington_dc': '+1 202 555 0124', // Washington, DC
-    'new_york': '+1 212 555 0125',     // New York, NY
-    'houston': '+1 713 555 0126',      // Houston, TX
-    'chicago': '+1 312 555 0127',      // Chicago, IL
-    'los_angeles': '+1 213 555 0128',  // Los Angeles, CA
-    'boston': '+1 617 555 0129',       // Boston, MA
-    'minneapolis': '+1 612 555 0130',  // Minneapolis, MN
+    'new_york': '+1 212 555 0125', // New York, NY
+    'houston': '+1 713 555 0126', // Houston, TX
+    'chicago': '+1 312 555 0127', // Chicago, IL
+    'los_angeles': '+1 213 555 0128', // Los Angeles, CA
+    'boston': '+1 617 555 0129', // Boston, MA
+    'minneapolis': '+1 612 555 0130', // Minneapolis, MN
   };
 
   /// African countries for testing cultural background
   static const List<String> testAfricanCountries = [
     'Nigeria',
-    'Ghana', 
+    'Ghana',
     'Ethiopia',
     'Kenya',
     'South Africa',
@@ -45,7 +45,7 @@ class DiasporaTestConfig {
   static const List<String> testLanguages = [
     'English',
     'Yoruba',
-    'Igbo', 
+    'Igbo',
     'Hausa',
     'Swahili',
     'Amharic',
@@ -64,7 +64,7 @@ class DiasporaTestConfig {
       'primary_communities': ['Nigerian', 'Ghanaian', 'Ethiopian'],
     },
     'Washington': {
-      'state': 'DC', 
+      'state': 'DC',
       'zip': '20001',
       'african_population': 150000,
       'primary_communities': ['Ethiopian', 'Nigerian', 'Somali'],
@@ -127,7 +127,7 @@ class DiasporaTestConfig {
   /// Setup method channel mocks for testing
   static Future<void> setupTestEnvironment() async {
     IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-    
+
     // Mock location services for US cities
     const MethodChannel('flutter.baseflow.com/geolocator')
         .setMockMethodCallHandler((MethodCall methodCall) async {
@@ -166,7 +166,8 @@ class DiasporaTestConfig {
         case 'Auth#signInWithCredential':
           return {
             'user': {
-              'uid': 'test_diaspora_user_${DateTime.now().millisecondsSinceEpoch}',
+              'uid':
+                  'test_diaspora_user_${DateTime.now().millisecondsSinceEpoch}',
               'phoneNumber': methodCall.arguments['phoneNumber'],
               'displayName': 'Test Diaspora User',
             }
@@ -186,19 +187,22 @@ class DiasporaTestConfig {
     final country = testAfricanCountries[countryIndex];
     final cityIndex = random % diasporaCities.keys.length;
     final city = diasporaCities.keys.elementAt(cityIndex);
-    
+
     return {
-      'phoneNumber': testPhoneNumbers.values.elementAt(random % testPhoneNumbers.length),
+      'phoneNumber':
+          testPhoneNumbers.values.elementAt(random % testPhoneNumbers.length),
       'country': country,
       'ethnicity': testEthnicities[country]?.first ?? 'Other',
       'city': city,
       'state': diasporaCities[city]!['state'],
       'profession': testProfessions[random % testProfessions.length],
       'education': testEducationLevels[random % testEducationLevels.length],
-      'immigration_status': testImmigrationStatuses[random % testImmigrationStatuses.length],
+      'immigration_status':
+          testImmigrationStatuses[random % testImmigrationStatuses.length],
       'languages': [
         'English',
-        testLanguages[1 + (random % (testLanguages.length - 1))], // Skip English
+        testLanguages[
+            1 + (random % (testLanguages.length - 1))], // Skip English
       ],
     };
   }
@@ -209,7 +213,7 @@ class DiasporaTestConfig {
         .setMockMethodCallHandler(null);
     const MethodChannel('plugins.flutter.io/firebase_auth')
         .setMockMethodCallHandler(null);
-    
+
     print('✅ Diaspora test environment cleanup complete');
   }
 }

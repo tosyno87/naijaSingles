@@ -66,13 +66,10 @@ class _TicketingStepState extends State<TicketingStep> {
             ),
           ),
           const SizedBox(height: 32),
-          
           _buildPricingSection(),
           const SizedBox(height: 32),
-          
           _buildCapacitySection(),
           const SizedBox(height: 32),
-          
           _buildPricingSummary(),
           const SizedBox(height: 40),
         ],
@@ -104,7 +101,7 @@ class _TicketingStepState extends State<TicketingStep> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Free/Paid toggle
         Row(
           children: [
@@ -137,11 +134,11 @@ class _TicketingStepState extends State<TicketingStep> {
             ),
           ],
         ),
-        
+
         // Price input for paid events
         if (!widget.eventData.isFree) ...[
           const SizedBox(height: 20),
-          
+
           // Currency selector
           Text(
             'Currency *',
@@ -167,7 +164,8 @@ class _TicketingStepState extends State<TicketingStep> {
               child: DropdownButton<String>(
                 value: widget.eventData.currency,
                 isExpanded: true,
-                dropdownColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+                dropdownColor:
+                    const Color(0xFFFFF6E5), // NaijaSingles cream background
                 icon: const Icon(
                   Icons.keyboard_arrow_down,
                   color: Color(0xFF666666),
@@ -181,7 +179,9 @@ class _TicketingStepState extends State<TicketingStep> {
                     value: 'NGN',
                     child: Row(
                       children: [
-                        Text('₦', style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('₦',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         Text('Nigerian Naira (NGN)'),
                       ],
@@ -191,7 +191,9 @@ class _TicketingStepState extends State<TicketingStep> {
                     value: 'USD',
                     child: Row(
                       children: [
-                        Text('\$', style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('\$',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         Text('US Dollar (USD)'),
                       ],
@@ -201,7 +203,9 @@ class _TicketingStepState extends State<TicketingStep> {
                     value: 'GBP',
                     child: Row(
                       children: [
-                        Text('£', style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('£',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         Text('British Pound (GBP)'),
                       ],
@@ -211,7 +215,9 @@ class _TicketingStepState extends State<TicketingStep> {
                     value: 'EUR',
                     child: Row(
                       children: [
-                        Text('€', style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('€',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         Text('Euro (EUR)'),
                       ],
@@ -228,7 +234,7 @@ class _TicketingStepState extends State<TicketingStep> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 20),
           Text(
             'Ticket Price (${widget.eventData.currencySymbol}) *',
@@ -267,7 +273,8 @@ class _TicketingStepState extends State<TicketingStep> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF008037), width: 2),
+                borderSide:
+                    const BorderSide(color: Color(0xFF008037), width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
               prefixIcon: Container(
@@ -307,10 +314,13 @@ class _TicketingStepState extends State<TicketingStep> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF008037).withOpacity(0.1) : Colors.white,
+          color: isSelected
+              ? const Color(0xFF008037).withOpacity(0.1)
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
+            color:
+                isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -320,8 +330,12 @@ class _TicketingStepState extends State<TicketingStep> {
             Row(
               children: [
                 Icon(
-                  isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                  color: isSelected ? const Color(0xFF008037) : const Color(0xFF999999),
+                  isSelected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  color: isSelected
+                      ? const Color(0xFF008037)
+                      : const Color(0xFF999999),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -331,7 +345,9 @@ class _TicketingStepState extends State<TicketingStep> {
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? const Color(0xFF008037) : const Color(0xFF333333),
+                      color: isSelected
+                          ? const Color(0xFF008037)
+                          : const Color(0xFF333333),
                     ),
                   ),
                 ),
@@ -375,7 +391,6 @@ class _TicketingStepState extends State<TicketingStep> {
           ),
         ),
         const SizedBox(height: 16),
-        
         TextFormField(
           controller: _capacityController,
           keyboardType: TextInputType.number,
@@ -459,7 +474,8 @@ class _TicketingStepState extends State<TicketingStep> {
             ),
             const SizedBox(height: 12),
             _buildSummaryRow('Ticket Price', 'Free'),
-            _buildSummaryRow('Max Attendees', '${widget.eventData.maxAttendees}'),
+            _buildSummaryRow(
+                'Max Attendees', '${widget.eventData.maxAttendees}'),
             _buildSummaryRow('Platform Fee', 'None'),
           ],
         ),
@@ -469,7 +485,7 @@ class _TicketingStepState extends State<TicketingStep> {
       final platformFee = ticketPrice * 0.10; // 10% platform fee
       final processingFee = (ticketPrice * 0.029) + 0.30; // 2.9% + $0.30
       final creatorEarnings = ticketPrice - platformFee - processingFee;
-      
+
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -501,13 +517,17 @@ class _TicketingStepState extends State<TicketingStep> {
               ],
             ),
             const SizedBox(height: 12),
-            _buildSummaryRow('Ticket Price', '${widget.eventData.currencySymbol}${ticketPrice.toStringAsFixed(2)}'),
-            _buildSummaryRow('Max Attendees', '${widget.eventData.maxAttendees}'),
-            _buildSummaryRow('Platform Fee (10%)', '${widget.eventData.currencySymbol}${platformFee.toStringAsFixed(2)}'),
-            _buildSummaryRow('Processing Fee', '${widget.eventData.currencySymbol}${processingFee.toStringAsFixed(2)}'),
+            _buildSummaryRow('Ticket Price',
+                '${widget.eventData.currencySymbol}${ticketPrice.toStringAsFixed(2)}'),
+            _buildSummaryRow(
+                'Max Attendees', '${widget.eventData.maxAttendees}'),
+            _buildSummaryRow('Platform Fee (10%)',
+                '${widget.eventData.currencySymbol}${platformFee.toStringAsFixed(2)}'),
+            _buildSummaryRow('Processing Fee',
+                '${widget.eventData.currencySymbol}${processingFee.toStringAsFixed(2)}'),
             const Divider(color: Color(0xFF008037)),
             _buildSummaryRow(
-              'Your Earnings per Ticket', 
+              'Your Earnings per Ticket',
               '${widget.eventData.currencySymbol}${creatorEarnings.toStringAsFixed(2)}',
               isTotal: true,
             ),

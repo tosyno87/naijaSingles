@@ -32,7 +32,8 @@ class CachedUserService {
     String? intentFilter, // Add intent filter parameter
   }) async {
     try {
-      final cacheKey = _generateCacheKey(currentUser, intentFilter: intentFilter);
+      final cacheKey =
+          _generateCacheKey(currentUser, intentFilter: intentFilter);
 
       debugPrint('🗄️ Checking cache for key: $cacheKey');
       if (intentFilter != null) {
@@ -74,7 +75,8 @@ class CachedUserService {
       debugPrint('❌ Error in getCachedUsers: $e');
 
       // Try to return stale cache as fallback
-      final cacheKey = _generateCacheKey(currentUser, intentFilter: intentFilter);
+      final cacheKey =
+          _generateCacheKey(currentUser, intentFilter: intentFilter);
       final staleCache = await _getCachedUserList(cacheKey);
 
       if (staleCache.isNotEmpty) {

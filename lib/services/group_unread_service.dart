@@ -74,21 +74,20 @@ class GroupUnreadService {
   }
 
   /// Increment unread count for a group (called when new message arrives)
-  Future<void> incrementUnreadCount(String groupId, {String? excludeUserId}) async {
+  Future<void> incrementUnreadCount(String groupId,
+      {String? excludeUserId}) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null || currentUserId == excludeUserId) return;
 
       // Get all group members
-      final groupDoc = await _firestore
-          .collection('unifiedGroups')
-          .doc(groupId)
-          .get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
 
       if (!groupDoc.exists) return;
 
       final memberIds = List<String>.from(groupDoc.data()?['memberIds'] ?? []);
-      
+
       // Increment unread count for all members except sender
       final batch = _firestore.batch();
       for (final memberId in memberIds) {
@@ -97,12 +96,15 @@ class GroupUnreadService {
               .collection('group_unread_counts')
               .doc('${groupId}_$memberId');
 
-          batch.set(unreadDocRef, {
-            'groupId': groupId,
-            'userId': memberId,
-            'count': FieldValue.increment(1),
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+          batch.set(
+              unreadDocRef,
+              {
+                'groupId': groupId,
+                'userId': memberId,
+                'count': FieldValue.increment(1),
+                'updatedAt': FieldValue.serverTimestamp(),
+              },
+              SetOptions(merge: true));
         }
       }
       await batch.commit();

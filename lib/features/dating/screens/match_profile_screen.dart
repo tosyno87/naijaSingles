@@ -5,7 +5,6 @@ import 'package:naijasingles/features/messages/services/chat_service.dart';
 import 'package:naijasingles/features/messages/chat_thread_screen.dart';
 import 'package:naijasingles/models/user_model.dart';
 
-
 class MatchProfileScreen extends StatefulWidget {
   final UserModel user;
 
@@ -44,25 +43,23 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
   // Start conversation with the matched user
   Future<void> _startConversation() async {
     if (_isLoadingMessage) return;
-    
+
     setState(() {
       _isLoadingMessage = true;
     });
 
     try {
       HapticFeedback.mediumImpact();
-      
+
       // Get or create chat thread
       String? threadId = await _chatService.getChatThreadId(widget.user.id!);
-      
+
       if (threadId == null) {
         // Create new thread
         threadId = await _chatService.createChatThread(
-          widget.user.id!, 
-          widget.user.name ?? 'User'
-        );
+            widget.user.id!, widget.user.name ?? 'User');
       }
-      
+
       if (threadId != null && mounted) {
         // Navigate to chat thread
         Navigator.push(
@@ -71,7 +68,9 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
             builder: (context) => ChatThreadScreen(
               threadId: threadId!,
               userName: widget.user.name ?? 'User',
-              avatarUrl: widget.user.imageUrl?.isNotEmpty == true ? widget.user.imageUrl![0] : null,
+              avatarUrl: widget.user.imageUrl?.isNotEmpty == true
+                  ? widget.user.imageUrl![0]
+                  : null,
               otherUserId: widget.user.id,
             ),
           ),
@@ -193,7 +192,8 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(75),
-                  child: widget.user.imageUrl != null && widget.user.imageUrl!.isNotEmpty
+                  child: widget.user.imageUrl != null &&
+                          widget.user.imageUrl!.isNotEmpty
                       ? Image.network(
                           widget.user.imageUrl![0],
                           fit: BoxFit.cover,
@@ -236,7 +236,8 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
           const SizedBox(height: 4),
 
           // Location
-          if (widget.user.living_in != null && widget.user.living_in!.isNotEmpty)
+          if (widget.user.living_in != null &&
+              widget.user.living_in!.isNotEmpty)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -266,11 +267,14 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
               spacing: 8,
               runSpacing: 8,
               children: [
-                if (widget.user.job_title != null && widget.user.job_title!.isNotEmpty)
+                if (widget.user.job_title != null &&
+                    widget.user.job_title!.isNotEmpty)
                   _buildTag(widget.user.job_title!, true),
-                if (widget.user.profession != null && widget.user.profession!.isNotEmpty)
+                if (widget.user.profession != null &&
+                    widget.user.profession!.isNotEmpty)
                   _buildTag(widget.user.profession!, false),
-                if (widget.user.education != null && widget.user.education!.isNotEmpty)
+                if (widget.user.education != null &&
+                    widget.user.education!.isNotEmpty)
                   _buildTag(widget.user.education!, false),
               ],
             ),
@@ -418,7 +422,9 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
 
           // Message labelLarge
           _buildCircleButton(
-            icon: _isLoadingMessage ? Icons.hourglass_empty : Icons.chat_bubble_outline,
+            icon: _isLoadingMessage
+                ? Icons.hourglass_empty
+                : Icons.chat_bubble_outline,
             color: Colors.blue.shade400,
             onTap: _isLoadingMessage ? () {} : () => _startConversation(),
             label: 'Message',

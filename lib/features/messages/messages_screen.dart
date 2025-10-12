@@ -52,7 +52,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         ),
         centerTitle: true,
-
       ),
       body: StreamBuilder<List<MessageThreadInfo>>(
         stream: _getChatThreadsStreamWithUserData(),
@@ -535,12 +534,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
     );
   }
 
-
-
   // Show delete confirmation dialog
   Future<bool?> _showDeleteConfirmation(MessageThreadInfo thread) async {
     if (!mounted) return false;
-    
+
     return showDialog<bool>(
       context: context,
       barrierDismissible: false, // Prevent dismissing by tapping outside
@@ -689,7 +686,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   // Delete chat thread with loading indicator
   Future<void> _deleteChatThread(MessageThreadInfo thread) async {
     if (!mounted) return;
-    
+
     // Show MVP compliant loading indicator
     showDialog(
       context: context,
@@ -757,35 +754,35 @@ class _MessagesScreenState extends State<MessagesScreen> {
         // Show success message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Conversation deleted and users unmatched',
-              style: GoogleFonts.montserrat(color: Colors.white),
+            SnackBar(
+              content: Text(
+                'Conversation deleted and users unmatched',
+                style: GoogleFonts.montserrat(color: Colors.white),
+              ),
+              backgroundColor: successColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            backgroundColor: successColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+          );
         }
       } else {
         // Show error message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to delete conversation',
-              style: GoogleFonts.montserrat(color: Colors.white),
+            SnackBar(
+              content: Text(
+                'Failed to delete conversation',
+                style: GoogleFonts.montserrat(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+          );
         }
       }
     } catch (e) {
@@ -797,18 +794,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       // Show error message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Error deleting conversation',
-            style: GoogleFonts.montserrat(color: Colors.white),
+          SnackBar(
+            content: Text(
+              'Error deleting conversation',
+              style: GoogleFonts.montserrat(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      );
+        );
       }
     }
   }
@@ -816,7 +813,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   // Method to view user profile from messages
   Future<void> _viewUserProfile(String userId) async {
     if (!mounted) return;
-    
+
     try {
       // Show MVP compliant loading indicator
       showDialog(
@@ -824,7 +821,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         barrierDismissible: false,
         builder: (context) => AlertDialog(
           backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 8,
           contentPadding: const EdgeInsets.all(32),
           content: Column(

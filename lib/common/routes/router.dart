@@ -144,7 +144,8 @@ abstract class AppRouter {
     // Settings screens
     RouteName.settingsScreen: (context) => const SettingsScreen(),
     RouteName.blockedUsers: (context) => const BlockedUsersScreen(),
-    RouteName.notificationSettings: (context) => const NotificationSettingsScreen(),
+    RouteName.notificationSettings: (context) =>
+        const NotificationSettingsScreen(),
     RouteName.safetyCenter: (context) => const SafetyCenterScreen(),
     RouteName.helpCenter: (context) => const HelpCenterScreen(),
     RouteName.feedbackScreen: (context) => const FeedbackScreen(),
@@ -154,9 +155,11 @@ abstract class AppRouter {
 
     // Events routes
     RouteName.eventsScreen: (context) => const EventsScreen(),
-    RouteName.eventTemplateSelection: (context) => const EventTemplateSelectionScreen(),
+    RouteName.eventTemplateSelection: (context) =>
+        const EventTemplateSelectionScreen(),
     RouteName.createEvent: (context) {
-      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
       return BlocProvider(
         create: (context) => EventCreationBloc(
           userEventService: UserEventService(),
@@ -170,7 +173,7 @@ abstract class AppRouter {
     RouteName.myEvents: (context) => const MyEventsScreen(),
     RouteName.eventDetails: (context) {
       final arguments = ModalRoute.of(context)!.settings.arguments;
-      
+
       // Handle both EventModel and EnhancedEventModel
       if (arguments is EnhancedEventModel) {
         return EventDetailsScreen(event: arguments.toEventModel());
@@ -178,10 +181,11 @@ abstract class AppRouter {
         return EventDetailsScreen(event: arguments);
       } else {
         // Fallback for any other type - this shouldn't happen but provides safety
-        throw ArgumentError('Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}');
+        throw ArgumentError(
+            'Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}');
       }
     },
-    
+
     // User detail route
     RouteName.userDetailScreen: (context) {
       final arguments = ModalRoute.of(context)!.settings.arguments;
@@ -193,7 +197,8 @@ abstract class AppRouter {
           selectedMode: arguments['selectedMode'] as String?,
         );
       } else {
-        throw ArgumentError('Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}');
+        throw ArgumentError(
+            'Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}');
       }
     },
   };
@@ -201,10 +206,10 @@ abstract class AppRouter {
   /// Generate route method for MaterialApp
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final String routeName = settings.name ?? '';
-    
+
     // Debug logging to help identify route issues
     debugPrint('🔍 Router: Attempting to navigate to route: "$routeName"');
-    
+
     final WidgetBuilder? builder = allRoutes[routeName];
 
     if (builder != null) {
@@ -214,7 +219,7 @@ abstract class AppRouter {
         settings: settings,
       );
     }
-    
+
     debugPrint('❌ Router: Route "$routeName" not found, showing error page');
 
     // Return a user-friendly error page with navigation options
@@ -240,16 +245,16 @@ abstract class AppRouter {
                 Text(
                   'Page Not Found',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: const Color(0xFF008037),
-                    fontWeight: FontWeight.bold,
-                  ),
+                        color: const Color(0xFF008037),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'The page you\'re looking for doesn\'t exist.',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                        color: Colors.grey[600],
+                      ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),

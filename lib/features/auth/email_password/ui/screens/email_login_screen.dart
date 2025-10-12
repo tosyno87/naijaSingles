@@ -23,7 +23,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
   // Define colors based on the Afrocentric design guidelines
   static const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
   static const Color primaryColor = Color(0xFF008037); // Green accent
-  static const Color accentColor = Color(0xFF008037); // Use green for consistency
+  static const Color accentColor =
+      Color(0xFF008037); // Use green for consistency
   static const Color textColor = Color(0xFF2D2D2D); // Dark text
 
   @override

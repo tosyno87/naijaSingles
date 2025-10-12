@@ -218,17 +218,27 @@ jobs:
           
           # Get app ID from bundle identifier
           APP_RESPONSE=$(curl -s -H "Authorization: Bearer $JWT" \
-            "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=com.app.naijasingles")
+            "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=com.app.naijasingles" || echo '{"data":[]}')
           
-          APP_ID=$(echo "$APP_RESPONSE" | jq -r '.data[0].id')
+          echo "📋 API Response: $APP_RESPONSE" | head -c 200
+          echo ""
+          
+          APP_ID=$(echo "$APP_RESPONSE" | jq -r '.data[0].id // "null"' 2>/dev/null || echo "null")
           echo "📱 App ID: $APP_ID"
           
           # Get latest build for this app
           if [ "$APP_ID" != "null" ] && [ -n "$APP_ID" ]; then
             BUILDS_RESPONSE=$(curl -s -H "Authorization: Bearer $JWT" \
-              "https://api.appstoreconnect.apple.com/v1/builds?filter[app]=$APP_ID&sort=-uploadedDate&limit=1")
+              "https://api.appstoreconnect.apple.com/v1/builds?filter[app]=$APP_ID&sort=-uploadedDate&limit=1" || echo '{"data":[]}')
             
-            CURRENT_BUILD=$(echo "$BUILDS_RESPONSE" | jq -r '.data[0].attributes.version // "0"')
+            CURRENT_BUILD=$(echo "$BUILDS_RESPONSE" | jq -r '.data[0].attributes.version // "0"' 2>/dev/null || echo "0")
+            
+            # Handle non-numeric values
+            if ! [[ "$CURRENT_BUILD" =~ ^[0-9]+$ ]]; then
+              echo "⚠️ Invalid build number: $CURRENT_BUILD, defaulting to 0"
+              CURRENT_BUILD=0
+            fi
+            
             echo "📊 Current build in App Store Connect: $CURRENT_BUILD"
           else
             echo "ℹ️ App not found or no builds yet, starting from build 1"

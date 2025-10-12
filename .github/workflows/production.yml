@@ -317,20 +317,67 @@ jobs:
           
           # Upload using App Store Connect API directly (bypasses Fastlane OpenSSL issues)
           echo "🚀 Starting upload to App Store Connect..."
-          xcrun altool --upload-app \
+          
+          # First upload attempt - may fail due to version conflict
+          UPLOAD_OUTPUT=$(xcrun altool --upload-app \
             --type ios \
             --file "$IPA_FILE" \
             --apiKey "$APPSTORE_API_KEY_ID" \
             --apiIssuer "$APPSTORE_API_ISSUER_ID" \
-            --verbose
+            --verbose 2>&1) || true
           
-          UPLOAD_RESULT=$?
-          if [ $UPLOAD_RESULT -eq 0 ]; then
+          echo "$UPLOAD_OUTPUT"
+          
+          # Check if upload succeeded
+          if echo "$UPLOAD_OUTPUT" | grep -q "No errors uploading"; then
             echo "✅ Upload successful!"
-          else
-            echo "❌ Upload failed with exit code: $UPLOAD_RESULT"
-            exit $UPLOAD_RESULT
+            exit 0
           fi
+          
+          # Check if it's a version conflict error
+          if echo "$UPLOAD_OUTPUT" | grep -q "previousBundleVersion"; then
+            PREVIOUS_BUILD=$(echo "$UPLOAD_OUTPUT" | grep -o 'previousBundleVersion[[:space:]]*:[[:space:]]*[0-9]*' | grep -o '[0-9]*$' | head -1)
+            
+            if [ -n "$PREVIOUS_BUILD" ] && [ "$PREVIOUS_BUILD" != "0" ]; then
+              NEW_BUILD=$((PREVIOUS_BUILD + 1))
+              echo "🔄 Version conflict detected!"
+              echo "   Previous build: $PREVIOUS_BUILD"
+              echo "   Retrying with build: $NEW_BUILD"
+              
+              # Update pubspec.yaml
+              CURRENT_VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: \(.*\)+.*/\1/')
+              sed -i.bak "s/version: .*+.*/version: ${CURRENT_VERSION}+${NEW_BUILD}/" pubspec.yaml
+              echo "✅ Updated to: $(grep 'version:' pubspec.yaml)"
+              
+              # Rebuild with correct version
+              echo "🔨 Rebuilding with correct version..."
+              cd ios
+              flutter pub get
+              bundle exec fastlane build_app
+              cd ..
+              
+              # Find the new IPA
+              IPA_FILE=$(find . -name "*.ipa" | head -1)
+              echo "📱 New IPA: $IPA_FILE"
+              
+              # Retry upload
+              echo "🚀 Retrying upload with build $NEW_BUILD..."
+              xcrun altool --upload-app \
+                --type ios \
+                --file "$IPA_FILE" \
+                --apiKey "$APPSTORE_API_KEY_ID" \
+                --apiIssuer "$APPSTORE_API_ISSUER_ID" \
+                --verbose
+              
+              echo "✅ Upload successful!"
+              exit 0
+            fi
+          fi
+          
+          # If we got here, upload failed for another reason
+          echo "❌ Upload failed"
+          echo "$UPLOAD_OUTPUT"
+          exit 1
             
       - name: Create Deployment Record
         uses: actions/github-script@v7

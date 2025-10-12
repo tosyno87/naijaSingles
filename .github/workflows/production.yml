@@ -347,7 +347,12 @@ jobs:
               # Update pubspec.yaml
               CURRENT_VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: \(.*\)+.*/\1/')
               sed -i.bak "s/version: .*+.*/version: ${CURRENT_VERSION}+${NEW_BUILD}/" pubspec.yaml
-              echo "✅ Updated to: $(grep 'version:' pubspec.yaml)"
+              echo "✅ Updated pubspec.yaml to: $(grep 'version:' pubspec.yaml)"
+              
+              # Also update iOS Info.plist directly (critical for version to be picked up)
+              /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $NEW_BUILD" ios/Runner/Info.plist
+              /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CURRENT_VERSION" ios/Runner/Info.plist
+              echo "✅ Updated Info.plist: CFBundleVersion=$NEW_BUILD, CFBundleShortVersionString=$CURRENT_VERSION"
               
               # Rebuild with correct version
               echo "🔨 Rebuilding with correct version..."

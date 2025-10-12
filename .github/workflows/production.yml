@@ -386,17 +386,8 @@ jobs:
           echo "$UPLOAD_OUTPUT"
           exit 1
             
-      - name: Create Deployment Record
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.sha,
-              environment: 'production',
-              description: 'Production deployment via release branch ${{ github.ref_name }}'
-            });
+      # Deployment record creation removed - not essential for App Store deployment
+      # The actual deployment to App Store Connect is what matters
 
   security-scan:
     name: Security Scan

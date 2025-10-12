@@ -7,7 +7,7 @@ class TestDataGeneratorService {
   static const String _testUserPrefix = 'test_user_';
   
   // City coordinates for realistic location testing
-  static const Map<String, Map<String, double>> _cities = {
+  static const Map<String, Map<String, dynamic>> _cities = {
     'atlanta': {
       'lat': 33.7490,
       'lng': -84.3880,
@@ -301,16 +301,19 @@ class TestDataGeneratorService {
     for (final user in users) {
       // Gender distribution
       final gender = user['gender'] as String;
-      stats['byGender'][gender] = (stats['byGender'][gender] ?? 0) + 1;
+      final genderMap = stats['byGender'] as Map<String, int>;
+      genderMap[gender] = (genderMap[gender] ?? 0) + 1;
       
       // City distribution
       final city = user['city'] as String;
-      stats['byCity'][city] = (stats['byCity'][city] ?? 0) + 1;
+      final cityMap = stats['byCity'] as Map<String, int>;
+      cityMap[city] = (cityMap[city] ?? 0) + 1;
       
       // Age distribution
       final age = user['age'] as int;
       final ageGroup = '${(age ~/ 10) * 10}s';
-      stats['ageDistribution'][ageGroup] = (stats['ageDistribution'][ageGroup] ?? 0) + 1;
+      final ageMap = stats['ageDistribution'] as Map<String, int>;
+      ageMap[ageGroup] = (ageMap[ageGroup] ?? 0) + 1;
     }
     
     return stats;

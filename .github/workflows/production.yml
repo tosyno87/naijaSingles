@@ -354,6 +354,7 @@ jobs:
               flutter clean
               flutter pub get
               cd ios
+              pod install
               bundle exec fastlane build_app
               cd ..
               

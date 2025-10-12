@@ -351,8 +351,9 @@ jobs:
               
               # Rebuild with correct version
               echo "🔨 Rebuilding with correct version..."
-              cd ios
+              flutter clean
               flutter pub get
+              cd ios
               bundle exec fastlane build_app
               cd ..
               

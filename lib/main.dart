@@ -41,10 +41,12 @@ Future<void> main() async {
   }
 
   // Initialize Firebase with error handling
+  bool firebaseInitialized = false;
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    firebaseInitialized = true;
     log('🔥 Firebase initialized successfully');
 
     // Initialize Enhanced Notification Service
@@ -59,27 +61,26 @@ Future<void> main() async {
     } catch (e) {
       log('⚠️ Events seeding error: $e');
     }
+
+    // Add debug logging for auth state changes
+    FirebaseAuth.instance.authStateChanges().listen(
+      (User? user) {
+        log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
+      },
+      onError: (error) {
+        log("❌ Auth state error: $error");
+      },
+    );
+
+    // Auto-login for testing in debug mode
+    try {
+      await AutoLoginService.autoLoginForTesting();
+    } catch (e) {
+      log('⚠️ Auto-login error: $e');
+    }
   } catch (e) {
     log('❌ Firebase initialization error: $e');
-  }
-
-  // Authentication state will be managed by the app flow
-
-  // Add debug logging for auth state changes
-  FirebaseAuth.instance.authStateChanges().listen(
-    (User? user) {
-      log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
-    },
-    onError: (error) {
-      log("❌ Auth state error: $error");
-    },
-  );
-
-  // Auto-login for testing in debug mode
-  try {
-    await AutoLoginService.autoLoginForTesting();
-  } catch (e) {
-    log('⚠️ Auto-login error: $e');
+    log('💡 The app will continue but Firebase features will not work');
   }
 
   Bloc.observer = SimpleBlocObserver();

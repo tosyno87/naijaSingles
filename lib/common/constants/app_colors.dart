@@ -19,10 +19,10 @@ class AppColors {
   static const Color gradientDark = Color(0xFF006B2E);
 
   // 🎯 BACKGROUND COLORS - Afrocentric Theme
-  static const Color backgroundColor = Colors.white; // White background
-  static const Color surfaceColor = Colors.white; // White surface
+  static const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green background
+  static const Color surfaceColor = Color(0xFFE8F5E8); // Soft mint surface
   static const Color cardColor = Colors.white; // White cards
-  static const Color overlayColor = Color(0xFFF8FAFC);
+  static const Color overlayColor = Color(0xFFD4F0D4); // Slightly darker mint
 
   // 📝 TEXT COLORS - Afrocentric Theme
   static const Color textPrimary =

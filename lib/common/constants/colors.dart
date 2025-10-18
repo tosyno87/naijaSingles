@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // Afropeep MVP Color Scheme - Consistent across the app
 const Color primaryColor = Color(0xFF008037); // Deep green
-const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
+const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green
 const Color cardColor = Color(0xFFFFFFFF); // White for cards
 const Color textPrimary = Color(0xFF5D4037); // Brown
 const Color textSecondary = Color(0xFF8D6E63); // Light brown
@@ -25,12 +25,12 @@ const Color infoColor = Color(0xFF2196F3); // Blue for info
 // Opacity variations of primary colors
 const Color primaryColorLight = Color(0x1A008037); // 10% opacity
 const Color primaryColorMedium = Color(0x4D008037); // 30% opacity
-const Color backgroundColorDark = Color(0xFFFDF1E7); // Slightly darker cream
+const Color backgroundColorDark = Color(0xFFD4F0D4); // Slightly darker mint
 
 // AppColors class for backward compatibility
 class AppColors {
   static const Color primaryColor = Color(0xFF008037);
-  static const Color backgroundColor = Color(0xFFFFF6E5);
+  static const Color backgroundColor = Color(0xFFE8F5E8);
   static const Color cardColor = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF5D4037);
   static const Color textSecondary = Color(0xFF8D6E63);

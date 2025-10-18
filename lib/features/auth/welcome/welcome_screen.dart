@@ -170,7 +170,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               },
                             ),
 
-                            const SizedBox(height: 32), // Increased spacing for massive logo
+                            const SizedBox(height: 24), // Reduced spacing for better button visibility
 
                             // Animated progress bar instead of decorative line
                             AnimatedBuilder(
@@ -183,7 +183,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               },
                             ),
 
-                            const SizedBox(height: 40), // Increased spacing
+                            const SizedBox(height: 32), // Reduced spacing
 
                             // Welcome message with animation
                             AnimatedBuilder(
@@ -254,7 +254,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       top: false,
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          bottom: 40.0, // Increased bottom padding
+                          bottom: 60.0, // Further increased bottom padding
                           left: 0.0,
                           right: 0.0,
                         ),
@@ -301,7 +301,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   ),
                                 ),
 
-                                const SizedBox(height: 16), // Consistent spacing between buttons
+                                const SizedBox(height: 20), // Increased spacing between buttons
 
                                 // Login Button
                                 SlideTransition(
@@ -337,7 +337,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   // Clean logo without glow - stands confidently on its own
   Widget _buildCleanLogo() {
-    return const AfropeepLogo(size: 180); // Further reduced size for better fit
+    return const AfropeepLogo(size: 160); // Further reduced size for better button visibility
   }
 
   // Animated progress bar

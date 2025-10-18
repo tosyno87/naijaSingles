@@ -130,199 +130,215 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     ));
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, // 2. Set resizeToAvoidBottomInset: true
-      body: SafeArea( // 1. Wrap full layout in SafeArea
-        child: SingleChildScrollView( // 1. Wrap full layout in SingleChildScrollView
-          physics: const BouncingScrollPhysics(),
-          child: AnimatedBuilder(
-            animation: _backgroundOpacity,
-            builder: (context, child) {
-              return Container(
-                decoration: BoxDecoration(
-                  // 6. Maintain mint green background (#E9F5EC)
-                  color: const Color(0xFFE9F5EC),
-                  image: DecorationImage(
-                    image: const AssetImage('assets/images/african_pattern.png'),
-                    fit: BoxFit.cover,
-                    opacity: _backgroundOpacity.value, // Animated opacity for polish
-                  ),
+      resizeToAvoidBottomInset: true,
+      body: SafeArea( // 1. Wrap entire screen content in SafeArea with specific parameters
+        top: true,
+        bottom: true,
+        maintainBottomViewPadding: true,
+        child: AnimatedBuilder(
+          animation: _backgroundOpacity,
+          builder: (context, child) {
+            return Container(
+              decoration: BoxDecoration(
+                // Mint green background (#E9F5EC)
+                color: const Color(0xFFE9F5EC),
+                image: DecorationImage(
+                  image: const AssetImage('assets/images/african_pattern.png'),
+                  fit: BoxFit.cover,
+                  opacity: _backgroundOpacity.value, // Animated opacity for polish
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // 3. spaceBetween for button anchoring
-                    children: [
-                      // Top Section: Logo and tagline
-                      Column(
-                        children: [
-                          const SizedBox(height: 20), // Top spacing
-                          
-                          // Clean Afropeep Logo with bounce-in and fade animation
-                          AnimatedBuilder(
-                            animation: _logoScale,
-                            builder: (context, child) {
-                              return Transform.scale(
-                                scale: _logoScale.value,
-                                child: Opacity(
-                                  opacity: _logoScale.value.clamp(0.0, 1.0),
-                                  child: _buildCleanLogo(),
-                                ),
-                              );
-                            },
-                          ),
-
-                          const SizedBox(height: 24), // 5. Consistent vertical spacing
-
-                          // Animated progress bar instead of decorative line
-                          AnimatedBuilder(
-                            animation: _textOpacity,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _textOpacity.value,
-                                child: _buildAnimatedProgressBar(),
-                              );
-                            },
-                          ),
-
-                          const SizedBox(height: 24), // 5. Consistent vertical spacing
-
-                          // Main tagline with animation
-                          AnimatedBuilder(
-                            animation: _textOpacity,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _textOpacity.value,
-                                child: Text(
-                                  "Connect Your Tribe From Anywhere",
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat( // 6. Maintain Montserrat font
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textPrimary,
-                                    height: 1.3,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-
-                      // Middle Section: Welcome text and slogan
-                      Column(
-                        children: [
-                          // Welcome message with animation
-                          AnimatedBuilder(
-                            animation: _textOpacity,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _textOpacity.value,
-                                child: Text(
-                                  "Welcome to Afropeep, your journey to meaningful connections starts here.",
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat( // 6. Maintain Montserrat font
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.italic,
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                          const SizedBox(height: 24), // 5. Consistent vertical spacing
-
-                          // Rotating greeting in African languages with animation
-                          AnimatedBuilder(
-                            animation: _textOpacity,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _textOpacity.value,
-                                child: const RotatingGreetingWidget(),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-
-                      // Bottom Section: Buttons with adaptive padding
-                      Padding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).padding.bottom + 20, // 4. Adaptive padding
-                        ),
-                        child: Column(
+              ),
+              child: Center( // 🔧 1. Replace IntrinsicHeight with Center + SingleChildScrollView
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox( // 2. Move Column into ConstrainedBox with minHeight
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height - 
+                                MediaQuery.of(context).padding.top - 
+                                MediaQuery.of(context).padding.bottom,
+                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween, // 3. spaceBetween for button anchoring
+                      children: [
+                        // Top Section: Logo and tagline
+                        Column(
                           children: [
-                            // Show loading indicator while checking auth status
-                            if (_isLoading)
-                              const CircularProgressIndicator(
-                                color: Color(0xFF008037), // 6. Green (#008037)
-                              ),
-
-                            // Show different buttons based on authentication status
-                            if (!_isLoading) ...[
-                              // Continue to App button for authenticated users
-                              if (_isAuthenticated)
-                                SlideTransition(
-                                  position: _buttonSlide,
-                                  child: _buildGradientButton(
-                                    text: "Continue to App",
-                                    onPressed: () {
-                                      Navigator.pushReplacementNamed(
-                                          context, RouteName.mainNavigation);
-                                    },
+                            const SizedBox(height: 20), // Top spacing
+                            
+                            // Clean Afropeep Logo with bounce-in and fade animation
+                            AnimatedBuilder(
+                              animation: _logoScale,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: _logoScale.value,
+                                  child: Opacity(
+                                    opacity: _logoScale.value.clamp(0.0, 1.0),
+                                    child: _buildCleanLogo(),
                                   ),
-                                ),
+                                );
+                              },
+                            ),
 
-                              // Create Account and Login buttons for unauthenticated users
-                              if (!_isAuthenticated) ...[
-                                // Create Account Button
-                                SlideTransition(
-                                  position: _buttonSlide,
-                                  child: _buildGradientButton(
-                                    text: "Create Account",
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AuthMethodSelectionScreen(),
-                                        ),
-                                      );
-                                    },
+                            const SizedBox(height: 24), // Consistent vertical spacing
+
+                            // Animated progress bar instead of decorative line
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: _buildAnimatedProgressBar(),
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 24), // Consistent vertical spacing
+
+                            // Main tagline with animation
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: Text(
+                                    "Connect Your Tribe From Anywhere",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textPrimary,
+                                      height: 1.3,
+                                    ),
                                   ),
-                                ),
-
-                                const SizedBox(height: 24), // 5. Consistent vertical spacing between buttons
-
-                                // Login Button
-                                SlideTransition(
-                                  position: _buttonSlide,
-                                  child: _buildOutlinedButton(
-                                    text: "Login",
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SignInMethodSelectionScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ],
+                                );
+                              },
+                            ),
                           ],
                         ),
-                      ),
-                    ],
+
+                        // Middle Section: Welcome text and slogan
+                        Column(
+                          children: [
+                            // Welcome message with animation
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: Text(
+                                    "Welcome to Afropeep, your journey to meaningful connections starts here.",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.italic,
+                                      color: AppColors.textSecondary,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 24), // Consistent vertical spacing
+
+                            // Rotating greeting in African languages with animation
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: const RotatingGreetingWidget(),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+
+                        const Spacer(), // 🔧 2. keeps buttons floating above the home indicator
+
+                        // Bottom Section: Buttons with updated padding
+                        Padding(
+                          padding: EdgeInsets.only(
+                            // 🔧 3. Update bottom padding logic for keyboard and safe area
+                            bottom: MediaQuery.of(context).viewInsets.bottom > 0
+                                ? 20
+                                : MediaQuery.of(context).viewPadding.bottom + 50,
+                          ),
+                          child: Column(
+                            children: [
+                              // Show loading indicator while checking auth status
+                              if (_isLoading)
+                                const CircularProgressIndicator(
+                                  color: Color(0xFF008037), // Green (#008037)
+                                ),
+
+                              // Show different buttons based on authentication status
+                              if (!_isLoading) ...[
+                                // Continue to App button for authenticated users
+                                if (_isAuthenticated)
+                                  SlideTransition(
+                                    position: _buttonSlide,
+                                    child: _buildGradientButton(
+                                      text: "Continue to App",
+                                      onPressed: () {
+                                        Navigator.pushReplacementNamed(
+                                            context, RouteName.mainNavigation);
+                                      },
+                                    ),
+                                  ),
+
+                                // Create Account and Login buttons for unauthenticated users
+                                if (!_isAuthenticated) ...[
+                                  // Create Account Button
+                                  SlideTransition(
+                                    position: _buttonSlide,
+                                    child: _buildGradientButton(
+                                      text: "Create Account",
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AuthMethodSelectionScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 24), // Consistent vertical spacing between buttons
+
+                                  // Login Button
+                                  SlideTransition(
+                                    position: _buttonSlide,
+                                    child: _buildOutlinedButton(
+                                      text: "Login",
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SignInMethodSelectionScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

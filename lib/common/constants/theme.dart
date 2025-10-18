@@ -7,9 +7,13 @@ import 'app_colors.dart';
 class MyThemes {
   static final darkTheme = ThemeData(
     scaffoldBackgroundColor: AppColors.backgroundColor,
-    colorScheme: const ColorScheme.light(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primaryGreen,
+      brightness: Brightness.light,
       primary: AppColors.primaryGreen,
       secondary: AppColors.accentGreen,
+      surface: AppColors.surfaceColor,
+      background: AppColors.backgroundColor,
       error: AppColors.error,
     ),
     textTheme: GoogleFonts.montserratTextTheme(
@@ -53,7 +57,7 @@ class MyThemes {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: Colors.white.withValues(alpha: 0.1),
+      fillColor: AppColors.backgroundColor.withValues(alpha: 0.1),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -61,7 +65,7 @@ class MyThemes {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+        borderSide: BorderSide(color: AppColors.backgroundColor.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

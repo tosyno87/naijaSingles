@@ -140,8 +140,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               image: DecorationImage(
                 image: const AssetImage('assets/images/african_pattern.png'),
                 fit: BoxFit.cover,
-                opacity:
-                    _backgroundOpacity.value, // Animated opacity for polish
+                opacity: _backgroundOpacity.value, // Animated opacity for polish
               ),
             ),
             child: SafeArea(
@@ -155,176 +154,174 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                      const SizedBox(
-                          height: 20), // Reduced spacing for better fit
+                            const SizedBox(height: 20), // Reduced spacing for better fit
 
-                      // Clean Afropeep Logo with bounce-in and fade animation
-                      AnimatedBuilder(
-                        animation: _logoScale,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: _logoScale.value,
-                            child: Opacity(
-                              opacity: _logoScale.value.clamp(0.0, 1.0),
-                              child: _buildCleanLogo(),
+                            // Clean Afropeep Logo with bounce-in and fade animation
+                            AnimatedBuilder(
+                              animation: _logoScale,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: _logoScale.value,
+                                  child: Opacity(
+                                    opacity: _logoScale.value.clamp(0.0, 1.0),
+                                    child: _buildCleanLogo(),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
+
+                            const SizedBox(height: 32), // Increased spacing for massive logo
+
+                            // Animated progress bar instead of decorative line
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: _buildAnimatedProgressBar(),
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 40), // Increased spacing
+
+                            // Welcome message with animation
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: Text(
+                                    "Welcome to Afropeep, your journey to meaningful connections starts here.",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.italic,
+                                      color: AppColors.textSecondary,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 24), // Increased spacing
+
+                            // Rotating greeting in African languages with animation
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: const RotatingGreetingWidget(),
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 32), // Increased spacing
+
+                            // Main tagline with animation
+                            AnimatedBuilder(
+                              animation: _textOpacity,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _textOpacity.value,
+                                  child: Text(
+                                    "Connect Your Tribe From Anywhere",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textPrimary,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 40), // Fixed spacing instead of Spacer
+
+                            // Content ends here - buttons moved to bottom section
+                          ],
+                        ),
                       ),
+                    ),
+                    
+                    // Bottom buttons section with safe area padding
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: Column(
+                        children: [
+                          // Show loading indicator while checking auth status
+                          if (_isLoading)
+                            const CircularProgressIndicator(
+                              color: AppColors.primaryGreen,
+                            ),
 
-                      const SizedBox(
-                          height: 32), // Increased spacing for massive logo
-
-                      // Animated progress bar instead of decorative line
-                      AnimatedBuilder(
-                        animation: _textOpacity,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _textOpacity.value,
-                            child: _buildAnimatedProgressBar(),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 40), // Increased spacing
-
-                      // Welcome message with animation
-                      AnimatedBuilder(
-                        animation: _textOpacity,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _textOpacity.value,
-                            child: Text(
-                              "Welcome to Afropeep, your journey to meaningful connections starts here.",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FontStyle.italic,
-                                color: AppColors.textSecondary,
-                                height: 1.4,
+                          // Show different buttons based on authentication status
+                          if (!_isLoading) ...[
+                            // Continue to App button for authenticated users
+                            if (_isAuthenticated)
+                              SlideTransition(
+                                position: _buttonSlide,
+                                child: _buildGradientButton(
+                                  text: "Continue to App",
+                                  onPressed: () {
+                                    Navigator.pushReplacementNamed(
+                                        context, RouteName.mainNavigation);
+                                  },
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
 
-                      const SizedBox(height: 24), // Increased spacing
-
-                      // Rotating greeting in African languages with animation
-                      AnimatedBuilder(
-                        animation: _textOpacity,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _textOpacity.value,
-                            child: const RotatingGreetingWidget(),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 32), // Increased spacing
-
-                      // Main tagline with animation
-                      AnimatedBuilder(
-                        animation: _textOpacity,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _textOpacity.value,
-                            child: Text(
-                              "Connect Your Tribe From Anywhere",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimary,
-                                height: 1.3,
+                            // Create Account and Login buttons for unauthenticated users
+                            if (!_isAuthenticated) ...[
+                              // Create Account Button
+                              SlideTransition(
+                                position: _buttonSlide,
+                                child: _buildGradientButton(
+                                  text: "Create Account",
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const AuthMethodSelectionScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                          );
-                        },
+
+                              const SizedBox(height: 16), // Proper spacing between buttons
+
+                              // Login Button
+                              SlideTransition(
+                                position: _buttonSlide,
+                                child: _buildOutlinedButton(
+                                  text: "Login",
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignInMethodSelectionScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ],
+                        ],
                       ),
-
-                      const SizedBox(
-                          height: 40), // Fixed spacing instead of Spacer
-
-                      // Content ends here - buttons moved to bottom section
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-                
-                // Bottom buttons section with safe area padding
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    children: [
-                      // Show loading indicator while checking auth status
-                      if (_isLoading)
-                        const CircularProgressIndicator(
-                          color: AppColors.primaryGreen,
-                        ),
-
-                      // Show different buttons based on authentication status
-                      if (!_isLoading) ...[
-                        // Continue to App button for authenticated users
-                        if (_isAuthenticated)
-                          SlideTransition(
-                            position: _buttonSlide,
-                            child: _buildGradientButton(
-                              text: "Continue to App",
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, RouteName.mainNavigation);
-                              },
-                            ),
-                          ),
-
-                        // Create Account and Login buttons for unauthenticated users
-                        if (!_isAuthenticated) ...[
-                          // Create Account Button
-                          SlideTransition(
-                            position: _buttonSlide,
-                            child: _buildGradientButton(
-                              text: "Create Account",
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AuthMethodSelectionScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 16), // Proper spacing between buttons
-
-                          // Login Button
-                          SlideTransition(
-                            position: _buttonSlide,
-                            child: _buildOutlinedButton(
-                              text: "Login",
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const SignInMethodSelectionScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ],
-                    ],
-                  ),
-                ),
-              ],
             ),
-          ),
-        );
+          );
         },
       ),
     );
@@ -348,9 +345,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             borderRadius: BorderRadius.circular(1),
             gradient: LinearGradient(
               colors: [
-                AppColors.primaryGreen.withOpacity(0.1),
-                AppColors.primaryGreen.withOpacity(0.3),
-                AppColors.primaryGreen.withOpacity(0.1),
+                AppColors.primaryGreen.withValues(alpha: 0.1),
+                AppColors.primaryGreen.withValues(alpha: 0.3),
+                AppColors.primaryGreen.withValues(alpha: 0.1),
               ],
             ),
           ),

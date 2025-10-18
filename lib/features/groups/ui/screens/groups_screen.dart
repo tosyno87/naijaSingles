@@ -577,7 +577,7 @@ class _GroupsScreenState extends State<GroupsScreen>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF6E5), // Soft cream background
+                color: const Color(0xFFE8F5E8), // Soft cream background
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(

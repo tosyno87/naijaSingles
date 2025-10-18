@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:naijasingles/common/providers/user_provider.dart';
 import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/routes/router.dart';
@@ -31,11 +32,10 @@ Future<void> main() async {
 
   // Initialize Secure Configuration first
   try {
-    await SecureConfig.initialize();
-    SecureConfig.validate();
-    log('🔒 Secure configuration loaded successfully');
+    await dotenv.load(fileName: ".env");
+    log('🔒 Environment configuration loaded successfully');
   } catch (e) {
-    log('❌ Secure configuration error: $e');
+    log('❌ Environment configuration error: $e');
     log('💡 Make sure you have created a .env file with your Firebase configuration');
     // Continue anyway in development mode
   }

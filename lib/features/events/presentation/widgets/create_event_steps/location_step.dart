@@ -139,7 +139,7 @@ class _LocationStepState extends State<LocationStep> {
                   .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -198,7 +198,7 @@ class _LocationStepState extends State<LocationStep> {
                   .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -257,7 +257,7 @@ class _LocationStepState extends State<LocationStep> {
                   .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -316,7 +316,7 @@ class _LocationStepState extends State<LocationStep> {
                   .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -367,7 +367,7 @@ class _LocationStepState extends State<LocationStep> {
                   .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(

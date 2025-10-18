@@ -64,7 +64,7 @@ class _MediaStepState extends State<MediaStep> {
       width: double.infinity,
       height: 220,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF6E5),
+        color: const Color(0xFFE8F5E8),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: const Color(0xFF008037).withOpacity(0.3),
@@ -386,7 +386,7 @@ class _MediaStepState extends State<MediaStep> {
             child: Container(
               width: double.infinity,
               height: double.infinity,
-              color: const Color(0xFFFFF6E5),
+              color: const Color(0xFFE8F5E8),
               child: widget.eventData.imageUrls[index].startsWith('http')
                   ? Image.network(
                       widget.eventData.imageUrls[index],

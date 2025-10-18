@@ -90,7 +90,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+      backgroundColor: const Color(0xFFE8F5E8),
       body: SafeArea(
         child: Column(
           children: [

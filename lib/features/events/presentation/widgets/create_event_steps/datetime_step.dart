@@ -241,7 +241,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+              color: const Color(0xFFE8F5E8), // NaijaSingles cream background
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: const Color(0xFF008037)
@@ -302,7 +302,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+              color: const Color(0xFFE8F5E8), // NaijaSingles cream background
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: const Color(0xFF008037)

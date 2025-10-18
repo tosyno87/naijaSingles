@@ -196,7 +196,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: const Color(0xFFE8F5E8),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -305,7 +305,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: const Color(0xFFE8F5E8),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -371,7 +371,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            color: const Color(0xFFE8F5E8), // NaijaSingles cream background
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFF008037)
@@ -405,7 +405,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               ),
               isExpanded: true,
               dropdownColor:
-                  const Color(0xFFFFF6E5), // NaijaSingles cream dropdown
+                  const Color(0xFFE8F5E8), // NaijaSingles cream dropdown
               items: _categories.map((category) {
                 return DropdownMenuItem<String>(
                   value: category,
@@ -476,7 +476,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   ),
                   filled: true,
                   fillColor:
-                      const Color(0xFFFFF6E5), // NaijaSingles cream background
+                      const Color(0xFFE8F5E8), // NaijaSingles cream background
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(

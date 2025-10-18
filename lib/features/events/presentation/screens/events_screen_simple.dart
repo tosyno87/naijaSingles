@@ -12,7 +12,7 @@ class _EventsScreenSimpleState extends State<EventsScreenSimple> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+      backgroundColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),

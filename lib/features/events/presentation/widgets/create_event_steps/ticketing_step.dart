@@ -165,7 +165,7 @@ class _TicketingStepState extends State<TicketingStep> {
                 value: widget.eventData.currency,
                 isExpanded: true,
                 dropdownColor:
-                    const Color(0xFFFFF6E5), // NaijaSingles cream background
+                    const Color(0xFFE8F5E8), // NaijaSingles cream background
                 icon: const Icon(
                   Icons.keyboard_arrow_down,
                   color: Color(0xFF666666),

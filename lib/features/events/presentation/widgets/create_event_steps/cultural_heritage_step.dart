@@ -156,7 +156,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF6E5),
+            color: const Color(0xFFE8F5E8),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFF008037).withOpacity(0.3),
@@ -185,7 +185,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 size: 24,
               ),
               isExpanded: true,
-              dropdownColor: const Color(0xFFFFF6E5),
+              dropdownColor: const Color(0xFFE8F5E8),
               items: _culturalHeritages.map((heritage) {
                 return DropdownMenuItem<String>(
                   value: heritage,
@@ -271,7 +271,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? const Color(0xFF008037).withOpacity(0.1)
-                      : const Color(0xFFFFF6E5),
+                      : const Color(0xFFE8F5E8),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isSelected
@@ -323,7 +323,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF6E5),
+            color: const Color(0xFFE8F5E8),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFF008037).withOpacity(0.3),
@@ -352,7 +352,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 size: 24,
               ),
               isExpanded: true,
-              dropdownColor: const Color(0xFFFFF6E5),
+              dropdownColor: const Color(0xFFE8F5E8),
               items: _ageGroups.map((ageGroup) {
                 return DropdownMenuItem<String>(
                   value: ageGroup,
@@ -431,7 +431,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: const Color(0xFFE8F5E8),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -501,7 +501,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: const Color(0xFFE8F5E8),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -593,7 +593,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 width: 150,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF6E5),
+                  color: const Color(0xFFE8F5E8),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: const Color(0xFF008037).withOpacity(0.3),

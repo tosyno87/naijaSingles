@@ -44,7 +44,7 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
       Color(0xFF007A33); // Afropeep green from MVP
   static const Color textDarkBrown = Color(0xFF3A1D0F); // Dark text from MVP
   static const Color textLightBrown = Color(0xFF8B6C59); // Light text from MVP
-  static const Color creamBackground = Color(0xFFFFF6E5); // Main background
+  static const Color creamBackground = Color(0xFFE8F5E8); // Main background
 
   @override
   void initState() {

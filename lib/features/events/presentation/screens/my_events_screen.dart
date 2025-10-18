@@ -193,7 +193,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFFFFF6E5),
+      backgroundColor: const Color(0xFFE8F5E8),
       elevation: 0,
       iconTheme: const IconThemeData(
         color: Color(0xFF333333), // Dark color for back button
@@ -243,7 +243,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ],
       systemOverlayStyle: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFFFFF6E5),
+        statusBarColor: Color(0xFFE8F5E8),
         statusBarIconBrightness: Brightness.dark,
       ),
     );
@@ -693,7 +693,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
 
   Widget _buildAuthRequiredScreen() {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+      backgroundColor: const Color(0xFFE8F5E8),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),

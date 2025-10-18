@@ -83,7 +83,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         width: MediaQuery.of(context).size.width * 0.95,
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+          color: const Color(0xFFE8F5E8), // NaijaSingles cream background
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -178,7 +178,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: _selectedCategory,
-          dropdownColor: const Color(0xFFFFF6E5),
+          dropdownColor: const Color(0xFFE8F5E8),
           style: GoogleFonts.montserrat(color: const Color(0xFF333333)),
           decoration: InputDecoration(
             border: OutlineInputBorder(
@@ -191,7 +191,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
             filled: true,
           ),
           items: categories.map((category) {
@@ -274,13 +274,13 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 colorScheme: const ColorScheme.light(
                   primary: Color(0xFF008037), // NaijaSingles green
                   onPrimary: Colors.white,
-                  surface: Color(0xFFFFF6E5), // NaijaSingles cream background
+                  surface: Color(0xFFE8F5E8), // NaijaSingles cream background
                   onSurface: Color(0xFF333333), // Dark text
                   secondary: Color(0xFF008037),
                   onSecondary: Colors.white,
                 ),
                 dialogBackgroundColor:
-                    const Color(0xFFFFF6E5), // Cream background
+                    const Color(0xFFE8F5E8), // Cream background
                 textTheme: Theme.of(context).textTheme.copyWith(
                       bodyLarge: GoogleFonts.montserrat(
                         color: const Color(0xFF333333),
@@ -301,7 +301,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         decoration: BoxDecoration(
           border: Border.all(color: const Color(0xFFE0E0E0)),
           borderRadius: BorderRadius.circular(12),
-          color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+          color: const Color(0xFFE8F5E8), // NaijaSingles cream background
         ),
         child: Row(
           children: [
@@ -357,7 +357,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: const Color(0xFFE8F5E8), // NaijaSingles cream background
             filled: true,
             prefixIcon: const Icon(Icons.location_on, color: Color(0xFF333333)),
           ),
@@ -375,7 +375,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 ),
                 DropdownButton<double>(
                   value: _radiusKm,
-                  dropdownColor: const Color(0xFFFFF6E5),
+                  dropdownColor: const Color(0xFFE8F5E8),
                   style: GoogleFonts.montserrat(color: const Color(0xFF333333)),
                   items: _radiusOptionsInCurrentUnit.map((radius) {
                     return DropdownMenuItem(

@@ -194,7 +194,7 @@ class MyEventCard extends StatelessWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     const Color(0xFF008037).withOpacity(0.1),
-                    const Color(0xFFFFF6E5),
+                    const Color(0xFFE8F5E8),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(

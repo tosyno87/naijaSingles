@@ -145,18 +145,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
             child: SafeArea(
-              child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height - 
-                              MediaQuery.of(context).padding.top - 
-                              MediaQuery.of(context).padding.bottom,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  children: [
+                    // Top content with flexible space
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                       const SizedBox(
                           height: 20), // Reduced spacing for better fit
 
@@ -249,6 +247,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       const SizedBox(
                           height: 40), // Fixed spacing instead of Spacer
 
+                      // Content ends here - buttons moved to bottom section
+                    ],
+                  ),
+                ),
+              ),
+                
+                // Bottom buttons section with safe area padding
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Column(
+                    children: [
                       // Show loading indicator while checking auth status
                       if (_isLoading)
                         const CircularProgressIndicator(
@@ -289,7 +298,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             ),
                           ),
 
-                          const SizedBox(height: 20), // Increased spacing
+                          const SizedBox(height: 16), // Proper spacing between buttons
 
                           // Login Button
                           SlideTransition(
@@ -309,13 +318,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ],
                       ],
-
-                        const SizedBox(height: 32),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
-              ),
+              ],
             ),
           );
         },

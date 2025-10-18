@@ -135,8 +135,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         builder: (context, child) {
           return Container(
             decoration: BoxDecoration(
-              // Clean white background
-              color: Colors.white,
+              // Soft mint green background
+              color: AppColors.backgroundColor,
               image: DecorationImage(
                 image: const AssetImage('assets/images/african_pattern.png'),
                 fit: BoxFit.cover,
@@ -146,13 +146,19 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             ),
             child: SafeArea(
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height - 
+                              MediaQuery.of(context).padding.top - 
+                              MediaQuery.of(context).padding.bottom,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                       const SizedBox(
-                          height: 40), // Fixed spacing instead of Spacer
+                          height: 20), // Reduced spacing for better fit
 
                       // Clean Afropeep Logo with bounce-in and fade animation
                       AnimatedBuilder(
@@ -304,8 +310,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ],
                       ],
 
-                      const SizedBox(height: 32),
-                    ],
+                        const SizedBox(height: 32),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -318,7 +325,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   // Clean logo without glow - stands confidently on its own
   Widget _buildCleanLogo() {
-    return const AfropeepLogo(size: 280); // Doubled size - hero element
+    return const AfropeepLogo(size: 180); // Further reduced size for better fit
   }
 
   // Animated progress bar

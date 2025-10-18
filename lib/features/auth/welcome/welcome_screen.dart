@@ -249,72 +249,80 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       ),
                     ),
                     
-                    // Bottom buttons section with safe area padding
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: Column(
-                        children: [
-                          // Show loading indicator while checking auth status
-                          if (_isLoading)
-                            const CircularProgressIndicator(
-                              color: AppColors.primaryGreen,
-                            ),
-
-                          // Show different buttons based on authentication status
-                          if (!_isLoading) ...[
-                            // Continue to App button for authenticated users
-                            if (_isAuthenticated)
-                              SlideTransition(
-                                position: _buttonSlide,
-                                child: _buildGradientButton(
-                                  text: "Continue to App",
-                                  onPressed: () {
-                                    Navigator.pushReplacementNamed(
-                                        context, RouteName.mainNavigation);
-                                  },
-                                ),
+                    // Bottom buttons section with proper safe area handling
+                    SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 40.0, // Increased bottom padding
+                          left: 0.0,
+                          right: 0.0,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Show loading indicator while checking auth status
+                            if (_isLoading)
+                              const CircularProgressIndicator(
+                                color: AppColors.primaryGreen,
                               ),
 
-                            // Create Account and Login buttons for unauthenticated users
-                            if (!_isAuthenticated) ...[
-                              // Create Account Button
-                              SlideTransition(
-                                position: _buttonSlide,
-                                child: _buildGradientButton(
-                                  text: "Create Account",
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const AuthMethodSelectionScreen(),
-                                      ),
-                                    );
-                                  },
+                            // Show different buttons based on authentication status
+                            if (!_isLoading) ...[
+                              // Continue to App button for authenticated users
+                              if (_isAuthenticated)
+                                SlideTransition(
+                                  position: _buttonSlide,
+                                  child: _buildGradientButton(
+                                    text: "Continue to App",
+                                    onPressed: () {
+                                      Navigator.pushReplacementNamed(
+                                          context, RouteName.mainNavigation);
+                                    },
+                                  ),
                                 ),
-                              ),
 
-                              const SizedBox(height: 16), // Proper spacing between buttons
-
-                              // Login Button
-                              SlideTransition(
-                                position: _buttonSlide,
-                                child: _buildOutlinedButton(
-                                  text: "Login",
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignInMethodSelectionScreen(),
-                                      ),
-                                    );
-                                  },
+                              // Create Account and Login buttons for unauthenticated users
+                              if (!_isAuthenticated) ...[
+                                // Create Account Button
+                                SlideTransition(
+                                  position: _buttonSlide,
+                                  child: _buildGradientButton(
+                                    text: "Create Account",
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AuthMethodSelectionScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
+
+                                const SizedBox(height: 16), // Consistent spacing between buttons
+
+                                // Login Button
+                                SlideTransition(
+                                  position: _buttonSlide,
+                                  child: _buildOutlinedButton(
+                                    text: "Login",
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SignInMethodSelectionScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ],

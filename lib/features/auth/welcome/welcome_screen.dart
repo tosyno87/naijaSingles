@@ -130,25 +130,27 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     ));
 
     return Scaffold(
-      body: AnimatedBuilder(
-        animation: _backgroundOpacity,
-        builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              // Soft mint green background
-              color: AppColors.backgroundColor,
-              image: DecorationImage(
-                image: const AssetImage('assets/images/african_pattern.png'),
-                fit: BoxFit.cover,
-                opacity: _backgroundOpacity.value, // Animated opacity for polish
+      resizeToAvoidBottomInset: true, // 4. Add resizeToAvoidBottomInset: true
+      body: SafeArea( // 1. Ensure entire screen is wrapped in top-level SafeArea
+        child: AnimatedBuilder(
+          animation: _backgroundOpacity,
+          builder: (context, child) {
+            return Container(
+              decoration: BoxDecoration(
+                // Soft mint green background
+                color: AppColors.backgroundColor,
+                image: DecorationImage(
+                  image: const AssetImage('assets/images/african_pattern.png'),
+                  fit: BoxFit.cover,
+                  opacity: _backgroundOpacity.value, // Animated opacity for polish
+                ),
               ),
-            ),
-            child: SafeArea(
-              child: Center(
+              child: SingleChildScrollView( // 2. Wrap main Column in SingleChildScrollView
+                physics: const BouncingScrollPhysics(), // 2. Add BouncingScrollPhysics
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // 5. Change to spaceBetween
                     children: [
                       // 1️⃣ Top Section: Logo and tagline
                       Column(
@@ -245,81 +247,81 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ],
                       ),
 
-                      // 3️⃣ Bottom Section: Buttons wrapped in Padding(bottom: 30)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 30.0),
-                        child: Column(
-                          children: [
-                            // Show loading indicator while checking auth status
-                            if (_isLoading)
-                              const CircularProgressIndicator(
-                                color: AppColors.primaryGreen,
+                      // 3️⃣ Bottom Section: Buttons with proper safe area handling
+                      Column(
+                        children: [
+                          // Show loading indicator while checking auth status
+                          if (_isLoading)
+                            const CircularProgressIndicator(
+                              color: AppColors.primaryGreen,
+                            ),
+
+                          // Show different buttons based on authentication status
+                          if (!_isLoading) ...[
+                            // Continue to App button for authenticated users
+                            if (_isAuthenticated)
+                              SlideTransition(
+                                position: _buttonSlide,
+                                child: _buildGradientButton(
+                                  text: "Continue to App",
+                                  onPressed: () {
+                                    Navigator.pushReplacementNamed(
+                                        context, RouteName.mainNavigation);
+                                  },
+                                ),
                               ),
 
-                            // Show different buttons based on authentication status
-                            if (!_isLoading) ...[
-                              // Continue to App button for authenticated users
-                              if (_isAuthenticated)
-                                SlideTransition(
-                                  position: _buttonSlide,
-                                  child: _buildGradientButton(
-                                    text: "Continue to App",
-                                    onPressed: () {
-                                      Navigator.pushReplacementNamed(
-                                          context, RouteName.mainNavigation);
-                                    },
-                                  ),
+                            // Create Account and Login buttons for unauthenticated users
+                            if (!_isAuthenticated) ...[
+                              // Create Account Button
+                              SlideTransition(
+                                position: _buttonSlide,
+                                child: _buildGradientButton(
+                                  text: "Create Account",
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const AuthMethodSelectionScreen(),
+                                      ),
+                                    );
+                                  },
                                 ),
+                              ),
 
-                              // Create Account and Login buttons for unauthenticated users
-                              if (!_isAuthenticated) ...[
-                                // Create Account Button
-                                SlideTransition(
-                                  position: _buttonSlide,
-                                  child: _buildGradientButton(
-                                    text: "Create Account",
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AuthMethodSelectionScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                              const SizedBox(height: 20), // Slight vertical spacing between buttons
+
+                              // Login Button
+                              SlideTransition(
+                                position: _buttonSlide,
+                                child: _buildOutlinedButton(
+                                  text: "Login",
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignInMethodSelectionScreen(),
+                                      ),
+                                    );
+                                  },
                                 ),
-
-                                const SizedBox(height: 20), // Slight vertical spacing between buttons
-
-                                // Login Button
-                                SlideTransition(
-                                  position: _buttonSlide,
-                                  child: _buildOutlinedButton(
-                                    text: "Login",
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SignInMethodSelectionScreen(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
+                              ),
                             ],
                           ],
-                        ),
+                          
+                          // 3. Remove duplicate bottom padding - SafeArea handles this
+                          const SizedBox(height: 20), // Minimal bottom spacing for visual comfort
+                        ],
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

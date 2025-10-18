@@ -130,29 +130,29 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     ));
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, // 4. Add resizeToAvoidBottomInset: true
-      body: SafeArea( // 1. Ensure entire screen is wrapped in top-level SafeArea
-        child: AnimatedBuilder(
-          animation: _backgroundOpacity,
-          builder: (context, child) {
-            return Container(
-              decoration: BoxDecoration(
-                // Soft mint green background
-                color: AppColors.backgroundColor,
-                image: DecorationImage(
-                  image: const AssetImage('assets/images/african_pattern.png'),
-                  fit: BoxFit.cover,
-                  opacity: _backgroundOpacity.value, // Animated opacity for polish
+      resizeToAvoidBottomInset: true, // 2. Set resizeToAvoidBottomInset: true
+      body: SafeArea( // 1. Wrap full layout in SafeArea
+        child: SingleChildScrollView( // 1. Wrap full layout in SingleChildScrollView
+          physics: const BouncingScrollPhysics(),
+          child: AnimatedBuilder(
+            animation: _backgroundOpacity,
+            builder: (context, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  // 6. Maintain mint green background (#E9F5EC)
+                  color: const Color(0xFFE9F5EC),
+                  image: DecorationImage(
+                    image: const AssetImage('assets/images/african_pattern.png'),
+                    fit: BoxFit.cover,
+                    opacity: _backgroundOpacity.value, // Animated opacity for polish
+                  ),
                 ),
-              ),
-              child: SingleChildScrollView( // 2. Wrap main Column in SingleChildScrollView
-                physics: const BouncingScrollPhysics(), // 2. Add BouncingScrollPhysics
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // 5. Change to spaceBetween
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // 3. spaceBetween for button anchoring
                     children: [
-                      // 1️⃣ Top Section: Logo and tagline
+                      // Top Section: Logo and tagline
                       Column(
                         children: [
                           const SizedBox(height: 20), // Top spacing
@@ -171,7 +171,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             },
                           ),
 
-                          const SizedBox(height: 24), // Spacing after logo
+                          const SizedBox(height: 24), // 5. Consistent vertical spacing
 
                           // Animated progress bar instead of decorative line
                           AnimatedBuilder(
@@ -184,7 +184,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             },
                           ),
 
-                          const SizedBox(height: 32), // Spacing after progress bar
+                          const SizedBox(height: 24), // 5. Consistent vertical spacing
 
                           // Main tagline with animation
                           AnimatedBuilder(
@@ -195,7 +195,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 child: Text(
                                   "Connect Your Tribe From Anywhere",
                                   textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat(
+                                  style: GoogleFonts.montserrat( // 6. Maintain Montserrat font
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textPrimary,
@@ -208,7 +208,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ],
                       ),
 
-                      // 2️⃣ Middle Section: Welcome text and slogan
+                      // Middle Section: Welcome text and slogan
                       Column(
                         children: [
                           // Welcome message with animation
@@ -220,7 +220,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 child: Text(
                                   "Welcome to Afropeep, your journey to meaningful connections starts here.",
                                   textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat(
+                                  style: GoogleFonts.montserrat( // 6. Maintain Montserrat font
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                     fontStyle: FontStyle.italic,
@@ -232,7 +232,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             },
                           ),
 
-                          const SizedBox(height: 24), // Spacing after welcome message
+                          const SizedBox(height: 24), // 5. Consistent vertical spacing
 
                           // Rotating greeting in African languages with animation
                           AnimatedBuilder(
@@ -247,80 +247,82 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ],
                       ),
 
-                      // 3️⃣ Bottom Section: Buttons with proper safe area handling
-                      Column(
-                        children: [
-                          // Show loading indicator while checking auth status
-                          if (_isLoading)
-                            const CircularProgressIndicator(
-                              color: AppColors.primaryGreen,
-                            ),
-
-                          // Show different buttons based on authentication status
-                          if (!_isLoading) ...[
-                            // Continue to App button for authenticated users
-                            if (_isAuthenticated)
-                              SlideTransition(
-                                position: _buttonSlide,
-                                child: _buildGradientButton(
-                                  text: "Continue to App",
-                                  onPressed: () {
-                                    Navigator.pushReplacementNamed(
-                                        context, RouteName.mainNavigation);
-                                  },
-                                ),
+                      // Bottom Section: Buttons with adaptive padding
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.bottom + 20, // 4. Adaptive padding
+                        ),
+                        child: Column(
+                          children: [
+                            // Show loading indicator while checking auth status
+                            if (_isLoading)
+                              const CircularProgressIndicator(
+                                color: Color(0xFF008037), // 6. Green (#008037)
                               ),
 
-                            // Create Account and Login buttons for unauthenticated users
-                            if (!_isAuthenticated) ...[
-                              // Create Account Button
-                              SlideTransition(
-                                position: _buttonSlide,
-                                child: _buildGradientButton(
-                                  text: "Create Account",
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const AuthMethodSelectionScreen(),
-                                      ),
-                                    );
-                                  },
+                            // Show different buttons based on authentication status
+                            if (!_isLoading) ...[
+                              // Continue to App button for authenticated users
+                              if (_isAuthenticated)
+                                SlideTransition(
+                                  position: _buttonSlide,
+                                  child: _buildGradientButton(
+                                    text: "Continue to App",
+                                    onPressed: () {
+                                      Navigator.pushReplacementNamed(
+                                          context, RouteName.mainNavigation);
+                                    },
+                                  ),
                                 ),
-                              ),
 
-                              const SizedBox(height: 20), // Slight vertical spacing between buttons
-
-                              // Login Button
-                              SlideTransition(
-                                position: _buttonSlide,
-                                child: _buildOutlinedButton(
-                                  text: "Login",
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignInMethodSelectionScreen(),
-                                      ),
-                                    );
-                                  },
+                              // Create Account and Login buttons for unauthenticated users
+                              if (!_isAuthenticated) ...[
+                                // Create Account Button
+                                SlideTransition(
+                                  position: _buttonSlide,
+                                  child: _buildGradientButton(
+                                    text: "Create Account",
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AuthMethodSelectionScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
+
+                                const SizedBox(height: 24), // 5. Consistent vertical spacing between buttons
+
+                                // Login Button
+                                SlideTransition(
+                                  position: _buttonSlide,
+                                  child: _buildOutlinedButton(
+                                    text: "Login",
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SignInMethodSelectionScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ],
                           ],
-                          
-                          // 3. Remove duplicate bottom padding - SafeArea handles this
-                          const SizedBox(height: 20), // Minimal bottom spacing for visual comfort
-                        ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

@@ -22,7 +22,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
     ));
 
     // Define colors based on MVP styling
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green background
     const Color primaryColor = Color(0xFF008037); // Green
     const Color accentColor = Color(0xFFEF476F); // Pink/Coral
     const Color googleBlue = Color(0xFF3B82F6); // Google blue
@@ -238,7 +238,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16), // 16dp radius as specified
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFFF6E5)
+            color: const Color(0xFFE8F5E8)
                 .withValues(alpha: 0.5), // Soft cream shadow
             blurRadius: 8,
             offset: const Offset(0, 4),

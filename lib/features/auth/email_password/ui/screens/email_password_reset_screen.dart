@@ -33,7 +33,7 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: const Color(0xFFFFF4E8),
+        backgroundColor: const Color(0xFFE8F5E8),
         foregroundColor: Colors.black,
         elevation: 0,
       ),

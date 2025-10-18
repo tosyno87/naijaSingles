@@ -55,7 +55,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     ));
 
     // Define colors based on MVP styling
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green background
     const Color primaryColor = Color(0xFF008037); // Green
     const Color textColor = Color(0xFF3E1F0D); // Deep brown
     const Color textLightBrown = Color(0xFF8B6C59); // Light brown for subtitle

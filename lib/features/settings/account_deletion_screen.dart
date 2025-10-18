@@ -18,7 +18,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   final _reasonController = TextEditingController();
 
   // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
+  static const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/danger

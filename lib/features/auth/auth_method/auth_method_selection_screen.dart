@@ -19,7 +19,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
     ));
 
     // Define colors based on Afrocentric design guidelines
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green background
     const Color primaryColor = Color(0xFF008037); // Green accent
     const Color accentColor = Color(0xFF008037); // Use green for consistency
     const Color googleBlue = Color(0xFF3B82F6); // Google blue
@@ -228,7 +228,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16), // 16dp radius as specified
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFFF6E5)
+            color: const Color(0xFFE8F5E8)
                 .withValues(alpha: 0.5), // Soft cream shadow
             blurRadius: 8,
             offset: const Offset(0, 4),

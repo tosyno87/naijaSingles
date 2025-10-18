@@ -67,7 +67,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
     ));
 
     // Define colors based on MVP styling
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green background
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color textColor = Color(0xFF3E1F0D); // Deep brown
     const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
@@ -255,13 +255,13 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     fontSize: 16,
                                   ),
                                   dialogBackgroundColor:
-                                      const Color(0xFFFFF6E5),
+                                      const Color(0xFFE8F5E8),
                                   boxDecoration: BoxDecoration(
-                                    color: const Color(0xFFFFF6E5),
+                                    color: const Color(0xFFE8F5E8),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   barrierColor: Colors.black54,
-                                  backgroundColor: const Color(0xFFFFF6E5),
+                                  backgroundColor: const Color(0xFFE8F5E8),
                                   dialogSize: Size(
                                       MediaQuery.of(context).size.width * 0.9,
                                       MediaQuery.of(context).size.height * 0.7),

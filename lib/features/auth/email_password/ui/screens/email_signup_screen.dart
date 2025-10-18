@@ -30,7 +30,7 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF4E8),
+      backgroundColor: const Color(0xFFE8F5E8),
       appBar: AppBar(
         title: Text(
           'Create Account',
@@ -40,7 +40,7 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
             color: Colors.black,
           ),
         ),
-        backgroundColor: const Color(0xFFFFF4E8),
+        backgroundColor: const Color(0xFFE8F5E8),
         foregroundColor: Colors.black,
         elevation: 0,
       ),

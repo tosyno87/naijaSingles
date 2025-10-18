@@ -21,7 +21,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
   bool _obscurePassword = true;
 
   // Define colors based on the Afrocentric design guidelines
-  static const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+  static const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green background
   static const Color primaryColor = Color(0xFF008037); // Green accent
   static const Color accentColor =
       Color(0xFF008037); // Use green for consistency

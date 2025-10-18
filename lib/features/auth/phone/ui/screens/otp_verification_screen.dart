@@ -97,7 +97,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     // Define colors
-    const Color backgroundColor = Color(0xFFFFF6E5); // Warm cream/beige
+    const Color backgroundColor = Color(0xFFE8F5E8); // Soft mint green background
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color accentColor = Color(0xFFE74C3C); // Coral Red
     const Color textColor = Color(0xFF333333);

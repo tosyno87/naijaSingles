@@ -112,6 +112,90 @@ lane :screenshots do
   UI.success "📸 Screenshots generated successfully! Check ./fastlane/screenshots/"
 end
 
+desc "Fetch recent TestFlight feedback for NaijaSingles from App Store Connect"
+lane :testflight_feedback do
+  UI.message "📝 Fetching recent TestFlight feedback for NaijaSingles..."
+
+  begin
+    require "spaceship"
+
+    # Use App Store Connect API key (recommended for CI and secure access)
+    # Configure the following environment variables in your shell or CI:
+    #   ASC_KEY_ID        - App Store Connect API Key ID
+    #   ASC_ISSUER_ID     - App Store Connect Issuer ID
+    #   ASC_KEY_PATH      - Path to AuthKey_*.p8 file (relative or absolute)
+    #
+    # Example (local):
+    #   export ASC_KEY_ID="ABC123XYZ"
+    #   export ASC_ISSUER_ID="00000000-0000-0000-0000-000000000000"
+    #   export ASC_KEY_PATH="./fastlane/AuthKey_ABC123XYZ.p8"
+
+    asc_key_id = ENV["ASC_KEY_ID"]
+    asc_issuer_id = ENV["ASC_ISSUER_ID"]
+    asc_key_path = ENV["ASC_KEY_PATH"]
+
+    unless asc_key_id && asc_issuer_id && asc_key_path
+      UI.user_error!("Missing App Store Connect API configuration. Please set ASC_KEY_ID, ASC_ISSUER_ID and ASC_KEY_PATH.")
+    end
+
+    token = Spaceship::ConnectAPI::Token.create(
+      key_id: asc_key_id,
+      issuer_id: asc_issuer_id,
+      filepath: asc_key_path
+    )
+
+    Spaceship::ConnectAPI.token = token
+
+    app_identifier = "com.app.naijasingles"
+    app = Spaceship::ConnectAPI::App.find(app_identifier)
+
+    unless app
+      UI.user_error!("App with identifier #{app_identifier} not found in App Store Connect.")
+    end
+
+    UI.message "🔍 Fetching latest TestFlight feedback for #{app_identifier}..."
+
+    # Fetch recent feedback entries (limit to keep output readable)
+    feedback_items = Spaceship::ConnectAPI::BetaFeedback.all(
+      sort: "-lastModifiedDate",
+      limit: 50
+    )
+
+    if feedback_items.empty?
+      UI.message "ℹ️ No recent TestFlight feedback found."
+      next
+    end
+
+    UI.message "✅ Found #{feedback_items.size} recent feedback items:"
+    UI.message "--------------------------------------------------------------"
+
+    feedback_items.each do |item|
+      build_label = item.build_id ? "Build #{item.build_id}" : "Build (unknown)"
+      updated_at = item.last_modified_date
+      email = item.tester_email || "Unknown tester"
+      device = item.device_model || "Unknown device"
+      os_version = item.os_version || "Unknown OS"
+      has_screenshots = item.screenshots && !item.screenshots.empty?
+
+      UI.message ""
+      UI.message "📦 #{build_label}"
+      UI.message "   🧪 Tester: #{email}"
+      UI.message "   📱 Device: #{device} (iOS #{os_version})"
+      UI.message "   🕒 Updated: #{updated_at}"
+      UI.message "   🖼  Screenshots attached: #{has_screenshots ? "yes" : "no"}"
+      UI.message "   💬 Feedback:"
+      UI.message "     #{item.feedback_text&.strip || "(no text)"}"
+    end
+
+    UI.message ""
+    UI.success "🎉 TestFlight feedback fetched successfully."
+  rescue => ex
+    UI.error "❌ Failed to fetch TestFlight feedback: #{ex.message}"
+    UI.error ex.backtrace.join("\n")
+    UI.user_error!("TestFlight feedback retrieval failed.")
+  end
+end
+
 desc "Deploy to beta testing (TestFlight + Internal Testing)"
 lane :beta do
   UI.message "🚀 Deploying NaijaSingles to beta testing..."

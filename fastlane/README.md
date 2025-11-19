@@ -29,6 +29,14 @@ Run comprehensive test suite for African diaspora dating app
 
 Generate screenshots for App Store
 
+### testflight_feedback
+
+```sh
+[bundle exec] fastlane testflight_feedback
+```
+
+Fetch recent TestFlight feedback for NaijaSingles from App Store Connect
+
 ### beta
 
 ```sh
@@ -89,6 +97,14 @@ Deploy Android only (when iOS has CodeSign issues)
 
 
 ## iOS
+
+### ios build_app
+
+```sh
+[bundle exec] fastlane ios build_app
+```
+
+Build iOS app for CI/CD
 
 ### ios testflight_deploy
 

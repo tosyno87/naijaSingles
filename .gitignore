@@ -80,3 +80,14 @@ ios/build/
 ios/build/*.ipa
 ios/Runner.xcarchive/
 # Secrets configured Thu Oct  2 20:49:29 EDT 2025
+
+# App Store Connect API Keys (NEVER commit these!)
+*.p8
+AuthKey_*.p8
+fastlane/AuthKey_*.p8
+
+# Fastlane build artifacts
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/screenshots.html

@@ -1,7 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../common/routes/route_name.dart';
 
 import 'edit_profile_screen.dart';
@@ -31,18 +35,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static final Color textPrimary = Colors.brown.shade800;
   static final Color textSecondary = Colors.brown.shade600;
 
-  @override
-  void dispose() {
-    _photoPageController.dispose();
-    super.dispose();
-  }
+  StreamSubscription<DocumentSnapshot>? _userDataSubscription;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _listenToUserData();
   }
 
+  @override
+  void dispose() {
+    _photoPageController.dispose();
+    _userDataSubscription?.cancel();
+    super.dispose();
+  }
+
+  // Listen to Firestore changes for automatic updates (e.g., after photo upload)
+  void _listenToUserData() {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        _userDataSubscription =
+            _firestore.collection('users').doc(user.uid).snapshots().listen(
+          (docSnapshot) {
+            if (docSnapshot.exists) {
+              setState(() {
+                _userData = docSnapshot.data();
+                _isLoading = false;
+              });
+            } else {
+              setState(() => _isLoading = false);
+            }
+          },
+          onError: (error) {
+            log('❌ Error listening to user data: $error');
+            setState(() => _isLoading = false);
+          },
+        );
+      } else {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      log('❌ Error setting up user data listener: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // Legacy method kept for compatibility (not used if _listenToUserData is active)
   Future<void> _loadUserData() async {
     try {
       final user = _auth.currentUser;
@@ -60,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() => _isLoading = false);
       }
     } catch (e) {
-      print('❌ Error loading user data: $e');
+      log('❌ Error loading user data: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -158,23 +197,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Simplified Photo Section
                     _buildSimplifiedPhotoSection(),
                     const SizedBox(height: 24),
-                    
+
                     // Simplified Basic Info
                     _buildSimplifiedBasicInfo(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified About Section
                     _buildSimplifiedAbout(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified Interests
                     _buildSimplifiedInterests(),
                     const SizedBox(height: 16),
-                    
+
                     // Simplified Location (includes nationality)
                     _buildSimplifiedLocation(),
                     const SizedBox(height: 32),
-                    
+
                     // Single Edit Button
                     _buildEditButton(),
                     const SizedBox(height: 32),
@@ -186,7 +225,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSimplifiedPhotoSection() {
-    final photos = _userData?['photos'] as List<dynamic>? ?? [];
+    // Try multiple field names for compatibility
+    final photos = _userData?['photos'] as List<dynamic>? ??
+        _userData?['Pictures'] as List<dynamic>? ??
+        _userData?['imageUrl'] as List<dynamic>? ??
+        [];
 
     if (photos.isEmpty) {
       return Container(
@@ -273,7 +316,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               top: 16,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(20),
@@ -478,7 +522,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 runSpacing: 8,
                 children: interests.take(6).map((interest) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -517,20 +562,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Handle both String and Map types for location and nationality
     String location = '';
     String nationality = '';
-    
+
     if (_userData?['location'] != null) {
       if (_userData!['location'] is String) {
         location = _userData!['location'] as String;
       } else if (_userData!['location'] is Map) {
-        location = _userData!['location']['name'] ?? _userData!['location']['city'] ?? '';
+        location = _userData!['location']['name'] ??
+            _userData!['location']['city'] ??
+            '';
       }
     }
-    
+
     if (_userData?['nationality'] != null) {
       if (_userData!['nationality'] is String) {
         nationality = _userData!['nationality'] as String;
       } else if (_userData!['nationality'] is Map) {
-        nationality = _userData!['nationality']['name'] ?? _userData!['nationality']['country'] ?? '';
+        nationality = _userData!['nationality']['name'] ??
+            _userData!['nationality']['country'] ??
+            '';
       }
     }
 

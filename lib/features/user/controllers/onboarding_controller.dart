@@ -46,7 +46,7 @@ class OnboardingController extends ChangeNotifier {
   String _lookingFor = 'Dating'; // Dating, Friendship, Networking
   String _relationshipIntent =
       'Not sure yet'; // Short-term, Long-term, Casual, Not sure yet
-  
+
   // Location coordinates - CRITICAL FOR DISCOVERY
   double? _latitude;
   double? _longitude;
@@ -63,7 +63,7 @@ class OnboardingController extends ChangeNotifier {
   String get bio => _bio;
   List<String> get interests => _interests;
   List<File?> get profilePhotos => _profilePhotos;
-  
+
   // Location getters - CRITICAL FOR DISCOVERY
   double? get latitude => _latitude;
   double? get longitude => _longitude;
@@ -328,7 +328,7 @@ class OnboardingController extends ChangeNotifier {
     _smokingPreference = preference;
     notifyListeners();
   }
-  
+
   // Location setters - CRITICAL FOR DISCOVERY
   void setLocationCoordinates(double latitude, double longitude) {
     _latitude = latitude;
@@ -374,7 +374,7 @@ class OnboardingController extends ChangeNotifier {
       // Determine crop type based on photo index
       CropType cropType;
       String title;
-      
+
       switch (index) {
         case 0:
           cropType = CropType.square; // Main photo - square crop
@@ -402,7 +402,8 @@ class OnboardingController extends ChangeNotifier {
       }
 
       // Pick and crop image with industry-standard settings
-      final File? croppedImage = await ProfileImageCropperService.pickAndCropImage(
+      final File? croppedImage =
+          await ProfileImageCropperService.pickAndCropImage(
         source: source,
         cropType: cropType,
         title: title,
@@ -422,7 +423,8 @@ class OnboardingController extends ChangeNotifier {
   Future<void> pickMultiplePhotos(BuildContext context) async {
     try {
       // Pick multiple photos at once
-      final List<File> selectedPhotos = await BulkPhotoPickerService.pickMultiplePhotos(
+      final List<File> selectedPhotos =
+          await BulkPhotoPickerService.pickMultiplePhotos(
         context: context,
         maxPhotos: 5,
       );
@@ -430,13 +432,16 @@ class OnboardingController extends ChangeNotifier {
       if (selectedPhotos.isEmpty) return;
 
       // Crop each photo individually
-      final List<File> croppedPhotos = await BulkPhotoPickerService.cropSelectedPhotos(
+      final List<File> croppedPhotos =
+          await BulkPhotoPickerService.cropSelectedPhotos(
         selectedPhotos: selectedPhotos,
         context: context,
       );
 
       // Add cropped photos to profile photos
-      for (int i = 0; i < croppedPhotos.length && i < _profilePhotos.length; i++) {
+      for (int i = 0;
+          i < croppedPhotos.length && i < _profilePhotos.length;
+          i++) {
         _profilePhotos[i] = croppedPhotos[i];
       }
 
@@ -519,7 +524,12 @@ class OnboardingController extends ChangeNotifier {
       // Continue with non-essential operations in background
       _uploadProfilePictures(user.uid).then((_) {
         // Update UI if needed when pictures are done uploading
-        debugPrint('✅ Profile pictures uploaded successfully');
+        log('✅ Profile pictures uploaded successfully');
+        notifyListeners(); // Notify listeners that photos are now uploaded
+      }).catchError((error) {
+        log('❌ Failed to upload profile pictures: $error', error: error);
+        // Update error state for potential retry
+        notifyListeners();
       });
 
       _isLoading = false;
@@ -593,13 +603,6 @@ class OnboardingController extends ChangeNotifier {
       'dealbreakers': _dealbreakers,
       'drinkingPreference': _drinkingPreference,
       'smokingPreference': _smokingPreference,
-      
-      // Cultural fields for database consistency
-      'tribe': _tribe,
-      'nationality': _nationality,
-      'languages': _languages,
-      'religion': _religion,
-      'occupation': _occupation,
 
       // System fields
       'lastActive': DateTime.now().toIso8601String(),
@@ -630,7 +633,7 @@ class OnboardingController extends ChangeNotifier {
         'min': _ageRange[0].toString(),
         'max': _ageRange[1].toString(),
       },
-      
+
       // Additional discovery fields - CRITICAL FOR USER DISCOVERY
       'userGender': _gender, // Required for gender filtering
       'age_range': {
@@ -662,7 +665,8 @@ class OnboardingController extends ChangeNotifier {
     print('   Age: $age');
     print('   Gender: $_gender');
     print('   Location: ${_locationName ?? 'Not set'}');
-    print('   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}');
+    print(
+        '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}');
     print('   Tribe: $_tribe');
     print('   Bio: ${_bio.length} characters');
     print('   Interests: ${_interests.length} items - $_interests');
@@ -701,48 +705,98 @@ class OnboardingController extends ChangeNotifier {
     print('✅ All onboarding data should now be available in profile');
   }
 
-  // Upload profile pictures in the background
+  // Upload profile pictures with proper error handling
   Future<void> _uploadProfilePictures(String userId) async {
     List<String> photoUrls = [];
     List<File> validPhotos = _profilePhotos.whereType<File>().toList();
 
     if (validPhotos.isEmpty) {
+      log('⚠️ No photos to upload');
       return;
     }
 
-    print('📸 Uploading ${validPhotos.length} profile pictures');
+    log('📸 Starting upload of ${validPhotos.length} profile pictures for user: $userId');
 
     try {
       for (int i = 0; i < validPhotos.length; i++) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('users/$userId/profile_photo_$i.jpg');
+        final photo = validPhotos[i];
 
-        await storageRef.putFile(validPhotos[i]);
-        String url = await storageRef.getDownloadURL();
-        photoUrls.add(url);
+        // Validate file exists and is readable
+        if (!photo.existsSync()) {
+          log('❌ Photo $i does not exist at path: ${photo.path}');
+          continue;
+        }
+
+        // Check file size (max 10MB)
+        final fileSize = await photo.length();
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (fileSize > maxSize) {
+          log('❌ Photo $i is too large: ${(fileSize / 1024 / 1024).toStringAsFixed(2)}MB (max 10MB)');
+          continue;
+        }
+
+        log('📤 Uploading photo $i/${validPhotos.length} (${(fileSize / 1024).toStringAsFixed(2)}KB)...');
+
+        try {
+          // Create storage reference
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('users/$userId/profile_photo_$i.jpg');
+
+          // Upload file with metadata
+          final uploadTask = storageRef.putFile(
+            photo,
+            SettableMetadata(
+              contentType: 'image/jpeg',
+              customMetadata: {
+                'uploadedAt': DateTime.now().toIso8601String(),
+                'photoIndex': i.toString(),
+              },
+            ),
+          );
+
+          // Wait for upload to complete
+          final snapshot = await uploadTask;
+
+          // Get download URL
+          final url = await snapshot.ref.getDownloadURL();
+          photoUrls.add(url);
+
+          log('✅ Photo $i uploaded successfully: $url');
+        } catch (uploadError) {
+          log('❌ Error uploading photo $i: $uploadError', error: uploadError);
+          // Continue with next photo instead of failing all
+        }
       }
 
       // Update photos list for compatibility
-      _photos = photoUrls;
-
-      // Update Firestore with photo URLs
       if (photoUrls.isNotEmpty) {
+        _photos = photoUrls;
+
+        // Update Firestore with photo URLs
         final photoData = {
-          'profilePicture': photoUrls[0],
-          'photos': photoUrls,
-          'Pictures': photoUrls,
-          'imageUrl': photoUrls,
+          'profilePicture': photoUrls[0], // Main profile picture
+          'photos': photoUrls, // Array of all photo URLs
+          'Pictures': photoUrls, // Legacy field name
+          'imageUrl': photoUrls, // Alternative field name
+          'profilePhotoCount': photoUrls.length,
+          'lastPhotoUpdate': FieldValue.serverTimestamp(),
         };
 
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userId)
-            .update(photoData);
+            .set(photoData, SetOptions(merge: true));
+
+        log('✅ Successfully updated Firestore with ${photoUrls.length} photo URLs');
+      } else {
+        log('⚠️ No photos were successfully uploaded');
+        throw Exception('Failed to upload any profile photos');
       }
     } catch (e) {
-      log("Error uploading profile pictures: $e");
-      // Don't rethrow - this is a background operation
+      log('❌ Critical error in _uploadProfilePictures: $e', error: e);
+      // Re-throw so calling code can handle it
+      rethrow;
     }
   }
 
@@ -824,7 +878,7 @@ class OnboardingController extends ChangeNotifier {
       missingFields.add('Location');
       isValid = false;
     }
-    
+
     // Location coordinates validation - CRITICAL FOR DISCOVERY
     if (_latitude == null || _longitude == null) {
       missingFields.add('Location Coordinates');

@@ -151,68 +151,151 @@ class PhoneAuthRepository {
   }
 
   Future<bool> userDetails(String userId) async {
-    var querySnapshot = await firebaseFireStoreInstance
-        .collection('users')
-        .where('userId', isEqualTo: userId)
-        .get();
+    try {
+      // Try direct document access first (faster and more reliable)
+      var docSnapshot = await firebaseFireStoreInstance
+          .collection('users')
+          .doc(userId)
+          .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      var docSnapshot = querySnapshot.docs.first;
-      if (docSnapshot.data().containsKey('location')) {
-        log(docSnapshot.data().toString());
-        return true;
+      if (docSnapshot.exists) {
+        var userData = docSnapshot.data();
+        log('✅ User document exists for: $userId');
+        log('📄 User data keys: ${userData?.keys.toList()}');
+        
+        // Check if user has completed onboarding or has basic profile data
+        // A user is considered registered if they have ANY of these indicators:
+        bool hasBasicProfile = userData != null && (
+          userData.containsKey('name') ||
+          userData.containsKey('onboardingCompleted') ||
+          userData.containsKey('profileSetupComplete') ||
+          userData.containsKey('location') ||
+          userData.containsKey('photos') ||
+          userData.containsKey('Pictures')
+        );
+        
+        if (hasBasicProfile) {
+          log('✅ User has profile data - considered registered');
+          return true;
+        } else {
+          log('⚠️ User document exists but has no profile data yet');
+          // Still return true if document exists - they're registered even if onboarding incomplete
+          return true;
+        }
       } else {
-        // log(querySnapshot.docs.first.data().toString());
-        log(userId.toString());
-        log('Location field not found');
+        log('❌ User document does not exist for: $userId');
+        return false;
       }
-    } else {
-      log(userId.toString());
-      log('Document not found');
+    } catch (e) {
+      log('❌ Error checking user details: $e');
+      // Fallback to query method
+      try {
+        var querySnapshot = await firebaseFireStoreInstance
+            .collection('users')
+            .where('userId', isEqualTo: userId)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          log('✅ User found via query fallback');
+          return true;
+        }
+      } catch (queryError) {
+        log('❌ Query fallback also failed: $queryError');
+      }
+      return false;
     }
-    return false;
   }
 
   Future<UserModel> getRegisterUser() async {
-    UserModel? registeredUser;
     User? fbuser = auth.currentUser;
+    if (fbuser == null) {
+      throw Exception('No authenticated user found');
+    }
+
     try {
-      var result = await firebaseFireStoreInstance
+      log('🔍 Fetching user data for: ${fbuser.uid}');
+      
+      // Try direct document access first (faster and more reliable)
+      var docSnapshot = await firebaseFireStoreInstance
           .collection('users')
-          .where('userId', isEqualTo: fbuser!.uid)
+          .doc(fbuser.uid)
           .get();
 
-      // log(result.docs.first.data().toString());
-      registeredUser = UserModel.fromDocument(result.docs.first);
+      if (docSnapshot.exists) {
+        log('✅ User document found via direct access');
+        try {
+          var registeredUser = UserModel.fromDocument(docSnapshot);
+          return registeredUser;
+        } catch (parseError) {
+          log('❌ Error parsing user document: $parseError');
+          // Fallback to query method
+        }
+      } else {
+        log('⚠️ User document not found via direct access, trying query...');
+      }
 
+      // Fallback to query method
+      var result = await firebaseFireStoreInstance
+          .collection('users')
+          .where('userId', isEqualTo: fbuser.uid)
+          .get();
+
+      if (result.docs.isEmpty) {
+        log('❌ No user document found in query result');
+        throw Exception('User document not found in Firestore');
+      }
+
+      log('✅ User document found via query (${result.docs.length} results)');
+      var registeredUser = UserModel.fromDocument(result.docs.first);
       return registeredUser;
     } catch (e) {
+      log('❌ Error in getRegisterUser: $e');
       rethrow;
     }
   }
 
   Future<void> deleteUserStorageCollection(String userId) async {
     try {
+      log('🗑️ Starting storage deletion for user: $userId');
+      
       // Initialize Firebase Storage
       FirebaseStorage storage = FirebaseStorage.instanceFor(bucket: bucketId);
 
       // Get a reference to the user's collection
       Reference userCollectionRef = storage.ref().child('users/$userId');
 
-      // List all the files in the user's collection
-      ListResult listResult = await userCollectionRef.listAll();
+      try {
+        // List all the files in the user's collection
+        ListResult listResult = await userCollectionRef.listAll();
+        log('📁 Found ${listResult.items.length} files to delete');
 
-      // Delete each file in the user's collection
-      for (Reference item in listResult.items) {
-        await item.delete();
+        // Delete each file in the user's collection
+        for (Reference item in listResult.items) {
+          try {
+            await item.delete();
+            log('✅ Deleted file: ${item.fullPath}');
+          } catch (fileError) {
+            log('⚠️ Error deleting file ${item.fullPath}: $fileError');
+            // Continue with other files even if one fails
+          }
+        }
+
+        // Note: Firebase Storage doesn't have folders - deleting all files is sufficient
+        // The "folder" will automatically disappear when empty
+        log('✅ Storage cleanup completed for user: $userId');
+      } catch (listError) {
+        // If listAll fails (e.g., path doesn't exist), that's okay
+        log('⚠️ Could not list files (path may not exist): $listError');
+        // This is non-fatal - user might not have uploaded files
       }
-
-      // Delete the user's collection folder
-      await userCollectionRef.delete();
     } catch (error) {
-      // Handle any errors gracefully
-      log('Error deleting user collection: $error');
-      // Display a user-friendly message or perform any necessary actions
+      // Log error but don't throw - storage cleanup failure shouldn't block account deletion
+      log('⚠️ Error during storage deletion (non-fatal): $error');
+      log('⚠️ Error type: ${error.runtimeType}');
+      if (error is FirebaseException) {
+        log('⚠️ Firebase Storage error: code=${error.code}, message=${error.message}');
+      }
+      // Don't rethrow - allow account deletion to continue even if storage cleanup fails
     }
   }
 }

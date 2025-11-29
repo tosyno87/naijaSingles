@@ -36,29 +36,53 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
         var user = await phoneAuthRepository.getCurrentUser();
 
         if (user!.displayName != null || user.phoneNumber != null) {
+          log('🔍 Checking registration for user: ${user.uid}');
           var isRegistered = await phoneAuthRepository.userDetails(user.uid);
-          log(isRegistered.toString());
+          log('📋 Registration check result: $isRegistered');
+          
           if (isRegistered) {
-            var usr = await phoneAuthRepository.getRegisterUser();
-            if (usr.name != null) {
-              log("coming in already state $usr");
-              emit(AlreadyRegistered(user: usr));
-            } else {
-              log("coming in no data $usr");
+            try {
+              var usr = await phoneAuthRepository.getRegisterUser();
+              log('👤 Retrieved user data: ${usr.name ?? "no name"}');
+              
+              // If user has name or has completed onboarding, they're fully registered
+              if (usr.name != null && usr.name!.isNotEmpty) {
+                log("✅ User already registered with profile: ${usr.name}");
+                emit(AlreadyRegistered(user: usr));
+              } else {
+                // User document exists but profile incomplete - still consider them registered
+                // This handles edge cases where onboarding was interrupted
+                log("⚠️ User document exists but profile incomplete - treating as registered");
+                emit(AlreadyRegistered(user: usr));
+              }
+            } catch (getUserError) {
+              log('❌ Error getting user data: $getUserError');
+              log('❌ Error type: ${getUserError.runtimeType}');
+              
+              // If userDetails returned true but we can't get user data,
+              // there might be a data inconsistency
+              // In this case, treat as new registration to allow onboarding
+              log("⚠️ User document exists but cannot retrieve data - treating as new registration");
               emit(NewRegistration(token: event.token, user: user));
             }
           } else {
+            log("📝 User not found in database - new registration");
             if (user.displayName != null || user.phoneNumber != null) {
-              log("from here");
               emit(NewRegistration(token: event.token, user: user));
             } else {
-              // ignore: prefer_const_constructors
-              emit(RegistrationFailed(message: "Error"));
+              emit(RegistrationFailed(message: "Error: No user identifier found"));
             }
           }
+        } else {
+          log('❌ User has no displayName or phoneNumber');
+          emit(RegistrationFailed(message: "Error: No user identifier found"));
         }
       } on SocketException {
+        log('❌ Network error during registration check');
         emit(const RegistrationFailed(message: "No internet"));
+      } catch (e) {
+        log('❌ Unexpected error in CheckRegistration: $e');
+        emit(RegistrationFailed(message: "Error checking registration: $e"));
       }
     });
   }

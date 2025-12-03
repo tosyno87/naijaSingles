@@ -253,7 +253,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                             textColor: Colors.white,
                             variant: AuthButtonVariant.primary,
                             onTap: () {
-                              Navigator.push(
+                              // Use pushReplacement to remove this screen from stack
+                              // This prevents both screens from being visible during transition
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PhoneNumber(
@@ -278,7 +280,8 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
+                                  // Use pushReplacement to remove this screen from stack
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => PhoneNumber(

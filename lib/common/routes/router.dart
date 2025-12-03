@@ -56,6 +56,37 @@ import 'package:naijasingles/features/user/ui/screens/user_name.dart';
 import 'package:naijasingles/features/dating/screens/user_detail_screen.dart';
 import '../../features/auth/phone/ui/screens/otp_page.dart';
 
+/// Transparent widget that handles Firebase auth callback deep links
+/// Immediately pops itself so no UI is visible to the user
+class _FirebaseCallbackHandler extends StatefulWidget {
+  const _FirebaseCallbackHandler();
+
+  @override
+  State<_FirebaseCallbackHandler> createState() => _FirebaseCallbackHandlerState();
+}
+
+class _FirebaseCallbackHandlerState extends State<_FirebaseCallbackHandler> {
+  @override
+  void initState() {
+    super.initState();
+    // Pop immediately in the next frame - user should never see this widget
+    // Firebase will process the callback and trigger auth state changes
+    // The PhoneAuthBloc listener will handle navigation to OTP screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Return completely transparent/empty widget
+    // This ensures no visual flash occurs
+    return const SizedBox.shrink();
+  }
+}
+
 abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
@@ -138,31 +169,83 @@ abstract class AppRouter {
       // Safely extract arguments with null checks
       final arguments = ModalRoute.of(context)?.settings.arguments;
       
+      // Validate arguments - if invalid, show loading state instead of navigating away
+      // This prevents the "Page Not Found" flash
       if (arguments == null || arguments is! Map) {
-        // If arguments are missing, navigate back to prevent "Page Not Found"
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Error: Missing verification details. Please try again.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        });
-        // Return a placeholder while we navigate away
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
+        // Return a loading screen instead of trying to navigate back
+        // This prevents any flash of "Page Not Found" screen
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(
+                  color: Color(0xFF008037),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Loading...',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
         );
       }
       
-      final argsMap = arguments as Map;
+      final argsMap = arguments;
+      
+      // Validate required arguments exist
+      if (argsMap['verificationId'] == null || argsMap['phoneNumber'] == null) {
+        // Missing critical arguments - show error but don't navigate away immediately
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: const Text('Error'),
+            backgroundColor: Colors.white,
+          ),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Missing verification details',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Please try again.',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF008037),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Go Back'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
       
       return OtpPage(
         codeController: (argsMap['codeController']?.toString() ?? ''),
-        verificationId: (argsMap['verificationId']?.toString() ?? ''),
-        phoneNumber: (argsMap['phoneNumber']?.toString() ?? ''),
+        verificationId: argsMap['verificationId']!.toString(),
+        phoneNumber: argsMap['phoneNumber']!.toString(),
         updatePhoneNumber: argsMap['updatenumber'] ?? false,
         isLogin: argsMap['isLogin'] ?? false,
       );
@@ -246,6 +329,33 @@ abstract class AppRouter {
 
     // Debug logging to help identify route issues
     debugPrint('🔍 Router: Attempting to navigate to route: "$routeName"');
+
+    // Handle Firebase Authentication deep link callbacks silently
+    // Firebase phone auth uses /link?deep_link_id=... to redirect back to app after reCAPTCHA
+    // The route name includes the full path with query parameters
+    if (routeName.startsWith('/link')) {
+      debugPrint('✅ Router: Handling Firebase auth callback deep link: $routeName');
+      
+      // Simplified check: if route starts with /link and contains deep_link_id, treat as Firebase callback
+      // This prevents "Page Not Found" errors - Firebase will handle the callback automatically
+      if (routeName.contains('deep_link_id')) {
+        debugPrint('✅ Router: Firebase auth callback detected, processing silently');
+        
+        // Return a completely transparent route that immediately pops
+        // This prevents any visible flash while Firebase processes the callback
+        return PageRouteBuilder(
+          settings: settings,
+          // Make transition instant and transparent
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          opaque: false, // Make route transparent
+          pageBuilder: (context, animation, secondaryAnimation) {
+            // Return an empty transparent widget that immediately pops
+            return const _FirebaseCallbackHandler();
+          },
+        );
+      }
+    }
 
     final WidgetBuilder? builder = allRoutes[routeName];
 

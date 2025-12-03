@@ -6,8 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../common/routes/route_name.dart';
 import '../../../common/widgets/afropeep_logo.dart';
 import '../../../common/constants/app_colors.dart';
-import '../auth_method/auth_method_selection_screen.dart';
 import '../auth_method/sign_in_method_selection_screen.dart';
+import '../phone/ui/screens/phone_number.dart';
 import 'widgets/rotating_greeting_widget.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -289,7 +289,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                               // Create Account and Login buttons for unauthenticated users
                               if (!_isAuthenticated) ...[
-                                // Create Account Button
+                                // Create Account Button - Direct to phone sign-up
                                 SlideTransition(
                                   position: _buttonSlide,
                                   child: _buildGradientButton(
@@ -298,8 +298,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AuthMethodSelectionScreen(),
+                                          builder: (context) => PhoneNumber(
+                                            updatePhoneNumber: false,
+                                            isSignIn: false, // Sign-up mode
+                                          ),
                                         ),
                                       );
                                     },

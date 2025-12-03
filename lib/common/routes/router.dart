@@ -4,6 +4,7 @@ import 'package:naijasingles/common/utils/large_image.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
 import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
 import 'package:naijasingles/features/auth/welcome/welcome_screen.dart';
+import 'package:naijasingles/features/home/ui/screens/splash.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_signup_screen.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_login_screen.dart';
 import 'package:naijasingles/features/auth/email_password/ui/screens/email_password_reset_screen.dart';
@@ -58,9 +59,21 @@ import '../../features/auth/phone/ui/screens/otp_page.dart';
 abstract class AppRouter {
   // register here for routes
   static Map<String, WidgetBuilder> allRoutes = {
-    // Root route - redirect to welcome
+    // Root route - redirect to welcome (splash removed to eliminate flash)
     '/': (context) => const WelcomeScreen(),
-    RouteName.welcomeScreen: (context) => const WelcomeScreen(),
+    RouteName.splashScreen: (context) => const Splash(),
+    RouteName.welcomeScreen: (context) {
+      debugPrint('🎯 WelcomeScreen route builder called');
+      try {
+        final widget = const WelcomeScreen();
+        debugPrint('✅ WelcomeScreen widget created successfully');
+        return widget;
+      } catch (e, stackTrace) {
+        debugPrint('❌ Error creating WelcomeScreen: $e');
+        debugPrint('Stack trace: $stackTrace');
+        rethrow;
+      }
+    },
     RouteName.loginScreen: (context) =>
         const EmailLoginScreen(), // Redirect to EmailLoginScreen
     RouteName.tabScreen: (context) => const Tabbar(),
@@ -121,21 +134,39 @@ abstract class AppRouter {
     RouteName.datingHomePage: (context) => const ExploreScreen(),
     RouteName.profilePicSetScreen: (context) => const UserProfilePic(),
     RouteName.allowLocationScreen: (context) => const AllowLocation(),
-    RouteName.otpScreen: (context) => OtpPage(
-        codeController: (ModalRoute.of(context)!.settings.arguments
-                as Map)['codeController']
-            .toString(),
-        verificationId: (ModalRoute.of(context)!.settings.arguments
-                as Map)['verificationId']
-            .toString(),
-        phoneNumber:
-            (ModalRoute.of(context)!.settings.arguments as Map)['phoneNumber']
-                .toString(),
-        updatePhoneNumber:
-            (ModalRoute.of(context)!.settings.arguments as Map)['updatenumber'],
-        isLogin:
-            (ModalRoute.of(context)!.settings.arguments as Map)['isLogin'] ??
-                false),
+    RouteName.otpScreen: (context) {
+      // Safely extract arguments with null checks
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      
+      if (arguments == null || arguments is! Map) {
+        // If arguments are missing, navigate back to prevent "Page Not Found"
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Error: Missing verification details. Please try again.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
+        // Return a placeholder while we navigate away
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      }
+      
+      final argsMap = arguments as Map;
+      
+      return OtpPage(
+        codeController: (argsMap['codeController']?.toString() ?? ''),
+        verificationId: (argsMap['verificationId']?.toString() ?? ''),
+        phoneNumber: (argsMap['phoneNumber']?.toString() ?? ''),
+        updatePhoneNumber: argsMap['updatenumber'] ?? false,
+        isLogin: argsMap['isLogin'] ?? false,
+      );
+    },
     RouteName.userDobScreen: (context) => UserDOB(
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
     RouteName.userNameScreen: (context) => const UserName(),
@@ -221,7 +252,47 @@ abstract class AppRouter {
     if (builder != null) {
       debugPrint('✅ Router: Found route "$routeName", navigating...');
       return MaterialPageRoute(
-        builder: builder,
+        builder: (context) {
+          try {
+            debugPrint('🏗️ Router: Building widget for route "$routeName"');
+            final widget = builder(context);
+            debugPrint('✅ Router: Widget built successfully for route "$routeName"');
+            return widget;
+          } catch (e, stackTrace) {
+            debugPrint('❌ Router: Error building widget for route "$routeName": $e');
+            debugPrint('Stack trace: $stackTrace');
+            // Return error widget instead of crashing
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error loading screen',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Route: $routeName\nError: $e',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        },
         settings: settings,
       );
     }

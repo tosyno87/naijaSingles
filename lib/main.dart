@@ -1,10 +1,12 @@
 // ignore_for_file: deprecated_member_use, depend_on_referenced_packages
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,9 +23,10 @@ import 'common/data/repo/phone_auth_repo.dart';
 import 'common/providers/theme_provider.dart';
 import 'common/utils/observer.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
-import 'debug/auto_login_service.dart';
+// import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
 import 'config/secure_config.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +49,22 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     log('🔥 Firebase initialized successfully');
+
+    // Configure Firebase Auth for iOS Simulator testing
+    if (Platform.isIOS && kDebugMode) {
+      // Disable app verification for testing on iOS Simulator
+      // This allows phone auth to work without real SMS
+      // IMPORTANT: Only use test phone numbers from Firebase Console
+      // Go to: Firebase Console > Authentication > Sign-in method > Phone > Phone numbers for testing
+      try {
+        // Note: Flutter doesn't have direct access to Auth.auth().settings
+        // Instead, we'll handle this in the phone auth repository
+        log('📱 iOS Simulator detected - Test phone numbers should be configured in Firebase Console');
+        log('💡 Configure test numbers at: Firebase Console > Auth > Sign-in method > Phone > Test phone numbers');
+      } catch (e) {
+        log('⚠️ Could not configure simulator settings: $e');
+      }
+    }
 
     // Initialize Enhanced Notification Service
     await EnhancedNotificationService.initialize();
@@ -76,10 +95,27 @@ Future<void> main() async {
   );
 
   // Auto-login for testing in debug mode
+  // DISABLED: Commented out to ensure clean start with no authenticated user
+  // Uncomment below if you need auto-login for testing purposes
+  /*
   try {
     await AutoLoginService.autoLoginForTesting();
   } catch (e) {
     log('⚠️ Auto-login error: $e');
+  }
+  */
+  
+  // Ensure clean start: Sign out any existing authenticated user
+  // This ensures new builds start with no user authenticated
+  try {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null && kDebugMode) {
+      log('🧹 Signing out existing user for clean start: ${currentUser.uid}');
+      await FirebaseAuth.instance.signOut();
+      log('✅ Signed out - app will start with no authenticated user');
+    }
+  } catch (e) {
+    log('⚠️ Error signing out existing user: $e');
   }
 
   Bloc.observer = SimpleBlocObserver();
@@ -155,13 +191,14 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // Global navigator key for notification navigation
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     // Set navigator key for notification service
     EnhancedNotificationService.setNavigatorKey(navigatorKey);
-    
+
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
@@ -174,7 +211,7 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          initialRoute: RouteName.welcomeScreen,
+          initialRoute: RouteName.welcomeScreen, // Direct to WelcomeScreen - no splash flash
           onGenerateRoute: AppRouter.generateRoute,
           // Add safety check for Navigator during hot reload
           builder: (context, child) {

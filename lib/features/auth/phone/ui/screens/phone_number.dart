@@ -1,15 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import '../../bloc/phone_auth_bloc.dart';
+import 'otp_page.dart';
 
 // ignore: must_be_immutable
 class PhoneNumber extends StatefulWidget {
@@ -31,7 +33,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
   bool isValidNumber = false;
   bool _isLoading = false;
 
-  String countryCode = '+234'; // Default to Nigeria code
+  String countryCode = '+1'; // Default to US code
   TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
 
@@ -53,9 +55,19 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
   void _validatePhoneNumber() {
     if (mounted) {
+      final phoneDigits = phoneNumberController.text.trim().replaceAll(RegExp(r'[^\d]'), '');
+      
+      // Allow typing freely - just check minimum length for button enable
+      // Full validation happens on submit to Firebase
+      final minDigits = 6; // Minimum to enable button
+      
+      final isValid = phoneDigits.length >= minDigits;
+      
       setState(() {
-        isValidNumber = phoneNumberController.text.trim().length >= 6;
+        isValidNumber = isValid;
       });
+      
+      log('📞 Phone validation: "${phoneNumberController.text.trim()}" -> $phoneDigits digits -> button enabled: $isValid (min: $minDigits)');
     }
   }
 
@@ -67,7 +79,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
     ));
 
     // Define colors based on MVP styling
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color textColor = Color(0xFF3E1F0D); // Deep brown
     const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
@@ -102,17 +114,10 @@ class _PhoneNumberState extends State<PhoneNumber> {
           ),
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
             listener: (context, state) {
-              if (state is PhoneAuthVerified) {
-                log("phone auth success listener called");
-                // Navigate based on sign in or sign up
-                if (widget.isSignIn) {
-                  Navigator.pushReplacementNamed(
-                      context, RouteName.mainNavigation);
-                } else {
-                  Navigator.pushReplacementNamed(context, RouteName.onboarding);
-                }
-              }
-
+              // Don't handle PhoneAuthVerified here - let OTP screen handle it
+              // This prevents premature navigation before registration check completes
+              // The OTP screen will handle navigation after checking registration status
+              
               if (state is PhoneAuthCodeSentSuccess) {
                 log("phone auth code sent success listener called");
                 if (mounted) {
@@ -120,24 +125,59 @@ class _PhoneNumberState extends State<PhoneNumber> {
                     _isLoading = false;
                   });
 
-                  Navigator.pushNamed(context, RouteName.otpScreen, arguments: {
-                    'phoneNumber': countryCode + phoneNumberController.text,
-                    'codeController': _codeController.text,
-                    'verificationId': state.verificationId,
-                    "updatenumber": widget.updatePhoneNumber,
-                    "isLogin": widget.isSignIn,
-                  });
+                  // Use direct MaterialPageRoute instead of named route to avoid router issues
+                  // This ensures smooth transition without any "Page Not Found" flash
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => OtpPage(
+                        phoneNumber: countryCode + phoneNumberController.text,
+                        verificationId: state.verificationId,
+                        codeController: _codeController.text,
+                        updatePhoneNumber: widget.updatePhoneNumber,
+                        isLogin: widget.isSignIn,
+                      ),
+                    ),
+                  );
                 }
               }
 
               if (state is PhoneAuthError) {
-                log("phone auth error listener called");
+                log('');
+                log('═══════════════════════════════════════════════════════');
+                log('❌ PHONE AUTH ERROR');
+                log('═══════════════════════════════════════════════════════');
+                log('Error: ${state.error}');
+                log('═══════════════════════════════════════════════════════');
+                log('');
+                
                 if (mounted) {
                   setState(() {
                     _isLoading = false;
                   });
+                  
+                  // Provide helpful error message for simulator users
+                  String errorMessage = state.error;
+                  String debugHint = '';
+                  
+                  if (state.error.contains('invalid-phone-number')) {
+                    String countrySpecificHint = '';
+                    if (countryCode == '+1') {
+                      countrySpecificHint = '\n\n⚠️ US/Canada numbers must be exactly 10 digits (not including country code +1)';
+                      countrySpecificHint += '\nExample: 2179044453 (10 digits), not 21790444533 (11 digits)';
+                    }
+                    debugHint = '\n\n📋 Troubleshooting:$countrySpecificHint\n1. Check console logs for the EXACT number sent\n2. In Firebase Console, add test number WITHOUT spaces/dashes\n3. Format: +12179044453 (not +1 217 904 445 33)';
+                  } else if (state.error.contains('missing-verification-code')) {
+                    debugHint = '\n\n📋 Test number not found!\n1. Check console logs for exact number sent\n2. Add that EXACT number (no spaces) to Firebase Console\n3. Set a verification code (e.g., 123456)';
+                  } else if (state.error.contains('invalid-verification-code')) {
+                    debugHint = '\n\n📋 Wrong verification code!\nUse the code you set in Firebase Console test numbers';
+                  } else if (state.error.contains('quota-exceeded')) {
+                    debugHint = '\n\n📋 Too many requests!\nWait a few minutes and try again';
+                  } else {
+                    debugHint = '\n\n💡 For iOS Simulator: Use test phone numbers from Firebase Console.\nCheck console logs for exact number format needed.';
+                  }
+                  
                   CustomSnackbar.showSnackBarSimple(
-                    state.error,
+                    '$errorMessage$debugHint',
                     context,
                   );
                 }
@@ -175,6 +215,34 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         ),
 
                         const SizedBox(height: 32),
+
+                        // Debug info banner for iOS Simulator
+                        if (kDebugMode && Platform.isIOS)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue.shade200),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline,
+                                    color: Colors.blue.shade700, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '💡 iOS Simulator: Use test phone numbers from Firebase Console',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 12,
+                                      color: Colors.blue.shade900,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
 
                         Text(
                           "Enter your phone number",
@@ -226,12 +294,14 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     if (mounted) {
                                       setState(() {
                                         countryCode = code.dialCode!;
+                                        // Re-validate when country code changes
+                                        _validatePhoneNumber();
                                       });
                                     }
                                   },
-                                  initialSelection: 'NG',
+                                  initialSelection: 'US',
                                   favorite: const [
-                                    'NG',
+                                    'US',
                                     'GH',
                                     'ZA',
                                     'KE',
@@ -255,13 +325,13 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     fontSize: 16,
                                   ),
                                   dialogBackgroundColor:
-                                      const Color(0xFFFFF6E5),
+                                      Colors.white,
                                   boxDecoration: BoxDecoration(
-                                    color: const Color(0xFFFFF6E5),
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   barrierColor: Colors.black54,
-                                  backgroundColor: const Color(0xFFFFF6E5),
+                                  backgroundColor: Colors.white,
                                   dialogSize: Size(
                                       MediaQuery.of(context).size.width * 0.9,
                                       MediaQuery.of(context).size.height * 0.7),
@@ -351,61 +421,104 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
                         const SizedBox(height: 40),
 
-                        // Continue labelLarge
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: (!isValidNumber || _isLoading)
-                                ? null
-                                : () {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
+                        // Continue button with enhanced debugging
+                        Builder(
+                          builder: (context) {
+                            final isButtonEnabled = isValidNumber && !_isLoading;
+                            
+                            return SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: isButtonEnabled
+                                    ? () {
+                                        log('');
+                                        log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
+                                        log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
+                                        log('Phone input: "${phoneNumberController.text}"');
+                                        log('Country code: $countryCode');
+                                        log('');
+                                        
+                                        setState(() {
+                                          _isLoading = true;
+                                        });
 
-                                    // Remove spaces from phone number
-                                    final cleanPhoneNumber =
-                                        phoneNumberController.text
-                                            .replaceAll(' ', '');
-
-                                    context.read<PhoneAuthBloc>().add(
+                                        // Remove spaces, dashes, and other formatting from phone number
+                                        final cleanPhoneNumber = phoneNumberController.text
+                                            .replaceAll(' ', '')
+                                            .replaceAll('-', '')
+                                            .replaceAll('(', '')
+                                            .replaceAll(')', '')
+                                            .trim();
+                                        
+                                        final fullPhoneNumber = countryCode + cleanPhoneNumber;
+                                        
+                                        log('');
+                                        log('═══════════════════════════════════════════════════════');
+                                        log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
+                                        log('═══════════════════════════════════════════════════════');
+                                        log('Country Code: $countryCode');
+                                        log('User Input: "${phoneNumberController.text}"');
+                                        log('Cleaned Input: "$cleanPhoneNumber"');
+                                        log('Full Number (sent to Firebase): "$fullPhoneNumber"');
+                                        log('');
+                                        log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
+                                        log('   "$fullPhoneNumber"');
+                                        log('');
+                                        log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
+                                        log('═══════════════════════════════════════════════════════');
+                                        log('');
+                                        
+                                        final bloc = context.read<PhoneAuthBloc>();
+                                        log('📤 Adding SendOtpToPhoneEvent to bloc...');
+                                        bloc.add(
                                           SendOtpToPhoneEvent(
-                                            phoneNumber:
-                                                countryCode + cleanPhoneNumber,
+                                            phoneNumber: fullPhoneNumber,
                                           ),
                                         );
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isValidNumber
-                                  ? primaryColor
-                                  : Colors.grey.shade400,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor: Colors.grey.shade400,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: isValidNumber ? 3 : 1,
-                              shadowColor: isValidNumber
-                                  ? primaryColor.withValues(alpha: 0.3)
-                                  : Colors.transparent,
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 24,
-                                    width: 24,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    "Continue",
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        log('✅ Event added to bloc');
+                                      }
+                                    : () {
+                                        // Log why button is disabled
+                                        log('🚫 Button disabled!');
+                                        log('   isValidNumber: $isValidNumber');
+                                        log('   isLoading: $_isLoading');
+                                        log('   Phone input: "${phoneNumberController.text}" (length: ${phoneNumberController.text.trim().length})');
+                                        log('   Button requires: min 6 characters');
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isButtonEnabled
+                                      ? primaryColor
+                                      : Colors.grey.shade400,
+                                  foregroundColor: Colors.white,
+                                  disabledBackgroundColor: Colors.grey.shade400,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                          ),
+                                  elevation: isButtonEnabled ? 3 : 1,
+                                  shadowColor: isButtonEnabled
+                                      ? primaryColor.withValues(alpha: 0.3)
+                                      : Colors.transparent,
+                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(
+                                        "Continue",
+                                        style: GoogleFonts.montserrat(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                              ),
+                            );
+                          },
                         ),
 
                         const SizedBox(height: 24),

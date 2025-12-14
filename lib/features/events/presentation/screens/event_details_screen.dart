@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/utils/app_logger.dart';
 import '../bloc/rsvp_bloc.dart';
 import '../widgets/event_attendees_list.dart';
 import '../../data/models/event_model.dart';

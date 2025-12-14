@@ -277,7 +277,11 @@ class UserModel {
               : null),
       editInfo: json['editInfo'],
       streetView: json['streetView'],
-      imageUrl: json['photos'] ?? json['Pictures'],
+      imageUrl: json['photos'] is List
+          ? List<String>.from(json['photos'].map((e) => e?.toString() ?? '').where((url) => url.isNotEmpty))
+          : json['Pictures'] is List
+              ? List<String>.from(json['Pictures'].map((e) => e?.toString() ?? '').where((url) => url.isNotEmpty))
+              : [],
       distanceBW: json['distanceBW'] != null
           ? (json['distanceBW'] as num).round()
           : null,

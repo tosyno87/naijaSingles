@@ -278,7 +278,11 @@ class PrivacyAwareUserSearchRepo {
       showMyAge: data['showMyAge'] ?? true,
       latitude: latitude,
       longitude: longitude,
-      imageUrl: data['photos'] ?? data['Pictures'] ?? [],
+      imageUrl: data['photos'] is List
+          ? List<String>.from((data['photos'] as List).map((e) => e?.toString() ?? '').where((url) => url.toString().isNotEmpty))
+          : data['Pictures'] is List
+              ? List<String>.from((data['Pictures'] as List).map((e) => e?.toString() ?? '').where((url) => url.toString().isNotEmpty))
+              : [],
       isBlocked: data['isBlocked'] ?? false,
       // Only include data that user has chosen to share
       sexualOrientation: data['sexualOrientation'], // Only if privacy allows

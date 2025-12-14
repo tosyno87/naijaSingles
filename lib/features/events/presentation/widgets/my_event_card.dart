@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -93,93 +95,116 @@ class MyEventCard extends StatelessWidget {
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),
-                child: Image.network(
-                  event.primaryImageUrl,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit
-                      .cover, // Perfect for posters - fills space while maintaining aspect ratio
-                  filterQuality: FilterQuality.high, // High quality rendering
-                  isAntiAlias: true, // Smooth edges
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: const Color(0xFFF8F8F8),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF008037),
-                                ),
-                                strokeWidth: 3,
+                child: event.primaryImageUrl.startsWith('http')
+                    ? Image.network(
+                        event.primaryImageUrl,
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.high,
+                        isAntiAlias: true,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: const Color(0xFFF8F8F8),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes !=
+                                              null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes!
+                                          : null,
+                                      valueColor: const AlwaysStoppedAnimation<Color>(
+                                        Color(0xFF008037),
+                                      ),
+                                      strokeWidth: 3,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Loading poster...',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 12,
+                                      color: const Color(0xFF666666),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Loading poster...',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: const Color(0xFF666666),
-                                fontWeight: FontWeight.w500,
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          AppLogger.error(
+                              '❌ Error loading image for event ${event.id}', error: error, stackTrace: stackTrace,);
+                          AppLogger.debug('❌ Image URL: ${event.primaryImageUrl}');
+                          return Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: const Color(0xFFF0F0F0),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.broken_image_outlined,
+                                    size: 48,
+                                    color: Color(0xFF999999),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Poster failed to load',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 14,
+                                      color: const Color(0xFF666666),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Tap to retry',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 12,
+                                      color: const Color(0xFF999999),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          );
+                        },
+                      )
+                    : Image.file(
+                        File(event.primaryImageUrl),
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.high,
+                        errorBuilder: (context, error, stackTrace) {
+                          AppLogger.error(
+                              '❌ Error loading local image for event ${event.id}', error: error, stackTrace: stackTrace,);
+                          return Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: const Color(0xFFF0F0F0),
+                            child: const Center(
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                size: 48,
+                                color: Color(0xFF999999),
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    AppLogger.error(
-                        '❌ Error loading image for event ${event.id}', error: error, stackTrace: stackTrace,);
-                    AppLogger.debug('❌ Image URL: ${event.primaryImageUrl}');
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: const Color(0xFFF0F0F0),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.broken_image_outlined,
-                              size: 48,
-                              color: Color(0xFF999999),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Poster failed to load',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                color: const Color(0xFF666666),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Tap to retry',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: const Color(0xFF999999),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
               ),
             )
           else

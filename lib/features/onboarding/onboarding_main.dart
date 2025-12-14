@@ -121,14 +121,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
       // Bio page - Optional (Tinder standard: bio can be empty)
       // No validation - users can skip bio
     } else if (_currentPage == 5) {
-      // Enhanced Interests page
-      if (controller.interests.length < 5) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Please complete the interests selection process'),),
-        );
-        return;
-      }
+      // Enhanced Interests page - Optional (Tinder standard: passions are optional)
+      // No validation - users can skip or select 0-5 interests
     } else if (_currentPage == 6) {
       // Dating preferences page
       // Basic validation - these have defaults so they should always be set
@@ -333,8 +327,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                       case 4: // Bio page - Optional (Tinder standard)
                         canContinue = true; // Bio is optional
                         break;
-                      case 5: // Interests page
-                        canContinue = controller.areInterestsSelected();
+                      case 5: // Interests page - Optional (Tinder standard)
+                        canContinue = true; // Interests are optional
                         break;
                       case 6: // Dating preferences page
                         canContinue = controller.interestedIn.isNotEmpty;

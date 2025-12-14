@@ -213,5 +213,5 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
 
 void _refreshPage(BuildContext context, {required String lCode, cCode}) {
   EasyLocalization.of(context)!.setLocale(Locale(lCode, cCode));
-  Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+  Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
 }

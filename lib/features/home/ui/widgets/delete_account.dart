@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/features/home/ui/widgets/re_auth_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
@@ -296,8 +295,11 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         "Account deleted successfully".tr().toString(),
         context,
       );
-      Navigator.pushReplacementNamed(context, RouteName.loginScreen)
-          .then((value) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteName.welcomeScreen,
+        (route) => false,
+      ).then((value) {
         Provider.of<UserProvider>(context, listen: false).currentUser = null;
       });
     }

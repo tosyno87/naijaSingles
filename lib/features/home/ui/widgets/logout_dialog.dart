@@ -47,8 +47,12 @@ void showLogoutDialog(BuildContext context) {
               // Sign out from Firebase Auth
               await auth.signOut();
               if (context.mounted) {
-                // Navigate to the login screen
-                Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+                // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteName.welcomeScreen,
+                  (route) => false,
+                );
               }
             },
             child: Text(

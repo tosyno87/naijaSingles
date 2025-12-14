@@ -725,10 +725,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Close loading dialog
       if (mounted) Navigator.pop(context);
 
-      // Navigate to login screen
+      // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
-          '/login',
+          RouteName.welcomeScreen,
           (route) => false,
         );
       }

@@ -168,9 +168,12 @@ Future<void> deleteUserAndNavigateToLogin(
         "Account deleted Successfully".tr().toString(),
         context,
       );
-      // Navigate to login screen
-      Navigator.pushReplacementNamed(context, RouteName.loginScreen)
-          .then((value) {
+      // Navigate to welcome screen to show all sign-in options
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteName.welcomeScreen,
+        (route) => false,
+      ).then((value) {
         // Update user provider
         Provider.of<UserProvider>(context, listen: false).currentUser = null;
       });

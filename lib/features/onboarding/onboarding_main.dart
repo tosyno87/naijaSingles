@@ -27,7 +27,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
   final List<String> _pageNames = [
     'Basic Info',
     'Your Location',
-    'Your Tribe',
+    'Nationality',
     'Tell Your Story',
     'Your Interests',
     'Profile Photo',
@@ -101,10 +101,10 @@ class _OnboardingMainState extends State<OnboardingMain> {
         return;
       }
     } else if (_currentPage == 2) {
-      // Tribe selection page
-      if (controller.tribe.trim().isEmpty) {
+      // Nationality selection page (tribe optional)
+      if (controller.nationality == null || controller.nationality!.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select your tribe')),
+          const SnackBar(content: Text('Please select your nationality')),
         );
         return;
       }
@@ -352,8 +352,9 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         canContinue = controller.locationName != null &&
                             controller.locationName!.trim().isNotEmpty;
                         break;
-                      case 2: // Tribe page
-                        canContinue = controller.isTribeSelected();
+                      case 2: // Nationality page (tribe optional)
+                        canContinue = controller.nationality != null &&
+                            controller.nationality!.isNotEmpty;
                         break;
                       case 3: // Bio page
                         canContinue = controller.isBioComplete();

@@ -11,6 +11,7 @@ class TribeSelectionScreen extends StatefulWidget {
 }
 
 class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
+  String? _selectedNationality;
   String? _selectedTribe;
   final TextEditingController _otherTribeController = TextEditingController();
   bool _showOtherField = false;
@@ -22,7 +23,63 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
 
-  // List of main Nigerian tribes for dropdown
+  // List of African nationalities
+  final List<String> _nationalities = [
+    'Nigeria',
+    'Ghana',
+    'Kenya',
+    'South Africa',
+    'Ethiopia',
+    'Tanzania',
+    'Uganda',
+    'Zimbabwe',
+    'Senegal',
+    'Cameroon',
+    'Ivory Coast',
+    'Morocco',
+    'Egypt',
+    'Tunisia',
+    'Algeria',
+    'Sudan',
+    'Mozambique',
+    'Angola',
+    'Madagascar',
+    'Mali',
+    'Burkina Faso',
+    'Niger',
+    'Malawi',
+    'Zambia',
+    'Somalia',
+    'Guinea',
+    'Benin',
+    'Burundi',
+    'Togo',
+    'Eritrea',
+    'Sierra Leone',
+    'Libya',
+    'Rwanda',
+    'Chad',
+    'Central African Republic',
+    'Mauritania',
+    'Namibia',
+    'Botswana',
+    'Gabon',
+    'Gambia',
+    'Lesotho',
+    'Guinea-Bissau',
+    'Equatorial Guinea',
+    'Mauritius',
+    'Eswatini',
+    'Djibouti',
+    'Comoros',
+    'Cabo Verde',
+    'São Tomé and Príncipe',
+    'Seychelles',
+    'African Diaspora',
+    'Other',
+  ];
+
+  // List of main Nigerian tribes for dropdown (optional)
   final List<String> _mainTribes = [
     'Yoruba',
     'Igbo',
@@ -30,6 +87,10 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
     'Fulani',
     'Ijaw',
     'Kanuri',
+    'Ibibio',
+    'Tiv',
+    'Edo',
+    'Urhobo',
     'Other',
   ];
 
@@ -42,6 +103,14 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
       final controller =
           Provider.of<OnboardingController>(context, listen: false);
 
+      // Load nationality
+      if (controller.nationality != null && controller.nationality!.isNotEmpty) {
+        setState(() {
+          _selectedNationality = controller.nationality;
+        });
+      }
+
+      // Load tribe (optional)
       if (controller.tribe.isNotEmpty) {
         if (_mainTribes.contains(controller.tribe)) {
           setState(() {
@@ -62,6 +131,18 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   void dispose() {
     _otherTribeController.dispose();
     super.dispose();
+  }
+
+  void _selectNationality(String? nationality) {
+    setState(() {
+      _selectedNationality = nationality;
+    });
+    if (nationality != null) {
+      final controller =
+          Provider.of<OnboardingController>(context, listen: false);
+      final isDiaspora = nationality == 'African Diaspora';
+      controller.updateNationality(nationality, isDiaspora);
+    }
   }
 
   void _selectTribe(String? tribe) {
@@ -96,7 +177,81 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
 
           const SizedBox(height: 32),
 
-          // Dropdown for tribe selection
+          // Nationality field (required)
+          Text(
+            'Nationality *',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: textDarkBrown,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: cardBackground,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _selectedNationality != null
+                    ? afropeepGreen
+                    : Colors.transparent,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedNationality,
+                hint: Text(
+                  'Select your nationality',
+                  style: GoogleFonts.montserrat(
+                    color: textLightBrown,
+                    fontSize: 16,
+                  ),
+                ),
+                isExpanded: true,
+                icon: const Icon(Icons.arrow_drop_down, color: afropeepGreen),
+                dropdownColor: cardBackground,
+                style: GoogleFonts.montserrat(
+                  color: textDarkBrown,
+                  fontSize: 16,
+                ),
+                items: _nationalities
+                    .map((String nationality) => DropdownMenuItem<String>(
+                          value: nationality,
+                          child: Text(nationality),
+                        ))
+                    .toList(),
+                onChanged: _selectNationality,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // Tribe field (optional)
+          Row(
+            children: [
+              Text(
+                'Tribe or Ethnic Group',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: textDarkBrown,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '(Optional)',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  color: textLightBrown,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: cardBackground,
@@ -111,7 +266,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
               child: DropdownButton<String>(
                 value: _selectedTribe,
                 hint: Text(
-                  'Select your tribe',
+                  'Select your tribe (optional)',
                   style: GoogleFonts.montserrat(
                     color: textLightBrown,
                     fontSize: 16,

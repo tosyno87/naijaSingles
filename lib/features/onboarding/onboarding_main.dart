@@ -33,7 +33,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     'Tell Your Story',
     'Your Interests',
     'Dating Preferences',
-    'Additional Info (Optional)',
+    'Additional Info',
   ];
 
   @override

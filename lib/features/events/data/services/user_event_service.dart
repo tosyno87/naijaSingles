@@ -366,14 +366,26 @@ class UserEventService {
         }
 
         log('📤 Uploading image ${i + 1} to Firebase Storage...', name: 'UserEventService');
+        log('📦 Storage instance: ${_storage.app.name}', name: 'UserEventService');
+        log('📦 Storage bucket: ${_storage.app.options.storageBucket}', name: 'UserEventService');
+        
+        // Verify user is authenticated
+        final currentUser = _auth.currentUser;
+        if (currentUser == null) {
+          log('❌ User is not authenticated - cannot upload', name: 'UserEventService');
+          throw Exception('User must be authenticated to upload images');
+        }
+        log('✅ User authenticated: ${currentUser.uid}', name: 'UserEventService');
 
         // Create unique filename
         final fileName =
             'event_images/${DateTime.now().millisecondsSinceEpoch}_${imagePath.split('/').last}';
+        log('📝 Target file path: $fileName', name: 'UserEventService');
         final ref = _storage.ref().child(fileName);
 
         // Upload file
         log('📤 Starting upload task for image ${i + 1}...', name: 'UserEventService');
+        log('📤 File size: ${await file.length()} bytes', name: 'UserEventService');
         final uploadTask = ref.putFile(file);
         
         // Monitor upload progress

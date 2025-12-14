@@ -37,17 +37,11 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
               size: 28,
             ),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Search functionality coming soon!',
-                    style: GoogleFonts.montserrat(),
-                  ),
-                  backgroundColor: AppColors.primaryGreen,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              // Navigate to UnifiedGroupsScreen which has full search functionality
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UnifiedGroupsScreen(),
                 ),
               );
             },

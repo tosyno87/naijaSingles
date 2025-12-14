@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/group_join_exception.dart';
+import 'content_moderation_service.dart';
 
 /// Unified Group Service that combines Cultural Groups and Group Chats
 /// This eliminates redundancy and creates synergy between features
@@ -33,6 +34,25 @@ class UnifiedGroupService {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) {
         throw Exception('User not authenticated');
+      }
+
+      // Content moderation for group name and description
+      final moderationService = ContentModerationService();
+      final nameModeration = await moderationService.moderateText(name);
+      final descriptionModeration = await moderationService.moderateText(description);
+
+      // Reject if content is inappropriate
+      if (nameModeration.action == ModerationAction.reject ||
+          descriptionModeration.action == ModerationAction.reject) {
+        throw Exception(
+          'Group content contains inappropriate material. Please revise your group name and description.',
+        );
+      }
+
+      // Warn but allow if content needs review
+      if (nameModeration.action == ModerationAction.review ||
+          descriptionModeration.action == ModerationAction.review) {
+        log('⚠️ Group content flagged for review: $name');
       }
 
       // Ensure creator is included in members and remove duplicates
@@ -509,6 +529,8 @@ class UnifiedGroupService {
     String? name,
     String? description,
     String? imageUrl,
+    String? location,
+    GroupType? type,
     List<String>? tags,
     Map<String, dynamic>? culturalInfo,
     bool? enableChat,
@@ -537,6 +559,25 @@ class UnifiedGroupService {
         throw Exception('Only admins can update group settings');
       }
 
+      // Content moderation for name and description if provided
+      final moderationService = ContentModerationService();
+      if (name != null) {
+        final nameModeration = await moderationService.moderateText(name);
+        if (nameModeration.action == ModerationAction.reject) {
+          throw Exception(
+            'Group name contains inappropriate material. Please revise.',
+          );
+        }
+      }
+      if (description != null) {
+        final descModeration = await moderationService.moderateText(description);
+        if (descModeration.action == ModerationAction.reject) {
+          throw Exception(
+            'Group description contains inappropriate material. Please revise.',
+          );
+        }
+      }
+
       // Update group settings
       final updateData = <String, dynamic>{
         'updatedAt': FieldValue.serverTimestamp(),
@@ -546,6 +587,8 @@ class UnifiedGroupService {
       if (name != null) updateData['name'] = name;
       if (description != null) updateData['description'] = description;
       if (imageUrl != null) updateData['imageUrl'] = imageUrl;
+      if (location != null) updateData['location'] = location;
+      if (type != null) updateData['type'] = type.name;
       if (tags != null) updateData['tags'] = tags;
       if (culturalInfo != null) updateData['culturalInfo'] = culturalInfo;
       if (enableChat != null) updateData['enableChat'] = enableChat;

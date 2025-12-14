@@ -16,6 +16,7 @@ import '../../../widgets/group_report_modal.dart';
 import '../../group_chat/screens/group_chat_screen.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/message_shimmer.dart';
+import '../widgets/invite_members_modal.dart';
 import 'group_settings_screen.dart';
 
 /// Enhanced Group Details Screen for members
@@ -694,9 +695,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   Widget _buildMemberTile(String memberId) {
-    final isCurrentUser = memberId == FirebaseAuth.instance.currentUser?.uid;
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final isCurrentUser = memberId == currentUserId;
     final isCreator = memberId == widget.group.creatorId;
     final isAdmin = widget.group.adminIds.contains(memberId);
+    final canRemoveMembers = _canEditGroup() && !isCreator && !isCurrentUser;
 
     return FutureBuilder<UserProfile?>(
       future: _userService.getUserProfile(memberId),
@@ -772,6 +775,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               ],
             ],
           ),
+          trailing: canRemoveMembers
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.remove_circle_outline,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                  onPressed: () => _showRemoveMemberConfirmation(memberId, displayName),
+                  tooltip: 'Remove member',
+                )
+              : null,
           onTap: () => _navigateToMemberProfile(memberId),
         );
       },
@@ -957,13 +971,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   void _inviteMembers() {
-    // TODO: Implement invite members functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Invite members functionality coming soon!'),
-        backgroundColor: AppColors.primaryGreen,
-      ),
-    );
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => InviteMembersModal(group: widget.group),
+    ).then((refresh) {
+      // Refresh the screen if members were added
+      if (refresh == true && mounted) {
+        setState(() {});
+      }
+    });
   }
 
   Future<void> _leaveGroup() async {
@@ -1266,23 +1284,103 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   void _editGroupPhoto() {
-    // TODO: Implement group photo editing
+    // Navigate to group settings where photo editing is available
+    Navigator.pop(context); // Close the image options modal
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GroupSettingsScreen(group: widget.group),
+      ),
+    ).then((_) {
+      // Refresh the screen after returning from settings
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _navigateToMemberProfile(String memberId) {
+    // Navigate to user profile screen
+    // For now, show a snackbar. This can be enhanced to navigate to a profile screen
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Group photo editing coming soon!'),
+      SnackBar(
+        content: Text('Viewing ${memberId == FirebaseAuth.instance.currentUser?.uid ? "your" : "member"} profile'),
         backgroundColor: AppColors.primaryGreen,
       ),
     );
   }
 
-  void _navigateToMemberProfile(String memberId) {
-    // TODO: Implement member profile navigation
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Member profile navigation coming soon!'),
-        backgroundColor: AppColors.primaryGreen,
+  Future<void> _showRemoveMemberConfirmation(String memberId, String memberName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Remove Member',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to remove $memberName from this group?',
+          style: GoogleFonts.montserrat(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              'Remove',
+              style: GoogleFonts.montserrat(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+
+    if (confirmed == true) {
+      await _removeMember(memberId, memberName);
+    }
+  }
+
+  Future<void> _removeMember(String memberId, String memberName) async {
+    try {
+      await _groupService.removeMemberFromGroup(
+        groupId: widget.group.id,
+        userId: memberId,
+        reason: 'Removed by admin',
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$memberName has been removed from the group'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        // Refresh the screen
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to remove member: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   String _formatDate(DateTime date) {

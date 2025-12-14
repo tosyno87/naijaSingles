@@ -957,64 +957,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return null;
     }
 
-    // Education
+    // Education - graduation cap icon (like Hinge)
     final education = getValue('education');
     if (education != null) {
-      details.add({'icon': Icons.school, 'label': 'Education', 'value': education});
+      details.add({'icon': Icons.school, 'label': '', 'value': education});
     }
 
-    // Work/Job - check multiple fields for compatibility
+    // Work/Job - briefcase icon (like Hinge)
     final workTitle = getValue('job_title') ?? 
                      getValue('profession') ?? 
                      getValue('occupation');
     if (workTitle != null) {
-      details.add({'icon': Icons.work, 'label': 'Work', 'value': workTitle});
+      details.add({'icon': Icons.business_center, 'label': '', 'value': workTitle});
     }
 
-    // Religion
+    // Religion - book icon (like Hinge)
     final religion = getValue('religion');
     if (religion != null) {
-      details.add({'icon': Icons.favorite, 'label': 'Religion', 'value': religion});
+      details.add({'icon': Icons.menu_book, 'label': '', 'value': religion});
     }
 
-    // Height
-    final height = getValue('heightDisplay') ?? 
-                   getValue('height_ft_in') ??
-                   getValue('height');
-    if (height != null && height != '0' && height != '0.0') {
-      // Format height display
-      String heightDisplay = height;
-      if (heightDisplay.contains('.')) {
-        // If it's a number, try to format it
-        try {
-          final heightNum = double.parse(heightDisplay);
-          if (heightNum > 0) {
-            heightDisplay = heightDisplay;
-          } else {
-            heightDisplay = ''; // Skip if invalid
-          }
-        } catch (e) {
-          // Keep original string if parsing fails
-        }
-      }
-      if (heightDisplay.isNotEmpty) {
-        details.add({'icon': Icons.height, 'label': 'Height', 'value': heightDisplay});
-      }
+    // Relationship Intent (Relationship goals) - search icon (like Hinge)
+    final relationshipIntent = getValue('relationshipIntent') ??
+                              _userData?['preferences']?['relationshipIntent']?.toString();
+    if (relationshipIntent != null && relationshipIntent.isNotEmpty) {
+      details.add({'icon': Icons.search, 'label': '', 'value': relationshipIntent});
     }
 
-    // Languages
-    final languages = _userData?['languages'];
-    if (languages is List && languages.isNotEmpty) {
-      final languagesList = languages.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
-      if (languagesList.isNotEmpty) {
-        details.add({'icon': Icons.language, 'label': 'Languages', 'value': languagesList.join(', ')});
-      }
-    }
-
-    // Tribe
+    // Tribe - group icon
     final tribe = getValue('tribe');
     if (tribe != null) {
-      details.add({'icon': Icons.group, 'label': 'Tribe', 'value': tribe});
+      details.add({'icon': Icons.group, 'label': '', 'value': tribe});
     }
 
     if (details.isEmpty) return const SizedBox.shrink();
@@ -1032,7 +1005,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          // Hinge-style details: just icon and value, no label
           ...details.map((detail) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
@@ -1040,31 +1014,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Icon(
                       detail['icon'] as IconData,
                       size: 20,
-                      color: primaryColor,
+                      color: textSecondary,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            detail['label'] as String,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            detail['value'] as String,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: textPrimary,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        detail['value'] as String,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: textPrimary,
+                        ),
                       ),
                     ),
                   ],

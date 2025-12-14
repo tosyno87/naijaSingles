@@ -231,6 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
+                    color: Colors.grey.shade100, // Background for images that don't fill container
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -243,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     child: Image.network(
                       photos[index],
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain, // Show full image without cropping
                       errorBuilder: (context, error, stackTrace) => ColoredBox(
                           color: Colors.grey.shade200,
                           child: Icon(

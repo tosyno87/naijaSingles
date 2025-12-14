@@ -113,7 +113,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     );
   }
 
-  // Tinder-style photo grid item - Square (1:1) aspect ratio
+  // Tinder-style photo grid item - Minimal, clean, edge-to-edge
   Widget _buildPhotoGridItem({
     required File? photo,
     required int index,
@@ -123,41 +123,28 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       onTap: () => _showAddPhotoOptions(index),
       child: AspectRatio(
         aspectRatio: 1.0, // Square - Industry standard (Tinder, Bumble, Hinge)
-        child: DecoratedBox(
+        child: Container(
           decoration: BoxDecoration(
-            color: photo == null ? Colors.grey.shade100 : Colors.transparent,
+            color: photo == null ? Colors.grey.shade100 : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isMainPhoto && photo != null
-                  ? primaryGreen
-                  : Colors.grey.shade300,
-              width: isMainPhoto && photo != null ? 2.5 : 1.5,
-            ),
-            boxShadow: photo != null
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
+            // Subtle border only for main photo
+            border: isMainPhoto && photo != null
+                ? Border.all(color: primaryGreen, width: 3)
+                : Border.all(color: Colors.grey.shade200, width: 1),
           ),
+          clipBehavior: Clip.antiAlias,
           child: Stack(
             children: [
-              // Photo - Tinder style: photos are already square-cropped, use cover to fill perfectly
+              // Photo - Tinder style: edge-to-edge fill
               if (photo != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.file(
-                    photo,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.cover, // Fill square completely (photos are pre-cropped to 1:1)
-                  ),
+                Image.file(
+                  photo,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
                 )
               else
-                // Empty state - Minimal like Tinder
+                // Empty state
                 Center(
                   child: Icon(
                     Icons.add_photo_alternate,

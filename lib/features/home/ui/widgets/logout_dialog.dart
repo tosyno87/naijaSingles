@@ -42,10 +42,12 @@ void showLogoutDialog(BuildContext context) {
           ),
           TextButton(
             onPressed: () async {
-              // Clear any cached user data
+              // Cancel subscriptions and clear user data BEFORE sign out
               await clearUserData();
               // Sign out from Firebase Auth
               await auth.signOut();
+              // Small delay to ensure subscriptions are fully canceled
+              await Future.delayed(const Duration(milliseconds: 100));
               if (context.mounted) {
                 // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
                 Navigator.pushNamedAndRemoveUntil(

@@ -29,6 +29,10 @@ class UserProvider extends ChangeNotifier {
   // for listining all details of user
 
   Future<void> listenCurrentUserdetails() async {
+    // Cancel any existing subscription before starting a new one
+    _userSubscription?.cancel();
+    _userSubscription = null;
+    
     final user = _auth.currentUser;
     if (user != null) {
       try {
@@ -50,12 +54,18 @@ class UserProvider extends ChangeNotifier {
             // Don't set currentUser to null here, keep existing data
           }
         }, onError: (error) {
-          print("Error listening to user details: $error");
+          // Only log errors if user is still authenticated
+          // Permission errors when user is logged out are expected
+          if (_auth.currentUser != null) {
+            print("Error listening to user details: $error");
+          }
         });
       } catch (e) {
         print("Exception in listenCurrentUserdetails: $e");
       }
     } else {
+      // User is not authenticated - ensure user data is cleared
+      currentUser = null;
       print("No authenticated user found");
     }
   }
@@ -64,10 +74,13 @@ class UserProvider extends ChangeNotifier {
   void listenAuthChanges() {
     authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
+        // User logged in - start listening to user details
         listenCurrentUserdetails();
       } else {
-        // User is logged out
-        // Handle this case as needed
+        // User is logged out - cancel any active subscriptions and clear user data
+        _userSubscription?.cancel();
+        _userSubscription = null;
+        currentUser = null;
       }
     });
   }
@@ -75,6 +88,9 @@ class UserProvider extends ChangeNotifier {
 // you can cancel listen to user if requieed
   void cancelCurrentUserSubscription() {
     _userSubscription?.cancel();
-    authStateSubscription!.cancel();
+    _userSubscription = null;
+    authStateSubscription?.cancel();
+    authStateSubscription = null;
+    currentUser = null;
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'dart:developer';
 
 import '../../common/routes/route_name.dart';
+import '../../common/providers/user_provider.dart';
 import '../settings/safety_center_screen.dart';
 import '../settings/help_center_screen.dart';
 import '../settings/language_settings_screen.dart';
@@ -719,8 +721,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       );
 
+      // Cancel subscriptions and clear user data BEFORE sign out
+      try {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.currentUser = null;
+        userProvider.cancelCurrentUserSubscription();
+      } catch (e) {
+        log('Error clearing user provider: $e');
+      }
+
       // Sign out from Firebase
       await _auth.signOut();
+
+      // Small delay to ensure subscriptions are fully canceled
+      await Future.delayed(const Duration(milliseconds: 100));
 
       // Close loading dialog
       if (mounted) Navigator.pop(context);

@@ -145,18 +145,15 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
           ),
           child: Stack(
             children: [
-              // Photo - Show full image without cropping (BoxFit.contain)
+              // Photo - Tinder style: photos are already square-cropped, use cover to fill perfectly
               if (photo != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    color: Colors.grey.shade50, // Light gray background instead of black
-                    child: Image.file(
-                      photo,
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.contain, // Show full image without cutting off parts
-                    ),
+                  child: Image.file(
+                    photo,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover, // Fill square completely (photos are pre-cropped to 1:1)
                   ),
                 )
               else

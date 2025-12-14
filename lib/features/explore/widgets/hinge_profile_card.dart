@@ -243,6 +243,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
               ],
             ),
           );
+        },
       ),
     );
   }

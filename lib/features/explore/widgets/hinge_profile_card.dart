@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../models/user_model.dart';
@@ -81,15 +82,31 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   List<String> _extractPhotos(dynamic imageUrl) {
-    if (imageUrl == null) return [];
-    if (imageUrl is! List) return [];
-    if (imageUrl.isEmpty) return [];
+    // Debug: Log what we're receiving
+    debugPrint('🔍 HingeProfileCard._extractPhotos - imageUrl type: ${imageUrl.runtimeType}');
+    debugPrint('🔍 HingeProfileCard._extractPhotos - imageUrl value: $imageUrl');
     
-    return imageUrl
+    if (imageUrl == null) {
+      debugPrint('❌ imageUrl is null');
+      return [];
+    }
+    if (imageUrl is! List) {
+      debugPrint('❌ imageUrl is not a List, it is: ${imageUrl.runtimeType}');
+      return [];
+    }
+    if (imageUrl.isEmpty) {
+      debugPrint('❌ imageUrl list is empty');
+      return [];
+    }
+    
+    final photos = imageUrl
         .map((e) => e?.toString() ?? '')
         .where((url) => url.isNotEmpty && url.trim().isNotEmpty)
         .toList()
         .cast<String>();
+    
+    debugPrint('✅ Extracted ${photos.length} photos: $photos');
+    return photos;
   }
 
   Widget _buildPhotoPlaceholder() {

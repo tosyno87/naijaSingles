@@ -208,11 +208,16 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
   String? _getEventImageUrl() {
     // Check if imageUrl exists and is not empty
-    if (widget.event.imageUrl != null && widget.event.imageUrl!.trim().isNotEmpty) {
-      AppLogger.debug('📷 EventDetails: Using imageUrl: ${widget.event.imageUrl}');
-      return widget.event.imageUrl;
+    final imageUrl = widget.event.imageUrl;
+    AppLogger.debug('🔍 EventDetails._getEventImageUrl - Event ID: ${widget.event.id}');
+    AppLogger.debug('🔍 EventDetails._getEventImageUrl - imageUrl type: ${imageUrl.runtimeType}');
+    AppLogger.debug('🔍 EventDetails._getEventImageUrl - imageUrl value: $imageUrl');
+    
+    if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+      AppLogger.debug('✅ EventDetails: Using imageUrl: $imageUrl');
+      return imageUrl;
     }
-    AppLogger.debug('📷 EventDetails: imageUrl is null or empty. Event ID: ${widget.event.id}');
+    AppLogger.debug('❌ EventDetails: imageUrl is null or empty. Event ID: ${widget.event.id}');
     return null;
   }
 

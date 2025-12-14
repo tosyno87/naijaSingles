@@ -82,7 +82,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Cultural Heritage & Context'),
+          _buildSectionTitle('Cultural Heritage'),
           const SizedBox(height: 8),
           Text(
             'Help attendees understand the cultural significance and requirements of your event',

@@ -48,9 +48,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   Widget build(BuildContext context) {
     final controller = Provider.of<OnboardingController>(context);
     final uploadedPhotos = controller.profilePhotos;
-    final uploadedCount = uploadedPhotos.where((photo) => photo != null).length;
-    final hasMinimumPhotos = uploadedCount >= 3;
-    const maxPhotos = 6; // Allow up to 6 photos like popular apps
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -81,211 +78,43 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Progress indicator and count
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                children: [
-                  // Progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: uploadedCount / 6,
-                      backgroundColor: dividerColor,
-                      valueColor: const AlwaysStoppedAnimation<Color>(primaryGreen),
-                      minHeight: 4,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Photo count
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '$uploadedCount of 6 photos',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: textPrimary,
-                        ),
-                      ),
-                      if (!hasMinimumPhotos)
-                        Text(
-                          'Add ${3 - uploadedCount} more',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.red,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const Divider(height: 1, color: dividerColor),
-
-            // Photo grid - Tinder-style 3 photos side by side
+            // Photo grid - Tinder-style: Clean and minimal
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header
-                    Text(
-                      'Add at least 3 photos',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Profiles with 3+ photos get 5x more matches',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // 3-photo grid (Tinder style)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildPhotoGridItem(
-                            photo: uploadedPhotos[0],
-                            index: 0,
-                            isMainPhoto: true,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildPhotoGridItem(
-                            photo: uploadedPhotos[1],
-                            index: 1,
-                            isMainPhoto: false,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildPhotoGridItem(
-                            photo: uploadedPhotos[2],
-                            index: 2,
-                            isMainPhoto: false,
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    // Additional photos (optional, shown below grid if added)
-                    if (uploadedCount > 3) ...[
-                      const SizedBox(height: 24),
-                      Text(
-                        'Additional Photos (Optional)',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: textPrimary,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildPhotoGridItem(
+                          photo: uploadedPhotos[0],
+                          index: 0,
+                          isMainPhoto: true,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: List.generate(
-                          maxPhotos - 3,
-                          (index) {
-                            final actualIndex = index + 3;
-                            final photo = actualIndex < uploadedPhotos.length 
-                                ? uploadedPhotos[actualIndex] 
-                                : null;
-                            return SizedBox(
-                              width: (MediaQuery.of(context).size.width - 64 - 36) / 3,
-                              child: _buildPhotoGridItem(
-                                photo: photo,
-                                index: actualIndex,
-                                isMainPhoto: false,
-                              ),
-                            );
-                          },
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildPhotoGridItem(
+                          photo: uploadedPhotos[1],
+                          index: 1,
+                          isMainPhoto: false,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildPhotoGridItem(
+                          photo: uploadedPhotos[2],
+                          index: 2,
+                          isMainPhoto: false,
                         ),
                       ),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
 
-            // Bottom section
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      // Only show "Add Photo" button if less than 3 photos
-                      if (uploadedCount < 3)
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              // Find first empty slot
-                              int emptySlot = uploadedPhotos.indexWhere((p) => p == null);
-                              if (emptySlot == -1) emptySlot = uploadedCount;
-                              _showAddPhotoOptions(emptySlot);
-                            },
-                            icon: const Icon(Icons.add_photo_alternate, size: 22),
-                            label: Text(
-                              'Add Photo ${uploadedCount + 1}',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryGreen,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 0,
-                            ),
-                          ),
-                        ),
-                      // Removed Continue button - navigation handled by OnboardingMain wrapper
-                      if (!hasMinimumPhotos && uploadedCount > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Text(
-                            'Add at least 3 photos to continue',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              color: Colors.red,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // Bottom section - Minimal like Tinder (no button needed, photos are tappable)
           ],
         ),
       ),
@@ -339,38 +168,12 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   ),
                 )
               else
-                // Empty state
+                // Empty state - Minimal like Tinder
                 Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_photo_alternate,
-                        size: 40,
-                        color: Colors.grey.shade400,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Add Photo',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      if (isMainPhoto)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            'Main',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: primaryGreen,
-                            ),
-                          ),
-                        ),
-                    ],
+                  child: Icon(
+                    Icons.add_photo_alternate,
+                    size: 48,
+                    color: Colors.grey.shade300,
                   ),
                 ),
 

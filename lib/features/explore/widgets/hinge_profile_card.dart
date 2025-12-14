@@ -33,7 +33,11 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
 
   @override
   Widget build(BuildContext context) {
-    final photos = (widget.user.imageUrl ?? []) as List<String>;
+    // Safely convert imageUrl to List<String>
+    final imageUrl = widget.user.imageUrl;
+    final photos = imageUrl is List
+        ? List<String>.from(imageUrl.map((e) => e.toString()).where((url) => url.isNotEmpty))
+        : <String>[];
     final bio = widget.user.bio ?? widget.user.editInfo?['userBio']?.toString() ?? '';
     final interests = _extractInterests();
 

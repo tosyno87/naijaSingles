@@ -1,16 +1,18 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../common/widgets/custom_snackbar.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../common/constants/app_colors.dart';
 import '../../../common/widgets/afropeep_logo.dart';
 import '../../../common/widgets/afropeep_primary_button.dart';
-import '../../../common/constants/app_colors.dart';
-import '../phone/ui/screens/phone_number.dart';
+import '../../../common/widgets/custom_snackbar.dart';
 import '../google_login/google_login_bloc.dart';
 import '../google_login/google_login_events.dart';
 import '../google_login/google_login_states.dart';
+import '../phone/ui/screens/phone_number.dart';
 
 class SignInMethodSelectionScreen extends StatelessWidget {
   const SignInMethodSelectionScreen({super.key});
@@ -20,7 +22,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     // Define colors for modern dating app style
     const Color backgroundColor = Colors.white;
@@ -55,23 +57,21 @@ class SignInMethodSelectionScreen extends StatelessWidget {
           // Main content
           SafeArea(
             child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
+              builder: (context, constraints) => SingleChildScrollView(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight,
                     ),
                     child: Padding(
                       padding: EdgeInsets.only(
-                        left: 24.0,
-                        right: 24.0,
+                        left: 24,
+                        right: 24,
                         bottom: MediaQuery.of(context).padding.bottom > 0
                             ? MediaQuery.of(context).padding.bottom + 16
                             : 24,
                         top: 16,
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const SizedBox(height: 16),
 
@@ -82,7 +82,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
 
                           // Header text - "Sign in"
                           Text(
-                            "Sign in",
+                            'Sign in',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.montserrat(
                               fontSize: 28,
@@ -112,13 +112,13 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                           if (Platform.isIOS) ...[
                             AfropeepPrimaryButton(
                               icon: Icons.apple,
-                              text: "Continue with Apple",
+                              text: 'Continue with Apple',
                               backgroundColor: appleBlack,
                               textColor: Colors.white,
                               variant: AuthButtonVariant.secondary,
                               onPressed: () {
                                 CustomSnackbar.showSnackBarSimple(
-                                  "Apple Sign In will be implemented soon",
+                                  'Apple Sign In will be implemented soon',
                                   context,
                                 );
                               },
@@ -133,7 +133,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                               listener: (context, state) {
                                 if (state is GoogleLoginSuccess) {
                                   Navigator.pushReplacementNamed(
-                                      context, '/main_navigation');
+                                      context, '/main_navigation',);
                                 } else if (state is GoogleLoginFailed) {
                                   CustomSnackbar.showSnackBarSimple(
                                     state.message,
@@ -141,10 +141,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                   );
                                 }
                               },
-                              builder: (context, state) {
-                                return AfropeepPrimaryButton(
+                              builder: (context, state) => AfropeepPrimaryButton(
                                   icon: Icons.g_mobiledata_rounded,
-                                  text: "Continue with Google",
+                                  text: 'Continue with Google',
                                   backgroundColor: googleBlue,
                                   textColor: Colors.white,
                                   variant: AuthButtonVariant.secondary,
@@ -155,8 +154,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                       const GoogleLoginRequested(),
                                     );
                                   },
-                                );
-                              },
+                                ),
                             ),
                           ),
 
@@ -165,10 +163,9 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                           // Phone Number Button - Primary (last, most prominent)
                           AfropeepPrimaryButton(
                             icon: Icons.phone_outlined,
-                            text: "Continue with Phone",
+                            text: 'Continue with Phone',
                             backgroundColor: primaryColor,
                             textColor: Colors.white,
-                            variant: AuthButtonVariant.primary,
                             onPressed: () {
                               // Use pushReplacement to remove this screen from stack
                               // This prevents both screens from being visible during transition
@@ -176,7 +173,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PhoneNumber(
-                                      updatePhoneNumber: false, isSignIn: true),
+                                      updatePhoneNumber: false, isSignIn: true,),
                                 ),
                               );
                             },
@@ -203,13 +200,12 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                     MaterialPageRoute(
                                       builder: (context) => PhoneNumber(
                                         updatePhoneNumber: false,
-                                        isSignIn: false, // Sign-up mode
                                       ),
                                     ),
                                   );
                                 },
                                 child: Text(
-                                  "Create one",
+                                  'Create one',
                                   style: GoogleFonts.montserrat(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -225,8 +221,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                );
-              },
+                ),
             ),
           ),
         ],

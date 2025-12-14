@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -10,16 +9,13 @@ import '../../../auth_status/bloc/registration/bloc/registration_bloc.dart';
 import '../../bloc/phone_auth_bloc.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
+
+  const OtpVerificationScreen({
+    required this.phoneNumber, required this.verificationId, required this.updatePhoneNumber, super.key,
+  });
   final String phoneNumber;
   final String verificationId;
   final bool updatePhoneNumber;
-
-  const OtpVerificationScreen({
-    Key? key,
-    required this.phoneNumber,
-    required this.verificationId,
-    required this.updatePhoneNumber,
-  }) : super(key: key);
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -84,15 +80,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       );
     } else {
       CustomSnackbar.showSnackBarSimple(
-        "Please enter a valid 6-digit code",
+        'Please enter a valid 6-digit code',
         context,
       );
     }
   }
 
-  String _formatTime(int seconds) {
-    return '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
-  }
+  String _formatTime(int seconds) => '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +108,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Verify OTP",
+          'Verify OTP',
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -138,9 +132,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           // Main content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
 
@@ -154,7 +147,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
                   // Header text
                   Text(
-                    "Verification Code",
+                    'Verification Code',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
@@ -169,7 +162,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      text: "Enter the code sent to ",
+                      text: 'Enter the code sent to ',
                       style: GoogleFonts.montserrat(
                         fontSize: 16,
                         color: Colors.black54,
@@ -195,7 +188,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     child: PinCodeTextField(
                       appContext: context,
                       length: 6,
-                      obscureText: false,
                       animationType: AnimationType.fade,
                       pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,
@@ -237,19 +229,17 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           color: Colors.black54,
                         ),
                       ),
-                      _canResend
-                          ? TextButton(
+                      if (_canResend) TextButton(
                               onPressed: _resendOtp,
                               child: Text(
-                                "Resend",
+                                'Resend',
                                 style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: primaryColor,
                                 ),
                               ),
-                            )
-                          : Text(
+                            ) else Text(
                               _formatTime(_remainingTime),
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
@@ -278,7 +268,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               Navigator.pop(context);
                               Navigator.pop(context);
                               CustomSnackbar.showSnackBarSimple(
-                                "Phone number updated successfully",
+                                'Phone number updated successfully',
                                 context,
                               );
                             } else {
@@ -317,8 +307,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       width: double.infinity,
                       height: 56,
                       child: BlocBuilder<PhoneAuthBloc, PhoneAuthState>(
-                        builder: (context, state) {
-                          return ElevatedButton(
+                        builder: (context, state) => ElevatedButton(
                             onPressed:
                                 state is PhoneAuthLoading ? null : _verifyOtp,
                             style: ElevatedButton.styleFrom(
@@ -341,14 +330,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                     ),
                                   )
                                 : Text(
-                                    "Verify",
+                                    'Verify',
                                     style: GoogleFonts.montserrat(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                          );
-                        },
+                          ),
                       ),
                     ),
                   ),

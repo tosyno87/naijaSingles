@@ -1,23 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CommunityGroup {
-  final String id;
-  final String name;
-  final String description;
-  final String category; // 'Cultural', 'Professional', 'Interest', 'Location'
-  final String country; // 'Nigeria', 'Ghana', 'Kenya', etc.
-  final String city;
-  final String creatorId;
-  final List<String> memberIds;
-  final List<String> adminIds;
-  final String imageUrl;
-  final bool isPublic;
-  final bool isVerified; // Community-verified groups
-  final Map<String, dynamic> rules;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final int memberCount;
-  final List<String> tags; // ['Technology', 'Music', 'Food', 'Language']
+class CommunityGroup { // ['Technology', 'Music', 'Food', 'Language']
 
   const CommunityGroup({
     required this.id,
@@ -61,9 +44,25 @@ class CommunityGroup {
       tags: List<String>.from(data['tags'] ?? []),
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final String category; // 'Cultural', 'Professional', 'Interest', 'Location'
+  final String country; // 'Nigeria', 'Ghana', 'Kenya', etc.
+  final String city;
+  final String creatorId;
+  final List<String> memberIds;
+  final List<String> adminIds;
+  final String imageUrl;
+  final bool isPublic;
+  final bool isVerified; // Community-verified groups
+  final Map<String, dynamic> rules;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int memberCount;
+  final List<String> tags;
 
-  Map<String, dynamic> toFirestore() {
-    return {
+  Map<String, dynamic> toFirestore() => {
       'name': name,
       'description': description,
       'category': category,
@@ -81,7 +80,6 @@ class CommunityGroup {
       'memberCount': memberCount,
       'tags': tags,
     };
-  }
 
   CommunityGroup copyWith({
     String? id,
@@ -101,8 +99,7 @@ class CommunityGroup {
     DateTime? updatedAt,
     int? memberCount,
     List<String>? tags,
-  }) {
-    return CommunityGroup(
+  }) => CommunityGroup(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -121,5 +118,4 @@ class CommunityGroup {
       memberCount: memberCount ?? this.memberCount,
       tags: tags ?? this.tags,
     );
-  }
 }

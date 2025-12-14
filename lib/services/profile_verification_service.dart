@@ -1,9 +1,8 @@
 import 'dart:developer';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 /// Industry-standard profile verification service
 /// Features:
@@ -14,10 +13,10 @@ import 'dart:io';
 /// - Social media verification
 /// - Verification badges and status
 class ProfileVerificationService {
-  static final ProfileVerificationService _instance =
-      ProfileVerificationService._internal();
   factory ProfileVerificationService() => _instance;
   ProfileVerificationService._internal();
+  static final ProfileVerificationService _instance =
+      ProfileVerificationService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -30,7 +29,7 @@ class ProfileVerificationService {
       // Get user's profile photo
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists) {
-        return VerificationResult(
+        return const VerificationResult(
           type: VerificationType.profilePhoto,
           status: VerificationStatus.failed,
           message: 'User not found',
@@ -41,7 +40,7 @@ class ProfileVerificationService {
       final profilePhoto = userData['profilePhoto'] as String?;
 
       if (profilePhoto == null || profilePhoto.isEmpty) {
-        return VerificationResult(
+        return const VerificationResult(
           type: VerificationType.profilePhoto,
           status: VerificationStatus.failed,
           message: 'No profile photo found',
@@ -67,7 +66,7 @@ class ProfileVerificationService {
 
       // Update verification status
       await _updateVerificationStatus(
-          userId, VerificationType.profilePhoto, status);
+          userId, VerificationType.profilePhoto, status,);
 
       final result = VerificationResult(
         type: VerificationType.profilePhoto,
@@ -92,7 +91,7 @@ class ProfileVerificationService {
 
   /// Verify government ID
   Future<VerificationResult> verifyGovernmentId(
-      String userId, File idImage) async {
+      String userId, File idImage,) async {
     try {
       log('🆔 Starting government ID verification for user: $userId');
 
@@ -119,7 +118,7 @@ class ProfileVerificationService {
 
       // Update verification status
       await _updateVerificationStatus(
-          userId, VerificationType.governmentId, status);
+          userId, VerificationType.governmentId, status,);
 
       final result = VerificationResult(
         type: VerificationType.governmentId,
@@ -145,7 +144,7 @@ class ProfileVerificationService {
 
   /// Verify phone number
   Future<VerificationResult> verifyPhoneNumber(
-      String userId, String phoneNumber) async {
+      String userId, String phoneNumber,) async {
     try {
       log('📱 Starting phone number verification for user: $userId');
 
@@ -177,7 +176,7 @@ class ProfileVerificationService {
 
       // Update verification status
       await _updateVerificationStatus(
-          userId, VerificationType.phoneNumber, status);
+          userId, VerificationType.phoneNumber, status,);
 
       final result = VerificationResult(
         type: VerificationType.phoneNumber,
@@ -257,7 +256,7 @@ class ProfileVerificationService {
 
   /// Verify social media account
   Future<VerificationResult> verifySocialMedia(
-      String userId, String platform, String username) async {
+      String userId, String platform, String username,) async {
     try {
       log('📱 Starting social media verification for user: $userId, platform: $platform');
 
@@ -277,7 +276,7 @@ class ProfileVerificationService {
 
       // Update verification status
       await _updateVerificationStatus(
-          userId, VerificationType.socialMedia, status);
+          userId, VerificationType.socialMedia, status,);
 
       final result = VerificationResult(
         type: VerificationType.socialMedia,
@@ -304,7 +303,7 @@ class ProfileVerificationService {
 
   /// Get user's verification status
   Future<UserVerificationStatus> getUserVerificationStatus(
-      String userId) async {
+      String userId,) async {
     try {
       final doc = await _firestore
           .collection('users')
@@ -348,7 +347,7 @@ class ProfileVerificationService {
         userId: userId,
         verifications: {},
         overallStatus: VerificationStatus.pending,
-        verificationScore: 0.0,
+        verificationScore: 0,
       );
     }
   }
@@ -417,7 +416,7 @@ class ProfileVerificationService {
   Future<String> _uploadVerificationDocument(File document, String type) async {
     try {
       final ref = _storage.ref().child(
-          'verifications/$type/${DateTime.now().millisecondsSinceEpoch}');
+          'verifications/$type/${DateTime.now().millisecondsSinceEpoch}',);
       final uploadTask = await ref.putFile(document);
       return await uploadTask.ref.getDownloadURL();
     } catch (e) {
@@ -428,7 +427,7 @@ class ProfileVerificationService {
 
   /// Update verification status
   Future<void> _updateVerificationStatus(
-      String userId, VerificationType type, VerificationStatus status) async {
+      String userId, VerificationType type, VerificationStatus status,) async {
     try {
       await _firestore
           .collection('users')
@@ -442,7 +441,7 @@ class ProfileVerificationService {
         'verifiedAt': status == VerificationStatus.verified
             ? FieldValue.serverTimestamp()
             : null,
-      }, SetOptions(merge: true));
+      }, SetOptions(merge: true),);
     } catch (e) {
       log('❌ Error updating verification status: $e');
       rethrow;
@@ -451,7 +450,7 @@ class ProfileVerificationService {
 
   /// Get verification status
   Future<VerificationResult?> _getVerificationStatus(
-      String userId, VerificationType type) async {
+      String userId, VerificationType type,) async {
     try {
       final doc = await _firestore
           .collection('users')
@@ -484,7 +483,7 @@ class ProfileVerificationService {
 
   /// Calculate overall verification status
   VerificationStatus _calculateOverallStatus(
-      Map<VerificationType, VerificationResult> verifications) {
+      Map<VerificationType, VerificationResult> verifications,) {
     if (verifications.isEmpty) return VerificationStatus.pending;
 
     final verifiedCount = verifications.values
@@ -499,8 +498,8 @@ class ProfileVerificationService {
 
   /// Calculate verification score
   double _calculateVerificationScore(
-      Map<VerificationType, VerificationResult> verifications) {
-    if (verifications.isEmpty) return 0.0;
+      Map<VerificationType, VerificationResult> verifications,) {
+    if (verifications.isEmpty) return 0;
 
     final totalScore =
         verifications.values.fold(0.0, (sum, v) => sum + v.score);
@@ -527,14 +526,6 @@ enum VerificationStatus {
 
 /// Verification result
 class VerificationResult {
-  final VerificationType type;
-  final VerificationStatus status;
-  final String message;
-  final double score;
-  final DateTime? verifiedAt;
-  final String? documentUrl;
-  final String? platform;
-  final String? username;
 
   const VerificationResult({
     required this.type,
@@ -546,19 +537,21 @@ class VerificationResult {
     this.platform,
     this.username,
   });
+  final VerificationType type;
+  final VerificationStatus status;
+  final String message;
+  final double score;
+  final DateTime? verifiedAt;
+  final String? documentUrl;
+  final String? platform;
+  final String? username;
 
   @override
-  String toString() {
-    return 'VerificationResult(${type.name}: ${status.name}, score: $score)';
-  }
+  String toString() => 'VerificationResult(${type.name}: ${status.name}, score: $score)';
 }
 
 /// User verification status
 class UserVerificationStatus {
-  final String userId;
-  final Map<VerificationType, VerificationResult> verifications;
-  final VerificationStatus overallStatus;
-  final double verificationScore;
 
   const UserVerificationStatus({
     required this.userId,
@@ -566,6 +559,10 @@ class UserVerificationStatus {
     required this.overallStatus,
     required this.verificationScore,
   });
+  final String userId;
+  final Map<VerificationType, VerificationResult> verifications;
+  final VerificationStatus overallStatus;
+  final double verificationScore;
 
   /// Get verification badge
   String get verificationBadge {
@@ -596,7 +593,5 @@ class UserVerificationStatus {
   }
 
   @override
-  String toString() {
-    return 'UserVerificationStatus($userId: ${overallStatus.name}, score: $verificationScore)';
-  }
+  String toString() => 'UserVerificationStatus($userId: ${overallStatus.name}, score: $verificationScore)';
 }

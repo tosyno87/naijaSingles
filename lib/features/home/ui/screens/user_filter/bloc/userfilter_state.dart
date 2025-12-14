@@ -14,8 +14,8 @@ class UpdatingUserFilter extends UserfilterState {}
 class UserFilterUpdated extends UserfilterState {}
 
 class UserFilterUpdationFailed extends UserfilterState {
-  final String message;
   const UserFilterUpdationFailed({required this.message});
+  final String message;
 
   @override
   List<Object> get props => [message];

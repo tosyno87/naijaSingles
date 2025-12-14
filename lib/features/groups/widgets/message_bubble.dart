@@ -1,11 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../../common/constants/app_colors.dart';
 
 /// Message bubble widget for group chat messages
 class MessageBubble extends StatelessWidget {
+
+  const MessageBubble({
+    required this.messageId, required this.text, required this.senderId, required this.senderName, required this.timestamp, required this.isCurrentUser, super.key,
+  });
   final String messageId;
   final String text;
   final String senderId;
@@ -13,19 +18,8 @@ class MessageBubble extends StatelessWidget {
   final DateTime timestamp;
   final bool isCurrentUser;
 
-  const MessageBubble({
-    super.key,
-    required this.messageId,
-    required this.text,
-    required this.senderId,
-    required this.senderName,
-    required this.timestamp,
-    required this.isCurrentUser,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
         mainAxisAlignment:
@@ -129,5 +123,4 @@ class MessageBubble extends StatelessWidget {
         ],
       ),
     );
-  }
 }

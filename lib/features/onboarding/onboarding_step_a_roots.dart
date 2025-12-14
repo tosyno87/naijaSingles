@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/app_logger.dart';
 import '../user/controllers/onboarding_controller.dart';
 import 'shared_styles.dart';
 
@@ -11,14 +13,14 @@ import 'shared_styles.dart';
 /// This screen collects information about the user's tribe,
 /// languages spoken, and their intent for using the app.
 class OnboardingStepARoots extends StatefulWidget {
+
+  const OnboardingStepARoots({
+    required this.onNext,
+    super.key,
+    this.backgroundColor = AppColors.backgroundColor,
+  });
   final VoidCallback onNext;
   final Color backgroundColor;
-
-  OnboardingStepARoots({
-    Key? key,
-    required this.onNext,
-    this.backgroundColor = OnboardingStyles.backgroundColor,
-  }) : super(key: key);
 
   @override
   State<OnboardingStepARoots> createState() => _OnboardingStepARootsState();
@@ -62,7 +64,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     'Tutsi',
     'Akan',
     'Baganda',
-    'Other'
+    'Other',
   ];
 
   // List of languages for dropdown
@@ -83,7 +85,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     'Somali',
     'Portuguese',
     'Spanish',
-    'Other'
+    'Other',
   ];
 
   // Intent options with icons, titles and descriptions
@@ -114,7 +116,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
 
     // Add listener to text controller to rebuild UI when text changes
     _tribeController.addListener(() {
-      print("Tribe text changed: '${_tribeController.text}'");
+      AppLogger.debug("Tribe text changed: '${_tribeController.text}'");
       setState(() {});
     });
 
@@ -122,9 +124,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller =
           Provider.of<OnboardingController>(context, listen: false);
-      if (controller.tribe != null && controller.tribe!.isNotEmpty) {
-        print("Setting initial tribe: '${controller.tribe}'");
-        _tribeController.text = controller.tribe!;
+      if (controller.tribe.isNotEmpty) {
+        AppLogger.debug("Setting initial tribe: '${controller.tribe}'");
+        _tribeController.text = controller.tribe;
 
         // Check if the tribe is in our dropdown list
         if (_africanTribes.contains(controller.tribe)) {
@@ -132,13 +134,14 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
             _selectedTribe = controller.tribe;
             _isCustomTribe = false;
           });
-        } else if (controller.tribe != null) {
+        } else {
           // If not in the list, set to "Other" and enable custom entry
-          setState(() {
-            _selectedTribe = 'Other';
-            _isCustomTribe = true;
-          });
+        setState(() {
+          _selectedTribe = 'Other';
+          _isCustomTribe = true;
+        });
         }
+      
       }
     });
   }
@@ -239,7 +242,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     // Dropdown for tribe selection
                     DropdownButtonFormField<String>(
                       key: _tribeFieldKey,
-                      value: _selectedTribe,
+                      initialValue: _selectedTribe,
                       onChanged: (value) {
                         if (value == 'Other') {
                           setState(() {
@@ -250,15 +253,14 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           });
                         } else {
                           setState(() {
-                            _selectedTribe = value!;
+                            _selectedTribe = value;
                             _isCustomTribe = false;
-                            _tribeController.text = value;
-                            controller.updateTribe(value);
+                            _tribeController.text = value ?? '';
+                            controller.updateTribe(value ?? '');
                           });
                         }
                       },
-                      items: _africanTribes.map((tribe) {
-                        return DropdownMenuItem(
+                      items: _africanTribes.map((tribe) => DropdownMenuItem(
                           value: tribe,
                           child: Text(
                             tribe,
@@ -268,8 +270,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               color: Colors.black87,
                             ),
                           ),
-                        );
-                      }).toList(),
+                        ),).toList(),
                       decoration: InputDecoration(
                         labelText: 'Tribe or Ethnic Group',
                         labelStyle: GoogleFonts.montserrat(
@@ -302,7 +303,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                         color: Colors.black87,
                       ),
                       dropdownColor: Colors.white,
-                      icon: Icon(Icons.arrow_drop_down, color: deepGreen),
+                      icon: const Icon(Icons.arrow_drop_down, color: deepGreen),
                       isExpanded: true,
                     ),
 
@@ -371,8 +372,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: controller.languages.map((language) {
-                          return Chip(
+                        children: controller.languages.map((language) => Chip(
                             label: Text(
                               language,
                               style: GoogleFonts.montserrat(
@@ -385,15 +385,14 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             deleteIconColor: Colors.white,
                             onDeleted: () {
                               setState(() {
-                                List<String> updatedLanguages = [
-                                  ...controller.languages
+                                final List<String> updatedLanguages = [
+                                  ...controller.languages,
                                 ];
                                 updatedLanguages.remove(language);
                                 controller.updateLanguages(updatedLanguages);
                               });
                             },
-                          );
-                        }).toList(),
+                          ),).toList(),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -401,7 +400,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     // Dropdown for language selection
                     DropdownButtonFormField<String>(
                       key: _languagesKey,
-                      value: _selectedLanguage,
+                      initialValue: _selectedLanguage,
                       hint: Text(
                         'Select a language',
                         style: GoogleFonts.montserrat(
@@ -422,8 +421,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
 
                             // Add to languages list if not already there
                             if (!controller.languages.contains(value)) {
-                              List<String> updatedLanguages = [
-                                ...controller.languages
+                              final List<String> updatedLanguages = [
+                                ...controller.languages,
                               ];
                               updatedLanguages.add(value);
                               controller.updateLanguages(updatedLanguages);
@@ -434,8 +433,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           });
                         }
                       },
-                      items: _availableLanguages.map((language) {
-                        return DropdownMenuItem(
+                      items: _availableLanguages.map((language) => DropdownMenuItem(
                           value: language,
                           child: Text(
                             language,
@@ -445,8 +443,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               color: Colors.black87,
                             ),
                           ),
-                        );
-                      }).toList(),
+                        ),).toList(),
                       decoration: InputDecoration(
                         labelText: 'Add Language',
                         labelStyle: GoogleFonts.montserrat(
@@ -479,7 +476,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                         color: Colors.black87,
                       ),
                       dropdownColor: Colors.white,
-                      icon: Icon(Icons.arrow_drop_down, color: deepGreen),
+                      icon: const Icon(Icons.arrow_drop_down, color: deepGreen),
                       isExpanded: true,
                     ),
 
@@ -517,7 +514,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                      color: deepGreen, width: 2),
+                                      color: deepGreen, width: 2,),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -541,8 +538,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                   // Add custom language to the list
                                   if (!controller.languages
                                       .contains(customLanguage)) {
-                                    List<String> updatedLanguages = [
-                                      ...controller.languages
+                                    final List<String> updatedLanguages = [
+                                      ...controller.languages,
                                     ];
                                     updatedLanguages.add(customLanguage);
                                     controller
@@ -605,7 +602,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           isSelected: controller.intent == option['value'],
                           onTap: () => controller.updateIntent(option['value']),
                           deepGreen: deepGreen,
-                        )),
+                        ),),
                   ],
                 ),
               ),
@@ -653,8 +650,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   }
 
   /// Builds a section title with consistent styling
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 18,
@@ -662,7 +658,6 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
         color: Colors.black87,
       ),
     );
-  }
 
   /// Builds an intent option card with icon, title and description
   Widget _buildIntentOption({
@@ -670,8 +665,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     required bool isSelected,
     required VoidCallback onTap,
     required Color deepGreen,
-  }) {
-    return Semantics(
+  }) => Semantics(
       button: true,
       label: '${option['title']} option',
       hint: option['description'],
@@ -749,7 +743,6 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
         ),
       ),
     );
-  }
 
   /// Validates if all required fields are filled
   bool _isStepValid(OnboardingController controller) {

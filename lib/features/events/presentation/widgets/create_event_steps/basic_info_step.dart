@@ -4,12 +4,11 @@ import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class BasicInfoStep extends StatefulWidget {
-  final EventCreationData eventData;
 
   const BasicInfoStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
   State<BasicInfoStep> createState() => _BasicInfoStepState();
@@ -109,8 +108,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,10 +126,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 24,
@@ -139,7 +135,6 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         color: const Color(0xFF333333),
       ),
     );
-  }
 
   Widget _buildEventNameField() {
     final currentLength = _nameController.text.length;
@@ -167,11 +162,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _isNameValid ? const Color(0xFF008037) : Colors.red,
-                  width: 1,
                 ),
               ),
               child: Text(
-                '${currentLength}/100',
+                '$currentLength/100',
                 style: GoogleFonts.montserrat(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -273,11 +267,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   color: _isDescriptionValid
                       ? const Color(0xFF008037)
                       : Colors.red,
-                  width: 1,
                 ),
               ),
               child: Text(
-                '${currentLength}/2000',
+                '$currentLength/2000',
                 style: GoogleFonts.montserrat(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -355,8 +348,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     );
   }
 
-  Widget _buildCategorySelector() {
-    return Column(
+  Widget _buildCategorySelector() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -407,8 +399,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               isExpanded: true,
               dropdownColor:
                   AppColors.backgroundColor, // NaijaSingles cream dropdown
-              items: _categories.map((category) {
-                return DropdownMenuItem<String>(
+              items: _categories.map((category) => DropdownMenuItem<String>(
                   value: category,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -421,8 +412,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                       ),
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
               onChanged: (value) {
                 setState(() {
                   widget.eventData.category = value ?? '';
@@ -433,10 +423,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildTagsSection() {
-    return Column(
+  Widget _buildTagsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -506,7 +494,6 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             ),
             const SizedBox(width: 8),
             Flexible(
-              flex: 1,
               child: ElevatedButton(
                 onPressed: () => _addTag(_tagController.text),
                 style: ElevatedButton.styleFrom(
@@ -538,8 +525,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: widget.eventData.tags.map((tag) {
-              return Container(
+            children: widget.eventData.tags.map((tag) => Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -571,8 +557,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                     ),
                   ],
                 ),
-              );
-            }).toList(),
+              ),).toList(),
           ),
 
         if (widget.eventData.tags.length >= 10)
@@ -589,7 +574,6 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           ),
       ],
     );
-  }
 
   void _addTag(String tag) {
     final trimmedTag = tag.trim();

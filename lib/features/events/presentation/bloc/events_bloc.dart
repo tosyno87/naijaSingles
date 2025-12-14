@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../data/models/event_model.dart';
 import '../../data/repositories/events_repository.dart';
 
@@ -15,9 +17,9 @@ abstract class EventsEvent extends Equatable {
 }
 
 class LoadEventsEvent extends EventsEvent {
-  final bool forceRefresh;
 
   const LoadEventsEvent({this.forceRefresh = false});
+  final bool forceRefresh;
 
   @override
   List<Object?> get props => [forceRefresh];
@@ -28,18 +30,18 @@ class RefreshEventsEvent extends EventsEvent {}
 class LoadMoreEventsEvent extends EventsEvent {}
 
 class FilterEventsEvent extends EventsEvent {
-  final EventFilter filter;
 
   const FilterEventsEvent(this.filter);
+  final EventFilter filter;
 
   @override
   List<Object?> get props => [filter];
 }
 
 class SearchEventsEvent extends EventsEvent {
-  final String query;
 
   const SearchEventsEvent(this.query);
+  final String query;
 
   @override
   List<Object?> get props => [query];
@@ -60,11 +62,6 @@ class EventsInitial extends EventsState {}
 class EventsLoading extends EventsState {}
 
 class EventsLoaded extends EventsState {
-  final List<EventModel> events;
-  final bool hasReachedMax;
-  final EventFilter? currentFilter;
-  final String? searchQuery;
-  final bool isLoadingMore;
 
   const EventsLoaded({
     required this.events,
@@ -73,6 +70,11 @@ class EventsLoaded extends EventsState {
     this.searchQuery,
     this.isLoadingMore = false,
   });
+  final List<EventModel> events;
+  final bool hasReachedMax;
+  final EventFilter? currentFilter;
+  final String? searchQuery;
+  final bool isLoadingMore;
 
   EventsLoaded copyWith({
     List<EventModel>? events,
@@ -80,15 +82,13 @@ class EventsLoaded extends EventsState {
     EventFilter? currentFilter,
     String? searchQuery,
     bool? isLoadingMore,
-  }) {
-    return EventsLoaded(
+  }) => EventsLoaded(
       events: events ?? this.events,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       currentFilter: currentFilter ?? this.currentFilter,
       searchQuery: searchQuery ?? this.searchQuery,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
-  }
 
   @override
   List<Object?> get props => [
@@ -101,22 +101,22 @@ class EventsLoaded extends EventsState {
 }
 
 class EventsError extends EventsState {
-  final String message;
-  final bool isNetworkError;
 
   const EventsError({
     required this.message,
     this.isNetworkError = false,
   });
+  final String message;
+  final bool isNetworkError;
 
   @override
   List<Object?> get props => [message, isNetworkError];
 }
 
 class EventsSearching extends EventsState {
-  final String query;
 
   const EventsSearching(this.query);
+  final String query;
 
   @override
   List<Object?> get props => [query];
@@ -124,21 +124,6 @@ class EventsSearching extends EventsState {
 
 // Event Filter Model
 class EventFilter extends Equatable {
-  final String? category;
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final String? location;
-  final bool freeOnly;
-  final bool? paidOnly;
-  final double? maxPrice;
-  final double? minPrice;
-  final double? latitude;
-  final double? longitude;
-  final double? radiusKm;
-  final List<String>? tags;
-  final String? sortBy; // 'date', 'popularity', 'distance', 'price'
-  final bool trendingOnly;
-  final bool weekendOnly;
 
   const EventFilter({
     this.category,
@@ -157,6 +142,21 @@ class EventFilter extends Equatable {
     this.trendingOnly = false,
     this.weekendOnly = false,
   });
+  final String? category;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? location;
+  final bool freeOnly;
+  final bool? paidOnly;
+  final double? maxPrice;
+  final double? minPrice;
+  final double? latitude;
+  final double? longitude;
+  final double? radiusKm;
+  final List<String>? tags;
+  final String? sortBy; // 'date', 'popularity', 'distance', 'price'
+  final bool trendingOnly;
+  final bool weekendOnly;
 
   EventFilter copyWith({
     String? category,
@@ -174,8 +174,7 @@ class EventFilter extends Equatable {
     String? sortBy,
     bool? trendingOnly,
     bool? weekendOnly,
-  }) {
-    return EventFilter(
+  }) => EventFilter(
       category: category ?? this.category,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
@@ -192,7 +191,6 @@ class EventFilter extends Equatable {
       trendingOnly: trendingOnly ?? this.trendingOnly,
       weekendOnly: weekendOnly ?? this.weekendOnly,
     );
-  }
 
   bool get hasActiveFilters =>
       category != null ||
@@ -231,17 +229,12 @@ class EventFilter extends Equatable {
         tags,
         sortBy,
         trendingOnly,
-        weekendOnly
+        weekendOnly,
       ];
 }
 
 // Events BLoC
 class EventsBloc extends Bloc<EventsEvent, EventsState> {
-  final EventsRepository _repository;
-
-  static const int _eventsPerPage = 20;
-  int _currentPage = 1;
-  List<EventModel> _allEvents = [];
 
   EventsBloc({
     required EventsRepository repository,
@@ -254,9 +247,14 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     on<SearchEventsEvent>(_onSearchEvents);
     on<ClearSearchEvent>(_onClearSearch);
   }
+  final EventsRepository _repository;
+
+  static const int _eventsPerPage = 20;
+  int _currentPage = 1;
+  List<EventModel> _allEvents = [];
 
   Future<void> _onLoadEvents(
-      LoadEventsEvent event, Emitter<EventsState> emit) async {
+      LoadEventsEvent event, Emitter<EventsState> emit,) async {
     try {
       if (state is! EventsLoaded || event.forceRefresh) {
         emit(EventsLoading());
@@ -264,8 +262,6 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
 
       // Use location-based loading to get events with distance information
       final events = await _repository.getEventsWithDistance(
-        page: 1,
-        limit: _eventsPerPage,
         forceRefresh: event.forceRefresh,
       );
 
@@ -275,23 +271,23 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
       emit(EventsLoaded(
         events: _allEvents,
         hasReachedMax: events.length < _eventsPerPage,
-      ));
+      ),);
     } catch (e) {
       log('Error loading events: $e', name: 'EventsBloc');
       emit(EventsError(
         message: _getErrorMessage(e),
         isNetworkError: _isNetworkError(e),
-      ));
+      ),);
     }
   }
 
   Future<void> _onRefreshEvents(
-      RefreshEventsEvent event, Emitter<EventsState> emit) async {
+      RefreshEventsEvent event, Emitter<EventsState> emit,) async {
     add(const LoadEventsEvent(forceRefresh: true));
   }
 
   Future<void> _onLoadMoreEvents(
-      LoadMoreEventsEvent event, Emitter<EventsState> emit) async {
+      LoadMoreEventsEvent event, Emitter<EventsState> emit,) async {
     final currentState = state;
     if (currentState is! EventsLoaded ||
         currentState.hasReachedMax ||
@@ -304,7 +300,6 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     try {
       final moreEvents = await _repository.getEvents(
         page: _currentPage + 1,
-        limit: _eventsPerPage,
       );
 
       if (moreEvents.isNotEmpty) {
@@ -316,12 +311,12 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           hasReachedMax: moreEvents.length < _eventsPerPage,
           currentFilter: currentState.currentFilter,
           searchQuery: currentState.searchQuery,
-        ));
+        ),);
       } else {
         emit(currentState.copyWith(
           hasReachedMax: true,
           isLoadingMore: false,
-        ));
+        ),);
       }
     } catch (e) {
       log('Error loading more events: $e', name: 'EventsBloc');
@@ -330,7 +325,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   Future<void> _onFilterEvents(
-      FilterEventsEvent event, Emitter<EventsState> emit) async {
+      FilterEventsEvent event, Emitter<EventsState> emit,) async {
     final currentState = state;
     if (currentState is! EventsLoaded) return;
 
@@ -359,7 +354,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         events: filteredEvents,
         hasReachedMax: true,
         currentFilter: event.filter,
-      ));
+      ),);
     } catch (e) {
       log('Error filtering events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
@@ -367,7 +362,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   Future<void> _onSearchEvents(
-      SearchEventsEvent event, Emitter<EventsState> emit) async {
+      SearchEventsEvent event, Emitter<EventsState> emit,) async {
     if (event.query.trim().isEmpty) {
       add(ClearSearchEvent());
       return;
@@ -382,7 +377,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         events: searchResults,
         hasReachedMax: true,
         searchQuery: event.query,
-      ));
+      ),);
     } catch (e) {
       log('Error searching events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
@@ -390,11 +385,11 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   Future<void> _onClearSearch(
-      ClearSearchEvent event, Emitter<EventsState> emit) async {
+      ClearSearchEvent event, Emitter<EventsState> emit,) async {
     emit(EventsLoaded(
       events: _allEvents,
       hasReachedMax: _allEvents.length < _eventsPerPage,
-    ));
+    ),);
   }
 
   List<EventModel> _applyFilters(List<EventModel> events, EventFilter filter) {
@@ -412,7 +407,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         return false;
       }
 
-      if (filter.paidOnly == true && event.isFree) {
+      if (filter.paidOnly ?? false && event.isFree) {
         return false;
       }
 
@@ -449,7 +444,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
       if (filter.tags != null && filter.tags!.isNotEmpty) {
         final eventTags = event.tags.map((tag) => tag.toLowerCase()).toList();
         final hasMatchingTag = filter.tags!.any((filterTag) => eventTags
-            .any((eventTag) => eventTag.contains(filterTag.toLowerCase())));
+            .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),);
         if (!hasMatchingTag) return false;
       }
 
@@ -469,7 +464,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     // Apply location-based filtering (radius)
     if (filter.hasLocationFilter) {
       filteredEvents = _filterByLocation(filteredEvents, filter.latitude!,
-          filter.longitude!, filter.radiusKm!);
+          filter.longitude!, filter.radiusKm!,);
     }
 
     // Apply sorting
@@ -481,8 +476,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   List<EventModel> _filterByLocation(List<EventModel> events, double latitude,
-      double longitude, double radiusKm) {
-    return events.where((event) {
+      double longitude, double radiusKm,) => events.where((event) {
       // Skip events without location data
       if (event.location.latitude == null || event.location.longitude == null) {
         return false;
@@ -490,13 +484,12 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
 
       // Calculate distance between user location and event location
       final distance = _calculateDistance(latitude, longitude,
-          event.location.latitude!, event.location.longitude!);
+          event.location.latitude!, event.location.longitude!,);
       return distance <= radiusKm;
     }).toList();
-  }
 
   double _calculateDistance(
-      double lat1, double lon1, double lat2, double lon2) {
+      double lat1, double lon1, double lat2, double lon2,) {
     const double earthRadius = 6371; // Earth's radius in kilometers
     final double dLat = _degreesToRadians(lat2 - lat1);
     final double dLon = _degreesToRadians(lon2 - lon1);
@@ -509,9 +502,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     return earthRadius * c;
   }
 
-  double _degreesToRadians(double degrees) {
-    return degrees * (math.pi / 180);
-  }
+  double _degreesToRadians(double degrees) => degrees * (math.pi / 180);
 
   List<EventModel> _sortEvents(List<EventModel> events, String sortBy) {
     switch (sortBy) {
@@ -532,7 +523,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     return events;
   }
 
-  String _getErrorMessage(dynamic error) {
+  String _getErrorMessage(error) {
     if (error.toString().contains('FirestoreException')) {
       return 'Failed to save events. Please try again.';
     } else {
@@ -540,8 +531,6 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }
   }
 
-  bool _isNetworkError(dynamic error) {
-    return error.toString().contains('SocketException') ||
+  bool _isNetworkError(error) => error.toString().contains('SocketException') ||
         error.toString().contains('TimeoutException');
-  }
 }

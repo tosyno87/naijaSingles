@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/data/repo/user_search_repo.dart';
+
 import '../helpers/firebase_test_setup.dart';
 
 void main() {
@@ -8,9 +8,7 @@ void main() {
     await FirebaseTestSetup.setupFirebase();
   });
 
-  tearDownAll(() {
-    FirebaseTestSetup.cleanup();
-  });
+  tearDownAll(FirebaseTestSetup.cleanup);
 
   group('Cultural Sensitivity Tests', () {
     test('Cultural representation accuracy - Nigerian ethnicities', () {
@@ -86,7 +84,7 @@ void main() {
         'Tunde',
         'Folake',
         'Yaw',
-        'Akosua'
+        'Akosua',
       ];
 
       for (final name in traditionalNames) {
@@ -109,14 +107,14 @@ void main() {
         'Wolof',
         'Zulu',
         'Xhosa',
-        'Shona'
+        'Shona',
       ];
 
       for (final language in africanLanguages) {
         expect(language, isNotEmpty);
         expect(language.length, greaterThan(2));
         // Languages should be capitalized properly
-        expect(language[0], matches(RegExp(r'[A-Z]')));
+        expect(language[0], matches(RegExp('[A-Z]')));
       }
     });
 
@@ -150,7 +148,7 @@ void main() {
         'Ghana Independence Day',
         'Ethiopian New Year',
         'Kwanzaa Celebration',
-        'African Cultural Night'
+        'African Cultural Night',
       ];
 
       for (final event in culturalEvents) {
@@ -171,7 +169,7 @@ void main() {
         'F1 Student Visa',
         'Green Card Holder',
         'Naturalized Citizen',
-        'Dual Citizen'
+        'Dual Citizen',
       ];
 
       for (final status in immigrationStatuses) {
@@ -195,7 +193,7 @@ void main() {
         'Lawyer',
         'Business Analyst',
         'Consultant',
-        'Researcher'
+        'Researcher',
       ];
 
       for (final profession in professions) {

@@ -113,8 +113,8 @@ class _GroupsScreenState extends State<GroupsScreen>
       await _loadGroups(); // Refresh the list
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Failed to join group'),
+        const SnackBar(
+          content: Text('Failed to join group'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -140,8 +140,7 @@ class _GroupsScreenState extends State<GroupsScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
@@ -208,10 +207,8 @@ class _GroupsScreenState extends State<GroupsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildSearchBar() {
-    return Container(
+  Widget _buildSearchBar() => Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -232,7 +229,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             color: AppColors.textSecondary,
             fontSize: 14,
           ),
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.search,
             color: AppColors.primaryGreen,
             size: 20,
@@ -243,7 +240,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                     _searchController.clear();
                     _loadGroups();
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.clear,
                     color: AppColors.textSecondary,
                     size: 18,
@@ -258,10 +255,8 @@ class _GroupsScreenState extends State<GroupsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildCategoryFilter() {
-    return Container(
+  Widget _buildCategoryFilter() => Container(
       height: 50,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: ListView.builder(
@@ -292,7 +287,6 @@ class _GroupsScreenState extends State<GroupsScreen>
               selectedColor: AppColors.primaryGreen,
               side: BorderSide(
                 color: isSelected ? AppColors.primaryGreen : AppColors.border,
-                width: 1,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -304,10 +298,8 @@ class _GroupsScreenState extends State<GroupsScreen>
         },
       ),
     );
-  }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildTabBar() => Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -316,12 +308,12 @@ class _GroupsScreenState extends State<GroupsScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        indicator: UnderlineTabIndicator(
+        indicator: const UnderlineTabIndicator(
           borderSide: BorderSide(
-            color: const Color(0xFF008037), // Deep Green
+            color: Color(0xFF008037), // Deep Green
             width: 3,
           ),
-          insets: const EdgeInsets.symmetric(horizontal: 16),
+          insets: EdgeInsets.symmetric(horizontal: 16),
         ),
         indicatorSize: TabBarIndicatorSize.label,
         labelColor: const Color(0xFF008037), // Deep Green
@@ -341,7 +333,6 @@ class _GroupsScreenState extends State<GroupsScreen>
         ],
       ),
     );
-  }
 
   Widget _buildDiscoverTab() {
     if (_isLoading) {
@@ -361,7 +352,7 @@ class _GroupsScreenState extends State<GroupsScreen>
             : 'Be the first to create a cultural group in this category and start building your community!',
         actionButton: _isSearching
             ? null
-            : Container(
+            : DecoratedBox(
                 decoration: BoxDecoration(
                   color: const Color(0xFF008037), // Solid Deep Green
                   borderRadius: BorderRadius.circular(20),
@@ -374,7 +365,7 @@ class _GroupsScreenState extends State<GroupsScreen>
                     borderRadius: BorderRadius.circular(20),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                          horizontal: 24, vertical: 12,),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -430,7 +421,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         title: 'No Groups Joined',
         subtitle:
             'Discover and join cultural groups that match your heritage and interests!',
-        actionButton: Container(
+        actionButton: DecoratedBox(
           decoration: BoxDecoration(
             color: const Color(0xFF008037), // Solid Deep Green
             borderRadius: BorderRadius.circular(20),
@@ -496,9 +487,7 @@ class _GroupsScreenState extends State<GroupsScreen>
     }
 
     // Filter groups created by current user
-    final createdGroups = _userGroups.where((group) {
-      return group.isCreator(_groupService.currentUserId ?? '');
-    }).toList();
+    final createdGroups = _userGroups.where((group) => group.isCreator(_groupService.currentUserId ?? '')).toList();
 
     if (createdGroups.isEmpty) {
       return _buildEmptyState(
@@ -506,7 +495,7 @@ class _GroupsScreenState extends State<GroupsScreen>
         title: 'No Groups Created',
         subtitle:
             'Create your first cultural group and start building your community! Share your heritage and connect with others.',
-        actionButton: Container(
+        actionButton: DecoratedBox(
           decoration: BoxDecoration(
             color: const Color(0xFF008037), // Solid Deep Green
             borderRadius: BorderRadius.circular(20),
@@ -566,8 +555,7 @@ class _GroupsScreenState extends State<GroupsScreen>
     required String title,
     required String subtitle,
     Widget? actionButton,
-  }) {
-    return Center(
+  }) => Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -618,5 +606,4 @@ class _GroupsScreenState extends State<GroupsScreen>
         ),
       ),
     );
-  }
 }

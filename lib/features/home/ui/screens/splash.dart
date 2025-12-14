@@ -37,7 +37,7 @@ class SplashState extends State<Splash> {
       // Safety check for Navigator state during hot reload
       if (!Navigator.canPop(context) &&
           Navigator.of(context).widget.initialRoute == null) {
-        log("Navigator state issue detected, skipping navigation");
+        log('Navigator state issue detected, skipping navigation');
         return;
       }
 
@@ -47,7 +47,7 @@ class SplashState extends State<Splash> {
       
       // Wait for auth state to be determined with timeout
       // The BlocListener will handle navigation when state changes
-      final maxWaitTime = Duration(seconds: 3);
+      const maxWaitTime = Duration(seconds: 3);
       final startTime = DateTime.now();
       
       while (DateTime.now().difference(startTime) < maxWaitTime && !_hasNavigated) {
@@ -63,12 +63,12 @@ class SplashState extends State<Splash> {
           if (!_hasNavigated && mounted) {
             if (currentState is AuthenticatedState) {
               _hasNavigated = true;
-              log("Timeout fallback: User authenticated, navigating to main screen");
+              log('Timeout fallback: User authenticated, navigating to main screen');
               Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
               return;
             } else {
               _hasNavigated = true;
-              log("Timeout fallback: Navigating to welcome screen");
+              log('Timeout fallback: Navigating to welcome screen');
               Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
               return;
             }
@@ -80,10 +80,10 @@ class SplashState extends State<Splash> {
       if (!mounted || _hasNavigated) return;
       
       _hasNavigated = true;
-      log("Final fallback: Navigating to welcome screen");
+      log('Final fallback: Navigating to welcome screen');
       Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
     } catch (e) {
-      log("Error in _checkAuthAndNavigate: $e");
+      log('Error in _checkAuthAndNavigate: $e');
       if (mounted && !_hasNavigated) {
         _hasNavigated = true;
         Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
@@ -102,7 +102,7 @@ class SplashState extends State<Splash> {
       backgroundColor: backgroundColor,
       body: BlocListener<AuthstatusBloc, AuthstatusState>(
         listener: (context, state) {
-          log("Auth state changed in splash listener: $state");
+          log('Auth state changed in splash listener: $state');
 
           // Only handle if we haven't navigated yet
           if (!mounted || _hasNavigated) return;
@@ -110,25 +110,25 @@ class SplashState extends State<Splash> {
           // Safety check for Navigator state during hot reload
           if (!Navigator.canPop(context) &&
               Navigator.of(context).widget.initialRoute == null) {
-            log("Navigator state issue detected in listener, skipping navigation");
+            log('Navigator state issue detected in listener, skipping navigation');
             return;
           }
 
           // Navigate based on auth state
           if (state is AuthenticatedState) {
             _hasNavigated = true;
-            log("User authenticated in listener: ${state.user.uid}");
+            log('User authenticated in listener: ${state.user.uid}');
             Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
           } else if (state is UnauthenticatedState) {
             _hasNavigated = true;
-            log("User not authenticated in listener - going to welcome");
+            log('User not authenticated in listener - going to welcome');
             Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
           } else if (state is AuthFailed) {
             _hasNavigated = true;
-            log("Authentication failed in listener: ${state.message}");
+            log('Authentication failed in listener: ${state.message}');
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Authentication error: ${state.message}")),
+                SnackBar(content: Text('Authentication error: ${state.message}')),
               );
               Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
             }
@@ -148,7 +148,7 @@ class SplashState extends State<Splash> {
                       end: Alignment.bottomCenter,
                       colors: [
                         backgroundColor,
-                        Color(0xFF27A957).withOpacity(0.1), // Very subtle green tint at bottom
+                        const Color(0xFF27A957).withOpacity(0.1), // Very subtle green tint at bottom
                       ],
                       stops: const [0.7, 1.0],
                     ),
@@ -171,7 +171,7 @@ class SplashState extends State<Splash> {
 
                   // App name - single wordmark in dark brown/charcoal
                   Text(
-                    "Afropeep",
+                    'Afropeep',
                     style: GoogleFonts.montserrat(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,

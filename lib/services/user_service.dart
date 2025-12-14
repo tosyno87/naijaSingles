@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../common/utils/app_logger.dart';
 
 /// Service for managing user data and profiles
 class UserService {
-  static final UserService _instance = UserService._internal();
   factory UserService() => _instance;
   UserService._internal();
+  static final UserService _instance = UserService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -20,7 +21,7 @@ class UserService {
       }
       return null;
     } catch (e) {
-      print('Error getting user profile: $e');
+      AppLogger.error('Error getting user profile', error: e);
       return null;
     }
   }
@@ -30,7 +31,7 @@ class UserService {
     try {
       if (userIds.isEmpty) return [];
 
-      final futures = userIds.map((id) => getUserProfile(id));
+      final futures = userIds.map(getUserProfile);
       final results = await Future.wait(futures);
 
       return results
@@ -38,7 +39,7 @@ class UserService {
           .cast<UserProfile>()
           .toList();
     } catch (e) {
-      print('Error getting user profiles: $e');
+      AppLogger.error('Error getting user profiles', error: e);
       return [];
     }
   }
@@ -48,7 +49,7 @@ class UserService {
     final currentUser = _auth.currentUser;
     if (currentUser == null) return null;
 
-    return await getUserProfile(currentUser.uid);
+    return getUserProfile(currentUser.uid);
   }
 
   /// Search users by name
@@ -57,7 +58,7 @@ class UserService {
       final snapshot = await _firestore
           .collection('users')
           .where('displayName', isGreaterThanOrEqualTo: query)
-          .where('displayName', isLessThan: query + '\uf8ff')
+          .where('displayName', isLessThan: '$query\uf8ff')
           .limit(20)
           .get();
 
@@ -65,7 +66,7 @@ class UserService {
           .map((doc) => UserProfile.fromMap(doc.data(), doc.id))
           .toList();
     } catch (e) {
-      print('Error searching users: $e');
+      AppLogger.error('Error searching users', error: e);
       return [];
     }
   }
@@ -79,7 +80,7 @@ class UserService {
           .update(profile.toMap());
       return true;
     } catch (e) {
-      print('Error updating user profile: $e');
+      AppLogger.error('Error updating user profile', error: e);
       return false;
     }
   }
@@ -90,7 +91,7 @@ class UserService {
       final profile = await getUserProfile(userId);
       return profile?.displayName ?? 'Unknown User';
     } catch (e) {
-      print('Error getting user display name: $e');
+      AppLogger.error('Error getting user display name', error: e);
       return 'Unknown User';
     }
   }
@@ -101,7 +102,7 @@ class UserService {
       final profile = await getUserProfile(userId);
       return profile?.avatarUrl;
     } catch (e) {
-      print('Error getting user avatar URL: $e');
+      AppLogger.error('Error getting user avatar URL', error: e);
       return null;
     }
   }
@@ -112,7 +113,7 @@ class UserService {
       final doc = await _firestore.collection('users').doc(userId).get();
       return doc.exists;
     } catch (e) {
-      print('Error checking if user exists: $e');
+      AppLogger.error('Error checking if user exists', error: e);
       return false;
     }
   }
@@ -120,26 +121,16 @@ class UserService {
 
 /// User profile model
 class UserProfile {
-  final String id;
-  final String displayName;
-  final String? email;
-  final String? avatarUrl;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final Map<String, dynamic>? preferences;
 
   UserProfile({
     required this.id,
     required this.displayName,
-    this.email,
+    required this.createdAt, required this.updatedAt, this.email,
     this.avatarUrl,
-    required this.createdAt,
-    required this.updatedAt,
     this.preferences,
   });
 
-  factory UserProfile.fromMap(Map<String, dynamic> map, String id) {
-    return UserProfile(
+  factory UserProfile.fromMap(Map<String, dynamic> map, String id) => UserProfile(
       id: id,
       displayName: map['displayName'] ?? 'Unknown User',
       email: map['email'],
@@ -148,10 +139,15 @@ class UserProfile {
       updatedAt: (map['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       preferences: map['preferences'] as Map<String, dynamic>?,
     );
-  }
+  final String id;
+  final String displayName;
+  final String? email;
+  final String? avatarUrl;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final Map<String, dynamic>? preferences;
 
-  Map<String, dynamic> toMap() {
-    return {
+  Map<String, dynamic> toMap() => {
       'displayName': displayName,
       'email': email,
       'avatarUrl': avatarUrl,
@@ -159,7 +155,6 @@ class UserProfile {
       'updatedAt': Timestamp.fromDate(updatedAt),
       'preferences': preferences,
     };
-  }
 
   /// Get user's initials for avatar
   String get initials {
@@ -185,8 +180,7 @@ class UserProfile {
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? preferences,
-  }) {
-    return UserProfile(
+  }) => UserProfile(
       id: id ?? this.id,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
@@ -195,10 +189,7 @@ class UserProfile {
       updatedAt: updatedAt ?? this.updatedAt,
       preferences: preferences ?? this.preferences,
     );
-  }
 
   @override
-  String toString() {
-    return 'UserProfile(id: $id, displayName: $displayName, email: $email, avatarUrl: $avatarUrl)';
-  }
+  String toString() => 'UserProfile(id: $id, displayName: $displayName, email: $email, avatarUrl: $avatarUrl)';
 }

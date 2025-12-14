@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
-import '../widgets/premium_swipe.dart';
-import '../widgets/swipe_card_list.dart';
-import '../widgets/swipe_buttons.dart';
-import '../widgets/privacy_migration_prompt.dart';
-import '../../../../models/user_model.dart';
-import '../../controllers/home_controller.dart';
-import '../../bloc/searchuser_bloc.dart';
+
 import '../../../../common/constants/constants.dart';
+import '../../../../models/user_model.dart';
+import '../../bloc/searchuser_bloc.dart';
+import '../../controllers/home_controller.dart';
+import '../widgets/premium_swipe.dart';
+import '../widgets/privacy_migration_prompt.dart';
+import '../widgets/swipe_buttons.dart';
+import '../widgets/swipe_card_list.dart';
 
 class Homepage extends StatefulWidget {
+  const Homepage({required this.items, required this.isPurchased, super.key});
   final Map items;
   final bool isPurchased;
-  const Homepage({super.key, required this.items, required this.isPurchased});
 
   // NOTE: This is the main dating interface. Do not add profile counters or pagination indicators
   // as they are not typical in dating apps and can create user anxiety
@@ -68,18 +69,18 @@ class _HomepageState extends State<Homepage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    int freeSwipe = widget.items['free_swipes'] != null
+    final int freeSwipe = widget.items['free_swipes'] != null
         ? int.parse(widget.items['free_swipes'])
         : 10;
-    bool exceedSwipes =
+    final bool exceedSwipes =
         !widget.isPurchased ? controller.swipedCount >= freeSwipe : false;
 
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(50), topRight: Radius.circular(50)),
+              topLeft: Radius.circular(50), topRight: Radius.circular(50),),
           color: Theme.of(context).primaryColor,
         ),
         child: BlocListener<SearchUserBloc, SearchUserState>(
@@ -93,7 +94,7 @@ class _HomepageState extends State<Homepage>
           },
           child: ClipRRect(
             borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(50), topRight: Radius.circular(50)),
+                topLeft: Radius.circular(50), topRight: Radius.circular(50),),
             child: Stack(
               children: [
                 AbsorbPointer(
@@ -118,9 +119,7 @@ class _HomepageState extends State<Homepage>
                           child: SwipeButtons(
                             stackController: stackController,
                             onRewind: () {
-                              setState(() {
-                                removedUsers.clear();
-                              });
+                              setState(removedUsers.clear);
                             },
                             hasRemoved: removedUsers.isNotEmpty,
                           ),
@@ -129,9 +128,7 @@ class _HomepageState extends State<Homepage>
                     ],
                   ),
                 ),
-                exceedSwipes
-                    ? PremiumSwipePage(currentUser: controller.currentUser)
-                    : const SizedBox.shrink(),
+                if (exceedSwipes) PremiumSwipePage(currentUser: controller.currentUser) else const SizedBox.shrink(),
 
                 // Privacy Migration Prompt
                 if (_shouldShowMigrationPrompt)
@@ -149,7 +146,7 @@ class _HomepageState extends State<Homepage>
                       onMigrate: () {
                         // Refresh user list after migration
                         context.read<SearchUserBloc>().add(
-                            LoadUserEvent(currentUser: controller.currentUser));
+                            LoadUserEvent(currentUser: controller.currentUser),);
                         setState(() {
                           _shouldShowMigrationPrompt = false;
                         });

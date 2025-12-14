@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/services/group_chat_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
-import 'package:naijasingles/features/group_chat/screens/create_group_screen.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../services/group_chat_service.dart';
+import 'create_group_screen.dart';
+import 'group_chat_screen.dart';
 
 /// Screen for displaying user's group chats
 class GroupListScreen extends StatefulWidget {
@@ -17,8 +18,7 @@ class _GroupListScreenState extends State<GroupListScreen> {
   final GroupChatService _groupChatService = GroupChatService();
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
@@ -92,10 +92,8 @@ class _GroupListScreenState extends State<GroupListScreen> {
         },
       ),
     );
-  }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -144,10 +142,8 @@ class _GroupListScreenState extends State<GroupListScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildGroupTile(GroupChat group) {
-    return Container(
+  Widget _buildGroupTile(GroupChat group) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -211,10 +207,8 @@ class _GroupListScreenState extends State<GroupListScreen> {
         onTap: () => _navigateToGroupChat(group),
       ),
     );
-  }
 
-  Widget _buildGroupAvatar(GroupChat group) {
-    return Container(
+  Widget _buildGroupAvatar(GroupChat group) => Container(
       width: 50,
       height: 50,
       decoration: BoxDecoration(
@@ -227,10 +221,8 @@ class _GroupListScreenState extends State<GroupListScreen> {
         size: 24,
       ),
     );
-  }
 
-  Widget _buildGroupTypeChip(GroupType type) {
-    return Container(
+  Widget _buildGroupTypeChip(GroupType type) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: _getGroupTypeColor(type).withOpacity(0.1),
@@ -245,7 +237,6 @@ class _GroupListScreenState extends State<GroupListScreen> {
         ),
       ),
     );
-  }
 
   Color _getGroupTypeColor(GroupType type) {
     switch (type) {

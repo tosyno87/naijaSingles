@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:naijasingles/config/app_config.dart';
+import '../../../config/app_config.dart';
 
 import '../../../models/user_model.dart';
 import '../../constants/constants.dart';
@@ -26,7 +26,6 @@ class PhoneAuthRepository {
       codeSent: codeSent,
       timeout: const Duration(seconds: 120),
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
-      forceResendingToken: null,
     );
   }
 
@@ -34,7 +33,7 @@ class PhoneAuthRepository {
     required String phoneNumber,
     required PhoneAuthCredential verificationCompleted,
   }) async {
-    User? user = firebaseAuthInstance.currentUser;
+    final User? user = firebaseAuthInstance.currentUser;
 
     if (user != null) {
       try {
@@ -52,98 +51,96 @@ class PhoneAuthRepository {
 
   // check signIn
   Future<bool> isSignedIn() async {
-    var currentUser = auth.currentUser;
+    final currentUser = auth.currentUser;
     return currentUser != null;
   }
 
   Future<void> deleteUser(User user) async {
     // user.delete();
     final checkedSnapshot = await firebaseFireStoreInstance
-        .collection("users")
+        .collection('users')
         .doc(user.uid)
         .collection('CheckedUser')
         .get();
     for (final element in checkedSnapshot.docs) {
       await firebaseFireStoreInstance
-          .collection("users")
+          .collection('users')
           .doc(user.uid)
-          .collection("CheckedUser")
+          .collection('CheckedUser')
           .doc(element.id)
           .delete()
-          .then((value) => log("success"));
+          .then((value) => log('success'));
     }
     final likedBySnapshot = await firebaseFireStoreInstance
-        .collection("users")
+        .collection('users')
         .doc(user.uid)
         .collection('LikedBy')
         .get();
     for (final element in likedBySnapshot.docs) {
       await firebaseFireStoreInstance
-          .collection("users")
+          .collection('users')
           .doc(user.uid)
-          .collection("LikedBy")
+          .collection('LikedBy')
           .doc(element.id)
           .delete()
-          .then((value) => log("success"));
+          .then((value) => log('success'));
     }
 
     final matchesSnapshot = await firebaseFireStoreInstance
-        .collection("users")
+        .collection('users')
         .doc(user.uid)
         .collection('Matches')
         .get();
     for (final element in matchesSnapshot.docs) {
       await firebaseFireStoreInstance
-          .collection("users")
+          .collection('users')
           .doc(user.uid)
-          .collection("Matches")
+          .collection('Matches')
           .doc(element.id)
           .delete()
-          .then((value) => log("success"));
+          .then((value) => log('success'));
     }
 
-    await firebaseFireStoreInstance.collection("users").doc(user.uid).delete();
+    await firebaseFireStoreInstance.collection('users').doc(user.uid).delete();
     // Delete user details from Firebase Storage
     await deleteUserStorageCollection(user.uid);
   }
 
   // get current user
-  Future<User?> getCurrentUser() async {
-    return auth.currentUser;
-  }
+  Future<User?> getCurrentUser() async => auth.currentUser;
 
   Future<String?> getToken() async {
     try {
       final user = auth.currentUser;
       if (user == null) {
-        log("Cannot get token: No user is signed in");
+        log('Cannot get token: No user is signed in');
         return null;
       }
 
       return await user.getIdToken(true); // Force refresh the token
     } catch (e) {
-      log("Error getting token: $e");
+      log('Error getting token: $e');
       return null;
     }
   }
 
   Future<UserModel> registration(
-      {required Map<String, dynamic> userData}) async {
-    User? user = auth.currentUser;
+      {required Map<String, dynamic> userData,}) async {
+    final User? user = auth.currentUser;
 
     userData.addAll({
       'userId': user!.uid,
-      "isBlocked": false,
+      'isBlocked': false,
       'isPremium': false,
       'phoneNumber': user.phoneNumber,
-      'Pictures': [] // Initialize empty Pictures array
+      'Pictures': [], // Initialize empty Pictures array
     });
 
     await firebaseFireStoreInstance
-        .collection("users")
+        .collection('users')
         .doc(user.uid)
         .set(userData, SetOptions(merge: true));
-    var result = await firebaseFireStoreInstance
+    final result = await firebaseFireStoreInstance
         .collection('users')
         .where('userId', isEqualTo: user.uid)
         .get();
@@ -153,19 +150,19 @@ class PhoneAuthRepository {
   Future<bool> userDetails(String userId) async {
     try {
       // Try direct document access first (faster and more reliable)
-      var docSnapshot = await firebaseFireStoreInstance
+      final docSnapshot = await firebaseFireStoreInstance
           .collection('users')
           .doc(userId)
           .get();
 
       if (docSnapshot.exists) {
-        var userData = docSnapshot.data();
+        final userData = docSnapshot.data();
         log('✅ User document exists for: $userId');
         log('📄 User data keys: ${userData?.keys.toList()}');
         
         // Check if user has completed onboarding or has basic profile data
         // A user is considered registered if they have ANY of these indicators:
-        bool hasBasicProfile = userData != null && (
+        final bool hasBasicProfile = userData != null && (
           userData.containsKey('name') ||
           userData.containsKey('onboardingCompleted') ||
           userData.containsKey('profileSetupComplete') ||
@@ -190,7 +187,7 @@ class PhoneAuthRepository {
       log('❌ Error checking user details: $e');
       // Fallback to query method
       try {
-        var querySnapshot = await firebaseFireStoreInstance
+        final querySnapshot = await firebaseFireStoreInstance
             .collection('users')
             .where('userId', isEqualTo: userId)
             .get();
@@ -207,7 +204,7 @@ class PhoneAuthRepository {
   }
 
   Future<UserModel> getRegisterUser() async {
-    User? fbuser = auth.currentUser;
+    final User? fbuser = auth.currentUser;
     if (fbuser == null) {
       throw Exception('No authenticated user found');
     }
@@ -216,7 +213,7 @@ class PhoneAuthRepository {
       log('🔍 Fetching user data for: ${fbuser.uid}');
       
       // Try direct document access first (faster and more reliable)
-      var docSnapshot = await firebaseFireStoreInstance
+      final docSnapshot = await firebaseFireStoreInstance
           .collection('users')
           .doc(fbuser.uid)
           .get();
@@ -224,7 +221,7 @@ class PhoneAuthRepository {
       if (docSnapshot.exists) {
         log('✅ User document found via direct access');
         try {
-          var registeredUser = UserModel.fromDocument(docSnapshot);
+          final registeredUser = UserModel.fromDocument(docSnapshot);
           return registeredUser;
         } catch (parseError) {
           log('❌ Error parsing user document: $parseError');
@@ -235,7 +232,7 @@ class PhoneAuthRepository {
       }
 
       // Fallback to query method
-      var result = await firebaseFireStoreInstance
+      final result = await firebaseFireStoreInstance
           .collection('users')
           .where('userId', isEqualTo: fbuser.uid)
           .get();
@@ -246,7 +243,7 @@ class PhoneAuthRepository {
       }
 
       log('✅ User document found via query (${result.docs.length} results)');
-      var registeredUser = UserModel.fromDocument(result.docs.first);
+      final registeredUser = UserModel.fromDocument(result.docs.first);
       return registeredUser;
     } catch (e) {
       log('❌ Error in getRegisterUser: $e');
@@ -259,14 +256,14 @@ class PhoneAuthRepository {
       log('🗑️ Starting storage deletion for user: $userId');
       
       // Initialize Firebase Storage
-      FirebaseStorage storage = FirebaseStorage.instanceFor(bucket: bucketId);
+      final FirebaseStorage storage = FirebaseStorage.instanceFor(bucket: bucketId);
 
       // Get a reference to the user's collection
-      Reference userCollectionRef = storage.ref().child('users/$userId');
+      final Reference userCollectionRef = storage.ref().child('users/$userId');
 
       try {
         // List all the files in the user's collection
-        ListResult listResult = await userCollectionRef.listAll();
+        final ListResult listResult = await userCollectionRef.listAll();
         log('📁 Found ${listResult.items.length} files to delete');
 
         // Delete each file in the user's collection

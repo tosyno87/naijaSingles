@@ -1,18 +1,18 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:country_code_picker/country_code_picker.dart';
+
 import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../bloc/phone_auth_bloc.dart';
 import 'otp_verification_screen.dart';
 
 class PhoneVerificationScreen extends StatefulWidget {
-  final bool updatePhoneNumber;
 
   const PhoneVerificationScreen({
-    Key? key,
-    required this.updatePhoneNumber,
-  }) : super(key: key);
+    required this.updatePhoneNumber, super.key,
+  });
+  final bool updatePhoneNumber;
 
   @override
   State<PhoneVerificationScreen> createState() =>
@@ -65,7 +65,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Phone Verification",
+          'Phone Verification',
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -89,9 +89,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           // Main content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
 
@@ -105,7 +104,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
                   // Header text
                   Text(
-                    "Verify Your Phone Number",
+                    'Verify Your Phone Number',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
@@ -128,7 +127,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   const SizedBox(height: 40),
 
                   // Phone number input
-                  Container(
+                  DecoratedBox(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
@@ -151,9 +150,6 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           },
                           initialSelection: 'US',
                           favorite: const ['US', 'NG', 'GB', 'CA'],
-                          showCountryOnly: false,
-                          showOnlyCountryWhenClosed: false,
-                          alignLeft: false,
                           padding: EdgeInsets.zero,
                           textStyle: TextStyle(
                             color: Colors.green[800],
@@ -181,7 +177,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                             controller: phoneNumberController,
                             onChanged: _validatePhoneNumber,
                             decoration: InputDecoration(
-                              hintText: "Enter your number",
+                              hintText: 'Enter your number',
                               hintStyle: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[500],
@@ -204,7 +200,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      "By continuing, you agree to receive SMS messages for verification and may incur charges from your carrier.",
+                      'By continuing, you agree to receive SMS messages for verification and may incur charges from your carrier.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
@@ -238,8 +234,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                         );
                       }
                     },
-                    builder: (context, state) {
-                      return SizedBox(
+                    builder: (context, state) => SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
@@ -271,15 +266,14 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                                   ),
                                 )
                               : Text(
-                                  "Continue",
+                                  'Continue',
                                   style: GoogleFonts.montserrat(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                         ),
-                      );
-                    },
+                      ),
                   ),
 
                   SizedBox(height: screenSize.height * 0.08),

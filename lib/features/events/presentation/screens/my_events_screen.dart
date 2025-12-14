@@ -1,20 +1,22 @@
 import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../common/constants/app_colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
-import '../bloc/event_creation_bloc.dart';
-import '../widgets/my_event_card.dart';
+import '../../../../common/utils/app_logger.dart';
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/services/user_event_service.dart';
-import 'create_event_screen.dart';
+import '../bloc/event_creation_bloc.dart';
+import '../widgets/my_event_card.dart';
 
 class MyEventsScreen extends StatefulWidget {
-  const MyEventsScreen({Key? key}) : super(key: key);
+  const MyEventsScreen({super.key});
 
   @override
   State<MyEventsScreen> createState() => _MyEventsScreenState();
@@ -65,10 +67,10 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           children: [
             BlocListener<EventCreationBloc, EventCreationState>(
               listener: (context, state) {
-                print('🔄 EventCreationBloc State: ${state.runtimeType}');
+                AppLogger.debug('🔄 EventCreationBloc State: ${state.runtimeType}');
 
                 if (state is EventDeleted) {
-                  print('✅ Event deleted successfully: ${state.eventId}');
+                  AppLogger.info('✅ Event deleted successfully: ${state.eventId}');
                   // Only clear loading if this is the event we're deleting
                   if (_deletingEventId == state.eventId) {
                     setState(() {
@@ -158,7 +160,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             ),
             // Loading overlay during delete operations
             if (_isDeleting)
-              Container(
+              ColoredBox(
                 color: Colors.black.withOpacity(0.3),
                 child: const Center(
                   child: Card(
@@ -192,8 +194,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
+  PreferredSizeWidget _buildAppBar() => AppBar(
       backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       iconTheme: const IconThemeData(
@@ -248,10 +249,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         statusBarIconBrightness: Brightness.dark,
       ),
     );
-  }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildTabBar() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       height: 50,
       decoration: BoxDecoration(
@@ -284,7 +283,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           fontWeight: FontWeight.w500,
         ),
         dividerColor: Colors.transparent,
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
         tabs: [
           Tab(
             child: Container(
@@ -301,10 +300,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildPublishedEventsTab() {
-    return BlocBuilder<EventCreationBloc, EventCreationState>(
+  Widget _buildPublishedEventsTab() => BlocBuilder<EventCreationBloc, EventCreationState>(
       builder: (context, state) {
         if (state is UserEventsLoading) {
           return _buildLoadingState();
@@ -319,7 +316,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               .where((event) =>
                   event.status == EventStatus.published ||
                   event.status == EventStatus.underReview ||
-                  event.status == EventStatus.completed)
+                  event.status == EventStatus.completed,)
               .toList();
 
           if (publishedEvents.isEmpty) {
@@ -348,10 +345,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         );
       },
     );
-  }
 
-  Widget _buildDraftsTab() {
-    return BlocBuilder<EventCreationBloc, EventCreationState>(
+  Widget _buildDraftsTab() => BlocBuilder<EventCreationBloc, EventCreationState>(
       builder: (context, state) {
         if (state is UserEventsLoading) {
           return _buildLoadingState();
@@ -392,10 +387,9 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         );
       },
     );
-  }
 
   Widget _buildEventsList(List<EnhancedEventModel> events,
-      {bool isDrafts = false}) {
+      {bool isDrafts = false,}) {
     // Only apply optimistic update if there are multiple events to prevent empty state flash
     final filteredEvents = events.length > 1 && _deletingEventId != null
         ? events.where((event) => event.id != _deletingEventId).toList()
@@ -455,8 +449,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     );
   }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -486,19 +479,17 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildErrorState(String message) {
-    return Center(
+  Widget _buildErrorState(String message) => Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 80,
-              color: const Color(0xFF999999),
+              color: Color(0xFF999999),
             ),
             const SizedBox(height: 24),
             Text(
@@ -546,15 +537,13 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
   Widget _buildEmptyState({
     required String title,
     required String message,
     required IconData icon,
     bool showCreateButton = false,
-  }) {
-    return Center(
+  }) => Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -665,13 +654,11 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
   Widget _buildFeatureHighlight({
     required IconData icon,
     required String text,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(
           icon,
@@ -690,10 +677,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildAuthRequiredScreen() {
-    return Scaffold(
+  Widget _buildAuthRequiredScreen() => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: Center(
         child: Padding(
@@ -701,10 +686,10 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.login,
                 size: 80,
-                color: const Color(0xFF999999),
+                color: Color(0xFF999999),
               ),
               const SizedBox(height: 24),
               Text(
@@ -729,11 +714,9 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildCreateEventFAB() {
-    return FloatingActionButton.extended(
-      heroTag: "my_events_screen_fab",
+  Widget _buildCreateEventFAB() => FloatingActionButton.extended(
+      heroTag: 'my_events_screen_fab',
       onPressed: _createNewEvent,
       backgroundColor: const Color(0xFF008037),
       foregroundColor: Colors.white,
@@ -746,7 +729,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
   void _createNewEvent() {
     Navigator.pushNamed(context, RouteName.createEvent).then((_) {
@@ -777,7 +759,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   void _deleteEvent(BuildContext screenContext, EnhancedEventModel event) {
     showDialog(
       context: screenContext,
-      barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -836,7 +817,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           ),
           ElevatedButton(
             onPressed: () {
-              print('🗑️ Delete button pressed for event: ${event.id}');
+              AppLogger.debug('🗑️ Delete button pressed for event: ${event.id}');
               Navigator.of(dialogContext).pop();
 
               // Track which event is being deleted
@@ -869,7 +850,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               });
 
               // Use the passed screen context that has access to EventCreationBloc
-              print('📤 Dispatching DeleteEventEvent for: ${event.id}');
+              AppLogger.debug('📤 Dispatching DeleteEventEvent for: ${event.id}');
               screenContext
                   .read<EventCreationBloc>()
                   .add(DeleteEventEvent(event.id));
@@ -898,7 +879,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   void _publishDraft(BuildContext screenContext, EnhancedEventModel event) {
     showDialog(
       context: screenContext,
-      barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -1228,8 +1208,7 @@ Join me at this amazing event! 🚀
     required String title,
     required String value,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -1258,14 +1237,12 @@ Join me at this amazing event! 🚀
         ],
       ),
     );
-  }
 
   Widget _buildInsightRow({
     required IconData icon,
     required String text,
     required Color color,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 8),
@@ -1280,5 +1257,4 @@ Join me at this amazing event! 🚀
         ),
       ],
     );
-  }
 }

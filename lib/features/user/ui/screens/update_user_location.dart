@@ -3,21 +3,21 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../widgets/location_savedailog.dart';
 
 class UpdateLocation extends StatefulWidget {
+  const UpdateLocation({required this.selectedLocation, super.key});
   final Map? selectedLocation;
-  const UpdateLocation({super.key, required this.selectedLocation});
   @override
   UpdateLocationState createState() => UpdateLocationState();
 }
@@ -25,7 +25,8 @@ class UpdateLocation extends StatefulWidget {
 class UpdateLocationState extends State<UpdateLocation> {
   final kGoogleApiKey = googleMapsKey;
   Map? _newAddress;
-  double? latitude, longitude;
+  double? latitude;
+  double? longitude;
   // LatLng defaultLocation =
   //     const LatLng(33.501324, -111.925278); //Scottsdale, AZ, USA
 
@@ -51,7 +52,7 @@ class UpdateLocationState extends State<UpdateLocation> {
         .getLocationCoordinates()
         .then((updateAddress) {
       setState(() {
-        _newAddress = updateAddress!;
+        _newAddress = updateAddress;
       });
     });
   }
@@ -60,12 +61,11 @@ class UpdateLocationState extends State<UpdateLocation> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     return PopScope(
-      canPop: true,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
         if (didPop) return;
         final NavigatorState navigator = Navigator.of(context);
         if (latitude != null && longitude != null) {
-          Map<String, dynamic>? a =
+          final Map<String, dynamic>? a =
               await showLocationDialog(context, latitude, longitude);
 
           navigator.pop(a);
@@ -80,7 +80,7 @@ class UpdateLocationState extends State<UpdateLocation> {
               color: Colors.white,
               onTap: () async {
                 if (latitude != null && longitude != null) {
-                  var a =
+                  final a =
                       await showLocationDialog(context, latitude, longitude);
 
                   Navigator.pop(context, a);
@@ -96,13 +96,12 @@ class UpdateLocationState extends State<UpdateLocation> {
               onTap: () {
                 showDialog(
                   context: context,
-                  builder: (BuildContext context) {
-                    return Dialog(
+                  builder: (BuildContext context) => Dialog(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Container(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -112,9 +111,9 @@ class UpdateLocationState extends State<UpdateLocation> {
                                   fontSize: 20,
                                   color: themeProvider.isDarkMode
                                       ? Colors.white70
-                                      : Colors.black87),
+                                      : Colors.black87,),
                             ),
-                            const SizedBox(height: 8.0),
+                            const SizedBox(height: 8),
                             Column(
                               children: [
                                 Text(
@@ -143,7 +142,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                   },
                                   child: Text(
                                     'No'.tr().toString(),
-                                    style: TextStyle(color: primaryColor),
+                                    style: const TextStyle(color: primaryColor),
                                   ),
                                 ),
                                 TextButton(
@@ -155,7 +154,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                             _newAddress?['latitude'],
                                             _newAddress?['longitude'],
                                           ),
-                                          zoom: 16.0,
+                                          zoom: 16,
                                         ),
                                       ),
                                     );
@@ -167,7 +166,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                   },
                                   child: Text(
                                     'Yes'.tr().toString(),
-                                    style: TextStyle(color: primaryColor),
+                                    style: const TextStyle(color: primaryColor),
                                   ),
                                 ),
                               ],
@@ -175,20 +174,19 @@ class UpdateLocationState extends State<UpdateLocation> {
                           ],
                         ),
                       ),
-                    );
-                  },
+                    ),
                 );
               },
               title: Text(
-                "Choose location".tr().toString(),
+                'Choose location'.tr().toString(),
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                    color: Colors.white, fontWeight: FontWeight.bold,),
               ),
               // ignore: unnecessary_null_comparison
               subtitle: Text(_newAddress != null
                       ? _newAddress!['PlaceName'] ??
                           'Fetching..'.tr().toString()
-                      : 'Unable to load...'.tr().toString())
+                      : 'Unable to load...'.tr().toString(),)
                   .tr(),
             ),
             actions: [
@@ -196,20 +194,20 @@ class UpdateLocationState extends State<UpdateLocation> {
                   icon: const Icon(Icons.search),
                   onPressed: () async {
                     try {
-                      Prediction? prediction = await PlacesAutocomplete.show(
+                      final Prediction? prediction = await PlacesAutocomplete.show(
                           offset: 0,
                           types: [],
                           strictbounds: false,
                           context: context,
                           apiKey: kGoogleApiKey,
                           mode: Mode.overlay,
-                          language: "es",
+                          language: 'es',
                           onError: onError,
-                          components: []);
+                          components: [],);
                       if (prediction != null) {
                         final GoogleMapsPlaces places =
                             GoogleMapsPlaces(apiKey: kGoogleApiKey);
-                        PlacesDetailsResponse response = await places
+                        final PlacesDetailsResponse response = await places
                             .getDetailsByPlaceId(prediction.placeId!);
 
                         final lat = response.result.geometry?.location.lat;
@@ -219,7 +217,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                           CameraUpdate.newCameraPosition(
                             CameraPosition(
                               target: LatLng(lat!, lng!),
-                              zoom: 16.0,
+                              zoom: 16,
                             ),
                           ),
                         );
@@ -238,7 +236,7 @@ class UpdateLocationState extends State<UpdateLocation> {
 
                       return;
                     }
-                  })
+                  },),
             ],
           ),
           body: _newAddress != null
@@ -268,7 +266,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                                       ['coordinates'][1],
                                                   widget.selectedLocation?[
                                                           'position']
-                                                      ['coordinates'][0]),
+                                                      ['coordinates'][0],),
                                           onTap: () {
                                             showDialog(
                                               barrierColor: Colors.transparent,
@@ -283,11 +281,11 @@ class UpdateLocationState extends State<UpdateLocation> {
                                                       _newAddress?['longitude'];
                                                   return FutureBuilder(
                                                       future: getAddress(
-                                                          latitude, longitude),
+                                                          latitude, longitude,),
                                                       builder:
                                                           (BuildContext ctx,
                                                               AsyncSnapshot
-                                                                  snapshot) {
+                                                                  snapshot,) {
                                                         if (snapshot
                                                                 .connectionState ==
                                                             ConnectionState
@@ -295,7 +293,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                                                           return AlertDialog(
                                                             title: const Center(
                                                                 child:
-                                                                    Hookup4uBar()),
+                                                                    Hookup4uBar(),),
                                                             content: Text(
                                                               'loading...'
                                                                   .tr()
@@ -309,26 +307,26 @@ class UpdateLocationState extends State<UpdateLocation> {
                                                             .hasError) {
                                                           return AlertDialog(
                                                             title: Text(
-                                                                '${snapshot.error}'),
+                                                                '${snapshot.error}',),
                                                           );
                                                         } else if (snapshot
                                                             .hasData) {
                                                           return AlertDialog(
                                                             title: Text(
-                                                                '${snapshot.data}'),
+                                                                '${snapshot.data}',),
                                                           );
                                                         }
                                                         return Container();
-                                                      });
+                                                      },);
                                                 }
                                                 return AlertDialog(
                                                   title: Text(
-                                                          '${widget.selectedLocation?['address'] ?? 'loading...'}')
+                                                          '${widget.selectedLocation?['address'] ?? 'loading...'}',)
                                                       .tr(),
                                                 );
                                               },
                                             );
-                                          }),
+                                          },),
                                     }
                                   : {
                                       Marker(
@@ -342,8 +340,8 @@ class UpdateLocationState extends State<UpdateLocation> {
                                               CameraUpdate.newCameraPosition(
                                                 CameraPosition(
                                                   target: LatLng(loc.latitude,
-                                                      loc.longitude),
-                                                  zoom: 16.0,
+                                                      loc.longitude,),
+                                                  zoom: 16,
                                                 ),
                                               ),
                                             );
@@ -355,17 +353,16 @@ class UpdateLocationState extends State<UpdateLocation> {
                                                     CameraPosition(
                                               target:
                                                   LatLng(latitude!, longitude!),
-                                              zoom: 16.0,
-                                            )));
+                                              zoom: 16,
+                                            ),),);
                                             showAddressDialog(
-                                                context, latitude!, longitude!);
+                                                context, latitude!, longitude!,);
                                           },
                                           draggable: true,
                                           markerId: const MarkerId('randomId'),
                                           position:
-                                              LatLng(latitude!, longitude!))
+                                              LatLng(latitude!, longitude!),),
                                     },
-                              mapType: MapType.normal,
                               initialCameraPosition: CameraPosition(
                                   target: widget.selectedLocation?.isEmpty ??
                                           true
@@ -377,16 +374,13 @@ class UpdateLocationState extends State<UpdateLocation> {
                                           widget.selectedLocation?['position']
                                               ['coordinates'][0],
                                           widget.selectedLocation?['position']
-                                              ['coordinates'][1]),
-                                  zoom: 16),
+                                              ['coordinates'][1],),
+                                  zoom: 16,),
                               onMapCreated: (GoogleMapController controller) {
                                 googleMapController = controller;
                               },
                               myLocationEnabled: true,
-                              myLocationButtonEnabled: true,
-                              zoomGesturesEnabled: true,
                               zoomControlsEnabled: false,
-                              buildingsEnabled: true,
                               onLongPress: (position) {
                                 setState(() {
                                   latitude = position.latitude;
@@ -396,13 +390,12 @@ class UpdateLocationState extends State<UpdateLocation> {
                                   CameraUpdate.newCameraPosition(
                                     CameraPosition(
                                       target: LatLng(position.latitude,
-                                          position.longitude),
-                                      zoom: 16.0,
+                                          position.longitude,),
+                                      zoom: 16,
                                     ),
                                   ),
                                 );
                               },
-                              mapToolbarEnabled: true,
                             ),
                           ],
                         ),
@@ -410,7 +403,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                     ],
                   ),
                 )
-              : const Hookup4uBar()),
+              : const Hookup4uBar(),),
     );
   }
 }

@@ -4,12 +4,11 @@ import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class CulturalHeritageStep extends StatefulWidget {
-  final EventCreationData eventData;
 
   const CulturalHeritageStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
   State<CulturalHeritageStep> createState() => _CulturalHeritageStepState();
@@ -78,8 +77,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,14 +107,12 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Row(
+  Widget _buildSectionTitle(String title) => Row(
       children: [
-        Icon(
+        const Icon(
           Icons.celebration,
-          color: const Color(0xFF008037),
+          color: Color(0xFF008037),
           size: 24,
         ),
         const SizedBox(width: 8),
@@ -130,10 +126,8 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildCulturalHeritageSelector() {
-    return Column(
+  Widget _buildCulturalHeritageSelector() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -166,7 +160,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: widget.eventData.metadata['culturalHeritage'] ?? null,
+              value: widget.eventData.metadata['culturalHeritage'],
               hint: Text(
                 'Select cultural heritage',
                 style: GoogleFonts.montserrat(
@@ -187,8 +181,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
               ),
               isExpanded: true,
               dropdownColor: AppColors.backgroundColor,
-              items: _culturalHeritages.map((heritage) {
-                return DropdownMenuItem<String>(
+              items: _culturalHeritages.map((heritage) => DropdownMenuItem<String>(
                   value: heritage,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -211,8 +204,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                       ],
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
               onChanged: (value) {
                 setState(() {
                   widget.eventData.metadata['culturalHeritage'] = value;
@@ -223,10 +215,8 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildLanguageRequirements() {
-    return Column(
+  Widget _buildLanguageRequirements() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -257,7 +247,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
               onTap: () {
                 setState(() {
                   final languages = List<String>.from(
-                      widget.eventData.metadata['languages'] ?? []);
+                      widget.eventData.metadata['languages'] ?? [],);
                   if (isSelected) {
                     languages.remove(language);
                   } else {
@@ -297,10 +287,8 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildAgeGroupSelector() {
-    return Column(
+  Widget _buildAgeGroupSelector() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -333,7 +321,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: widget.eventData.metadata['ageGroup'] ?? null,
+              value: widget.eventData.metadata['ageGroup'],
               hint: Text(
                 'Select age group',
                 style: GoogleFonts.montserrat(
@@ -354,8 +342,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
               ),
               isExpanded: true,
               dropdownColor: AppColors.backgroundColor,
-              items: _ageGroups.map((ageGroup) {
-                return DropdownMenuItem<String>(
+              items: _ageGroups.map((ageGroup) => DropdownMenuItem<String>(
                   value: ageGroup,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -378,8 +365,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                       ],
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
               onChanged: (value) {
                 setState(() {
                   widget.eventData.metadata['ageGroup'] = value;
@@ -390,10 +376,8 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildCulturalSignificanceField() {
-    return Column(
+  Widget _buildCulturalSignificanceField() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -460,10 +444,8 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildDressCodeField() {
-    return Column(
+  Widget _buildDressCodeField() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -530,7 +512,6 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         ),
       ],
     );
-  }
 
   Widget _buildCulturalTemplates() {
     final templates = [
@@ -587,8 +568,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
         Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: templates.map((template) {
-            return GestureDetector(
+          children: templates.map((template) => GestureDetector(
               onTap: () => _applyTemplate(template),
               child: Container(
                 width: 150,
@@ -629,8 +609,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                   ],
                 ),
               ),
-            );
-          }).toList(),
+            ),).toList(),
         ),
       ],
     );

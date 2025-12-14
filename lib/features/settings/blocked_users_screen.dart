@@ -8,7 +8,7 @@ import '../../common/providers/user_provider.dart';
 import '../../services/settings_service.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
-  const BlockedUsersScreen({Key? key}) : super(key: key);
+  const BlockedUsersScreen({super.key});
 
   @override
   State<BlockedUsersScreen> createState() => _BlockedUsersScreenState();
@@ -97,8 +97,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     }
   }
 
-  Future<bool> _showUnblockConfirmation(String userName) async {
-    return await showDialog<bool>(
+  Future<bool> _showUnblockConfirmation(String userName) async => await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: Text(
@@ -135,7 +134,6 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
           ),
         ) ??
         false;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +146,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             color: AppColors.textPrimary,
           ),
@@ -172,10 +170,9 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     );
   }
 
-  Widget _buildEmptyState(bool isDarkMode) {
-    return Center(
+  Widget _buildEmptyState(bool isDarkMode) => Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -212,7 +209,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.info_outline,
                     color: AppColors.primaryGreen,
                     size: 20,
@@ -234,10 +231,8 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildBlockedUsersList(bool isDarkMode) {
-    return Column(
+  Widget _buildBlockedUsersList(bool isDarkMode) => Column(
       children: [
         // Header info
         Container(
@@ -250,7 +245,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
           ),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
                 color: AppColors.primaryGreen,
                 size: 20,
@@ -300,7 +295,6 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         ),
       ],
     );
-  }
 
   Widget _buildBlockedUserCard(BlockedUser user, bool isDarkMode) {
     final timeAgo = _getTimeAgo(user.blockedAt);
@@ -389,7 +383,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: AppColors.primaryGreen),
+                  side: const BorderSide(color: AppColors.primaryGreen),
                 ),
               ),
               child: Text(

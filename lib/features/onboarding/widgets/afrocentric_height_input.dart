@@ -5,16 +5,13 @@ import 'afrocentric_height_picker.dart';
 
 /// Afrocentric height input widget with inline scroll picker
 class AfrocentricHeightInput extends StatefulWidget {
+
+  const AfrocentricHeightInput({
+    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+  });
   final double initialHeight;
   final String initialUnit;
   final Function(double height, String unit) onChanged;
-
-  const AfrocentricHeightInput({
-    Key? key,
-    required this.initialHeight,
-    required this.initialUnit,
-    required this.onChanged,
-  }) : super(key: key);
 
   @override
   State<AfrocentricHeightInput> createState() => _AfrocentricHeightInputState();
@@ -45,18 +42,18 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
     if (_heightUnit == 'cm') {
       return '${_height.round()} cm';
     } else {
-      double totalInches = _height / 2.54;
-      int feet = (totalInches / 12).floor();
-      int inches = (totalInches % 12).round();
+      final double totalInches = _height / 2.54;
+      final int feet = (totalInches / 12).floor();
+      final int inches = (totalInches % 12).round();
       return '$feet\'$inches"';
     }
   }
 
   String _getEquivalentDisplay() {
     if (_heightUnit == 'cm') {
-      double totalInches = _height / 2.54;
-      int feet = (totalInches / 12).floor();
-      int inches = (totalInches % 12).round();
+      final double totalInches = _height / 2.54;
+      final int feet = (totalInches / 12).floor();
+      final int inches = (totalInches % 12).round();
       return '$feet\'$inches"';
     } else {
       return '${_height.round()} cm';

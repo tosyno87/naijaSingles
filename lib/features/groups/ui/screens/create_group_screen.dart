@@ -24,7 +24,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   String _selectedCategory = 'Cultural';
   bool _isPublic = true;
   int _maxMembers = 100;
-  List<String> _tags = [];
+  final List<String> _tags = [];
   bool _isLoading = false;
 
   @override
@@ -67,7 +67,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Group "${_nameController.text.trim()}" created successfully!'),
+                'Group "${_nameController.text.trim()}" created successfully!',),
             backgroundColor: AppColors.success,
           ),
         );
@@ -106,8 +106,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
@@ -220,13 +219,11 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildGroupImageSection() {
-    return Center(
+  Widget _buildGroupImageSection() => Center(
       child: Stack(
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             radius: 50,
             backgroundColor: AppColors.border,
             child: Icon(
@@ -238,7 +235,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           Positioned(
             bottom: 0,
             right: 0,
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen,
                 shape: BoxShape.circle,
@@ -272,7 +269,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -281,8 +277,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     required IconData icon,
     int maxLines = 1,
     String? Function(String?)? validator,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -294,7 +289,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -317,19 +312,19 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.border),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.border),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.error),
+                borderSide: const BorderSide(color: AppColors.error),
               ),
               filled: true,
               fillColor: Colors.white,
@@ -342,10 +337,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildCategorySelection() {
-    return Column(
+  Widget _buildCategorySelection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -357,39 +350,38 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             boxShadow: AppColors.cardShadow,
           ),
           child: DropdownButtonFormField<String>(
-            value: _selectedCategory,
+            initialValue: _selectedCategory,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.border),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.border),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 16,
               ),
-              prefixIcon: Icon(
+              prefixIcon: const Icon(
                 Icons.filter_list,
                 color: AppColors.primaryGreen,
                 size: 20,
               ),
             ),
-            items: GroupCategories.categories.map((category) {
-              return DropdownMenuItem<String>(
+            items: GroupCategories.categories.map((category) => DropdownMenuItem<String>(
                 value: category,
                 child: Row(
                   children: [
@@ -404,12 +396,11 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     ),
                   ],
                 ),
-              );
-            }).toList(),
+              ),).toList(),
             onChanged: (value) {
               setState(() => _selectedCategory = value!);
             },
-            icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
+            icon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
             dropdownColor: Colors.white,
             style:
                 GoogleFonts.montserrat(color: AppColors.textPrimary, fontSize: 14),
@@ -417,10 +408,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildTagsSection() {
-    return Column(
+  Widget _buildTagsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -438,8 +427,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _tags.map((tag) {
-              return Chip(
+            children: _tags.map((tag) => Chip(
                 label: Text(
                   tag,
                   style: GoogleFonts.montserrat(
@@ -451,19 +439,17 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
                 side: BorderSide(
                   color: AppColors.primaryGreen.withOpacity(0.3),
-                  width: 1,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                deleteIcon: Icon(
+                deleteIcon: const Icon(
                   Icons.close,
                   size: 16,
                   color: AppColors.primaryGreen,
                 ),
                 onDeleted: () => _removeTag(tag),
-              );
-            }).toList(),
+              ),).toList(),
           ),
           const SizedBox(height: 12),
         ],
@@ -473,7 +459,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           Row(
             children: [
               Expanded(
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -487,23 +473,23 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         color: AppColors.textSecondary,
                         fontSize: 14,
                       ),
-                      prefixIcon: Icon(
+                      prefixIcon: const Icon(
                         Icons.tag,
                         color: AppColors.primaryGreen,
                         size: 20,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.border),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.border),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide:
-                            BorderSide(color: AppColors.primaryGreen, width: 2),
+                            const BorderSide(color: AppColors.primaryGreen, width: 2),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -517,7 +503,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.primaryGreen),
                   borderRadius: BorderRadius.circular(12),
@@ -542,12 +528,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
       ],
     );
-  }
 
-  Widget _buildSectionDivider(String title) {
-    return Row(
+  Widget _buildSectionDivider(String title) => Row(
       children: [
-        Expanded(
+        const Expanded(
           child: Divider(
             color: AppColors.border,
             thickness: 1,
@@ -564,7 +548,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ),
           ),
         ),
-        Expanded(
+        const Expanded(
           child: Divider(
             color: AppColors.border,
             thickness: 1,
@@ -572,10 +556,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildGroupSettings() {
-    return Column(
+  Widget _buildGroupSettings() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Public/Private Toggle
@@ -588,7 +570,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.public,
                 color: AppColors.primaryGreen,
                 size: 20,
@@ -621,7 +603,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 onChanged: (value) {
                   setState(() => _isPublic = value);
                 },
-                activeColor: AppColors.primaryGreen,
+                activeThumbColor: AppColors.primaryGreen,
               ),
             ],
           ),
@@ -642,7 +624,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.groups,
                     color: AppColors.primaryGreen,
                     size: 20,
@@ -681,10 +663,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildCreateButton() {
-    return Container(
+  Widget _buildCreateButton() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -700,7 +680,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         child: SizedBox(
           width: double.infinity,
           height: 56,
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.circular(12),
@@ -736,42 +716,41 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ),
     );
-  }
 
   LinearGradient _getCategoryGradient() {
     switch (_selectedCategory.toLowerCase()) {
       case 'cultural':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.culture, AppColors.heritage],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'professional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.business, AppColors.success],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'social':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.community, AppColors.info],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'educational':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.primaryGreen, AppColors.primaryGreenLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'religious':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.warning, AppColors.error],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'regional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.textPrimary, AppColors.textSecondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

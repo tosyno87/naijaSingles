@@ -1,20 +1,21 @@
+import 'dart:developer';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'dart:developer';
-import '../onboarding/widgets/afropeep_height_dropdown.dart';
+
 import '../../common/constants/app_colors.dart';
+import '../onboarding/widgets/afropeep_height_dropdown.dart';
 
 // Using centralized AppColors instead of local constants
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({Key? key}) : super(key: key);
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -58,7 +59,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Male',
     'Female',
     'Non-binary',
-    'Prefer not to say'
+    'Prefer not to say',
   ];
   final List<String> _interestedInOptions = ['Male', 'Female', 'Everyone'];
 
@@ -76,7 +77,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Nupe',
     'Urhobo',
     'Igala',
-    'Other'
+    'Other',
   ];
 
   // Image picker
@@ -118,19 +119,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (!mounted) return;
 
     // Count valid photos
-    int photoCount = _photos.where((photo) => photo != null).length;
+    final int photoCount = _photos.where((photo) => photo != null).length;
 
     // Check if all required fields are valid
-    bool isValid = _formKey.currentState?.validate() ?? false;
+    final bool isValid = _formKey.currentState?.validate() ?? false;
 
     // Check if user is 18+
-    bool isAdult = _age >= 18;
+    final bool isAdult = _age >= 18;
 
     // Check if bio is at least 20 characters (match registration requirement)
-    bool validBioLength = _bioController.text.trim().length >= 20;
+    final bool validBioLength = _bioController.text.trim().length >= 20;
 
     // Check if at least 3 photos are uploaded
-    bool hasEnoughPhotos = photoCount >= 3;
+    final bool hasEnoughPhotos = photoCount >= 3;
 
     setState(() {
       _formValid = isValid && isAdult && validBioLength && hasEnoughPhotos;
@@ -196,7 +197,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           setState(() {
             _heightCm = (userData['height'] as num).round();
             // Try to find matching ft/in value
-            String? ftIn = HeightData.getFtInFromCm(_heightCm);
+            final String? ftIn = HeightData.getFtInFromCm(_heightCm);
             if (ftIn != null) {
               _heightFtIn = ftIn;
             }
@@ -292,15 +293,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   // Show dialog to choose camera or gallery
-  Future<ImageSource?> _showImageSourceDialog() async {
-    return await showModalBottomSheet<ImageSource>(
+  Future<ImageSource?> _showImageSourceDialog() async => showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -333,15 +333,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
-  }
 
   // Build image source option labelLarge
   Widget _buildImageSourceOption({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-  }) {
-    return InkWell(
+  }) => InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -367,7 +365,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
-  }
 
   // Remove photo from a specific slot
   void _removePhoto(int index) {
@@ -390,12 +387,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-  Future<void> _showDeleteDialog(int index) async {
-    return showDialog<void>(
+  Future<void> _showDeleteDialog(int index) async => showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
           title: Text(
             'Remove Photo',
             style: GoogleFonts.montserrat(
@@ -438,10 +433,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-        );
-      },
+        ),
     );
-  }
 
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
@@ -461,7 +454,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       // Upload photos if they are File objects
-      List<String> photoUrls = [];
+      final List<String> photoUrls = [];
 
       for (int i = 0; i < _photos.length; i++) {
         final photo = _photos[i];
@@ -520,7 +513,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await user.updateDisplayName(_nameController.text.trim());
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Profile updated successfully'),
           backgroundColor: Colors.green,
         ),
@@ -541,8 +534,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Widget _buildInterestedInSelector() {
-    return Column(
+  Widget _buildInterestedInSelector() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -592,10 +584,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildDateOfBirthSelector() {
-    return InkWell(
+  Widget _buildDateOfBirthSelector() => InkWell(
       onTap: () async {
         final DateTime? picked = await showDatePicker(
           context: context,
@@ -603,19 +593,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               DateTime.now().subtract(const Duration(days: 365 * 25)),
           firstDate: DateTime(1950),
           lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
-          builder: (context, child) {
-            return Theme(
+          builder: (context, child) => Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
+                colorScheme: const ColorScheme.light(
                   primary: AppColors.primaryGreen,
-                  onPrimary: Colors.white,
-                  surface: Colors.white,
                   onSurface: AppColors.textPrimary,
                 ),
               ),
               child: child!,
-            );
-          },
+            ),
         );
 
         if (picked != null && picked != _selectedDOB) {
@@ -642,7 +628,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today, color: AppColors.primaryGreen),
+            const Icon(Icons.calendar_today, color: AppColors.primaryGreen),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -676,7 +662,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildBioField() {
     const int maxLength = 500; // Match registration max length
@@ -696,7 +681,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SizedBox(height: 8),
 
         // Bio input container - match registration styling
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -717,7 +702,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             maxLines: 8, // Match registration max lines
             maxLength: maxLength,
             decoration: InputDecoration(
-              hintText: "Write your bio here...", // Match registration hint
+              hintText: 'Write your bio here...', // Match registration hint
               hintStyle: GoogleFonts.montserrat(
                 color: Colors.grey.shade400,
               ),
@@ -727,10 +712,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+                borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
-              counterText: "", // Hide default counter
+              counterText: '', // Hide default counter
             ),
             onChanged: (value) {
               setState(() {}); // Update character counter
@@ -746,14 +731,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Minimum 20 characters", // Match registration requirement
+              'Minimum 20 characters', // Match registration requirement
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: currentLength >= 20 ? AppColors.primaryGreen : Colors.grey,
               ),
             ),
             Text(
-              "$currentLength/$maxLength",
+              '$currentLength/$maxLength',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: currentLength >= 20 ? AppColors.primaryGreen : Colors.grey,
@@ -768,7 +753,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-              "Bio should be at least 20 characters",
+              'Bio should be at least 20 characters',
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: Colors.red,
@@ -787,8 +772,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     int maxLines = 1,
     int? maxLength,
     String? Function(String?)? validator,
-  }) {
-    return TextFormField(
+  }) => TextFormField(
       controller: controller,
       maxLines: maxLines,
       maxLength: maxLength,
@@ -804,7 +788,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
         filled: true,
         fillColor: Colors.white,
@@ -812,10 +796,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       validator: validator,
       onChanged: (_) => _validateForm(),
     );
-  }
 
-  Widget _buildReadOnlyField(String value, IconData icon) {
-    return Container(
+  Widget _buildReadOnlyField(String value, IconData icon) => Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -850,7 +832,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.lock_outline,
                   color: AppColors.primaryGreen,
                   size: 12,
@@ -870,11 +852,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+  Widget _buildSectionTitle(String title) => Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         title,
         style: GoogleFonts.montserrat(
@@ -884,7 +864,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
-  }
 
   void _calculateAge() {
     if (_selectedDOB != null) {
@@ -901,8 +880,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
@@ -925,7 +903,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: AppColors.primaryGreen),
+                  const CircularProgressIndicator(color: AppColors.primaryGreen),
                   const SizedBox(height: 16),
                   Text(
                     'Updating profile...',
@@ -940,7 +918,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           : Form(
               key: _formKey,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -952,7 +930,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     // Photo count warning if needed
                     if (_photos.where((p) => p != null).length < 3)
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
+                        padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           'Please upload at least 3 photos',
                           style: GoogleFonts.montserrat(
@@ -988,36 +966,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     // Gender selection - only editable during onboarding
                     _buildSectionTitle('Gender'),
                     const SizedBox(height: 8),
-                    _hasCompletedOnboarding
-                        ? _buildReadOnlyField(
-                            _selectedGender, Icons.person_outline)
-                        : _buildGenderSelector(),
+                    if (_hasCompletedOnboarding) _buildReadOnlyField(
+                            _selectedGender, Icons.person_outline,) else _buildGenderSelector(),
                     const SizedBox(height: 24),
 
                     // Date of Birth - only editable during onboarding
                     _buildSectionTitle('Date of Birth'),
                     const SizedBox(height: 8),
-                    _hasCompletedOnboarding
-                        ? _buildReadOnlyField(
+                    if (_hasCompletedOnboarding) _buildReadOnlyField(
                             _selectedDOB != null
                                 ? '${_selectedDOB!.day}/${_selectedDOB!.month}/${_selectedDOB!.year} ($_age years old)'
                                 : 'Not set',
-                            Icons.cake_outlined)
-                        : _buildDateOfBirthSelector(),
+                            Icons.cake_outlined,) else _buildDateOfBirthSelector(),
                     const SizedBox(height: 24),
 
                     // Tribe selection - only editable during onboarding
                     _buildSectionTitle('Tribe/Ethnicity (Optional)'),
                     const SizedBox(height: 8),
-                    _hasCompletedOnboarding
-                        ? _buildReadOnlyField(
+                    if (_hasCompletedOnboarding) _buildReadOnlyField(
                             _selectedTribe == 'Other'
                                 ? _otherTribeController.text.isNotEmpty
                                     ? _otherTribeController.text
                                     : 'Other'
                                 : _selectedTribe ?? 'Not specified',
-                            Icons.people_outline)
-                        : _buildTribeSelector(),
+                            Icons.people_outline,) else _buildTribeSelector(),
                     const SizedBox(height: 24),
 
                     // Height section
@@ -1144,10 +1116,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
     );
-  }
 
-  Widget _buildPhotoGrid() {
-    return GridView.builder(
+  Widget _buildPhotoGrid() => GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1162,13 +1132,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return GestureDetector(
           onTap: () => _pickImage(index),
           onLongPress: photo != null ? () => _showDeleteDialog(index) : null,
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: Colors.grey.shade300,
-                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
@@ -1213,7 +1182,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 loadingBuilder:
                                     (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
-                                  return Container(
+                                  return ColoredBox(
                                     color: Colors.grey.shade100,
                                     child: Center(
                                       child: CircularProgressIndicator(
@@ -1233,7 +1202,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 },
                                 errorBuilder: (context, error, stackTrace) {
                                   log('Error loading image: $error');
-                                  return Container(
+                                  return ColoredBox(
                                     color: Colors.grey.shade200,
                                     child: Column(
                                       mainAxisAlignment:
@@ -1262,7 +1231,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Positioned(
                         top: 4,
                         right: 4,
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.6),
                             shape: BoxShape.circle,
@@ -1288,10 +1257,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
       },
     );
-  }
 
-  Widget _buildGenderSelector() {
-    return Wrap(
+  Widget _buildGenderSelector() => Wrap(
       spacing: 8,
       runSpacing: 8,
       children: _genders.map((gender) {
@@ -1327,13 +1294,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
       }).toList(),
     );
-  }
 
-  Widget _buildTribeSelector() {
-    return Column(
+  Widget _buildTribeSelector() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -1347,24 +1312,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ],
           ),
           child: DropdownButtonFormField<String>(
-            value: _selectedTribe,
+            initialValue: _selectedTribe,
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               hintText: 'Select your tribe/ethnicity (optional)',
               hintStyle: GoogleFonts.montserrat(color: Colors.grey.shade600),
-              prefixIcon: Icon(Icons.people, color: AppColors.primaryGreen),
+              prefixIcon: const Icon(Icons.people, color: AppColors.primaryGreen),
             ),
-            items: _tribes.map((tribe) {
-              return DropdownMenuItem<String>(
+            items: _tribes.map((tribe) => DropdownMenuItem<String>(
                 value: tribe,
                 child: Text(
                   tribe,
                   style: GoogleFonts.montserrat(color: AppColors.textPrimary),
                 ),
-              );
-            }).toList(),
+              ),).toList(),
             onChanged: (value) {
               setState(() {
                 _selectedTribe = value;
@@ -1375,7 +1338,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               // Tribe is now optional - no validation required
               return null;
             },
-            icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
+            icon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
             dropdownColor: Colors.white,
             style: GoogleFonts.montserrat(fontSize: 16, color: AppColors.textPrimary),
           ),
@@ -1403,10 +1366,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ],
       ],
     );
-  }
 
-  Widget _buildAgeRangeSelector() {
-    return Column(
+  Widget _buildAgeRangeSelector() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -1461,7 +1422,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               color: Colors.white,
               fontSize: 12,
             ),
-            showValueIndicator: ShowValueIndicator.always,
+            showValueIndicator: ShowValueIndicator.onDrag,
           ),
           child: RangeSlider(
             values: _ageRange,
@@ -1482,49 +1443,48 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ],
     );
-  }
 
   Widget _buildValidationRequirements() {
-    List<Widget> requirements = [];
+    final List<Widget> requirements = [];
 
     // Check photo count
-    int photoCount = _photos.where((photo) => photo != null).length;
+    final int photoCount = _photos.where((photo) => photo != null).length;
     if (photoCount < 3) {
       requirements.add(_buildRequirementItem(
         'Upload at least 3 photos',
         Icons.photo_camera,
         photoCount >= 3,
-      ));
+      ),);
     }
 
     // Check bio length
-    bool validBioLength = _bioController.text.trim().length >= 20;
+    final bool validBioLength = _bioController.text.trim().length >= 20;
     if (!validBioLength) {
       requirements.add(_buildRequirementItem(
         'Write a bio (minimum 20 characters)',
         Icons.description,
         validBioLength,
-      ));
+      ),);
     }
 
     // Check age
-    bool isAdult = _age >= 18;
+    final bool isAdult = _age >= 18;
     if (!isAdult) {
       requirements.add(_buildRequirementItem(
         'You must be 18+ years old',
         Icons.cake,
         isAdult,
-      ));
+      ),);
     }
 
     // Check form validation
-    bool formValid = _formKey.currentState?.validate() ?? false;
+    final bool formValid = _formKey.currentState?.validate() ?? false;
     if (!formValid) {
       requirements.add(_buildRequirementItem(
         'Complete all required fields',
         Icons.check_circle,
         formValid,
-      ));
+      ),);
     }
 
     return Column(
@@ -1532,8 +1492,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildRequirementItem(String text, IconData icon, bool isCompleted) {
-    return Padding(
+  Widget _buildRequirementItem(String text, IconData icon, bool isCompleted) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
@@ -1558,5 +1517,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ],
       ),
     );
-  }
 }

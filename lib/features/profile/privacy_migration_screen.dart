@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../services/privacy_migration_service.dart';
 import '../../common/constants/colors.dart';
+import '../../services/privacy_migration_service.dart';
 import 'privacy_settings_screen.dart';
 
 class PrivacyMigrationScreen extends StatefulWidget {
-  const PrivacyMigrationScreen({Key? key}) : super(key: key);
+  const PrivacyMigrationScreen({super.key});
 
   @override
   State<PrivacyMigrationScreen> createState() => _PrivacyMigrationScreenState();
@@ -103,13 +103,14 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -137,8 +138,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
     }
   }
 
-  Widget _buildMigrationNeededContent() {
-    return SingleChildScrollView(
+  Widget _buildMigrationNeededContent() => SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,7 +150,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               gradient: LinearGradient(
                 colors: [
                   primaryColor.withValues(alpha: 0.1),
-                  primaryColor.withValues(alpha: 0.05)
+                  primaryColor.withValues(alpha: 0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -160,7 +160,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
             ),
             child: Column(
               children: [
-                Icon(
+                const Icon(
                   Icons.security_update_good,
                   size: 48,
                   color: primaryColor,
@@ -299,15 +299,13 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildAlreadyMigratedContent() {
-    return Padding(
+  Widget _buildAlreadyMigratedContent() => Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.check_circle_outline,
             size: 80,
             color: primaryColor,
@@ -364,10 +362,8 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionHeader(String title) {
-    return Text(
+  Widget _buildSectionHeader(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 18,
@@ -375,10 +371,8 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         color: textPrimary,
       ),
     );
-  }
 
-  Widget _buildFeatureCard(IconData icon, String title, String description) {
-    return Container(
+  Widget _buildFeatureCard(IconData icon, String title, String description) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
@@ -432,10 +426,8 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildInfoCard(String title, List<String> points) {
-    return Container(
+  Widget _buildInfoCard(String title, List<String> points) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
@@ -469,7 +461,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                           margin: const EdgeInsets.only(top: 6),
                           width: 6,
                           height: 6,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: primaryColor,
                             shape: BoxShape.circle,
                           ),
@@ -486,10 +478,8 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                         ),
                       ],
                     ),
-                  ))
-              .toList(),
+                  ),),
         ],
       ),
     );
-  }
 }

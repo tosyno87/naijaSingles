@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CulturalStoryCard extends StatelessWidget {
+
+  const CulturalStoryCard({
+    required this.title, required this.author, required this.country, required this.category, required this.content, required this.likesCount, required this.commentsCount, required this.isVerified, required this.onLike, super.key,
+  });
   final String title;
   final String author;
   final String country;
@@ -12,22 +16,8 @@ class CulturalStoryCard extends StatelessWidget {
   final bool isVerified;
   final VoidCallback onLike;
 
-  const CulturalStoryCard({
-    Key? key,
-    required this.title,
-    required this.author,
-    required this.country,
-    required this.category,
-    required this.content,
-    required this.likesCount,
-    required this.commentsCount,
-    required this.isVerified,
-    required this.onLike,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -186,7 +176,7 @@ class CulturalStoryCard extends StatelessWidget {
                       onTap: onLike,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: const Color(0xFF008037).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -218,7 +208,7 @@ class CulturalStoryCard extends StatelessWidget {
                     // Comments
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 12, vertical: 6,),
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(16),
@@ -273,5 +263,4 @@ class CulturalStoryCard extends StatelessWidget {
         ],
       ),
     );
-  }
 }

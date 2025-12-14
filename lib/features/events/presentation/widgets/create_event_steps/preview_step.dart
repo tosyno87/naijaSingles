@@ -4,16 +4,14 @@ import 'package:intl/intl.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class PreviewStep extends StatelessWidget {
-  final EventCreationData eventData;
 
   const PreviewStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,10 +33,8 @@ class PreviewStep extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 24,
@@ -46,10 +42,8 @@ class PreviewStep extends StatelessWidget {
         color: const Color(0xFF333333),
       ),
     );
-  }
 
-  Widget _buildEventPreviewCard(BuildContext context) {
-    return Container(
+  Widget _buildEventPreviewCard(BuildContext context) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -87,15 +81,13 @@ class PreviewStep extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildEventImage() {
-    return Container(
+  Widget _buildEventImage() => Container(
       height: 200,
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: const BorderRadius.only(
+      decoration: const BoxDecoration(
+        color: Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
@@ -112,10 +104,10 @@ class PreviewStep extends StatelessWidget {
                     width: double.infinity,
                     height: double.infinity,
                     color: const Color(0xFFF0F0F0),
-                    child: Icon(
+                    child: const Icon(
                       Icons.image,
                       size: 48,
-                      color: const Color(0xFF999999),
+                      color: Color(0xFF999999),
                     ),
                   ),
                   if (eventData.imageUrls.length > 1)
@@ -124,7 +116,7 @@ class PreviewStep extends StatelessWidget {
                       right: 12,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 8, vertical: 4,),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(12),
@@ -146,10 +138,10 @@ class PreviewStep extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.image_outlined,
                     size: 48,
-                    color: const Color(0xFF999999),
+                    color: Color(0xFF999999),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -163,10 +155,8 @@ class PreviewStep extends StatelessWidget {
               ),
             ),
     );
-  }
 
-  Widget _buildEventHeader() {
-    return Column(
+  Widget _buildEventHeader() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -232,7 +222,6 @@ class PreviewStep extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildEventDateTime() {
     if (eventData.startDate == null || eventData.endDate == null) {
@@ -244,10 +233,10 @@ class PreviewStep extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.schedule,
           size: 20,
-          color: const Color(0xFF666666),
+          color: Color(0xFF666666),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -284,10 +273,10 @@ class PreviewStep extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
+        const Icon(
           Icons.location_on,
           size: 20,
-          color: const Color(0xFF666666),
+          color: Color(0xFF666666),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -303,8 +292,7 @@ class PreviewStep extends StatelessWidget {
     );
   }
 
-  Widget _buildEventDescription() {
-    return Column(
+  Widget _buildEventDescription() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -326,7 +314,6 @@ class PreviewStep extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildEventTags() {
     if (eventData.tags.isEmpty) {
@@ -348,8 +335,7 @@ class PreviewStep extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: eventData.tags.map((tag) {
-            return Container(
+          children: eventData.tags.map((tag) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFF008037).withOpacity(0.1),
@@ -366,15 +352,13 @@ class PreviewStep extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            );
-          }).toList(),
+            ),).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildEventPricing() {
-    return Container(
+  Widget _buildEventPricing() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFF8F9FA),
@@ -424,10 +408,8 @@ class PreviewStep extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildSubmissionNote() {
-    return Container(
+  Widget _buildSubmissionNote() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.blue.withOpacity(0.1),
@@ -441,7 +423,7 @@ class PreviewStep extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
                 color: Colors.blue,
                 size: 24,
@@ -472,5 +454,4 @@ class PreviewStep extends StatelessWidget {
         ],
       ),
     );
-  }
 }

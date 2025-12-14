@@ -11,15 +11,13 @@ void main() {
       eventData = EventCreationData();
     });
 
-    Widget createWidgetUnderTest() {
-      return MaterialApp(
+    Widget createWidgetUnderTest() => MaterialApp(
         home: Scaffold(
           body: LocationStep(
             eventData: eventData,
           ),
         ),
       );
-    }
 
     testWidgets('should display location step with correct structure',
         (WidgetTester tester) async {
@@ -75,7 +73,7 @@ void main() {
       expect(find.text('e.g., 52A Kofo Abayomi Street'), findsOneWidget);
       expect(find.text('e.g., Lagos'), findsOneWidget);
       expect(
-          find.text('Enter state (e.g., Lagos, Abuja, Kano)'), findsOneWidget);
+          find.text('Enter state (e.g., Lagos, Abuja, Kano)'), findsOneWidget,);
     });
 
     testWidgets('should accept African location inputs',
@@ -104,7 +102,7 @@ void main() {
       // Check that TextFormFields exist and are empty
       final textFields = find.byType(TextFormField);
       expect(textFields,
-          findsAtLeastNWidgets(5)); // Venue, Address, City, State, Country
+          findsAtLeastNWidgets(5),); // Venue, Address, City, State, Country
     });
 
     testWidgets('should display correct background colors',

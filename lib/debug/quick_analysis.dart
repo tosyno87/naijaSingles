@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/services/user_analytics_service.dart';
+import '../services/user_analytics_service.dart';
 
 /// Quick analysis that can be called from the running app
 class QuickAnalysis {
@@ -20,9 +20,9 @@ class QuickAnalysis {
       debugPrint('📊 Quick Analysis Results:');
       debugPrint('   Total Users: ${analytics.totalUsers}');
       debugPrint(
-          '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)');
+          '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
       debugPrint(
-          '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)');
+          '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
       debugPrint('   Complete Profiles: ${analytics.completeProfiles}');
       debugPrint('   Incomplete Profiles: ${analytics.incompleteProfiles}');
       debugPrint('   Very Incomplete: ${analytics.veryIncompleteProfiles}');

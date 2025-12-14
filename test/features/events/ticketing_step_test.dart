@@ -11,15 +11,13 @@ void main() {
       eventData = EventCreationData();
     });
 
-    Widget createWidgetUnderTest() {
-      return MaterialApp(
+    Widget createWidgetUnderTest() => MaterialApp(
         home: Scaffold(
           body: TicketingStep(
             eventData: eventData,
           ),
         ),
       );
-    }
 
     testWidgets('should display ticketing step with correct structure',
         (WidgetTester tester) async {
@@ -28,7 +26,7 @@ void main() {
 
       expect(find.text('Event Pricing & Capacity'), findsOneWidget);
       expect(find.text('Set your event pricing and attendance limits'),
-          findsOneWidget);
+          findsOneWidget,);
     });
 
     testWidgets('should display pricing section', (WidgetTester tester) async {
@@ -88,7 +86,7 @@ void main() {
 
       // Now check for currency symbols in the expanded dropdown
       expect(find.text('₦'), findsOneWidget);
-      expect(find.text('\$'), findsAtLeastNWidgets(1)); // Multiple $ symbols
+      expect(find.text(r'$'), findsAtLeastNWidgets(1)); // Multiple $ symbols
       expect(find.text('£'), findsOneWidget);
       expect(find.text('€'), findsOneWidget);
     });
@@ -102,9 +100,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Check for price input field - the label shows the currency symbol
-      expect(find.text('Ticket Price (\$) *'), findsOneWidget);
+      expect(find.text(r'Ticket Price ($) *'), findsOneWidget);
       expect(find.byType(TextFormField),
-          findsAtLeastNWidgets(2)); // Price + Capacity
+          findsAtLeastNWidgets(2),); // Price + Capacity
     });
 
     testWidgets('should update price when input changes',

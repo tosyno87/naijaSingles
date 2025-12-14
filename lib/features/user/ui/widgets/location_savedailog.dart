@@ -3,26 +3,25 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/widgets/hookup_circularbar.dart';
 
 Future<Map<String, dynamic>?> showLocationDialog(
-    BuildContext context, double? latitude, double? longitude) {
-  Map<String, dynamic> updatedLocation = {};
+    BuildContext context, double? latitude, double? longitude,) {
+  final Map<String, dynamic> updatedLocation = {};
   final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
   return showDialog<Map<String, dynamic>?>(
     context: context,
-    builder: (BuildContext context) {
-      return Dialog(
+    builder: (BuildContext context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -32,14 +31,14 @@ Future<Map<String, dynamic>?> showLocationDialog(
                     fontSize: 18,
                     color: themeProvider.isDarkMode
                         ? Colors.white
-                        : Colors.black87),
+                        : Colors.black87,),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 16),
               Text(
                 'Do you want to continue with this location?'.tr().toString(),
                 style: const TextStyle(fontSize: 16),
               ),
-              const SizedBox(height: 5.0),
+              const SizedBox(height: 5),
               FutureBuilder(
                 future: getAddress(latitude, longitude),
                 builder: (BuildContext ctx, AsyncSnapshot snapshot) {
@@ -52,35 +51,35 @@ Future<Map<String, dynamic>?> showLocationDialog(
                       Container(
                         padding: const EdgeInsets.all(10),
                         child: Text(
-                            '${snapshot.data ?? 'loading...'.tr().toString()}'),
+                            '${snapshot.data ?? 'loading...'.tr().toString()}',),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context, null),
+                            onPressed: () => Navigator.pop(context),
                             child: Text(
                               'No'.tr().toString(),
-                              style: TextStyle(color: primaryColor),
+                              style: const TextStyle(color: primaryColor),
                             ),
                           ),
                           TextButton(
                             onPressed: () {
                               updatedLocation.addAll({
                                 'position': {
-                                  "coordinates": <double>[
+                                  'coordinates': <double>[
                                     longitude ?? 0.0,
-                                    latitude ?? 0.0
-                                  ]
+                                    latitude ?? 0.0,
+                                  ],
                                 },
-                                "address": snapshot.data?.toString() ?? '',
+                                'address': snapshot.data?.toString() ?? '',
                               });
-                              log("new address is $updatedLocation");
+                              log('new address is $updatedLocation');
                               Navigator.pop(context, updatedLocation);
                             },
                             child: Text(
                               'Yes'.tr().toString(),
-                              style: TextStyle(color: primaryColor),
+                              style: const TextStyle(color: primaryColor),
                             ),
                           ),
                         ],
@@ -92,18 +91,15 @@ Future<Map<String, dynamic>?> showLocationDialog(
             ],
           ),
         ),
-      );
-    },
+      ),
   );
 }
 
 Future<void> showAddressDialog(
-    BuildContext context, double latitude, double longitude) {
-  return showDialog(
+    BuildContext context, double latitude, double longitude,) => showDialog(
     barrierColor: Colors.transparent,
     context: context,
-    builder: (BuildContext context) {
-      return FutureBuilder(
+    builder: (BuildContext context) => FutureBuilder(
         future: getAddress(latitude, longitude),
         builder: (BuildContext ctx, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -125,10 +121,8 @@ Future<void> showAddressDialog(
           }
           return Container();
         },
-      );
-    },
+      ),
   );
-}
 
 Future getAddress(lat, lng) async {
   try {

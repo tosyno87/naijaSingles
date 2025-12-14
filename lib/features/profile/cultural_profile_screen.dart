@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../common/widgets/custom_3d_icons.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../common/constants/app_colors.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/widgets/custom_3d_icons.dart';
 import '../../services/region_detection_service.dart';
 
 class CulturalProfileScreen extends StatefulWidget {
-  const CulturalProfileScreen({Key? key}) : super(key: key);
+  const CulturalProfileScreen({super.key});
 
   @override
   State<CulturalProfileScreen> createState() => _CulturalProfileScreenState();
@@ -51,8 +52,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -90,10 +90,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryGreen))
+              child: CircularProgressIndicator(color: AppColors.primaryGreen),)
           : SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     // Cultural Identity Header
@@ -128,7 +128,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
             ),
     );
-  }
 
   Widget _buildCulturalIdentityHeader() {
     final name = _userData?['name']?.toString() ?? 'Cultural Community Member';
@@ -145,7 +144,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             color: AppColors.primaryGreen.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
-            spreadRadius: 0,
           ),
         ],
       ),
@@ -174,14 +172,12 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   ? Image.network(
                       mainPhoto,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
+                      errorBuilder: (context, error, stackTrace) => ColoredBox(
                           color: Colors.white.withOpacity(0.2),
                           child: Custom3DIcons.profile(size: 60),
-                        );
-                      },
+                        ),
                     )
-                  : Container(
+                  : ColoredBox(
                       color: Colors.white.withOpacity(0.2),
                       child: Custom3DIcons.profile(size: 60),
                     ),
@@ -209,7 +205,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: Colors.white.withOpacity(0.3),
-                width: 1,
               ),
             ),
             child: Row(
@@ -242,7 +237,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: Colors.white.withOpacity(0.2),
-                  width: 1,
                 ),
               ),
               child: Row(
@@ -307,7 +301,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Custom3DIcons.culture(size: 24),
+              Custom3DIcons.culture(),
               const SizedBox(width: 12),
               Text(
                 'Nationality & Tribe',
@@ -370,7 +364,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -385,7 +378,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Custom3DIcons.groups(size: 24),
+              Custom3DIcons.groups(),
               const SizedBox(width: 12),
               Text(
                 'Community Involvement',
@@ -407,7 +400,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: AppColors.primaryGreen.withOpacity(0.3),
-                width: 1,
               ),
             ),
             child: Text(
@@ -459,7 +451,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -474,7 +465,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Custom3DIcons.business(size: 24),
+              Custom3DIcons.business(),
               const SizedBox(width: 12),
               Text(
                 'Professional Profile',
@@ -531,8 +522,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: skills.take(5).map((skill) {
-                return Container(
+              children: skills.take(5).map((skill) => Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -540,7 +530,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: AppColors.primaryGreen.withOpacity(0.3),
-                      width: 1,
                     ),
                   ),
                   child: Text(
@@ -551,8 +540,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       color: AppColors.primaryGreen,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
             ),
           ],
         ],
@@ -572,7 +560,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -587,7 +574,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.favorite,
                 color: AppColors.primaryGreen,
                 size: 24,
@@ -617,8 +604,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: culturalInterests.map((interest) {
-                return Container(
+              children: culturalInterests.map((interest) => Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -626,7 +612,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: AppColors.primaryGreen.withOpacity(0.3),
-                      width: 1,
                     ),
                   ),
                   child: Text(
@@ -637,8 +622,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       color: AppColors.primaryGreen,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
             ),
             const SizedBox(height: 16),
           ],
@@ -655,8 +639,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: interests.take(8).map((interest) {
-                return Container(
+              children: interests.take(8).map((interest) => Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -664,7 +647,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: AppColors.textSecondary.withOpacity(0.3),
-                      width: 1,
                     ),
                   ),
                   child: Text(
@@ -675,8 +657,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       color: AppColors.textSecondary,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
             ),
           ],
         ],
@@ -696,7 +677,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -711,7 +691,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.handshake,
                 color: AppColors.primaryGreen,
                 size: 24,
@@ -763,7 +743,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -778,7 +757,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         children: [
           Row(
             children: [
-              Custom3DIcons.star(size: 24),
+              Custom3DIcons.star(),
               const SizedBox(width: 12),
               Text(
                 'Cultural Contributions',
@@ -823,8 +802,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, Widget icon) {
-    return Row(
+  Widget _buildInfoRow(String label, String value, Widget icon) => Row(
       children: [
         icon,
         const SizedBox(width: 12),
@@ -853,17 +831,14 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildStatCard(String label, String value, Widget icon) {
-    return Container(
+  Widget _buildStatCard(String label, String value, Widget icon) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.primaryGreen.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
-          width: 1,
         ),
       ),
       child: Column(
@@ -889,7 +864,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         ],
       ),
     );
-  }
 
   String _getNationalityText() {
     // Extract nationality from user data - using available fields

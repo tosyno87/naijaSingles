@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
+import '../../../common/constants/colors.dart';
+import '../../../common/widgets/hookup_circularbar.dart';
 
 class PaymentDetails extends StatelessWidget {
-  final List<PurchaseDetails> purchases;
   const PaymentDetails(this.purchases, {super.key});
+  final List<PurchaseDetails> purchases;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class PaymentDetails extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           centerTitle: true,
-          title: Text("Subscription details".tr().toString()),
+          title: Text('Subscription details'.tr().toString()),
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
@@ -33,29 +33,26 @@ class PaymentDetails extends StatelessWidget {
             decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50)),
-                color: Theme.of(context).primaryColor),
+                    topRight: Radius.circular(50),),
+                color: Theme.of(context).primaryColor,),
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(50), topRight: Radius.circular(50)),
+                  topLeft: Radius.circular(50), topRight: Radius.circular(50),),
               child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Row(children: <Widget>[
                       Padding(
-                        padding: const EdgeInsets.all(38.0),
-                        child: Text("Payment Summary:".tr().toString(),
-                            style: TextStyle(
+                        padding: const EdgeInsets.all(38),
+                        child: Text('Payment Summary:'.tr().toString(),
+                            style: const TextStyle(
                                 color: primaryColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 23)),
+                                fontSize: 23,),),
                       ),
-                    ]),
-                    purchases.isNotEmpty
-                        ? ListView(
-                            scrollDirection: Axis.vertical,
+                    ],),
+                    if (purchases.isNotEmpty) ListView(
                             physics: const ScrollPhysics(),
                             shrinkWrap: true,
                             children: purchases.map((index) {
@@ -64,93 +61,92 @@ class PaymentDetails extends StatelessWidget {
                                 index as AppStorePurchaseDetails;
                               }
                               return Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(8),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: DataTable(
                                     columns: [
                                       DataColumn(
                                           label: Text(
-                                        "Plan".tr().toString(),
+                                        'Plan'.tr().toString(),
                                         style: const TextStyle(
                                           //   color: primaryColor,
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400,
                                         ),
-                                      )),
+                                      ),),
                                       DataColumn(
-                                          label: Text("Details".tr().toString(),
+                                          label: Text('Details'.tr().toString(),
                                               style: const TextStyle(
                                                 fontSize: 15,
                                                 // color: primaryColor,
                                                 fontWeight: FontWeight.w400,
-                                              ))),
+                                              ),),),
                                     ],
                                     rows: [
                                       DataRow(cells: [
                                         DataCell(Text(
-                                            "Transaction_id".tr().toString(),
+                                            'Transaction_id'.tr().toString(),
                                             style: const TextStyle(
                                               fontSize: 15,
-                                            ))),
-                                        DataCell(Text("${index.purchaseID}",
+                                            ),),),
+                                        DataCell(Text('${index.purchaseID}',
                                             style: const TextStyle(
                                               fontSize: 15,
-                                            ))),
-                                      ]),
+                                            ),),),
+                                      ],),
                                       DataRow(cells: [
-                                        const DataCell(Text("product_id",
+                                        const DataCell(Text('product_id',
                                             style: TextStyle(
                                               fontSize: 15,
-                                            ))),
+                                            ),),),
                                         DataCell(Text(index.productID,
                                             style: const TextStyle(
                                               fontSize: 15,
                                               // color: primaryColor,
-                                            ))),
-                                      ]),
+                                            ),),),
+                                      ],),
                                       DataRow(cells: [
                                         DataCell(Text(
-                                            "Subscribed on".tr().toString(),
+                                            'Subscribed on'.tr().toString(),
                                             style: const TextStyle(
                                               fontSize: 15,
-                                            ))),
+                                            ),),),
                                         DataCell(Text(
                                             DateTime.fromMillisecondsSinceEpoch(
                                                     int.parse(
-                                                        index.transactionDate!))
+                                                        index.transactionDate!,),)
                                                 .toLocal()
                                                 .toString(),
                                             style: const TextStyle(
                                               fontSize: 15,
                                               // color: primaryColor,
-                                            ))),
-                                      ]),
+                                            ),),),
+                                      ],),
                                       DataRow(cells: [
-                                        DataCell(Text("Status".tr().toString(),
+                                        DataCell(Text('Status'.tr().toString(),
                                             style: const TextStyle(
                                               fontSize: 15,
-                                            ))),
+                                            ),),),
                                         DataCell(Text(
                                             index.billingClientPurchase
                                                     .isAutoRenewing
-                                                ? "Active".tr().toString()
-                                                : "Cancelled".tr().toString(),
+                                                ? 'Active'.tr().toString()
+                                                : 'Cancelled'.tr().toString(),
                                             style: TextStyle(
                                               color: index.billingClientPurchase
                                                       .isAutoRenewing
                                                   ? Colors.green
                                                   : Colors.red,
                                               fontSize: 15,
-                                            ))),
-                                      ]),
+                                            ),),),
+                                      ],),
                                     ],
                                   ),
                                 ),
                               );
                             }).toList(),
-                          )
-                        : const Center(
+                          ) else const Center(
                             child: Hookup4uBar(),
                           ),
                     const SizedBox(
@@ -163,13 +159,13 @@ class PaymentDetails extends StatelessWidget {
                         child: Card(
                           color: primaryColor,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25)),
+                              borderRadius: BorderRadius.circular(25),),
                           child: Center(
                               child: Text(
-                            "Back".tr().toString(),
+                            'Back'.tr().toString(),
                             style: const TextStyle(
-                                fontSize: 17, color: Colors.white),
-                          )),
+                                fontSize: 17, color: Colors.white,),
+                          ),),
                         ),
                         onTap: () {
                           Navigator.pop(context);
@@ -179,6 +175,6 @@ class PaymentDetails extends StatelessWidget {
                   ],
                 ),
               ),
-            )));
+            ),),);
   }
 }

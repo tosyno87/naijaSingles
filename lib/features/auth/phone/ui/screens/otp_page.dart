@@ -8,15 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
 import 'package:otp_autofill/otp_autofill.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../../common/providers/user_provider.dart';
+import '../../../../../common/routes/route_name.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
+import '../../../../../common/widgets/hookup_circularbar.dart';
 import '../../../auth_status/bloc/registration/bloc/registration_bloc.dart';
 import '../../bloc/phone_auth_bloc.dart';
 import '../widgets/timer_widget.dart';
@@ -30,13 +30,11 @@ class OtpPage extends StatefulWidget {
   final bool isLogin; // Added to distinguish between login and registration
 
   OtpPage({
-    Key? key,
+    required this.phoneNumber, required this.verificationId, super.key,
     this.codeController = '',
     this.updatePhoneNumber = false,
-    required this.phoneNumber,
-    required this.verificationId,
     this.isLogin = false,
-  }) : super(key: key);
+  });
 
   @override
   State<OtpPage> createState() => _OtpPageState();
@@ -44,7 +42,7 @@ class OtpPage extends StatefulWidget {
 
 class _OtpPageState extends State<OtpPage> {
   int start = 30;
-  NumberFormat formatter = NumberFormat("00");
+  NumberFormat formatter = NumberFormat('00');
 
   OTPTextEditController? controller;
   OTPInteractor? _otpInteractor;
@@ -82,10 +80,10 @@ class _OtpPageState extends State<OtpPage> {
       controller = OTPTextEditController(
         codeLength: 6,
         onCodeReceive: (code) => log('Your Application receive code - $code'),
-        otpInteractor: _otpInteractor!,
+        otpInteractor: _otpInteractor,
       )..startListenUserConsent(
           (code) {
-            log("code is $code");
+            log('code is $code');
             final exp = RegExp(r'(\d{6})');
             log("code is final  ${exp.stringMatch(code ?? '')}");
             return exp.stringMatch(code ?? '') ?? '';
@@ -105,7 +103,7 @@ class _OtpPageState extends State<OtpPage> {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     // MVP Color Scheme
     const Color backgroundColor = Colors.white; // White background (MVP color)
@@ -115,7 +113,6 @@ class _OtpPageState extends State<OtpPage> {
     const Color iconBackgroundColor = Color(0xFFDFF5E2); // Light green for icon background
 
     return PopScope(
-      canPop: true,
       child: RepositoryProvider(
         create: (context) => PhoneAuthRepository(),
         child: MultiBlocProvider(
@@ -123,12 +120,12 @@ class _OtpPageState extends State<OtpPage> {
             BlocProvider(
               create: (context) => PhoneAuthBloc(
                   phoneAuthRepository:
-                      RepositoryProvider.of<PhoneAuthRepository>(context)),
+                      RepositoryProvider.of<PhoneAuthRepository>(context),),
             ),
             BlocProvider(
               create: (context) => RegistrationBloc(
                   phoneAuthRepository:
-                      RepositoryProvider.of<PhoneAuthRepository>(context)),
+                      RepositoryProvider.of<PhoneAuthRepository>(context),),
             ),
           ],
           child: Scaffold(
@@ -141,7 +138,7 @@ class _OtpPageState extends State<OtpPage> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               title: Text(
-                "Verify Phone".tr().toString(),
+                'Verify Phone'.tr().toString(),
                 style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -152,10 +149,9 @@ class _OtpPageState extends State<OtpPage> {
             ),
             body: SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(height: 40),
                     
@@ -185,7 +181,7 @@ class _OtpPageState extends State<OtpPage> {
 
                     // Title
                     Text(
-                      "Enter verification code".tr().toString(),
+                      'Enter verification code'.tr().toString(),
                       style: GoogleFonts.montserrat(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
@@ -200,7 +196,7 @@ class _OtpPageState extends State<OtpPage> {
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                        text: "We sent a code to ".tr().toString(),
+                        text: 'We sent a code to '.tr().toString(),
                         style: GoogleFonts.montserrat(
                           fontSize: 16,
                           color: subtextColor,
@@ -227,7 +223,6 @@ class _OtpPageState extends State<OtpPage> {
                         controller: controller ?? TextEditingController(),
                         keyboardType: TextInputType.number,
                         length: 6,
-                        obscureText: false,
                         animationType: AnimationType.fade,
                         pinTheme: PinTheme(
                           shape: PinCodeFieldShape.box,
@@ -266,8 +261,7 @@ class _OtpPageState extends State<OtpPage> {
                       listener: (context, state) {
                         if (state is PhoneAuthLoading) {}
                       },
-                      builder: (context, state) {
-                        return TimerWidget(
+                      builder: (context, state) => TimerWidget(
                           start: start,
                           resendText:
                               "Didn't receive the code? ".tr().toString(),
@@ -282,8 +276,7 @@ class _OtpPageState extends State<OtpPage> {
                               _initializeOtpInteractor();
                             }
                           },
-                        );
-                      },
+                        ),
                     ),
                     
                     const SizedBox(height: 24),
@@ -324,7 +317,7 @@ class _OtpPageState extends State<OtpPage> {
                                 if (mounted) {
                                   Navigator.of(context).pushNamedAndRemoveUntil(
                                       RouteName.onboarding,
-                                      (route) => false);
+                                      (route) => false,);
                                 }
                               });
                             }
@@ -341,7 +334,7 @@ class _OtpPageState extends State<OtpPage> {
                                 if (mounted) {
                                   Navigator.of(context).pushNamedAndRemoveUntil(
                                       RouteName.onboarding,
-                                      (route) => false);
+                                      (route) => false,);
                                 }
                               });
                             }
@@ -358,10 +351,10 @@ class _OtpPageState extends State<OtpPage> {
                             if (!mounted) return;
                             
                             // This should only be reached for LOGIN flows with complete profiles
-                            log("✅ Navigating to main navigation for existing user login");
+                            log('✅ Navigating to main navigation for existing user login');
                             Navigator.of(context).pushNamedAndRemoveUntil(
                                 RouteName.mainNavigation,
-                                (route) => false);
+                                (route) => false,);
                           });
                         } else if (state is NewRegistration) {
                           log('');
@@ -377,7 +370,7 @@ class _OtpPageState extends State<OtpPage> {
                             if (!_hasNavigated && mounted) {
                               _hasNavigated = true;
                               CustomSnackbar.showSnackBarSimple(
-                                "No account found with this phone number. Please sign up first.",
+                                'No account found with this phone number. Please sign up first.',
                                 context,
                               );
                               Future.microtask(() {
@@ -395,14 +388,14 @@ class _OtpPageState extends State<OtpPage> {
                                 if (mounted) {
                                   Navigator.of(context).pushNamedAndRemoveUntil(
                                       RouteName.onboarding,
-                                      (route) => false);
+                                      (route) => false,);
                                 }
                               });
                             }
                           }
                         } else if (state is RegistrationFailed) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(state.message)));
+                              SnackBar(content: Text(state.message)),);
                         }
                       },
                     ),
@@ -430,12 +423,12 @@ class _OtpPageState extends State<OtpPage> {
                                 : () {
                                     if (widget.codeController.trim().isEmpty) {
                                       CustomSnackbar.showSnackBarSimple(
-                                        "OTP cannot be empty".tr().toString(),
+                                        'OTP cannot be empty'.tr().toString(),
                                         context,
                                       );
                                     } else {
                                       CustomSnackbar.showSnackBarSimple(
-                                        "Please enter all 6 digits".tr().toString(),
+                                        'Please enter all 6 digits'.tr().toString(),
                                         context,
                                       );
                                     }
@@ -471,57 +464,57 @@ class _OtpPageState extends State<OtpPage> {
                         if (state is PhoneAuthVerified) {
                           try {
                             if (state.user != null) {
-                              log("✅ Phone verified, checking registration status...");
+                              log('✅ Phone verified, checking registration status...');
                               state.user!.getIdToken().then((value) async {
                                 if (value != null && mounted && !_hasNavigated) {
-                                  log("Got token after phone verification, dispatching CheckRegistration");
+                                  log('Got token after phone verification, dispatching CheckRegistration');
                                   BlocProvider.of<RegistrationBloc>(context)
                                       .add(CheckRegistration(token: value));
                                 } else if (value == null) {
-                                  log("Error: Token is null after phone verification");
+                                  log('Error: Token is null after phone verification');
                                   if (mounted) {
                                     CustomSnackbar.showSnackBarSimple(
                                         'Authentication error: Token is null',
-                                        context);
+                                        context,);
                                   }
                                 }
                               }).catchError((error) {
-                                log("Error getting token after phone verification: $error");
+                                log('Error getting token after phone verification: $error');
                                 if (mounted && !_hasNavigated) {
                                   CustomSnackbar.showSnackBarSimple(
-                                      'Authentication error: $error', context);
+                                      'Authentication error: $error', context,);
                                 }
                               });
                             } else {
-                              log("Error: User is null after phone verification");
+                              log('Error: User is null after phone verification');
                               if (mounted && !_hasNavigated) {
                                 CustomSnackbar.showSnackBarSimple(
                                     'Authentication error: User is null',
-                                    context);
+                                    context,);
                               }
                             }
                           } catch (e) {
-                            log("Exception during token retrieval after phone verification: $e");
+                            log('Exception during token retrieval after phone verification: $e');
                             if (mounted && !_hasNavigated) {
                               CustomSnackbar.showSnackBarSimple(
-                                  'Authentication error: $e', context);
+                                  'Authentication error: $e', context,);
                             }
                           }
                         } else if (state is PhoneupdateSuccess) {
                           if (!_hasNavigated && mounted) {
                             _hasNavigated = true;
                             Navigator.pushReplacementNamed(
-                                context, RouteName.tabScreen);
+                                context, RouteName.tabScreen,);
                           }
                         } else if (state is PhoneAuthError) {
                           CustomSnackbar.showSnackBarSimple(
-                              state.error, context);
+                              state.error, context,);
                         }
                       },
                     ),
                     const SizedBox(
                       height: 10,
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -537,12 +530,12 @@ class _OtpPageState extends State<OtpPage> {
       context.read<PhoneAuthBloc>().add(OnPhoneNumberupdateEvent(
           phoneNumber: widget.phoneNumber,
           verificationId: widget.verificationId,
-          token: widget.codeController));
-      log("coming under update number");
+          token: widget.codeController,),);
+      log('coming under update number');
     } else {
       context.read<PhoneAuthBloc>().add(VerifySentOtpEvent(
           otpCode: widget.codeController,
-          verificationId: widget.verificationId));
+          verificationId: widget.verificationId,),);
     }
   }
 }

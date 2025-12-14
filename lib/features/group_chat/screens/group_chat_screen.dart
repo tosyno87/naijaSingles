@@ -1,17 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/services/group_chat_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../services/group_chat_service.dart';
 
 /// Group chat screen for displaying and managing group conversations
 class GroupChatScreen extends StatefulWidget {
-  final String groupId;
 
   const GroupChatScreen({
-    super.key,
-    required this.groupId,
+    required this.groupId, super.key,
   });
+  final String groupId;
 
   @override
   State<GroupChatScreen> createState() => _GroupChatScreenState();
@@ -296,10 +296,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ),
           if (isCurrentUser) ...[
             const SizedBox(width: 8),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primaryGreen,
-              child: const Icon(
+              child: Icon(
                 Icons.person,
                 color: Colors.white,
                 size: 16,
@@ -311,8 +311,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
-  Widget _buildMessageInput() {
-    return Container(
+  Widget _buildMessageInput() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -327,7 +326,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(24),
@@ -370,7 +369,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ],
       ),
     );
-  }
 
   String _formatTime(DateTime timestamp) {
     final now = DateTime.now();
@@ -396,8 +394,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
-  Widget _buildGroupInfoSheet() {
-    return Container(
+  Widget _buildGroupInfoSheet() => Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -431,13 +428,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   const SizedBox(height: 20),
                   _buildInfoRow(Icons.group, 'Name', _group!.name),
                   _buildInfoRow(
-                      Icons.description, 'Description', _group!.description),
+                      Icons.description, 'Description', _group!.description,),
                   _buildInfoRow(
-                      Icons.people, 'Members', '${_group!.memberCount}'),
+                      Icons.people, 'Members', '${_group!.memberCount}',),
                   _buildInfoRow(Icons.category, 'Type', _group!.type.name),
                   if (_group!.location != null)
                     _buildInfoRow(
-                        Icons.location_on, 'Location', _group!.location!),
+                        Icons.location_on, 'Location', _group!.location!,),
                   const SizedBox(height: 20),
                   Text(
                     'Members',
@@ -449,7 +446,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   ),
                   const SizedBox(height: 10),
                   ..._group!.memberIds
-                      .map((memberId) => _buildMemberTile(memberId)),
+                      .map(_buildMemberTile),
                 ],
               ),
             ),
@@ -457,10 +454,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
+  Widget _buildInfoRow(IconData icon, String label, String value) => Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
@@ -486,7 +481,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildMemberTile(String memberId) {
     final isAdmin = _group!.adminIds.contains(memberId);

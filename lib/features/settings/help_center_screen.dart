@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:developer';
 
 class HelpCenterScreen extends StatefulWidget {
-  const HelpCenterScreen({Key? key}) : super(key: key);
+  const HelpCenterScreen({super.key});
 
   @override
   State<HelpCenterScreen> createState() => _HelpCenterScreenState();
@@ -23,8 +24,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   final List<String> _tabs = ['FAQ', 'Contact', 'Guides'];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -55,10 +55,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildTabBar() => Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
@@ -101,7 +99,6 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         }).toList(),
       ),
     );
-  }
 
   Widget _buildTabContent() {
     switch (_selectedTabIndex) {
@@ -173,14 +170,11 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: faqs.length,
-      itemBuilder: (context, index) {
-        return _buildFAQItem(faqs[index]);
-      },
+      itemBuilder: (context, index) => _buildFAQItem(faqs[index]),
     );
   }
 
-  Widget _buildFAQItem(Map<String, String> faq) {
-    return Container(
+  Widget _buildFAQItem(Map<String, String> faq) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: cardColor,
@@ -219,10 +213,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildContactTab() {
-    return SingleChildScrollView(
+  Widget _buildContactTab() => SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
@@ -249,7 +241,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                     color: primaryColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.support_agent,
                     size: 40,
                     color: primaryColor,
@@ -314,7 +306,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.schedule, color: primaryColor, size: 20),
+                    const Icon(Icons.schedule, color: primaryColor, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       'Response Time',
@@ -341,7 +333,6 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildContactOption({
     required IconData icon,
@@ -349,8 +340,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
     required String subtitle,
     required String description,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -418,7 +408,6 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildGuidesTab() {
     final guides = [
@@ -475,14 +464,11 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: guides.length,
-      itemBuilder: (context, index) {
-        return _buildGuideItem(guides[index]);
-      },
+      itemBuilder: (context, index) => _buildGuideItem(guides[index]),
     );
   }
 
-  Widget _buildGuideItem(Map<String, dynamic> guide) {
-    return Container(
+  Widget _buildGuideItem(Map<String, dynamic> guide) => Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: cardColor,
@@ -539,7 +525,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                       Container(
                         width: 24,
                         height: 24,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: primaryColor,
                           shape: BoxShape.circle,
                         ),
@@ -574,7 +560,6 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         ],
       ),
     );
-  }
 
   Future<void> _sendEmail(String email) async {
     final Uri emailUri = Uri(

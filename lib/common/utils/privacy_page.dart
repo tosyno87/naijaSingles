@@ -1,15 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/constants/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+import '../constants/colors.dart';
 import '../providers/theme_provider.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
+
+  const PrivacyPolicyPage({required this.url, required this.tittle, super.key});
   final String url;
   final String tittle;
-
-  const PrivacyPolicyPage({super.key, required this.url, required this.tittle});
 
   @override
   PrivacyPolicyPageState createState() => PrivacyPolicyPageState();
@@ -26,7 +27,7 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(
-          themeProvider.isDarkMode ? Colors.white : const Color(0x00000000))
+          themeProvider.isDarkMode ? Colors.white : const Color(0x00000000),)
       ..setNavigationDelegate(NavigationDelegate(
         onPageStarted: (url) {
           setState(() {
@@ -50,15 +51,14 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
           }
           return NavigationDecision.navigate;
         },
-      ))
+      ),)
       ..loadRequest(
         Uri.parse(widget.url),
       );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
@@ -77,6 +77,5 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                 color: primaryColor,
               ),
           ],
-        ));
-  }
+        ),);
 }

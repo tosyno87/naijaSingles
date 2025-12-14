@@ -5,7 +5,7 @@ import '../../user/controllers/onboarding_controller.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class AdditionalPreferencesScreen extends StatefulWidget {
-  const AdditionalPreferencesScreen({Key? key}) : super(key: key);
+  const AdditionalPreferencesScreen({super.key});
 
   @override
   State<AdditionalPreferencesScreen> createState() =>
@@ -24,12 +24,12 @@ class _AdditionalPreferencesScreenState
     {
       'label': 'Friendship',
       'value': 'Friendship',
-      'icon': Icons.people_outline
+      'icon': Icons.people_outline,
     },
     {
       'label': 'Networking',
       'value': 'Networking',
-      'icon': Icons.business_center_outlined
+      'icon': Icons.business_center_outlined,
     },
   ];
 
@@ -37,22 +37,22 @@ class _AdditionalPreferencesScreenState
     {
       'label': 'Short-term fun',
       'value': 'Short-term',
-      'icon': Icons.flash_on_outlined
+      'icon': Icons.flash_on_outlined,
     },
     {
       'label': 'Long-term relationship',
       'value': 'Long-term',
-      'icon': Icons.favorite_border
+      'icon': Icons.favorite_border,
     },
     {
       'label': 'Casual dating',
       'value': 'Casual',
-      'icon': Icons.coffee_outlined
+      'icon': Icons.coffee_outlined,
     },
     {
       'label': 'Not sure yet',
       'value': 'Not sure yet',
-      'icon': Icons.help_outline
+      'icon': Icons.help_outline,
     },
   ];
 
@@ -89,8 +89,7 @@ class _AdditionalPreferencesScreenState
       ),
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
+          builder: (context, constraints) => SingleChildScrollView(
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 32 : 24,
                 vertical: 16,
@@ -164,15 +163,13 @@ class _AdditionalPreferencesScreenState
                     // Continue Button
                     ContinueButton(
                       onPressed: _saveAndContinue,
-                      text: 'Continue',
                     ),
 
                     SizedBox(height: isTablet ? 32 : 24),
                   ],
                 ),
               ),
-            );
-          },
+            ),
         ),
       ),
     );
@@ -182,8 +179,7 @@ class _AdditionalPreferencesScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) {
-      return Padding(
+    return _lookingForOptions.map((option) => Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
         child: SelectionOption(
           label: option['label'],
@@ -196,16 +192,14 @@ class _AdditionalPreferencesScreenState
           },
           icon: option['icon'],
         ),
-      );
-    }).toList();
+      ),).toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) {
-      return Padding(
+    return _relationshipIntentOptions.map((option) => Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
         child: SelectionOption(
           label: option['label'],
@@ -218,8 +212,7 @@ class _AdditionalPreferencesScreenState
           },
           icon: option['icon'],
         ),
-      );
-    }).toList();
+      ),).toList();
   }
 
   void _saveAndContinue() {

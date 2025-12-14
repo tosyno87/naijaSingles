@@ -11,9 +11,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// - Group moderation and reporting
 /// - Group events
 class GroupChatService {
-  static final GroupChatService _instance = GroupChatService._internal();
   factory GroupChatService() => _instance;
   GroupChatService._internal();
+  static final GroupChatService _instance = GroupChatService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -402,11 +402,7 @@ class GroupChatService {
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return GroupMessage.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+        .map((snapshot) => snapshot.docs.map((doc) => GroupMessage.fromMap(doc.id, doc.data())).toList(),);
   }
 
   /// Get user's groups
@@ -422,11 +418,7 @@ class GroupChatService {
         .where('isActive', isEqualTo: true)
         .orderBy('lastMessageAt', descending: true)
         .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return GroupChat.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+        .map((snapshot) => snapshot.docs.map((doc) => GroupChat.fromMap(doc.id, doc.data())).toList(),);
   }
 
   /// Get group details
@@ -581,7 +573,7 @@ class GroupChatService {
 
   /// Notify group members (internal method)
   Future<void> _notifyGroupMembers(String groupId, String message,
-      {String? excludeUserId}) async {
+      {String? excludeUserId,}) async {
     try {
       final groupDoc =
           await _firestore.collection('unifiedGroups').doc(groupId).get();
@@ -632,42 +624,17 @@ enum MessageType {
 
 /// Group chat model
 class GroupChat {
-  final String id;
-  final String name;
-  final String description;
-  final GroupType type;
-  final String? location;
-  final String? eventId;
-  final String creatorId;
-  final List<String> adminIds;
-  final List<String> memberIds;
-  final int memberCount;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime lastMessageAt;
-  final String lastMessageText;
-  final String lastMessageSenderId;
 
   const GroupChat({
     required this.id,
     required this.name,
     required this.description,
     required this.type,
-    this.location,
+    required this.creatorId, required this.adminIds, required this.memberIds, required this.memberCount, required this.isActive, required this.createdAt, required this.lastMessageAt, required this.lastMessageText, required this.lastMessageSenderId, this.location,
     this.eventId,
-    required this.creatorId,
-    required this.adminIds,
-    required this.memberIds,
-    required this.memberCount,
-    required this.isActive,
-    required this.createdAt,
-    required this.lastMessageAt,
-    required this.lastMessageText,
-    required this.lastMessageSenderId,
   });
 
-  factory GroupChat.fromMap(String id, Map<String, dynamic> data) {
-    return GroupChat(
+  factory GroupChat.fromMap(String id, Map<String, dynamic> data) => GroupChat(
       id: id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
@@ -688,42 +655,37 @@ class GroupChat {
       lastMessageText: data['lastMessageText'] ?? '',
       lastMessageSenderId: data['lastMessageSenderId'] ?? '',
     );
-  }
+  final String id;
+  final String name;
+  final String description;
+  final GroupType type;
+  final String? location;
+  final String? eventId;
+  final String creatorId;
+  final List<String> adminIds;
+  final List<String> memberIds;
+  final int memberCount;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime lastMessageAt;
+  final String lastMessageText;
+  final String lastMessageSenderId;
 
   /// Check if user is admin
-  bool isAdmin(String userId) {
-    return adminIds.contains(userId);
-  }
+  bool isAdmin(String userId) => adminIds.contains(userId);
 
   /// Check if user is member
-  bool isMember(String userId) {
-    return memberIds.contains(userId);
-  }
+  bool isMember(String userId) => memberIds.contains(userId);
 
   /// Check if user is creator
-  bool isCreator(String userId) {
-    return creatorId == userId;
-  }
+  bool isCreator(String userId) => creatorId == userId;
 
   @override
-  String toString() {
-    return 'GroupChat($name: $memberCount members)';
-  }
+  String toString() => 'GroupChat($name: $memberCount members)';
 }
 
 /// Group message model
 class GroupMessage {
-  final String id;
-  final String groupId;
-  final String senderId;
-  final String text;
-  final MessageType messageType;
-  final String? mediaUrl;
-  final String? mediaType;
-  final String? replyToMessageId;
-  final DateTime timestamp;
-  final bool isRead;
-  final List<String> readBy;
 
   const GroupMessage({
     required this.id,
@@ -731,16 +693,12 @@ class GroupMessage {
     required this.senderId,
     required this.text,
     required this.messageType,
-    this.mediaUrl,
+    required this.timestamp, required this.isRead, required this.readBy, this.mediaUrl,
     this.mediaType,
     this.replyToMessageId,
-    required this.timestamp,
-    required this.isRead,
-    required this.readBy,
   });
 
-  factory GroupMessage.fromMap(String id, Map<String, dynamic> data) {
-    return GroupMessage(
+  factory GroupMessage.fromMap(String id, Map<String, dynamic> data) => GroupMessage(
       id: id,
       groupId: data['groupId'] ?? '',
       senderId: data['senderId'] ?? '',
@@ -756,15 +714,21 @@ class GroupMessage {
       isRead: data['isRead'] ?? false,
       readBy: List<String>.from(data['readBy'] ?? []),
     );
-  }
+  final String id;
+  final String groupId;
+  final String senderId;
+  final String text;
+  final MessageType messageType;
+  final String? mediaUrl;
+  final String? mediaType;
+  final String? replyToMessageId;
+  final DateTime timestamp;
+  final bool isRead;
+  final List<String> readBy;
 
   /// Check if message is read by user
-  bool isReadBy(String userId) {
-    return readBy.contains(userId);
-  }
+  bool isReadBy(String userId) => readBy.contains(userId);
 
   @override
-  String toString() {
-    return 'GroupMessage($text: ${messageType.name})';
-  }
+  String toString() => 'GroupMessage($text: ${messageType.name})';
 }

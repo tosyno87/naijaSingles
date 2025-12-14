@@ -5,6 +5,18 @@ import '../constants/app_colors.dart';
 /// Reusable styled text field for authentication and form screens
 /// Provides consistent styling with white container, shadow, and validation border
 class AfropeepTextField extends StatefulWidget {
+
+  const AfropeepTextField({
+    required this.controller, required this.hintText, super.key,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.keyboardType,
+    this.obscureText = false,
+    this.validator,
+    this.onChanged,
+    this.showValidationBorder = true,
+    this.validationChecker,
+  });
   final TextEditingController controller;
   final String hintText;
   final IconData? prefixIcon;
@@ -15,20 +27,6 @@ class AfropeepTextField extends StatefulWidget {
   final VoidCallback? onChanged;
   final bool showValidationBorder;
   final bool Function(String)? validationChecker;
-
-  const AfropeepTextField({
-    super.key,
-    required this.controller,
-    required this.hintText,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.keyboardType,
-    this.obscureText = false,
-    this.validator,
-    this.onChanged,
-    this.showValidationBorder = true,
-    this.validationChecker,
-  });
 
   @override
   State<AfropeepTextField> createState() => _AfropeepTextFieldState();

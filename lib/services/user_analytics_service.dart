@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
 
 /// Service for analyzing user demographics and cleaning up incomplete profiles
 class UserAnalyticsService {
@@ -29,10 +28,10 @@ class UserAnalyticsService {
       int incompleteProfiles = 0;
       int veryIncompleteProfiles = 0;
 
-      List<String> incompleteUserIds = [];
-      List<String> veryIncompleteUserIds = [];
+      final List<String> incompleteUserIds = [];
+      final List<String> veryIncompleteUserIds = [];
 
-      Map<String, int> ageGroups = {
+      final Map<String, int> ageGroups = {
         '18-25': 0,
         '26-35': 0,
         '36-45': 0,
@@ -107,13 +106,13 @@ class UserAnalyticsService {
       debugPrint('📈 Analytics Summary:');
       debugPrint('   Total Users: ${analytics.totalUsers}');
       debugPrint(
-          '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)');
+          '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
       debugPrint(
-          '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)');
+          '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
       debugPrint('   Complete Profiles: ${analytics.completeProfiles}');
       debugPrint('   Incomplete Profiles: ${analytics.incompleteProfiles}');
       debugPrint(
-          '   Very Incomplete Profiles: ${analytics.veryIncompleteProfiles}');
+          '   Very Incomplete Profiles: ${analytics.veryIncompleteProfiles}',);
 
       return analytics;
     } catch (e) {
@@ -124,9 +123,9 @@ class UserAnalyticsService {
 
   /// Analyze individual profile completeness
   static ProfileCompleteness _analyzeProfileCompleteness(
-      Map<String, dynamic> data) {
+      Map<String, dynamic> data,) {
     int score = 0;
-    List<String> missingFields = [];
+    final List<String> missingFields = [];
 
     // Essential fields (60 points total)
     if (data['name'] != null && data['name'].toString().isNotEmpty) {
@@ -195,7 +194,7 @@ class UserAnalyticsService {
       }
 
       debugPrint(
-          '🗑️ Deleting ${userIdsToDelete.length} very incomplete profiles...');
+          '🗑️ Deleting ${userIdsToDelete.length} very incomplete profiles...',);
 
       int deletedCount = 0;
       for (final userId in userIdsToDelete) {
@@ -238,24 +237,24 @@ class UserAnalyticsService {
       final analytics = await analyzeUsers();
 
       // Check if we have enough users for good matching
-      bool hasEnoughUsers = analytics.totalUsers >= 10;
-      bool hasGoodGenderBalance =
+      final bool hasEnoughUsers = analytics.totalUsers >= 10;
+      final bool hasGoodGenderBalance =
           analytics.maleCount > 0 && analytics.femaleCount > 0;
-      bool hasCompleteProfiles = analytics.completeProfiles >= 5;
+      final bool hasCompleteProfiles = analytics.completeProfiles >= 5;
 
       // Calculate gender balance ratio
-      double genderBalance = 0.0;
+      double genderBalance = 0;
       if (analytics.maleCount + analytics.femaleCount > 0) {
         genderBalance =
             analytics.maleCount / (analytics.maleCount + analytics.femaleCount);
       }
 
       // Determine algorithm readiness
-      bool isReady =
+      final bool isReady =
           hasEnoughUsers && hasGoodGenderBalance && hasCompleteProfiles;
 
-      String status = isReady ? 'Ready' : 'Needs Improvement';
-      List<String> recommendations = [];
+      final String status = isReady ? 'Ready' : 'Needs Improvement';
+      final List<String> recommendations = [];
 
       if (!hasEnoughUsers) {
         recommendations
@@ -263,15 +262,15 @@ class UserAnalyticsService {
       }
       if (!hasGoodGenderBalance) {
         recommendations.add(
-            'Need both male and female users (M: ${analytics.maleCount}, F: ${analytics.femaleCount})');
+            'Need both male and female users (M: ${analytics.maleCount}, F: ${analytics.femaleCount})',);
       }
       if (!hasCompleteProfiles) {
         recommendations.add(
-            'Need at least 5 complete profiles (currently: ${analytics.completeProfiles})');
+            'Need at least 5 complete profiles (currently: ${analytics.completeProfiles})',);
       }
       if (genderBalance < 0.2 || genderBalance > 0.8) {
         recommendations.add(
-            'Gender balance is skewed (${(genderBalance * 100).toStringAsFixed(1)}% male)');
+            'Gender balance is skewed (${(genderBalance * 100).toStringAsFixed(1)}% male)',);
       }
 
       return AlgorithmStatus(
@@ -293,17 +292,6 @@ class UserAnalyticsService {
 
 /// User analytics data model
 class UserAnalytics {
-  final int totalUsers;
-  final int maleCount;
-  final int femaleCount;
-  final int otherGenderCount;
-  final int unknownGenderCount;
-  final int completeProfiles;
-  final int incompleteProfiles;
-  final int veryIncompleteProfiles;
-  final List<String> incompleteUserIds;
-  final List<String> veryIncompleteUserIds;
-  final Map<String, int> ageGroups;
 
   UserAnalytics({
     required this.totalUsers,
@@ -319,8 +307,7 @@ class UserAnalytics {
     required this.ageGroups,
   });
 
-  factory UserAnalytics.empty() {
-    return UserAnalytics(
+  factory UserAnalytics.empty() => UserAnalytics(
       totalUsers: 0,
       maleCount: 0,
       femaleCount: 0,
@@ -333,15 +320,21 @@ class UserAnalytics {
       veryIncompleteUserIds: [],
       ageGroups: {},
     );
-  }
+  final int totalUsers;
+  final int maleCount;
+  final int femaleCount;
+  final int otherGenderCount;
+  final int unknownGenderCount;
+  final int completeProfiles;
+  final int incompleteProfiles;
+  final int veryIncompleteProfiles;
+  final List<String> incompleteUserIds;
+  final List<String> veryIncompleteUserIds;
+  final Map<String, int> ageGroups;
 }
 
 /// Profile completeness data model
 class ProfileCompleteness {
-  final int score;
-  final List<String> missingFields;
-  final bool isComplete;
-  final bool isVeryIncomplete;
 
   ProfileCompleteness({
     required this.score,
@@ -349,14 +342,14 @@ class ProfileCompleteness {
     required this.isComplete,
     required this.isVeryIncomplete,
   });
+  final int score;
+  final List<String> missingFields;
+  final bool isComplete;
+  final bool isVeryIncomplete;
 }
 
 /// Cleanup result data model
 class CleanupResult {
-  final int deletedCount;
-  final int remainingUsers;
-  final bool success;
-  final String? error;
 
   CleanupResult({
     required this.deletedCount,
@@ -364,18 +357,14 @@ class CleanupResult {
     required this.success,
     this.error,
   });
+  final int deletedCount;
+  final int remainingUsers;
+  final bool success;
+  final String? error;
 }
 
 /// Algorithm status data model
 class AlgorithmStatus {
-  final bool isReady;
-  final String status;
-  final int totalUsers;
-  final int maleCount;
-  final int femaleCount;
-  final int completeProfiles;
-  final double genderBalance;
-  final List<String> recommendations;
 
   AlgorithmStatus({
     required this.isReady,
@@ -388,16 +377,22 @@ class AlgorithmStatus {
     required this.recommendations,
   });
 
-  factory AlgorithmStatus.error(String error) {
-    return AlgorithmStatus(
+  factory AlgorithmStatus.error(String error) => AlgorithmStatus(
       isReady: false,
       status: 'Error',
       totalUsers: 0,
       maleCount: 0,
       femaleCount: 0,
       completeProfiles: 0,
-      genderBalance: 0.0,
+      genderBalance: 0,
       recommendations: ['Error: $error'],
     );
-  }
+  final bool isReady;
+  final String status;
+  final int totalUsers;
+  final int maleCount;
+  final int femaleCount;
+  final int completeProfiles;
+  final double genderBalance;
+  final List<String> recommendations;
 }

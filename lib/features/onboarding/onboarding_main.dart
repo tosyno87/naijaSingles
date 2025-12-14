@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
 import '../user/controllers/onboarding_controller.dart';
 import 'screens/basic_info_screen.dart';
-import 'screens/location_screen.dart';
+import 'screens/enhanced_additional_info_screen.dart';
 import 'screens/enhanced_bio_screen.dart';
 import 'screens/enhanced_interests_screen.dart';
 import 'screens/enhanced_photo_upload_screen.dart';
-import 'screens/tribe_selection_screen.dart';
+import 'screens/location_screen.dart';
 import 'screens/preferences_onboarding_screen.dart';
-import 'screens/enhanced_additional_info_screen.dart';
+import 'screens/tribe_selection_screen.dart';
 
 class OnboardingMain extends StatefulWidget {
   const OnboardingMain({super.key});
@@ -24,14 +25,14 @@ class _OnboardingMainState extends State<OnboardingMain> {
   final int _totalPages = 8; // Updated to include location screen
 
   final List<String> _pageNames = [
-    "Basic Info",
-    "Your Location",
-    "Your Tribe",
-    "Tell Your Story",
-    "Your Interests",
-    "Profile Photo",
-    "Dating Preferences",
-    "Additional Info"
+    'Basic Info',
+    'Your Location',
+    'Your Tribe',
+    'Tell Your Story',
+    'Your Interests',
+    'Profile Photo',
+    'Dating Preferences',
+    'Additional Info',
   ];
 
   @override
@@ -47,21 +48,21 @@ class _OnboardingMainState extends State<OnboardingMain> {
     // Debug: Print current controller state
     debugPrint('🔍 OnboardingMain: Current page: $_currentPage');
     debugPrint(
-        '🔍 OnboardingMain: Controller instance: ${controller.hashCode}');
+        '🔍 OnboardingMain: Controller instance: ${controller.hashCode}',);
     debugPrint('🔍 OnboardingMain: Controller state:');
     debugPrint(
-        '   Name: "${controller.fullName}" (length: ${controller.fullName.length})');
+        '   Name: "${controller.fullName}" (length: ${controller.fullName.length})',);
     debugPrint('   DOB: ${controller.dateOfBirth}');
     debugPrint(
-        '   Gender: "${controller.gender}" (length: ${controller.gender.length})');
+        '   Gender: "${controller.gender}" (length: ${controller.gender.length})',);
     debugPrint('   Location: "${controller.locationName ?? 'Not set'}"');
     debugPrint(
-        '   Tribe: "${controller.tribe}" (length: ${controller.tribe.length})');
+        '   Tribe: "${controller.tribe}" (length: ${controller.tribe.length})',);
     debugPrint(
-        '   Bio: "${controller.bio}" (length: ${controller.bio.length})');
+        '   Bio: "${controller.bio}" (length: ${controller.bio.length})',);
     debugPrint('   Interests: ${controller.interests}');
     debugPrint(
-        '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5');
+        '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5',);
     debugPrint('   Photo validation: ${controller.isPhotoUploaded()}');
     debugPrint('   Height: ${controller.heightDisplay}');
     debugPrint('   Looking For: ${controller.lookingFor}');
@@ -74,19 +75,19 @@ class _OnboardingMainState extends State<OnboardingMain> {
       // Basic Info page
       if (controller.fullName.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please enter your full name")),
+          const SnackBar(content: Text('Please enter your full name')),
         );
         return;
       }
       if (controller.dateOfBirth == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select your date of birth")),
+          const SnackBar(content: Text('Please select your date of birth')),
         );
         return;
       }
       if (controller.gender.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select your gender")),
+          const SnackBar(content: Text('Please select your gender')),
         );
         return;
       }
@@ -95,7 +96,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (controller.locationName == null ||
           controller.locationName!.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select your location")),
+          const SnackBar(content: Text('Please select your location')),
         );
         return;
       }
@@ -103,7 +104,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       // Tribe selection page
       if (controller.tribe.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select your tribe")),
+          const SnackBar(content: Text('Please select your tribe')),
         );
         return;
       }
@@ -112,7 +113,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (controller.bio.trim().isEmpty || controller.bio.trim().length < 50) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text("Please write a bio (at least 50 characters)")),
+              content: Text('Please write a bio (at least 50 characters)'),),
         );
         return;
       }
@@ -121,7 +122,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (controller.interests.length < 5) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text("Please complete the interests selection process")),
+              content: Text('Please complete the interests selection process'),),
         );
         return;
       }
@@ -129,7 +130,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       // Photo upload page
       if (!controller.isPhotoUploaded()) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please upload at least 3 photos")),
+          const SnackBar(content: Text('Please upload at least 3 photos')),
         );
         return;
       }
@@ -139,7 +140,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (controller.interestedIn.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text("Please select who you're interested in")),
+              content: Text("Please select who you're interested in"),),
         );
         return;
       }
@@ -148,14 +149,14 @@ class _OnboardingMainState extends State<OnboardingMain> {
       // Enhanced validation for new fields
       if (controller.height <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please set your height")),
+          const SnackBar(content: Text('Please set your height')),
         );
         return;
       }
       if (controller.lookingFor.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text("Please select what brings you to Afropeep")),
+              content: Text('Please select what brings you to Afropeep'),),
         );
         return;
       }
@@ -165,7 +166,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
           controller.relationshipIntent.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text("Please select your relationship goals")),
+              content: Text('Please select your relationship goals'),),
         );
         return;
       }
@@ -208,7 +209,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
     debugPrint('   Bio: ${controller.bio}');
     debugPrint('   Interests: ${controller.interests}');
     debugPrint(
-        '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5');
+        '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5',);
     debugPrint('   Height: ${controller.heightDisplay}');
     debugPrint('   Looking For: ${controller.lookingFor}');
     debugPrint('   Relationship Intent: ${controller.relationshipIntent}');
@@ -220,8 +221,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.celebration, color: Colors.white),
-            SizedBox(width: 8),
+            const Icon(Icons.celebration, color: Colors.white),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Profile Complete! 🎉 Welcome to Afropeep!',
@@ -235,7 +236,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
           ],
         ),
         backgroundColor: Colors.green.shade600,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -249,7 +250,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (mounted) {
         // Check if widget is still mounted before showing snackbar
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $error")),
+          SnackBar(content: Text('Error: $error')),
         );
       }
     });
@@ -303,7 +304,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
             children: [
               // Progress indicator
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: LinearProgressIndicator(
                   value: (_currentPage + 1) / _totalPages,
                   backgroundColor: Colors.grey.shade300,
@@ -338,7 +339,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
               // Next labelLarge
               Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(24),
                 child: Consumer<OnboardingController>(
                   builder: (context, controller, _) {
                     bool canContinue = false;
@@ -380,17 +381,17 @@ class _OnboardingMainState extends State<OnboardingMain> {
                     // Debug logging for continue labelLarge state
                     if (_currentPage >= 5) {
                       debugPrint(
-                          '🔍 Continue labelLarge state for page $_currentPage:');
+                          '🔍 Continue labelLarge state for page $_currentPage:',);
                       debugPrint('   canContinue: $canContinue');
                       if (_currentPage == 5) {
                         debugPrint(
-                            '   interestedIn: "${controller.interestedIn}"');
+                            '   interestedIn: "${controller.interestedIn}"',);
                         debugPrint('   ageRange: ${controller.ageRange}');
                       } else if (_currentPage == 6) {
                         debugPrint('   height: ${controller.height}');
                         debugPrint('   lookingFor: "${controller.lookingFor}"');
                         debugPrint(
-                            '   relationshipIntent: "${controller.relationshipIntent}"');
+                            '   relationshipIntent: "${controller.relationshipIntent}"',);
                       }
                     }
 
@@ -411,8 +412,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         ),
                         child: Text(
                           _currentPage < _totalPages - 1
-                              ? "Continue"
-                              : "Finish",
+                              ? 'Continue'
+                              : 'Finish',
                           style: GoogleFonts.montserrat(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,

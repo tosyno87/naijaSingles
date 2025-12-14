@@ -1,18 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../../../data/models/enhanced_event_model.dart';
 
 class AdvancedSettingsStep extends StatefulWidget {
-  final EventCreationData eventData;
 
   const AdvancedSettingsStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
   State<AdvancedSettingsStep> createState() => _AdvancedSettingsStepState();
@@ -54,8 +55,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,10 +85,8 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 24,
@@ -96,10 +94,8 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         color: const Color(0xFF333333),
       ),
     );
-  }
 
-  Widget _buildPhotosSection() {
-    return Column(
+  Widget _buildPhotosSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -145,14 +141,12 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         if (widget.eventData.imageUrls.isNotEmpty) _buildImagePreview(),
       ],
     );
-  }
 
   Widget _buildImageUploadButton({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-  }) {
-    return InkWell(
+  }) => InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -183,10 +177,8 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         ),
       ),
     );
-  }
 
-  Widget _buildImagePreview() {
-    return Container(
+  Widget _buildImagePreview() => Container(
       margin: const EdgeInsets.only(top: 16),
       child: GridView.builder(
         shrinkWrap: true,
@@ -195,18 +187,13 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
           crossAxisCount: 3,
           crossAxisSpacing: 8,
           mainAxisSpacing: 8,
-          childAspectRatio: 1,
         ),
         itemCount: widget.eventData.imageUrls.length,
-        itemBuilder: (context, index) {
-          return _buildImageItem(widget.eventData.imageUrls[index], index);
-        },
+        itemBuilder: (context, index) => _buildImageItem(widget.eventData.imageUrls[index], index),
       ),
     );
-  }
 
-  Widget _buildImageItem(String imagePath, int index) {
-    return Container(
+  Widget _buildImageItem(String imagePath, int index) => DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFE0E0E0)),
@@ -245,10 +232,8 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         ),
       ),
     );
-  }
 
-  Widget _buildTicketingSection() {
-    return Column(
+  Widget _buildTicketingSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -262,7 +247,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         const SizedBox(height: 16),
 
         // Free/Paid Toggle
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -296,7 +281,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
                     }
                   });
                 },
-                activeColor: const Color(0xFF008037),
+                activeThumbColor: const Color(0xFF008037),
               ),
             ],
           ),
@@ -305,7 +290,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         // Price Input (only for paid events)
         if (!widget.eventData.isFree) ...[
           const SizedBox(height: 16),
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -341,10 +326,8 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         ],
       ],
     );
-  }
 
-  Widget _buildCapacitySection() {
-    return Column(
+  Widget _buildCapacitySection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -364,7 +347,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -398,7 +381,6 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
         ),
       ],
     );
-  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -437,13 +419,9 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
               aspectRatioLockEnabled: true,
               resetAspectRatioEnabled: false,
               aspectRatioPickerButtonHidden: true,
-              rotateButtonsHidden: false,
-              rotateClockwiseButtonHidden: false,
               hidesNavigationBar: false,
             ),
           ],
-          compressFormat: ImageCompressFormat.jpg,
-          compressQuality: 90,
           maxWidth: 1200,
           maxHeight: 1200,
         );

@@ -3,22 +3,18 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// Reusable selection option widget for onboarding screens
 class SelectionOption extends StatelessWidget {
+
+  const SelectionOption({
+    required this.label, required this.value, required this.selectedValue, required this.onSelected, super.key,
+    this.icon,
+    this.isFullWidth = true,
+  });
   final String label;
   final String value;
   final String selectedValue;
   final Function(String) onSelected;
   final IconData? icon;
   final bool isFullWidth;
-
-  const SelectionOption({
-    Key? key,
-    required this.label,
-    required this.value,
-    required this.selectedValue,
-    required this.onSelected,
-    this.icon,
-    this.isFullWidth = true,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -87,14 +83,13 @@ class SelectionOption extends StatelessWidget {
 
 /// Reusable section header widget
 class SectionHeader extends StatelessWidget {
-  final String title;
-  final String? subtitle;
 
   const SectionHeader({
-    Key? key,
-    required this.title,
+    required this.title, super.key,
     this.subtitle,
-  }) : super(key: key);
+  });
+  final String title;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -128,16 +123,13 @@ class SectionHeader extends StatelessWidget {
 
 /// Height input widget with unit toggle
 class HeightInput extends StatefulWidget {
+
+  const HeightInput({
+    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+  });
   final double initialHeight;
   final String initialUnit;
   final Function(double height, String unit) onChanged;
-
-  const HeightInput({
-    Key? key,
-    required this.initialHeight,
-    required this.initialUnit,
-    required this.onChanged,
-  }) : super(key: key);
 
   @override
   State<HeightInput> createState() => _HeightInputState();
@@ -161,9 +153,9 @@ class _HeightInputState extends State<HeightInput> {
       _controller = TextEditingController(text: _height.round().toString());
     } else {
       // Convert cm to feet and inches
-      double totalInches = _height / 2.54;
-      int feet = (totalInches / 12).floor();
-      int inches = (totalInches % 12).round();
+      final double totalInches = _height / 2.54;
+      final int feet = (totalInches / 12).floor();
+      final int inches = (totalInches % 12).round();
       _controller = TextEditingController(text: '$feet\'$inches"');
     }
   }
@@ -326,9 +318,9 @@ class _HeightInputState extends State<HeightInput> {
   }
 
   String _convertToFeetInches(double cm) {
-    double totalInches = cm / 2.54;
-    int feet = (totalInches / 12).floor();
-    int inches = (totalInches % 12).round();
+    final double totalInches = cm / 2.54;
+    final int feet = (totalInches / 12).floor();
+    final int inches = (totalInches % 12).round();
     return "$feet'$inches\"";
   }
 
@@ -341,16 +333,15 @@ class _HeightInputState extends State<HeightInput> {
 
 /// Reusable continue labelLarge
 class ContinueButton extends StatelessWidget {
+
+  const ContinueButton({
+    required this.onPressed, super.key,
+    this.text = 'Continue',
+    this.isEnabled = true,
+  });
   final VoidCallback onPressed;
   final String text;
   final bool isEnabled;
-
-  const ContinueButton({
-    Key? key,
-    required this.onPressed,
-    this.text = 'Continue',
-    this.isEnabled = true,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

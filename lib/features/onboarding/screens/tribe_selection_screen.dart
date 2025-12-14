@@ -80,15 +80,14 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+  Widget build(BuildContext context) => SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Description text
           Text(
-            "This helps us connect you with people from similar backgrounds",
+            'This helps us connect you with people from similar backgrounds',
             style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textLightBrown,
@@ -105,7 +104,6 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
               border: Border.all(
                 color:
                     _selectedTribe != null ? afropeepGreen : Colors.transparent,
-                width: 1,
               ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -113,25 +111,23 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
               child: DropdownButton<String>(
                 value: _selectedTribe,
                 hint: Text(
-                  "Select your tribe",
+                  'Select your tribe',
                   style: GoogleFonts.montserrat(
                     color: textLightBrown,
                     fontSize: 16,
                   ),
                 ),
                 isExpanded: true,
-                icon: Icon(Icons.arrow_drop_down, color: afropeepGreen),
+                icon: const Icon(Icons.arrow_drop_down, color: afropeepGreen),
                 dropdownColor: cardBackground,
                 style: GoogleFonts.montserrat(
                   color: textDarkBrown,
                   fontSize: 16,
                 ),
-                items: _mainTribes.map((String tribe) {
-                  return DropdownMenuItem<String>(
+                items: _mainTribes.map((String tribe) => DropdownMenuItem<String>(
                     value: tribe,
                     child: Text(tribe),
-                  );
-                }).toList(),
+                  ),).toList(),
                 onChanged: _selectTribe,
               ),
             ),
@@ -141,7 +137,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
           if (_showOtherField) ...[
             const SizedBox(height: 24),
             Text(
-              "Please specify your tribe",
+              'Please specify your tribe',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -158,7 +154,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: cardBackground,
-                hintText: "Enter your tribe",
+                hintText: 'Enter your tribe',
                 hintStyle: GoogleFonts.montserrat(
                   color: textLightBrown,
                 ),
@@ -168,7 +164,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: afropeepGreen, width: 2),
+                  borderSide: const BorderSide(color: afropeepGreen, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -186,5 +182,4 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
         ],
       ),
     );
-  }
 }

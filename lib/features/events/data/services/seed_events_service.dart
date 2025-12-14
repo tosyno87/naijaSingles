@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/event_model.dart';
+
 import '../../../../common/utils/app_logger.dart';
+import '../models/event_model.dart';
 
 class SeedEventsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -51,7 +52,7 @@ class SeedEventsService {
             'Experience the best of Afrobeats music with top DJs and live performances. Dance the night away to the latest hits from Nigeria, Ghana, and across Africa.',
         startDate: now.add(const Duration(days: 7)),
         endDate: now.add(const Duration(days: 7, hours: 6)),
-        location: EventLocation(
+        location: const EventLocation(
           name: 'Victoria Island, Lagos',
           address: 'Victoria Island, Lagos, Nigeria',
           latitude: 6.4281,
@@ -63,7 +64,6 @@ class SeedEventsService {
         isFree: false,
         createdAt: now,
         updatedAt: now,
-        status: EventStatus.published,
         createdByUserId: systemUserId,
       ),
       EventModel(
@@ -73,7 +73,7 @@ class SeedEventsService {
             'Discover contemporary African art, traditional crafts, and cultural artifacts. Meet local artists and learn about African heritage and traditions.',
         startDate: now.add(const Duration(days: 14)),
         endDate: now.add(const Duration(days: 16)),
-        location: EventLocation(
+        location: const EventLocation(
           name: 'National Theatre, Iganmu, Lagos',
           address: 'National Theatre, Iganmu, Lagos, Nigeria',
           latitude: 6.4698,
@@ -85,7 +85,6 @@ class SeedEventsService {
         isFree: false,
         createdAt: now,
         updatedAt: now,
-        status: EventStatus.published,
         createdByUserId: systemUserId,
       ),
       EventModel(
@@ -95,7 +94,7 @@ class SeedEventsService {
             'Taste authentic Nigerian cuisine from different regions. Enjoy jollof rice, suya, pounded yam, and more delicious traditional dishes.',
         startDate: now.add(const Duration(days: 21)),
         endDate: now.add(const Duration(days: 21, hours: 8)),
-        location: EventLocation(
+        location: const EventLocation(
           name: 'Tafawa Balewa Square, Lagos',
           address: 'Tafawa Balewa Square, Lagos, Nigeria',
           latitude: 6.4541,
@@ -107,7 +106,6 @@ class SeedEventsService {
         isFree: false,
         createdAt: now,
         updatedAt: now,
-        status: EventStatus.published,
         createdByUserId: systemUserId,
       ),
       EventModel(
@@ -117,7 +115,7 @@ class SeedEventsService {
             'Connect with fellow Nigerians living abroad and locals. Share experiences, network, and build lasting friendships in the diaspora community.',
         startDate: now.add(const Duration(days: 10)),
         endDate: now.add(const Duration(days: 10, hours: 4)),
-        location: EventLocation(
+        location: const EventLocation(
           name: 'Radisson Blu Anchorage Hotel, Victoria Island',
           address: 'Radisson Blu Anchorage Hotel, Victoria Island, Lagos',
           latitude: 6.4269,
@@ -129,7 +127,6 @@ class SeedEventsService {
         isFree: true,
         createdAt: now,
         updatedAt: now,
-        status: EventStatus.published,
         createdByUserId: systemUserId,
       ),
       EventModel(
@@ -139,7 +136,7 @@ class SeedEventsService {
             'Learn traditional and modern Afro-Caribbean dance moves. Suitable for all skill levels. Bring comfortable clothes and dancing shoes!',
         startDate: now.add(const Duration(days: 5)),
         endDate: now.add(const Duration(days: 5, hours: 3)),
-        location: EventLocation(
+        location: const EventLocation(
           name: 'Terra Kulture, Victoria Island',
           address: 'Terra Kulture, Victoria Island, Lagos',
           latitude: 6.4302,
@@ -151,7 +148,6 @@ class SeedEventsService {
         isFree: false,
         createdAt: now,
         updatedAt: now,
-        status: EventStatus.published,
         createdByUserId: systemUserId,
       ),
     ];

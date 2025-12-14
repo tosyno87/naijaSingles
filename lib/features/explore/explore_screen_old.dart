@@ -1,12 +1,14 @@
 import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/features/explore/screens/tribe_connect_screen.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/data/repo/user_search_repo.dart';
+
+import '../../common/data/repo/user_search_repo.dart';
+import '../../common/providers/user_provider.dart';
+import '../../models/user_model.dart';
+import 'screens/tribe_connect_screen.dart';
 
 // Afropeep MVP Color Scheme
 const Color kBackgroundColor = Colors.white; // Clean white
@@ -17,13 +19,13 @@ const Color kBorderColor = Color(0xFFDADADA); // Light gray border
 const Color kRedColor = Color(0xFFFF5A5F); // Red for dislike
 
 class ExploreScreen extends StatefulWidget {
-  // Add a parameter to track if this screen was navigated from Messages
-  final bool showBackButton;
 
   const ExploreScreen({
-    Key? key,
+    super.key,
     this.showBackButton = false, // Default to false (no back labelLarge)
-  }) : super(key: key);
+  });
+  // Add a parameter to track if this screen was navigated from Messages
+  final bool showBackButton;
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
@@ -63,7 +65,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateUndoState();
     });
-    log("ExploreScreen initialized");
+    log('ExploreScreen initialized');
   }
 
   Future<void> _loadCurrentUser() async {
@@ -155,7 +157,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       });
 
       _loadSwipeItems();
-      log("Loaded ${users.length} users from Firebase with intent filter: $_selectedIntent");
+      log('Loaded ${users.length} users from Firebase with intent filter: $_selectedIntent');
 
       // Initialize undo state
       _updateUndoState();
@@ -171,8 +173,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   void _loadSwipeItems() {
     if (_users.isEmpty) return;
 
-    _swipeItems = _users.map((user) {
-      return SwipeItem(
+    _swipeItems = _users.map((user) => SwipeItem(
         content: user,
         likeAction: () {
           handleLike(user);
@@ -183,13 +184,12 @@ class _ExploreScreenState extends State<ExploreScreen>
         superlikeAction: () {
           handleSave(user);
         },
-      );
-    }).toList();
+      ),).toList();
 
     _matchEngine = MatchEngine(swipeItems: _swipeItems);
   }
 
-  void handleLike(UserModel user) async {
+  Future<void> handleLike(UserModel user) async {
     if (_currentUser == null) return;
 
     log('🔥 LIKE ACTION: ${_currentUser!.name} (${_currentUser!.id}) likes ${user.name} (${user.id})');
@@ -208,10 +208,10 @@ class _ExploreScreenState extends State<ExploreScreen>
         log('🎉 MATCH DETECTED! Match ID: $matchId');
         // Show match confirmation modal
         _showMatchConfirmation(
-          _currentUser!.imageUrl?.isNotEmpty == true
+          _currentUser!.imageUrl?.isNotEmpty ?? false
               ? _currentUser!.imageUrl![0]
               : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-          user.imageUrl?.isNotEmpty == true ? user.imageUrl![0] : '',
+          user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
           user.name ?? 'Unknown',
           user.id,
         );
@@ -229,16 +229,16 @@ class _ExploreScreenState extends State<ExploreScreen>
     } catch (e) {
       log('❌ Error handling like: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Like saved! 💕'),
           backgroundColor: kPrimaryColor,
-          duration: const Duration(seconds: 2),
+          duration: Duration(seconds: 2),
         ),
       );
     }
   }
 
-  void handlePass(UserModel user) async {
+  Future<void> handlePass(UserModel user) async {
     if (_currentUser == null) return;
 
     log('Passed: ${user.name}');
@@ -272,7 +272,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  void handleSuperLike(UserModel user) async {
+  Future<void> handleSuperLike(UserModel user) async {
     if (_currentUser == null) return;
 
     log('⭐ SUPER LIKE ACTION: ${_currentUser!.name} super likes ${user.name}');
@@ -306,10 +306,10 @@ class _ExploreScreenState extends State<ExploreScreen>
         if (result.isInstantMatch) {
           log('🎉 SUPER LIKE INSTANT MATCH! Match ID: ${result.matchId}');
           _showMatchConfirmation(
-            _currentUser!.imageUrl?.isNotEmpty == true
+            _currentUser!.imageUrl?.isNotEmpty ?? false
                 ? _currentUser!.imageUrl![0]
                 : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-            user.imageUrl?.isNotEmpty == true ? user.imageUrl![0] : '',
+            user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
             user.name ?? 'Unknown',
             user.id,
           );
@@ -334,16 +334,16 @@ class _ExploreScreenState extends State<ExploreScreen>
     } catch (e) {
       log('❌ Error handling super like: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Super like saved! ⭐'),
           backgroundColor: Colors.blue,
-          duration: const Duration(seconds: 2),
+          duration: Duration(seconds: 2),
         ),
       );
     }
   }
 
-  void handleUndo() async {
+  Future<void> handleUndo() async {
     if (_currentUser == null) return;
 
     log('↩️ UNDO ACTION');
@@ -356,10 +356,10 @@ class _ExploreScreenState extends State<ExploreScreen>
         await _loadUsers();
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('↩️ Pass undone! You\'ll see them again.'),
             backgroundColor: Colors.purple,
-            duration: const Duration(seconds: 2),
+            duration: Duration(seconds: 2),
           ),
         );
 
@@ -377,16 +377,16 @@ class _ExploreScreenState extends State<ExploreScreen>
     } catch (e) {
       log('❌ Error handling undo: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Cannot undo at this time'),
           backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 2),
+          duration: Duration(seconds: 2),
         ),
       );
     }
   }
 
-  void _updateUndoState() async {
+  Future<void> _updateUndoState() async {
     if (_currentUser?.id != null) {
       final canUndo = await _undoService.canUndoLastSwipe(_currentUser!.id!);
       log('🔄 Undo state updated: canUndo = $canUndo');
@@ -492,16 +492,13 @@ class _ExploreScreenState extends State<ExploreScreen>
     // Show the redesigned match confirmation modal
     showDialog(
       context: context,
-      barrierDismissible: true,
       barrierColor: Colors.black.withValues(alpha: 0.6),
-      builder: (BuildContext context) {
-        return MatchConfirmationModal(
+      builder: (BuildContext context) => MatchConfirmationModal(
           currentUserImageUrl: currentUserImageUrl,
           matchedUserImageUrl: matchedUserImageUrl,
           matchedUserName: matchedUserName,
           matchedUserId: matchedUserId ?? '',
-        );
-      },
+        ),
     );
 
     // Also show a snackbar notification when the modal is dismissed
@@ -509,7 +506,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("You and $matchedUserName matched!"),
+            content: Text('You and $matchedUserName matched!'),
             backgroundColor: kPrimaryColor,
             duration: const Duration(seconds: 3),
           ),
@@ -536,25 +533,22 @@ class _ExploreScreenState extends State<ExploreScreen>
             // Clean header with undo and filter
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Undo button (always show if user is loaded)
-                      _currentUser != null
-                          ? IconButton(
+                      if (_currentUser != null) IconButton(
                               icon: Icon(Icons.undo,
                                   color: _canUndo ? Colors.purple : Colors.grey,
-                                  size: 24),
+                                  size: 24,),
                               onPressed: _canUndo ? handleUndo : null,
                               tooltip: _canUndo
                                   ? 'Undo last pass'
                                   : 'No pass to undo',
-                            )
-                          : const SizedBox(width: 48),
+                            ) else const SizedBox(width: 48),
 
                       // Title
                       Text(
@@ -570,10 +564,8 @@ class _ExploreScreenState extends State<ExploreScreen>
                       Stack(
                         children: [
                           IconButton(
-                            icon: Icon(Icons.tune, color: kTextPrimary),
-                            onPressed: () {
-                              _showIntentSelector();
-                            },
+                            icon: const Icon(Icons.tune, color: kTextPrimary),
+                            onPressed: _showIntentSelector,
                             tooltip: 'Filter preferences',
                           ),
                           // Active filter indicator
@@ -584,7 +576,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                               child: Container(
                                 width: 8,
                                 height: 8,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: kPrimaryColor,
                                   shape: BoxShape.circle,
                                 ),
@@ -598,14 +590,14 @@ class _ExploreScreenState extends State<ExploreScreen>
                   // Current filter indicator
                   if (_selectedIntent != 'Dating')
                     Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 8),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: kPrimaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: kPrimaryColor, width: 1),
+                          border: Border.all(color: kPrimaryColor),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -634,7 +626,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                                 setState(() => _selectedIntent = 'Dating');
                                 _loadUsers();
                               },
-                              child: Icon(
+                              child: const Icon(
                                 Icons.close,
                                 size: 16,
                                 color: kPrimaryColor,
@@ -711,7 +703,7 @@ class _ExploreScreenState extends State<ExploreScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: kPrimaryColor),
+            const CircularProgressIndicator(color: kPrimaryColor),
             const SizedBox(height: 16),
             Text(
               'Loading users...',
@@ -752,7 +744,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                 backgroundColor: kPrimaryColor,
                 foregroundColor: Colors.white,
               ),
-              child: Text('Retry'),
+              child: const Text('Retry'),
             ),
           ],
         ),
@@ -792,7 +784,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0), // Remove bottom padding
+      padding: const EdgeInsets.only(top: 8), // Remove bottom padding
       child: SwipeCards(
         matchEngine: _matchEngine,
         itemBuilder: (BuildContext context, int index) {
@@ -805,7 +797,7 @@ class _ExploreScreenState extends State<ExploreScreen>
           _loadUsers();
         },
         itemChanged: (SwipeItem item, int index) {
-          log('Item changed: ${index}');
+          log('Item changed: $index');
         },
         upSwipeAllowed: true,
         fillSpace: true,
@@ -840,14 +832,13 @@ class _ExploreScreenState extends State<ExploreScreen>
 
 // Profile Card Widget with fade-in animation
 class ProfileCard extends StatefulWidget {
-  final UserModel user;
-  final String? selectedMode;
 
   const ProfileCard({
-    Key? key,
-    required this.user,
+    required this.user, super.key,
     this.selectedMode,
-  }) : super(key: key);
+  });
+  final UserModel user;
+  final String? selectedMode;
 
   @override
   State<ProfileCard> createState() => _ProfileCardState();
@@ -866,7 +857,7 @@ class _ProfileCardState extends State<ProfileCard>
       duration: const Duration(milliseconds: 500),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _fadeController,
         curve: Curves.easeIn,
@@ -885,18 +876,17 @@ class _ProfileCardState extends State<ProfileCard>
 
   @override
   Widget build(BuildContext context) {
-    final cardPadding = 16.0;
+    const cardPadding = 16.0;
     final photos = widget.user.imageUrl ?? [];
 
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 12.0,
+          horizontal: 16,
+          vertical: 12,
         ),
         child: Material(
-          elevation: 0,
           borderRadius: BorderRadius.circular(20),
           color: kBackgroundColor,
           child: GestureDetector(
@@ -912,7 +902,7 @@ class _ProfileCardState extends State<ProfileCard>
                 ),
               );
             },
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: const [
@@ -931,7 +921,7 @@ class _ProfileCardState extends State<ProfileCard>
                     children: [
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
+                            top: Radius.circular(20),),
                         child: AspectRatio(
                           aspectRatio: 4 / 3,
                           child: photos.isNotEmpty
@@ -967,7 +957,7 @@ class _ProfileCardState extends State<ProfileCard>
                           right: 12,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                                horizontal: 8, vertical: 4,),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.7),
                               borderRadius: BorderRadius.circular(12),
@@ -975,7 +965,7 @@ class _ProfileCardState extends State<ProfileCard>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.photo_library,
                                   color: Colors.white,
                                   size: 14,
@@ -1011,7 +1001,7 @@ class _ProfileCardState extends State<ProfileCard>
                               ),
                             ],
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.visibility,
                             color: Colors.white,
                             size: 16,
@@ -1048,7 +1038,7 @@ class _ProfileCardState extends State<ProfileCard>
 
                   // User info
                   Padding(
-                    padding: EdgeInsets.all(cardPadding),
+                    padding: const EdgeInsets.all(cardPadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1067,7 +1057,7 @@ class _ProfileCardState extends State<ProfileCard>
                         if (widget.user.address != null)
                           Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.location_on,
                                 size: 16,
                                 color: kTextSecondary,
@@ -1092,7 +1082,7 @@ class _ProfileCardState extends State<ProfileCard>
                         if (widget.user.distanceBW != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 8),
+                                horizontal: 14, vertical: 8,),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
@@ -1143,7 +1133,7 @@ class _ProfileCardState extends State<ProfileCard>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.touch_app,
                               size: 16,
                               color: kPrimaryColor,

@@ -11,7 +11,7 @@ void main() {
       print('🧪 Testing chat list navigation...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 5));
+      await tester.pumpAndSettle(const Duration(seconds: 5));
 
       // Look for chat/messages tab or button
       final chatIcons = find.byIcon(Icons.chat);
@@ -54,7 +54,7 @@ void main() {
       print('🧪 Testing chat list display...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for list elements
       final listViews = find.byType(ListView);
@@ -86,7 +86,7 @@ void main() {
       print('🧪 Testing individual chat screen...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for message input field
       final textFields = find.byWidgetPredicate(
@@ -121,7 +121,7 @@ void main() {
       print('🧪 Testing message bubbles and display...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for message containers/bubbles
       final containers = find.byType(Container);
@@ -150,7 +150,7 @@ void main() {
       print('🧪 Testing chat actions...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for more options or menu
       final moreIcons = find.byIcon(Icons.more_vert);
@@ -190,7 +190,7 @@ void main() {
       print('🧪 Testing message delivery status...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for delivery status icons
       final checkIcons = find.byIcon(Icons.check);

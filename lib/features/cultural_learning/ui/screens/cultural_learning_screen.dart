@@ -5,7 +5,7 @@ import '../widgets/cultural_story_card.dart';
 import '../widgets/language_exchange_card.dart';
 
 class CulturalLearningScreen extends StatefulWidget {
-  const CulturalLearningScreen({Key? key}) : super(key: key);
+  const CulturalLearningScreen({super.key});
 
   @override
   State<CulturalLearningScreen> createState() => _CulturalLearningScreenState();
@@ -28,8 +28,7 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Column(
@@ -50,10 +49,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildHeader() {
-    return Container(
+  Widget _buildHeader() => Container(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,10 +74,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildTabBar() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -116,10 +111,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildCulturalStoriesTab() {
-    return ListView(
+  Widget _buildCulturalStoriesTab() => ListView(
       padding: const EdgeInsets.all(20),
       children: [
         CulturalStoryCard(
@@ -183,10 +176,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildLanguageExchangeTab() {
-    return ListView(
+  Widget _buildLanguageExchangeTab() => ListView(
       padding: const EdgeInsets.all(20),
       children: [
         LanguageExchangeCard(
@@ -253,10 +244,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildCulturalEventsTab() {
-    return Center(
+  Widget _buildCulturalEventsTab() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -286,5 +275,4 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ],
       ),
     );
-  }
 }

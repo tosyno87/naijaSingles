@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
+
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:developer';
 
 /// Industry-standard deep linking service
 /// Features:
@@ -9,9 +10,9 @@ import 'dart:developer';
 /// - Handle incoming links
 /// - Fallback to web version
 class DeepLinkingService {
-  static final DeepLinkingService _instance = DeepLinkingService._internal();
   factory DeepLinkingService() => _instance;
   DeepLinkingService._internal();
+  static final DeepLinkingService _instance = DeepLinkingService._internal();
 
   final StreamController<DeepLinkData> _linkStreamController =
       StreamController<DeepLinkData>.broadcast();
@@ -199,9 +200,6 @@ class DeepLinkingService {
 
 /// Deep link data model
 class DeepLinkData {
-  final String type;
-  final Map<String, String> parameters;
-  final DateTime timestamp;
 
   const DeepLinkData({
     required this.type,
@@ -209,16 +207,15 @@ class DeepLinkData {
     required this.timestamp,
   });
 
-  factory DeepLinkData.fromUri(Uri uri) {
-    return DeepLinkData(
+  factory DeepLinkData.fromUri(Uri uri) => DeepLinkData(
       type: uri.pathSegments.isNotEmpty ? uri.pathSegments.first : 'unknown',
       parameters: uri.queryParameters,
       timestamp: DateTime.now(),
     );
-  }
+  final String type;
+  final Map<String, String> parameters;
+  final DateTime timestamp;
 
   @override
-  String toString() {
-    return 'DeepLinkData(type: $type, parameters: $parameters, timestamp: $timestamp)';
-  }
+  String toString() => 'DeepLinkData(type: $type, parameters: $parameters, timestamp: $timestamp)';
 }

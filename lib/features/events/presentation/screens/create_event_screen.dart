@@ -1,27 +1,30 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/utils/app_logger.dart';
+import '../../data/models/enhanced_event_model.dart';
+import '../../data/services/event_templates_service.dart';
 import '../bloc/event_creation_bloc.dart';
+import '../widgets/create_event_steps/advanced_settings_step.dart';
 import '../widgets/create_event_steps/basic_info_step.dart';
 import '../widgets/create_event_steps/cultural_heritage_step.dart';
 import '../widgets/create_event_steps/datetime_step.dart';
 import '../widgets/create_event_steps/location_step.dart';
-import '../widgets/create_event_steps/advanced_settings_step.dart';
 import '../widgets/create_event_steps/preview_step.dart';
-import '../../data/models/enhanced_event_model.dart';
-import '../../data/services/event_templates_service.dart';
 
-class CreateEventScreen extends StatefulWidget {
-  final EnhancedEventModel? existingEvent; // For editing existing events
-  final EventTemplate? template; // For template-based creation
+class CreateEventScreen extends StatefulWidget { // For template-based creation
 
   const CreateEventScreen({
-    Key? key,
+    super.key,
     this.existingEvent,
     this.template,
-  }) : super(key: key);
+  });
+  final EnhancedEventModel? existingEvent; // For editing existing events
+  final EventTemplate? template;
 
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -100,8 +103,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(),
       body: BlocListener<EventCreationBloc, EventCreationState>(
@@ -128,10 +130,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ),
       ),
     );
-  }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
+  PreferredSizeWidget _buildAppBar() => AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
       leading: IconButton(
@@ -176,10 +176,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           ),
       ],
     );
-  }
 
-  Widget _buildProgressIndicator() {
-    return Container(
+  Widget _buildProgressIndicator() => Container(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
@@ -192,7 +190,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 child: Container(
                   height: 4,
                   margin: EdgeInsets.only(
-                      right: index < _stepTitles.length - 1 ? 8 : 0),
+                      right: index < _stepTitles.length - 1 ? 8 : 0,),
                   decoration: BoxDecoration(
                     color: isCompleted || isActive
                         ? const Color(0xFF008037)
@@ -215,10 +213,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildNavigationButtons() {
-    return Container(
+  Widget _buildNavigationButtons() => Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -293,7 +289,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ],
       ),
     );
-  }
 
   String _getNextButtonText() {
     if (_currentStep == _stepTitles.length - 1) {
@@ -528,7 +523,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               children: [
                 // Close button
                 Expanded(
-                  flex: 1,
                   child: TextButton(
                     onPressed: () {
                       Navigator.of(context).pop(); // Close dialog
@@ -552,10 +546,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   flex: 2,
                   child: ElevatedButton(
                     onPressed: () {
-                      print('[DEBUG] View My Events button pressed');
+                      AppLogger.debug('[DEBUG] View My Events button pressed');
                       // Close the dialog first
                       Navigator.of(context).pop();
-                      print('[DEBUG] Dialog closed, navigating to My Events');
+                      AppLogger.debug('[DEBUG] Dialog closed, navigating to My Events');
 
                       // Navigate to My Events page
                       _navigateToMyEvents();
@@ -603,21 +597,21 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  void _navigateToMyEvents() async {
-    print('[DEBUG] _navigateToMyEvents called');
+  Future<void> _navigateToMyEvents() async {
+    AppLogger.debug('[DEBUG] _navigateToMyEvents called');
 
     // Get context references before async operations
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
-      print('[DEBUG] Attempting to navigate to My Events screen');
+      AppLogger.debug('[DEBUG] Attempting to navigate to My Events screen');
       // Replace the current create event screen with My Events screen
       // This ensures back button goes to the screen before create event
       await navigator.pushReplacementNamed(RouteName.myEvents);
-      print('[DEBUG] Navigation to My Events successful');
+      AppLogger.debug('[DEBUG] Navigation to My Events successful');
     } catch (e) {
-      print('[DEBUG] Navigation failed: $e, using fallback');
+      AppLogger.error('[DEBUG] Navigation failed', error: e);
       // Fallback navigation - go back to main navigation
       navigator.pushNamedAndRemoveUntil(
         RouteName.mainNavigation,
@@ -628,7 +622,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     // Show success message after navigation
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        print('[DEBUG] Showing success snackbar');
+        AppLogger.debug('[DEBUG] Showing success snackbar');
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
@@ -640,7 +634,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -667,7 +660,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     if (_hasUnsavedChanges) {
       showDialog(
         context: context,
-        barrierDismissible: true,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,

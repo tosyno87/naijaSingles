@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// Service for managing unread message counts and indicators for groups
 class GroupUnreadService {
-  static final GroupUnreadService _instance = GroupUnreadService._internal();
   factory GroupUnreadService() => _instance;
   GroupUnreadService._internal();
+  static final GroupUnreadService _instance = GroupUnreadService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -48,7 +48,7 @@ class GroupUnreadService {
         'count': 0,
         'lastReadAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      }, SetOptions(merge: true),);
 
       // Mark all unread messages as read
       final unreadMessages = await _firestore
@@ -75,7 +75,7 @@ class GroupUnreadService {
 
   /// Increment unread count for a group (called when new message arrives)
   Future<void> incrementUnreadCount(String groupId,
-      {String? excludeUserId}) async {
+      {String? excludeUserId,}) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null || currentUserId == excludeUserId) return;
@@ -104,7 +104,7 @@ class GroupUnreadService {
                 'count': FieldValue.increment(1),
                 'updatedAt': FieldValue.serverTimestamp(),
               },
-              SetOptions(merge: true));
+              SetOptions(merge: true),);
         }
       }
       await batch.commit();

@@ -1,24 +1,20 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:ui';
-import 'package:flutter/foundation.dart';
 
-import '../../messages/services/chat_service.dart';
 import '../../messages/chat_thread_screen.dart';
+import '../../messages/services/chat_service.dart';
 
 class MatchConfirmationModal extends StatefulWidget {
+
+  const MatchConfirmationModal({
+    required this.currentUserImageUrl, required this.matchedUserImageUrl, required this.matchedUserName, required this.matchedUserId, super.key,
+  });
   final String currentUserImageUrl;
   final String matchedUserImageUrl;
   final String matchedUserName;
   final String matchedUserId;
-
-  const MatchConfirmationModal({
-    Key? key,
-    required this.currentUserImageUrl,
-    required this.matchedUserImageUrl,
-    required this.matchedUserName,
-    required this.matchedUserId,
-  }) : super(key: key);
 
   @override
   State<MatchConfirmationModal> createState() => _MatchConfirmationModalState();
@@ -40,17 +36,17 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
       duration: const Duration(milliseconds: 800),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.elasticOut,
       ),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
+        curve: const Interval(0.4, 1, curve: Curves.easeIn),
       ),
     );
 
@@ -196,7 +192,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: Text(
-                    "You and ${widget.matchedUserName} like each other",
+                    'You and ${widget.matchedUserName} like each other',
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: const Color(0xFF4E2B1B).withValues(alpha: 0.8),
@@ -240,9 +236,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                 const SizedBox(height: 40),
 
                 // Action labelLarges
-                isWideScreen
-                    ? _buildHorizontalButtons()
-                    : _buildVerticalButtons(),
+                if (isWideScreen) _buildHorizontalButtons() else _buildVerticalButtons(),
               ],
             ),
           ),
@@ -251,8 +245,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
     );
   }
 
-  Widget _buildProfileAvatar(String imageUrl) {
-    return Container(
+  Widget _buildProfileAvatar(String imageUrl) => Container(
       width: 100,
       height: 100,
       decoration: BoxDecoration(
@@ -281,10 +274,8 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         ),
       ),
     );
-  }
 
-  Widget _buildHorizontalButtons() {
-    return Row(
+  Widget _buildHorizontalButtons() => Row(
       children: [
         // Keep Exploring labelLarge
         Expanded(
@@ -350,10 +341,8 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         ),
       ],
     );
-  }
 
-  Widget _buildVerticalButtons() {
-    return Column(
+  Widget _buildVerticalButtons() => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Send Message labelLarge
@@ -416,5 +405,4 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
         ),
       ],
     );
-  }
 }

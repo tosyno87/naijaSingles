@@ -13,12 +13,11 @@ import '../../data/models/rsvp_model.dart';
 import '../../data/services/events_firestore_service.dart';
 
 class EventDetailsScreen extends StatefulWidget {
-  final EventModel event;
 
   const EventDetailsScreen({
-    Key? key,
-    required this.event,
-  }) : super(key: key);
+    required this.event, super.key,
+  });
+  final EventModel event;
 
   @override
   State<EventDetailsScreen> createState() => _EventDetailsScreenState();
@@ -41,8 +40,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
+  Widget build(BuildContext context) => BlocProvider(
       create: (context) => RSVPBloc(
         firestoreService: EventsFirestoreService(),
         currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
@@ -54,7 +52,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               context.read<RSVPBloc>().add(LoadEventAttendeesEvent(
                     eventId: widget.event.id,
-                  ));
+                  ),);
             });
           }
 
@@ -74,10 +72,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         },
       ),
     );
-  }
 
-  Widget _buildSliverAppBar() {
-    return SliverAppBar(
+  Widget _buildSliverAppBar() => SliverAppBar(
       expandedHeight: 350,
       pinned: true,
       backgroundColor: Colors.transparent,
@@ -114,7 +110,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           ),
           child: IconButton(
             icon: const Icon(Icons.favorite_border,
-                color: Colors.white, size: 20),
+                color: Colors.white, size: 20,),
             onPressed: _toggleFavorite,
           ),
         ),
@@ -123,13 +119,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            widget.event.imageUrl != null && widget.event.imageUrl!.isNotEmpty
-                ? CachedNetworkImage(
+            if (widget.event.imageUrl != null && widget.event.imageUrl!.isNotEmpty) CachedNetworkImage(
                     imageUrl: widget.event.imageUrl!,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: const Color(0xFFF5F5F5),
-                      child: const Center(
+                    placeholder: (context, url) => const ColoredBox(
+                      color: Color(0xFFF5F5F5),
+                      child: Center(
                         child: CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
                         ),
@@ -137,8 +132,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     ),
                     errorWidget: (context, url, error) =>
                         _buildPlaceholderImage(),
-                  )
-                : _buildPlaceholderImage(),
+                  ) else _buildPlaceholderImage(),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -175,7 +169,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       // Category chip
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: const Color(0xFF008037),
                           borderRadius: BorderRadius.circular(16),
@@ -193,7 +187,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       // Paid/Free chip
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: widget.event.isFree
                               ? Colors.grey.withOpacity(0.8)
@@ -218,10 +212,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildPlaceholderImage() {
-    return Container(
+  Widget _buildPlaceholderImage() => ColoredBox(
       color: const Color(0xFF008037),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -243,10 +235,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildEventDetails() {
-    return Container(
+  Widget _buildEventDetails() => DecoratedBox(
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -270,10 +260,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildStatsRow() {
-    return Padding(
+  Widget _buildStatsRow() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -297,14 +285,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String value,
     required String label,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(
           icon,
@@ -329,10 +315,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildDateTimeCard() {
-    return Container(
+  Widget _buildDateTimeCard() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -387,10 +371,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildLocationCard() {
-    return Container(
+  Widget _buildLocationCard() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -462,7 +444,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildEventDescription() {
     if (widget.event.description.isEmpty) return const SizedBox.shrink();
@@ -540,8 +521,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     );
   }
 
-  Widget _buildEventAttendees() {
-    return Padding(
+  Widget _buildEventAttendees() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -558,7 +538,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               ),
               const Spacer(),
               TextButton(
-                onPressed: () => _showAllAttendees(),
+                onPressed: _showAllAttendees,
                 child: Text(
                   'See All',
                   style: GoogleFonts.montserrat(
@@ -578,10 +558,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildSimilarEvents() {
-    return Padding(
+  Widget _buildSimilarEvents() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -595,13 +573,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          Container(
+          SizedBox(
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: 5, // Mock similar events
-              itemBuilder: (context, index) {
-                return Container(
+              itemBuilder: (context, index) => Container(
                   width: 200,
                   margin: EdgeInsets.only(right: index == 4 ? 0 : 16),
                   decoration: BoxDecoration(
@@ -650,17 +627,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ],
                     ),
                   ),
-                );
-              },
+                ),
             ),
           ),
         ],
       ),
     );
-  }
 
-  Widget _buildBottomActionBar() {
-    return BlocBuilder<RSVPBloc, RSVPState>(
+  Widget _buildBottomActionBar() => BlocBuilder<RSVPBloc, RSVPState>(
       builder: (context, state) {
         bool isGoing = false;
         if (state is EventRSVPStatusLoaded) {
@@ -683,7 +657,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             child: SizedBox(
               width: double.infinity,
               height: 56,
-              child: Container(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: const Color(0xFF008037),
                   borderRadius: BorderRadius.circular(20),
@@ -705,7 +679,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                             status: isGoing
                                 ? RSVPStatus.notGoing
                                 : RSVPStatus.going,
-                          ));
+                          ),);
                     },
                     borderRadius: BorderRadius.circular(20),
                     child: Center(
@@ -737,7 +711,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         );
       },
     );
-  }
 
   IconData _getCategoryIcon() {
     switch (widget.event.category.toLowerCase()) {
@@ -814,7 +787,7 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
     );
   }
 
-  void _openMaps() async {
+  Future<void> _openMaps() async {
     if (widget.event.location.latitude != null &&
         widget.event.location.longitude != null) {
       final url =
@@ -842,8 +815,7 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
         initialChildSize: 0.7,
         maxChildSize: 0.9,
         minChildSize: 0.5,
-        builder: (context, scrollController) {
-          return Container(
+        builder: (context, scrollController) => DecoratedBox(
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -880,8 +852,7 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
                 ),
               ],
             ),
-          );
-        },
+          ),
       ),
     );
   }

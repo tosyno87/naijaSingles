@@ -117,7 +117,7 @@ void _generateForCity(String cityKey, int count) {
   final cityCoords = _getCityCoords(cityKey);
 
   print('🏙️ $cityName (${cityCoords['lat']}, ${cityCoords['lng']})');
-  print('${'=' * (cityName.length + 20)}');
+  print('=' * (cityName.length + 20));
 
   final maleCount = count ~/ 2;
   final femaleCount = count ~/ 2;
@@ -188,51 +188,47 @@ String _generateBio(List<String> interests, String occupation) {
   return bios[Random().nextInt(bios.length)];
 }
 
-String _getCityName(String cityKey) {
-  return {
+String _getCityName(String cityKey) => {
     'atlanta': 'Atlanta, GA',
     'miami': 'Miami, FL',
     'houston': 'Houston, TX',
   }[cityKey] ?? cityKey;
-}
 
-Map<String, double> _getCityCoords(String cityKey) {
-  return {
+Map<String, double> _getCityCoords(String cityKey) => {
     'atlanta': {'lat': 33.7490, 'lng': -84.3880},
     'miami': {'lat': 25.7617, 'lng': -80.1918},
     'houston': {'lat': 29.7604, 'lng': -95.3698},
   }[cityKey] ?? {'lat': 0.0, 'lng': 0.0};
-}
 
 // Test data constants
 const List<String> _maleNames = [
   'James', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas',
   'Christopher', 'Charles', 'Daniel', 'Matthew', 'Anthony', 'Mark',
-  'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin'
+  'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin',
 ];
 
 const List<String> _femaleNames = [
   'Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara',
   'Susan', 'Jessica', 'Sarah', 'Karen', 'Nancy', 'Lisa', 'Betty',
-  'Helen', 'Sandra', 'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle'
+  'Helen', 'Sandra', 'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle',
 ];
 
 const List<String> _lastNames = [
   'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller',
   'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez',
-  'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'
+  'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
 ];
 
 const List<String> _interests = [
   'Travel', 'Photography', 'Music', 'Cooking', 'Fitness', 'Reading',
   'Movies', 'Dancing', 'Sports', 'Art', 'Technology', 'Fashion',
   'Food', 'Adventure', 'Yoga', 'Gaming', 'Hiking', 'Coffee',
-  'Wine', 'Volunteering', 'Languages', 'Business', 'Education'
+  'Wine', 'Volunteering', 'Languages', 'Business', 'Education',
 ];
 
 const List<String> _occupations = [
   'Software Engineer', 'Marketing Manager', 'Teacher', 'Doctor', 'Lawyer',
   'Artist', 'Entrepreneur', 'Sales Representative', 'Designer', 'Consultant',
   'Nurse', 'Accountant', 'Chef', 'Photographer', 'Writer', 'Engineer',
-  'Business Analyst', 'Project Manager', 'Real Estate Agent', 'Therapist'
+  'Business Analyst', 'Project Manager', 'Real Estate Agent', 'Therapist',
 ];

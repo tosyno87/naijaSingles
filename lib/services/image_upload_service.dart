@@ -1,15 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 
 /// Service for handling image uploads to Firebase Storage
 class ImageUploadService {
-  static final ImageUploadService _instance = ImageUploadService._internal();
   factory ImageUploadService() => _instance;
   ImageUploadService._internal();
+  static final ImageUploadService _instance = ImageUploadService._internal();
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
@@ -118,7 +119,7 @@ class ImageUploadService {
         '.jpeg',
         '.png',
         '.gif',
-        '.webp'
+        '.webp',
       ];
 
       if (!allowedExtensions.contains(extension)) {
@@ -140,11 +141,9 @@ class ImageUploadService {
   }
 
   /// Show image picker dialog
-  Future<File?> showImagePickerDialog() async {
-    return await showDialog<File>(
+  Future<File?> showImagePickerDialog() async => showDialog<File>(
       context: navigatorKey.currentContext!,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
           title: const Text('Select Image'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -155,14 +154,14 @@ class ImageUploadService {
                 onTap: () async {
                   Navigator.pop(context);
                   final File? image =
-                      await pickImage(source: ImageSource.gallery);
+                      await pickImage();
                   if (image != null && validateImage(image)) {
                     Navigator.pop(context, image);
                   } else if (image != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                            'Invalid image. Please select a valid image file.'),
+                            'Invalid image. Please select a valid image file.',),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -182,7 +181,7 @@ class ImageUploadService {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                            'Invalid image. Please select a valid image file.'),
+                            'Invalid image. Please select a valid image file.',),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -191,10 +190,8 @@ class ImageUploadService {
               ),
             ],
           ),
-        );
-      },
+        ),
     );
-  }
 }
 
 // Global navigator key for accessing context

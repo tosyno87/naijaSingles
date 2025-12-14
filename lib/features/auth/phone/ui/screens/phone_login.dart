@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../common/widgets/custom_snackbar.dart';
+
 import '../../../../../common/routes/route_name.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
 
 class PhoneNumber extends StatefulWidget {
-  final bool updatePhoneNumber;
 
-  const PhoneNumber({Key? key, required this.updatePhoneNumber})
-      : super(key: key);
+  const PhoneNumber({required this.updatePhoneNumber, super.key});
+  final bool updatePhoneNumber;
 
   @override
   State<PhoneNumber> createState() => _PhoneNumberState();
@@ -65,7 +65,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     // Define colors - Consistent with phone signup screen
     const Color backgroundColor = Colors.white; // White background (MVP color)
@@ -84,7 +84,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Sign In with Phone",
+          'Sign In with Phone',
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -95,12 +95,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Center(
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Phone icon with Afrocentric style
                   Container(
@@ -127,7 +126,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   const SizedBox(height: 32),
 
                   Text(
-                    "Enter your phone number",
+                    'Enter your phone number',
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
@@ -147,7 +146,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   const SizedBox(height: 40),
 
               // Phone number input with country code
-              Container(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -168,14 +167,12 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         border: Border(
                           right: BorderSide(
                             color: Colors.grey.withValues(alpha: 0.3),
-                            width: 1,
                           ),
                         ),
                       ),
                       child: DropdownButton<String>(
                         value: _selectedCountryCode,
                         icon: const Icon(Icons.arrow_drop_down),
-                        iconSize: 24,
                         elevation: 16,
                         style: GoogleFonts.montserrat(
                           fontSize: 16,
@@ -190,12 +187,10 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           });
                         },
                         items: _countryCodes.map<DropdownMenuItem<String>>(
-                            (Map<String, String> value) {
-                          return DropdownMenuItem<String>(
+                            (Map<String, String> value) => DropdownMenuItem<String>(
                             value: value['code'],
                             child: Text("${value['code']} (${value['name']})"),
-                          );
-                        }).toList(),
+                          ),).toList(),
                       ),
                     ),
 
@@ -209,7 +204,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           color: textColor,
                         ),
                         decoration: InputDecoration(
-                          hintText: "Phone number",
+                          hintText: 'Phone number',
                           hintStyle: GoogleFonts.montserrat(
                             color: Colors.grey,
                           ),
@@ -257,7 +252,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                               ),
                             )
                           : Text(
-                              "Continue",
+                              'Continue',
                               style: GoogleFonts.montserrat(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -284,7 +279,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           Navigator.pushReplacementNamed(context, '/welcome');
                         },
                         child: Text(
-                          "Sign Up",
+                          'Sign Up',
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

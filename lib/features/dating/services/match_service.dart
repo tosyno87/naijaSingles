@@ -157,7 +157,7 @@ class MatchService {
     final List<MatchedUser> filteredMatches = List.from(_allPotentialMatches);
 
     // Apply filters based on user preferences
-    if (controller.tribe != null && controller.tribe!.isNotEmpty) {
+    if (controller.tribe.isNotEmpty) {
       // Prioritize matches from the same tribe but don't exclude others
       filteredMatches.sort((a, b) {
         if (a.tribe == controller.tribe && b.tribe != controller.tribe) {
@@ -251,7 +251,7 @@ class MatchService {
 
       case 'same_tribe':
         // Get matches from the same tribe
-        if (controller.tribe != null && controller.tribe!.isNotEmpty) {
+        if (controller.tribe.isNotEmpty) {
           matches = _allPotentialMatches
               .where((match) => match.tribe == controller.tribe)
               .toList();
@@ -290,16 +290,14 @@ class MatchService {
   }
 
   /// Get all available match categories
-  static List<String> getAvailableCategories() {
-    return ['nearby', 'same_tribe', 'shared_interests'];
-  }
+  static List<String> getAvailableCategories() => ['nearby', 'same_tribe', 'shared_interests'];
 
   /// Calculate match compatibility score between two users
   static double calculateMatchScore(
     MatchedUser user1,
     MatchedUser user2,
   ) {
-    double score = 0.0;
+    double score = 0;
     int factors = 0;
 
     // Location compatibility (30% weight)

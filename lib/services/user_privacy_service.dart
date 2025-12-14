@@ -4,22 +4,6 @@ import 'package:flutter/foundation.dart';
 
 /// Privacy settings for user profile visibility
 class UserPrivacySettings {
-  // Communication Settings
-  final bool allowMessagesFromMatches;
-
-  // Activity Status
-  final bool showOnlineStatus;
-  final bool showLastActive;
-
-  // Profile Visibility
-  final bool showTribe;
-  final bool showOrientation;
-  final bool showAge;
-  final bool hideFromDiscovery;
-
-  // Location Privacy
-  final bool showLocation;
-  final bool showDistance;
 
   const UserPrivacySettings({
     // Communication defaults
@@ -40,8 +24,42 @@ class UserPrivacySettings {
     this.showDistance = true,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
+  factory UserPrivacySettings.fromMap(Map<String, dynamic> map) => UserPrivacySettings(
+      // Communication
+      allowMessagesFromMatches: map['allowMessagesFromMatches'] ?? true,
+
+      // Activity Status
+      showOnlineStatus: map['showOnlineStatus'] ?? true,
+      showLastActive: map['showLastActive'] ?? true,
+
+      // Profile Visibility
+      showTribe: map['showTribe'] ?? true,
+      showOrientation: map['showOrientation'] ?? false,
+      showAge: map['showAge'] ?? true,
+      hideFromDiscovery: map['hideFromDiscovery'] ?? false,
+
+      // Location Privacy
+      showLocation: map['showLocation'] ?? true,
+      showDistance: map['showDistance'] ?? true,
+    );
+  // Communication Settings
+  final bool allowMessagesFromMatches;
+
+  // Activity Status
+  final bool showOnlineStatus;
+  final bool showLastActive;
+
+  // Profile Visibility
+  final bool showTribe;
+  final bool showOrientation;
+  final bool showAge;
+  final bool hideFromDiscovery;
+
+  // Location Privacy
+  final bool showLocation;
+  final bool showDistance;
+
+  Map<String, dynamic> toMap() => {
       // Communication
       'allowMessagesFromMatches': allowMessagesFromMatches,
 
@@ -61,28 +79,6 @@ class UserPrivacySettings {
 
       'updatedAt': FieldValue.serverTimestamp(),
     };
-  }
-
-  factory UserPrivacySettings.fromMap(Map<String, dynamic> map) {
-    return UserPrivacySettings(
-      // Communication
-      allowMessagesFromMatches: map['allowMessagesFromMatches'] ?? true,
-
-      // Activity Status
-      showOnlineStatus: map['showOnlineStatus'] ?? true,
-      showLastActive: map['showLastActive'] ?? true,
-
-      // Profile Visibility
-      showTribe: map['showTribe'] ?? true,
-      showOrientation: map['showOrientation'] ?? false,
-      showAge: map['showAge'] ?? true,
-      hideFromDiscovery: map['hideFromDiscovery'] ?? false,
-
-      // Location Privacy
-      showLocation: map['showLocation'] ?? true,
-      showDistance: map['showDistance'] ?? true,
-    );
-  }
 
   UserPrivacySettings copyWith({
     // Communication
@@ -101,8 +97,7 @@ class UserPrivacySettings {
     // Location Privacy
     bool? showLocation,
     bool? showDistance,
-  }) {
-    return UserPrivacySettings(
+  }) => UserPrivacySettings(
       // Communication
       allowMessagesFromMatches:
           allowMessagesFromMatches ?? this.allowMessagesFromMatches,
@@ -121,7 +116,6 @@ class UserPrivacySettings {
       showLocation: showLocation ?? this.showLocation,
       showDistance: showDistance ?? this.showDistance,
     );
-  }
 }
 
 /// Service for managing user privacy settings
@@ -193,7 +187,7 @@ class UserPrivacyService {
       if (!userDoc.exists) return;
 
       final userData = userDoc.data()!;
-      Map<String, dynamic> publicData = {};
+      final Map<String, dynamic> publicData = {};
 
       // Always include basic info
       publicData['name'] = userData['name'];
@@ -290,8 +284,8 @@ class UserPrivacyService {
 
   /// Filter user data based on privacy settings
   Map<String, dynamic> _filterUserData(
-      Map<String, dynamic> userData, UserPrivacySettings privacy) {
-    Map<String, dynamic> filteredData = {
+      Map<String, dynamic> userData, UserPrivacySettings privacy,) {
+    final Map<String, dynamic> filteredData = {
       'name': userData['name'],
       'bio': userData['bio'],
       'photos': userData['photos'],
@@ -347,7 +341,7 @@ class UserPrivacyService {
 
       // Check if users are matched
       // This would integrate with your existing match checking logic
-      bool areMatched = await _checkIfMatched(currentUserId!, targetUserId);
+      final bool areMatched = await _checkIfMatched(currentUserId!, targetUserId);
 
       if (areMatched && privacy.allowMessagesFromMatches) {
         return true;
@@ -387,7 +381,7 @@ class UserPrivacyService {
 
   /// Get privacy summary for display
   String getPrivacySummary(UserPrivacySettings settings) {
-    List<String> activeSettings = [];
+    final List<String> activeSettings = [];
 
     if (settings.hideFromDiscovery) {
       return 'Profile hidden from discovery';
@@ -397,8 +391,9 @@ class UserPrivacyService {
     if (!settings.showTribe) activeSettings.add('Tribe hidden');
     if (!settings.showOrientation) activeSettings.add('Orientation private');
     if (!settings.showLocation) activeSettings.add('Location private');
-    if (!settings.allowMessagesFromMatches)
+    if (!settings.allowMessagesFromMatches) {
       activeSettings.add('Messages restricted');
+    }
 
     if (activeSettings.isEmpty) {
       return 'All profile information visible';

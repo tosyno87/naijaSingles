@@ -5,10 +5,9 @@ import '../../user/controllers/onboarding_controller.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingAdditionalPreferencesScreen extends StatefulWidget {
-  final VoidCallback? onNext;
 
-  const OnboardingAdditionalPreferencesScreen({Key? key, this.onNext})
-      : super(key: key);
+  const OnboardingAdditionalPreferencesScreen({super.key, this.onNext});
+  final VoidCallback? onNext;
 
   @override
   State<OnboardingAdditionalPreferencesScreen> createState() =>
@@ -27,12 +26,12 @@ class _OnboardingAdditionalPreferencesScreenState
     {
       'label': 'Friendship',
       'value': 'Friendship',
-      'icon': Icons.people_outline
+      'icon': Icons.people_outline,
     },
     {
       'label': 'Networking',
       'value': 'Networking',
-      'icon': Icons.business_center_outlined
+      'icon': Icons.business_center_outlined,
     },
   ];
 
@@ -40,22 +39,22 @@ class _OnboardingAdditionalPreferencesScreenState
     {
       'label': 'Short-term fun',
       'value': 'Short-term',
-      'icon': Icons.flash_on_outlined
+      'icon': Icons.flash_on_outlined,
     },
     {
       'label': 'Long-term relationship',
       'value': 'Long-term',
-      'icon': Icons.favorite_border
+      'icon': Icons.favorite_border,
     },
     {
       'label': 'Casual dating',
       'value': 'Casual',
-      'icon': Icons.coffee_outlined
+      'icon': Icons.coffee_outlined,
     },
     {
       'label': 'Not sure yet',
       'value': 'Not sure yet',
-      'icon': Icons.help_outline
+      'icon': Icons.help_outline,
     },
   ];
 
@@ -158,8 +157,7 @@ class _OnboardingAdditionalPreferencesScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) {
-      return Padding(
+    return _lookingForOptions.map((option) => Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
         child: SelectionOption(
           label: option['label'],
@@ -172,16 +170,14 @@ class _OnboardingAdditionalPreferencesScreenState
           },
           icon: option['icon'],
         ),
-      );
-    }).toList();
+      ),).toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) {
-      return Padding(
+    return _relationshipIntentOptions.map((option) => Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
         child: SelectionOption(
           label: option['label'],
@@ -194,8 +190,7 @@ class _OnboardingAdditionalPreferencesScreenState
           },
           icon: option['icon'],
         ),
-      );
-    }).toList();
+      ),).toList();
   }
 
   void _saveAndContinue() {

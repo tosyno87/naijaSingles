@@ -1,8 +1,9 @@
 import 'dart:developer' as dev;
+
 import 'package:contacts_service/contacts_service.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Industry-standard contact invitation service
 /// Features:
@@ -11,10 +12,10 @@ import 'package:flutter/material.dart';
 /// - Contact validation and formatting
 /// - Privacy-compliant contact handling
 class ContactInvitationService {
-  static final ContactInvitationService _instance =
-      ContactInvitationService._internal();
   factory ContactInvitationService() => _instance;
   ContactInvitationService._internal();
+  static final ContactInvitationService _instance =
+      ContactInvitationService._internal();
 
   /// Check and request contact permission
   Future<bool> requestContactPermission() async {
@@ -94,15 +95,13 @@ class ContactInvitationService {
   }
 
   /// Validate email address
-  bool isValidEmail(String email) {
-    return EmailValidator.validate(email);
-  }
+  bool isValidEmail(String email) => EmailValidator.validate(email);
 
   /// Format contact for display
   String formatContactDisplay(Contact contact) {
     final name = contact.displayName ?? 'Unknown';
     final phone =
-        contact.phones?.isNotEmpty == true ? contact.phones!.first.value : null;
+        contact.phones?.isNotEmpty ?? false ? contact.phones!.first.value : null;
 
     if (phone != null) {
       return '$name ($phone)';
@@ -112,7 +111,7 @@ class ContactInvitationService {
 
   /// Get primary phone number from contact
   String? getPrimaryPhone(Contact contact) {
-    if (contact.phones?.isEmpty == true) return null;
+    if (contact.phones?.isEmpty ?? false) return null;
 
     // Return the first phone number
     return contact.phones!.first.value;
@@ -120,7 +119,7 @@ class ContactInvitationService {
 
   /// Get primary email from contact
   String? getPrimaryEmail(Contact contact) {
-    if (contact.emails?.isEmpty == true) return null;
+    if (contact.emails?.isEmpty ?? false) return null;
 
     // Return the first email
     return contact.emails!.first.value;

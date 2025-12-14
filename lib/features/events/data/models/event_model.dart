@@ -1,5 +1,7 @@
-import 'package:equatable/equatable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
+
+import '../../../../common/utils/app_logger.dart';
 
 enum EventStatus {
   draft,
@@ -9,7 +11,73 @@ enum EventStatus {
   underReview,
 }
 
-class EventModel extends Equatable {
+class EventModel extends Equatable { // Distance in kilometers from user's location
+
+  const EventModel({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.startDate,
+    required this.endDate,
+    required this.location,
+    required this.isFree,
+    required this.category,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.createdByUserId,
+    this.externalId, // Made optional
+    this.imageUrl,
+    this.ticketUrl,
+    this.ticketPrice,
+    this.tags = const [],
+    this.attendeeCount = 0,
+    this.rsvpCount = 0,
+    this.status = EventStatus.published,
+    this.isPublic = true,
+    this.distanceFromUser,
+  });
+
+  factory EventModel.fromFirestoreJson(
+      Map<String, dynamic> json, String docId,) {
+    try {
+      // Handle both imageUrl (singular) and imageUrls (plural) for backward compatibility
+      String? imageUrl;
+      if (json['imageUrl'] != null) {
+        imageUrl = json['imageUrl'];
+      } else if (json['imageUrls'] != null &&
+          (json['imageUrls'] as List).isNotEmpty) {
+        imageUrl = (json['imageUrls'] as List).first;
+      }
+
+      return EventModel(
+        id: docId,
+        externalId: json['externalId'] ?? '',
+        name: json['name'] ?? '',
+        description: json['description'] ?? '',
+        startDate: _parseDateTime(json['startDate']),
+        endDate: _parseDateTime(json['endDate']),
+        imageUrl: imageUrl,
+        location: EventLocation.fromJson(json['location'] ?? {}),
+        ticketUrl: json['ticketUrl'],
+        isFree: json['isFree'] ?? false,
+        ticketPrice: json['ticketPrice']?.toDouble(),
+        category: json['category'] ?? 'General',
+        tags: List<String>.from(json['tags'] ?? []),
+        attendeeCount: json['attendeeCount'] ?? 0,
+        rsvpCount: json['rsvpCount'] ?? 0,
+        createdAt: _parseDateTime(json['createdAt']),
+        updatedAt: _parseDateTime(json['updatedAt']),
+        status: _parseEventStatus(json['status']),
+        isPublic: json['isPublic'] ?? true,
+        createdByUserId: json['createdByUserId'] ?? 'unknown',
+        distanceFromUser: json['distanceFromUser']?.toDouble(),
+      );
+    } catch (e, stackTrace) {
+      AppLogger.error('❌ Error parsing EventModel from Firestore', error: e, stackTrace: stackTrace);
+      AppLogger.debug('📄 Raw data: $json');
+      rethrow;
+    }
+  }
   final String id;
   final String? externalId; // Optional for external event sources
   final String name;
@@ -30,36 +98,12 @@ class EventModel extends Equatable {
   final EventStatus status;
   final bool isPublic;
   final String createdByUserId;
-  final double? distanceFromUser; // Distance in kilometers from user's location
-
-  const EventModel({
-    required this.id,
-    this.externalId, // Made optional
-    required this.name,
-    required this.description,
-    required this.startDate,
-    required this.endDate,
-    this.imageUrl,
-    required this.location,
-    this.ticketUrl,
-    required this.isFree,
-    this.ticketPrice,
-    required this.category,
-    this.tags = const [],
-    this.attendeeCount = 0,
-    this.rsvpCount = 0,
-    required this.createdAt,
-    required this.updatedAt,
-    this.status = EventStatus.published,
-    this.isPublic = true,
-    required this.createdByUserId,
-    this.distanceFromUser,
-  });
+  final double? distanceFromUser;
 
   // Helper method to safely parse EventStatus from Firestore
-  static EventStatus _parseEventStatus(dynamic statusValue) {
-    print(
-        '🔄 Parsing EventStatus from: $statusValue (type: ${statusValue.runtimeType})');
+  static EventStatus _parseEventStatus(statusValue) {
+    AppLogger.debug(
+        '🔄 Parsing EventStatus from: $statusValue (type: ${statusValue.runtimeType})',);
 
     if (statusValue == null) return EventStatus.published;
 
@@ -78,8 +122,8 @@ class EventModel extends Equatable {
         case 'under_review':
           return EventStatus.underReview;
         default:
-          print(
-              '⚠️ Unknown EventStatus string: $statusValue, defaulting to published');
+          AppLogger.warning(
+              '⚠️ Unknown EventStatus string: $statusValue, defaulting to published',);
           return EventStatus.published;
       }
     }
@@ -91,13 +135,13 @@ class EventModel extends Equatable {
       }
     }
 
-    print(
-        '⚠️ Could not parse EventStatus: $statusValue, defaulting to published');
+    AppLogger.warning(
+        '⚠️ Could not parse EventStatus: $statusValue, defaulting to published',);
     return EventStatus.published;
   }
 
   // Helper method to safely parse DateTime from Firestore
-  static DateTime _parseDateTime(dynamic dateValue) {
+  static DateTime _parseDateTime(dateValue) {
     if (dateValue == null) return DateTime.now();
 
     // Handle Timestamp objects (Firestore native)
@@ -136,7 +180,7 @@ class EventModel extends Equatable {
     if (dateValue is Map && dateValue.containsKey('millisecondsSinceEpoch')) {
       try {
         return DateTime.fromMillisecondsSinceEpoch(
-            dateValue['millisecondsSinceEpoch']);
+            dateValue['millisecondsSinceEpoch'],);
       } catch (e) {
         return DateTime.now();
       }
@@ -145,51 +189,7 @@ class EventModel extends Equatable {
     return DateTime.now();
   }
 
-  factory EventModel.fromFirestoreJson(
-      Map<String, dynamic> json, String docId) {
-    try {
-      // Handle both imageUrl (singular) and imageUrls (plural) for backward compatibility
-      String? imageUrl;
-      if (json['imageUrl'] != null) {
-        imageUrl = json['imageUrl'];
-      } else if (json['imageUrls'] != null &&
-          (json['imageUrls'] as List).isNotEmpty) {
-        imageUrl = (json['imageUrls'] as List).first;
-      }
-
-      return EventModel(
-        id: docId,
-        externalId: json['externalId'] ?? '',
-        name: json['name'] ?? '',
-        description: json['description'] ?? '',
-        startDate: _parseDateTime(json['startDate']),
-        endDate: _parseDateTime(json['endDate']),
-        imageUrl: imageUrl,
-        location: EventLocation.fromJson(json['location'] ?? {}),
-        ticketUrl: json['ticketUrl'],
-        isFree: json['isFree'] ?? false,
-        ticketPrice: json['ticketPrice']?.toDouble(),
-        category: json['category'] ?? 'General',
-        tags: List<String>.from(json['tags'] ?? []),
-        attendeeCount: json['attendeeCount'] ?? 0,
-        rsvpCount: json['rsvpCount'] ?? 0,
-        createdAt: _parseDateTime(json['createdAt']),
-        updatedAt: _parseDateTime(json['updatedAt']),
-        status: _parseEventStatus(json['status']),
-        isPublic: json['isPublic'] ?? true,
-        createdByUserId: json['createdByUserId'] ?? 'unknown',
-        distanceFromUser: json['distanceFromUser']?.toDouble(),
-      );
-    } catch (e, stackTrace) {
-      print('❌ Error parsing EventModel from Firestore: $e');
-      print('📄 Raw data: $json');
-      print('📍 Stack trace: $stackTrace');
-      rethrow;
-    }
-  }
-
-  Map<String, dynamic> toFirestoreJson() {
-    return {
+  Map<String, dynamic> toFirestoreJson() => {
       'externalId': externalId,
       'name': name,
       'description': description,
@@ -210,7 +210,6 @@ class EventModel extends Equatable {
       'isPublic': isPublic,
       'createdByUserId': createdByUserId,
     };
-  }
 
   EventModel copyWith({
     String? id,
@@ -234,8 +233,7 @@ class EventModel extends Equatable {
     bool? isPublic,
     String? createdByUserId,
     double? distanceFromUser,
-  }) {
-    return EventModel(
+  }) => EventModel(
       id: id ?? this.id,
       externalId: externalId ?? this.externalId,
       name: name ?? this.name,
@@ -258,7 +256,6 @@ class EventModel extends Equatable {
       createdByUserId: createdByUserId ?? this.createdByUserId,
       distanceFromUser: distanceFromUser ?? this.distanceFromUser,
     );
-  }
 
   @override
   List<Object?> get props => [
@@ -287,13 +284,6 @@ class EventModel extends Equatable {
 }
 
 class EventLocation extends Equatable {
-  final String? name;
-  final String? address;
-  final String? city;
-  final String? state;
-  final String? country;
-  final double? latitude;
-  final double? longitude;
 
   const EventLocation({
     this.name,
@@ -307,7 +297,7 @@ class EventLocation extends Equatable {
 
   factory EventLocation.fromJson(Map<String, dynamic> json) {
     try {
-      print('🌍 Parsing EventLocation from: $json');
+      AppLogger.debug('🌍 Parsing EventLocation from: $json');
 
       return EventLocation(
         name: json['name'],
@@ -322,15 +312,20 @@ class EventLocation extends Equatable {
         longitude: json['longitude']?.toDouble(),
       );
     } catch (e, stackTrace) {
-      print('❌ Error parsing EventLocation: $e');
-      print('📄 Raw location data: $json');
-      print('📍 Stack trace: $stackTrace');
+      AppLogger.error('❌ Error parsing EventLocation', error: e, stackTrace: stackTrace);
+      AppLogger.debug('📄 Raw location data: $json');
       rethrow;
     }
   }
+  final String? name;
+  final String? address;
+  final String? city;
+  final String? state;
+  final String? country;
+  final double? latitude;
+  final double? longitude;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'name': name,
       'address': address,
       'city': city,
@@ -339,7 +334,6 @@ class EventLocation extends Equatable {
       'latitude': latitude,
       'longitude': longitude,
     };
-  }
 
   String get displayAddress {
     final parts = <String>[];

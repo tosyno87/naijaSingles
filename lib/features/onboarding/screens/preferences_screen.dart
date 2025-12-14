@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../user/controllers/onboarding_controller.dart';
 
 class PreferencesScreen extends StatefulWidget {
-  const PreferencesScreen({Key? key}) : super(key: key);
+  const PreferencesScreen({super.key});
 
   @override
   State<PreferencesScreen> createState() => _PreferencesScreenState();
@@ -15,8 +15,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   RangeValues _ageRange = const RangeValues(18, 50);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -27,7 +26,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -103,10 +102,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildInterestedInOptions() {
-    return Column(
+  Widget _buildInterestedInOptions() => Column(
       children: [
         _buildInterestedInOption('Men', 'men'),
         const SizedBox(height: 12),
@@ -115,7 +112,6 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         _buildInterestedInOption('Everyone', 'everyone'),
       ],
     );
-  }
 
   Widget _buildInterestedInOption(String label, String value) {
     final isSelected = _selectedInterestedIn == value;
@@ -151,8 +147,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     );
   }
 
-  Widget _buildAgeRangeSlider() {
-    return Column(
+  Widget _buildAgeRangeSlider() => Column(
       children: [
         Text(
           '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
@@ -178,7 +173,6 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
       ],
     );
-  }
 
   void _savePreferences() {
     final controller =

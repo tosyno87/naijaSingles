@@ -4,18 +4,15 @@ import '../../../models/user_model.dart';
 
 /// Mode-specific profile sections that show different information based on relationship intent
 class ModeSpecificProfileSections extends StatelessWidget {
+
+  const ModeSpecificProfileSections({
+    required this.user, required this.selectedMode, super.key,
+  });
   final UserModel user;
   final String selectedMode;
 
-  const ModeSpecificProfileSections({
-    Key? key,
-    required this.user,
-    required this.selectedMode,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: [
         // Mode-specific header
         _buildModeHeader(),
@@ -26,7 +23,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ..._buildModeSpecificSections(),
       ],
     );
-  }
 
   Widget _buildModeHeader() {
     final config = _getModeConfig();
@@ -86,8 +82,7 @@ class ModeSpecificProfileSections extends StatelessWidget {
     }
   }
 
-  List<Widget> _buildDatingSections() {
-    return [
+  List<Widget> _buildDatingSections() => [
       _buildSection(
         title: 'Relationship Goals',
         icon: Icons.favorite,
@@ -121,10 +116,8 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ],
       ),
     ];
-  }
 
-  List<Widget> _buildFriendshipSections() {
-    return [
+  List<Widget> _buildFriendshipSections() => [
       _buildSection(
         title: 'Social Interests',
         icon: Icons.people,
@@ -158,10 +151,8 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ],
       ),
     ];
-  }
 
-  List<Widget> _buildNetworkingSections() {
-    return [
+  List<Widget> _buildNetworkingSections() => [
       _buildSection(
         title: 'Professional Info',
         icon: Icons.business_center,
@@ -192,19 +183,17 @@ class ModeSpecificProfileSections extends StatelessWidget {
           _buildInfoRow('Professional Focus', _getProfessionalFocus()),
           _buildInfoRow('Collaboration Style', _getCollaborationStyle()),
           _buildInfoRow(
-              'Networking Availability', _getNetworkingAvailability()),
+              'Networking Availability', _getNetworkingAvailability(),),
         ],
       ),
     ];
-  }
 
   Widget _buildSection({
     required String title,
     required IconData icon,
     required Color color,
     required List<Widget> children,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -239,7 +228,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildInfoRow(String label, String value) {
     if (value.isEmpty) return const SizedBox.shrink();
@@ -280,12 +268,11 @@ class ModeSpecificProfileSections extends StatelessWidget {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: tags.map((tag) => _buildTag(tag)).toList(),
+      children: tags.map(_buildTag).toList(),
     );
   }
 
-  Widget _buildTag(String tag) {
-    return Container(
+  Widget _buildTag(String tag) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFF008037).withOpacity(0.1),
@@ -301,7 +288,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ),
       ),
     );
-  }
 
   // Mode configuration
   _ModeConfig _getModeConfig() {
@@ -385,10 +371,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
 }
 
 class _ModeConfig {
-  final IconData icon;
-  final Color color;
-  final String title;
-  final String subtitle;
 
   _ModeConfig({
     required this.icon,
@@ -396,4 +378,8 @@ class _ModeConfig {
     required this.title,
     required this.subtitle,
   });
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
 }

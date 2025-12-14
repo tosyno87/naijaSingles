@@ -49,7 +49,7 @@ Future<void> generateAllTestUsers() async {
     final city = cityEntry.value;
     
     print('🏙️  ${city['name']}');
-    print('${'=' * 40}');
+    print('=' * 40);
 
     // Generate 10 males
     for (int i = 0; i < 10; i++) {
@@ -57,7 +57,7 @@ Future<void> generateAllTestUsers() async {
         await createTestUser('male', cityKey, city);
         totalCreated++;
         print('  ✅ Male ${i + 1}/10');
-        await Future.delayed(Duration(milliseconds: 500)); // Rate limit delay
+        await Future.delayed(const Duration(milliseconds: 500)); // Rate limit delay
       } catch (e) {
         totalFailed++;
         print('  ❌ Male ${i + 1}/10 failed: $e');
@@ -70,7 +70,7 @@ Future<void> generateAllTestUsers() async {
         await createTestUser('female', cityKey, city);
         totalCreated++;
         print('  ✅ Female ${i + 1}/10');
-        await Future.delayed(Duration(milliseconds: 500)); // Rate limit delay
+        await Future.delayed(const Duration(milliseconds: 500)); // Rate limit delay
       } catch (e) {
         totalFailed++;
         print('  ❌ Female ${i + 1}/10 failed: $e');
@@ -181,43 +181,43 @@ String generateBio(List<String> interests, String occupation) {
 List<String> generateTestPhotos(String gender, Random random) {
   final photoCount = 2 + random.nextInt(3);
   return List.generate(photoCount, (index) =>
-      'https://via.placeholder.com/400x600/4A90E2/FFFFFF?text=${gender == 'male' ? 'M' : 'F'}+${index + 1}');
+      'https://via.placeholder.com/400x600/4A90E2/FFFFFF?text=${gender == 'male' ? 'M' : 'F'}+${index + 1}',);
 }
 
 // Test data constants
 const List<String> maleNames = [
   'James', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas',
   'Christopher', 'Charles', 'Daniel', 'Matthew', 'Anthony', 'Mark',
-  'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin'
+  'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin',
 ];
 
 const List<String> femaleNames = [
   'Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara',
   'Susan', 'Jessica', 'Sarah', 'Karen', 'Nancy', 'Lisa', 'Betty',
-  'Helen', 'Sandra', 'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle'
+  'Helen', 'Sandra', 'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle',
 ];
 
 const List<String> lastNames = [
   'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller',
   'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez',
-  'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'
+  'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
 ];
 
 const List<String> interests = [
   'Travel', 'Photography', 'Music', 'Cooking', 'Fitness', 'Reading',
   'Movies', 'Dancing', 'Sports', 'Art', 'Technology', 'Fashion',
   'Food', 'Adventure', 'Yoga', 'Gaming', 'Hiking', 'Coffee',
-  'Wine', 'Volunteering', 'Languages', 'Business', 'Education'
+  'Wine', 'Volunteering', 'Languages', 'Business', 'Education',
 ];
 
 const List<String> occupations = [
   'Software Engineer', 'Marketing Manager', 'Teacher', 'Doctor', 'Lawyer',
   'Artist', 'Entrepreneur', 'Sales Representative', 'Designer', 'Consultant',
   'Nurse', 'Accountant', 'Chef', 'Photographer', 'Writer', 'Engineer',
-  'Business Analyst', 'Project Manager', 'Real Estate Agent', 'Therapist'
+  'Business Analyst', 'Project Manager', 'Real Estate Agent', 'Therapist',
 ];
 
 const List<String> educationLevels = [
-  'High School', 'Some College', 'Bachelor\'s Degree', 'Master\'s Degree', 'PhD'
+  'High School', 'Some College', 'Bachelor\'s Degree', 'Master\'s Degree', 'PhD',
 ];
 

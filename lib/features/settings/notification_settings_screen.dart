@@ -8,7 +8,7 @@ import '../../common/providers/user_provider.dart';
 import '../../services/settings_service.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
-  const NotificationSettingsScreen({Key? key}) : super(key: key);
+  const NotificationSettingsScreen({super.key});
 
   @override
   State<NotificationSettingsScreen> createState() =>
@@ -65,7 +65,7 @@ class _NotificationSettingsScreenState
 
     try {
       final success = await SettingsService.updateNotificationSettings(
-          _currentUserId!, _settings!);
+          _currentUserId!, _settings!,);
 
       if (mounted) {
         setState(() => _isSaving = false);
@@ -101,19 +101,14 @@ class _NotificationSettingsScreenState
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: currentTime,
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: primaryColor,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
 
     if (picked != null) {
@@ -134,9 +129,7 @@ class _NotificationSettingsScreenState
     );
   }
 
-  String _formatTime(TimeOfDay time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatTime(TimeOfDay time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
   String _formatTimeDisplay(String timeString) {
     final time = _parseTime(timeString);
@@ -194,8 +187,7 @@ class _NotificationSettingsScreenState
     );
   }
 
-  Widget _buildErrorState(bool isDarkMode) {
-    return Center(
+  Widget _buildErrorState(bool isDarkMode) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -227,10 +219,8 @@ class _NotificationSettingsScreenState
         ],
       ),
     );
-  }
 
-  Widget _buildSettingsContent(bool isDarkMode) {
-    return SingleChildScrollView(
+  Widget _buildSettingsContent(bool isDarkMode) => SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,7 +235,7 @@ class _NotificationSettingsScreenState
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.notifications_active,
                   color: primaryColor,
                   size: 24,
@@ -286,7 +276,7 @@ class _NotificationSettingsScreenState
             icon: Icons.message,
             value: _settings!.messageNotifications,
             onChanged: (value) => _updateSetting(
-                _settings!.copyWith(messageNotifications: value)),
+                _settings!.copyWith(messageNotifications: value),),
             isDarkMode: isDarkMode,
           ),
 
@@ -306,7 +296,7 @@ class _NotificationSettingsScreenState
             icon: Icons.star,
             value: _settings!.superLikeNotifications,
             onChanged: (value) => _updateSetting(
-                _settings!.copyWith(superLikeNotifications: value)),
+                _settings!.copyWith(superLikeNotifications: value),),
             isDarkMode: isDarkMode,
           ),
 
@@ -394,10 +384,8 @@ class _NotificationSettingsScreenState
         ],
       ),
     );
-  }
 
-  Widget _buildSectionHeader(String title, bool isDarkMode) {
-    return Text(
+  Widget _buildSectionHeader(String title, bool isDarkMode) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 18,
@@ -405,7 +393,6 @@ class _NotificationSettingsScreenState
         color: isDarkMode ? Colors.white : Colors.black,
       ),
     );
-  }
 
   Widget _buildSettingTile({
     required String title,
@@ -414,8 +401,7 @@ class _NotificationSettingsScreenState
     required bool value,
     required ValueChanged<bool> onChanged,
     required bool isDarkMode,
-  }) {
-    return Container(
+  }) => Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
@@ -443,18 +429,16 @@ class _NotificationSettingsScreenState
         ),
         value: value,
         onChanged: onChanged,
-        activeColor: primaryColor,
+        activeThumbColor: primaryColor,
       ),
     );
-  }
 
   Widget _buildTimeSetting({
     required String title,
     required String time,
     required VoidCallback onTap,
     required bool isDarkMode,
-  }) {
-    return Container(
+  }) => Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
@@ -490,5 +474,4 @@ class _NotificationSettingsScreenState
         onTap: onTap,
       ),
     );
-  }
 }

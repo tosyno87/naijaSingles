@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 class FeedbackScreen extends StatefulWidget {
-  const FeedbackScreen({Key? key}) : super(key: key);
+  const FeedbackScreen({super.key});
 
   @override
   State<FeedbackScreen> createState() => _FeedbackScreenState();
@@ -66,8 +67,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -124,10 +124,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildHeaderSection() {
-    return Container(
+  Widget _buildHeaderSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -149,7 +147,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               color: primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.feedback,
               size: 40,
               color: primaryColor,
@@ -178,10 +176,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildRatingSection() {
-    return Container(
+  Widget _buildRatingSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -216,8 +212,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (index) {
-              return GestureDetector(
+            children: List.generate(5, (index) => GestureDetector(
                 onTap: () => setState(() => _rating = index + 1),
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -228,8 +223,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         index < _rating ? Colors.amber : Colors.grey.shade300,
                   ),
                 ),
-              );
-            }),
+              ),),
           ),
           if (_rating > 0) ...[
             const SizedBox(height: 12),
@@ -247,10 +241,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildCategorySection() {
-    return Container(
+  Widget _buildCategorySection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -284,7 +276,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: _selectedCategory,
+            initialValue: _selectedCategory,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -292,13 +284,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: primaryColor, width: 2),
+                borderSide: const BorderSide(color: primaryColor, width: 2),
               ),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
-            items: _categories.map((category) {
-              return DropdownMenuItem(
+            items: _categories.map((category) => DropdownMenuItem(
                 value: category,
                 child: Text(
                   category,
@@ -307,8 +298,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     color: textPrimary,
                   ),
                 ),
-              );
-            }).toList(),
+              ),).toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() => _selectedCategory = value);
@@ -318,10 +308,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildEmailField() {
-    return Container(
+  Widget _buildEmailField() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -366,11 +354,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: primaryColor, width: 2),
+                borderSide: const BorderSide(color: primaryColor, width: 2),
               ),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              prefixIcon: Icon(Icons.email, color: primaryColor),
+              prefixIcon: const Icon(Icons.email, color: primaryColor),
             ),
             style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
             validator: (value) {
@@ -387,10 +375,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildFeedbackField() {
-    return Container(
+  Widget _buildFeedbackField() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -435,7 +421,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: primaryColor, width: 2),
+                borderSide: const BorderSide(color: primaryColor, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -453,10 +439,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildSubmitButton() {
-    return SizedBox(
+  Widget _buildSubmitButton() => SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _isSubmitting ? null : _submitFeedback,
@@ -473,7 +457,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
@@ -500,10 +484,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
       ),
     );
-  }
 
-  Widget _buildTipsSection() {
-    return Container(
+  Widget _buildTipsSection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
@@ -515,7 +497,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb, color: primaryColor, size: 20),
+              const Icon(Icons.lightbulb, color: primaryColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Tips for Better Feedback',
@@ -535,10 +517,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildTip(String tip) {
-    return Padding(
+  Widget _buildTip(String tip) => Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -563,7 +543,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ],
       ),
     );
-  }
 
   String _getRatingText(int rating) {
     switch (rating) {
@@ -648,7 +627,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     shape: BoxShape.circle,
                   ),
                   child:
-                      Icon(Icons.check_circle, color: successColor, size: 40),
+                      const Icon(Icons.check_circle, color: successColor, size: 40),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -681,12 +660,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: primaryColor.withOpacity(0.2),
-                      width: 1,
                     ),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: primaryColor, size: 20),
+                      const Icon(Icons.info_outline, color: primaryColor, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(

@@ -3,16 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class IOSHeightPicker extends StatefulWidget {
+
+  const IOSHeightPicker({
+    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+  });
   final double initialHeight; // Height in cm
   final String initialUnit; // 'cm' or 'ft'
   final Function(double height, String unit) onChanged;
-
-  const IOSHeightPicker({
-    Key? key,
-    required this.initialHeight,
-    required this.initialUnit,
-    required this.onChanged,
-  }) : super(key: key);
 
   @override
   State<IOSHeightPicker> createState() => _IOSHeightPickerState();
@@ -47,13 +44,13 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
 
   void _initializeControllers() {
     if (_selectedUnit == 'cm') {
-      int cmIndex = (_heightInCm.round() - minCm).clamp(0, maxCm - minCm);
+      final int cmIndex = (_heightInCm.round() - minCm).clamp(0, maxCm - minCm);
       _cmController = FixedExtentScrollController(initialItem: cmIndex);
     } else {
       // Convert cm to feet and inches
-      double totalInches = _heightInCm / 2.54;
-      int feet = (totalInches / 12).floor().clamp(minFeet, maxFeet);
-      int inches = (totalInches % 12).round().clamp(0, maxInches);
+      final double totalInches = _heightInCm / 2.54;
+      final int feet = (totalInches / 12).floor().clamp(minFeet, maxFeet);
+      final int inches = (totalInches % 12).round().clamp(0, maxInches);
 
       _feetController =
           FixedExtentScrollController(initialItem: feet - minFeet);
@@ -85,8 +82,8 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
   }
 
   void _onFeetInchesChanged() {
-    int feet = _feetController.selectedItem + minFeet;
-    int inches = _inchesController.selectedItem;
+    final int feet = _feetController.selectedItem + minFeet;
+    final int inches = _inchesController.selectedItem;
     _heightInCm = ((feet * 12) + inches) * 2.54;
     widget.onChanged(_heightInCm, _selectedUnit);
   }
@@ -95,9 +92,9 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
     if (_selectedUnit == 'cm') {
       return '${_heightInCm.round()} cm';
     } else {
-      double totalInches = _heightInCm / 2.54;
-      int feet = (totalInches / 12).floor();
-      int inches = (totalInches % 12).round();
+      final double totalInches = _heightInCm / 2.54;
+      final int feet = (totalInches / 12).floor();
+      final int inches = (totalInches % 12).round();
       return '$feet\'$inches"';
     }
   }
@@ -111,7 +108,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Unit toggle
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.grey.shade100,
             borderRadius: BorderRadius.circular(12),
@@ -190,7 +187,6 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: const Color(0xFF008037).withValues(alpha: 0.3),
-                width: 1,
               ),
             ),
             child: Text(
@@ -265,10 +261,10 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
       children: List.generate(
         maxCm - minCm + 1,
         (index) {
-          int cm = minCm + index;
-          double totalInches = cm / 2.54;
-          int feet = (totalInches / 12).floor();
-          int inches = (totalInches % 12).round();
+          final int cm = minCm + index;
+          final double totalInches = cm / 2.54;
+          final int feet = (totalInches / 12).floor();
+          final int inches = (totalInches % 12).round();
 
           return Center(
             child: Column(
@@ -322,7 +318,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             children: List.generate(
               maxFeet - minFeet + 1,
               (index) {
-                int feet = minFeet + index;
+                final int feet = minFeet + index;
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -376,8 +372,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             ),
             children: List.generate(
               maxInches + 1,
-              (index) {
-                return Center(
+              (index) => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -398,8 +393,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                       ),
                     ],
                   ),
-                );
-              },
+                ),
             ),
           ),
         ),

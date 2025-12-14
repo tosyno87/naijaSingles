@@ -4,24 +4,23 @@ import '../constants/app_colors.dart';
 /// Reusable circular icon container for authentication screens
 /// Provides consistent styling with light green background and shadow
 class AuthIconContainer extends StatelessWidget {
+
+  const AuthIconContainer({
+    required this.icon, super.key,
+    this.size = 100,
+    this.iconColor,
+    this.backgroundColor,
+  });
   final IconData icon;
   final double size;
   final Color? iconColor;
   final Color? backgroundColor;
 
-  const AuthIconContainer({
-    super.key,
-    required this.icon,
-    this.size = 100,
-    this.iconColor,
-    this.backgroundColor,
-  });
-
   @override
   Widget build(BuildContext context) {
     final iconBgColor = backgroundColor ?? AppColors.iconBackgroundColor;
     final iconCol = iconColor ?? AppColors.primaryGreen;
-    final primaryColor = AppColors.primaryGreen;
+    const primaryColor = AppColors.primaryGreen;
 
     return Container(
       width: size,

@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../common/widgets/custom_snackbar.dart';
-import '../../../../../common/widgets/auth_icon_container.dart';
-import '../../../../../common/widgets/afropeep_text_field.dart';
-import '../../../../../common/widgets/afropeep_primary_button.dart';
-import '../../../../../common/widgets/afropeep_app_bar.dart';
+
 import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/widgets/afropeep_app_bar.dart';
+import '../../../../../common/widgets/afropeep_primary_button.dart';
+import '../../../../../common/widgets/afropeep_text_field.dart';
+import '../../../../../common/widgets/auth_icon_container.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../../auth_method/auth_method_selection_screen.dart';
 import '../../bloc/email_auth_bloc.dart';
 import 'email_password_reset_screen.dart';
 
 class EmailLoginScreen extends StatefulWidget {
-  const EmailLoginScreen({Key? key}) : super(key: key);
+  const EmailLoginScreen({super.key});
 
   @override
   State<EmailLoginScreen> createState() => _EmailLoginScreenState();
@@ -39,7 +40,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -60,17 +61,15 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
               );
             }
           },
-          builder: (context, state) {
-            return SafeArea(
+          builder: (context, state) => SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Center(
                   child: SingleChildScrollView(
                     child: Form(
                       key: _formKey,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // Email icon using reusable widget
                           const AuthIconContainer(
@@ -81,7 +80,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
                           // Header
                           Text(
-                            "Welcome Back",
+                            'Welcome Back',
                             style: GoogleFonts.montserrat(
                               fontSize: 24,
                               fontWeight: FontWeight.w600,
@@ -91,7 +90,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            "Sign in to continue",
+                            'Sign in to continue',
                             style: GoogleFonts.montserrat(
                               fontSize: 16,
                               color: AppColors.textSecondary,
@@ -107,10 +106,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                             prefixIcon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
                             onChanged: () => setState(() {}),
-                            validationChecker: (text) {
-                              return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(text);
-                            },
+                            validationChecker: (text) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(text),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
@@ -174,7 +171,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               child: Text(
-                                "Forgot Password?",
+                                'Forgot Password?',
                                 style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -187,7 +184,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
                           // Sign In Button using reusable widget
                           AfropeepPrimaryButton(
-                            text: "Sign In",
+                            text: 'Sign In',
                             isLoading: state is EmailAuthLoading,
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
@@ -225,7 +222,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   );
                                 },
                                 child: Text(
-                                  "Sign Up",
+                                  'Sign Up',
                                   style: GoogleFonts.montserrat(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -243,8 +240,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                   ),
                 ),
               ),
-            );
-          },
+            ),
         ),
       ),
     );

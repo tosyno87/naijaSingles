@@ -8,6 +8,18 @@ enum AuthButtonVariant { primary, secondary }
 /// Modern dating app style primary button widget
 /// Reusable button for authentication and action screens
 class AfropeepPrimaryButton extends StatelessWidget {
+
+  const AfropeepPrimaryButton({
+    required this.text, super.key,
+    this.icon,
+    this.backgroundColor,
+    this.textColor,
+    this.onPressed,
+    this.isLoading = false,
+    this.variant = AuthButtonVariant.primary,
+    this.width,
+    this.height,
+  });
   final IconData? icon;
   final String text;
   final Color? backgroundColor;
@@ -17,19 +29,6 @@ class AfropeepPrimaryButton extends StatelessWidget {
   final AuthButtonVariant variant;
   final double? width;
   final double? height;
-
-  const AfropeepPrimaryButton({
-    super.key,
-    this.icon,
-    required this.text,
-    this.backgroundColor,
-    this.textColor,
-    this.onPressed,
-    this.isLoading = false,
-    this.variant = AuthButtonVariant.primary,
-    this.width,
-    this.height,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +72,6 @@ class AfropeepPrimaryButton extends StatelessWidget {
                 ? Align(
                     alignment: Alignment.centerLeft,
                     child: Row(
-                      mainAxisSize: MainAxisSize.max,
                       children: [
                         Icon(
                           icon,

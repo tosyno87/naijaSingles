@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../common/utils/app_logger.dart';
 
 /// Screen to verify all onboarding data is properly saved and accessible
 class OnboardingDataVerificationScreen extends StatefulWidget {
-  const OnboardingDataVerificationScreen({Key? key}) : super(key: key);
+  const OnboardingDataVerificationScreen({super.key});
 
   @override
   State<OnboardingDataVerificationScreen> createState() =>
@@ -19,8 +21,8 @@ class _OnboardingDataVerificationScreenState
 
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
-  List<String> _missingFields = [];
-  List<String> _presentFields = [];
+  final List<String> _missingFields = [];
+  final List<String> _presentFields = [];
 
   // Expected onboarding fields
   final List<String> _expectedFields = [
@@ -52,7 +54,7 @@ class _OnboardingDataVerificationScreenState
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        print('🔍 Loading user data for verification: ${user.uid}');
+        AppLogger.debug('🔍 Loading user data for verification: ${user.uid}');
         final doc = await _firestore.collection('users').doc(user.uid).get();
 
         if (doc.exists) {
@@ -95,23 +97,22 @@ class _OnboardingDataVerificationScreenState
             _isLoading = false;
           });
 
-          print('✅ Data verification complete');
-          print('   Present fields: $_presentFields');
-          print('   Missing fields: $_missingFields');
+          AppLogger.info('✅ Data verification complete');
+          AppLogger.debug('   Present fields: $_presentFields');
+          AppLogger.debug('   Missing fields: $_missingFields');
         } else {
-          print('❌ No user document found');
+          AppLogger.warning('❌ No user document found');
           setState(() => _isLoading = false);
         }
       }
     } catch (e) {
-      print('❌ Error loading user data: $e');
+      AppLogger.error('❌ Error loading user data', error: e);
       setState(() => _isLoading = false);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
@@ -180,7 +181,6 @@ class _OnboardingDataVerificationScreenState
               ),
             ),
     );
-  }
 
   Widget _buildSummaryCard() {
     final completionPercentage = _expectedFields.isEmpty
@@ -245,8 +245,7 @@ class _OnboardingDataVerificationScreenState
     );
   }
 
-  Widget _buildPresentFieldsCard() {
-    return Card(
+  Widget _buildPresentFieldsCard() => Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -254,7 +253,7 @@ class _OnboardingDataVerificationScreenState
           children: [
             Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 20),
+                const Icon(Icons.check_circle, color: Colors.green, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Present Fields (${_presentFields.length})',
@@ -280,25 +279,21 @@ class _OnboardingDataVerificationScreenState
               Wrap(
                 spacing: 8,
                 runSpacing: 4,
-                children: _presentFields.map((field) {
-                  return Chip(
+                children: _presentFields.map((field) => Chip(
                     label: Text(
                       field,
                       style: GoogleFonts.montserrat(fontSize: 12),
                     ),
                     backgroundColor: Colors.green.shade100,
                     side: BorderSide(color: Colors.green.shade300),
-                  );
-                }).toList(),
+                  ),).toList(),
               ),
           ],
         ),
       ),
     );
-  }
 
-  Widget _buildMissingFieldsCard() {
-    return Card(
+  Widget _buildMissingFieldsCard() => Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -306,7 +301,7 @@ class _OnboardingDataVerificationScreenState
           children: [
             Row(
               children: [
-                Icon(Icons.error, color: Colors.red, size: 20),
+                const Icon(Icons.error, color: Colors.red, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Missing Fields (${_missingFields.length})',
@@ -332,25 +327,21 @@ class _OnboardingDataVerificationScreenState
               Wrap(
                 spacing: 8,
                 runSpacing: 4,
-                children: _missingFields.map((field) {
-                  return Chip(
+                children: _missingFields.map((field) => Chip(
                     label: Text(
                       field,
                       style: GoogleFonts.montserrat(fontSize: 12),
                     ),
                     backgroundColor: Colors.red.shade100,
                     side: BorderSide(color: Colors.red.shade300),
-                  );
-                }).toList(),
+                  ),).toList(),
               ),
           ],
         ),
       ),
     );
-  }
 
-  Widget _buildRawDataCard() {
-    return Card(
+  Widget _buildRawDataCard() => Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -382,16 +373,16 @@ class _OnboardingDataVerificationScreenState
                   _buildDataRow('Gender', _userData!['gender']),
                   _buildDataRow('Tribe', _userData!['tribe']),
                   _buildDataRow('Bio Length',
-                      '${(_userData!['bio'] ?? '').length} chars'),
+                      '${(_userData!['bio'] ?? '').length} chars',),
                   _buildDataRow('Interests',
-                      '${(_userData!['interests'] as List?)?.length ?? 0} items'),
+                      '${(_userData!['interests'] as List?)?.length ?? 0} items',),
                   _buildDataRow(
                       'Height',
                       _userData!['heightDisplay'] ??
-                          _userData!['height_ft_in']),
+                          _userData!['height_ft_in'],),
                   _buildDataRow('Looking For', _userData!['lookingFor']),
                   _buildDataRow(
-                      'Relationship Intent', _userData!['relationshipIntent']),
+                      'Relationship Intent', _userData!['relationshipIntent'],),
                   _buildDataRow('Interested In', _userData!['interestedIn']),
                 ],
               ),
@@ -399,10 +390,8 @@ class _OnboardingDataVerificationScreenState
         ),
       ),
     );
-  }
 
-  Widget _buildDataRow(String label, dynamic value) {
-    return Padding(
+  Widget _buildDataRow(String label, value) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,5 +419,4 @@ class _OnboardingDataVerificationScreenState
         ],
       ),
     );
-  }
 }

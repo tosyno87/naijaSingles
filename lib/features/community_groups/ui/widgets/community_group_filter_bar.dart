@@ -2,22 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CommunityGroupFilterBar extends StatelessWidget {
+
+  const CommunityGroupFilterBar({
+    required this.selectedCategory, required this.selectedCountry, required this.onCategoryChanged, required this.onCountryChanged, super.key,
+  });
   final String selectedCategory;
   final String selectedCountry;
   final Function(String) onCategoryChanged;
   final Function(String) onCountryChanged;
 
-  const CommunityGroupFilterBar({
-    Key? key,
-    required this.selectedCategory,
-    required this.selectedCountry,
-    required this.onCategoryChanged,
-    required this.onCountryChanged,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,16 +34,16 @@ class CommunityGroupFilterBar extends StatelessWidget {
                 _buildFilterChip('All', selectedCategory, onCategoryChanged),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                    'Cultural', selectedCategory, onCategoryChanged),
+                    'Cultural', selectedCategory, onCategoryChanged,),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                    'Professional', selectedCategory, onCategoryChanged),
+                    'Professional', selectedCategory, onCategoryChanged,),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                    'Interest', selectedCategory, onCategoryChanged),
+                    'Interest', selectedCategory, onCategoryChanged,),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                    'Location', selectedCategory, onCategoryChanged),
+                    'Location', selectedCategory, onCategoryChanged,),
               ],
             ),
           ),
@@ -78,7 +73,7 @@ class CommunityGroupFilterBar extends StatelessWidget {
                 _buildFilterChip('Kenya', selectedCountry, onCountryChanged),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                    'South Africa', selectedCountry, onCountryChanged),
+                    'South Africa', selectedCountry, onCountryChanged,),
                 const SizedBox(width: 8),
                 _buildFilterChip('Ethiopia', selectedCountry, onCountryChanged),
               ],
@@ -87,10 +82,9 @@ class CommunityGroupFilterBar extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildFilterChip(
-      String label, String selected, Function(String) onChanged) {
+      String label, String selected, Function(String) onChanged,) {
     final isSelected = selected == label;
 
     return GestureDetector(
@@ -102,7 +96,6 @@ class CommunityGroupFilterBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? const Color(0xFF008037) : Colors.grey[300]!,
-            width: 1,
           ),
           boxShadow: isSelected
               ? [

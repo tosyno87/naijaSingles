@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/features/messages/services/chat_service.dart';
-import 'package:naijasingles/features/messages/chat_thread_screen.dart';
-import 'package:naijasingles/models/user_model.dart';
+
+import '../../../models/user_model.dart';
+import '../../messages/chat_thread_screen.dart';
+import '../../messages/services/chat_service.dart';
 
 class MatchProfileScreen extends StatefulWidget {
-  final UserModel user;
 
   const MatchProfileScreen({
-    Key? key,
-    required this.user,
-  }) : super(key: key);
+    required this.user, super.key,
+  });
+  final UserModel user;
 
   @override
   State<MatchProfileScreen> createState() => _MatchProfileScreenState();
@@ -54,11 +54,8 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
       // Get or create chat thread
       String? threadId = await _chatService.getChatThreadId(widget.user.id!);
 
-      if (threadId == null) {
-        // Create new thread
-        threadId = await _chatService.createChatThread(
-            widget.user.id!, widget.user.name ?? 'User');
-      }
+      threadId ??= await _chatService.createChatThread(
+            widget.user.id!, widget.user.name ?? 'User',);
 
       if (threadId != null && mounted) {
         // Navigate to chat thread
@@ -68,7 +65,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
             builder: (context) => ChatThreadScreen(
               threadId: threadId!,
               userName: widget.user.name ?? 'User',
-              avatarUrl: widget.user.imageUrl?.isNotEmpty == true
+              avatarUrl: widget.user.imageUrl?.isNotEmpty ?? false
                   ? widget.user.imageUrl![0]
                   : null,
               otherUserId: widget.user.id,
@@ -151,8 +148,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
   }
 
   // Top profile card with image, name, age, location, and tags
-  Widget _buildProfileHeader() {
-    return Container(
+  Widget _buildProfileHeader() => Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -166,11 +162,10 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Profile image
           Padding(
-            padding: const EdgeInsets.only(top: 24.0),
+            padding: const EdgeInsets.only(top: 24),
             child: Hero(
               tag: 'profile-${widget.user.id}',
               child: Container(
@@ -197,16 +192,14 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
                       ? Image.network(
                           widget.user.imageUrl![0],
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
+                          errorBuilder: (context, error, stackTrace) => Container(
                               color: Colors.grey[300],
                               child: const Icon(
                                 Icons.person,
                                 size: 80,
                                 color: Colors.grey,
                               ),
-                            );
-                          },
+                            ),
                         )
                       : Container(
                           color: Colors.grey[300],
@@ -261,7 +254,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
 
           // Tags
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Wrap(
               alignment: WrapAlignment.center,
               spacing: 8,
@@ -284,12 +277,10 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
         ],
       ),
     );
-  }
 
   // About section with bio
-  Widget _buildAboutSection() {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
+  Widget _buildAboutSection() => Padding(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -327,12 +318,10 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
         ],
       ),
     );
-  }
 
   // Interests section
-  Widget _buildInterestsSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+  Widget _buildInterestsSection() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -370,12 +359,10 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
         ],
       ),
     );
-  }
 
   // Action labelLarges (Like, Pass, Message)
-  Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
+  Widget _buildActionButtons() => Padding(
+      padding: const EdgeInsets.all(24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -426,13 +413,12 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
                 ? Icons.hourglass_empty
                 : Icons.chat_bubble_outline,
             color: Colors.blue.shade400,
-            onTap: _isLoadingMessage ? () {} : () => _startConversation(),
+            onTap: _isLoadingMessage ? () {} : _startConversation,
             label: 'Message',
           ),
         ],
       ),
     );
-  }
 
   // Circle labelLarge with icon and label
   Widget _buildCircleButton({
@@ -441,8 +427,7 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
     required VoidCallback onTap,
     required String label,
     bool isAnimated = false,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         GestureDetector(
           onTap: onTap,
@@ -490,11 +475,9 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
         ),
       ],
     );
-  }
 
   // Tag widget for profile attributes
-  Widget _buildTag(String label, bool isPrimary) {
-    return Container(
+  Widget _buildTag(String label, bool isPrimary) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: isPrimary
@@ -515,5 +498,4 @@ class _MatchProfileScreenState extends State<MatchProfileScreen>
         ),
       ),
     );
-  }
 }

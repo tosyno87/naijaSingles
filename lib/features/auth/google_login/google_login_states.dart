@@ -13,18 +13,18 @@ class GoogleLoginInitial extends GoogleLoginStates {}
 class GoogleLoginLoading extends GoogleLoginStates {}
 
 class GoogleLoginSuccess extends GoogleLoginStates {
-  final User? user;
 
   const GoogleLoginSuccess({required this.user});
+  final User? user;
 
   @override
   List<Object?> get props => [user];
 }
 
 class GoogleLoginFailed extends GoogleLoginStates {
-  final String message;
 
   const GoogleLoginFailed({required this.message});
+  final String message;
 
   @override
   List<Object?> get props => [message];

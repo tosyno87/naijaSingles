@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:naijasingles/features/onboarding/screens/enhanced_bio_screen.dart';
+import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
 import 'package:provider/provider.dart';
-import '../lib/features/onboarding/screens/enhanced_bio_screen.dart';
-import '../lib/features/user/controllers/onboarding_controller.dart';
 
 void main() {
   group('Enhanced Bio Screen Tests', () {
@@ -69,7 +69,7 @@ void main() {
 
       // Enter text
       await tester.enterText(bioField,
-          'This is my test bio with enough characters to meet the minimum requirement.');
+          'This is my test bio with enough characters to meet the minimum requirement.',);
       await tester.pump();
 
       // Verify character count updates
@@ -125,7 +125,7 @@ void main() {
 
       // Enter a longer, better bio
       await tester.enterText(bioField,
-          'I love hiking and exploring new places. Currently passionate about photography and cooking. Looking for someone who shares my love for adventure and good food!');
+          'I love hiking and exploring new places. Currently passionate about photography and cooking. Looking for someone who shares my love for adventure and good food!',);
       await tester.pump();
 
       // Should show better quality indicator

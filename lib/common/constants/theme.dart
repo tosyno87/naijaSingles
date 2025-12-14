@@ -15,17 +15,17 @@ class MyThemes {
     textTheme: GoogleFonts.montserratTextTheme(
       const TextTheme(
         displayLarge: TextStyle(
-            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold,),
         displayMedium: TextStyle(
-            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold,),
         displaySmall: TextStyle(
-            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold,),
         headlineMedium: TextStyle(
-            color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+            color: AppColors.textPrimary, fontWeight: FontWeight.bold,),
         headlineSmall: TextStyle(
-            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600,),
         titleLarge: TextStyle(
-            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600,),
         bodyLarge: TextStyle(color: AppColors.textPrimary),
         bodyMedium: TextStyle(color: AppColors.textSecondary),
       ),

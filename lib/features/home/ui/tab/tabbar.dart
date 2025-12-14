@@ -3,25 +3,22 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:naijasingles/common/utils/app_exit.dart';
-import 'package:naijasingles/features/explore/explore_screen.dart';
-import 'package:naijasingles/features/home/ui/screens/home_page.dart';
-import 'package:naijasingles/features/messages/messages_screen.dart';
-import 'package:naijasingles/features/profile/profile_screen.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/constants/constants.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/providers/theme_provider.dart';
-import 'package:naijasingles/common/utils/app_exit.dart';
-import 'package:provider/provider.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../common/constants/colors.dart';
+import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/routes/route_name.dart';
+import '../../../../common/utils/app_exit.dart';
+import '../../../../models/user_model.dart';
+import '../../../explore/explore_screen.dart';
+import '../../../messages/messages_screen.dart';
+import '../../../profile/profile_screen.dart';
+import '../screens/home_page.dart';
 
 // Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -35,11 +32,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class Tabbar extends StatefulWidget {
+
+  const Tabbar({super.key, this.isPaymentSuccess, this.currentUserId});
   final bool? isPaymentSuccess;
   final String? currentUserId;
-
-  const Tabbar({Key? key, this.isPaymentSuccess, this.currentUserId})
-      : super(key: key);
 
   @override
   TabbarState createState() => TabbarState();
@@ -76,15 +72,14 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
             Provider.of<ThemeProvider>(context, listen: false);
         showDialog(
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
+          builder: (BuildContext context) => AlertDialog(
               backgroundColor: themeProvider.isDarkMode
                   ? const Color(0xFF2C2C2E)
                   : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: Icon(
+              title: const Icon(
                 Icons.check_circle,
                 color: Colors.green,
                 size: 60,
@@ -101,7 +96,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
+                  child: const Text(
                     'OK',
                     style: TextStyle(
                       color: Colors.green,
@@ -110,8 +105,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
                   ),
                 ),
               ],
-            );
-          },
+            ),
         );
       });
     }
@@ -148,24 +142,22 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
 
   void initFirebase(BuildContext context) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      String notificationId = message.data['notificationId'] ?? '';
+      final String notificationId = message.data['notificationId'] ?? '';
 
       if (shownNotificationForegroundIds.contains(notificationId)) {
         return;
       }
 
       shownNotificationForegroundIds.add(notificationId);
-      if (message != null) {
-        // Handle non-call notifications only
-        if (message.data['type'] != 'Call') {
-          // Handle other notification types (messages, matches, etc.)
-          debugPrint('Received notification: ${message.data}');
-        }
+      // Handle non-call notifications only
+      if (message.data['type'] != 'Call') {
+        // Handle other notification types (messages, matches, etc.)
+        debugPrint('Received notification: ${message.data}');
       }
-    });
+        });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      String notificationId = message.data['notificationId'] ?? '';
+      final String notificationId = message.data['notificationId'] ?? '';
 
       if (shownNotificationForegroundIds.contains(notificationId)) {
         return;
@@ -177,10 +169,10 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
         // Navigate to appropriate screen based on notification type
         if (message.data['type'] == 'message') {
           Navigator.pushNamed(context, RouteName.tabScreen,
-              arguments: "messages");
+              arguments: 'messages',);
         } else {
           Navigator.pushNamed(context, RouteName.tabScreen,
-              arguments: "notification");
+              arguments: 'notification',);
         }
       }
     });
@@ -189,7 +181,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
         .getInitialMessage()
         .then((RemoteMessage? message) async {
       if (message != null) {
-        String notificationId = message.data['notificationId'] ?? '';
+        final String notificationId = message.data['notificationId'] ?? '';
 
         if (shownNotificationForegroundIds.contains(notificationId)) {
           return;
@@ -274,10 +266,10 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               ),
             ),
           ),
-          body: TabBarView(
+          body: const TabBarView(
             children: [
               Homepage(
-                  items: const {}, isPurchased: false), // Use existing Homepage
+                  items: {}, isPurchased: false,), // Use existing Homepage
               ExploreScreen(),
               MessagesScreen(),
               ProfileScreen(),

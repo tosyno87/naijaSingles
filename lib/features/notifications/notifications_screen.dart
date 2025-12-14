@@ -5,7 +5,7 @@ import 'notification_model.dart';
 import 'notification_service.dart';
 
 class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({Key? key}) : super(key: key);
+  const NotificationsScreen({super.key});
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
@@ -141,8 +141,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -160,10 +159,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -193,10 +190,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildNotificationsList() {
-    return ListView.builder(
+  Widget _buildNotificationsList() => ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: _notifications.length,
       itemBuilder: (context, index) {
@@ -216,9 +211,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           onDismissed: (direction) {
             _deleteNotification(notification.id);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Notification removed'),
-                duration: const Duration(seconds: 2),
+                duration: Duration(seconds: 2),
               ),
             );
           },
@@ -226,7 +221,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
       },
     );
-  }
 
   Widget _buildNotificationItem(AppNotification notification) {
     final bool isRead = notification.isRead;
@@ -240,7 +234,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           border: Border(
             bottom: BorderSide(
               color: Colors.grey.withValues(alpha: 0.2),
-              width: 1,
             ),
           ),
         ),

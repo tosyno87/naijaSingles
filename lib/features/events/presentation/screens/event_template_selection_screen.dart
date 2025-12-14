@@ -4,7 +4,7 @@ import '../../../../common/routes/route_name.dart';
 import '../../data/services/event_templates_service.dart';
 
 class EventTemplateSelectionScreen extends StatelessWidget {
-  const EventTemplateSelectionScreen({Key? key}) : super(key: key);
+  const EventTemplateSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -113,10 +113,9 @@ class EventTemplateSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTemplateCard(BuildContext context, EventTemplate template) {
-    return GestureDetector(
+  Widget _buildTemplateCard(BuildContext context, EventTemplate template) => GestureDetector(
       onTap: () => _navigateToCreateEvent(context, template),
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -205,7 +204,6 @@ class EventTemplateSelectionScreen extends StatelessWidget {
         ),
       ),
     );
-  }
 
   void _navigateToCreateEvent(BuildContext context, EventTemplate? template) {
     Navigator.pushReplacementNamed(

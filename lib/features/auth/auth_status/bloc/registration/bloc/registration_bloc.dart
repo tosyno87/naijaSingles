@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
+import '../../../../../../common/data/repo/phone_auth_repo.dart';
 
 import '../../../../../../models/user_model.dart';
 
@@ -12,48 +12,47 @@ part 'registration_event.dart';
 part 'registration_state.dart';
 
 class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
-  PhoneAuthRepository phoneAuthRepository;
   RegistrationBloc({required this.phoneAuthRepository})
       : super(RegistrationInitial()) {
     on<RegistrationRequest>((event, emit) async {
       emit(RegistrationLoading());
       try {
-        User? user = await phoneAuthRepository.getCurrentUser();
+        final User? user = await phoneAuthRepository.getCurrentUser();
 
         if (user != null) {
-          var registeredUser =
+          final registeredUser =
               await phoneAuthRepository.registration(userData: event.userdata);
 
           emit(RegistrationSuccess(user: registeredUser));
         }
       } on SocketException {
-        emit(const RegistrationFailed(message: "No internet"));
+        emit(const RegistrationFailed(message: 'No internet'));
       }
     });
     on<CheckRegistration>((event, emit) async {
       emit(RegistrationLoading());
       try {
-        var user = await phoneAuthRepository.getCurrentUser();
+        final user = await phoneAuthRepository.getCurrentUser();
 
         if (user!.displayName != null || user.phoneNumber != null) {
           log('🔍 Checking registration for user: ${user.uid}');
-          var isRegistered = await phoneAuthRepository.userDetails(user.uid);
+          final isRegistered = await phoneAuthRepository.userDetails(user.uid);
           log('📋 Registration check result: $isRegistered');
           
           if (isRegistered) {
             try {
-              var usr = await phoneAuthRepository.getRegisterUser();
+              final usr = await phoneAuthRepository.getRegisterUser();
               log('👤 Retrieved user data: ${usr.name ?? "no name"}');
               
               // Only consider user registered if they have a name (completed onboarding)
               if (usr.name != null && usr.name!.isNotEmpty) {
-                log("✅ User already registered with complete profile: ${usr.name}");
+                log('✅ User already registered with complete profile: ${usr.name}');
                 emit(AlreadyRegistered(user: usr));
               } else {
                 // User document exists but profile incomplete (no name) - treat as new registration
                 // This ensures users complete onboarding even if document exists
-                log("⚠️ User document exists but has no name - treating as new registration");
-                log("⚠️ Redirecting to onboarding to complete profile");
+                log('⚠️ User document exists but has no name - treating as new registration');
+                log('⚠️ Redirecting to onboarding to complete profile');
                 emit(NewRegistration(token: event.token, user: user));
               }
             } catch (getUserError) {
@@ -63,28 +62,29 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               // If userDetails returned true but we can't get user data,
               // there might be a data inconsistency
               // In this case, treat as new registration to allow onboarding
-              log("⚠️ User document exists but cannot retrieve data - treating as new registration");
+              log('⚠️ User document exists but cannot retrieve data - treating as new registration');
               emit(NewRegistration(token: event.token, user: user));
             }
           } else {
-            log("📝 User not found in database - new registration");
+            log('📝 User not found in database - new registration');
             if (user.displayName != null || user.phoneNumber != null) {
               emit(NewRegistration(token: event.token, user: user));
             } else {
-              emit(RegistrationFailed(message: "Error: No user identifier found"));
+              emit(const RegistrationFailed(message: 'Error: No user identifier found'));
             }
           }
         } else {
           log('❌ User has no displayName or phoneNumber');
-          emit(RegistrationFailed(message: "Error: No user identifier found"));
+          emit(const RegistrationFailed(message: 'Error: No user identifier found'));
         }
       } on SocketException {
         log('❌ Network error during registration check');
-        emit(const RegistrationFailed(message: "No internet"));
+        emit(const RegistrationFailed(message: 'No internet'));
       } catch (e) {
         log('❌ Unexpected error in CheckRegistration: $e');
-        emit(RegistrationFailed(message: "Error checking registration: $e"));
+        emit(RegistrationFailed(message: 'Error checking registration: $e'));
       }
     });
   }
+  PhoneAuthRepository phoneAuthRepository;
 }

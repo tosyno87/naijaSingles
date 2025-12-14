@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../common/widgets/custom_snackbar.dart';
-import '../../../../../common/widgets/auth_icon_container.dart';
-import '../../../../../common/widgets/afropeep_text_field.dart';
-import '../../../../../common/widgets/afropeep_primary_button.dart';
-import '../../../../../common/widgets/afropeep_app_bar.dart';
+
 import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/widgets/afropeep_app_bar.dart';
+import '../../../../../common/widgets/afropeep_primary_button.dart';
+import '../../../../../common/widgets/afropeep_text_field.dart';
+import '../../../../../common/widgets/auth_icon_container.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../bloc/email_auth_bloc.dart';
 
 class EmailSignupScreen extends StatefulWidget {
-  const EmailSignupScreen({Key? key}) : super(key: key);
+  const EmailSignupScreen({super.key});
 
   @override
   State<EmailSignupScreen> createState() => _EmailSignupScreenState();
@@ -36,10 +36,9 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
   // Using centralized AppColors - no need for local color constants
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AfropeepAppBar(
+      appBar: const AfropeepAppBar(
         title: 'Create Account',
       ),
       body: BlocProvider(
@@ -56,17 +55,15 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
               );
             }
           },
-          builder: (context, state) {
-            return SafeArea(
+          builder: (context, state) => SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Center(
                   child: SingleChildScrollView(
                     child: Form(
                       key: _formKey,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // Email icon using reusable widget
                           const AuthIconContainer(
@@ -103,10 +100,8 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                             prefixIcon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
                             onChanged: () => setState(() {}),
-                            validationChecker: (text) {
-                              return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(text);
-                            },
+                            validationChecker: (text) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(text),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
@@ -219,7 +214,7 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                               GestureDetector(
                                 onTap: () {
                                   Navigator.pushReplacementNamed(
-                                      context, '/email_login');
+                                      context, '/email_login',);
                                 },
                                 child: Text(
                                   'Log In',
@@ -238,10 +233,8 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                   ),
                 ),
               ),
-            );
-          },
+            ),
         ),
       ),
     );
-  }
 }

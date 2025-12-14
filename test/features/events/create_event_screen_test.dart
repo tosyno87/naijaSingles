@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:naijasingles/features/events/data/models/enhanced_event_model.dart';
+import 'package:naijasingles/features/events/data/services/user_event_service.dart';
 import 'package:naijasingles/features/events/presentation/bloc/event_creation_bloc.dart';
 import 'package:naijasingles/features/events/presentation/screens/create_event_screen.dart';
-import 'package:naijasingles/features/events/data/services/user_event_service.dart';
 
 class MockEventCreationBloc extends Mock implements EventCreationBloc {}
 
@@ -29,14 +29,12 @@ void main() {
           .thenAnswer((_) => Stream.value(EventCreationInitial()));
     });
 
-    Widget createWidgetUnderTest({EnhancedEventModel? existingEvent}) {
-      return MaterialApp(
+    Widget createWidgetUnderTest({EnhancedEventModel? existingEvent}) => MaterialApp(
         home: BlocProvider<EventCreationBloc>.value(
           value: mockEventCreationBloc,
           child: CreateEventScreen(existingEvent: existingEvent),
         ),
       );
-    }
 
     testWidgets('should display create event screen with correct structure',
         (WidgetTester tester) async {
@@ -100,9 +98,9 @@ void main() {
     testWidgets('should display success state correctly',
         (WidgetTester tester) async {
       when(() => mockEventCreationBloc.state).thenReturn(
-          EventCreationSuccess('event123', 'Event created successfully!'));
+          const EventCreationSuccess('event123', 'Event created successfully!'),);
       when(() => mockEventCreationBloc.stream).thenAnswer((_) => Stream.value(
-          EventCreationSuccess('event123', 'Event created successfully!')));
+          const EventCreationSuccess('event123', 'Event created successfully!'),),);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -113,9 +111,9 @@ void main() {
     testWidgets('should display error state correctly',
         (WidgetTester tester) async {
       when(() => mockEventCreationBloc.state)
-          .thenReturn(EventCreationError('Error message'));
+          .thenReturn(const EventCreationError('Error message'));
       when(() => mockEventCreationBloc.stream)
-          .thenAnswer((_) => Stream.value(EventCreationError('Error message')));
+          .thenAnswer((_) => Stream.value(const EventCreationError('Error message')));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -126,9 +124,9 @@ void main() {
     testWidgets('should display validation errors correctly',
         (WidgetTester tester) async {
       when(() => mockEventCreationBloc.state)
-          .thenReturn(EventValidationState(false, ['Title is required']));
+          .thenReturn(const EventValidationState(false, ['Title is required']));
       when(() => mockEventCreationBloc.stream).thenAnswer((_) =>
-          Stream.value(EventValidationState(false, ['Title is required'])));
+          Stream.value(const EventValidationState(false, ['Title is required'])),);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -146,7 +144,7 @@ void main() {
         description: 'Existing Description',
         startDate: DateTime.now().add(const Duration(days: 1)),
         endDate: DateTime.now().add(const Duration(days: 1, hours: 2)),
-        location: EventLocation(
+        location: const EventLocation(
           name: 'Existing Venue',
           address: 'Existing Address',
           city: 'Existing City',
@@ -157,7 +155,6 @@ void main() {
         category: 'Cultural Events',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
-        status: EventStatus.published,
       );
 
       await tester
@@ -183,7 +180,7 @@ void main() {
         description: 'Existing Description',
         startDate: DateTime.now().add(const Duration(days: 1)),
         endDate: DateTime.now().add(const Duration(days: 1, hours: 2)),
-        location: EventLocation(
+        location: const EventLocation(
           name: 'Existing Venue',
           address: 'Existing Address',
           city: 'Existing City',
@@ -194,7 +191,6 @@ void main() {
         category: 'Cultural Events',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
-        status: EventStatus.published,
       );
 
       await tester

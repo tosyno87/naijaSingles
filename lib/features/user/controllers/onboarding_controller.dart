@@ -1,17 +1,19 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'dart:developer';
-import '../../../common/widgets/loading_transition_screen.dart';
+
 import '../../../common/providers/user_provider.dart';
-import '../../../services/profile_image_cropper_service.dart';
-import '../../../services/bulk_photo_picker_service.dart';
 import '../../../common/utils/app_logger.dart';
+import '../../../common/widgets/loading_transition_screen.dart';
+import '../../../services/bulk_photo_picker_service.dart';
+import '../../../services/profile_image_cropper_service.dart';
 
 class OnboardingController extends ChangeNotifier {
   // Basic user data
@@ -21,7 +23,7 @@ class OnboardingController extends ChangeNotifier {
   String _tribe = '';
   String _bio = '';
   List<String> _interests = [];
-  List<File?> _profilePhotos = List.filled(5, null); // Support up to 5 photos
+  final List<File?> _profilePhotos = List.filled(5, null); // Support up to 5 photos
   bool _isLoading = false;
 
   // Additional user data (for compatibility with existing code)
@@ -45,7 +47,7 @@ class OnboardingController extends ChangeNotifier {
   List<int> _ageRange = [18, 50]; // Default age range
 
   // Additional profile fields
-  double _height = 170.0; // Default height in cm
+  double _height = 170; // Default height in cm
   String _heightUnit = 'cm'; // 'cm' or 'ft'
   String _lookingFor = 'Dating'; // Dating, Friendship, Networking
   String _relationshipIntent =
@@ -115,9 +117,9 @@ class OnboardingController extends ChangeNotifier {
       return '${_height.round()} cm';
     } else {
       // Convert cm to feet and inches
-      double totalInches = _height / 2.54;
-      int feet = (totalInches / 12).floor();
-      int inches = (totalInches % 12).round();
+      final double totalInches = _height / 2.54;
+      final int feet = (totalInches / 12).floor();
+      final int inches = (totalInches % 12).round();
       return '$feet\'$inches"';
     }
   }
@@ -353,9 +355,7 @@ class OnboardingController extends ChangeNotifier {
         age >= 18; // Ensure user is at least 18
   }
 
-  bool isTribeSelected() {
-    return _tribe.isNotEmpty;
-  }
+  bool isTribeSelected() => _tribe.isNotEmpty;
 
   bool isBioComplete() {
     return _bio.length >= 50; // Updated minimum bio length for dating context
@@ -368,14 +368,14 @@ class OnboardingController extends ChangeNotifier {
 
   bool isPhotoUploaded() {
     // Require at least 3 photos
-    int photoCount = _profilePhotos.where((photo) => photo != null).length;
+    final int photoCount = _profilePhotos.where((photo) => photo != null).length;
     return photoCount >= 3;
   }
 
   // Photo selection for a specific index with industry-standard cropping
   Future<void> pickProfilePhoto(ImageSource source, int index, BuildContext? context) async {
     try {
-      log("📸 Starting photo pick for index $index with source: $source");
+      log('📸 Starting photo pick for index $index with source: $source');
       
       // Determine crop type based on photo index
       CropType cropType;
@@ -419,13 +419,13 @@ class OnboardingController extends ChangeNotifier {
       if (croppedImage != null) {
         _profilePhotos[index] = croppedImage;
         notifyListeners();
-        log("✅ Photo $index cropped and saved successfully");
+        log('✅ Photo $index cropped and saved successfully');
       } else {
-        log("⚠️ Photo selection cancelled or failed for index $index");
+        log('⚠️ Photo selection cancelled or failed for index $index');
       }
     } catch (e, stackTrace) {
-      log("❌ Error picking and cropping image: $e");
-      log("❌ Stack trace: $stackTrace");
+      log('❌ Error picking and cropping image: $e');
+      log('❌ Stack trace: $stackTrace');
       
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -447,7 +447,6 @@ class OnboardingController extends ChangeNotifier {
       final List<File> selectedPhotos =
           await BulkPhotoPickerService.pickMultiplePhotos(
         context: context,
-        maxPhotos: 5,
       );
 
       if (selectedPhotos.isEmpty) return;
@@ -467,9 +466,9 @@ class OnboardingController extends ChangeNotifier {
       }
 
       notifyListeners();
-      log("✅ Bulk photo selection completed: ${croppedPhotos.length} photos added");
+      log('✅ Bulk photo selection completed: ${croppedPhotos.length} photos added');
     } catch (e) {
-      log("❌ Error in bulk photo selection: $e");
+      log('❌ Error in bulk photo selection: $e');
     }
   }
 
@@ -489,11 +488,11 @@ class OnboardingController extends ChangeNotifier {
 
       // Validate onboarding data before saving
       debugPrint('🔍 Validating onboarding data before save...');
-      bool isDataValid = validateOnboardingData();
+      final bool isDataValid = validateOnboardingData();
 
       if (!isDataValid) {
         debugPrint(
-            '❌ Onboarding data validation failed - some required fields are missing');
+            '❌ Onboarding data validation failed - some required fields are missing',);
         // Still proceed with save but log the issues
       }
 
@@ -503,7 +502,7 @@ class OnboardingController extends ChangeNotifier {
 
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        throw Exception("User not authenticated");
+        throw Exception('User not authenticated');
       }
 
       // Show loading screen if context is provided
@@ -570,7 +569,7 @@ class OnboardingController extends ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      log("Error saving user data: $e");
+      log('Error saving user data: $e');
 
       // If there's an error but context is provided, still navigate
       if (context != null && context.mounted) {
@@ -586,7 +585,7 @@ class OnboardingController extends ChangeNotifier {
   }
 
   // Navigate to main screen
-  void _navigateToMainScreen(BuildContext context) async {
+  Future<void> _navigateToMainScreen(BuildContext context) async {
     // Ensure UserProvider is updated before navigation
     // This prevents MainNavigationScreen from redirecting back to onboarding
     try {
@@ -606,7 +605,7 @@ class OnboardingController extends ChangeNotifier {
         while (retries < 5 && 
                (userProvider.currentUser == null || 
                 userProvider.currentUser?.name == null ||
-                userProvider.currentUser?.name?.isEmpty == true)) {
+                (userProvider.currentUser?.name?.isEmpty ?? false))) {
           await Future.delayed(const Duration(milliseconds: 200));
           retries++;
         }
@@ -735,7 +734,7 @@ class OnboardingController extends ChangeNotifier {
     AppLogger.debug('   Gender: $_gender');
     AppLogger.debug('   Location: ${_locationName ?? 'Not set'}');
     AppLogger.debug(
-        '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}');
+        '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}',);
     AppLogger.debug('   Tribe: $_tribe');
     AppLogger.debug('   Bio: ${_bio.length} characters');
     AppLogger.debug('   Interests: ${_interests.length} items - $_interests');
@@ -755,7 +754,7 @@ class OnboardingController extends ChangeNotifier {
     AppLogger.debug('     Smoking: $_smokingPreference');
     AppLogger.debug('     Nationality: $_nationality');
     AppLogger.debug(
-        '   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos');
+        '   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos',);
 
     // Save essential data to Firestore
     AppLogger.info('🔍 Saving essential user data to Firestore...');
@@ -790,8 +789,8 @@ class OnboardingController extends ChangeNotifier {
 
   // Upload profile pictures with proper error handling
   Future<void> _uploadProfilePictures(String userId) async {
-    List<String> photoUrls = [];
-    List<File> validPhotos = _profilePhotos.whereType<File>().toList();
+    final List<String> photoUrls = [];
+    final List<File> validPhotos = _profilePhotos.whereType<File>().toList();
 
     if (validPhotos.isEmpty) {
       log('⚠️ No photos to upload');
@@ -941,9 +940,9 @@ class OnboardingController extends ChangeNotifier {
 
   // Helper method to get ft/in format from height in cm
   String _getHeightFtIn() {
-    double totalInches = _height / 2.54;
-    int feet = (totalInches / 12).floor();
-    int inches = (totalInches % 12).round();
+    final double totalInches = _height / 2.54;
+    final int feet = (totalInches / 12).floor();
+    final int inches = (totalInches % 12).round();
     return '$feet\'$inches"';
   }
 
@@ -952,7 +951,7 @@ class OnboardingController extends ChangeNotifier {
     AppLogger.debug('🔍 Validating onboarding data completeness:');
 
     bool isValid = true;
-    List<String> missingFields = [];
+    final List<String> missingFields = [];
 
     // Required fields validation
     if (_fullName.isEmpty) {
@@ -1018,7 +1017,7 @@ class OnboardingController extends ChangeNotifier {
     }
 
     // Check if at least one photo is uploaded
-    bool hasPhotos = _profilePhotos.any((photo) => photo != null);
+    final bool hasPhotos = _profilePhotos.any((photo) => photo != null);
     if (!hasPhotos) {
       missingFields.add('Profile Photos');
       isValid = false;
@@ -1039,7 +1038,7 @@ class OnboardingController extends ChangeNotifier {
       AppLogger.debug('   Interested in: $_interestedIn');
       AppLogger.debug('   Age range: ${_ageRange[0]}-${_ageRange[1]}');
       AppLogger.debug(
-          '   Photos: ${_profilePhotos.where((p) => p != null).length} uploaded');
+          '   Photos: ${_profilePhotos.where((p) => p != null).length} uploaded',);
     } else {
       AppLogger.warning('❌ Missing required fields: ${missingFields.join(', ')}');
     }
@@ -1048,8 +1047,7 @@ class OnboardingController extends ChangeNotifier {
   }
 
   // Method to get a summary of all onboarding data for debugging
-  Map<String, dynamic> getOnboardingDataSummary() {
-    return {
+  Map<String, dynamic> getOnboardingDataSummary() => {
       'fullName': _fullName,
       'age': age,
       'gender': _gender,
@@ -1067,5 +1065,4 @@ class OnboardingController extends ChangeNotifier {
       'photosCount': _profilePhotos.where((p) => p != null).length,
       'hasAllRequiredData': validateOnboardingData(),
     };
-  }
 }

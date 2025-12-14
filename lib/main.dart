@@ -10,22 +10,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/routes/router.dart';
-import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
-import 'package:naijasingles/services/enhanced_notification_service.dart';
-import 'package:naijasingles/features/events/data/services/seed_events_service.dart';
 import 'package:provider/provider.dart';
 
 import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/providers/theme_provider.dart';
+import 'common/providers/user_provider.dart';
+import 'common/routes/route_name.dart';
+import 'common/routes/router.dart';
 import 'common/utils/observer.dart';
+import 'config/secure_config.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
+import 'features/events/data/services/seed_events_service.dart';
+import 'features/user/controllers/onboarding_controller.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
-import 'config/secure_config.dart';
+import 'services/enhanced_notification_service.dart';
 
 
 Future<void> main() async {
@@ -90,7 +90,7 @@ Future<void> main() async {
       log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
     },
     onError: (error) {
-      log("❌ Auth state error: $error");
+      log('❌ Auth state error: $error');
     },
   );
 
@@ -200,8 +200,7 @@ class MyApp extends StatelessWidget {
     EnhancedNotificationService.setNavigatorKey(navigatorKey);
 
     return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
+      builder: (context, themeProvider, child) => MaterialApp(
           navigatorKey: navigatorKey, // Add navigator key
           title: 'Afropeep',
           debugShowCheckedModeBanner: false,
@@ -225,8 +224,7 @@ class MyApp extends StatelessWidget {
             }
             return child;
           },
-        );
-      },
+        ),
     );
   }
 }

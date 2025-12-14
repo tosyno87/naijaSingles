@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../common/constants/app_colors.dart';
+
 import '../user/controllers/onboarding_controller.dart';
 import 'shared_styles.dart';
 
@@ -11,16 +13,14 @@ import 'shared_styles.dart';
 /// This screen collects information about the user's music preferences,
 /// fashion style, and weekend activities.
 class OnboardingStepBExpression extends StatefulWidget {
+
+  const OnboardingStepBExpression({
+    required this.onNext, required this.onBack, super.key,
+    this.backgroundColor = AppColors.backgroundColor,
+  });
   final VoidCallback onNext;
   final VoidCallback onBack;
   final Color backgroundColor;
-
-  OnboardingStepBExpression({
-    Key? key,
-    required this.onNext,
-    required this.onBack,
-    this.backgroundColor = OnboardingStyles.backgroundColor,
-  }) : super(key: key);
 
   @override
   State<OnboardingStepBExpression> createState() =>
@@ -57,7 +57,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
     'Reggae',
     'Dancehall',
     'Alte',
-    'Afro-fusion'
+    'Afro-fusion',
   ];
 
   @override
@@ -109,9 +109,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
             // Main content
             SingleChildScrollView(
               padding: EdgeInsets.only(
-                left: 24.0,
-                right: 24.0,
-                top: 24.0,
+                left: 24,
+                right: 24,
+                top: 24,
                 bottom: 100.0 + keyboardPadding, // Extra padding for labelLarge
               ),
               child: Column(
@@ -122,7 +122,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: deepGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
@@ -163,7 +163,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
 
                   // New section title
                   Text(
-                    "How do you express yourself?",
+                    'How do you express yourself?',
                     style: GoogleFonts.montserrat(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -234,8 +234,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                 ),
                                 selected: isSelected,
                                 onSelected: (selected) {
-                                  List<String> updatedGenres = [
-                                    ...controller.genres
+                                  final List<String> updatedGenres = [
+                                    ...controller.genres,
                                   ];
                                   if (selected) {
                                     updatedGenres.add(genre);
@@ -374,7 +374,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                             ),
                             const SizedBox(width: 8),
                             _buildSectionTitle(
-                                'What\'s your ideal weekend like?'),
+                                'What\'s your ideal weekend like?',),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -472,7 +472,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.grey.shade700,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                            horizontal: 16, vertical: 12,),
                       ),
                     ),
 
@@ -517,8 +517,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
   }
 
   /// Builds a section title with consistent styling
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 18,
@@ -526,14 +525,11 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
         color: Colors.black87,
       ),
     );
-  }
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) {
-    return controller.genres.isNotEmpty &&
+  bool _isStepValid(OnboardingController controller) => controller.genres.isNotEmpty &&
         controller.fashionStyle != null &&
         controller.fashionStyle!.trim().isNotEmpty &&
         controller.weekendVibe != null &&
         controller.weekendVibe!.trim().isNotEmpty;
-  }
 }

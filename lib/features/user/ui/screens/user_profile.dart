@@ -4,10 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/utils/crousle_slider.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
-import 'package:naijasingles/features/user/ui/widgets/user_info.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +11,10 @@ import '../../../../common/constants/adds.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
+import '../../../../common/routes/route_name.dart';
+import '../../../../common/utils/crousle_slider.dart';
 import '../../../../common/utils/upload_media.dart';
+import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../common/widgets/image_widget.dart';
 import '../../../payment/ui/payments_detail.dart';
@@ -23,17 +22,15 @@ import '../../../payment/ui/products.dart';
 import '../../bloc/update_user_bloc.dart';
 import '../../bloc/update_user_state.dart';
 import '../../bloc/user_event.dart';
+import '../widgets/user_info.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage(
+      {required this.isPuchased, required this.items, required this.purchases, super.key,});
   // final bool isPuchased;
   final bool isPuchased;
   final Map items;
   final List<PurchaseDetails> purchases;
-  const ProfilePage(
-      {super.key,
-      required this.isPuchased,
-      required this.items,
-      required this.purchases});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -46,19 +43,19 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final currentUser =
-        Provider.of<UserProvider>(context, listen: true).currentUser;
+        Provider.of<UserProvider>(context).currentUser;
     return BlocListener<UserBloc, UserStates>(
       listener: (context, state) {
         if (state is UpdatingUserProfilePicture) {
           CustomSnackbar.showSnackBarSimple(
-              "Uploading..".tr().toString(), context);
+              'Uploading..'.tr().toString(), context,);
         } else if (state is UserProfilePictureUploaded) {
-          log("coming in userprofile updated");
+          log('coming in userprofile updated');
           CustomSnackbar.showSnackBarSimple(
-              "Media added successfully..".tr().toString(), context);
+              'Media added successfully..'.tr().toString(), context,);
         } else if (state is UserUpdationFailed) {
           CustomSnackbar.showSnackBarSimple(
-              state.message.tr().toString(), context);
+              state.message.tr().toString(), context,);
         }
       },
       child: Scaffold(
@@ -67,8 +64,8 @@ class _ProfilePageState extends State<ProfilePage> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
               borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(50), topRight: Radius.circular(50)),
-              color: Theme.of(context).primaryColor),
+                  topLeft: Radius.circular(50), topRight: Radius.circular(50),),
+              color: Theme.of(context).primaryColor,),
           child: SingleChildScrollView(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -77,9 +74,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     height: 10,
                   ),
                   Hero(
-                    tag: "abc",
+                    tag: 'abc',
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8),
                       child: CircleAvatar(
                         radius: 80,
                         backgroundColor: AppColors.secondaryColor,
@@ -91,13 +88,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 onTap: () => showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (context) {
-                                      return Info(
+                                    builder: (context) => Info(
                                         currentUser,
                                         currentUser,
                                         false,
-                                      );
-                                    }),
+                                      ),),
                                 child: Center(
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(
@@ -120,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 alignment: Alignment.bottomRight,
                                 child: Card(
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30)),
+                                      borderRadius: BorderRadius.circular(30),),
                                   color: primaryColor,
                                   child: IconButton(
                                       alignment: Alignment.center,
@@ -132,16 +127,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                       onPressed: () async {
                                         final file = await UploadMedia.getImage(
                                             context: context,
-                                            checktype: 'profile');
-                                        log("file after edit is $file");
+                                            checktype: 'profile',);
+                                        log('file after edit is $file');
                                         // ignore: use_build_context_synchronously
                                         BlocProvider.of<UserBloc>(context).add(
                                           UpdateUserProfilePictures(
                                               checktype: 'profile',
                                               photo: file!,
-                                              currentUser: currentUser),
+                                              currentUser: currentUser,),
                                         );
-                                      }),
+                                      },),
                                 ),
                               ),
                             ],
@@ -152,30 +147,30 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   Text(
                     currentUser.name != null && currentUser.age != null
-                        ? "${currentUser.name}, ${currentUser.age}"
+                        ? '${currentUser.name}, ${currentUser.age}'
                             .tr()
                             .toString()
-                        : "".tr().toString(),
+                        : ''.tr().toString(),
                     style: TextStyle(
                         color: themeProvider.isDarkMode
                             ? Colors.white
                             : Colors.black87,
                         fontWeight: FontWeight.w500,
-                        fontSize: 30),
+                        fontSize: 30,),
                   ),
                   Text(
                     currentUser.editInfo!['job_title'] != null
                         ? "${currentUser.editInfo!['job_title'].toString().trim()} ${currentUser.editInfo!['company'] != null ? "at ${currentUser.editInfo!['company'].toString().trim()}" : ""}"
                             .tr()
                             .toString()
-                        : "".tr().toString(),
+                        : ''.tr().toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: themeProvider.isDarkMode
                             ? Colors.white
                             : Colors.black54,
                         fontWeight: FontWeight.w400,
-                        fontSize: 20),
+                        fontSize: 20,),
                   ),
                   Text(
                     currentUser.editInfo!['university'] != null
@@ -183,14 +178,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             .tr()
                             .toString()
                             .trim()
-                        : "".tr().toString(),
+                        : ''.tr().toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: themeProvider.isDarkMode
                             ? Colors.white
                             : Colors.black54,
                         fontWeight: FontWeight.w400,
-                        fontSize: 20),
+                        fontSize: 20,),
                   ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * .40,
@@ -199,7 +194,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 60),
                           child: Align(
-                            alignment: Alignment.center,
                             child: Column(
                               children: <Widget>[
                                 SizedBox(
@@ -219,30 +213,30 @@ class _ProfilePageState extends State<ProfilePage> {
                                           final file =
                                               await UploadMedia.getImage(
                                                   context: context,
-                                                  checktype: 'addMedia');
+                                                  checktype: 'addMedia',);
                                           // ignore: use_build_context_synchronously
                                           BlocProvider.of<UserBloc>(context)
                                               .add(
                                             UpdateUserProfilePictures(
                                                 checktype: 'addMedia',
                                                 photo: file!,
-                                                currentUser: currentUser),
+                                                currentUser: currentUser,),
                                           );
                                         } else {
                                           CustomSnackbar.showSnackBarSimple(
-                                              "You can upload upto 9 images"
+                                              'You can upload upto 9 images'
                                                   .tr()
                                                   .toString(),
-                                              context);
+                                              context,);
                                         }
-                                      }),
+                                      },),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(8),
                                   child: Text(
-                                    "Add media".tr().toString(),
-                                    style: TextStyle(
-                                        color: AppColors.secondaryColor),
+                                    'Add media'.tr().toString(),
+                                    style: const TextStyle(
+                                        color: AppColors.secondaryColor,),
                                   ),
                                 ),
                               ],
@@ -259,7 +253,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       splashColor: AppColors.secondaryColor,
                                       heroTag: UniqueKey(),
                                       backgroundColor: Colors.white,
-                                      child: Icon(
+                                      child: const Icon(
                                         Icons.settings,
                                         color: AppColors.secondaryColor,
                                         size: 28,
@@ -268,22 +262,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                         Navigator.pushNamed(
                                             context, RouteName.settingPage,
                                             arguments: {
-                                              "currentUser": currentUser,
-                                              "isPurchased": widget.isPuchased,
-                                              "items": widget.items
-                                            });
-                                      }),
+                                              'currentUser': currentUser,
+                                              'isPurchased': widget.isPuchased,
+                                              'items': widget.items,
+                                            },);
+                                      },),
                                   Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
-                                      "Settings".tr().toString(),
-                                      style: TextStyle(
-                                          color: AppColors.secondaryColor),
+                                      'Settings'.tr().toString(),
+                                      style: const TextStyle(
+                                          color: AppColors.secondaryColor,),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
-                            )),
+                            ),),
                         Padding(
                             padding: const EdgeInsets.only(
                               right: 30,
@@ -297,27 +291,27 @@ class _ProfilePageState extends State<ProfilePage> {
                                       heroTag: UniqueKey(),
                                       splashColor: AppColors.secondaryColor,
                                       backgroundColor: Colors.white,
-                                      child: Icon(
+                                      child: const Icon(
                                         Icons.edit,
                                         color: AppColors.secondaryColor,
                                         size: 28,
                                       ),
                                       onPressed: () {
                                         Navigator.pushNamed(context,
-                                            RouteName.editProfileScreen);
-                                      }),
+                                            RouteName.editProfileScreen,);
+                                      },),
                                   Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(8),
                                     child: Text(
-                                      "Edit Info".tr().toString(),
-                                      style: TextStyle(
+                                      'Edit Info'.tr().toString(),
+                                      style: const TextStyle(
                                         color: AppColors.secondaryColor,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            )),
+                            ),),
                         const Padding(
                           padding: EdgeInsets.only(top: 180),
                           child: SizedBox(
@@ -333,35 +327,35 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         CarouselSlider(
                           adds: adds,
-                        )
+                        ),
                       ],
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   CustomButton(
                       text: widget.isPuchased
-                          ? "Check Payment Details".tr().toString()
-                          : "Subscribe Plan".tr().toString(),
+                          ? 'Check Payment Details'.tr().toString()
+                          : 'Subscribe Plan'.tr().toString(),
                       onTap: () async {
                         if (widget.isPuchased) {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
                                 builder: (context) =>
-                                    PaymentDetails(widget.purchases)),
+                                    PaymentDetails(widget.purchases),),
                           );
                         } else {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
                                 builder: (context) =>
-                                    Products(currentUser, null, widget.items)),
+                                    Products(currentUser, null, widget.items),),
                           );
                         }
                       },
                       color: AppColors.textPrimary,
-                      active: true)
-                ]),
+                      active: true,),
+                ],),
           ),
         ),
       ),

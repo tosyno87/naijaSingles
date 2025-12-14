@@ -46,11 +46,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
     _logoScale = Tween<double>(
       begin: 0.3,
-      end: 1.0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _logoController,
       curve: Curves.elasticOut,
-    ));
+    ),);
 
     // Text fade-in animation
     _textController = AnimationController(
@@ -58,12 +58,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       vsync: this,
     );
     _textOpacity = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _textController,
       curve: Curves.easeInOut,
-    ));
+    ),);
 
     // Button slide-in animation
     _buttonController = AnimationController(
@@ -76,16 +76,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     ).animate(CurvedAnimation(
       parent: _buttonController,
       curve: Curves.easeOutBack,
-    ));
+    ),);
 
     // Background pattern fade-in animation
     _backgroundOpacity = Tween<double>(
-      begin: 0.0,
+      begin: 0,
       end: 0.02,
     ).animate(CurvedAnimation(
       parent: _textController,
       curve: Curves.easeInOut,
-    ));
+    ),);
 
     // Start animations with delays - check mounted before each call
     if (mounted) {
@@ -132,7 +132,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         // However, we want to show the welcome screen first, so we'll let user click the button
       }
     } catch (e) {
-      log("Error checking auth status: $e");
+      log('Error checking auth status: $e');
       if (mounted) {
         setState(() {
           _isAuthenticated = false;
@@ -147,13 +147,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     return Scaffold(
       body: AnimatedBuilder(
         animation: _backgroundOpacity,
-        builder: (context, child) {
-          return Container(
+        builder: (context, child) => DecoratedBox(
             decoration: BoxDecoration(
               // Clean white background
               color: Colors.white,
@@ -164,16 +163,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
             child: SafeArea(
-              bottom: true, // Explicitly handle bottom safe area
               child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
+                builder: (context, constraints) => SingleChildScrollView(
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         minHeight: constraints.maxHeight,
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -182,15 +179,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             // Clean Afropeep Logo with bounce-in and fade animation
                             AnimatedBuilder(
                               animation: _logoScale,
-                              builder: (context, child) {
-                                return Transform.scale(
+                              builder: (context, child) => Transform.scale(
                                   scale: _logoScale.value,
                                   child: Opacity(
                                     opacity: _logoScale.value.clamp(0.0, 1.0),
                                     child: _buildCleanLogo(),
                                   ),
-                                );
-                              },
+                                ),
                             ),
                             
                             const SizedBox(height: 32), // Increased spacing for massive logo
@@ -198,12 +193,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             // Animated progress bar instead of decorative line
                             AnimatedBuilder(
                               animation: _textOpacity,
-                              builder: (context, child) {
-                                return Opacity(
+                              builder: (context, child) => Opacity(
                                   opacity: _textOpacity.value,
                                   child: _buildAnimatedProgressBar(),
-                                );
-                              },
+                                ),
                             ),
 
                             const SizedBox(height: 40), // Increased spacing
@@ -211,11 +204,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             // Welcome message with animation
                             AnimatedBuilder(
                               animation: _textOpacity,
-                              builder: (context, child) {
-                                return Opacity(
+                              builder: (context, child) => Opacity(
                                   opacity: _textOpacity.value,
                                   child: Text(
-                                    "Welcome to Afropeep, your journey to meaningful connections starts here.",
+                                    'Welcome to Afropeep, your journey to meaningful connections starts here.',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.montserrat(
                                       fontSize: 16,
@@ -225,8 +217,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       height: 1.4,
                                     ),
                                   ),
-                                );
-                              },
+                                ),
                             ),
 
                             const SizedBox(height: 24), // Increased spacing
@@ -234,12 +225,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             // Rotating greeting in African languages with animation
                             AnimatedBuilder(
                               animation: _textOpacity,
-                              builder: (context, child) {
-                                return Opacity(
+                              builder: (context, child) => Opacity(
                                   opacity: _textOpacity.value,
                                   child: const RotatingGreetingWidget(),
-                                );
-                              },
+                                ),
                             ),
 
                             const SizedBox(height: 32), // Increased spacing
@@ -247,11 +236,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             // Main tagline with animation
                             AnimatedBuilder(
                               animation: _textOpacity,
-                              builder: (context, child) {
-                                return Opacity(
+                              builder: (context, child) => Opacity(
                                   opacity: _textOpacity.value,
                                   child: Text(
-                                    "Connect Your Tribe From Anywhere",
+                                    'Connect Your Tribe From Anywhere',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.montserrat(
                                       fontSize: 18,
@@ -260,8 +248,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       height: 1.3,
                                     ),
                                   ),
-                                );
-                              },
+                                ),
                             ),
 
                             const SizedBox(height: 40), // Fixed spacing instead of Spacer
@@ -279,10 +266,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 SlideTransition(
                                   position: _buttonSlide,
                                   child: _buildGradientButton(
-                                    text: "Continue to App",
+                                    text: 'Continue to App',
                                     onPressed: () {
                                       Navigator.pushReplacementNamed(
-                                          context, RouteName.mainNavigation);
+                                          context, RouteName.mainNavigation,);
                                     },
                                   ),
                                 ),
@@ -293,14 +280,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 SlideTransition(
                                   position: _buttonSlide,
                                   child: _buildGradientButton(
-                                    text: "Create Account",
+                                    text: 'Create Account',
                                     onPressed: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => PhoneNumber(
                                             updatePhoneNumber: false,
-                                            isSignIn: false, // Sign-up mode
                                           ),
                                         ),
                                       );
@@ -314,7 +300,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 SlideTransition(
                                   position: _buttonSlide,
                                   child: _buildOutlinedButton(
-                                    text: "Login",
+                                    text: 'Login',
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -339,12 +325,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
               ),
             ),
-          );
-        },
+          ),
       ),
     );
   }
@@ -355,12 +339,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   // Animated progress bar
-  Widget _buildAnimatedProgressBar() {
-    return TweenAnimationBuilder<double>(
+  Widget _buildAnimatedProgressBar() => TweenAnimationBuilder<double>(
       duration: const Duration(seconds: 2),
-      tween: Tween(begin: 0.0, end: 1.0),
-      builder: (context, value, child) {
-        return Container(
+      tween: Tween(begin: 0, end: 1),
+      builder: (context, value, child) => Container(
           width: 200,
           height: 2,
           decoration: BoxDecoration(
@@ -383,37 +365,30 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
           ),
-        );
-      },
+        ),
     );
-  }
 
   // Modern dating app style button widget
   Widget _buildAfropeepButton({
     required String text,
     required VoidCallback onPressed,
     required bool isPrimary,
-  }) {
-    return TweenAnimationBuilder<double>(
+  }) => TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 1500),
-      tween: Tween(begin: 0.98, end: 1.0),
-      builder: (context, scale, child) {
-        return Transform.scale(
+      tween: Tween(begin: 0.98, end: 1),
+      builder: (context, scale, child) => Transform.scale(
           scale: scale,
           child: isPrimary
               ? _buildPrimaryButton(text: text, onPressed: onPressed)
               : _buildSecondaryButton(text: text, onPressed: onPressed),
-        );
-      },
+        ),
     );
-  }
 
   // Primary button: Green gradient with white text
   Widget _buildPrimaryButton({
     required String text,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => Container(
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
@@ -423,7 +398,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             color: AppColors.primaryGreen.withOpacity(0.25),
             blurRadius: 12,
             offset: const Offset(0, 4),
-            spreadRadius: 0,
           ),
         ],
       ),
@@ -452,14 +426,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
       ),
     );
-  }
 
   // Secondary button: Ghost style with green border
   Widget _buildSecondaryButton({
     required String text,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.backgroundColor.withOpacity(0.5), // Light cream fill
@@ -495,28 +467,23 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
       ),
     );
-  }
 
   // Legacy methods kept for compatibility - now use _buildAfropeepButton
   Widget _buildGradientButton({
     required String text,
     required VoidCallback onPressed,
-  }) {
-    return _buildAfropeepButton(
+  }) => _buildAfropeepButton(
       text: text,
       onPressed: onPressed,
       isPrimary: true,
     );
-  }
 
   Widget _buildOutlinedButton({
     required String text,
     required VoidCallback onPressed,
-  }) {
-    return _buildAfropeepButton(
+  }) => _buildAfropeepButton(
       text: text,
       onPressed: onPressed,
       isPrimary: false,
     );
-  }
 }

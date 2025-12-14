@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/constants/constants.dart';
@@ -14,8 +13,6 @@ part 'phone_auth_event.dart';
 part 'phone_auth_state.dart';
 
 class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
-  final PhoneAuthRepository phoneAuthRepository;
-  final auth = firebaseAuthInstance;
   PhoneAuthBloc({required this.phoneAuthRepository})
       : super(PhoneAuthInitial()) {
     // When user clicks on send otp labelLarge then this event will be fired
@@ -27,11 +24,11 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
 
     // When the firebase sends the code to the user's phone, this event will be fired
     on<OnPhoneOtpSent>((event, emit) =>
-        emit(PhoneAuthCodeSentSuccess(verificationId: event.verificationId)));
+        emit(PhoneAuthCodeSentSuccess(verificationId: event.verificationId)),);
 
     // When any error occurs while sending otp to the user's phone, this event will be fired
     on<OnPhoneAuthErrorEvent>(
-        (event, emit) => emit(PhoneAuthError(error: event.error)));
+        (event, emit) => emit(PhoneAuthError(error: event.error)),);
 
     // When the otp verification is successful, this event will be fired
     on<OnPhoneAuthVerificationCompleteEvent>(_loginWithCredential);
@@ -39,28 +36,30 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
     // For development testing with Firebase test phone numbers
     on<UseTestPhoneAuthEvent>(_onUseTestPhoneAuth);
   }
+  final PhoneAuthRepository phoneAuthRepository;
+  final auth = firebaseAuthInstance;
   FutureOr<void> _updatenumber(
-      OnPhoneNumberupdateEvent event, Emitter<PhoneAuthState> emit) async {
+      OnPhoneNumberupdateEvent event, Emitter<PhoneAuthState> emit,) async {
     emit(PhoneAuthLoading());
     try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      final PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: event.verificationId,
         smsCode: event.token.toString(),
       );
       await phoneAuthRepository.updatePhone(
-          phoneNumber: event.phoneNumber, verificationCompleted: credential);
-      User? user = firebaseAuthInstance.currentUser;
+          phoneNumber: event.phoneNumber, verificationCompleted: credential,);
+      final User? user = firebaseAuthInstance.currentUser;
 
       if (user != null) {
         await firebaseFireStoreInstance
-            .collection("users")
+            .collection('users')
             .doc(user.uid)
             .update({'phoneNumber': event.phoneNumber});
         // add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
 
         emit(PhoneupdateSuccess(verificationId: event.verificationId));
       } else {
-        emit(const PhoneAuthError(error: "User is null"));
+        emit(const PhoneAuthError(error: 'User is null'));
       }
     } catch (e) {
       emit(PhoneAuthError(error: e.toString()));
@@ -68,7 +67,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   }
 
   FutureOr<void> _onSendOtp(
-      SendOtpToPhoneEvent event, Emitter<PhoneAuthState> emit) async {
+      SendOtpToPhoneEvent event, Emitter<PhoneAuthState> emit,) async {
     log('');
     log('🎯🎯🎯 EVENT RECEIVED IN BLOC! 🎯🎯🎯');
     log('Event: SendOtpToPhoneEvent');
@@ -117,7 +116,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
             add(OnPhoneOtpSent(
                 verificationId: verificationId,
                 token: resendToken,
-                phoneNumber: normalizedPhone));
+                phoneNumber: normalizedPhone,),);
           },
           verificationFailed: (FirebaseAuthException e) {
             log('❌ Phone verification failed: ${e.code} - ${e.message}');
@@ -151,7 +150,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
             add(OnPhoneOtpSent(
                 verificationId: verificationId,
                 token: resendToken,
-                phoneNumber: normalizedPhone));
+                phoneNumber: normalizedPhone,),);
           },
           verificationFailed: (FirebaseAuthException e) {
             log('❌ Phone verification failed: ${e.code} - ${e.message}');
@@ -168,11 +167,11 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   }
 
   FutureOr<void> _onVerifyOtp(
-      VerifySentOtpEvent event, Emitter<PhoneAuthState> emit) async {
+      VerifySentOtpEvent event, Emitter<PhoneAuthState> emit,) async {
     try {
       emit(PhoneAuthLoading());
       // After receiving the otp, we will verify the otp and then will create a credential from the otp and verificationId and then will send it to the [OnPhoneAuthVerificationCompleteEvent] event to be handled by the bloc and then will emit the [PhoneAuthVerified] state after successful login
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      final PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: event.verificationId,
         smsCode: event.otpCode,
       );
@@ -184,7 +183,7 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
 
   FutureOr<void> _loginWithCredential(
       OnPhoneAuthVerificationCompleteEvent event,
-      Emitter<PhoneAuthState> emit) async {
+      Emitter<PhoneAuthState> emit,) async {
     // After receiving the credential from the event, we will login with the credential and then will emit the [PhoneAuthVerified] state after successful login
     try {
       await auth.signInWithCredential(event.credential).then((user) {
@@ -201,12 +200,12 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
 
   // Handler for development testing with Firebase test phone numbers
   FutureOr<void> _onUseTestPhoneAuth(
-      UseTestPhoneAuthEvent event, Emitter<PhoneAuthState> emit) async {
+      UseTestPhoneAuthEvent event, Emitter<PhoneAuthState> emit,) async {
     try {
       emit(PhoneAuthLoading());
       // Test phone authentication is disabled in production
       emit(const PhoneAuthError(
-          error: "Test authentication is not available in production"));
+          error: 'Test authentication is not available in production',),);
     } catch (e) {
       emit(PhoneAuthError(error: e.toString()));
     }

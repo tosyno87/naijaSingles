@@ -12,22 +12,22 @@ class SwipeblocInitial extends SwipeblocState {}
 class SwipeFailedState extends SwipeblocState {}
 
 class SwipeSucessState extends SwipeblocState {
-  final List<UserModel> users;
 
   const SwipeSucessState(this.users);
+  final List<UserModel> users;
 
   @override
   List<Object> get props => [users];
 }
 
 class SwipeMatchCreatedState extends SwipeblocState {
-  final List<UserModel> users;
-  final UserModel matchedUser;
 
   const SwipeMatchCreatedState({
     required this.users,
     required this.matchedUser,
   });
+  final List<UserModel> users;
+  final UserModel matchedUser;
 
   @override
   List<Object> get props => [users, matchedUser];

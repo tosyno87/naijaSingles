@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
 import '../../../common/utils/app_logger.dart';
+import '../../user/controllers/onboarding_controller.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -56,7 +57,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
     try {
       // Check if location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         setState(() {
           _isLoadingLocation = false;
@@ -89,18 +90,18 @@ class _LocationScreenState extends State<LocationScreen> {
       }
 
       // Get current position
-      Position position = await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
       // Get address from coordinates
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
 
       if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
+        final Placemark place = placemarks[0];
         String location = '';
 
         // Format location based on country
@@ -123,11 +124,11 @@ class _LocationScreenState extends State<LocationScreen> {
             Provider.of<OnboardingController>(context, listen: false);
         controller.setLocationName(location);
         controller.setLocationCoordinates(
-            position.latitude, position.longitude);
+            position.latitude, position.longitude,);
 
         AppLogger.info('🔍 LocationScreen: GPS location set to "$location"');
         AppLogger.info(
-            '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}');
+            '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}',);
       }
     } catch (e) {
       setState(() {
@@ -189,15 +190,14 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+  Widget build(BuildContext context) => SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Text(
-            "Where are you located?",
+            'Where are you located?',
             style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -208,7 +208,7 @@ class _LocationScreenState extends State<LocationScreen> {
           const SizedBox(height: 8),
 
           Text(
-            "This helps us connect you with people nearby",
+            'This helps us connect you with people nearby',
             style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textLightBrown,
@@ -218,12 +218,12 @@ class _LocationScreenState extends State<LocationScreen> {
           const SizedBox(height: 32),
 
           // GPS Location Button
-          Container(
+          SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _isLoadingLocation ? null : _getCurrentLocation,
               icon: _isLoadingLocation
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -231,7 +231,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : Icon(Icons.my_location, color: Colors.white),
+                  : const Icon(Icons.my_location, color: Colors.white),
               label: Text(
                 _isLoadingLocation
                     ? 'Getting Location...'
@@ -266,7 +266,7 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.location_on,
                     color: afropeepGreen,
                     size: 20,
@@ -295,7 +295,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       ],
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.check_circle,
                     color: afropeepGreen,
                     size: 20,
@@ -316,7 +316,7 @@ class _LocationScreenState extends State<LocationScreen> {
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline,
                   color: afropeepGreen,
                   size: 20,
@@ -324,7 +324,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    "Your location helps us show you people nearby. We only show your city, never your exact location.",
+                    'Your location helps us show you people nearby. We only show your city, never your exact location.',
                     style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: textDarkBrown,
@@ -337,5 +337,4 @@ class _LocationScreenState extends State<LocationScreen> {
         ],
       ),
     );
-  }
 }

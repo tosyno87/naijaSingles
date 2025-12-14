@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
+import '../models/user_model.dart';
 
 /// Mode-specific filtering service that applies different filters based on relationship intent
 /// Implements Priority 2: Enhanced Matching Algorithm with mode differentiation
@@ -67,7 +67,7 @@ class ModeSpecificFilteringService {
 
     // TEMPORARILY DISABLED: lookingFor filter (field might not exist or have different name)
     debugPrint(
-        '🔍 TEMPORARILY DISABLING lookingFor FILTER - field might not exist');
+        '🔍 TEMPORARILY DISABLING lookingFor FILTER - field might not exist',);
     // try {
     //   query = query.where('lookingFor', whereIn: ['Dating', 'Romance', 'Relationship', 'Love', 'Marriage']);
     //   debugPrint('💕 Filtering by lookingFor: Dating/Romance/Relationship/Love/Marriage');
@@ -82,7 +82,7 @@ class ModeSpecificFilteringService {
 
     // TEMPORARILY DISABLED: Filter for users with complete dating profiles
     debugPrint(
-        '🔍 TEMPORARILY DISABLING hasDatingProfile FILTER FOR DEBUGGING');
+        '🔍 TEMPORARILY DISABLING hasDatingProfile FILTER FOR DEBUGGING',);
     // query = query.where('hasDatingProfile', isEqualTo: true);
 
     return query;
@@ -110,9 +110,9 @@ class ModeSpecificFilteringService {
       // Expand max distance for friendship
       final friendshipMaxDistance = (currentUser.maxDistance! * 1.5).round();
       query = query.where('maxDistance',
-          isGreaterThanOrEqualTo: friendshipMaxDistance);
+          isGreaterThanOrEqualTo: friendshipMaxDistance,);
       debugPrint(
-          '🤝 Friendship distance filter: ${(friendshipMaxDistance * 0.621371).round()} miles');
+          '🤝 Friendship distance filter: ${(friendshipMaxDistance * 0.621371).round()} miles',);
     }
 
     // Filter for users looking for friendship
@@ -149,14 +149,14 @@ class ModeSpecificFilteringService {
     if (currentUser.maxDistance != null) {
       // Keep original distance for networking
       query = query.where('maxDistance',
-          isGreaterThanOrEqualTo: currentUser.maxDistance!);
+          isGreaterThanOrEqualTo: currentUser.maxDistance,);
       debugPrint(
-          '💼 Networking distance filter: ${(currentUser.maxDistance! * 0.621371).round()} miles');
+          '💼 Networking distance filter: ${(currentUser.maxDistance! * 0.621371).round()} miles',);
     }
 
     // Filter for users looking for networking
     query = query.where('lookingFor',
-        whereIn: ['Networking', 'Business', 'Professional']);
+        whereIn: ['Networking', 'Business', 'Professional'],);
 
     // Filter for users with professional profiles
     query = query.where('hasProfessionalProfile', isEqualTo: true);
@@ -207,7 +207,7 @@ class ModeSpecificFilteringService {
             'min': (currentUser.ageRangeMin! - 10).clamp(18, 100),
             'max': (currentUser.ageRangeMax! + 10).clamp(18, 100),
           },
-          'maxDistance': currentUser.maxDistance!,
+          'maxDistance': currentUser.maxDistance,
           'lookingFor': ['Networking', 'Business', 'Professional'],
           'profileType': 'professional',
           'activityLevel': 'medium',
@@ -248,7 +248,7 @@ class ModeSpecificFilteringService {
 
   static bool _validateDatingMatch(UserModel user) {
     // Check if user has dating-relevant information
-    final bioCheck = user.bio?.isNotEmpty == true;
+    final bioCheck = user.bio?.isNotEmpty ?? false;
     final imageCheck = user.imageUrl != null && user.imageUrl!.isNotEmpty;
     final lookingForCheck = user.lookingFor == 'Dating' ||
         user.lookingFor == 'Romance' ||
@@ -259,7 +259,7 @@ class ModeSpecificFilteringService {
 
   static bool _validateFriendshipMatch(UserModel user) {
     // Check if user has social interests
-    return user.bio?.isNotEmpty == true &&
+    return user.bio?.isNotEmpty ?? false &&
         (user.lookingFor == 'Friendship' ||
             user.lookingFor == 'Friends' ||
             user.lookingFor == 'Social');
@@ -267,8 +267,8 @@ class ModeSpecificFilteringService {
 
   static bool _validateNetworkingMatch(UserModel user) {
     // Check if user has professional information
-    return user.job_title?.isNotEmpty == true &&
-        user.company?.isNotEmpty == true &&
+    return (user.job_title?.isNotEmpty ?? false) &&
+        (user.company?.isNotEmpty ?? false) &&
         (user.lookingFor == 'Networking' ||
             user.lookingFor == 'Business' ||
             user.lookingFor == 'Professional');

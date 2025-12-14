@@ -1,11 +1,10 @@
 import 'dart:developer';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class LocationService {
-  static final LocationService _instance = LocationService._internal();
   factory LocationService() => _instance;
   LocationService._internal();
+  static final LocationService _instance = LocationService._internal();
 
   Position? _currentPosition;
   DateTime? _lastLocationUpdate;
@@ -21,7 +20,7 @@ class LocationService {
           DateTime.now().difference(_lastLocationUpdate!) <
               _locationCacheTimeout) {
         log('📍 Using cached location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
-            name: 'LocationService');
+            name: 'LocationService',);
         return _currentPosition;
       }
 
@@ -42,7 +41,7 @@ class LocationService {
       _lastLocationUpdate = DateTime.now();
 
       log('📍 Location obtained: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
-          name: 'LocationService');
+          name: 'LocationService',);
       return _currentPosition;
     } catch (e) {
       log('❌ Error getting location: $e', name: 'LocationService');
@@ -54,7 +53,7 @@ class LocationService {
   Future<bool> _checkLocationPermissions() async {
     try {
       // Check if location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         log('❌ Location services are disabled', name: 'LocationService');
         return false;
@@ -73,7 +72,7 @@ class LocationService {
 
       if (permission == LocationPermission.deniedForever) {
         log('❌ Location permission permanently denied',
-            name: 'LocationService');
+            name: 'LocationService',);
         return false;
       }
 
@@ -98,7 +97,7 @@ class LocationService {
 
   /// Calculate distance between user location and event location
   static double? calculateDistanceToEvent(
-      Position? userLocation, double? eventLat, double? eventLon) {
+      Position? userLocation, double? eventLat, double? eventLon,) {
     if (userLocation == null || eventLat == null || eventLon == null) {
       return null;
     }
@@ -130,7 +129,5 @@ class LocationService {
   }
 
   /// Get last known location (cached)
-  Position? getLastKnownLocation() {
-    return _currentPosition;
-  }
+  Position? getLastKnownLocation() => _currentPosition;
 }

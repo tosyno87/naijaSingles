@@ -3,18 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/community_group_model.dart';
 
 class CommunityGroupCard extends StatelessWidget {
+
+  const CommunityGroupCard({
+    required this.group, required this.onJoin, super.key,
+  });
   final CommunityGroup group;
   final VoidCallback onJoin;
 
-  const CommunityGroupCard({
-    Key? key,
-    required this.group,
-    required this.onJoin,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -69,7 +66,7 @@ class CommunityGroupCard extends StatelessWidget {
                       if (group.isVerified)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                              horizontal: 8, vertical: 4,),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -125,10 +122,9 @@ class CommunityGroupCard extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: group.tags.take(4).map((tag) {
-                    return Container(
+                  children: group.tags.take(4).map((tag) => Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 8, vertical: 4,),
                       decoration: BoxDecoration(
                         color: const Color(0xFF008037).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -141,8 +137,7 @@ class CommunityGroupCard extends StatelessWidget {
                           color: const Color(0xFF008037),
                         ),
                       ),
-                    );
-                  }).toList(),
+                    ),).toList(),
                 ),
 
                 const SizedBox(height: 16),
@@ -191,7 +186,7 @@ class CommunityGroupCard extends StatelessWidget {
                         backgroundColor: const Color(0xFF008037),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                            horizontal: 16, vertical: 8,),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -212,5 +207,4 @@ class CommunityGroupCard extends StatelessWidget {
         ],
       ),
     );
-  }
 }

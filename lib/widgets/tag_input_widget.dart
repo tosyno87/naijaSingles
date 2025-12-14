@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/services/validation_service.dart';
+import '../common/constants/app_colors.dart';
+import '../services/validation_service.dart';
 
 /// Widget for inputting and managing tags
 class TagInputWidget extends StatefulWidget {
+
+  const TagInputWidget({
+    required this.tags, required this.onTagsChanged, super.key,
+    this.maxTags = 5,
+    this.hintText = 'Add tags...',
+    this.suggestions = const [],
+  });
   final List<String> tags;
   final Function(List<String>) onTagsChanged;
   final int maxTags;
   final String hintText;
   final List<String> suggestions;
-
-  const TagInputWidget({
-    super.key,
-    required this.tags,
-    required this.onTagsChanged,
-    this.maxTags = 5,
-    this.hintText = 'Add tags...',
-    this.suggestions = const [],
-  });
 
   @override
   State<TagInputWidget> createState() => _TagInputWidgetState();
@@ -43,8 +41,7 @@ class _TagInputWidgetState extends State<TagInputWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Tags display
@@ -52,7 +49,7 @@ class _TagInputWidgetState extends State<TagInputWidget> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: widget.tags.map((tag) => _buildTagChip(tag)).toList(),
+            children: widget.tags.map(_buildTagChip).toList(),
           ),
           const SizedBox(height: 12),
         ],
@@ -76,7 +73,7 @@ class _TagInputWidgetState extends State<TagInputWidget> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.primaryGreen),
+              borderSide: const BorderSide(color: AppColors.primaryGreen),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -84,7 +81,7 @@ class _TagInputWidgetState extends State<TagInputWidget> {
             ),
             suffixIcon: IconButton(
               onPressed: _addTag,
-              icon: Icon(
+              icon: const Icon(
                 Icons.add,
                 color: AppColors.primaryGreen,
               ),
@@ -144,10 +141,8 @@ class _TagInputWidgetState extends State<TagInputWidget> {
         ],
       ],
     );
-  }
 
-  Widget _buildTagChip(String tag) {
-    return Container(
+  Widget _buildTagChip(String tag) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primaryGreen.withOpacity(0.1),
@@ -168,7 +163,7 @@ class _TagInputWidgetState extends State<TagInputWidget> {
           const SizedBox(width: 4),
           GestureDetector(
             onTap: () => _removeTag(tag),
-            child: Icon(
+            child: const Icon(
               Icons.close,
               size: 16,
               color: AppColors.primaryGreen,
@@ -177,7 +172,6 @@ class _TagInputWidgetState extends State<TagInputWidget> {
         ],
       ),
     );
-  }
 
   void _onTextChanged(String value) {
     setState(() {
@@ -187,7 +181,7 @@ class _TagInputWidgetState extends State<TagInputWidget> {
         _filteredSuggestions = widget.suggestions
             .where((suggestion) =>
                 suggestion.toLowerCase().contains(value.toLowerCase()) &&
-                !widget.tags.contains(suggestion))
+                !widget.tags.contains(suggestion),)
             .toList();
       }
     });

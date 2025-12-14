@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
 import '../../../services/content_moderation_service.dart';
 import '../../../services/profile_verification_service.dart';
 
 /// Example of how to integrate Content Moderation and Profile Verification
 /// into your existing profile screens
 class ProfileWithModerationExample extends StatefulWidget {
-  final String userId;
 
   const ProfileWithModerationExample({
-    super.key,
-    required this.userId,
+    required this.userId, super.key,
   });
+  final String userId;
 
   @override
   State<ProfileWithModerationExample> createState() =>
@@ -48,8 +48,7 @@ class _ProfileWithModerationExampleState
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('Profile with Moderation'),
         actions: [
@@ -62,7 +61,7 @@ class _ProfileWithModerationExampleState
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -87,12 +86,10 @@ class _ProfileWithModerationExampleState
         ),
       ),
     );
-  }
 
-  Widget _buildProfileHeader() {
-    return Card(
+  Widget _buildProfileHeader() => Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             // Profile Picture
@@ -140,7 +137,6 @@ class _ProfileWithModerationExampleState
         ),
       ),
     );
-  }
 
   Widget _buildVerificationBadge(VerificationStatus status) {
     final badge = _profileVerificationService.getVerificationBadge(status);
@@ -187,22 +183,21 @@ class _ProfileWithModerationExampleState
     );
   }
 
-  Widget _buildProfileContent() {
-    return Card(
+  Widget _buildProfileContent() => const Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'About Me',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'I love traveling, cooking, and meeting new people. Looking for someone to share adventures with!',
               style: TextStyle(fontSize: 16),
             ),
@@ -210,13 +205,12 @@ class _ProfileWithModerationExampleState
         ),
       ),
     );
-  }
 
   Widget _buildVerificationSection() {
     if (_isLoading) {
       return const Card(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16),
           child: Center(child: CircularProgressIndicator()),
         ),
       );
@@ -224,7 +218,7 @@ class _ProfileWithModerationExampleState
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -238,9 +232,7 @@ class _ProfileWithModerationExampleState
             const SizedBox(height: 16),
 
             // Verification Types
-            ...VerificationType.values.map((type) {
-              return _buildVerificationTypeRow(type);
-            }).toList(),
+            ...VerificationType.values.map(_buildVerificationTypeRow),
           ],
         ),
       ),
@@ -252,7 +244,7 @@ class _ProfileWithModerationExampleState
         _profileVerificationService.getVerificationRequirements(type);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
           Icon(
@@ -303,8 +295,7 @@ class _ProfileWithModerationExampleState
     }
   }
 
-  Widget _buildActionButtons() {
-    return Row(
+  Widget _buildActionButtons() => Row(
       children: [
         Expanded(
           child: ElevatedButton.icon(
@@ -331,7 +322,6 @@ class _ProfileWithModerationExampleState
         ),
       ],
     );
-  }
 
   void _showReportDialog() {
     showDialog(
@@ -423,7 +413,7 @@ class _ProfileWithModerationExampleState
       if (!canRequest) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Cannot request this verification type')),
+              content: Text('Cannot request this verification type'),),
         );
         return;
       }
@@ -460,19 +450,19 @@ class _ProfileWithModerationExampleState
       case VerificationType.photo:
         return {
           'photos': ['photo1.jpg', 'photo2.jpg'],
-          'selfie': 'selfie.jpg'
+          'selfie': 'selfie.jpg',
         };
       case VerificationType.identity:
         return {
           'idType': 'passport',
           'idNumber': 'A1234567',
-          'idPhoto': 'id.jpg'
+          'idPhoto': 'id.jpg',
         };
       case VerificationType.employment:
         return {
           'company': 'Tech Company',
           'position': 'Developer',
-          'email': 'work@company.com'
+          'email': 'work@company.com',
         };
     }
   }

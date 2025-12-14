@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
+import '../../../../common/routes/route_name.dart';
 
 import '../../../../common/widgets/custom_button.dart';
 
 class UserDOB extends StatefulWidget {
-  final Map<String, dynamic> userData;
   const UserDOB(this.userData, {super.key});
+  final Map<String, dynamic> userData;
 
   @override
   _UserDOBState createState() => _UserDOBState();
@@ -39,10 +39,9 @@ class _UserDOBState extends State<UserDOB> {
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
-      builder: (BuildContext context) {
-        return Container(
+      builder: (BuildContext context) => Container(
           height: MediaQuery.of(context).size.height * 0.4,
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
@@ -57,7 +56,7 @@ class _UserDOBState extends State<UserDOB> {
               ),
               const SizedBox(height: 20),
               const Text(
-                "Select your birthday",
+                'Select your birthday',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -98,7 +97,7 @@ class _UserDOBState extends State<UserDOB> {
                     ),
                   ),
                   child: const Text(
-                    "Confirm",
+                    'Confirm',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -108,8 +107,7 @@ class _UserDOBState extends State<UserDOB> {
               ),
             ],
           ),
-        );
-      },
+        ),
     );
   }
 
@@ -134,7 +132,7 @@ class _UserDOBState extends State<UserDOB> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -167,7 +165,7 @@ class _UserDOBState extends State<UserDOB> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Age is just a number, but it helps us find your perfect match!",
+                    'Age is just a number, but it helps us find your perfect match!',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -221,7 +219,7 @@ class _UserDOBState extends State<UserDOB> {
 
               // Age requirement note
               const Text(
-                "You must be 18+ to join NaijaSingles",
+                'You must be 18+ to join NaijaSingles',
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF9E9E9E),
@@ -233,20 +231,20 @@ class _UserDOBState extends State<UserDOB> {
 
               // Continue labelLarge
               Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
+                padding: const EdgeInsets.only(bottom: 24),
                 child: CustomButton(
                   active: true,
                   color: const Color(0xFF27AE60),
                   onTap: () {
                     widget.userData.addAll({
-                      'user_DOB': "$selecteddate",
+                      'user_DOB': '$selecteddate',
                       'age': ((DateTime.now().difference(selecteddate).inDays) /
                               365.2425)
                           .truncate(),
                     });
                     log(widget.userData.toString());
                     Navigator.pushNamed(context, RouteName.genderScreen,
-                        arguments: widget.userData);
+                        arguments: widget.userData,);
                   },
                   text: 'CONTINUE',
                 ),

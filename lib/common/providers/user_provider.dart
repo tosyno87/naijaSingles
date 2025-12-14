@@ -15,7 +15,7 @@ class UserProvider extends ChangeNotifier {
   }
   final FirebaseAuth _auth = firebaseAuthInstance;
   final CollectionReference _userCollection =
-      firebaseFireStoreInstance.collection("users");
+      firebaseFireStoreInstance.collection('users');
 
   UserModel? _currentUser;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
@@ -46,28 +46,28 @@ class UserProvider extends ChangeNotifier {
               currentUser = userData;
               notifyListeners();
             } else {
-              AppLogger.warning("User document does not exist for UID: ${user.uid}");
+              AppLogger.warning('User document does not exist for UID: ${user.uid}');
               currentUser = null;
               notifyListeners();
             }
           } catch (e) {
-            AppLogger.error("Error parsing user document", error: e);
+            AppLogger.error('Error parsing user document', error: e);
             // Don't set currentUser to null here, keep existing data
           }
         }, onError: (error) {
           // Only log errors if user is still authenticated
           // Permission errors when user is logged out are expected
           if (_auth.currentUser != null) {
-            AppLogger.error("Error listening to user details", error: error);
+            AppLogger.error('Error listening to user details', error: error);
           }
-        });
+        },);
       } catch (e) {
-        AppLogger.error("Exception in listenCurrentUserdetails", error: e);
+        AppLogger.error('Exception in listenCurrentUserdetails', error: e);
       }
     } else {
       // User is not authenticated - ensure user data is cleared
       currentUser = null;
-      AppLogger.debug("No authenticated user found");
+      AppLogger.debug('No authenticated user found');
     }
   }
 

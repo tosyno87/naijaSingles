@@ -5,24 +5,18 @@ import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
 
 class TribeConnectCard extends StatelessWidget {
+
+  const TribeConnectCard({
+    required this.user, required this.onConnect, required this.onMessage, required this.onSave, required this.onBlock, super.key,
+  });
   final UserModel user;
   final VoidCallback onConnect;
   final VoidCallback onMessage;
   final VoidCallback onSave;
   final VoidCallback onBlock;
 
-  const TribeConnectCard({
-    super.key,
-    required this.user,
-    required this.onConnect,
-    required this.onMessage,
-    required this.onSave,
-    required this.onBlock,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
@@ -66,10 +60,8 @@ class TribeConnectCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildProfileImage() {
-    return Container(
+  Widget _buildProfileImage() => Container(
       height: 200,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -77,15 +69,15 @@ class TribeConnectCard extends StatelessWidget {
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
-        image: user.imageUrl?.isNotEmpty == true
+        image: user.imageUrl?.isNotEmpty ?? false
             ? DecorationImage(
                 image: NetworkImage(user.imageUrl![0]),
                 fit: BoxFit.cover,
               )
             : null,
       ),
-      child: user.imageUrl?.isEmpty == true
-          ? Container(
+      child: user.imageUrl?.isEmpty ?? false
+          ? DecoratedBox(
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen.withOpacity(0.1),
                 borderRadius: const BorderRadius.only(
@@ -102,10 +94,8 @@ class TribeConnectCard extends StatelessWidget {
             )
           : null,
     );
-  }
 
-  Widget _buildBasicInfo() {
-    return Row(
+  Widget _buildBasicInfo() => Row(
       children: [
         Expanded(
           child: Column(
@@ -134,7 +124,7 @@ class TribeConnectCard extends StatelessWidget {
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.success,
                       shape: BoxShape.circle,
                     ),
@@ -171,10 +161,8 @@ class TribeConnectCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildCulturalInfo() {
-    return Container(
+  Widget _buildCulturalInfo() => Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -256,13 +244,12 @@ class TribeConnectCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: AppColors.success.withOpacity(0.3),
-                    width: 1,
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.verified,
                       size: 12,
                       color: AppColors.success,
@@ -284,10 +271,8 @@ class TribeConnectCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildLocationAndLanguages() {
-    return Row(
+  Widget _buildLocationAndLanguages() => Row(
       children: [
         Expanded(
           child: _buildInfoChip(
@@ -306,21 +291,18 @@ class TribeConnectCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildInfoChip({
     required Widget icon,
     required String text,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: color.withOpacity(0.2),
-          width: 1,
         ),
       ),
       child: Row(
@@ -342,7 +324,6 @@ class TribeConnectCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildInterests() {
     final interests = _getInterests();
@@ -364,7 +345,7 @@ class TribeConnectCard extends StatelessWidget {
           spacing: 6,
           runSpacing: 6,
           children:
-              interests.map((interest) => _buildInterestTag(interest)).toList(),
+              interests.map(_buildInterestTag).toList(),
         ),
       ],
     );
@@ -388,7 +369,6 @@ class TribeConnectCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.success.withOpacity(0.2),
-          width: 1,
         ),
       ),
       child: Column(
@@ -396,7 +376,7 @@ class TribeConnectCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.handshake_outlined,
                 size: 16,
                 color: AppColors.success,
@@ -417,7 +397,7 @@ class TribeConnectCard extends StatelessWidget {
             spacing: 6,
             runSpacing: 6,
             children: mutualInterests
-                .map((interest) => _buildMutualInterestTag(interest))
+                .map(_buildMutualInterestTag)
                 .toList(),
           ),
         ],
@@ -425,15 +405,13 @@ class TribeConnectCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInterestTag(String interest) {
-    return Container(
+  Widget _buildInterestTag(String interest) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.primaryGreen.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Text(
@@ -445,23 +423,20 @@ class TribeConnectCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildMutualInterestTag(String interest) {
-    return Container(
+  Widget _buildMutualInterestTag(String interest) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.success.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.success.withOpacity(0.4),
-          width: 1,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.check_circle,
             size: 12,
             color: AppColors.success,
@@ -478,10 +453,9 @@ class TribeConnectCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildBio() {
-    if (user.bio?.isEmpty == true) return const SizedBox.shrink();
+    if (user.bio?.isEmpty ?? false) return const SizedBox.shrink();
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -490,7 +464,6 @@ class TribeConnectCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.border.withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Column(
@@ -498,7 +471,7 @@ class TribeConnectCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.person_outline_rounded,
                 size: 16,
                 color: AppColors.textSecondary,
@@ -533,8 +506,7 @@ class TribeConnectCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
-    return Row(
+  Widget _buildActionButtons() => Row(
       children: [
         Expanded(
           child: _buildActionButton(
@@ -575,7 +547,6 @@ class TribeConnectCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildActionButton({
     required Widget icon,
@@ -584,8 +555,7 @@ class TribeConnectCard extends StatelessWidget {
     required Color color,
     bool isPrimary = false,
     bool isDestructive = false,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onPressed,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -631,11 +601,10 @@ class TribeConnectCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
   String _getNationalityText() {
     // Extract nationality from user data - using available fields
-    if (user.living_in?.isNotEmpty == true) {
+    if (user.living_in?.isNotEmpty ?? false) {
       // If living_in contains country info, use it
       final location = user.living_in!.toLowerCase();
       if (location.contains('nigeria') ||
@@ -670,7 +639,7 @@ class TribeConnectCard extends StatelessWidget {
 
   String _getTribeText() {
     // Extract tribe from user data - using available fields
-    if (user.profession?.isNotEmpty == true) {
+    if (user.profession?.isNotEmpty ?? false) {
       final profession = user.profession!.toLowerCase();
       // Check if profession field contains tribe info
       if (profession.contains('yoruba') ||
@@ -704,7 +673,7 @@ class TribeConnectCard extends StatelessWidget {
 
   String _getLanguagesText() {
     // Using profession as a proxy for skills/interests
-    if (user.profession?.isNotEmpty == true) {
+    if (user.profession?.isNotEmpty ?? false) {
       return user.profession!;
     }
     return 'English';
@@ -712,14 +681,14 @@ class TribeConnectCard extends StatelessWidget {
 
   List<String> _getInterests() {
     // Using available fields to create interest tags
-    List<String> interests = [];
-    if (user.profession?.isNotEmpty == true) {
+    final List<String> interests = [];
+    if (user.profession?.isNotEmpty ?? false) {
       interests.add(user.profession!);
     }
-    if (user.education?.isNotEmpty == true) {
+    if (user.education?.isNotEmpty ?? false) {
       interests.add(user.education!);
     }
-    if (user.lookingFor?.isNotEmpty == true) {
+    if (user.lookingFor?.isNotEmpty ?? false) {
       interests.add(user.lookingFor!);
     }
 
@@ -731,7 +700,7 @@ class TribeConnectCard extends StatelessWidget {
 
   List<String> _getMutualInterests() {
     // Simulate cultural connections - in real app, this would compare with current user
-    List<String> connections = [];
+    final List<String> connections = [];
 
     // Add nationality connection
     final nationality = _getNationalityText();

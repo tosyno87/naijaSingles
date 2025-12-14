@@ -1,18 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class MediaStep extends StatefulWidget {
-  final EventCreationData eventData;
 
   const MediaStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
   State<MediaStep> createState() => _MediaStepState();
@@ -20,12 +21,11 @@ class MediaStep extends StatefulWidget {
 
 class _MediaStepState extends State<MediaStep> {
   final ImagePicker _picker = ImagePicker();
-  List<File> _selectedImages = [];
+  final List<File> _selectedImages = [];
   bool _isProcessingImage = false;
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,10 +47,8 @@ class _MediaStepState extends State<MediaStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 20,
@@ -58,10 +56,8 @@ class _MediaStepState extends State<MediaStep> {
         color: const Color(0xFF333333),
       ),
     );
-  }
 
-  Widget _buildImageUploadSection() {
-    return Container(
+  Widget _buildImageUploadSection() => Container(
       width: double.infinity,
       height: 220,
       decoration: BoxDecoration(
@@ -75,10 +71,10 @@ class _MediaStepState extends State<MediaStep> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.cloud_upload_outlined,
             size: 40,
-            color: const Color(0xFF008037),
+            color: Color(0xFF008037),
           ),
           const SizedBox(height: 12),
           Text(
@@ -152,10 +148,8 @@ class _MediaStepState extends State<MediaStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildImagePreview() {
-    return Column(
+  Widget _buildImagePreview() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -202,18 +196,15 @@ class _MediaStepState extends State<MediaStep> {
                 1.2, // Slightly rectangular to better show landscape images
           ),
           itemCount: widget.eventData.imageUrls.length,
-          itemBuilder: (context, index) {
-            return _buildImageTile(index);
-          },
+          itemBuilder: (context, index) => _buildImageTile(index),
         ),
       ],
     );
-  }
 
   Widget _buildCardPreview() {
     if (widget.eventData.imageUrls.isEmpty) return const SizedBox.shrink();
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -232,9 +223,9 @@ class _MediaStepState extends State<MediaStep> {
           Container(
             height: 200, // Same as MyEventCard
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: const BorderRadius.only(
+            decoration: const BoxDecoration(
+              color: Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
               ),
@@ -252,18 +243,16 @@ class _MediaStepState extends State<MediaStep> {
                     height: double.infinity,
                     fit: BoxFit.cover, // Same as event card
                     filterQuality: FilterQuality.high,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: const Color(0xFFF0F0F0),
-                        child: const Center(
+                    errorBuilder: (context, error, stackTrace) => const ColoredBox(
+                        color: Color(0xFFF0F0F0),
+                        child: Center(
                           child: Icon(
                             Icons.broken_image,
                             size: 48,
                             color: Color(0xFF999999),
                           ),
                         ),
-                      );
-                    },
+                      ),
                   ),
                 ),
 
@@ -371,8 +360,7 @@ class _MediaStepState extends State<MediaStep> {
     );
   }
 
-  Widget _buildImageTile(int index) {
-    return Container(
+  Widget _buildImageTile(int index) => DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
@@ -392,26 +380,22 @@ class _MediaStepState extends State<MediaStep> {
                   ? Image.network(
                       widget.eventData.imageUrls[index],
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
+                      errorBuilder: (context, error, stackTrace) => const Center(
                           child: Icon(
                             Icons.broken_image,
                             color: Color(0xFF999999),
                           ),
-                        );
-                      },
+                        ),
                     )
                   : Image.file(
                       File(widget.eventData.imageUrls[index]),
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
+                      errorBuilder: (context, error, stackTrace) => const Center(
                           child: Icon(
                             Icons.broken_image,
                             color: Color(0xFF999999),
                           ),
-                        );
-                      },
+                        ),
                     ),
             ),
           ),
@@ -488,7 +472,6 @@ class _MediaStepState extends State<MediaStep> {
         ],
       ),
     );
-  }
 
   Future<void> _cropImage(int index) async {
     if (index < 0 || index >= widget.eventData.imageUrls.length) {
@@ -500,7 +483,7 @@ class _MediaStepState extends State<MediaStep> {
       final imagePath = widget.eventData.imageUrls[index];
       if (imagePath.startsWith('http')) {
         _showErrorSnackBar(
-            'Cannot crop uploaded images. Please select a new image.');
+            'Cannot crop uploaded images. Please select a new image.',);
         return;
       }
 
@@ -520,7 +503,7 @@ class _MediaStepState extends State<MediaStep> {
           ),
           IOSUiSettings(
             title: 'Crop Event Photo',
-            minimumAspectRatio: 1.0,
+            minimumAspectRatio: 1,
           ),
         ],
       );
@@ -606,7 +589,7 @@ class _MediaStepState extends State<MediaStep> {
       // Check if already at maximum limit
       if (widget.eventData.imageUrls.length >= 10) {
         _showErrorSnackBar(
-            'Maximum 10 photos allowed. Please remove some photos first.');
+            'Maximum 10 photos allowed. Please remove some photos first.',);
         return;
       }
 
@@ -622,7 +605,6 @@ class _MediaStepState extends State<MediaStep> {
         maxWidth: 2048, // High quality for event photos
         maxHeight: 2048,
         imageQuality: 95, // High quality
-        preferredCameraDevice: CameraDevice.rear,
       );
 
       // Hide loading indicator
@@ -651,8 +633,7 @@ class _MediaStepState extends State<MediaStep> {
     }
   }
 
-  Future<ImageSource?> _showImageSourceDialog() async {
-    return showDialog<ImageSource>(
+  Future<ImageSource?> _showImageSourceDialog() async => showDialog<ImageSource>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -677,7 +658,6 @@ class _MediaStepState extends State<MediaStep> {
         ),
       ),
     );
-  }
 
   Future<void> _showCropDialogForNewImage(String imagePath) async {
     try {
@@ -702,7 +682,7 @@ class _MediaStepState extends State<MediaStep> {
           ),
           IOSUiSettings(
             title: 'Crop Event Photo',
-            minimumAspectRatio: 1.0,
+            minimumAspectRatio: 1,
           ),
         ],
       );

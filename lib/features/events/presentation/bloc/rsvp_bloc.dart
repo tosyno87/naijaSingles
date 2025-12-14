@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../data/models/rsvp_model.dart';
 import '../../data/services/events_firestore_service.dart';
 
@@ -14,50 +16,50 @@ abstract class RSVPEvent extends Equatable {
 }
 
 class RSVPToEventEvent extends RSVPEvent {
-  final String eventId;
-  final RSVPStatus status;
-  final String? notes;
 
   const RSVPToEventEvent({
     required this.eventId,
     required this.status,
     this.notes,
   });
+  final String eventId;
+  final RSVPStatus status;
+  final String? notes;
 
   @override
   List<Object?> get props => [eventId, status, notes];
 }
 
 class LoadUserRSVPsEvent extends RSVPEvent {
-  final String userId;
 
   const LoadUserRSVPsEvent(this.userId);
+  final String userId;
 
   @override
   List<Object?> get props => [userId];
 }
 
 class LoadEventRSVPStatusEvent extends RSVPEvent {
-  final String userId;
-  final String eventId;
 
   const LoadEventRSVPStatusEvent({
     required this.userId,
     required this.eventId,
   });
+  final String userId;
+  final String eventId;
 
   @override
   List<Object?> get props => [userId, eventId];
 }
 
 class LoadEventAttendeesEvent extends RSVPEvent {
-  final String eventId;
-  final RSVPStatus? statusFilter;
 
   const LoadEventAttendeesEvent({
     required this.eventId,
     this.statusFilter,
   });
+  final String eventId;
+  final RSVPStatus? statusFilter;
 
   @override
   List<Object?> get props => [eventId, statusFilter];
@@ -76,71 +78,71 @@ class RSVPInitial extends RSVPState {}
 class RSVPLoading extends RSVPState {}
 
 class RSVPSuccess extends RSVPState {
-  final String eventId;
-  final RSVPStatus status;
-  final String message;
 
   const RSVPSuccess({
     required this.eventId,
     required this.status,
     required this.message,
   });
+  final String eventId;
+  final RSVPStatus status;
+  final String message;
 
   @override
   List<Object?> get props => [eventId, status, message];
 }
 
 class RSVPError extends RSVPState {
-  final String message;
-  final String? eventId;
 
   const RSVPError({
     required this.message,
     this.eventId,
   });
+  final String message;
+  final String? eventId;
 
   @override
   List<Object?> get props => [message, eventId];
 }
 
 class UserRSVPsLoaded extends RSVPState {
-  final List<RSVPModel> rsvps;
-  final String userId;
 
   const UserRSVPsLoaded({
     required this.rsvps,
     required this.userId,
   });
+  final List<RSVPModel> rsvps;
+  final String userId;
 
   @override
   List<Object?> get props => [rsvps, userId];
 }
 
 class EventRSVPStatusLoaded extends RSVPState {
-  final String eventId;
-  final RSVPStatus status;
-  final RSVPModel? rsvpModel;
 
   const EventRSVPStatusLoaded({
     required this.eventId,
     required this.status,
     this.rsvpModel,
   });
+  final String eventId;
+  final RSVPStatus status;
+  final RSVPModel? rsvpModel;
 
   @override
   List<Object?> get props => [eventId, status, rsvpModel];
 }
 
 class EventAttendeesLoaded extends RSVPState {
-  final String eventId;
-  final List<EventAttendeeModel> attendees;
-  final Map<RSVPStatus, int> statusCounts;
 
   const EventAttendeesLoaded({
     required this.eventId,
     required this.attendees,
     required this.statusCounts,
   });
+  final String eventId;
+  final List<EventAttendeeModel> attendees;
+  final Map<RSVPStatus, int> statusCounts;
 
   @override
   List<Object?> get props => [eventId, attendees, statusCounts];
@@ -148,11 +150,6 @@ class EventAttendeesLoaded extends RSVPState {
 
 // RSVP BLoC
 class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
-  final EventsFirestoreService _firestoreService;
-  final String _currentUserId;
-
-  // Cache for RSVP statuses to avoid repeated queries
-  final Map<String, RSVPModel> _rsvpCache = {};
 
   RSVPBloc({
     required EventsFirestoreService firestoreService,
@@ -165,9 +162,14 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
     on<LoadEventRSVPStatusEvent>(_onLoadEventRSVPStatus);
     on<LoadEventAttendeesEvent>(_onLoadEventAttendees);
   }
+  final EventsFirestoreService _firestoreService;
+  final String _currentUserId;
+
+  // Cache for RSVP statuses to avoid repeated queries
+  final Map<String, RSVPModel> _rsvpCache = {};
 
   Future<void> _onRSVPToEvent(
-      RSVPToEventEvent event, Emitter<RSVPState> emit) async {
+      RSVPToEventEvent event, Emitter<RSVPState> emit,) async {
     emit(RSVPLoading());
 
     try {
@@ -185,7 +187,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
         );
 
         log('Updated RSVP for event ${event.eventId}: ${existingRSVP.status.value} -> ${event.status.value}',
-            name: 'RSVPBloc');
+            name: 'RSVPBloc',);
       } else {
         // Create new RSVP
         await _firestoreService.rsvpToEvent(
@@ -197,7 +199,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
         );
 
         log('Created new RSVP for event ${event.eventId} with status ${event.status.value}',
-            name: 'RSVPBloc');
+            name: 'RSVPBloc',);
       }
 
       // Update cache
@@ -215,18 +217,18 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
         eventId: event.eventId,
         status: event.status,
         message: _getSuccessMessage(event.status),
-      ));
+      ),);
     } catch (e) {
       log('Error processing RSVP: $e', name: 'RSVPBloc');
       emit(RSVPError(
         message: 'Failed to update RSVP. Please try again.',
         eventId: event.eventId,
-      ));
+      ),);
     }
   }
 
   Future<void> _onLoadUserRSVPs(
-      LoadUserRSVPsEvent event, Emitter<RSVPState> emit) async {
+      LoadUserRSVPsEvent event, Emitter<RSVPState> emit,) async {
     emit(RSVPLoading());
 
     try {
@@ -240,19 +242,19 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
       emit(UserRSVPsLoaded(
         rsvps: rsvps,
         userId: event.userId,
-      ));
+      ),);
 
       log('Loaded ${rsvps.length} RSVPs for user ${event.userId}',
-          name: 'RSVPBloc');
+          name: 'RSVPBloc',);
     } catch (e) {
       log('Error loading user RSVPs: $e', name: 'RSVPBloc');
       emit(const RSVPError(
-          message: 'Failed to load your RSVPs. Please try again.'));
+          message: 'Failed to load your RSVPs. Please try again.',),);
     }
   }
 
   Future<void> _onLoadEventRSVPStatus(
-      LoadEventRSVPStatusEvent event, Emitter<RSVPState> emit) async {
+      LoadEventRSVPStatusEvent event, Emitter<RSVPState> emit,) async {
     try {
       // Check cache first
       if (_rsvpCache.containsKey(event.eventId)) {
@@ -261,7 +263,7 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
           eventId: event.eventId,
           status: cachedRSVP.status,
           rsvpModel: cachedRSVP,
-        ));
+        ),);
         return;
       }
 
@@ -275,12 +277,12 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
           eventId: event.eventId,
           status: rsvp.status,
           rsvpModel: rsvp,
-        ));
+        ),);
       } else {
         emit(const EventRSVPStatusLoaded(
           eventId: '',
           status: RSVPStatus.none,
-        ));
+        ),);
       }
     } catch (e) {
       log('Error loading RSVP status: $e', name: 'RSVPBloc');
@@ -288,12 +290,12 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
       emit(EventRSVPStatusLoaded(
         eventId: event.eventId,
         status: RSVPStatus.none,
-      ));
+      ),);
     }
   }
 
   Future<void> _onLoadEventAttendees(
-      LoadEventAttendeesEvent event, Emitter<RSVPState> emit) async {
+      LoadEventAttendeesEvent event, Emitter<RSVPState> emit,) async {
     emit(RSVPLoading());
 
     try {
@@ -313,14 +315,14 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
         eventId: event.eventId,
         attendees: attendees,
         statusCounts: statusCounts,
-      ));
+      ),);
 
       log('Loaded ${attendees.length} attendees for event ${event.eventId}',
-          name: 'RSVPBloc');
+          name: 'RSVPBloc',);
     } catch (e) {
       log('Error loading event attendees: $e', name: 'RSVPBloc');
       emit(const RSVPError(
-          message: 'Failed to load event attendees. Please try again.'));
+          message: 'Failed to load event attendees. Please try again.',),);
     }
   }
 
@@ -342,29 +344,23 @@ class RSVPBloc extends Bloc<RSVPEvent, RSVPState> {
       case RSVPStatus.interested:
         return "Thanks for showing interest! We'll keep you updated.";
       case RSVPStatus.notGoing:
-        return "Thanks for letting us know. Maybe next time!";
+        return 'Thanks for letting us know. Maybe next time!';
       case RSVPStatus.none:
-        return "RSVP removed successfully.";
+        return 'RSVP removed successfully.';
     }
   }
 
   // Helper method to get RSVP status for an event (used by UI)
-  RSVPStatus getRSVPStatus(String eventId) {
-    return _rsvpCache[eventId]?.status ?? RSVPStatus.none;
-  }
+  RSVPStatus getRSVPStatus(String eventId) => _rsvpCache[eventId]?.status ?? RSVPStatus.none;
 
   // Helper method to check if user is going to an event
-  bool isUserGoing(String eventId) {
-    return getRSVPStatus(eventId) == RSVPStatus.going;
-  }
+  bool isUserGoing(String eventId) => getRSVPStatus(eventId) == RSVPStatus.going;
 
   // Helper method to get all events user is going to
-  List<String> getGoingEventIds() {
-    return _rsvpCache.entries
+  List<String> getGoingEventIds() => _rsvpCache.entries
         .where((entry) => entry.value.status == RSVPStatus.going)
         .map((entry) => entry.key)
         .toList();
-  }
 
   // Clear cache (useful for logout)
   void clearCache() {

@@ -5,7 +5,7 @@ import '../../user/controllers/onboarding_controller.dart';
 import '../widgets/afropeep_height_dropdown.dart';
 
 class AdditionalInfoOnboardingScreen extends StatefulWidget {
-  const AdditionalInfoOnboardingScreen({Key? key}) : super(key: key);
+  const AdditionalInfoOnboardingScreen({super.key});
 
   @override
   State<AdditionalInfoOnboardingScreen> createState() =>
@@ -24,12 +24,12 @@ class _AdditionalInfoOnboardingScreenState
     {
       'label': 'Friendship',
       'value': 'Friendship',
-      'icon': Icons.people_outline
+      'icon': Icons.people_outline,
     },
     {
       'label': 'Networking',
       'value': 'Networking',
-      'icon': Icons.business_center_outlined
+      'icon': Icons.business_center_outlined,
     },
   ];
 
@@ -37,22 +37,22 @@ class _AdditionalInfoOnboardingScreenState
     {
       'label': 'Short-term fun',
       'value': 'Short-term',
-      'icon': Icons.flash_on_outlined
+      'icon': Icons.flash_on_outlined,
     },
     {
       'label': 'Long-term relationship',
       'value': 'Long-term',
-      'icon': Icons.favorite_border
+      'icon': Icons.favorite_border,
     },
     {
       'label': 'Casual dating',
       'value': 'Casual',
-      'icon': Icons.coffee_outlined
+      'icon': Icons.coffee_outlined,
     },
     {
       'label': 'Not sure yet',
       'value': 'Not sure yet',
-      'icon': Icons.help_outline
+      'icon': Icons.help_outline,
     },
   ];
 
@@ -66,7 +66,7 @@ class _AdditionalInfoOnboardingScreenState
     if (controller.height > 0) {
       _heightCm = controller.height.round();
       // Try to find matching ft/in value
-      String? ftIn = HeightData.getFtInFromCm(_heightCm);
+      final String? ftIn = HeightData.getFtInFromCm(_heightCm);
       if (ftIn != null) {
         _heightFtIn = ftIn;
       }
@@ -108,7 +108,7 @@ class _AdditionalInfoOnboardingScreenState
 
           // Height Section
           _buildSectionHeader(
-              'Height', 'Your height helps with better matching'),
+              'Height', 'Your height helps with better matching',),
           SizedBox(height: isTablet ? 20 : 16),
           AfropeepHeightDropdown(
             initialHeightFtIn: _heightFtIn,
@@ -129,7 +129,7 @@ class _AdditionalInfoOnboardingScreenState
 
           // Looking For Section
           _buildSectionHeader(
-              'I\'m looking for', 'What brings you to NaijaSingles?'),
+              'I\'m looking for', 'What brings you to NaijaSingles?',),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildLookingForOptions(),
 
@@ -137,7 +137,7 @@ class _AdditionalInfoOnboardingScreenState
 
           // Relationship Intent Section
           _buildSectionHeader(
-              'Relationship goals', 'What are you hoping to find?'),
+              'Relationship goals', 'What are you hoping to find?',),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildRelationshipIntentOptions(),
 
@@ -178,8 +178,7 @@ class _AdditionalInfoOnboardingScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) {
-      return Padding(
+    return _lookingForOptions.map((option) => Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
         child: _buildSelectionOption(
           option['label'],
@@ -196,16 +195,14 @@ class _AdditionalInfoOnboardingScreenState
           },
           option['icon'],
         ),
-      );
-    }).toList();
+      ),).toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) {
-      return Padding(
+    return _relationshipIntentOptions.map((option) => Padding(
         padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
         child: _buildSelectionOption(
           option['label'],
@@ -222,8 +219,7 @@ class _AdditionalInfoOnboardingScreenState
           },
           option['icon'],
         ),
-      );
-    }).toList();
+      ),).toList();
   }
 
   Widget _buildSelectionOption(

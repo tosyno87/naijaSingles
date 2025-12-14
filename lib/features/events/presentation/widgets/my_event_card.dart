@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
 import '../../../../common/constants/app_colors.dart';
+import '../../../../common/utils/app_logger.dart';
 import '../../data/models/enhanced_event_model.dart';
 
 class MyEventCard extends StatelessWidget {
+
+  const MyEventCard({
+    required this.event, super.key,
+    this.isDraft = false,
+    this.onTap,
+    this.onEdit,
+    this.onDelete,
+    this.onPublish,
+    this.onShare,
+    this.onAnalytics,
+  });
   final EnhancedEventModel event;
   final bool isDraft;
   final VoidCallback? onTap;
@@ -15,23 +27,10 @@ class MyEventCard extends StatelessWidget {
   final VoidCallback? onShare;
   final VoidCallback? onAnalytics;
 
-  const MyEventCard({
-    Key? key,
-    required this.event,
-    this.isDraft = false,
-    this.onTap,
-    this.onEdit,
-    this.onDelete,
-    this.onPublish,
-    this.onShare,
-    this.onAnalytics,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -66,20 +65,19 @@ class MyEventCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
   Widget _buildEventImage(BuildContext context) {
     // Debug logging
-    print('🖼️ Event ${event.id} - hasImages: ${event.hasImages}');
-    print('🖼️ Event ${event.id} - imageUrls: ${event.imageUrls}');
-    print('🖼️ Event ${event.id} - primaryImageUrl: ${event.primaryImageUrl}');
+    AppLogger.debug('🖼️ Event ${event.id} - hasImages: ${event.hasImages}');
+    AppLogger.debug('🖼️ Event ${event.id} - imageUrls: ${event.imageUrls}');
+    AppLogger.debug('🖼️ Event ${event.id} - primaryImageUrl: ${event.primaryImageUrl}');
 
     return Container(
       height: 200, // Increased height for better poster visibility
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: const BorderRadius.only(
+      decoration: const BoxDecoration(
+        color: Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
@@ -143,9 +141,9 @@ class MyEventCard extends StatelessWidget {
                     );
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    print(
-                        '❌ Error loading image for event ${event.id}: $error');
-                    print('❌ Image URL: ${event.primaryImageUrl}');
+                    AppLogger.error(
+                        '❌ Error loading image for event ${event.id}', error: error, stackTrace: stackTrace,);
+                    AppLogger.debug('❌ Image URL: ${event.primaryImageUrl}');
                     return Container(
                       width: double.infinity,
                       height: double.infinity,
@@ -154,10 +152,10 @@ class MyEventCard extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.broken_image_outlined,
                               size: 48,
-                              color: const Color(0xFF999999),
+                              color: Color(0xFF999999),
                             ),
                             const SizedBox(height: 12),
                             Text(
@@ -358,8 +356,7 @@ class MyEventCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEventHeader() {
-    return Column(
+  Widget _buildEventHeader() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -390,7 +387,7 @@ class MyEventCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.star,
                       size: 12,
                       color: Colors.purple,
@@ -422,7 +419,6 @@ class MyEventCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildEventDetails() {
     final dateFormat = DateFormat('MMM dd, yyyy');
@@ -432,10 +428,10 @@ class MyEventCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.schedule,
               size: 16,
-              color: const Color(0xFF666666),
+              color: Color(0xFF666666),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -452,10 +448,10 @@ class MyEventCard extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.location_on,
               size: 16,
-              color: const Color(0xFF666666),
+              color: Color(0xFF666666),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -496,8 +492,7 @@ class MyEventCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEventStats() {
-    return Container(
+  Widget _buildEventStats() => Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFFF8F9FA),
@@ -540,14 +535,12 @@ class MyEventCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(
           icon,
@@ -572,10 +565,8 @@ class MyEventCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildActionButtons() {
-    return Row(
+  Widget _buildActionButtons() => Row(
       children: [
         if (isDraft && onPublish != null)
           Expanded(
@@ -649,7 +640,6 @@ class MyEventCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   void _showFullScreenPoster(BuildContext context) {
     if (!event.hasImages) return;
@@ -680,10 +670,9 @@ class MyEventCard extends StatelessWidget {
           ),
           body: Center(
             child: InteractiveViewer(
-              panEnabled: true,
               boundaryMargin: const EdgeInsets.all(20),
               minScale: 0.5,
-              maxScale: 4.0,
+              maxScale: 4,
               child: Image.network(
                 event.primaryImageUrl,
                 fit: BoxFit.contain,
@@ -722,8 +711,7 @@ class MyEventCard extends StatelessWidget {
                     ),
                   );
                 },
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
+                errorBuilder: (context, error, stackTrace) => Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -751,8 +739,7 @@ class MyEventCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
               ),
             ),
           ),

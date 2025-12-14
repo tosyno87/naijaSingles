@@ -4,10 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// Service for handling group reporting functionality
 class GroupReportingService {
-  static final GroupReportingService _instance =
-      GroupReportingService._internal();
   factory GroupReportingService() => _instance;
   GroupReportingService._internal();
+  static final GroupReportingService _instance =
+      GroupReportingService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -103,7 +103,7 @@ class GroupReportingService {
           .map((doc) => {
                 'id': doc.id,
                 ...doc.data(),
-              })
+              },)
           .toList();
     } catch (e) {
       log('Error getting group reports: $e');
@@ -127,7 +127,7 @@ class GroupReportingService {
           .map((doc) => {
                 'id': doc.id,
                 ...doc.data(),
-              })
+              },)
           .toList();
     } catch (e) {
       log('Error getting user reports: $e');

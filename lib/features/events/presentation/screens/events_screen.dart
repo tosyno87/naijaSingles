@@ -1,20 +1,21 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../../common/routes/route_name.dart';
-import '../bloc/events_bloc.dart';
-import '../bloc/rsvp_bloc.dart';
-import '../widgets/event_card.dart';
-import '../widgets/events_loading_shimmer.dart';
 import '../../data/models/event_model.dart';
 import '../../data/repositories/events_repository.dart';
 import '../../data/services/events_firestore_service.dart';
 import '../../data/services/location_service.dart';
+import '../bloc/events_bloc.dart';
+import '../bloc/rsvp_bloc.dart';
+import '../widgets/event_card.dart';
+import '../widgets/events_loading_shimmer.dart';
 
 class EventsScreen extends StatefulWidget {
-  const EventsScreen({Key? key}) : super(key: key);
+  const EventsScreen({super.key});
 
   @override
   State<EventsScreen> createState() => _EventsScreenState();
@@ -22,7 +23,7 @@ class EventsScreen extends StatefulWidget {
 
 class _EventsScreenState extends State<EventsScreen> {
   final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+      RefreshController();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -104,8 +105,7 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
+  Widget build(BuildContext context) => MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) {
@@ -126,8 +126,7 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ],
       child: Builder(
-        builder: (context) {
-          return Scaffold(
+        builder: (context) => Scaffold(
             backgroundColor: Colors.white,
             appBar: _buildAppBar(),
             body: SafeArea(
@@ -142,7 +141,7 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
             ),
             floatingActionButton: FloatingActionButton(
-              heroTag: "events_screen_fab",
+              heroTag: 'events_screen_fab',
               onPressed: () {
                 Navigator.pushNamed(context, RouteName.eventTemplateSelection);
               },
@@ -151,14 +150,11 @@ class _EventsScreenState extends State<EventsScreen> {
               child: const Icon(Icons.add),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          );
-        },
+          ),
       ),
     );
-  }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
+  PreferredSizeWidget _buildAppBar() => AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
       leading: IconButton(
@@ -217,10 +213,8 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildSubtitle() {
-    return Container(
+  Widget _buildSubtitle() => Container(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       child: Text(
         'Discover upcoming events, parties, and community gatherings',
@@ -230,10 +224,8 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildFilters() {
-    return Column(
+  Widget _buildFilters() => Column(
       children: [
         // Search Bar (when searching)
         if (_isSearching) _buildSearchBar(),
@@ -248,10 +240,8 @@ class _EventsScreenState extends State<EventsScreen> {
         _buildAdvancedFilterButton(),
       ],
     );
-  }
 
-  Widget _buildSearchBar() {
-    return Container(
+  Widget _buildSearchBar() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -286,7 +276,6 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildCategoryFilters() {
     final categories = [
@@ -295,7 +284,7 @@ class _EventsScreenState extends State<EventsScreen> {
       'Business',
       'Community',
       'Social',
-      'Cultural'
+      'Cultural',
     ];
 
     return Container(
@@ -333,7 +322,6 @@ class _EventsScreenState extends State<EventsScreen> {
                       color: isSelected
                           ? const Color(0xFF008037)
                           : const Color(0xFFE0E0E0),
-                      width: 1,
                     ),
                     boxShadow: isSelected
                         ? [
@@ -397,7 +385,6 @@ class _EventsScreenState extends State<EventsScreen> {
                       color: isSelected
                           ? const Color(0xFF008037)
                           : const Color(0xFFE0E0E0),
-                      width: 1,
                     ),
                     boxShadow: isSelected
                         ? [
@@ -441,12 +428,9 @@ class _EventsScreenState extends State<EventsScreen> {
             _currentFilter.startDate?.year == now.year;
       case 'This Week':
         final weekStart = now.subtract(Duration(days: now.weekday - 1));
-        return _currentFilter.startDate
-                    ?.isAfter(weekStart.subtract(const Duration(days: 1))) ==
-                true &&
-            _currentFilter.startDate
-                    ?.isBefore(weekStart.add(const Duration(days: 7))) ==
-                true;
+        final startDate = _currentFilter.startDate;
+        return (startDate?.isAfter(weekStart.subtract(const Duration(days: 1))) ?? false) &&
+            (startDate?.isBefore(weekStart.add(const Duration(days: 7))) ?? false);
       case 'This Month':
         return _currentFilter.startDate?.month == now.month &&
             _currentFilter.startDate?.year == now.year;
@@ -457,7 +441,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   EventFilter _getDateRangeFilter(String dateRange, bool selected) {
     if (!selected || dateRange == 'All Time') {
-      return _currentFilter.copyWith(startDate: null, endDate: null);
+      return _currentFilter.copyWith();
     }
 
     final now = DateTime.now();
@@ -475,7 +459,7 @@ class _EventsScreenState extends State<EventsScreen> {
             .add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
         break;
       case 'This Month':
-        startDate = DateTime(now.year, now.month, 1);
+        startDate = DateTime(now.year, now.month);
         endDate = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
         break;
     }
@@ -483,8 +467,7 @@ class _EventsScreenState extends State<EventsScreen> {
     return _currentFilter.copyWith(startDate: startDate, endDate: endDate);
   }
 
-  Widget _buildAdvancedFilterButton() {
-    return Container(
+  Widget _buildAdvancedFilterButton() => Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       child: Row(
         children: [
@@ -540,15 +523,13 @@ class _EventsScreenState extends State<EventsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildErrorState({
     required String title,
     required String message,
     required IconData icon,
     required VoidCallback onRetry,
-  }) {
-    return Center(
+  }) => Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -602,10 +583,8 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -671,7 +650,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
+                        horizontal: 20, vertical: 10,),
                     decoration: BoxDecoration(
                       color: const Color(0xFF008037), // Deep green
                       borderRadius: BorderRadius.circular(20),
@@ -700,12 +679,12 @@ class _EventsScreenState extends State<EventsScreen> {
                 child: InkWell(
                   onTap: () {
                     Navigator.pushNamed(
-                        context, RouteName.eventTemplateSelection);
+                        context, RouteName.eventTemplateSelection,);
                   },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
+                        horizontal: 20, vertical: 10,),
                     decoration: BoxDecoration(
                       color: const Color(0xFF008037), // Deep green
                       borderRadius: BorderRadius.circular(20),
@@ -743,10 +722,8 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildSearchingState(String query) {
-    return Center(
+  Widget _buildSearchingState(String query) => Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -778,7 +755,6 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ),
     );
-  }
 
   void _navigateToEventDetails(EventModel event) {
     Navigator.pushNamed(
@@ -788,8 +764,7 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  Widget _buildEventsListWithLocation() {
-    return BlocConsumer<EventsBloc, EventsState>(
+  Widget _buildEventsListWithLocation() => BlocConsumer<EventsBloc, EventsState>(
       listener: (context, state) {
         if (state is EventsLoaded) {
           _refreshController.refreshCompleted();
@@ -857,20 +832,18 @@ class _EventsScreenState extends State<EventsScreen> {
 
           return SmartRefresher(
             controller: _refreshController,
-            enablePullDown: true,
             enablePullUp: !state.hasReachedMax,
             onRefresh: _onRefresh,
             onLoading: _onLoading,
-            header: WaterDropMaterialHeader(
-              backgroundColor: const Color(0xFF008037),
-              color: Colors.white,
+            header: const WaterDropMaterialHeader(
+              backgroundColor: Color(0xFF008037),
             ),
             footer: CustomFooter(
               builder: (context, mode) {
                 Widget body;
                 if (mode == LoadStatus.idle) {
                   body = Text(
-                    "Pull up to load more",
+                    'Pull up to load more',
                     style:
                         GoogleFonts.montserrat(color: const Color(0xFF666666)),
                   );
@@ -880,24 +853,24 @@ class _EventsScreenState extends State<EventsScreen> {
                   );
                 } else if (mode == LoadStatus.failed) {
                   body = Text(
-                    "Load Failed! Click retry!",
+                    'Load Failed! Click retry!',
                     style: GoogleFonts.montserrat(color: Colors.red),
                   );
                 } else if (mode == LoadStatus.canLoading) {
                   body = Text(
-                    "Release to load more",
+                    'Release to load more',
                     style:
                         GoogleFonts.montserrat(color: const Color(0xFF666666)),
                   );
                 } else {
                   body = Text(
-                    "No more events",
+                    'No more events',
                     style:
                         GoogleFonts.montserrat(color: const Color(0xFF666666)),
                   );
                 }
-                return Container(
-                  height: 55.0,
+                return SizedBox(
+                  height: 55,
                   child: Center(child: body),
                 );
               },
@@ -905,7 +878,7 @@ class _EventsScreenState extends State<EventsScreen> {
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(
-                  20, 0, 20, 80), // Bottom padding for FAB
+                  20, 0, 20, 80,), // Bottom padding for FAB
               itemCount: state.events.length + (state.isLoadingMore ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index >= state.events.length) {
@@ -934,5 +907,4 @@ class _EventsScreenState extends State<EventsScreen> {
         return const SizedBox.shrink();
       },
     );
-  }
 }

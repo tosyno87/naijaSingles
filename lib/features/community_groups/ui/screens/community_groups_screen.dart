@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../common/constants/app_colors.dart';
+import '../../models/community_group_model.dart';
 import '../widgets/community_group_card.dart';
 import '../widgets/community_group_filter_bar.dart';
-import '../../models/community_group_model.dart';
 
 class CommunityGroupsScreen extends StatefulWidget {
-  const CommunityGroupsScreen({Key? key}) : super(key: key);
+  const CommunityGroupsScreen({super.key});
 
   @override
   State<CommunityGroupsScreen> createState() => _CommunityGroupsScreenState();
@@ -56,7 +57,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
       isVerified: true,
       rules: {
         'authentic': 'Share authentic recipes',
-        'respect': 'Respect traditions'
+        'respect': 'Respect traditions',
       },
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
       updatedAt: DateTime.now(),
@@ -79,7 +80,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
       isVerified: false,
       rules: {
         'support': 'Support local artists',
-        'original': 'Share original content'
+        'original': 'Share original content',
       },
       createdAt: DateTime.now().subtract(const Duration(days: 7)),
       updatedAt: DateTime.now(),
@@ -89,8 +90,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Column(
@@ -118,7 +118,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        heroTag: "community_groups_fab",
+        heroTag: 'community_groups_fab',
         onPressed: () {
           // TODO: Navigate to create group screen
           ScaffoldMessenger.of(context).showSnackBar(
@@ -140,10 +140,8 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildHeader() {
-    return Container(
+  Widget _buildHeader() => Container(
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -187,7 +185,6 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildSearchBar() {
     if (!_isSearching) return const SizedBox.shrink();
@@ -271,8 +268,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
     return ListView.builder(
       padding: const EdgeInsets.all(20),
       itemCount: filteredGroups.length,
-      itemBuilder: (context, index) {
-        return CommunityGroupCard(
+      itemBuilder: (context, index) => CommunityGroupCard(
           group: filteredGroups[index],
           onJoin: () {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -282,8 +278,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
               ),
             );
           },
-        );
-      },
+        ),
     );
   }
 }

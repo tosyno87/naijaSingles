@@ -26,13 +26,13 @@ class AppConfig {
 }
 
 // Privacy policy and terms URLs
-const String termConditionUrl = "https://naijasingles.com/terms";
-const String privacyUrl = "https://naijasingles.com/privacy";
+const String termConditionUrl = 'https://naijasingles.com/terms';
+const String privacyUrl = 'https://naijasingles.com/privacy';
 
 // Add google map key for google places search
 String get googleMapsKey => SecureConfig.googleMapsApiKey ?? '';
 //for support to user add you mail
-const adminMail = "support@naijasingles.com";
+const adminMail = 'support@naijasingles.com';
 // add bucket id from firebase or google-services-json
 String get bucketId => SecureConfig.firebaseStorageBucket;
 //for pagination set limit

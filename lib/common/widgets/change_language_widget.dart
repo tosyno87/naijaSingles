@@ -9,7 +9,7 @@ import '../constants/constants.dart';
 import '../providers/theme_provider.dart';
 
 class LanguageWidget extends StatefulWidget {
-  const LanguageWidget({Key? key}) : super(key: key);
+  const LanguageWidget({super.key});
 
   @override
   State<LanguageWidget> createState() => _LanguageWidgetState();
@@ -55,7 +55,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Padding(
-      padding: const EdgeInsets.all(15.0),
+      padding: const EdgeInsets.all(15),
       child: Card(
         child: StreamBuilder<DocumentSnapshot>(
           stream: firebaseFireStoreInstance
@@ -78,7 +78,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
 
             final List<String> languages = data.keys
                 .where((key) => data[key] == true)
-                .map((language) => capitalizeFirstLetter(language))
+                .map(capitalizeFirstLetter)
                 .toList();
 
             // Set initial selectedLanguage to the first language in the list
@@ -98,7 +98,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                 children: [
                   ListTile(
                     title: Text(
-                      "Change Language".tr().toString(),
+                      'Change Language'.tr().toString(),
                       style: TextStyle(
                         fontSize: 18,
                         color: themeProvider.isDarkMode
@@ -108,14 +108,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                       ),
                     ),
                     subtitle: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           DropdownButton<String>(
                             iconDisabledColor: primaryColor,
                             iconEnabledColor: primaryColor,
-                            iconSize: 24,
                             icon:
                                 const Icon(Icons.keyboard_arrow_down_outlined),
                             value: selectedLanguage,
@@ -138,7 +136,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar()));
+                                                  const Tabbar(),),);
                                     },
                                   );
                                   break;
@@ -154,7 +152,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar()));
+                                                  const Tabbar(),),);
                                     },
                                   );
                                   break;
@@ -169,7 +167,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar()));
+                                                  const Tabbar(),),);
                                     },
                                   );
                                   break;
@@ -187,7 +185,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                               builder: (context) =>
                                                   const Tabbar(
                                                       isPaymentSuccess:
-                                                          false)));
+                                                          false,),),);
                                     },
                                   );
                                   break;
@@ -203,7 +201,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar()));
+                                                  const Tabbar(),),);
                                     },
                                   );
                                   break;
@@ -219,14 +217,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar()));
+                                                  const Tabbar(),),);
                                     },
                                   );
                                   break;
                               }
                             },
-                            items: languages.map((language) {
-                              return DropdownMenuItem<String>(
+                            items: languages.map((language) => DropdownMenuItem<String>(
                                 value: language,
                                 child: Text(
                                   language.tr().toString(),
@@ -235,10 +232,9 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           ? Colors.white70
                                           : primaryColor,
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w500),
+                                      fontWeight: FontWeight.w500,),
                                 ),
-                              );
-                            }).toList(),
+                              ),).toList(),
                           ),
                         ],
                       ),
@@ -249,9 +245,9 @@ class _LanguageWidgetState extends State<LanguageWidget> {
             } catch (e) {
               return Center(
                   child: Text(
-                "Unable to load".tr().toString(),
-                style: TextStyle(color: primaryColor),
-              ));
+                'Unable to load'.tr().toString(),
+                style: const TextStyle(color: primaryColor),
+              ),);
             }
           },
         ),
@@ -261,29 +257,27 @@ class _LanguageWidgetState extends State<LanguageWidget> {
 }
 
 void showChangeDialog(
-    BuildContext context, String language, VoidCallback onTap) {
+    BuildContext context, String language, VoidCallback onTap,) {
   showDialog(
     context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Change Language".tr().toString()),
+    builder: (BuildContext context) => AlertDialog(
+        title: Text('Change Language'.tr().toString()),
         content: Text(
-            'Do you want to change the language to $language?'.tr().toString()),
+            'Do you want to change the language to $language?'.tr().toString(),),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text('No'.tr().toString(),
-                style: TextStyle(color: primaryColor)),
+                style: const TextStyle(color: primaryColor),),
           ),
           TextButton(
             onPressed: onTap,
             child: Text(
               'Yes'.tr().toString(),
-              style: TextStyle(color: primaryColor),
+              style: const TextStyle(color: primaryColor),
             ),
           ),
         ],
-      );
-    },
+      ),
   );
 }

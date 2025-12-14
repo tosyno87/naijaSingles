@@ -1,7 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import '../common/constants/constants.dart';
+import '../common/utils/app_logger.dart';
 
 class NotificationData {
   static final firebaseInstance = FirebaseMessaging.instance;
@@ -9,13 +8,7 @@ class NotificationData {
   // Request notification permissions
   static Future<bool> requestNotificationPermissions() async {
     final settings = await firebaseInstance.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
+      
     );
 
     return settings.authorizationStatus == AuthorizationStatus.authorized;
@@ -26,7 +19,7 @@ class NotificationData {
     try {
       return await firebaseInstance.getToken();
     } catch (e) {
-      print('Error getting FCM token: $e');
+      AppLogger.error('Error getting FCM token', error: e);
       return null;
     }
   }
@@ -36,7 +29,7 @@ class NotificationData {
     try {
       await firebaseInstance.subscribeToTopic(topic);
     } catch (e) {
-      print('Error subscribing to topic $topic: $e');
+      AppLogger.error('Error subscribing to topic $topic', error: e);
     }
   }
 
@@ -45,7 +38,7 @@ class NotificationData {
     try {
       await firebaseInstance.unsubscribeFromTopic(topic);
     } catch (e) {
-      print('Error unsubscribing from topic $topic: $e');
+      AppLogger.error('Error unsubscribing from topic $topic', error: e);
     }
   }
 }

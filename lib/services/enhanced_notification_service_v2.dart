@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:naijasingles/services/performance_monitor.dart';
+import 'performance_monitor.dart';
 
 /// Enhanced notification service for real-time match and interaction alerts
 /// Implements Priority 3: User Experience Enhancements
@@ -53,7 +53,7 @@ class EnhancedNotificationServiceV2 {
 
       // Setup background message handler
       FirebaseMessaging.onBackgroundMessage(
-          _firebaseMessagingBackgroundHandler);
+          _firebaseMessagingBackgroundHandler,);
 
       debugPrint('✅ Enhanced notification service initialized');
     } catch (e) {
@@ -66,9 +66,7 @@ class EnhancedNotificationServiceV2 {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      
     );
 
     const initSettings = InitializationSettings(
@@ -112,7 +110,6 @@ class EnhancedNotificationServiceV2 {
         EXPIRY_CHANNEL_ID,
         'Match Expiry Notifications',
         description: 'Notifications for expiring matches',
-        importance: Importance.defaultImportance,
       ),
     ];
 
@@ -128,10 +125,7 @@ class EnhancedNotificationServiceV2 {
   Future<void> _requestPermissions() async {
     // Request FCM permissions
     final settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
+      
     );
 
     debugPrint('🔐 FCM Permission status: ${settings.authorizationStatus}');
@@ -338,7 +332,7 @@ class EnhancedNotificationServiceV2 {
     await PerformanceMonitor.measure('send_super_like_notification', () async {
       try {
         debugPrint(
-            '⭐ Sending super like notification: $fromUserName → $toUserId');
+            '⭐ Sending super like notification: $fromUserName → $toUserId',);
 
         // Check notification settings
         final settings = await _getNotificationSettings(toUserId);
@@ -396,7 +390,7 @@ class EnhancedNotificationServiceV2 {
     await PerformanceMonitor.measure('send_message_notification', () async {
       try {
         debugPrint(
-            '💬 Sending message notification: $fromUserName → $toUserId');
+            '💬 Sending message notification: $fromUserName → $toUserId',);
 
         // Check notification settings
         final settings = await _getNotificationSettings(toUserId);
@@ -458,7 +452,7 @@ class EnhancedNotificationServiceV2 {
     await PerformanceMonitor.measure('send_expiry_notification', () async {
       try {
         debugPrint(
-            '⏰ Sending match expiry notification: $otherUserName → $toUserId');
+            '⏰ Sending match expiry notification: $otherUserName → $toUserId',);
 
         // Check notification settings
         final settings = await _getNotificationSettings(toUserId);
@@ -560,7 +554,7 @@ class EnhancedNotificationServiceV2 {
 
   /// Update notification settings
   Future<void> updateNotificationSettings(
-      String userId, NotificationSettings settings) async {
+      String userId, NotificationSettings settings,) async {
     try {
       await _notificationSettingsCollection
           .doc(userId)
@@ -688,29 +682,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 /// Represents an app notification
 class AppNotification {
-  final String id;
-  final String type;
-  final String toUserId;
-  final String? fromUserId;
-  final String title;
-  final String body;
-  final DateTime timestamp;
-  final bool read;
-  final String priority;
-  final Map<String, dynamic> data;
-  final String? imageUrl;
 
   const AppNotification({
     required this.id,
     required this.type,
     required this.toUserId,
-    this.fromUserId,
-    required this.title,
-    required this.body,
-    required this.timestamp,
-    required this.read,
-    required this.priority,
-    required this.data,
+    required this.title, required this.body, required this.timestamp, required this.read, required this.priority, required this.data, this.fromUserId,
     this.imageUrl,
   });
 
@@ -731,8 +708,7 @@ class AppNotification {
     );
   }
 
-  factory AppNotification.fromRemoteMessage(RemoteMessage message) {
-    return AppNotification(
+  factory AppNotification.fromRemoteMessage(RemoteMessage message) => AppNotification(
       id: message.messageId ?? '',
       type: message.data['type'] ?? '',
       toUserId: message.data['toUserId'] ?? '',
@@ -745,24 +721,24 @@ class AppNotification {
       data: message.data,
       imageUrl: message.notification?.android?.imageUrl,
     );
-  }
+  final String id;
+  final String type;
+  final String toUserId;
+  final String? fromUserId;
+  final String title;
+  final String body;
+  final DateTime timestamp;
+  final bool read;
+  final String priority;
+  final Map<String, dynamic> data;
+  final String? imageUrl;
 
   @override
-  String toString() {
-    return 'AppNotification($type: $title)';
-  }
+  String toString() => 'AppNotification($type: $title)';
 }
 
 /// Notification settings for a user
 class NotificationSettings {
-  final bool matchNotifications;
-  final bool superLikeNotifications;
-  final bool messageNotifications;
-  final bool expiryNotifications;
-  final bool soundEnabled;
-  final bool vibrationEnabled;
-  final String quietHoursStart;
-  final String quietHoursEnd;
 
   const NotificationSettings({
     required this.matchNotifications,
@@ -775,8 +751,7 @@ class NotificationSettings {
     required this.quietHoursEnd,
   });
 
-  factory NotificationSettings.defaultSettings() {
-    return const NotificationSettings(
+  factory NotificationSettings.defaultSettings() => const NotificationSettings(
       matchNotifications: true,
       superLikeNotifications: true,
       messageNotifications: true,
@@ -786,7 +761,6 @@ class NotificationSettings {
       quietHoursStart: '22:00',
       quietHoursEnd: '08:00',
     );
-  }
 
   factory NotificationSettings.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -801,9 +775,16 @@ class NotificationSettings {
       quietHoursEnd: data['quietHoursEnd'] ?? '08:00',
     );
   }
+  final bool matchNotifications;
+  final bool superLikeNotifications;
+  final bool messageNotifications;
+  final bool expiryNotifications;
+  final bool soundEnabled;
+  final bool vibrationEnabled;
+  final String quietHoursStart;
+  final String quietHoursEnd;
 
-  Map<String, dynamic> toMap() {
-    return {
+  Map<String, dynamic> toMap() => {
       'matchNotifications': matchNotifications,
       'superLikeNotifications': superLikeNotifications,
       'messageNotifications': messageNotifications,
@@ -813,28 +794,21 @@ class NotificationSettings {
       'quietHoursStart': quietHoursStart,
       'quietHoursEnd': quietHoursEnd,
     };
-  }
 }
 
 /// Notification event for real-time updates
 class NotificationEvent {
-  final NotificationEventType type;
-  final AppNotification notification;
 
   const NotificationEvent._(this.type, this.notification);
 
-  factory NotificationEvent.received(AppNotification notification) {
-    return NotificationEvent._(NotificationEventType.received, notification);
-  }
+  factory NotificationEvent.received(AppNotification notification) => NotificationEvent._(NotificationEventType.received, notification);
 
-  factory NotificationEvent.tapped(AppNotification notification) {
-    return NotificationEvent._(NotificationEventType.tapped, notification);
-  }
+  factory NotificationEvent.tapped(AppNotification notification) => NotificationEvent._(NotificationEventType.tapped, notification);
+  final NotificationEventType type;
+  final AppNotification notification;
 
   @override
-  String toString() {
-    return 'NotificationEvent(${type.name}: ${notification.title})';
-  }
+  String toString() => 'NotificationEvent(${type.name}: ${notification.title})';
 }
 
 /// Types of notification events

@@ -1,7 +1,9 @@
 import 'dart:developer' as dev;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../models/user_model.dart';
 
 /// Industry-standard smart matching algorithm service
 /// Features:
@@ -12,19 +14,19 @@ import 'dart:math';
 /// - Machine learning-inspired scoring
 /// - Match quality prediction
 class SmartMatchingService {
-  static final SmartMatchingService _instance =
-      SmartMatchingService._internal();
   factory SmartMatchingService() => _instance;
   SmartMatchingService._internal();
+  static final SmartMatchingService _instance =
+      SmartMatchingService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Calculate compatibility score between two users
   Future<MatchScore> calculateCompatibilityScore(
-      String userId1, String userId2) async {
+      String userId1, String userId2,) async {
     try {
       dev.log(
-          '💕 Calculating compatibility score between $userId1 and $userId2');
+          '💕 Calculating compatibility score between $userId1 and $userId2',);
 
       // Get both users' data
       final user1Doc = await _firestore.collection('users').doc(userId1).get();
@@ -34,7 +36,7 @@ class SmartMatchingService {
         return MatchScore(
           userId1: userId1,
           userId2: userId2,
-          overallScore: 0.0,
+          overallScore: 0,
           factors: {},
           recommendation: MatchRecommendation.notRecommended,
           calculatedAt: DateTime.now(),
@@ -85,14 +87,14 @@ class SmartMatchingService {
       );
 
       dev.log(
-          '✅ Compatibility score calculated: ${overallScore.toStringAsFixed(2)}');
+          '✅ Compatibility score calculated: ${overallScore.toStringAsFixed(2)}',);
       return matchScore;
     } catch (e) {
       dev.log('❌ Error calculating compatibility score: $e');
       return MatchScore(
         userId1: userId1,
         userId2: userId2,
-        overallScore: 0.0,
+        overallScore: 0,
         factors: {},
         recommendation: MatchRecommendation.notRecommended,
         calculatedAt: DateTime.now(),
@@ -102,7 +104,7 @@ class SmartMatchingService {
 
   /// Get smart matches for a user
   Future<List<SmartMatch>> getSmartMatches(String userId,
-      {int limit = 20}) async {
+      {int limit = 20,}) async {
     try {
       dev.log('🔍 Finding smart matches for user: $userId');
 
@@ -130,13 +132,13 @@ class SmartMatchingService {
             distance: await _calculateDistance(user, potentialMatch),
             commonInterests: _getCommonInterests(user, potentialMatch),
             matchReasons: _getMatchReasons(matchScore),
-          ));
+          ),);
         }
       }
 
       // Sort by compatibility score (highest first)
       smartMatches.sort((a, b) =>
-          b.matchScore.overallScore.compareTo(a.matchScore.overallScore));
+          b.matchScore.overallScore.compareTo(a.matchScore.overallScore),);
 
       // Return top matches
       final topMatches = smartMatches.take(limit).toList();
@@ -187,7 +189,7 @@ class SmartMatchingService {
       final snapshot = await query.get();
       return snapshot.docs
           .map((doc) =>
-              UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+              UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),)
           .toList();
     } catch (e) {
       dev.log('❌ Error getting potential matches: $e');
@@ -201,7 +203,7 @@ class SmartMatchingService {
 
     final ageDiff = (age1 - age2).abs();
 
-    if (ageDiff <= 2) return 1.0;
+    if (ageDiff <= 2) return 1;
     if (ageDiff <= 5) return 0.8;
     if (ageDiff <= 10) return 0.6;
     if (ageDiff <= 15) return 0.4;
@@ -210,7 +212,7 @@ class SmartMatchingService {
 
   /// Calculate location compatibility score
   Future<double> _calculateLocationCompatibility(
-      UserModel user1, UserModel user2) async {
+      UserModel user1, UserModel user2,) async {
     try {
       // If both users have location data
       if (user1.latitude != null &&
@@ -232,7 +234,9 @@ class SmartMatchingService {
       if (user1Location != null && user2Location != null) {
         if (user1Location == user2Location) return 1.0;
         if (user1Location.contains(user2Location) ||
-            user2Location.contains(user1Location)) return 0.7;
+            user2Location.contains(user1Location)) {
+          return 0.7;
+        }
       }
 
       return 0.5; // Default score
@@ -251,7 +255,7 @@ class SmartMatchingService {
       if (interests1.isEmpty || interests2.isEmpty) return 0.5;
 
       final commonInterests =
-          interests1.where((interest) => interests2.contains(interest)).length;
+          interests1.where(interests2.contains).length;
       final totalInterests = (interests1.length + interests2.length) / 2;
 
       return (commonInterests / totalInterests).clamp(0.0, 1.0);
@@ -345,7 +349,7 @@ class SmartMatchingService {
     try {
       if (user1.education == null || user2.education == null) return 0.5;
 
-      if (user1.education == user2.education) return 1.0;
+      if (user1.education == user2.education) return 1;
 
       // Define education levels for comparison
       const educationLevels = {
@@ -362,7 +366,7 @@ class SmartMatchingService {
       if (level1 == 0 || level2 == 0) return 0.5;
 
       final diff = (level1 - level2).abs();
-      if (diff == 0) return 1.0;
+      if (diff == 0) return 1;
       if (diff == 1) return 0.8;
       if (diff == 2) return 0.6;
       return 0.4;
@@ -377,7 +381,7 @@ class SmartMatchingService {
     try {
       if (user1.occupation == null || user2.occupation == null) return 0.5;
 
-      if (user1.occupation == user2.occupation) return 1.0;
+      if (user1.occupation == user2.occupation) return 1;
 
       // Define occupation categories for comparison
       const occupationCategories = {
@@ -385,7 +389,7 @@ class SmartMatchingService {
           'Software Engineer',
           'Developer',
           'IT Specialist',
-          'Data Scientist'
+          'Data Scientist',
         ],
         'Healthcare': ['Doctor', 'Nurse', 'Pharmacist', 'Therapist'],
         'Education': ['Teacher', 'Professor', 'Educator', 'Academic'],
@@ -394,7 +398,8 @@ class SmartMatchingService {
         'Service': ['Sales', 'Customer Service', 'Retail', 'Hospitality'],
       };
 
-      String? category1, category2;
+      String? category1;
+      String? category2;
 
       for (final entry in occupationCategories.entries) {
         if (entry.value.contains(user1.occupation)) category1 = entry.key;
@@ -422,8 +427,8 @@ class SmartMatchingService {
       'occupation': 0.05,
     };
 
-    double weightedSum = 0.0;
-    double totalWeight = 0.0;
+    double weightedSum = 0;
+    double totalWeight = 0;
 
     for (final entry in factors.entries) {
       final weight = weights[entry.key] ?? 0.0;
@@ -483,7 +488,7 @@ class SmartMatchingService {
       final interests2 = user2.editInfo?['interests'] as List<String>? ?? [];
 
       return interests1
-          .where((interest) => interests2.contains(interest))
+          .where(interests2.contains)
           .toList();
     } catch (e) {
       dev.log('❌ Error getting common interests: $e');
@@ -554,12 +559,6 @@ enum MatchRecommendation {
 
 /// Match score model
 class MatchScore {
-  final String userId1;
-  final String userId2;
-  final double overallScore;
-  final Map<String, double> factors;
-  final MatchRecommendation recommendation;
-  final DateTime calculatedAt;
 
   const MatchScore({
     required this.userId1,
@@ -569,20 +568,19 @@ class MatchScore {
     required this.recommendation,
     required this.calculatedAt,
   });
+  final String userId1;
+  final String userId2;
+  final double overallScore;
+  final Map<String, double> factors;
+  final MatchRecommendation recommendation;
+  final DateTime calculatedAt;
 
   @override
-  String toString() {
-    return 'MatchScore($userId1-$userId2: ${overallScore.toStringAsFixed(2)}, ${recommendation.name})';
-  }
+  String toString() => 'MatchScore($userId1-$userId2: ${overallScore.toStringAsFixed(2)}, ${recommendation.name})';
 }
 
 /// Smart match model
 class SmartMatch {
-  final UserModel user;
-  final MatchScore matchScore;
-  final double distance;
-  final List<String> commonInterests;
-  final List<String> matchReasons;
 
   const SmartMatch({
     required this.user,
@@ -591,9 +589,12 @@ class SmartMatch {
     required this.commonInterests,
     required this.matchReasons,
   });
+  final UserModel user;
+  final MatchScore matchScore;
+  final double distance;
+  final List<String> commonInterests;
+  final List<String> matchReasons;
 
   @override
-  String toString() {
-    return 'SmartMatch(${user.name}: ${matchScore.overallScore.toStringAsFixed(2)})';
-  }
+  String toString() => 'SmartMatch(${user.name}: ${matchScore.overallScore.toStringAsFixed(2)})';
 }

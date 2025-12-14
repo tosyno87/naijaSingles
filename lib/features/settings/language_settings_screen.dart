@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer';
 
 class LanguageSettingsScreen extends StatefulWidget {
-  const LanguageSettingsScreen({Key? key}) : super(key: key);
+  const LanguageSettingsScreen({super.key});
 
   @override
   State<LanguageSettingsScreen> createState() => _LanguageSettingsScreenState();
@@ -171,7 +172,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 color: primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.language, color: primaryColor, size: 30),
+              child: const Icon(Icons.language, color: primaryColor, size: 30),
             ),
             const SizedBox(height: 16),
             Text(
@@ -204,12 +205,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: primaryColor.withOpacity(0.2),
-                  width: 1,
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: primaryColor, size: 20),
+                  const Icon(Icons.info_outline, color: primaryColor, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -256,14 +256,13 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -301,14 +300,12 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               ),
             ),
     );
-  }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             color: primaryColor,
             strokeWidth: 3,
           ),
@@ -323,10 +320,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildHeaderSection() {
-    return Container(
+  Widget _buildHeaderSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -348,7 +343,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               color: primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.language,
               size: 40,
               color: primaryColor,
@@ -377,7 +372,6 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildAvailableLanguagesSection() {
     final availableLanguages =
@@ -397,7 +391,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         const SizedBox(height: 12),
         ...availableLanguages
             .map((language) => _buildLanguageCard(language, true))
-            .toList(),
+            ,
       ],
     );
   }
@@ -422,7 +416,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         const SizedBox(height: 12),
         ...comingSoonLanguages
             .map((language) => _buildLanguageCard(language, false))
-            .toList(),
+            ,
       ],
     );
   }
@@ -502,7 +496,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                         const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                              horizontal: 8, vertical: 4,),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -524,7 +518,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 // Selection Indicator
                 if (isAvailable) ...[
                   if (_isSaving && isSelected)
-                    SizedBox(
+                    const SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
@@ -536,11 +530,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                     Container(
                       width: 24,
                       height: 24,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: primaryColor,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.check,
                         color: Colors.white,
                         size: 16,
@@ -565,8 +559,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     );
   }
 
-  Widget _buildLanguageInfoSection() {
-    return Container(
+  Widget _buildLanguageInfoSection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
@@ -578,7 +571,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: primaryColor, size: 20),
+              const Icon(Icons.info_outline, color: primaryColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Language Support',
@@ -592,19 +585,17 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           ),
           const SizedBox(height: 12),
           _buildInfoItem(
-              '🇳🇬 Nigerian languages are prioritized for local users'),
+              '🇳🇬 Nigerian languages are prioritized for local users',),
           _buildInfoItem(
-              '🔄 App restart may be required for full language change'),
+              '🔄 App restart may be required for full language change',),
           _buildInfoItem(
-              '📱 More languages will be added based on user demand'),
+              '📱 More languages will be added based on user demand',),
           _buildInfoItem('🌍 Help us translate by sending feedback'),
         ],
       ),
     );
-  }
 
-  Widget _buildInfoItem(String text) {
-    return Padding(
+  Widget _buildInfoItem(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         text,
@@ -615,5 +606,4 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ),
       ),
     );
-  }
 }

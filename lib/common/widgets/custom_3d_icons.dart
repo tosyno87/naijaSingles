@@ -668,8 +668,7 @@ class Custom3DIcons {
     required double size,
     required Color color,
     required LinearGradient gradient,
-  }) {
-    return Container(
+  }) => Container(
       width: size + 8,
       height: size + 8,
       decoration: BoxDecoration(
@@ -680,13 +679,11 @@ class Custom3DIcons {
             color: color.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
-            spreadRadius: 0,
           ),
           BoxShadow(
             color: Colors.white.withOpacity(0.1),
             blurRadius: 2,
             offset: const Offset(0, 1),
-            spreadRadius: 0,
           ),
         ],
       ),
@@ -696,7 +693,6 @@ class Custom3DIcons {
         color: Colors.white,
       ),
     );
-  }
 
   // 🌍 CULTURAL & COMMUNITY ICONS
   static Widget culture({double size = 24, Color? color}) => _build3DIcon(

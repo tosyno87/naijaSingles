@@ -5,9 +5,9 @@ import '../../user/controllers/onboarding_controller.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingPreferencesScreen extends StatefulWidget {
-  final VoidCallback? onNext;
 
-  const OnboardingPreferencesScreen({Key? key, this.onNext}) : super(key: key);
+  const OnboardingPreferencesScreen({super.key, this.onNext});
+  final VoidCallback? onNext;
 
   @override
   State<OnboardingPreferencesScreen> createState() =>
@@ -87,7 +87,6 @@ class _OnboardingPreferencesScreenState
           // Continue Button
           ContinueButton(
             onPressed: _saveAndContinue,
-            text: 'Continue',
           ),
         ],
       ),

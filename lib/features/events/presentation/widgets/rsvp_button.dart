@@ -1,21 +1,21 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../data/models/rsvp_model.dart';
 import '../bloc/rsvp_bloc.dart';
 
 class RSVPButton extends StatefulWidget {
+
+  const RSVPButton({
+    required this.eventId, super.key,
+    this.compact = false,
+    this.initialStatus,
+  });
   final String eventId;
   final bool compact;
   final RSVPStatus? initialStatus;
-
-  const RSVPButton({
-    Key? key,
-    required this.eventId,
-    this.compact = false,
-    this.initialStatus,
-  }) : super(key: key);
 
   @override
   State<RSVPButton> createState() => _RSVPButtonState();
@@ -39,12 +39,12 @@ class _RSVPButtonState extends State<RSVPButton>
     );
 
     _scaleAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: 0.95,
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
-    ));
+    ),);
 
     // Load current RSVP status
     _loadRSVPStatus();
@@ -61,7 +61,7 @@ class _RSVPButtonState extends State<RSVPButton>
     context.read<RSVPBloc>().add(LoadEventRSVPStatusEvent(
           userId: currentUserId,
           eventId: widget.eventId,
-        ));
+        ),);
   }
 
   void _handleRSVPTap() {
@@ -86,7 +86,7 @@ class _RSVPButtonState extends State<RSVPButton>
     context.read<RSVPBloc>().add(RSVPToEventEvent(
           eventId: widget.eventId,
           status: newStatus,
-        ));
+        ),);
   }
 
   void _showRSVPOptions() {
@@ -98,8 +98,7 @@ class _RSVPButtonState extends State<RSVPButton>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocListener<RSVPBloc, RSVPState>(
+  Widget build(BuildContext context) => BlocListener<RSVPBloc, RSVPState>(
       listener: (context, state) {
         if (state is RSVPSuccess && state.eventId == widget.eventId) {
           setState(() {
@@ -149,15 +148,12 @@ class _RSVPButtonState extends State<RSVPButton>
       },
       child: AnimatedBuilder(
         animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
+        builder: (context, child) => Transform.scale(
             scale: _scaleAnimation.value,
             child: _buildButton(),
-          );
-        },
+          ),
       ),
     );
-  }
 
   Widget _buildButton() {
     if (widget.compact) {
@@ -166,8 +162,7 @@ class _RSVPButtonState extends State<RSVPButton>
     return _buildFullButton();
   }
 
-  Widget _buildCompactButton() {
-    return GestureDetector(
+  Widget _buildCompactButton() => GestureDetector(
       onTap: _handleRSVPTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -210,10 +205,8 @@ class _RSVPButtonState extends State<RSVPButton>
         ),
       ),
     );
-  }
 
-  Widget _buildFullButton() {
-    return SizedBox(
+  Widget _buildFullButton() => SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _isLoading ? null : _handleRSVPTap,
@@ -259,10 +252,8 @@ class _RSVPButtonState extends State<RSVPButton>
         ),
       ),
     );
-  }
 
-  Widget _buildRSVPOptionsSheet() {
-    return Container(
+  Widget _buildRSVPOptionsSheet() => DecoratedBox(
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -301,15 +292,15 @@ class _RSVPButtonState extends State<RSVPButton>
                 ),
                 _buildRSVPOption(
                   status: RSVPStatus.interested,
-                  title: "Interested",
-                  subtitle: "Save for later consideration",
+                  title: 'Interested',
+                  subtitle: 'Save for later consideration',
                   icon: Icons.star,
                   color: const Color(0xFFFF9800),
                 ),
                 _buildRSVPOption(
                   status: RSVPStatus.notGoing,
                   title: "Can't Go",
-                  subtitle: "Remove from your events",
+                  subtitle: 'Remove from your events',
                   icon: Icons.cancel,
                   color: const Color(0xFFF44336),
                 ),
@@ -320,7 +311,6 @@ class _RSVPButtonState extends State<RSVPButton>
         ],
       ),
     );
-  }
 
   Widget _buildRSVPOption({
     required RSVPStatus status,

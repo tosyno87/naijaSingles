@@ -2,31 +2,25 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
+
+  const CustomButton({
+    required this.text, required this.onTap, required this.color, required this.active, super.key,
+    this.width,
+  });
   final String text;
   final VoidCallback? onTap;
   final Color color;
   final bool active;
   final double? width;
 
-  const CustomButton({
-    super.key,
-    required this.text,
-    required this.onTap,
-    required this.color,
-    required this.active,
-    this.width,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
+  Widget build(BuildContext context) => InkWell(
       onTap: active ? onTap : null,
       child: Container(
         width: width,
         decoration: BoxDecoration(
           // Use the suggested medium sea green color
           color: active ? const Color(0xFF27AE60) : Colors.grey[300],
-          shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(30),
           // Add subtle shadow for depth
           boxShadow: [
@@ -53,5 +47,4 @@ class CustomButton extends StatelessWidget {
         ),
       ),
     );
-  }
 }

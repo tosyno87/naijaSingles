@@ -4,26 +4,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
-import '../../../../models/user_model.dart';
-import '../../../home/controllers/home_controller.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../models/user_model.dart';
+import '../../../home/controllers/home_controller.dart';
+import '../../../match/ui/widget/match_dialog_new.dart';
 import '../../bloc/searchuser_bloc.dart';
 import '../../bloc/swipebloc_bloc.dart';
 import '../screens/swipe_card.dart';
-import '../../../match/ui/widget/match_dialog_new.dart';
 
 class SwipeCardList extends StatefulWidget {
+
+  const SwipeCardList({
+    required this.controller, required this.stackController, required this.onUserRemoved, super.key,
+  });
   final HomeController controller;
   final SwipableStackController? stackController;
   final Function(UserModel) onUserRemoved;
-
-  const SwipeCardList({
-    super.key,
-    required this.controller,
-    required this.stackController,
-    required this.onUserRemoved,
-  });
 
   @override
   State<SwipeCardList> createState() => _SwipeCardListState();
@@ -37,7 +34,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
       builder: (context, state) {
         if (state is SearchUserLoadingState) {
           widget.stackController?.dispose();
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation(primaryColor),
             ),
@@ -67,17 +64,16 @@ class _SwipeCardListState extends State<SwipeCardList> {
             width: MediaQuery.of(context).size.width,
             child: state.users.isEmpty
                 ? Align(
-                    alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8),
                           child: CircleAvatar(
                             backgroundColor: Colors.grey[200],
                             radius: 50,
                             child: Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(10),
                               child: Image.asset(
                                 'asset/hookup4u-Logo-BP.png',
                                 fit: BoxFit.contain,
@@ -109,7 +105,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
                         context.read<SwipeBloc>().add(RightSwipeEvent(
                               currentUser: widget.controller.currentUser,
                               selectedUser: user,
-                            ));
+                            ),);
                         if (widget.controller.likedByList.contains(user.id) ||
                             (user.isBot ?? false)) {
                           showDialog(
@@ -128,7 +124,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
                         context.read<SwipeBloc>().add(LeftSwipeEvent(
                               currentUser: widget.controller.currentUser,
                               selectedUser: user,
-                            ));
+                            ),);
                         if (index < state.users.length) {
                           widget.onUserRemoved(user);
                         }

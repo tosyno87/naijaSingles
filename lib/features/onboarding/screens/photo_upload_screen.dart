@@ -41,13 +41,13 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Select Photo",
+              'Select Photo',
               style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -57,8 +57,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             const SizedBox(height: 16),
             _buildImageSourceOption(
               icon: Icons.camera_alt,
-              title: "Take a Photo",
-              subtitle: "Use your camera to take a new photo",
+              title: 'Take a Photo',
+              subtitle: 'Use your camera to take a new photo',
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera, index);
@@ -67,8 +67,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             const Divider(height: 24),
             _buildImageSourceOption(
               icon: Icons.photo_library,
-              title: "Choose from Gallery",
-              subtitle: "Select a photo from your device",
+              title: 'Choose from Gallery',
+              subtitle: 'Select a photo from your device',
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery, index);
@@ -85,8 +85,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) {
-    return InkWell(
+  }) => InkWell(
       onTap: onTap,
       child: Row(
         children: [
@@ -125,7 +124,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               ],
             ),
           ),
-          Icon(
+          const Icon(
             Icons.arrow_forward_ios,
             color: afropeepGreen,
             size: 16,
@@ -133,7 +132,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildPhotoItem(int index) {
     final controller = Provider.of<OnboardingController>(context);
@@ -178,7 +176,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        isRequired ? "Required" : "Add Photo",
+                        isRequired ? 'Required' : 'Add Photo',
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -229,12 +227,12 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     final bool hasMinimumPhotos = uploadedCount >= 3;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Add Your Profile Photos",
+            'Add Your Profile Photos',
             style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -245,7 +243,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           const SizedBox(height: 8),
 
           Text(
-            "Upload at least 3 photos to complete your profile",
+            'Upload at least 3 photos to complete your profile',
             style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textLightBrown,
@@ -264,7 +262,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              "$uploadedCount/5 photos uploaded (minimum 3)",
+              '$uploadedCount/5 photos uploaded (minimum 3)',
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -310,14 +308,13 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: Colors.blue.shade200,
-                width: 1,
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Tips for great profile photos:",
+                  'Tips for great profile photos:',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -326,19 +323,19 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 ),
                 const SizedBox(height: 8),
                 _buildTipItem(
-                  "Use clear, well-lit photos that show your face",
+                  'Use clear, well-lit photos that show your face',
                 ),
                 _buildTipItem(
-                  "Include at least one full-body photo",
+                  'Include at least one full-body photo',
                 ),
                 _buildTipItem(
-                  "Show your interests and personality",
+                  'Show your interests and personality',
                 ),
                 _buildTipItem(
-                  "Avoid heavily filtered or edited photos",
+                  'Avoid heavily filtered or edited photos',
                 ),
                 _buildTipItem(
-                  "Smile! Profiles with smiling photos get more matches",
+                  'Smile! Profiles with smiling photos get more matches',
                 ),
               ],
             ),
@@ -348,8 +345,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     );
   }
 
-  Widget _buildTipItem(String text) {
-    return Padding(
+  Widget _buildTipItem(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,5 +368,4 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         ],
       ),
     );
-  }
 }

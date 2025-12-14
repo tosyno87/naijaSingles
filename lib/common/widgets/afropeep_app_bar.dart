@@ -5,17 +5,9 @@ import '../constants/app_colors.dart';
 /// Reusable AppBar for authentication screens
 /// Provides consistent transparent background with green back button and title
 class AfropeepAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final VoidCallback? onBack;
-  final List<Widget>? actions;
-  final Color? backgroundColor;
-  final Color? titleColor;
-  final Color? backButtonColor;
-  final bool centerTitle;
 
   const AfropeepAppBar({
-    super.key,
-    required this.title,
+    required this.title, super.key,
     this.onBack,
     this.actions,
     this.backgroundColor,
@@ -23,6 +15,13 @@ class AfropeepAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backButtonColor,
     this.centerTitle = true,
   });
+  final String title;
+  final VoidCallback? onBack;
+  final List<Widget>? actions;
+  final Color? backgroundColor;
+  final Color? titleColor;
+  final Color? backButtonColor;
+  final bool centerTitle;
 
   @override
   Widget build(BuildContext context) {

@@ -1,34 +1,32 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:naijasingles/services/unified_group_service.dart';
-import 'package:naijasingles/services/user_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
-import 'package:naijasingles/features/groups/widgets/message_bubble.dart';
-import 'package:naijasingles/features/groups/widgets/message_shimmer.dart';
-import 'package:naijasingles/models/group_join_exception.dart';
-import 'package:naijasingles/widgets/full_screen_image_viewer.dart';
-import 'package:naijasingles/widgets/group_info_modal.dart';
-import 'package:naijasingles/widgets/group_notification_toggle.dart';
-import 'package:naijasingles/widgets/group_report_modal.dart';
-import 'package:naijasingles/features/groups/screens/group_settings_screen.dart';
-import 'package:naijasingles/services/group_notification_service.dart';
-import 'package:naijasingles/services/group_unread_service.dart';
-import 'package:naijasingles/widgets/unread_badge.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../models/group_join_exception.dart';
+import '../../../services/group_notification_service.dart';
+import '../../../services/group_unread_service.dart';
+import '../../../services/unified_group_service.dart';
+import '../../../services/user_service.dart';
+import '../../../widgets/full_screen_image_viewer.dart';
+import '../../../widgets/group_info_modal.dart';
+import '../../../widgets/group_notification_toggle.dart';
+import '../../../widgets/group_report_modal.dart';
+import '../../group_chat/screens/group_chat_screen.dart';
+import '../widgets/message_bubble.dart';
+import '../widgets/message_shimmer.dart';
+import 'group_settings_screen.dart';
 
 /// Enhanced Group Details Screen for members
 /// Provides comprehensive group information and member-specific actions
 class GroupDetailsScreen extends StatefulWidget {
-  final UnifiedGroup group;
-  final bool isMember;
 
   const GroupDetailsScreen({
-    super.key,
-    required this.group,
-    required this.isMember,
+    required this.group, required this.isMember, super.key,
   });
+  final UnifiedGroup group;
+  final bool isMember;
 
   @override
   State<GroupDetailsScreen> createState() => _GroupDetailsScreenState();
@@ -52,8 +50,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -81,10 +78,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           ? _buildChatInterface()
           : _buildGroupDetails(),
     );
-  }
 
-  Widget _buildChatInterface() {
-    return Column(
+  Widget _buildChatInterface() => Column(
       children: [
         // Group info header
         _buildChatHeader(),
@@ -96,10 +91,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         _buildMessageInput(),
       ],
     );
-  }
 
-  Widget _buildChatHeader() {
-    return Container(
+  Widget _buildChatHeader() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -122,14 +115,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     child: Image.network(
                       widget.group.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
+                      errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.group,
                         color: AppColors.primaryGreen,
                         size: 20,
                       ),
                     ),
                   )
-                : Icon(
+                : const Icon(
                     Icons.group,
                     color: AppColors.primaryGreen,
                     size: 20,
@@ -159,8 +152,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             ),
           ),
           IconButton(
-            onPressed: () => _showGroupInfoModal(),
-            icon: Icon(
+            onPressed: _showGroupInfoModal,
+            icon: const Icon(
               Icons.info_outline,
               color: AppColors.primaryGreen,
             ),
@@ -168,16 +161,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildMessagesList() {
-    return StreamBuilder<QuerySnapshot>(
+  Widget _buildMessagesList() => StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('unifiedGroups')
           .doc(widget.group.id)
           .collection('messages')
           .orderBy('timestamp',
-              descending: false) // Oldest first for proper display
+              descending: false,) // Oldest first for proper display
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -185,12 +176,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: 3, // Show 3 shimmer messages
-            itemBuilder: (context, index) {
-              return MessageShimmer(
+            itemBuilder: (context, index) => MessageShimmer(
                 isCurrentUser:
                     index % 2 == 0, // Alternate between user and other
-              );
-            },
+              ),
           );
         }
 
@@ -296,10 +285,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         );
       },
     );
-  }
 
-  Widget _buildMessageInput() {
-    return Container(
+  Widget _buildMessageInput() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -331,7 +318,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.primaryGreen),
+                  borderSide: const BorderSide(color: AppColors.primaryGreen),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -347,7 +334,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.primaryGreen,
               borderRadius: BorderRadius.circular(24),
@@ -364,7 +351,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
@@ -390,7 +376,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
       // Increment unread count for other members
       await _unreadService.incrementUnreadCount(widget.group.id,
-          excludeUserId: currentUser.uid);
+          excludeUserId: currentUser.uid,);
 
       _messageController.clear();
       setState(() {}); // Update send button state
@@ -406,8 +392,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     }
   }
 
-  Widget _buildGroupDetails() {
-    return SingleChildScrollView(
+  Widget _buildGroupDetails() => SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -419,14 +404,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildGroupHeader() {
-    return Container(
+  Widget _buildGroupHeader() => Container(
       width: double.infinity,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: AppColors.primaryGradient,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
         ),
@@ -463,11 +446,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildGroupAvatar() {
-    return GestureDetector(
-      onTap: () => _showGroupImageOptions(),
+  Widget _buildGroupAvatar() => GestureDetector(
+      onTap: _showGroupImageOptions,
       child: Container(
         width: 100,
         height: 100,
@@ -492,18 +473,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             : _buildDefaultAvatar(),
       ),
     );
-  }
 
-  Widget _buildDefaultAvatar() {
-    return Icon(
+  Widget _buildDefaultAvatar() => Icon(
       Icons.group,
       size: 50,
       color: Colors.white.withOpacity(0.8),
     );
-  }
 
-  Widget _buildGroupStats() {
-    return Row(
+  Widget _buildGroupStats() => Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildStatItem(
@@ -523,14 +500,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ],
     );
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(
           icon,
@@ -555,10 +530,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildGroupInfo() {
-    return Container(
+  Widget _buildGroupInfo() => Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -612,14 +585,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildInfoRow({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(
           icon,
@@ -652,10 +623,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildMemberSection() {
-    return Container(
+  Widget _buildMemberSection() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -697,7 +666,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildMemberList() {
     // Show first 6 members with "View All" option
@@ -706,7 +674,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
     return Column(
       children: [
-        ...displayMembers.map((memberId) => _buildMemberTile(memberId)),
+        ...displayMembers.map(_buildMemberTile),
         if (hasMoreMembers) ...[
           const SizedBox(height: 8),
           TextButton(
@@ -851,8 +819,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     );
   }
 
-  Widget _buildJoinButton() {
-    return Container(
+  Widget _buildJoinButton() => Container(
       margin: const EdgeInsets.all(16),
       child: _buildPrimaryButton(
         text: 'Join Group',
@@ -860,14 +827,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         onPressed: _joinGroup,
       ),
     );
-  }
 
   Widget _buildPrimaryButton({
     required String text,
     required IconData icon,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => Container(
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
@@ -906,14 +871,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildSecondaryButton({
     required String text,
     required IconData icon,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -945,14 +908,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildDangerButton({
     required String text,
     required IconData icon,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -984,7 +945,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
   // Action methods
   void _openGroupChat() {
@@ -999,7 +959,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   void _inviteMembers() {
     // TODO: Implement invite members functionality
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Invite members functionality coming soon!'),
         backgroundColor: AppColors.primaryGreen,
       ),
@@ -1046,7 +1006,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           ),
         );
         Navigator.pop(
-            context, true); // Return true to indicate group was joined
+            context, true,); // Return true to indicate group was joined
       }
     } catch (e) {
       if (mounted) {
@@ -1077,21 +1037,20 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     }
   }
 
-  Future<bool> _showLeaveConfirmation() async {
-    return await showDialog<bool>(
+  Future<bool> _showLeaveConfirmation() async => await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Leave Group'),
+            title: const Text('Leave Group'),
             content:
                 Text('Are you sure you want to leave "${widget.group.name}"?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text(
+                child: const Text(
                   'Leave',
                   style: TextStyle(color: Colors.red),
                 ),
@@ -1100,7 +1059,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           ),
         ) ??
         false;
-  }
 
   void _showGroupOptions() {
     showModalBottomSheet(
@@ -1111,8 +1069,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Group Settings'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Group Settings'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -1125,8 +1083,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.notifications),
-              title: Text('Notification Settings'),
+              leading: const Icon(Icons.notifications),
+              title: const Text('Notification Settings'),
               onTap: () {
                 Navigator.pop(context);
                 showModalBottomSheet(
@@ -1141,8 +1099,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.report),
-              title: Text('Report Group'),
+              leading: const Icon(Icons.report),
+              title: const Text('Report Group'),
               onTap: () {
                 Navigator.pop(context);
                 showModalBottomSheet(
@@ -1220,7 +1178,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.visibility,
                     color: AppColors.primaryGreen,
                     size: 24,
@@ -1251,7 +1209,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.edit,
                     color: AppColors.primaryGreen,
                     size: 24,
@@ -1310,7 +1268,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   void _editGroupPhoto() {
     // TODO: Implement group photo editing
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Group photo editing coming soon!'),
         backgroundColor: AppColors.primaryGreen,
       ),
@@ -1320,7 +1278,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   void _navigateToMemberProfile(String memberId) {
     // TODO: Implement member profile navigation
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Member profile navigation coming soon!'),
         backgroundColor: AppColors.primaryGreen,
       ),

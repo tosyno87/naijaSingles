@@ -1,29 +1,31 @@
+import 'dart:developer' as developer;
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/features/explore/explore_screen.dart';
-import 'package:naijasingles/features/messages/messages_screen.dart';
-import 'package:naijasingles/features/communities/ui/screens/communities_hub_screen.dart';
-import 'package:naijasingles/features/profile/profile_screen.dart';
-import 'package:naijasingles/debug/quick_analysis.dart';
-import 'package:naijasingles/common/widgets/custom_3d_icons.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
 import 'package:provider/provider.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/constants/constants.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer' as developer;
+
+import '../../common/constants/app_colors.dart';
+import '../../common/constants/constants.dart';
+import '../../common/providers/user_provider.dart';
+import '../../common/routes/route_name.dart';
 import '../../common/utils/app_logger.dart';
+import '../../common/widgets/custom_3d_icons.dart';
+import '../../debug/quick_analysis.dart';
+import '../../models/user_model.dart';
+import '../communities/ui/screens/communities_hub_screen.dart';
+import '../explore/explore_screen.dart';
+import '../messages/messages_screen.dart';
+import '../profile/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  final bool backgroundTasksRunning;
 
   const MainNavigationScreen({
-    Key? key,
+    super.key,
     this.backgroundTasksRunning = false,
-  }) : super(key: key);
+  });
+  final bool backgroundTasksRunning;
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
@@ -42,8 +44,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // NEW COMMUNITY-FIRST NAVIGATION
   final List<Widget> _pages = [
     const CommunitiesHubScreen(), // Tab 0: Communities Hub (All community features)
-    const ExploreScreen(
-        showBackButton: false), // Tab 1: Connect (Dating/Friendship)
+    const ExploreScreen(), // Tab 1: Connect (Dating/Friendship)
     const MessagesScreen(), // Tab 2: Messages
     const ProfileScreen(), // Tab 3: Profile
   ];
@@ -76,7 +77,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
   }
 
-  void _checkUserRegistration() async {
+  Future<void> _checkUserRegistration() async {
     if (_hasCheckedRegistration || !mounted) return;
     
     // FIRST: Check if user is actually authenticated
@@ -193,7 +194,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     if (!_hasCheckedRegistration || 
         userProvider.currentUser == null || 
         userProvider.currentUser?.name == null ||
-        userProvider.currentUser?.name?.isEmpty == true) {
+        (userProvider.currentUser?.name?.isEmpty ?? false)) {
       // If we haven't checked yet or user doesn't exist, show loading
       // This prevents the wrong screen from appearing
       if (!_hasCheckedRegistration) {
@@ -332,7 +333,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "Finishing setup...",
+                      'Finishing setup...',
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         color: Colors.white,
@@ -349,7 +350,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               top: MediaQuery.of(context).padding.top + 50,
               right: 16,
               child: FloatingActionButton(
-                heroTag: "analysis_fab",
+                heroTag: 'analysis_fab',
                 mini: true,
                 backgroundColor: Colors.blue.withOpacity(0.8),
                 child:
@@ -368,7 +369,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             // Ensure index is within valid range
             _selectedIndex = index.clamp(0, _pages.length - 1);
             AppLogger.debug(
-                '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex');
+                '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',);
             AppLogger.debug('📱 Pages length: ${_pages.length}');
           });
         },
@@ -418,7 +419,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               '📊 User Analysis',
               style: GoogleFonts.montserrat(
-                  fontSize: 20, fontWeight: FontWeight.bold),
+                  fontSize: 20, fontWeight: FontWeight.bold,),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -430,7 +431,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content: Text(
-                            'Analysis complete! Check console for results.')),
+                            'Analysis complete! Check console for results.',),),
                   );
                 }
               },
@@ -445,7 +446,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content: Text(
-                            'Cleanup complete! Check console for results.')),
+                            'Cleanup complete! Check console for results.',),),
                   );
                 }
               },

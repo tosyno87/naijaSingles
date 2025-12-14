@@ -20,7 +20,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
   static const Color textLightBrown = Color(0xFF8B6C59);
   static const Color goldAccent = Color(0xFFFFD700);
 
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   int _currentPhotoIndex = 0;
 
   @override
@@ -30,18 +30,17 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: afropeepGreen),
+          icon: const Icon(Icons.arrow_back_ios, color: afropeepGreen),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Profile Preview",
+          'Profile Preview',
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -52,9 +51,9 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         actions: [
           TextButton.icon(
             onPressed: _showImprovementSuggestions,
-            icon: Icon(Icons.tips_and_updates, color: afropeepGreen, size: 18),
+            icon: const Icon(Icons.tips_and_updates, color: afropeepGreen, size: 18),
             label: Text(
-              "Tips",
+              'Tips',
               style: GoogleFonts.montserrat(
                 color: afropeepGreen,
                 fontWeight: FontWeight.w500,
@@ -80,22 +79,22 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 // Photo carousel section
                 _buildPhotoCarousel(photos),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Profile card preview
                 _buildProfileCard(controller),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Match potential indicator
                 _buildMatchPotentialCard(controller),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Improvement suggestions
                 _buildQuickImprovements(controller),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
               ],
             ),
           );
@@ -103,19 +102,17 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
       ),
       bottomNavigationBar: _buildBottomActions(),
     );
-  }
 
-  Widget _buildPhotoCarousel(List<File> photos) {
-    return Container(
+  Widget _buildPhotoCarousel(List<File> photos) => Container(
       height: 500,
-      margin: EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 15,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -130,8 +127,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               });
             },
             itemCount: photos.length,
-            itemBuilder: (context, index) {
-              return Container(
+            itemBuilder: (context, index) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   image: DecorationImage(
@@ -139,8 +135,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     fit: BoxFit.cover,
                   ),
                 ),
-              );
-            },
+              ),
           ),
 
           // Photo indicators
@@ -150,11 +145,10 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               left: 16,
               right: 16,
               child: Row(
-                children: photos.asMap().entries.map((entry) {
-                  return Expanded(
+                children: photos.asMap().entries.map((entry) => Expanded(
                     child: Container(
                       height: 3,
-                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
                       decoration: BoxDecoration(
                         color: entry.key == _currentPhotoIndex
                             ? Colors.white
@@ -162,8 +156,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                  );
-                }).toList(),
+                  ),).toList(),
               ),
             ),
 
@@ -173,7 +166,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               top: 16,
               left: 16,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: goldAccent,
                   borderRadius: BorderRadius.circular(12),
@@ -181,10 +174,10 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star, color: Colors.white, size: 12),
-                    SizedBox(width: 4),
+                    const Icon(Icons.star, color: Colors.white, size: 12),
+                    const SizedBox(width: 4),
                     Text(
-                      "Main Photo",
+                      'Main Photo',
                       style: GoogleFonts.montserrat(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -206,16 +199,16 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 child: Center(
                   child: GestureDetector(
                     onTap: () => _pageController.previousPage(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     ),
                     child: Container(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.arrow_back_ios,
                         color: Colors.white,
                         size: 16,
@@ -232,16 +225,16 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 child: Center(
                   child: GestureDetector(
                     onTap: () => _pageController.nextPage(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     ),
                     child: Container(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.arrow_forward_ios,
                         color: Colors.white,
                         size: 16,
@@ -254,12 +247,10 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildProfileCard(OnboardingController controller) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.all(20),
+  Widget _buildProfileCard(OnboardingController controller) => Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -267,7 +258,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -278,16 +269,16 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           Row(
             children: [
               Text(
-                "${controller.fullName}, ${controller.age}",
+                '${controller.fullName}, ${controller.age}',
                 style: GoogleFonts.montserrat(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: textDarkBrown,
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: afropeepGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -304,7 +295,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             ],
           ),
 
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
 
           // Bio
           if (controller.bio.isNotEmpty)
@@ -317,31 +308,29 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Interests
           if (controller.interests.isNotEmpty) ...[
             Text(
-              "Interests",
+              'Interests',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: controller.interests.take(6).map((interest) {
-                return Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              children: controller.interests.take(6).map((interest) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: cardBackground,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: afropeepGreen.withValues(alpha: 0.3),
-                      width: 1,
                     ),
                   ),
                   child: Text(
@@ -352,14 +341,13 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
             ),
             if (controller.interests.length > 6)
               Padding(
-                padding: EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  "+${controller.interests.length - 6} more interests",
+                  '+${controller.interests.length - 6} more interests',
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: textLightBrown,
@@ -371,7 +359,6 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildMatchPotentialCard(OnboardingController controller) {
     final photos = controller.profilePhotos.where((p) => p != null).length;
@@ -390,21 +377,21 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
 
     if (score >= 80) {
       scoreColor = Colors.green;
-      scoreLabel = "Excellent";
+      scoreLabel = 'Excellent';
       scoreIcon = Icons.star;
     } else if (score >= 60) {
       scoreColor = Colors.orange;
-      scoreLabel = "Good";
+      scoreLabel = 'Good';
       scoreIcon = Icons.thumb_up;
     } else {
       scoreColor = Colors.red;
-      scoreLabel = "Needs Work";
+      scoreLabel = 'Needs Work';
       scoreIcon = Icons.warning;
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -417,7 +404,6 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: scoreColor.withValues(alpha: 0.3),
-          width: 1,
         ),
       ),
       child: Column(
@@ -425,12 +411,12 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           Row(
             children: [
               Icon(scoreIcon, color: scoreColor, size: 24),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Match Potential",
+                    'Match Potential',
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -438,7 +424,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     ),
                   ),
                   Text(
-                    "$scoreLabel ($score/100)",
+                    '$scoreLabel ($score/100)',
                     style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: scoreColor,
@@ -447,7 +433,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                   ),
                 ],
               ),
-              Spacer(),
+              const Spacer(),
               CircularProgressIndicator(
                 value: score / 100,
                 backgroundColor: scoreColor.withValues(alpha: 0.2),
@@ -456,13 +442,13 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Row(
             children: [
-              _buildScoreItem("Photos", photos, 5, photos >= 3),
-              _buildScoreItem("Bio", hasGoodBio ? 1 : 0, 1, hasGoodBio),
+              _buildScoreItem('Photos', photos, 5, photos >= 3),
+              _buildScoreItem('Bio', hasGoodBio ? 1 : 0, 1, hasGoodBio),
               _buildScoreItem(
-                  "Interests", hasInterests ? 1 : 0, 1, hasInterests),
+                  'Interests', hasInterests ? 1 : 0, 1, hasInterests,),
             ],
           ),
         ],
@@ -470,8 +456,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
     );
   }
 
-  Widget _buildScoreItem(String label, int current, int total, bool isGood) {
-    return Expanded(
+  Widget _buildScoreItem(String label, int current, int total, bool isGood) => Expanded(
       child: Column(
         children: [
           Icon(
@@ -479,7 +464,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             color: isGood ? Colors.green : Colors.grey,
             size: 16,
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             label,
             style: GoogleFonts.montserrat(
@@ -488,7 +473,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             ),
           ),
           Text(
-            "$current/$total",
+            '$current/$total',
             style: GoogleFonts.montserrat(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -498,32 +483,30 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildQuickImprovements(OnboardingController controller) {
-    List<String> improvements = [];
+    final List<String> improvements = [];
 
     final photos = controller.profilePhotos.where((p) => p != null).length;
-    if (photos < 5) improvements.add("Add ${5 - photos} more photos");
-    if (controller.bio.length < 50) improvements.add("Write a longer bio");
-    if (controller.interests.length < 5) improvements.add("Add more interests");
+    if (photos < 5) improvements.add('Add ${5 - photos} more photos');
+    if (controller.bio.length < 50) improvements.add('Write a longer bio');
+    if (controller.interests.length < 5) improvements.add('Add more interests');
 
     if (improvements.isEmpty) {
       return Container(
-        margin: EdgeInsets.symmetric(horizontal: 16),
-        padding: EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.green.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: Colors.green.withValues(alpha: 0.3),
-            width: 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(Icons.celebration, color: Colors.green, size: 24),
-            SizedBox(width: 12),
+            const Icon(Icons.celebration, color: Colors.green, size: 24),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 "Your profile looks great! You're ready to start matching.",
@@ -540,14 +523,13 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.blue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Colors.blue.withValues(alpha: 0.3),
-          width: 1,
         ),
       ),
       child: Column(
@@ -555,10 +537,10 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb_outline, color: Colors.blue, size: 20),
-              SizedBox(width: 8),
+              const Icon(Icons.lightbulb_outline, color: Colors.blue, size: 20),
+              const SizedBox(width: 8),
               Text(
-                "Quick Improvements",
+                'Quick Improvements',
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -567,14 +549,14 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           ...improvements
               .map((improvement) => Padding(
-                    padding: EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.only(bottom: 4),
                     child: Row(
                       children: [
-                        Icon(Icons.arrow_right, color: Colors.blue, size: 16),
-                        SizedBox(width: 4),
+                        const Icon(Icons.arrow_right, color: Colors.blue, size: 16),
+                        const SizedBox(width: 4),
                         Text(
                           improvement,
                           style: GoogleFonts.montserrat(
@@ -584,35 +566,34 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                         ),
                       ],
                     ),
-                  ))
-              .toList(),
+                  ),)
+              ,
         ],
       ),
     );
   }
 
-  Widget _buildNoPhotosState() {
-    return Center(
+  Widget _buildNoPhotosState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.photo_camera_outlined,
             size: 80,
             color: Colors.grey,
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
-            "No Photos to Preview",
+            'No Photos to Preview',
             style: GoogleFonts.montserrat(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            "Add some photos to see how your profile will look",
+            'Add some photos to see how your profile will look',
             style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textLightBrown,
@@ -622,18 +603,16 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildBottomActions() {
-    return Container(
-      padding: EdgeInsets.all(16),
+  Widget _buildBottomActions() => Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -643,14 +622,14 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             child: OutlinedButton(
               onPressed: () => Navigator.pop(context),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: afropeepGreen),
+                side: const BorderSide(color: afropeepGreen),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: Text(
-                "Back to Editing",
+                'Back to Editing',
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -659,7 +638,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
               onPressed: _shareProfile,
@@ -669,10 +648,10 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: Text(
-                "Share Preview",
+                'Share Preview',
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -683,52 +662,51 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ],
       ),
     );
-  }
 
   void _showImprovementSuggestions() {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Profile Improvement Tips",
+              'Profile Improvement Tips',
               style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildTipItem(
               Icons.photo_camera,
-              "Photo Variety",
-              "Include different types of photos: close-up, full-body, activity, and social photos.",
+              'Photo Variety',
+              'Include different types of photos: close-up, full-body, activity, and social photos.',
               Colors.blue,
             ),
             _buildTipItem(
               Icons.edit,
-              "Compelling Bio",
-              "Write 50-200 characters that show your personality and give conversation starters.",
+              'Compelling Bio',
+              'Write 50-200 characters that show your personality and give conversation starters.',
               Colors.green,
             ),
             _buildTipItem(
               Icons.favorite,
-              "Diverse Interests",
-              "Select 5-10 interests that represent different aspects of your personality.",
+              'Diverse Interests',
+              'Select 5-10 interests that represent different aspects of your personality.',
               Colors.purple,
             ),
             _buildTipItem(
               Icons.star,
-              "Main Photo",
-              "Your first photo should be a clear, smiling face shot with good lighting.",
+              'Main Photo',
+              'Your first photo should be a clear, smiling face shot with good lighting.',
               goldAccent,
             ),
           ],
@@ -738,21 +716,20 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
   }
 
   Widget _buildTipItem(
-      IconData icon, String title, String description, Color color) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16),
+      IconData icon, String title, String description, Color color,) => Padding(
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -765,7 +742,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     color: textDarkBrown,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   description,
                   style: GoogleFonts.montserrat(
@@ -779,14 +756,13 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ],
       ),
     );
-  }
 
   void _shareProfile() {
     // Implement profile sharing functionality
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          "Profile sharing feature coming soon!",
+          'Profile sharing feature coming soon!',
           style: GoogleFonts.montserrat(),
         ),
         backgroundColor: afropeepGreen,

@@ -1,5 +1,6 @@
-import 'dart:io';
 import 'dart:developer' as developer;
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -42,12 +43,9 @@ class ProfileImageCropperService {
             aspectRatioLockEnabled: true,
             resetAspectRatioEnabled: false,
             aspectRatioPickerButtonHidden: true,
-            rotateButtonsHidden: false,
-            rotateClockwiseButtonHidden: false,
             hidesNavigationBar: false,
           ),
         ],
-        compressFormat: ImageCompressFormat.jpg,
         compressQuality: 85, // Reduced from 90 for better file size
         maxWidth: 1080, // Industry standard for mobile
         maxHeight: 1080,
@@ -219,7 +217,6 @@ class ProfileImageCropperService {
             maxWidth: 1920, // Industry standard for mobile
             maxHeight: 1920,
             imageQuality: 90, // Reduced from 95 for better performance
-            preferredCameraDevice: CameraDevice.rear,
           );
         } else {
           // iOS - no preferredCameraDevice parameter
@@ -242,7 +239,7 @@ class ProfileImageCropperService {
             errorMessage = 'Camera access was denied. Please enable it in Settings > Privacy & Security > Camera.';
           } else if (e.code == 'camera_unavailable') {
             errorMessage = 'Camera is not available. It may be in use by another app.';
-          } else if (e.message?.contains('permission') == true) {
+          } else if (e.message?.contains('permission') ?? false) {
             errorMessage = 'Permission denied. Please enable camera access in Settings.';
           }
         }
@@ -252,12 +249,11 @@ class ProfileImageCropperService {
             SnackBar(
               content: Text(errorMessage),
               backgroundColor: Colors.red,
-              duration: const Duration(seconds: 4),
               action: Platform.isIOS
-                  ? SnackBarAction(
+                  ? const SnackBarAction(
                       label: 'Settings',
                       textColor: Colors.white,
-                      onPressed: () => openAppSettings(),
+                      onPressed: openAppSettings,
                     )
                   : null,
             ),
@@ -313,7 +309,6 @@ class ProfileImageCropperService {
               'Error: ${e.toString()}',
             ),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -364,7 +359,7 @@ class ProfileImageCropperService {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -398,7 +393,7 @@ class ProfileImageCropperService {
     if (source == null) return null;
 
     // Pick and crop the image
-    return await pickAndCropImage(
+    return pickAndCropImage(
       source: source,
       cropType: cropType,
       title: title,
@@ -410,8 +405,7 @@ class ProfileImageCropperService {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) {
-    return InkWell(
+  }) => InkWell(
       onTap: onTap,
       child: Row(
         children: [
@@ -458,7 +452,6 @@ class ProfileImageCropperService {
         ],
       ),
     );
-  }
 }
 
 /// Crop type enum for different photo types

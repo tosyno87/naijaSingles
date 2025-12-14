@@ -5,12 +5,11 @@ import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class TicketingStep extends StatefulWidget {
-  final EventCreationData eventData;
 
   const TicketingStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
   State<TicketingStep> createState() => _TicketingStepState();
@@ -51,8 +50,7 @@ class _TicketingStepState extends State<TicketingStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,10 +74,8 @@ class _TicketingStepState extends State<TicketingStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 24,
@@ -87,10 +83,8 @@ class _TicketingStepState extends State<TicketingStep> {
         color: const Color(0xFF333333),
       ),
     );
-  }
 
-  Widget _buildPricingSection() {
-    return Column(
+  Widget _buildPricingSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -182,9 +176,9 @@ class _TicketingStepState extends State<TicketingStep> {
                       children: [
                         Text('₦',
                             style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                                fontSize: 18, fontWeight: FontWeight.bold,),),
                         const SizedBox(width: 8),
-                        Text('Nigerian Naira (NGN)'),
+                        const Text('Nigerian Naira (NGN)'),
                       ],
                     ),
                   ),
@@ -192,11 +186,11 @@ class _TicketingStepState extends State<TicketingStep> {
                     value: 'USD',
                     child: Row(
                       children: [
-                        Text('\$',
+                        Text(r'$',
                             style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                                fontSize: 18, fontWeight: FontWeight.bold,),),
                         const SizedBox(width: 8),
-                        Text('US Dollar (USD)'),
+                        const Text('US Dollar (USD)'),
                       ],
                     ),
                   ),
@@ -206,9 +200,9 @@ class _TicketingStepState extends State<TicketingStep> {
                       children: [
                         Text('£',
                             style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                                fontSize: 18, fontWeight: FontWeight.bold,),),
                         const SizedBox(width: 8),
-                        Text('British Pound (GBP)'),
+                        const Text('British Pound (GBP)'),
                       ],
                     ),
                   ),
@@ -218,9 +212,9 @@ class _TicketingStepState extends State<TicketingStep> {
                       children: [
                         Text('€',
                             style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                                fontSize: 18, fontWeight: FontWeight.bold,),),
                         const SizedBox(width: 8),
-                        Text('Euro (EUR)'),
+                        const Text('Euro (EUR)'),
                       ],
                     ),
                   ),
@@ -281,7 +275,7 @@ class _TicketingStepState extends State<TicketingStep> {
               prefixIcon: Container(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  '\$',
+                  r'$',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -302,15 +296,13 @@ class _TicketingStepState extends State<TicketingStep> {
         ],
       ],
     );
-  }
 
   Widget _buildPricingOption({
     required String title,
     required String subtitle,
     required bool isSelected,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -369,10 +361,8 @@ class _TicketingStepState extends State<TicketingStep> {
         ),
       ),
     );
-  }
 
-  Widget _buildCapacitySection() {
-    return Column(
+  Widget _buildCapacitySection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -439,7 +429,6 @@ class _TicketingStepState extends State<TicketingStep> {
         ),
       ],
     );
-  }
 
   Widget _buildPricingSummary() {
     if (widget.eventData.isFree) {
@@ -457,9 +446,9 @@ class _TicketingStepState extends State<TicketingStep> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.event_available,
-                  color: const Color(0xFF008037),
+                  color: Color(0xFF008037),
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -476,7 +465,7 @@ class _TicketingStepState extends State<TicketingStep> {
             const SizedBox(height: 12),
             _buildSummaryRow('Ticket Price', 'Free'),
             _buildSummaryRow(
-                'Max Attendees', '${widget.eventData.maxAttendees}'),
+                'Max Attendees', '${widget.eventData.maxAttendees}',),
             _buildSummaryRow('Platform Fee', 'None'),
           ],
         ),
@@ -501,9 +490,9 @@ class _TicketingStepState extends State<TicketingStep> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.monetization_on,
-                  color: const Color(0xFF008037),
+                  color: Color(0xFF008037),
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -519,13 +508,13 @@ class _TicketingStepState extends State<TicketingStep> {
             ),
             const SizedBox(height: 12),
             _buildSummaryRow('Ticket Price',
-                '${widget.eventData.currencySymbol}${ticketPrice.toStringAsFixed(2)}'),
+                '${widget.eventData.currencySymbol}${ticketPrice.toStringAsFixed(2)}',),
             _buildSummaryRow(
-                'Max Attendees', '${widget.eventData.maxAttendees}'),
+                'Max Attendees', '${widget.eventData.maxAttendees}',),
             _buildSummaryRow('Platform Fee (10%)',
-                '${widget.eventData.currencySymbol}${platformFee.toStringAsFixed(2)}'),
+                '${widget.eventData.currencySymbol}${platformFee.toStringAsFixed(2)}',),
             _buildSummaryRow('Processing Fee',
-                '${widget.eventData.currencySymbol}${processingFee.toStringAsFixed(2)}'),
+                '${widget.eventData.currencySymbol}${processingFee.toStringAsFixed(2)}',),
             const Divider(color: Color(0xFF008037)),
             _buildSummaryRow(
               'Your Earnings per Ticket',
@@ -538,8 +527,7 @@ class _TicketingStepState extends State<TicketingStep> {
     }
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool isTotal = false}) {
-    return Padding(
+  Widget _buildSummaryRow(String label, String value, {bool isTotal = false}) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -563,5 +551,4 @@ class _TicketingStepState extends State<TicketingStep> {
         ],
       ),
     );
-  }
 }

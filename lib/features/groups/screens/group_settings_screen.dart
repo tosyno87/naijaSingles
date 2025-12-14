@@ -1,23 +1,24 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/services/unified_group_service.dart';
-import 'package:naijasingles/services/validation_service.dart';
-import 'package:naijasingles/widgets/group_avatar_picker.dart';
-import 'package:naijasingles/widgets/tag_input_widget.dart';
-import 'package:naijasingles/widgets/success_dialog.dart';
 // import 'package:naijasingles/common/widgets/loading_dialog.dart'; // TODO: Create loading dialog widget
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../services/unified_group_service.dart';
+import '../../../services/validation_service.dart';
+import '../../../widgets/group_avatar_picker.dart';
+import '../../../widgets/success_dialog.dart';
+import '../../../widgets/tag_input_widget.dart';
+
 /// Screen for editing group settings (creator/admin only)
 class GroupSettingsScreen extends StatefulWidget {
-  final UnifiedGroup group;
 
   const GroupSettingsScreen({
-    super.key,
-    required this.group,
+    required this.group, super.key,
   });
+  final UnifiedGroup group;
 
   @override
   State<GroupSettingsScreen> createState() => _GroupSettingsScreenState();
@@ -267,8 +268,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     );
   }
 
-  Widget _buildAvatarSection() {
-    return Column(
+  Widget _buildAvatarSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -293,10 +293,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildGroupInfoSection() {
-    return Column(
+  Widget _buildGroupInfoSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -336,10 +334,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildGroupTypeSection() {
-    return Column(
+  Widget _buildGroupTypeSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -352,7 +348,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          value: _selectedType.isNotEmpty ? _selectedType : null,
+          initialValue: _selectedType.isNotEmpty ? _selectedType : null,
           decoration: InputDecoration(
             labelText: 'Select group type',
             border: OutlineInputBorder(
@@ -390,10 +386,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildTagsSection() {
-    return Column(
+  Widget _buildTagsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -420,16 +414,13 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
               _tags = tags;
             });
           },
-          maxTags: 5,
           hintText: 'e.g., music, nigerian, afrobeats',
           suggestions: _tagSuggestions,
         ),
       ],
     );
-  }
 
-  Widget _buildLocationSection() {
-    return Column(
+  Widget _buildLocationSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -454,10 +445,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildSaveButton() {
-    return SizedBox(
+  Widget _buildSaveButton() => SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _isLoading ? null : _saveSettings,
@@ -488,5 +477,4 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
               ),
       ),
     );
-  }
 }

@@ -3,16 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/event_model.dart';
 
 class WeekendEventsSection extends StatelessWidget {
+
+  const WeekendEventsSection({
+    required this.weekendEvents, required this.onEventTap, super.key,
+    this.onViewAllTap,
+  });
   final List<EventModel> weekendEvents;
   final Function(EventModel) onEventTap;
   final VoidCallback? onViewAllTap;
-
-  const WeekendEventsSection({
-    Key? key,
-    required this.weekendEvents,
-    required this.onEventTap,
-    this.onViewAllTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +31,16 @@ class WeekendEventsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader() {
-    return Padding(
+  Widget _buildSectionHeader() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.weekend,
-                color: const Color(0xFF008037),
+                color: Color(0xFF008037),
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -72,10 +69,8 @@ class WeekendEventsSection extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildWeekendEventsList() {
-    return SizedBox(
+  Widget _buildWeekendEventsList() => SizedBox(
       height: 160,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -87,10 +82,8 @@ class WeekendEventsSection extends StatelessWidget {
         },
       ),
     );
-  }
 
-  Widget _buildWeekendEventCard(EventModel event) {
-    return Container(
+  Widget _buildWeekendEventCard(EventModel event) => Container(
       width: 240,
       margin: const EdgeInsets.only(right: 16),
       child: GestureDetector(
@@ -126,10 +119,8 @@ class WeekendEventsSection extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildEventImage(EventModel event) {
-    return Container(
+  Widget _buildEventImage(EventModel event) => Container(
       height: 80,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -152,10 +143,8 @@ class WeekendEventsSection extends StatelessWidget {
             )
           : null,
     );
-  }
 
-  Widget _buildEventTitle(EventModel event) {
-    return Text(
+  Widget _buildEventTitle(EventModel event) => Text(
       event.name,
       style: GoogleFonts.montserrat(
         fontSize: 13,
@@ -165,7 +154,6 @@ class WeekendEventsSection extends StatelessWidget {
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
-  }
 
   Widget _buildEventDate(EventModel event) {
     final date = event.startDate;
@@ -175,10 +163,10 @@ class WeekendEventsSection extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.calendar_today,
           size: 12,
-          color: const Color(0xFF666666),
+          color: Color(0xFF666666),
         ),
         const SizedBox(width: 4),
         Text(
@@ -192,13 +180,12 @@ class WeekendEventsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildEventLocation(EventModel event) {
-    return Row(
+  Widget _buildEventLocation(EventModel event) => Row(
       children: [
-        Icon(
+        const Icon(
           Icons.location_on,
           size: 12,
-          color: const Color(0xFF666666),
+          color: Color(0xFF666666),
         ),
         const SizedBox(width: 4),
         Expanded(
@@ -214,10 +201,8 @@ class WeekendEventsSection extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildEventPrice(EventModel event) {
-    return Row(
+  Widget _buildEventPrice(EventModel event) => Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         if (event.isFree)
@@ -249,10 +234,10 @@ class WeekendEventsSection extends StatelessWidget {
           const SizedBox.shrink(),
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.people,
               size: 12,
-              color: const Color(0xFF666666),
+              color: Color(0xFF666666),
             ),
             const SizedBox(width: 2),
             Text(
@@ -266,7 +251,6 @@ class WeekendEventsSection extends StatelessWidget {
         ),
       ],
     );
-  }
 
   String _getWeekdayName(int weekday) {
     switch (weekday) {

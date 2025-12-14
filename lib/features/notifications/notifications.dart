@@ -3,9 +3,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../common/constants/colors.dart';
@@ -14,8 +11,11 @@ import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
 import '../../common/providers/theme_provider.dart';
 import '../../common/providers/user_provider.dart';
+import '../../common/widgets/custom_snackbar.dart';
+import '../../common/widgets/hookup_circularbar.dart';
 import '../../common/widgets/image_widget.dart';
 import '../../config/app_config.dart';
+import '../../models/user_model.dart';
 import '../user/ui/widgets/user_info.dart';
 
 class Notifications extends StatefulWidget {
@@ -39,9 +39,9 @@ class NotificationsState extends State<Notifications> {
   @override
   void initState() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    currentUser = userProvider.currentUser!;
+    currentUser = userProvider.currentUser;
     notificationReference =
-        db.collection("users").doc(currentUser!.id).collection('Matches');
+        db.collection('users').doc(currentUser!.id).collection('Matches');
     _loadInitialNotifications();
     _scrollController.addListener(_scrollListener);
     super.initState();
@@ -52,14 +52,14 @@ class NotificationsState extends State<Notifications> {
             _scrollController.position.maxScrollExtent * 0.70 &&
         !_scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
-        log("load more called");
+        log('load more called');
         _loadMoreNotifications();
       }
     }
   }
 
   void _loadInitialNotifications() {
-    Stream<QuerySnapshot> snapshotStream =
+    final Stream<QuerySnapshot> snapshotStream =
         PaginationRepo.listenForNotifications(perPage, notificationReference);
     snapshotStream.listen((snapshot) {
       if (mounted) {
@@ -80,12 +80,12 @@ class NotificationsState extends State<Notifications> {
     super.dispose();
   }
 
-  void _loadMoreNotifications() async {
+  Future<void> _loadMoreNotifications() async {
     setState(() {
       _isLoadingMore = true;
     });
     final snapshot = await PaginationRepo.getMoreNotifications(
-        perPage, lastVisibleDocument, notificationReference);
+        perPage, lastVisibleDocument, notificationReference,);
     setState(() {
       notifications.addAll(snapshot.docs);
       _hasMoreMessages = snapshot.docs.length == perPage;
@@ -107,21 +107,21 @@ class NotificationsState extends State<Notifications> {
             'Notifications'.tr().toString(),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 18.0,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.0,
+              letterSpacing: 1,
             ),
           ),
           elevation: 0,
         ),
         backgroundColor: Theme.of(context).primaryColor,
-        body: Container(
+        body: DecoratedBox(
           decoration: BoxDecoration(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(50),
                 topRight: Radius.circular(50),
               ),
-              color: Theme.of(context).primaryColor),
+              color: Theme.of(context).primaryColor,),
           child: ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(50),
@@ -130,10 +130,10 @@ class NotificationsState extends State<Notifications> {
             child: notifications.isEmpty
                 ? Center(
                     child: Text(
-                    "No match found".tr().toString(),
-                    style: TextStyle(
-                        color: AppColors.secondaryColor, fontSize: 16),
-                  ))
+                    'No match found'.tr().toString(),
+                    style: const TextStyle(
+                        color: AppColors.secondaryColor, fontSize: 16,),
+                  ),)
                 : ListView.builder(
                     controller: _scrollController,
                     itemCount: notifications.length,
@@ -144,17 +144,17 @@ class NotificationsState extends State<Notifications> {
                           children: [
                             if (_isLoadingMore)
                               const SizedBox(
-                                  height: 20, width: 20, child: Hookup4uBar()),
+                                  height: 20, width: 20, child: Hookup4uBar(),),
                             const SizedBox(
                               height: 20,
                             ),
                           ],
                         );
                       } else {
-                        var doc = notifications[index];
+                        final doc = notifications[index];
                         return Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Container(
+                          padding: const EdgeInsets.all(5),
+                          child: DecoratedBox(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               color: !doc.get('isRead')
@@ -162,14 +162,14 @@ class NotificationsState extends State<Notifications> {
                                       ? Theme.of(context)
                                           .scaffoldBackgroundColor
                                       : primaryColor.withValues(
-                                          alpha: (.15 * 255).toDouble())
+                                          alpha: (.15 * 255).toDouble(),)
                                   : themeProvider.isDarkMode
                                       ? Theme.of(context)
                                           .scaffoldBackgroundColor
                                           .withValues(
-                                              alpha: (0.70 * 255).toDouble())
+                                              alpha: (0.70 * 255).toDouble(),)
                                       : AppColors.secondaryColor.withValues(
-                                          alpha: (.15 * 255).toDouble()),
+                                          alpha: (.15 * 255).toDouble(),),
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(5),
@@ -179,13 +179,13 @@ class NotificationsState extends State<Notifications> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
                                   child: CustomCNImage(
-                                    imageUrl: doc.get('pictureUrl') ?? "",
+                                    imageUrl: doc.get('pictureUrl') ?? '',
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
                               title: Text(
-                                      "you are matched with".tr().toString())
+                                      'you are matched with'.tr().toString(),)
                                   .tr(args: ["${doc.get('userName') ?? '__'}"]),
                               subtitle:
                                   Text("${doc.get('timestamp').toDate()}"),
@@ -195,53 +195,49 @@ class NotificationsState extends State<Notifications> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   children: <Widget>[
-                                    !doc.get('isRead')
-                                        ? Container(
-                                            width: 50.0,
-                                            height: 20.0,
+                                    if (!doc.get('isRead')) Container(
+                                            width: 50,
+                                            height: 20,
                                             decoration: BoxDecoration(
                                               color: primaryColor,
                                               borderRadius:
-                                                  BorderRadius.circular(30.0),
+                                                  BorderRadius.circular(30),
                                             ),
                                             alignment: Alignment.center,
                                             child: Text(
                                               'NEW'.tr().toString(),
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 12.0,
+                                                fontSize: 12,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                          )
-                                        : const Text(""),
+                                          ) else const Text(''),
                                   ],
                                 ),
                               ),
                               onTap: () async {
-                                log(doc.get("Matches"));
+                                log(doc.get('Matches'));
                                 showDialog(
                                   context: context,
-                                  builder: (context) {
-                                    return Center(
+                                  builder: (context) => const Center(
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                                primaryColor),
+                                                primaryColor,),
                                       ),
-                                    );
-                                  },
+                                    ),
                                 );
 
-                                DocumentSnapshot userdoc = await db
-                                    .collection("users")
-                                    .doc(doc.get("Matches"))
+                                final DocumentSnapshot userdoc = await db
+                                    .collection('users')
+                                    .doc(doc.get('Matches'))
                                     .get();
                                 if (!context.mounted) return;
                                 if (userdoc.exists) {
                                   Navigator.pop(context);
-                                  UserModel tempuser =
+                                  final UserModel tempuser =
                                       UserModel.fromDocument(userdoc);
                                   tempuser.distanceBW =
                                       UserSearchRepo.calculateDistance(
@@ -251,25 +247,25 @@ class NotificationsState extends State<Notifications> {
                                                   .coordinates!['longitude'],
                                               tempuser.coordinates!['latitude'],
                                               tempuser
-                                                  .coordinates!['longitude'])
+                                                  .coordinates!['longitude'],)
                                           .round();
 
                                   await showDialog(
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (context) {
-                                      if (!doc.get("isRead")) {
+                                      if (!doc.get('isRead')) {
                                         PaginationRepo.updateNotification(
-                                            currentUser!, doc);
+                                            currentUser!, doc,);
                                       }
                                       return Info(
-                                          tempuser, currentUser!, false);
+                                          tempuser, currentUser!, false,);
                                     },
                                   );
                                 } else {
                                   Navigator.pop(context);
                                   CustomSnackbar.showSnackBarSimple(
-                                    "User does not exist".tr().toString(),
+                                    'User does not exist'.tr().toString(),
                                     context,
                                   );
                                 }
@@ -281,6 +277,6 @@ class NotificationsState extends State<Notifications> {
                     },
                   ),
           ),
-        ));
+        ),);
   }
 }

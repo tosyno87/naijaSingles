@@ -13,7 +13,7 @@ import 'privacy_settings_screen.dart';
 import 'settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
   int _currentPhotoIndex = 0;
-  PageController _photoPageController = PageController();
+  final PageController _photoPageController = PageController();
 
   // Simplified color scheme
   static const Color backgroundColor = Colors.white;
@@ -105,8 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -153,32 +152,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'events',
                 child: Row(
                   children: [
                     Icon(Icons.event, color: primaryColor),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Text('Events'),
                   ],
                 ),
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'privacy',
                 child: Row(
                   children: [
                     Icon(Icons.privacy_tip_outlined, color: primaryColor),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Text('Privacy Settings'),
                   ],
                 ),
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'settings',
                 child: Row(
                   children: [
                     Icon(Icons.settings_outlined, color: primaryColor),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Text('Settings'),
                   ],
                 ),
@@ -191,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? const Center(child: CircularProgressIndicator(color: primaryColor))
           : SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     // Simplified Photo Section
@@ -222,7 +221,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
     );
-  }
 
   Widget _buildSimplifiedPhotoSection() {
     // Try multiple field names for compatibility
@@ -260,7 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
-    return Container(
+    return SizedBox(
       height: 300,
       child: Stack(
         children: [
@@ -273,8 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _currentPhotoIndex = index;
               });
             },
-            itemBuilder: (context, index) {
-              return GestureDetector(
+            itemBuilder: (context, index) => GestureDetector(
                 onTap: () => _showFullScreenPhoto(photos, index),
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -293,21 +290,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Image.network(
                       photos[index],
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
+                      errorBuilder: (context, error, stackTrace) => ColoredBox(
                           color: Colors.grey.shade200,
                           child: Icon(
                             Icons.broken_image_outlined,
                             size: 60,
                             color: Colors.grey.shade400,
                           ),
-                        );
-                      },
+                        ),
                     ),
                   ),
                 ),
-              );
-            },
+              ),
           ),
 
           // Photo counter
@@ -355,7 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.black.withOpacity(0.5),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.chevron_left,
                       color: Colors.white,
                       size: 20,
@@ -384,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.black.withOpacity(0.5),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.chevron_right,
                       color: Colors.white,
                       size: 20,
@@ -490,7 +484,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.favorite_outline,
                   color: primaryColor,
                   size: 24,
@@ -520,8 +514,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: interests.take(6).map((interest) {
-                  return Container(
+                children: interests.take(6).map((interest) => Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
@@ -537,8 +530,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: primaryColor,
                       ),
                     ),
-                  );
-                }).toList(),
+                  ),).toList(),
               ),
             if (interests.length > 6)
               Padding(
@@ -594,7 +586,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.location_on_outlined,
                   color: primaryColor,
                   size: 24,
@@ -623,8 +615,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildLocationRow(IconData icon, String label, String value) {
-    return Row(
+  Widget _buildLocationRow(IconData icon, String label, String value) => Row(
       children: [
         Icon(
           icon,
@@ -643,10 +634,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildInfoChip({required IconData icon, required String label}) {
-    return Container(
+  Widget _buildInfoChip({required IconData icon, required String label}) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.1),
@@ -672,10 +661,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildEditButton() {
-    return SizedBox(
+  Widget _buildEditButton() => SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
@@ -702,7 +689,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.edit_outlined, size: 20),
+            const Icon(Icons.edit_outlined, size: 20),
             const SizedBox(width: 12),
             Text(
               'Edit Profile',
@@ -715,7 +702,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
 
   int? _calculateAge(String? dobString) {
     if (dobString == null) return null;
@@ -749,13 +735,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 // Simplified full-screen photo viewer
 class _FullScreenPhotoViewer extends StatefulWidget {
-  final List<dynamic> photos;
-  final int initialIndex;
 
   const _FullScreenPhotoViewer({
     required this.photos,
     required this.initialIndex,
   });
+  final List<dynamic> photos;
+  final int initialIndex;
 
   @override
   State<_FullScreenPhotoViewer> createState() => _FullScreenPhotoViewerState();
@@ -779,8 +765,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -804,16 +789,14 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
             _currentIndex = index;
           });
         },
-        itemBuilder: (context, index) {
-          return InteractiveViewer(
+        itemBuilder: (context, index) => InteractiveViewer(
             minScale: 0.5,
-            maxScale: 3.0,
+            maxScale: 3,
             child: Center(
               child: Image.network(
                 widget.photos[index],
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
+                errorBuilder: (context, error, stackTrace) => ColoredBox(
                     color: Colors.grey.shade800,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -833,13 +816,10 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
               ),
             ),
-          );
-        },
+          ),
       ),
     );
-  }
 }

@@ -1,10 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 /// Industry-standard media sharing service for chat
 /// Features:
@@ -15,9 +15,9 @@ import 'dart:io';
 /// - Media gallery integration
 /// - Progress tracking for uploads
 class MediaSharingService {
-  static final MediaSharingService _instance = MediaSharingService._internal();
   factory MediaSharingService() => _instance;
   MediaSharingService._internal();
+  static final MediaSharingService _instance = MediaSharingService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -54,7 +54,6 @@ class MediaSharingService {
         thumbnailUrl: thumbnailUrl,
         caption: caption,
         fileSize: await _getFileSize(imagePath),
-        duration: null,
         timestamp: DateTime.now(),
         isRead: false,
         readBy: [],
@@ -165,8 +164,6 @@ class MediaSharingService {
         senderId: currentUserId,
         type: MediaType.audio,
         mediaUrl: audioUrl,
-        thumbnailUrl: null,
-        caption: null,
         fileSize: await _getFileSize(audioPath),
         duration: duration.inSeconds.toDouble(),
         timestamp: DateTime.now(),
@@ -236,10 +233,8 @@ class MediaSharingService {
         senderId: currentUserId,
         type: fileType,
         mediaUrl: fileUrl,
-        thumbnailUrl: null,
         caption: caption ?? fileName,
         fileSize: await _getFileSize(filePath),
-        duration: null,
         timestamp: DateTime.now(),
         isRead: false,
         readBy: [],
@@ -440,7 +435,7 @@ class MediaSharingService {
 
   /// Update thread metadata
   Future<void> _updateThreadMetadata(
-      String threadId, String lastMessageText, String senderId) async {
+      String threadId, String lastMessageText, String senderId,) async {
     try {
       await _firestore.collection('chatThreads').doc(threadId).update({
         'lastMessageText': lastMessageText,
@@ -453,20 +448,14 @@ class MediaSharingService {
   }
 
   /// Get media messages for a thread
-  Stream<List<MediaMessage>> getMediaMessages(String threadId) {
-    return _firestore
+  Stream<List<MediaMessage>> getMediaMessages(String threadId) => _firestore
         .collection('chatThreads')
         .doc(threadId)
         .collection('messages')
         .where('type', whereIn: ['image', 'video', 'audio', 'document'])
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            return MediaMessage.fromMap(doc.id, doc.data());
-          }).toList();
-        });
-  }
+        .map((snapshot) => snapshot.docs.map((doc) => MediaMessage.fromMap(doc.id, doc.data())).toList(),);
 
   /// Delete media message
   Future<void> deleteMediaMessage(String threadId, String messageId) async {
@@ -496,18 +485,6 @@ enum MediaType {
 
 /// Media message model
 class MediaMessage {
-  String id;
-  final String threadId;
-  final String senderId;
-  final MediaType type;
-  final String mediaUrl;
-  final String? thumbnailUrl;
-  final String? caption;
-  final int fileSize;
-  final double? duration;
-  final DateTime timestamp;
-  final bool isRead;
-  final List<String> readBy;
 
   MediaMessage({
     required this.id,
@@ -515,33 +492,12 @@ class MediaMessage {
     required this.senderId,
     required this.type,
     required this.mediaUrl,
-    this.thumbnailUrl,
+    required this.fileSize, required this.timestamp, required this.isRead, required this.readBy, this.thumbnailUrl,
     this.caption,
-    required this.fileSize,
     this.duration,
-    required this.timestamp,
-    required this.isRead,
-    required this.readBy,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'threadId': threadId,
-      'senderId': senderId,
-      'type': type.name,
-      'mediaUrl': mediaUrl,
-      'thumbnailUrl': thumbnailUrl,
-      'caption': caption,
-      'fileSize': fileSize,
-      'duration': duration,
-      'timestamp': timestamp,
-      'isRead': isRead,
-      'readBy': readBy,
-    };
-  }
-
-  factory MediaMessage.fromMap(String id, Map<String, dynamic> map) {
-    return MediaMessage(
+  factory MediaMessage.fromMap(String id, Map<String, dynamic> map) => MediaMessage(
       id: id,
       threadId: map['threadId'] ?? '',
       senderId: map['senderId'] ?? '',
@@ -558,15 +514,42 @@ class MediaMessage {
       isRead: map['isRead'] ?? false,
       readBy: List<String>.from(map['readBy'] ?? []),
     );
-  }
+  String id;
+  final String threadId;
+  final String senderId;
+  final MediaType type;
+  final String mediaUrl;
+  final String? thumbnailUrl;
+  final String? caption;
+  final int fileSize;
+  final double? duration;
+  final DateTime timestamp;
+  final bool isRead;
+  final List<String> readBy;
+
+  Map<String, dynamic> toMap() => {
+      'threadId': threadId,
+      'senderId': senderId,
+      'type': type.name,
+      'mediaUrl': mediaUrl,
+      'thumbnailUrl': thumbnailUrl,
+      'caption': caption,
+      'fileSize': fileSize,
+      'duration': duration,
+      'timestamp': timestamp,
+      'isRead': isRead,
+      'readBy': readBy,
+    };
 
   /// Get file size in human readable format
   String get fileSizeFormatted {
     if (fileSize < 1024) return '$fileSize B';
-    if (fileSize < 1024 * 1024)
+    if (fileSize < 1024 * 1024) {
       return '${(fileSize / 1024).toStringAsFixed(1)} KB';
-    if (fileSize < 1024 * 1024 * 1024)
+    }
+    if (fileSize < 1024 * 1024 * 1024) {
       return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(fileSize / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
@@ -578,14 +561,12 @@ class MediaMessage {
     final seconds = (duration! % 60).floor();
 
     if (minutes > 0) {
-      return '${minutes}:${seconds.toString().padLeft(2, '0')}';
+      return '$minutes:${seconds.toString().padLeft(2, '0')}';
     } else {
       return '${seconds}s';
     }
   }
 
   @override
-  String toString() {
-    return 'MediaMessage(${type.name}: $mediaUrl)';
-  }
+  String toString() => 'MediaMessage(${type.name}: $mediaUrl)';
 }

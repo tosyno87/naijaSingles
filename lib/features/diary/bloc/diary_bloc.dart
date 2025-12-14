@@ -9,14 +9,14 @@ part 'diary_event.dart';
 part 'diary_state.dart';
 
 class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
-  final DiaryRepository repository;
-  StreamSubscription<List<DiaryEntry>>? _subscription;
 
   DiaryBloc({required this.repository}) : super(DiaryInitial()) {
     on<LoadDiaryEntries>(_onLoad);
     on<AddDiaryEntryEvent>(_onAdd);
     on<_DiaryEntriesUpdated>(_onEntriesUpdated);
   }
+  final DiaryRepository repository;
+  StreamSubscription<List<DiaryEntry>>? _subscription;
 
   Future<void> _onLoad(LoadDiaryEntries event, Emitter<DiaryState> emit) async {
     emit(DiaryLoading());
@@ -27,7 +27,7 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
   }
 
   Future<void> _onAdd(
-      AddDiaryEntryEvent event, Emitter<DiaryState> emit) async {
+      AddDiaryEntryEvent event, Emitter<DiaryState> emit,) async {
     try {
       await repository.addEntry(
         userId: event.userId,
@@ -52,8 +52,8 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
 }
 
 class _DiaryEntriesUpdated extends DiaryEvent {
-  final List<DiaryEntry> entries;
   const _DiaryEntriesUpdated(this.entries);
+  final List<DiaryEntry> entries;
 
   @override
   List<Object> get props => [entries];

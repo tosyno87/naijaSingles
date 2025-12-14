@@ -12,9 +12,9 @@ class SearchuserInitial extends SearchUserState {}
 class SearchUserLoadingState extends SearchUserState {}
 
 class SearchUserLoadUserState extends SearchUserState {
-  final List<UserModel> users;
 
   const SearchUserLoadUserState(this.users);
+  final List<UserModel> users;
 
   @override
   List<Object> get props => [users];
@@ -23,9 +23,9 @@ class SearchUserLoadUserState extends SearchUserState {
 class SearchUserFailedState extends SearchUserState {}
 
 class MigrationStatusState extends SearchUserState {
-  final bool shouldPromptForMigration;
 
   const MigrationStatusState({required this.shouldPromptForMigration});
+  final bool shouldPromptForMigration;
 
   @override
   List<Object> get props => [shouldPromptForMigration];

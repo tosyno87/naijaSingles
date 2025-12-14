@@ -1,21 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 import 'dart:developer';
 
-import '../../common/routes/route_name.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
 import '../../common/providers/user_provider.dart';
-import '../settings/safety_center_screen.dart';
+import '../../common/routes/route_name.dart';
+import '../settings/account_deletion_screen.dart';
 import '../settings/help_center_screen.dart';
 import '../settings/language_settings_screen.dart';
 import '../settings/location_settings_screen.dart';
-import '../settings/account_deletion_screen.dart';
 import '../settings/password_settings_screen.dart';
+import '../settings/safety_center_screen.dart';
 import 'privacy_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -32,14 +33,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static const Color textSecondary = Color(0xFF666666); // Medium gray
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -75,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.lock_outline,
                 title: 'Change Password',
                 subtitle: 'Update your password',
-                onTap: () => _showChangePasswordDialog(),
+                onTap: _showChangePasswordDialog,
               ),
             ]),
 
@@ -135,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Notifications',
                 subtitle: 'Manage your notification preferences',
                 onTap: () => Navigator.pushNamed(
-                    context, RouteName.notificationSettings),
+                    context, RouteName.notificationSettings,),
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -192,14 +192,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.feedback_outlined,
                 title: 'Send Feedback',
                 subtitle: 'Share your thoughts with us',
-                onTap: () => _showFeedbackDialog(),
+                onTap: _showFeedbackDialog,
               ),
               _buildDivider(),
               _buildSettingsItem(
                 icon: Icons.info_outline,
                 title: 'About',
                 subtitle: 'App version and info',
-                onTap: () => _showAboutDialog(),
+                onTap: _showAboutDialog,
               ),
             ]),
 
@@ -212,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () => _showSignOutDialog(),
+                  onPressed: _showSignOutDialog,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.red.shade700,
@@ -244,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () => _showDeleteAccountDialog(),
+                  onPressed: _showDeleteAccountDialog,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.red.shade700,
@@ -272,10 +272,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildSectionHeader(String title) {
-    return Text(
+  Widget _buildSectionHeader(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 18,
@@ -283,16 +281,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: textPrimary,
       ),
     );
-  }
 
-  Widget _buildSettingsCard(List<Widget> children) {
-    return Container(
+  Widget _buildSettingsCard(List<Widget> children) => DecoratedBox(
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: primaryColor.withOpacity(0.1),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -304,7 +299,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       child: Column(children: children),
     );
-  }
 
   Widget _buildSettingsItem({
     required IconData icon,
@@ -312,8 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String subtitle,
     required VoidCallback onTap,
     Color? iconColor,
-  }) {
-    return Material(
+  }) => Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -359,7 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.chevron_right,
                 color: textSecondary,
                 size: 20,
@@ -369,15 +362,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildDivider() {
-    return Divider(
+  Widget _buildDivider() => Divider(
       height: 1,
       color: Colors.grey.shade200,
       indent: 72,
     );
-  }
 
   void _showSignOutDialog() {
     showDialog(
@@ -449,7 +439,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 8),
             child: ElevatedButton(
-              onPressed: () => _performSignOut(),
+              onPressed: _performSignOut,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
                 foregroundColor: Colors.white,
@@ -458,7 +448,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 elevation: 2,
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 12), // Proper padding
+                    horizontal: 20, vertical: 12,), // Proper padding
                 minimumSize:
                     const Size(100, 44), // Minimum size to prevent cramping
               ),
@@ -515,7 +505,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               decoration: BoxDecoration(
                 color: Colors.red.shade50, // Light red background for emphasis
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200, width: 1),
+                border: Border.all(color: Colors.red.shade200),
               ),
               child: Text(
                 '• Remove all your photos and profile information\n'
@@ -560,7 +550,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 8),
             child: ElevatedButton(
-              onPressed: () => _showDeleteConfirmation(),
+              onPressed: _showDeleteConfirmation,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
                 foregroundColor: Colors.white,
@@ -702,7 +692,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(
+                const CircularProgressIndicator(
                   color: primaryColor, // MVP green
                   strokeWidth: 3,
                 ),

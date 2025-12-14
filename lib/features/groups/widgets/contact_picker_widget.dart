@@ -1,8 +1,9 @@
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:contacts_service/contacts_service.dart';
-import 'package:naijasingles/services/contact_invitation_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../services/contact_invitation_service.dart';
 
 /// Modern contact picker widget for group member invitations
 /// Features:
@@ -12,16 +13,13 @@ import 'package:naijasingles/common/constants/app_colors.dart';
 /// - Permission handling
 /// - Industry-standard UI
 class ContactPickerWidget extends StatefulWidget {
+
+  const ContactPickerWidget({
+    required this.groupName, required this.groupId, required this.onInvitationsSent, super.key,
+  });
   final String groupName;
   final String groupId;
   final Function(List<Map<String, dynamic>>) onInvitationsSent;
-
-  const ContactPickerWidget({
-    super.key,
-    required this.groupName,
-    required this.groupId,
-    required this.onInvitationsSent,
-  });
 
   @override
   State<ContactPickerWidget> createState() => _ContactPickerWidgetState();
@@ -35,7 +33,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
 
   List<Contact> _contacts = [];
   List<Contact> _filteredContacts = [];
-  List<Contact> _selectedContacts = [];
+  final List<Contact> _selectedContacts = [];
   bool _isLoading = false;
   bool _showEmailOption = false;
 
@@ -184,8 +182,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -399,5 +396,4 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
         ],
       ),
     );
-  }
 }

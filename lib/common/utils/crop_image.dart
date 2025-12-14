@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:crop_image/crop_image.dart';
 import 'package:flutter/material.dart';
@@ -8,16 +7,12 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CropMedia extends StatefulWidget {
+
+  const CropMedia(
+      {required this.title, required this.file, required this.checktype, super.key,});
   final String title;
   final File file;
   final String checktype;
-
-  const CropMedia(
-      {Key? key,
-      required this.title,
-      required this.file,
-      required this.checktype})
-      : super(key: key);
 
   @override
   CropMediaState createState() => CropMediaState();
@@ -38,7 +33,7 @@ class CropMediaState extends State<CropMedia>
     super.initState();
 
     // Set aspect ratio based on checktype for better user experience
-    double aspectRatio = 1.0; // Default square
+    double aspectRatio = 1; // Default square
     if (widget.checktype == 'profile') {
       aspectRatio = 1.0; // Square for profile photos
     } else if (widget.checktype == 'fullbody') {
@@ -102,7 +97,7 @@ class CropMediaState extends State<CropMedia>
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Crop Your Photo",
+          'Crop Your Photo',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -111,8 +106,7 @@ class CropMediaState extends State<CropMedia>
         ),
         centerTitle: true,
         actions: [
-          isFinished
-              ? IconButton(
+          if (isFinished) IconButton(
                   icon: const Icon(
                     Icons.check,
                     color: Color(0xFF27AE60),
@@ -127,16 +121,15 @@ class CropMediaState extends State<CropMedia>
                       });
                     });
                   },
-                )
-              : const Padding(
+                ) else const Padding(
                   padding: EdgeInsets.fromLTRB(0, 18, 10, 18),
                   child: SizedBox(
-                    width: 20.0,
-                    height: 20.0,
+                    width: 20,
+                    height: 20,
                     child: CircularProgressIndicator(
                       valueColor:
                           AlwaysStoppedAnimation<Color>(Color(0xFF27AE60)),
-                      strokeWidth: 2.0,
+                      strokeWidth: 2,
                     ),
                   ),
                 ),
@@ -151,8 +144,7 @@ class CropMediaState extends State<CropMedia>
     );
   }
 
-  Widget _buildBodyContent(bool isDarkMode) {
-    return Column(
+  Widget _buildBodyContent(bool isDarkMode) => Column(
       children: [
         Expanded(
           child: Hero(
@@ -164,7 +156,6 @@ class CropMediaState extends State<CropMedia>
                 controller: controller,
                 image: Image.file(widget.file),
                 gridColor: Colors.white,
-                gridCornerSize: 25,
                 gridThinWidth: 1,
                 gridThickWidth: 1,
                 alwaysShowThirdLines: true,
@@ -177,9 +168,9 @@ class CropMediaState extends State<CropMedia>
         // Instruction text
         Container(
           color: isDarkMode ? Colors.black : Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text(
-            "Tip: Make sure your face is clearly visible.",
+            'Tip: Make sure your face is clearly visible.',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
@@ -201,7 +192,7 @@ class CropMediaState extends State<CropMedia>
             children: [
               _buildToolbarButton(
                 Icons.rotate_90_degrees_ccw,
-                "Rotate Left",
+                'Rotate Left',
                 () {
                   controller.rotateLeft();
                   _onCropChanged();
@@ -209,7 +200,7 @@ class CropMediaState extends State<CropMedia>
               ),
               _buildToolbarButton(
                 Icons.rotate_90_degrees_cw,
-                "Rotate Right",
+                'Rotate Right',
                 () {
                   controller.rotateRight();
                   _onCropChanged();
@@ -217,7 +208,7 @@ class CropMediaState extends State<CropMedia>
               ),
               _buildToolbarButton(
                 Icons.refresh,
-                "Reset",
+                'Reset',
                 () {
                   // Recreate controller to reset
                   final aspectRatio = controller.aspectRatio;
@@ -233,10 +224,8 @@ class CropMediaState extends State<CropMedia>
         ),
       ],
     );
-  }
 
-  Widget _buildToolbarButton(IconData icon, String label, VoidCallback onTap) {
-    return InkWell(
+  Widget _buildToolbarButton(IconData icon, String label, VoidCallback onTap) => InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
@@ -261,25 +250,24 @@ class CropMediaState extends State<CropMedia>
         ),
       ),
     );
-  }
 
   Future<void> _finished() async {
     try {
       final image = await controller.croppedBitmap();
 
       // Use JPEG format for better compression and smaller file sizes
-      final data = await image.toByteData(format: ImageByteFormat.rawRgba);
+      final data = await image.toByteData();
       if (data == null) {
         throw Exception('Failed to get image data');
       }
 
       // Convert to JPEG for better compression
       final bytes = data.buffer.asUint8List();
-      Directory tempDir = await getTemporaryDirectory();
-      String tempPath = tempDir.path;
-      Random random = Random();
-      int randomNumber = random.nextInt(1000);
-      var filePath =
+      final Directory tempDir = await getTemporaryDirectory();
+      final String tempPath = tempDir.path;
+      final Random random = Random();
+      final int randomNumber = random.nextInt(1000);
+      final filePath =
           '$tempPath/cropped_${DateTime.now().millisecondsSinceEpoch}_$randomNumber.jpg';
 
       // Write as JPEG with proper quality
@@ -312,8 +300,6 @@ class CropMediaState extends State<CropMedia>
         quality: 85, // High quality for profile photos
         minWidth: 400,
         minHeight: 400,
-        format: CompressFormat.jpeg,
-        keepExif: false, // Remove EXIF data for privacy
       );
 
       if (compressedFile != null) {

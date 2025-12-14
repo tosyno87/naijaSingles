@@ -5,6 +5,30 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../features/user/controllers/onboarding_controller.dart';
 
+/// Enum representing different types of photos for user profiles
+enum PhotoType {
+  closeUp,
+  fullBody,
+  activity,
+  social,
+  lifestyle,
+}
+
+/// Guidance information for each photo type
+class PhotoTypeGuidance {
+
+  const PhotoTypeGuidance({
+    required this.type,
+    required this.title,
+    required this.description,
+    this.isPrimary = false,
+  });
+  final PhotoType type;
+  final String title;
+  final String description;
+  final bool isPrimary;
+}
+
 class EnhancedPhotoUploadScreen extends StatefulWidget {
   const EnhancedPhotoUploadScreen({super.key});
 
@@ -26,7 +50,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     final uploadedPhotos = controller.profilePhotos;
     final uploadedCount = uploadedPhotos.where((photo) => photo != null).length;
     final hasMinimumPhotos = uploadedCount >= 3;
-    final maxPhotos = 6; // Allow up to 6 photos like popular apps
+    const maxPhotos = 6; // Allow up to 6 photos like popular apps
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -136,7 +160,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
             ),
 
             // Bottom section
-            Container(
+            DecoratedBox(
               decoration: BoxDecoration(
                 color: backgroundColor,
                 boxShadow: [
@@ -211,12 +235,11 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     VoidCallback? onRemove,
     VoidCallback? onReorderUp,
     VoidCallback? onReorderDown,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: AspectRatio(
         aspectRatio: isMainPhoto ? 1.0 : 0.75, // Square for main photo, 4:3 for others
-        child: Container(
+        child: DecoratedBox(
           decoration: BoxDecoration(
             color: photo == null ? Colors.grey.shade100 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
@@ -238,7 +261,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                     width: double.infinity,
                     height: double.infinity,
                     fit: BoxFit.cover, // Fill container completely
-                    alignment: Alignment.center,
                   ),
                 )
             else
@@ -370,9 +392,8 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
         ),
       ),
     );
-  }
 
-  void _showAddPhotoOptions(int index) async {
+  Future<void> _showAddPhotoOptions(int index) async {
     final controller = Provider.of<OnboardingController>(context, listen: false);
     
     // If clicking on existing photo, show options

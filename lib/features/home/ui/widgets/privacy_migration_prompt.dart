@@ -5,18 +5,17 @@ import '../../../../common/constants/colors.dart';
 import '../../../profile/privacy_migration_screen.dart';
 
 class PrivacyMigrationPrompt extends StatelessWidget {
+
+  const PrivacyMigrationPrompt({
+    super.key,
+    this.onDismiss,
+    this.onMigrate,
+  });
   final VoidCallback? onDismiss;
   final VoidCallback? onMigrate;
 
-  const PrivacyMigrationPrompt({
-    Key? key,
-    this.onDismiss,
-    this.onMigrate,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -50,7 +49,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                   color: primaryColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.security_update_good,
                   color: primaryColor,
                   size: 24,
@@ -87,13 +86,13 @@ class PrivacyMigrationPrompt extends StatelessWidget {
 
           // Benefits
           _buildBenefit(
-              Icons.visibility_outlined, 'Control what others see about you'),
+              Icons.visibility_outlined, 'Control what others see about you',),
           const SizedBox(height: 8),
           _buildBenefit(
-              Icons.location_on_outlined, 'Choose your location privacy level'),
+              Icons.location_on_outlined, 'Choose your location privacy level',),
           const SizedBox(height: 8),
           _buildBenefit(
-              Icons.shield_outlined, 'Enhanced security for your data'),
+              Icons.shield_outlined, 'Enhanced security for your data',),
 
           const SizedBox(height: 20),
 
@@ -154,10 +153,8 @@ class PrivacyMigrationPrompt extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildBenefit(IconData icon, String text) {
-    return Row(
+  Widget _buildBenefit(IconData icon, String text) => Row(
       children: [
         Icon(
           icon,
@@ -176,21 +173,19 @@ class PrivacyMigrationPrompt extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 /// Compact version for smaller spaces
 class CompactPrivacyMigrationPrompt extends StatelessWidget {
-  final VoidCallback? onTap;
 
   const CompactPrivacyMigrationPrompt({
-    Key? key,
+    super.key,
     this.onTap,
-  }) : super(key: key);
+  });
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -202,7 +197,7 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.security_update_good,
               color: primaryColor,
               size: 20,
@@ -230,7 +225,7 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.arrow_forward_ios,
               color: primaryColor,
               size: 16,
@@ -239,5 +234,4 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
         ),
       ),
     );
-  }
 }

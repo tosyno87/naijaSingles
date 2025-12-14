@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/services/paginated_user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/user_model.dart';
+import 'paginated_user_service.dart';
 
 /// Cached user service that provides intelligent caching for user data
 /// Reduces Firestore reads and improves app performance
@@ -106,7 +108,7 @@ class CachedUserService {
   }) async {
     debugPrint('📄 Loading more users (bypassing cache)');
 
-    return await _paginatedUserService.getUsers(
+    return _paginatedUserService.getUsers(
       currentUser: currentUser,
       lastDocument: previousResult.lastDocument,
     );
@@ -237,7 +239,7 @@ class CachedUserService {
       }
 
       debugPrint(
-          '🧹 Cleared ${expiredKeys.length} expired user list caches and ${expiredProfileKeys.length} expired profile caches');
+          '🧹 Cleared ${expiredKeys.length} expired user list caches and ${expiredProfileKeys.length} expired profile caches',);
     } catch (e) {
       debugPrint('❌ Error clearing expired cache: $e');
     }
@@ -311,7 +313,7 @@ class CachedUserService {
         final List<dynamic> userListData = jsonDecode(cachedData);
         final users = userListData
             .map((userData) => UserModel.fromMap(
-                userData as Map<String, dynamic>, userData['id'] ?? ''))
+                userData as Map<String, dynamic>, userData['id'] ?? '',),)
             .toList();
 
         // Update in-memory cache
@@ -355,8 +357,7 @@ class CachedUserService {
   }
 
   /// Get cache statistics for debugging
-  Map<String, dynamic> getCacheStats() {
-    return {
+  Map<String, dynamic> getCacheStats() => {
       'userListCacheSize': _userListCache.length,
       'profileCacheSize': _profileCache.length,
       'oldestUserListCache': _cacheTimestamps.values.isNotEmpty
@@ -370,5 +371,4 @@ class CachedUserService {
               .toString()
           : 'None',
     };
-  }
 }

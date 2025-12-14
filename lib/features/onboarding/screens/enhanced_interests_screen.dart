@@ -89,15 +89,14 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+  Widget build(BuildContext context) => SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Text(
-            "What are your interests?",
+            'What are your interests?',
             style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -108,7 +107,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
           const SizedBox(height: 8),
 
           Text(
-            "Select at least 5 interests to help us find your perfect matches",
+            'Select at least 5 interests to help us find your perfect matches',
             style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textLightBrown,
@@ -119,7 +118,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
 
           // Interests dropdown
           Text(
-            "Choose your interests",
+            'Choose your interests',
             style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -130,7 +129,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
           const SizedBox(height: 12),
 
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: cardBackground,
               borderRadius: BorderRadius.circular(12),
@@ -138,7 +137,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
             ),
             child: DropdownButton<String>(
               hint: Text(
-                "Select an interest to add",
+                'Select an interest to add',
                 style: GoogleFonts.montserrat(
                   color: textLightBrown,
                   fontSize: 16,
@@ -146,15 +145,14 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
               ),
               isExpanded: true,
               underline: const SizedBox(),
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_drop_down,
                 color: afropeepGreen,
               ),
               dropdownColor: cardBackground,
               items: _allInterests
                   .where((interest) => !_selectedInterests.contains(interest))
-                  .map((String interest) {
-                return DropdownMenuItem<String>(
+                  .map((String interest) => DropdownMenuItem<String>(
                   value: interest,
                   child: Text(
                     interest,
@@ -164,8 +162,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
               onChanged: (String? newValue) {
                 if (newValue != null) {
                   _toggleInterest(newValue);
@@ -222,7 +219,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
           // Selected interests display
           if (_selectedInterests.isNotEmpty) ...[
             Text(
-              "Your selected interests:",
+              'Your selected interests:',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -233,8 +230,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _selectedInterests.map((interest) {
-                return Container(
+              children: _selectedInterests.map((interest) => Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
@@ -256,7 +252,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                       const SizedBox(width: 8),
                       GestureDetector(
                         onTap: () => _toggleInterest(interest),
-                        child: Icon(
+                        child: const Icon(
                           Icons.close,
                           size: 16,
                           color: afropeepGreen,
@@ -264,12 +260,10 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                       ),
                     ],
                   ),
-                );
-              }).toList(),
+                ),).toList(),
             ),
           ],
         ],
       ),
     );
-  }
 }

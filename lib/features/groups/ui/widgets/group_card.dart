@@ -5,24 +5,22 @@ import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../models/group_model.dart';
 
 class GroupCard extends StatelessWidget {
+
+  const GroupCard({
+    required this.group, super.key,
+    this.onTap,
+    this.onJoin,
+    this.showJoinButton = true,
+    this.showAdminBadge = false,
+  });
   final GroupModel group;
   final VoidCallback? onTap;
   final VoidCallback? onJoin;
   final bool showJoinButton;
   final bool showAdminBadge;
 
-  const GroupCard({
-    super.key,
-    required this.group,
-    this.onTap,
-    this.onJoin,
-    this.showJoinButton = true,
-    this.showAdminBadge = false,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -131,10 +129,8 @@ class GroupCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildGroupImage() {
-    return Container(
+  Widget _buildGroupImage() => Container(
       width: 60,
       height: 60,
       decoration: BoxDecoration(
@@ -154,39 +150,32 @@ class GroupCard extends StatelessWidget {
               child: Image.network(
                 group.imageUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildDefaultIcon();
-                },
+                errorBuilder: (context, error, stackTrace) => _buildDefaultIcon(),
               ),
             )
           : _buildDefaultIcon(),
     );
-  }
 
-  Widget _buildDefaultIcon() {
-    return Center(
+  Widget _buildDefaultIcon() => Center(
       child: Custom3DIcons.groups(
         size: 28,
         color: Colors.white,
       ),
     );
-  }
 
-  Widget _buildAdminBadge() {
-    return Container(
+  Widget _buildAdminBadge() => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.warning.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.warning.withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.admin_panel_settings,
             size: 12,
             color: AppColors.warning,
@@ -203,10 +192,8 @@ class GroupCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildJoinButton() {
-    return Container(
+  Widget _buildJoinButton() => DecoratedBox(
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(20),
@@ -231,17 +218,14 @@ class GroupCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildCulturalInfo() {
-    return Container(
+  Widget _buildCulturalInfo() => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.culture.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.culture.withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Row(
@@ -260,13 +244,11 @@ class GroupCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildMemberCount() {
-    return Row(
+  Widget _buildMemberCount() => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
+        const Icon(
           Icons.people,
           size: 14,
           color: AppColors.textSecondary,
@@ -282,13 +264,11 @@ class GroupCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildLocation() {
-    return Row(
+  Widget _buildLocation() => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
+        const Icon(
           Icons.location_on,
           size: 14,
           color: AppColors.textSecondary,
@@ -306,21 +286,17 @@ class GroupCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildTags() {
-    return Wrap(
+  Widget _buildTags() => Wrap(
       spacing: 6,
       runSpacing: 6,
-      children: group.tags.take(3).map((tag) {
-        return Container(
+      children: group.tags.take(3).map((tag) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: AppColors.overlayColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: AppColors.border,
-              width: 1,
             ),
           ),
           child: Text(
@@ -331,45 +307,43 @@ class GroupCard extends StatelessWidget {
               color: AppColors.textSecondary,
             ),
           ),
-        );
-      }).toList(),
+        ),).toList(),
     );
-  }
 
   LinearGradient _getCategoryGradient() {
     switch (group.category.toLowerCase()) {
       case 'cultural':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.culture, AppColors.heritage],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'professional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.business, AppColors.success],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'social':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.community, AppColors.info],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'educational':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.primaryGreen, AppColors.primaryGreenLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'religious':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.warning, AppColors.error],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'regional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.textPrimary, AppColors.textSecondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

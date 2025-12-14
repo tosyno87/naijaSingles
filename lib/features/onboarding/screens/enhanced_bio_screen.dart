@@ -25,14 +25,14 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
     "I'm the type of person who...",
     "You'll find me on weekends...",
     "I'm passionate about...",
-    "My friends would describe me as...",
+    'My friends would describe me as...',
     "I'm looking for someone who...",
-    "My ideal date would be...",
+    'My ideal date would be...',
     "I can't live without...",
-    "Ask me about...",
-    "Currently obsessed with...",
-    "My hidden talent is...",
-    "I believe in...",
+    'Ask me about...',
+    'Currently obsessed with...',
+    'My hidden talent is...',
+    'I believe in...',
     "Life's too short not to...",
   ];
 
@@ -86,14 +86,14 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   }
 
   BioQuality _analyzeBioQuality() {
-    String bio = _bioController.text.toLowerCase();
+    final String bio = _bioController.text.toLowerCase();
 
-    bool hasOptimalLength =
+    final bool hasOptimalLength =
         _currentLength >= _optimalMin && _currentLength <= _optimalMax;
-    bool hasMinLength = _currentLength >= _minLength;
-    bool hasPersonality = _hasPersonalityWords(bio);
-    bool hasConversationStarter = _hasConversationStarter(bio);
-    bool avoidsCliches = !_containsCliches(bio);
+    final bool hasMinLength = _currentLength >= _minLength;
+    final bool hasPersonality = _hasPersonalityWords(bio);
+    final bool hasConversationStarter = _hasConversationStarter(bio);
+    final bool avoidsCliches = !_containsCliches(bio);
 
     int score = 0;
     if (hasMinLength) score += 20;
@@ -113,7 +113,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   }
 
   bool _hasPersonalityWords(String bio) {
-    List<String> personalityWords = [
+    final List<String> personalityWords = [
       'love',
       'enjoy',
       'passionate',
@@ -133,14 +133,14 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
       'reading',
       'cooking',
       'dancing',
-      'sports'
+      'sports',
     ];
 
     return personalityWords.any((word) => bio.contains(word));
   }
 
   bool _hasConversationStarter(String bio) {
-    List<String> conversationStarters = [
+    final List<String> conversationStarters = [
       'ask me',
       'tell me',
       'what about',
@@ -151,7 +151,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
       'debate',
       'recommend',
       'share',
-      'discuss'
+      'discuss',
     ];
 
     return conversationStarters.any((starter) => bio.contains(starter)) ||
@@ -160,7 +160,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   }
 
   bool _containsCliches(String bio) {
-    List<String> cliches = [
+    final List<String> cliches = [
       'love to laugh',
       'work hard play hard',
       'live laugh love',
@@ -168,7 +168,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
       'just ask',
       'good vibes only',
       'fluent in sarcasm',
-      'netflix and chill'
+      'netflix and chill',
     ];
 
     return cliches.any((cliche) => bio.contains(cliche));
@@ -179,16 +179,16 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
     const Color primaryColor = Color(0xFF008037);
     const Color textColor = Color(0xFF333333);
 
-    BioQuality quality = _analyzeBioQuality();
+    final BioQuality quality = _analyzeBioQuality();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Text(
-            "Tell your story",
+            'Tell your story',
             style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -219,7 +219,6 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _getBioQualityColor(quality.score),
-                  width: 1,
                 ),
               ),
               child: Row(
@@ -271,7 +270,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
           // Personality Prompts Section
           Text(
-            "Get started with prompts",
+            'Get started with prompts',
             style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -285,7 +284,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
             children: [
               Expanded(
                 child: Text(
-                  "Choose one prompt to get started",
+                  'Choose one prompt to get started',
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: Colors.black54,
@@ -301,7 +300,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                   border: Border.all(color: Colors.blue.shade200),
                 ),
                 child: Text(
-                  "Select 1",
+                  'Select 1',
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: Colors.blue.shade700,
@@ -319,7 +318,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
             spacing: 8,
             runSpacing: 8,
             children: _personalityPrompts.map((prompt) {
-              bool isSelected = _selectedPrompt == prompt;
+              final bool isSelected = _selectedPrompt == prompt;
 
               return GestureDetector(
                 onTap: () => _selectPrompt(prompt),
@@ -340,7 +339,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (isSelected) ...[
-                        Icon(
+                        const Icon(
                           Icons.check_circle,
                           size: 16,
                           color: primaryColor,
@@ -367,7 +366,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
           // Bio Text Field
           Text(
-            "Your bio",
+            'Your bio',
             style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -377,7 +376,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
           const SizedBox(height: 12),
 
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -414,7 +413,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                   borderSide: const BorderSide(color: primaryColor, width: 2),
                 ),
                 contentPadding: const EdgeInsets.all(20),
-                counterText: "",
+                counterText: '',
               ),
               onChanged: (value) {
                 setState(() {
@@ -449,7 +448,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 ),
               ),
               Text(
-                "$_currentLength/$_maxLength",
+                '$_currentLength/$_maxLength',
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color:
@@ -470,7 +469,6 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: Colors.blue.shade200,
-                width: 1,
               ),
             ),
             child: Column(
@@ -485,7 +483,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "Tips for a great bio",
+                      'Tips for a great bio',
                       style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -496,11 +494,11 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 ),
                 const SizedBox(height: 12),
                 _buildTipItem(
-                  "Be authentic and show your personality",
+                  'Be authentic and show your personality',
                   Icons.favorite_outline,
                 ),
                 _buildTipItem(
-                  "Mention specific interests and hobbies",
+                  'Mention specific interests and hobbies',
                   Icons.sports_soccer_outlined,
                 ),
                 _buildTipItem(
@@ -512,7 +510,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                   Icons.people_outline,
                 ),
                 _buildTipItem(
-                  "Keep it positive and engaging",
+                  'Keep it positive and engaging',
                   Icons.sentiment_satisfied_alt_outlined,
                 ),
               ],
@@ -523,8 +521,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
     );
   }
 
-  Widget _buildTipItem(String text, IconData icon) {
-    return Padding(
+  Widget _buildTipItem(String text, IconData icon) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -548,7 +545,6 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
         ],
       ),
     );
-  }
 
   Color _getBioQualityColor(int score) {
     if (score >= 80) return Colors.green;
@@ -563,29 +559,31 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
   }
 
   String _getBioQualityMessage(int score) {
-    if (score >= 80) return "Great bio! 🎉";
-    if (score >= 60) return "Good start! 👍";
-    return "Needs improvement 📝";
+    if (score >= 80) return 'Great bio! 🎉';
+    if (score >= 60) return 'Good start! 👍';
+    return 'Needs improvement 📝';
   }
 
   String _getBioImprovementTip(BioQuality quality) {
-    if (!quality.hasMinLength) return "Add more details about yourself";
-    if (!quality.hasPersonality) return "Share your interests and hobbies";
-    if (!quality.hasConversationStarter)
-      return "Add something people can ask you about";
-    if (!quality.avoidsCliches) return "Try to be more specific and unique";
-    if (!quality.hasOptimalLength)
-      return "Aim for 50-200 characters for best results";
+    if (!quality.hasMinLength) return 'Add more details about yourself';
+    if (!quality.hasPersonality) return 'Share your interests and hobbies';
+    if (!quality.hasConversationStarter) {
+      return 'Add something people can ask you about';
+    }
+    if (!quality.avoidsCliches) return 'Try to be more specific and unique';
+    if (!quality.hasOptimalLength) {
+      return 'Aim for 50-200 characters for best results';
+    }
     return "You're doing great!";
   }
 
   String _getCharacterCountMessage() {
     if (_currentLength < _minLength) {
-      return "Add ${_minLength - _currentLength} more characters";
+      return 'Add ${_minLength - _currentLength} more characters';
     } else if (_currentLength <= _optimalMax) {
-      return "Perfect length! 👌";
+      return 'Perfect length! 👌';
     } else {
-      return "Consider shortening for better impact";
+      return 'Consider shortening for better impact';
     }
   }
 
@@ -598,12 +596,6 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
 // Bio Quality Data Class
 class BioQuality {
-  final int score;
-  final bool hasOptimalLength;
-  final bool hasMinLength;
-  final bool hasPersonality;
-  final bool hasConversationStarter;
-  final bool avoidsCliches;
 
   BioQuality({
     required this.score,
@@ -613,4 +605,10 @@ class BioQuality {
     required this.hasConversationStarter,
     required this.avoidsCliches,
   });
+  final int score;
+  final bool hasOptimalLength;
+  final bool hasMinLength;
+  final bool hasPersonality;
+  final bool hasConversationStarter;
+  final bool avoidsCliches;
 }

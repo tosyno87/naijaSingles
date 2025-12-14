@@ -1,19 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/config/app_config.dart';
+
 import '../../../../../common/utils/privacy_page.dart';
+import '../../../../../config/app_config.dart';
 
 class PrivacyPolicy extends StatelessWidget {
   const PrivacyPolicy({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         GestureDetector(
           child: Text(
-            "Privacy Policy".tr().toString(),
+            'Privacy Policy'.tr().toString(),
             style: TextStyle(
               color: Colors.green[700],
               fontWeight: FontWeight.w500,
@@ -25,7 +25,7 @@ class PrivacyPolicy extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => const PrivacyPolicyPage(
                 url: privacyUrl,
-                tittle: "Privacy Policy",
+                tittle: 'Privacy Policy',
               ),
             ),
           ),
@@ -41,7 +41,7 @@ class PrivacyPolicy extends StatelessWidget {
         ),
         GestureDetector(
           child: Text(
-            "Terms & Conditions".tr().toString(),
+            'Terms & Conditions'.tr().toString(),
             style: TextStyle(
               color: Colors.green[700],
               fontWeight: FontWeight.w500,
@@ -53,12 +53,11 @@ class PrivacyPolicy extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => const PrivacyPolicyPage(
                 url: termConditionUrl,
-                tittle: "Terms & Conditions",
+                tittle: 'Terms & Conditions',
               ),
             ),
           ),
         ),
       ],
     );
-  }
 }

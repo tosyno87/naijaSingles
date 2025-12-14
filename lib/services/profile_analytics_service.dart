@@ -10,10 +10,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - User behavior analysis
 /// - A/B testing support
 class ProfileAnalyticsService {
-  static final ProfileAnalyticsService _instance =
-      ProfileAnalyticsService._internal();
   factory ProfileAnalyticsService() => _instance;
   ProfileAnalyticsService._internal();
+  static final ProfileAnalyticsService _instance =
+      ProfileAnalyticsService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -101,7 +101,7 @@ class ProfileAnalyticsService {
 
   /// Track message sent
   Future<void> trackMessageSent(
-      String threadId, String senderId, String receiverId) async {
+      String threadId, String senderId, String receiverId,) async {
     try {
       log('💬 Tracking message sent: $threadId');
 
@@ -221,8 +221,8 @@ class ProfileAnalyticsService {
         totalLikes: 0,
         totalPasses: 0,
         totalMatches: 0,
-        likeRate: 0.0,
-        matchRate: 0.0,
+        likeRate: 0,
+        matchRate: 0,
         dailyAnalytics: [],
         demographicAnalytics: DemographicAnalytics.empty(),
         lastUpdated: DateTime.now(),
@@ -269,7 +269,7 @@ class ProfileAnalyticsService {
           views: viewsSnapshot.docs.length,
           likes: likesSnapshot.docs.length,
           passes: passesSnapshot.docs.length,
-        ));
+        ),);
       }
 
       return last30Days;
@@ -429,7 +429,7 @@ class ProfileAnalyticsService {
       final analytics = await getProfileAnalytics(userId);
 
       // Calculate engagement score based on various factors
-      double score = 0.0;
+      double score = 0;
 
       // Profile completeness (30%)
       final profileCompleteness = await _calculateProfileCompleteness(userId);
@@ -460,23 +460,33 @@ class ProfileAnalyticsService {
 
       final userData = userDoc.data()!;
       int completedFields = 0;
-      int totalFields = 8; // Total number of important fields
+      const int totalFields = 8; // Total number of important fields
 
-      if (userData['name'] != null && userData['name'].toString().isNotEmpty)
+      if (userData['name'] != null && userData['name'].toString().isNotEmpty) {
         completedFields++;
+      }
       if (userData['age'] != null) completedFields++;
-      if (userData['bio'] != null && userData['bio'].toString().isNotEmpty)
+      if (userData['bio'] != null && userData['bio'].toString().isNotEmpty) {
         completedFields++;
-      if (userData['photos'] != null && (userData['photos'] as List).isNotEmpty)
+      }
+      if (userData['photos'] != null && (userData['photos'] as List).isNotEmpty) {
         completedFields++;
+      }
       if (userData['nationality'] != null &&
-          userData['nationality'].toString().isNotEmpty) completedFields++;
-      if (userData['tribe'] != null && userData['tribe'].toString().isNotEmpty)
+          userData['nationality'].toString().isNotEmpty) {
         completedFields++;
+      }
+      if (userData['tribe'] != null && userData['tribe'].toString().isNotEmpty) {
+        completedFields++;
+      }
       if (userData['occupation'] != null &&
-          userData['occupation'].toString().isNotEmpty) completedFields++;
+          userData['occupation'].toString().isNotEmpty) {
+        completedFields++;
+      }
       if (userData['interests'] != null &&
-          (userData['interests'] as List).isNotEmpty) completedFields++;
+          (userData['interests'] as List).isNotEmpty) {
+        completedFields++;
+      }
 
       return completedFields / totalFields;
     } catch (e) {
@@ -510,16 +520,6 @@ class ProfileAnalyticsService {
 
 /// Profile analytics model
 class ProfileAnalytics {
-  final String userId;
-  final int totalViews;
-  final int totalLikes;
-  final int totalPasses;
-  final int totalMatches;
-  final double likeRate;
-  final double matchRate;
-  final List<DailyAnalytics> dailyAnalytics;
-  final DemographicAnalytics demographicAnalytics;
-  final DateTime lastUpdated;
 
   const ProfileAnalytics({
     required this.userId,
@@ -533,19 +533,23 @@ class ProfileAnalytics {
     required this.demographicAnalytics,
     required this.lastUpdated,
   });
+  final String userId;
+  final int totalViews;
+  final int totalLikes;
+  final int totalPasses;
+  final int totalMatches;
+  final double likeRate;
+  final double matchRate;
+  final List<DailyAnalytics> dailyAnalytics;
+  final DemographicAnalytics demographicAnalytics;
+  final DateTime lastUpdated;
 
   @override
-  String toString() {
-    return 'ProfileAnalytics($userId: $totalViews views, $totalLikes likes, ${likeRate.toStringAsFixed(1)}% like rate)';
-  }
+  String toString() => 'ProfileAnalytics($userId: $totalViews views, $totalLikes likes, ${likeRate.toStringAsFixed(1)}% like rate)';
 }
 
 /// Daily analytics model
 class DailyAnalytics {
-  final DateTime date;
-  final int views;
-  final int likes;
-  final int passes;
 
   const DailyAnalytics({
     required this.date,
@@ -553,18 +557,17 @@ class DailyAnalytics {
     required this.likes,
     required this.passes,
   });
+  final DateTime date;
+  final int views;
+  final int likes;
+  final int passes;
 
   @override
-  String toString() {
-    return 'DailyAnalytics(${date.toIso8601String().split('T')[0]}: $views views, $likes likes)';
-  }
+  String toString() => 'DailyAnalytics(${date.toIso8601String().split('T')[0]}: $views views, $likes likes)';
 }
 
 /// Demographic analytics model
 class DemographicAnalytics {
-  final Map<String, int> ageGroups;
-  final Map<String, int> genderGroups;
-  final Map<String, int> locationGroups;
 
   const DemographicAnalytics({
     required this.ageGroups,
@@ -572,27 +575,21 @@ class DemographicAnalytics {
     required this.locationGroups,
   });
 
-  factory DemographicAnalytics.empty() {
-    return const DemographicAnalytics(
+  factory DemographicAnalytics.empty() => const DemographicAnalytics(
       ageGroups: {},
       genderGroups: {},
       locationGroups: {},
     );
-  }
+  final Map<String, int> ageGroups;
+  final Map<String, int> genderGroups;
+  final Map<String, int> locationGroups;
 
   @override
-  String toString() {
-    return 'DemographicAnalytics(age: ${ageGroups.length}, gender: ${genderGroups.length}, location: ${locationGroups.length})';
-  }
+  String toString() => 'DemographicAnalytics(age: ${ageGroups.length}, gender: ${genderGroups.length}, location: ${locationGroups.length})';
 }
 
 /// App analytics model
 class AppAnalytics {
-  final int totalUsers;
-  final int totalMatches;
-  final int totalMessages;
-  final int dailyActiveUsers;
-  final DateTime lastUpdated;
 
   const AppAnalytics({
     required this.totalUsers,
@@ -601,9 +598,12 @@ class AppAnalytics {
     required this.dailyActiveUsers,
     required this.lastUpdated,
   });
+  final int totalUsers;
+  final int totalMatches;
+  final int totalMessages;
+  final int dailyActiveUsers;
+  final DateTime lastUpdated;
 
   @override
-  String toString() {
-    return 'AppAnalytics($totalUsers users, $totalMatches matches, $dailyActiveUsers DAU)';
-  }
+  String toString() => 'AppAnalytics($totalUsers users, $totalMatches matches, $dailyActiveUsers DAU)';
 }

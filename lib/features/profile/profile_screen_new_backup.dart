@@ -10,7 +10,7 @@ import '../../../services/profile_verification_service.dart';
 import '../../../services/content_moderation_service.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -54,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Name: ${data?['name']}');
           print('   Interests: ${data?['interests']}');
           print(
-              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
+              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}',);
           print('   Looking for: ${data?['lookingFor']}');
           print('   Bio length: ${(data?['bio'] ?? '').length} characters');
           print('   Photos field: ${data?['photos']}');
@@ -85,8 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -246,7 +245,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
     );
-  }
 
   Widget _buildPhotoSection() {
     // Try multiple possible photo field names
@@ -279,8 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return _buildInstagramStylePhotoGrid(photos);
   }
 
-  Widget _buildInstagramStylePhotoGrid(List<dynamic> photos) {
-    return Container(
+  Widget _buildInstagramStylePhotoGrid(List<dynamic> photos) => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
 
           // Instagram-style grid
-          Container(
+          SizedBox(
             height: 300,
             child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -307,7 +304,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisCount: 3,
                 crossAxisSpacing: 4,
                 mainAxisSpacing: 4,
-                childAspectRatio: 1,
               ),
               itemCount:
                   photos.length > 6 ? 6 : photos.length, // Show max 6 photos
@@ -316,7 +312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // First photo takes up 2x2 space (spans 2 columns and 2 rows)
                   return GestureDetector(
                     onTap: () => _showFullScreenPhoto(photos, index),
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
@@ -335,8 +331,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Image.network(
                               photos[index],
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                              errorBuilder: (context, error, stackTrace) => ColoredBox(
                                   color: Colors.grey.shade200,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -356,8 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     ],
                                   ),
-                                );
-                              },
+                                ),
                             ),
                             // Photo number indicator
                             Positioned(
@@ -391,7 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Regular 1x1 photos
                   return GestureDetector(
                     onTap: () => _showFullScreenPhoto(photos, index),
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
@@ -410,8 +404,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Image.network(
                               photos[index],
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                              errorBuilder: (context, error, stackTrace) => ColoredBox(
                                   color: Colors.grey.shade200,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -431,8 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     ],
                                   ),
-                                );
-                              },
+                                ),
                             ),
                             // Photo number indicator
                             Positioned(
@@ -485,7 +477,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
 
   // Full screen photo viewer
   void _showFullScreenPhoto(List<dynamic> photos, int initialIndex) {
@@ -499,8 +490,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildEmptyPhotoPlaceholder() {
-    return Container(
+  Widget _buildEmptyPhotoPlaceholder() => Container(
       height: 200,
       decoration: BoxDecoration(
         color: cardColor,
@@ -535,10 +525,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildBasicInfoCard() {
-    return Card(
+  Widget _buildBasicInfoCard() => Card(
       color: cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -587,7 +575,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildVerificationBadge(VerificationStatus status) {
     final badge = _verificationService.getVerificationBadge(status);
@@ -634,8 +621,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileActionButtons() {
-    return Column(
+  Widget _buildProfileActionButtons() => Column(
       children: [
         // Edit Profile Button
         SizedBox(
@@ -666,7 +652,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.edit_outlined, size: 20),
+                const Icon(Icons.edit_outlined, size: 20),
                 const SizedBox(width: 12),
                 Text(
                   'Edit Profile',
@@ -690,12 +676,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: _showReportDialog,
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.red,
-              side: BorderSide(color: Colors.red),
+              side: const BorderSide(color: Colors.red),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            icon: Icon(Icons.flag_outlined, size: 18),
+            icon: const Icon(Icons.flag_outlined, size: 18),
             label: Text(
               'Report Profile',
               style: GoogleFonts.montserrat(
@@ -707,7 +693,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
-  }
 
   void _showReportDialog() {
     showDialog(
@@ -764,8 +749,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Widget _buildVerificationSection() {
-    return Card(
+  Widget _buildVerificationSection() => Card(
       color: cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -776,7 +760,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.verified_user, color: primaryColor, size: 20),
+                const Icon(Icons.verified_user, color: primaryColor, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Profile Verification',
@@ -825,18 +809,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: VerificationType.values.map((type) {
-                return _buildVerificationButton(type);
-              }).toList(),
+              children: VerificationType.values.map(_buildVerificationButton).toList(),
             ),
           ],
         ),
       ),
     );
-  }
 
-  Widget _buildVerificationButton(VerificationType type) {
-    return ElevatedButton.icon(
+  Widget _buildVerificationButton(VerificationType type) => ElevatedButton.icon(
       onPressed: () => _requestVerification(type),
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor.withOpacity(0.1),
@@ -851,7 +831,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         style: GoogleFonts.montserrat(fontSize: 12),
       ),
     );
-  }
 
   IconData _getVerificationIcon(VerificationType type) {
     switch (type) {
@@ -882,7 +861,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  '${type.toString().split('.').last.toUpperCase()} verification requested'),
+                  '${type.toString().split('.').last.toUpperCase()} verification requested',),
               backgroundColor: Colors.green,
             ),
           );
@@ -915,25 +894,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case VerificationType.photo:
         return {
           'photos': ['photo1.jpg', 'photo2.jpg'],
-          'selfie': 'selfie.jpg'
+          'selfie': 'selfie.jpg',
         };
       case VerificationType.identity:
         return {
           'idType': 'passport',
           'idNumber': 'A1234567',
-          'idPhoto': 'id.jpg'
+          'idPhoto': 'id.jpg',
         };
       case VerificationType.employment:
         return {
           'company': 'Tech Company',
           'position': 'Developer',
-          'email': 'work@company.com'
+          'email': 'work@company.com',
         };
     }
   }
 
-  Widget _buildAboutSection() {
-    return Card(
+  Widget _buildAboutSection() => Card(
       color: cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -963,7 +941,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildInterestsSection() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
@@ -991,8 +968,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: interests.map((interest) {
-                return Container(
+              children: interests.map((interest) => Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -1008,8 +984,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
             ),
           ],
         ),
@@ -1057,13 +1032,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 // Full-screen photo viewer widget
 class _FullScreenPhotoViewer extends StatefulWidget {
-  final List<dynamic> photos;
-  final int initialIndex;
 
   const _FullScreenPhotoViewer({
     required this.photos,
     required this.initialIndex,
   });
+  final List<dynamic> photos;
+  final int initialIndex;
 
   @override
   State<_FullScreenPhotoViewer> createState() => _FullScreenPhotoViewerState();
@@ -1087,8 +1062,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -1117,14 +1091,12 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                 _currentIndex = index;
               });
             },
-            itemBuilder: (context, index) {
-              return Center(
+            itemBuilder: (context, index) => Center(
                 child: InteractiveViewer(
                   child: Image.network(
                     widget.photos[index],
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
+                    errorBuilder: (context, error, stackTrace) => ColoredBox(
                         color: Colors.grey.shade800,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1144,12 +1116,10 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                             ),
                           ],
                         ),
-                      );
-                    },
+                      ),
                   ),
                 ),
-              );
-            },
+              ),
           ),
 
           // Page indicators
@@ -1179,5 +1149,4 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
         ],
       ),
     );
-  }
 }

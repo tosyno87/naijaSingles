@@ -28,7 +28,7 @@ void main() async {
         print('👤 Processing user: $userId - ${data['name'] ?? 'No name'}');
         
         // Prepare updates
-        Map<String, dynamic> updates = {};
+        final Map<String, dynamic> updates = {};
         
         // 1. Add isProfileComplete field
         if (!data.containsKey('isProfileComplete')) {
@@ -111,7 +111,7 @@ void main() async {
 /// Calculate profile completeness score
 bool _calculateProfileCompleteness(Map<String, dynamic> data) {
   int score = 0;
-  int totalFields = 8;
+  const int totalFields = 8;
   
   // Essential fields for a complete profile
   if (data['name'] != null && data['name'].toString().isNotEmpty) score++;

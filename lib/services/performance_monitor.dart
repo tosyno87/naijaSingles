@@ -64,7 +64,7 @@ class PerformanceMonitor {
 
     if (elapsedMs > threshold) {
       debugPrint(
-          '   ⚠️ Exceeded threshold of ${threshold}ms by ${elapsedMs - threshold}ms');
+          '   ⚠️ Exceeded threshold of ${threshold}ms by ${elapsedMs - threshold}ms',);
     }
   }
 
@@ -84,7 +84,7 @@ class PerformanceMonitor {
 
   /// Record a Firestore operation
   static void recordFirestoreOperation(String operationType,
-      {int? readCount, int? writeCount}) {
+      {int? readCount, int? writeCount,}) {
     final key = 'firestore_$operationType';
     _operationCounts[key] = (_operationCounts[key] ?? 0) + 1;
 
@@ -100,7 +100,7 @@ class PerformanceMonitor {
     }
 
     debugPrint(
-        '📊 Firestore $operationType: reads=${readCount ?? 0}, writes=${writeCount ?? 0}');
+        '📊 Firestore $operationType: reads=${readCount ?? 0}, writes=${writeCount ?? 0}',);
   }
 
   /// Get performance statistics for an operation
@@ -142,9 +142,7 @@ class PerformanceMonitor {
   }
 
   /// Get operation counts
-  static Map<String, int> getOperationCounts() {
-    return Map.from(_operationCounts);
-  }
+  static Map<String, int> getOperationCounts() => Map.from(_operationCounts);
 
   /// Generate performance report
   static String generateReport() {
@@ -170,7 +168,7 @@ class PerformanceMonitor {
       buffer.writeln('\n$emoji ${stat.operationName.toUpperCase()}');
       buffer.writeln('   Count: ${stat.count}');
       buffer.writeln(
-          '   Average: ${stat.averageMs}ms (threshold: ${stat.threshold}ms)');
+          '   Average: ${stat.averageMs}ms (threshold: ${stat.threshold}ms)',);
       buffer.writeln('   Min/Max: ${stat.minMs}ms / ${stat.maxMs}ms');
       buffer.writeln('   Median: ${stat.medianMs}ms');
       buffer.writeln('   95th percentile: ${stat.p95Ms}ms');
@@ -207,7 +205,7 @@ class PerformanceMonitor {
 
   /// Measure execution time of a function
   static Future<T> measure<T>(
-      String operationName, Future<T> Function() operation) async {
+      String operationName, Future<T> Function() operation,) async {
     startTimer(operationName);
     try {
       final result = await operation();
@@ -237,15 +235,6 @@ class PerformanceMonitor {
 
 /// Performance statistics for an operation
 class PerformanceStats {
-  final String operationName;
-  final int count;
-  final int averageMs;
-  final int minMs;
-  final int maxMs;
-  final int medianMs;
-  final int p95Ms;
-  final int lastMs;
-  final int threshold;
 
   const PerformanceStats({
     required this.operationName,
@@ -258,20 +247,25 @@ class PerformanceStats {
     required this.lastMs,
     required this.threshold,
   });
+  final String operationName;
+  final int count;
+  final int averageMs;
+  final int minMs;
+  final int maxMs;
+  final int medianMs;
+  final int p95Ms;
+  final int lastMs;
+  final int threshold;
 
   bool get isPerformant => averageMs <= threshold;
   double get performanceRatio => averageMs / threshold;
 
   @override
-  String toString() {
-    return 'PerformanceStats($operationName: avg=${averageMs}ms, count=$count, performant=$isPerformant)';
-  }
+  String toString() => 'PerformanceStats($operationName: avg=${averageMs}ms, count=$count, performant=$isPerformant)';
 }
 
 /// Extension methods for easy performance monitoring
 extension PerformanceMonitorExtension on Future {
-  Future<T> withPerformanceMonitoring<T>(String operationName) async {
-    return PerformanceMonitor.measure(
-        operationName, () async => await this as T);
-  }
+  Future<T> withPerformanceMonitoring<T>(String operationName) async => PerformanceMonitor.measure(
+        operationName, () async => await this as T,);
 }

@@ -3,16 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../models/user_model.dart';
 
 class ModernProfileCard extends StatefulWidget {
+
+  const ModernProfileCard({
+    required this.user, super.key,
+    this.onConnect,
+    this.onTap,
+  });
   final UserModel user;
   final VoidCallback? onConnect;
   final VoidCallback? onTap;
-
-  const ModernProfileCard({
-    Key? key,
-    required this.user,
-    this.onConnect,
-    this.onTap,
-  }) : super(key: key);
 
   @override
   State<ModernProfileCard> createState() => _ModernProfileCardState();
@@ -30,7 +29,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
@@ -58,7 +57,6 @@ class _ModernProfileCardState extends State<ModernProfileCard>
               color: Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 8),
-              spreadRadius: 0,
             ),
           ],
         ),
@@ -67,13 +65,12 @@ class _ModernProfileCardState extends State<ModernProfileCard>
           child: InkWell(
             onTap: widget.onTap,
             borderRadius: BorderRadius.circular(24),
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: Colors.white, // White background
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: const Color(0xFF008037).withOpacity(0.1),
-                  width: 1,
                 ),
               ),
               child: Column(
@@ -117,8 +114,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
     );
   }
 
-  Widget _buildHeroPhoto(String? photoUrl, int photoCount) {
-    return Container(
+  Widget _buildHeroPhoto(String? photoUrl, int photoCount) => Container(
       height: 250,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -220,10 +216,8 @@ class _ModernProfileCardState extends State<ModernProfileCard>
         ],
       ),
     );
-  }
 
-  Widget _buildNameAndStatus() {
-    return Row(
+  Widget _buildNameAndStatus() => Row(
       children: [
         Expanded(
           child: Text(
@@ -267,7 +261,6 @@ class _ModernProfileCardState extends State<ModernProfileCard>
         ),
       ],
     );
-  }
 
   Widget _buildNationalityTribeTags() {
     final nationality = widget.user.nationality ?? 'Nigerian';
@@ -282,7 +275,6 @@ class _ModernProfileCardState extends State<ModernProfileCard>
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: const Color(0xFF008037).withOpacity(0.3),
-              width: 1,
             ),
           ),
           child: Text(
@@ -302,7 +294,6 @@ class _ModernProfileCardState extends State<ModernProfileCard>
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: const Color(0xFF008037).withOpacity(0.3),
-              width: 1,
             ),
           ),
           child: Text(
@@ -338,15 +329,13 @@ class _ModernProfileCardState extends State<ModernProfileCard>
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: interests.take(3).map((interest) {
-        return Container(
+      children: interests.take(3).map((interest) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: const Color(0xFF008037).withOpacity(0.2),
-              width: 1,
             ),
             boxShadow: [
               BoxShadow(
@@ -364,13 +353,11 @@ class _ModernProfileCardState extends State<ModernProfileCard>
               color: const Color(0xFF2D2D2D),
             ),
           ),
-        );
-      }).toList(),
+        ),).toList(),
     );
   }
 
-  Widget _buildConnectButton() {
-    return SizedBox(
+  Widget _buildConnectButton() => SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
@@ -403,5 +390,4 @@ class _ModernProfileCardState extends State<ModernProfileCard>
         ),
       ),
     );
-  }
 }

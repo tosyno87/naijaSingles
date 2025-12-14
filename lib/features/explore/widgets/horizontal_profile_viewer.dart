@@ -3,22 +3,17 @@ import '../../../models/user_model.dart';
 import 'modern_profile_card.dart';
 
 class HorizontalProfileViewer extends StatefulWidget {
+
+  const HorizontalProfileViewer({
+    required this.users, required this.currentUser, required this.onConnect, required this.onPass, required this.onViewProfile, super.key,
+    this.onAllProfilesViewed,
+  });
   final List<UserModel> users;
   final UserModel currentUser;
   final Function(UserModel) onConnect;
   final Function(UserModel) onPass;
   final Function(UserModel) onViewProfile;
   final VoidCallback? onAllProfilesViewed;
-
-  const HorizontalProfileViewer({
-    Key? key,
-    required this.users,
-    required this.currentUser,
-    required this.onConnect,
-    required this.onPass,
-    required this.onViewProfile,
-    this.onAllProfilesViewed,
-  }) : super(key: key);
 
   @override
   State<HorizontalProfileViewer> createState() =>
@@ -138,8 +133,7 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
     );
   }
 
-  Widget _buildProfileCounter() {
-    return Container(
+  Widget _buildProfileCounter() => Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -147,19 +141,17 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: const Color(0xFF008037).withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Text(
         '${_currentIndex + 1} of ${_remainingUsers.length} profiles',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF008037),
+          color: Color(0xFF008037),
         ),
       ),
     );
-  }
 
   Widget _buildActionButtons() {
     if (_remainingUsers.isEmpty) return const SizedBox.shrink();
@@ -201,8 +193,7 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
     required Color color,
     required VoidCallback onTap,
     bool isPrimary = false,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         width: isPrimary ? 70 : 60,
@@ -229,10 +220,8 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
         ),
       ),
     );
-  }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -242,24 +231,23 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
             color: const Color(0xFF008037).withOpacity(0.3),
           ),
           const SizedBox(height: 24),
-          Text(
+          const Text(
             'No More Profiles',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2D2D2D),
+              color: Color(0xFF2D2D2D),
             ),
           ),
           const SizedBox(height: 12),
-          Text(
+          const Text(
             'Check back later for new connections!',
             style: TextStyle(
               fontSize: 16,
-              color: const Color(0xFF666666),
+              color: Color(0xFF666666),
             ),
           ),
         ],
       ),
     );
-  }
 }

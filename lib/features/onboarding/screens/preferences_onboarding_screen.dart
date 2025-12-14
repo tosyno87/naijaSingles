@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '../../../common/utils/app_logger.dart';
 import '../../user/controllers/onboarding_controller.dart';
 
 class PreferencesOnboardingScreen extends StatefulWidget {
-  const PreferencesOnboardingScreen({Key? key}) : super(key: key);
+  const PreferencesOnboardingScreen({super.key});
 
   @override
   State<PreferencesOnboardingScreen> createState() =>
@@ -28,11 +30,11 @@ class _PreferencesOnboardingScreenState
     );
 
     // Debug logging
-    print('🔍 PreferencesOnboardingScreen initState:');
-    print('   Initial interestedIn: "${controller.interestedIn}"');
-    print('   Initial ageRange: ${controller.ageRange}');
-    print('   Local selectedInterestedIn: "$_selectedInterestedIn"');
-    print('   Local ageRange: $_ageRange');
+    AppLogger.debug('🔍 PreferencesOnboardingScreen initState:');
+    AppLogger.debug('   Initial interestedIn: "${controller.interestedIn}"');
+    AppLogger.debug('   Initial ageRange: ${controller.ageRange}');
+    AppLogger.debug('   Local selectedInterestedIn: "$_selectedInterestedIn"');
+    AppLogger.debug('   Local ageRange: $_ageRange');
   }
 
   @override
@@ -128,10 +130,10 @@ class _PreferencesOnboardingScreenState
         controller.setInterestedIn(value);
 
         // Debug logging
-        print(
-            '🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"');
-        print(
-            '   Controller interestedIn after setting: "${controller.interestedIn}"');
+        AppLogger.debug(
+            '🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"',);
+        AppLogger.debug(
+            '   Controller interestedIn after setting: "${controller.interestedIn}"',);
       },
       child: Container(
         width: double.infinity,
@@ -219,10 +221,10 @@ class _PreferencesOnboardingScreenState
             controller.setAgeRange([values.start.round(), values.end.round()]);
 
             // Debug logging
-            print(
-                '🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}');
-            print(
-                '   Controller ageRange after setting: ${controller.ageRange}');
+            AppLogger.debug(
+                '🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}',);
+            AppLogger.debug(
+                '   Controller ageRange after setting: ${controller.ageRange}',);
           },
         ),
       ],

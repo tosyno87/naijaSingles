@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../common/constants/app_colors.dart';
+
 import '../user/controllers/onboarding_controller.dart';
 import 'shared_styles.dart';
 
@@ -11,14 +13,13 @@ import 'shared_styles.dart';
 /// This screen collects basic information about the user including
 /// full name, age, location, and a short bio.
 class OnboardingStepBio extends StatefulWidget {
-  final VoidCallback onNext;
-  final Color backgroundColor;
 
   const OnboardingStepBio({
-    Key? key,
-    required this.onNext,
-    this.backgroundColor = OnboardingStyles.backgroundColor,
-  }) : super(key: key);
+    required this.onNext, super.key,
+    this.backgroundColor = AppColors.backgroundColor,
+  });
+  final VoidCallback onNext;
+  final Color backgroundColor;
 
   @override
   State<OnboardingStepBio> createState() => _OnboardingStepBioState();
@@ -77,10 +78,8 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
         _locationController.text = controller.locationName!;
       }
 
-      if (controller.bio != null) {
-        _bioController.text = controller.bio!;
-      }
-    });
+      _bioController.text = controller.bio;
+        });
   }
 
   @override
@@ -105,8 +104,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (BuildContext context) {
-        return SafeArea(
+      builder: (BuildContext context) => SafeArea(
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
@@ -164,7 +162,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           Navigator.pop(context);
                         },
                         borderRadius: BorderRadius.circular(8),
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: isSelected ? deepGreen : Colors.white,
                             borderRadius: BorderRadius.circular(8),
@@ -219,8 +217,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
               ],
             ),
           ),
-        );
-      },
+        ),
     );
   }
 
@@ -267,7 +264,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 12, vertical: 6,),
                       decoration: BoxDecoration(
                         color: deepGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -380,7 +377,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.red[400]!, width: 1),
+                                BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -445,7 +442,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
+                              horizontal: 16, vertical: 16,),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey[400]!),
                             borderRadius: BorderRadius.circular(12),
@@ -497,7 +494,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                       ),
                       if (_selectedAge == null && _autoValidate)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8.0, left: 16.0),
+                          padding: const EdgeInsets.only(top: 8, left: 16),
                           child: Text(
                             'Please select your age',
                             style: GoogleFonts.montserrat(
@@ -586,7 +583,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.red[400]!, width: 1),
+                                BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -698,7 +695,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.red[400]!, width: 1),
+                                BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -742,14 +739,14 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           if (_selectedAge != null) {
                             final now = DateTime.now();
                             final dob = DateTime(
-                                now.year - _selectedAge!, now.month, now.day);
+                                now.year - _selectedAge!, now.month, now.day,);
                             controller.updateDateOfBirth(dob);
                           }
 
                           // Save location (in a real app, we would also save lat/lng)
                           // For now, we'll just use a placeholder for lat/lng
                           controller.updateLocation(
-                              0.0, 0.0, _locationController.text.trim());
+                              0, 0, _locationController.text.trim(),);
 
                           // Save bio
                           controller.updateBio(_bioController.text.trim());

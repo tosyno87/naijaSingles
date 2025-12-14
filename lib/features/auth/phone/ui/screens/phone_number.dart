@@ -8,12 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/common/widgets/auth_icon_container.dart';
-import 'package:naijasingles/common/widgets/afropeep_primary_button.dart';
-import 'package:naijasingles/common/widgets/afropeep_app_bar.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../../common/widgets/afropeep_app_bar.dart';
+import '../../../../../common/widgets/afropeep_primary_button.dart';
+import '../../../../../common/widgets/auth_icon_container.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../bloc/phone_auth_bloc.dart';
 import 'otp_page.dart';
 
@@ -23,10 +24,9 @@ class PhoneNumber extends StatefulWidget {
   final bool isSignIn;
 
   PhoneNumber({
-    Key? key,
-    required this.updatePhoneNumber,
+    required this.updatePhoneNumber, super.key,
     this.isSignIn = false,
-  }) : super(key: key);
+  });
 
   @override
   State<PhoneNumber> createState() => _PhoneNumberState();
@@ -63,7 +63,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
       
       // Allow typing freely - just check minimum length for button enable
       // Full validation happens on submit to Firebase
-      final minDigits = 6; // Minimum to enable button
+      const minDigits = 6; // Minimum to enable button
       
       final isValid = phoneDigits.length >= minDigits;
       
@@ -80,7 +80,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     // Using centralized AppColors - no need for local color constants
 
@@ -89,12 +89,12 @@ class _PhoneNumberState extends State<PhoneNumber> {
       child: BlocProvider(
         create: (context) => PhoneAuthBloc(
             phoneAuthRepository:
-                RepositoryProvider.of<PhoneAuthRepository>(context)),
+                RepositoryProvider.of<PhoneAuthRepository>(context),),
         child: Scaffold(
           key: _scaffoldKey,
           backgroundColor: AppColors.backgroundColor,
           appBar: AfropeepAppBar(
-            title: widget.isSignIn ? "Sign In with Phone" : "Sign Up with Phone",
+            title: widget.isSignIn ? 'Sign In with Phone' : 'Sign Up with Phone',
           ),
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
             listener: (context, state) {
@@ -103,7 +103,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
               // The OTP screen will handle navigation after checking registration status
               
               if (state is PhoneAuthCodeSentSuccess) {
-                log("phone auth code sent success listener called");
+                log('phone auth code sent success listener called');
                 if (mounted) {
                   setState(() {
                     _isLoading = false;
@@ -140,7 +140,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   });
                   
                   // Provide helpful error message for simulator users
-                  String errorMessage = state.error;
+                  final String errorMessage = state.error;
                   String debugHint = '';
                   
                   if (state.error.contains('invalid-phone-number')) {
@@ -169,12 +169,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
             },
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Center(
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Phone icon using reusable widget
                         const AuthIconContainer(
@@ -196,7 +195,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             child: Row(
                               children: [
                                 Icon(Icons.info_outline,
-                                    color: Colors.blue.shade700, size: 20),
+                                    color: Colors.blue.shade700, size: 20,),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -212,7 +211,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           ),
 
                         Text(
-                          "Enter your phone number",
+                          'Enter your phone number',
                           style: GoogleFonts.montserrat(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
@@ -273,11 +272,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     'ZA',
                                     'KE',
                                     'US',
-                                    'GB'
+                                    'GB',
                                   ],
-                                  showCountryOnly: false,
-                                  showOnlyCountryWhenClosed: false,
-                                  alignLeft: false,
                                   textStyle: GoogleFonts.montserrat(
                                     color: AppColors.textPrimary,
                                     fontSize: 16,
@@ -301,7 +297,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   backgroundColor: Colors.white,
                                   dialogSize: Size(
                                       MediaQuery.of(context).size.width * 0.9,
-                                      MediaQuery.of(context).size.height * 0.7),
+                                      MediaQuery.of(context).size.height * 0.7,),
                                   headerTextStyle: GoogleFonts.montserrat(
                                     color: const Color(0xFF3E1F0D),
                                     fontSize: 18,
@@ -364,7 +360,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText: "Phone number",
+                                    hintText: 'Phone number',
                                     hintStyle: GoogleFonts.montserrat(
                                       color: Colors.grey,
                                       fontWeight: FontWeight.w400,
@@ -391,9 +387,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         // Continue button using reusable widget
                         // Wrap in Builder to get context from within BlocProvider tree
                         Builder(
-                          builder: (builderContext) {
-                            return AfropeepPrimaryButton(
-                              text: "Continue",
+                          builder: (builderContext) => AfropeepPrimaryButton(
+                              text: 'Continue',
                               isLoading: _isLoading,
                               onPressed: isValidNumber && !_isLoading
                                   ? () {
@@ -445,15 +440,14 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                       log('✅ Event added to bloc');
                                     }
                                   : null,
-                            );
-                          },
+                            ),
                         ),
 
                         const SizedBox(height: 24),
 
                         // Consent text
                         Text(
-                          "By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.",
+                          'By continuing, you agree to receive SMS messages for verification and may be subject to carrier fees.',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.montserrat(
                             fontSize: 12,
@@ -470,7 +464,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             Text(
                               widget.isSignIn
                                   ? "Don't have an account? "
-                                  : "Already have an account? ",
+                                  : 'Already have an account? ',
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
                                 color: AppColors.textPrimary,
@@ -480,14 +474,14 @@ class _PhoneNumberState extends State<PhoneNumber> {
                               onTap: () {
                                 if (widget.isSignIn) {
                                   Navigator.pushReplacementNamed(
-                                      context, '/auth_method_selection');
+                                      context, '/auth_method_selection',);
                                 } else {
                                   Navigator.pushReplacementNamed(
-                                      context, '/sign_in_method_selection');
+                                      context, '/sign_in_method_selection',);
                                 }
                               },
                               child: Text(
-                                widget.isSignIn ? "Create one" : "Sign in",
+                                widget.isSignIn ? 'Create one' : 'Sign in',
                                 style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,

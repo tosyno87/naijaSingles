@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../../../common/constants/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class DateTimeStep extends StatefulWidget {
-  final EventCreationData eventData;
 
   const DateTimeStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
   State<DateTimeStep> createState() => _DateTimeStepState();
@@ -21,8 +21,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
   final DateFormat _timeFormat = DateFormat('hh:mm a');
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,10 +45,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 24,
@@ -57,10 +54,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
         color: const Color(0xFF333333),
       ),
     );
-  }
 
-  Widget _buildStartDateTimeSection() {
-    return Column(
+  Widget _buildStartDateTimeSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -145,10 +140,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildEndDateTimeSection() {
-    return Column(
+  Widget _buildEndDateTimeSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -215,15 +208,13 @@ class _DateTimeStepState extends State<DateTimeStep> {
         ),
       ],
     );
-  }
 
   Widget _buildDateSelector({
     required String label,
     required DateTime? selectedDate,
     required Function(DateTime) onDateSelected,
     DateTime? minDate,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -252,9 +243,9 @@ class _DateTimeStepState extends State<DateTimeStep> {
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.calendar_today,
-                  color: const Color(0xFF008037),
+                  color: Color(0xFF008037),
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -278,14 +269,12 @@ class _DateTimeStepState extends State<DateTimeStep> {
         ),
       ],
     );
-  }
 
   Widget _buildTimeSelector({
     required String label,
     required TimeOfDay? selectedTime,
     required Function(TimeOfDay) onTimeSelected,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -313,9 +302,9 @@ class _DateTimeStepState extends State<DateTimeStep> {
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.access_time,
-                  color: const Color(0xFF008037),
+                  color: Color(0xFF008037),
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -339,7 +328,6 @@ class _DateTimeStepState extends State<DateTimeStep> {
         ),
       ],
     );
-  }
 
   Widget _buildDurationInfo() {
     if (widget.eventData.startDate == null ||
@@ -372,9 +360,9 @@ class _DateTimeStepState extends State<DateTimeStep> {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.schedule,
-            color: const Color(0xFF008037),
+            color: Color(0xFF008037),
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -422,19 +410,15 @@ class _DateTimeStepState extends State<DateTimeStep> {
       initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF008037),
-              onPrimary: Colors.white,
-              surface: Colors.white,
               onSurface: Color(0xFF333333),
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
 
     if (pickedDate != null) {
@@ -452,19 +436,15 @@ class _DateTimeStepState extends State<DateTimeStep> {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: initialTime,
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF008037),
-              onPrimary: Colors.white,
-              surface: Colors.white,
               onSurface: Color(0xFF333333),
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
 
     if (pickedTime != null) {

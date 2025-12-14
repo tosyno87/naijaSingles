@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:naijasingles/services/profile_image_cropper_service.dart';
+import 'profile_image_cropper_service.dart';
 
 /// Industry-standard image upload service following Hinge/Bumble/Tinder best practices
 ///
@@ -97,8 +97,6 @@ class IndustryStandardImageService {
         quality: quality,
         minWidth: _getMinWidth(cropType),
         minHeight: _getMinHeight(cropType),
-        format: CompressFormat.jpeg,
-        keepExif: false, // Remove EXIF data for privacy
       );
 
       if (compressedFile == null) {
@@ -107,7 +105,7 @@ class IndustryStandardImageService {
 
       final compressedSize = await _getFileSizeInMB(File(compressedFile.path));
       debugPrint(
-          'Image optimization: ${originalSize.toStringAsFixed(2)}MB -> ${compressedSize.toStringAsFixed(2)}MB (${quality}% quality)');
+          'Image optimization: ${originalSize.toStringAsFixed(2)}MB -> ${compressedSize.toStringAsFixed(2)}MB ($quality% quality)',);
 
       return File(compressedFile.path);
     } catch (e) {
@@ -237,10 +235,6 @@ typedef ImageUploadProgressCallback = void Function(int current, int total);
 
 /// Image upload result
 class ImageUploadResult {
-  final bool success;
-  final File? image;
-  final String? error;
-  final Map<String, dynamic>? metadata;
 
   ImageUploadResult({
     required this.success,
@@ -248,4 +242,8 @@ class ImageUploadResult {
     this.error,
     this.metadata,
   });
+  final bool success;
+  final File? image;
+  final String? error;
+  final Map<String, dynamic>? metadata;
 }

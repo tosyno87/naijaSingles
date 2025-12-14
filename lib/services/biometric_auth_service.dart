@@ -1,15 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer';
 
 /// Stub implementation of biometric authentication service
 /// This is used when local_auth packages are not available due to dependency conflicts
 class BiometricAuthService {
-  static final BiometricAuthService _instance =
-      BiometricAuthService._internal();
   factory BiometricAuthService() => _instance;
   BiometricAuthService._internal();
+  static final BiometricAuthService _instance =
+      BiometricAuthService._internal();
 
   // Biometric authentication settings
   static const String _biometricEnabledKey = 'biometric_auth_enabled';
@@ -121,8 +122,7 @@ class BiometricAuthService {
   }
 
   /// Get biometric authentication status
-  Future<Map<String, dynamic>> getBiometricStatus() async {
-    return {
+  Future<Map<String, dynamic>> getBiometricStatus() async => {
       'available': false,
       'enabled': await isBiometricEnabled(),
       'enrolled': false,
@@ -131,7 +131,6 @@ class BiometricAuthService {
       'message':
           'Biometric authentication temporarily disabled due to dependency conflict',
     };
-  }
 
   /// Show biometric settings dialog
   Future<void> showBiometricSettingsDialog(BuildContext context) async {
@@ -164,8 +163,6 @@ class BiometricAuthService {
   }
 
   /// Get biometric authentication help text
-  String getBiometricHelpText() {
-    return 'Biometric authentication is temporarily disabled due to dependency conflicts. '
+  String getBiometricHelpText() => 'Biometric authentication is temporarily disabled due to dependency conflicts. '
         'This feature will be re-enabled in a future update.';
-  }
 }

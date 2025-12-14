@@ -80,7 +80,7 @@ class GroupService {
 
       final snapshot = await query.get();
       final groups =
-          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
+          snapshot.docs.map(GroupModel.fromDocument).toList();
 
       debugPrint('✅ Retrieved ${groups.length} public groups');
       return groups;
@@ -99,12 +99,12 @@ class GroupService {
 
       final snapshot = await _firestore
           .collection('groups')
-          .where('memberIds', arrayContains: currentUserId!)
+          .where('memberIds', arrayContains: currentUserId)
           .orderBy('updatedAt', descending: true)
           .get();
 
       final groups =
-          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
+          snapshot.docs.map(GroupModel.fromDocument).toList();
 
       debugPrint('✅ Retrieved ${groups.length} user groups');
       return groups;
@@ -123,12 +123,12 @@ class GroupService {
 
       final snapshot = await _firestore
           .collection('groups')
-          .where('creatorId', isEqualTo: currentUserId!)
+          .where('creatorId', isEqualTo: currentUserId)
           .orderBy('createdAt', descending: true)
           .get();
 
       final groups =
-          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
+          snapshot.docs.map(GroupModel.fromDocument).toList();
 
       debugPrint('✅ Retrieved ${groups.length} user created groups');
       return groups;
@@ -208,9 +208,9 @@ class GroupService {
 
         // Remove user from memberIds and adminIds
         final updatedMemberIds = List<String>.from(group.memberIds)
-          ..remove(currentUserId!);
+          ..remove(currentUserId);
         final updatedAdminIds = List<String>.from(group.adminIds)
-          ..remove(currentUserId!);
+          ..remove(currentUserId);
 
         // If user is the creator, transfer ownership to first admin or delete group
         if (group.isCreator(currentUserId!)) {
@@ -336,7 +336,7 @@ class GroupService {
 
       final snapshot = await firestoreQuery.get();
       final allGroups =
-          snapshot.docs.map((doc) => GroupModel.fromDocument(doc)).toList();
+          snapshot.docs.map(GroupModel.fromDocument).toList();
 
       // Filter by search query (Firestore doesn't support full-text search)
       final filteredGroups = allGroups.where((group) {

@@ -11,7 +11,7 @@ void main() {
       print('🧪 Testing user registration flow...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 5));
+      await tester.pumpAndSettle(const Duration(seconds: 5));
 
       // Test 1: App launches to registration/login screen
       expect(find.byType(MaterialApp), findsOneWidget);
@@ -49,7 +49,7 @@ void main() {
       print('🧪 Testing phone number validation...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for phone number input field
       final phoneFields = find.byWidgetPredicate(
@@ -80,7 +80,7 @@ void main() {
       print('🧪 Testing age verification...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for age-related elements
       final ageElements = find.textContaining('18');

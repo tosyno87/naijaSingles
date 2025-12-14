@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/utils/distance.dart' as distance;
+
+import '../common/utils/distance.dart' as distance;
+import '../models/user_model.dart';
 
 /// Service for real-time discovery using Firestore streams
 class RealtimeDiscoveryService {
@@ -13,21 +13,21 @@ class RealtimeDiscoveryService {
   static Stream<List<UserModel>> getUsersStream(UserModel currentUser) {
     try {
       debugPrint(
-          '🔍 Starting real-time discovery stream for ${currentUser.name}');
+          '🔍 Starting real-time discovery stream for ${currentUser.name}',);
 
       // Build query with basic filters
-      Query query = _firestore
+      final Query query = _firestore
           .collection('users')
           .where('id', isNotEqualTo: currentUser.id) // Exclude current user
           .where('userGender',
-              isEqualTo: currentUser.showGender) // Gender preference
+              isEqualTo: currentUser.showGender,) // Gender preference
           .limit(20); // Limit for performance
 
       return query.snapshots().asyncMap((snapshot) async {
         debugPrint('📡 Real-time stream update: ${snapshot.docs.length} users');
 
-        List<UserModel> users = [];
-        List<String> checkedUserIds = await _getCheckedUserIds(currentUser.id!);
+        final List<UserModel> users = [];
+        final List<String> checkedUserIds = await _getCheckedUserIds(currentUser.id!);
 
         for (var doc in snapshot.docs) {
           try {
@@ -35,8 +35,9 @@ class RealtimeDiscoveryService {
             if (checkedUserIds.contains(doc.id)) continue;
 
             // Skip blocked users
-            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true)
+            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
               continue;
+            }
 
             // Create user model
             final user = UserModel.fromDocument(doc);
@@ -92,7 +93,7 @@ class RealtimeDiscoveryService {
   }) {
     try {
       debugPrint(
-          '📄 Starting paginated real-time stream (page size: $pageSize)');
+          '📄 Starting paginated real-time stream (page size: $pageSize)',);
 
       Query query = _firestore
           .collection('users')
@@ -109,14 +110,15 @@ class RealtimeDiscoveryService {
       return query.snapshots().asyncMap((snapshot) async {
         debugPrint('📡 Paginated stream update: ${snapshot.docs.length} users');
 
-        List<UserModel> users = [];
-        List<String> checkedUserIds = await _getCheckedUserIds(currentUser.id!);
+        final List<UserModel> users = [];
+        final List<String> checkedUserIds = await _getCheckedUserIds(currentUser.id!);
 
         for (var doc in snapshot.docs) {
           try {
             if (checkedUserIds.contains(doc.id)) continue;
-            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true)
+            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
               continue;
+            }
 
             final user = UserModel.fromDocument(doc);
 
@@ -188,7 +190,7 @@ class RealtimeDiscoveryService {
 
       // For nearby users, we need to get all users and filter by distance
       // This is less efficient but necessary for geolocation queries
-      Query query = _firestore
+      final Query query = _firestore
           .collection('users')
           .where('id', isNotEqualTo: currentUser.id)
           .where('userGender', isEqualTo: currentUser.showGender)
@@ -197,14 +199,15 @@ class RealtimeDiscoveryService {
       return query.snapshots().asyncMap((snapshot) async {
         debugPrint('📡 Nearby stream update: ${snapshot.docs.length} users');
 
-        List<UserModel> users = [];
-        List<String> checkedUserIds = await _getCheckedUserIds(currentUser.id!);
+        final List<UserModel> users = [];
+        final List<String> checkedUserIds = await _getCheckedUserIds(currentUser.id!);
 
         for (var doc in snapshot.docs) {
           try {
             if (checkedUserIds.contains(doc.id)) continue;
-            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true)
+            if ((doc.data() as Map<String, dynamic>?)?['isBlocked'] == true) {
               continue;
+            }
 
             final user = UserModel.fromDocument(doc);
 
@@ -233,7 +236,7 @@ class RealtimeDiscoveryService {
         }
 
         debugPrint(
-            '✅ Nearby stream processed: ${users.length} users within ${radiusMiles}mi');
+            '✅ Nearby stream processed: ${users.length} users within ${radiusMiles}mi',);
         return users;
       });
     } catch (e) {
@@ -244,7 +247,7 @@ class RealtimeDiscoveryService {
 
   /// Get discovery statistics stream
   static Stream<Map<String, dynamic>> getDiscoveryStatsStream(
-      UserModel currentUser) {
+      UserModel currentUser,) {
     try {
       return _firestore
           .collection('users')

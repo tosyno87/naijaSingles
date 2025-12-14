@@ -2,23 +2,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/services/image_upload_service.dart';
+import '../common/constants/app_colors.dart';
+import '../services/image_upload_service.dart';
 
 /// Widget for selecting and displaying group avatar
 class GroupAvatarPicker extends StatefulWidget {
+
+  const GroupAvatarPicker({
+    required this.onImageSelected, super.key,
+    this.selectedImage,
+    this.size = 100,
+    this.defaultImageUrl,
+  });
   final File? selectedImage;
   final Function(File?) onImageSelected;
   final double size;
   final String? defaultImageUrl;
-
-  const GroupAvatarPicker({
-    super.key,
-    this.selectedImage,
-    required this.onImageSelected,
-    this.size = 100,
-    this.defaultImageUrl,
-  });
 
   @override
   State<GroupAvatarPicker> createState() => _GroupAvatarPickerState();
@@ -28,8 +27,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
   final ImageUploadService _imageService = ImageUploadService();
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: [
         // Avatar display
         GestureDetector(
@@ -126,10 +124,8 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
         ),
       ],
     );
-  }
 
-  Widget _buildDefaultAvatar() {
-    return Container(
+  Widget _buildDefaultAvatar() => Container(
       width: widget.size,
       height: widget.size,
       decoration: BoxDecoration(
@@ -142,13 +138,11 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
         color: AppColors.primaryGreen,
       ),
     );
-  }
 
   void _showImagePickerDialog() {
     showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
+      builder: (BuildContext context) => SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -173,7 +167,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.photo_library,
                     color: AppColors.primaryGreen,
                     size: 24,
@@ -206,7 +200,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.camera_alt,
                     color: AppColors.primaryGreen,
                     size: 24,
@@ -260,8 +254,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
               const SizedBox(height: 16),
             ],
           ),
-        );
-      },
+        ),
     );
   }
 
@@ -282,7 +275,7 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                    'Invalid image. Please select a valid image file (max 10MB).'),
+                    'Invalid image. Please select a valid image file (max 10MB).',),
                 backgroundColor: Colors.red,
               ),
             );

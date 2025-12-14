@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/services/group_notification_service.dart';
+import '../common/constants/app_colors.dart';
+import '../services/group_notification_service.dart';
 
 /// Widget for toggling group notification settings
 class GroupNotificationToggle extends StatefulWidget {
-  final String groupId;
-  final String groupName;
 
   const GroupNotificationToggle({
-    super.key,
-    required this.groupId,
-    required this.groupName,
+    required this.groupId, required this.groupName, super.key,
   });
+  final String groupId;
+  final String groupName;
 
   @override
   State<GroupNotificationToggle> createState() =>
@@ -97,8 +95,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -194,7 +191,7 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
                   Switch(
                     value: !_isMuted, // Switch shows "enabled" state
                     onChanged: (_) => _toggleMute(),
-                    activeColor: AppColors.primaryGreen,
+                    activeThumbColor: AppColors.primaryGreen,
                     activeTrackColor: AppColors.primaryGreen.withOpacity(0.3),
                   ),
               ],
@@ -229,5 +226,4 @@ class _GroupNotificationToggleState extends State<GroupNotificationToggle> {
         ],
       ),
     );
-  }
 }

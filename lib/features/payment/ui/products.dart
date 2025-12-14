@@ -9,8 +9,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
-import 'package:naijasingles/config/app_config.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
@@ -18,16 +16,18 @@ import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-import 'package:naijasingles/common/constants/adds.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/constants/constants.dart';
-import 'package:naijasingles/common/data/repo/in_app_purchase_repo.dart';
-import 'package:naijasingles/common/providers/theme_provider.dart';
-import 'package:naijasingles/common/utils/crousle_slider.dart';
-import 'package:naijasingles/common/utils/privacy_page.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
-import 'package:naijasingles/models/user_model.dart';
+import '../../../common/constants/adds.dart';
+import '../../../common/constants/colors.dart';
+import '../../../common/constants/constants.dart';
+import '../../../common/data/repo/in_app_purchase_repo.dart';
+import '../../../common/providers/theme_provider.dart';
+import '../../../common/utils/crousle_slider.dart';
+import '../../../common/utils/privacy_page.dart';
+import '../../../common/widgets/custom_button.dart';
+import '../../../common/widgets/custom_snackbar.dart';
+import '../../../common/widgets/hookup_circularbar.dart';
+import '../../../config/app_config.dart';
+import '../../../models/user_model.dart';
 import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_events.dart';
 import 'in_app_purchase/get_products/getproducts_bloc.dart';
@@ -35,11 +35,11 @@ import 'in_app_purchase/get_products/getproducts_events.dart';
 import 'in_app_purchase/get_products/getproducts_states.dart';
 
 class Products extends StatefulWidget {
+  const Products(this.currentUser, this.isPaymentSuccess, this.items,
+      {super.key,});
   final bool? isPaymentSuccess;
   final UserModel? currentUser;
   final Map items;
-  const Products(this.currentUser, this.isPaymentSuccess, this.items,
-      {super.key});
 
   @override
   ProductsState createState() => ProductsState();
@@ -74,17 +74,17 @@ class ProductsState extends State<Products> {
         await Alert(
           context: context,
           type: AlertType.error,
-          title: "Failed".tr().toString(),
-          desc: "Oops !! something went wrong. Try Again".tr().toString(),
+          title: 'Failed'.tr().toString(),
+          desc: 'Oops !! something went wrong. Try Again'.tr().toString(),
           buttons: [
             DialogButton(
               child: Text(
-                "Retry".tr().toString(),
+                'Retry'.tr().toString(),
                 style: const TextStyle(color: Colors.white, fontSize: 20),
               ),
               onPressed: () => Navigator.pop(context),
               width: 120,
-            )
+            ),
           ],
         ).show();
       });
@@ -97,14 +97,14 @@ class ProductsState extends State<Products> {
     super.dispose();
   }
 
-  void _initialize() async {
+  Future<void> _initialize() async {
     isAvailable = await _iap.isAvailable();
-    debugPrint("available is $isAvailable");
+    debugPrint('available is $isAvailable');
     if (isAvailable) {
       /// removing all the pending puchases.
       if (Platform.isIOS) {
-        var paymentWrapper = SKPaymentQueueWrapper();
-        var transactions = await paymentWrapper.transactions();
+        final paymentWrapper = SKPaymentQueueWrapper();
+        final transactions = await paymentWrapper.transactions();
         for (final transaction in transactions) {
           debugPrint(transaction.transactionState.toString());
           await paymentWrapper
@@ -122,7 +122,7 @@ class ProductsState extends State<Products> {
 
         for (final purchase in purchases) {
           await InAppPurchaseRepoImpl.verifyPuchase(purchase.productID,
-                  purchases, widget.currentUser!, widget.items, context)
+                  purchases, widget.currentUser!, widget.items, context,)
               .whenComplete(() async {
             await firebaseFireStoreInstance
                 .collection('users')
@@ -140,9 +140,9 @@ class ProductsState extends State<Products> {
             SnackBar(
               content: error != null
                   ? Text('$error')
-                  : Text("Oops !! something went wrong. Try Again"
+                  : Text('Oops !! something went wrong. Try Again'
                       .tr()
-                      .toString()),
+                      .toString(),),
             ),
           );
         },
@@ -163,7 +163,7 @@ class ProductsState extends State<Products> {
         } else if (state is GetInAppProductsFailedState) {
           return Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Center(
                 child: Text(state.msg ?? ''),
               ),
@@ -179,12 +179,12 @@ class ProductsState extends State<Products> {
                   : Colors.white,
               centerTitle: true,
               title: Text(
-                "Get our premium plans".tr().toString(),
+                'Get our premium plans'.tr().toString(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                     color: primaryColor,
                     fontSize: 25,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold,),
               ),
               automaticallyImplyLeading: false,
               actions: [
@@ -203,7 +203,6 @@ class ProductsState extends State<Products> {
             key: _scaffoldKey,
             body: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   Padding(
@@ -211,7 +210,7 @@ class ProductsState extends State<Products> {
                     child: Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
+                          borderRadius: BorderRadius.circular(20),),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -222,9 +221,9 @@ class ProductsState extends State<Products> {
                               color: Colors.blue,
                             ),
                             title: Text(
-                              "Unlimited swipe.".tr().toString(),
+                              'Unlimited swipe.'.tr().toString(),
                               style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w400),
+                                  fontSize: 16, fontWeight: FontWeight.w400,),
                             ),
                           ),
                           ListTile(
@@ -234,35 +233,32 @@ class ProductsState extends State<Products> {
                               color: Colors.green,
                             ),
                             title: Text(
-                              "Search users around".tr().toString(),
+                              'Search users around'.tr().toString(),
                               style: const TextStyle(
 
                                   // Color(0xFF1A1A1A),
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w400,),
                             ).tr(
-                                args: ["${widget.items['paid_radius'] ?? ''}"]),
+                                args: ["${widget.items['paid_radius'] ?? ''}"],),
                           ),
                           CarouselSlider(
                             adds: adds,
                           ),
-                          _isLoading
-                              ? SizedBox(
+                          if (_isLoading) SizedBox(
                                   height:
                                       MediaQuery.of(context).size.width * .8,
-                                  child: Center(
+                                  child: const Center(
                                     child: CircularProgressIndicator(
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                                primaryColor)),
+                                                primaryColor,),),
                                   ),
-                                )
-                              : state.result.isNotEmpty
+                                ) else state.result.isNotEmpty
                                   ? Stack(
                                       alignment: Alignment.bottomCenter,
                                       children: [
                                         Align(
-                                          alignment: Alignment.center,
                                           child: Transform.rotate(
                                             angle: -pi / 2,
                                             child: Container(
@@ -280,10 +276,10 @@ class ProductsState extends State<Products> {
                                                       color: themeProvider
                                                               .isDarkMode
                                                           ? const Color(
-                                                              0x33FFFFFF)
-                                                          : primaryColor)),
+                                                              0x33FFFFFF,)
+                                                          : primaryColor,),),
                                               child: Center(
-                                                child: (CupertinoPicker(
+                                                child: CupertinoPicker(
                                                     squeeze: 1.4,
                                                     selectionOverlay:
                                                         const CupertinoPickerDefaultSelectionOverlay(
@@ -294,8 +290,7 @@ class ProductsState extends State<Products> {
                                                     magnification: 1.08,
                                                     offAxisFraction: -.2,
                                                     scrollController:
-                                                        FixedExtentScrollController(
-                                                            initialItem: 0),
+                                                        FixedExtentScrollController(),
                                                     itemExtent: 100,
                                                     onSelectedItemChanged:
                                                         (value) {
@@ -326,10 +321,10 @@ class ProductsState extends State<Products> {
                                                                         .isIOS
                                                                     ? InAppPurchaseRepoImpl()
                                                                         .getInterval(
-                                                                            product)
+                                                                            product,)
                                                                     : InAppPurchaseRepoImpl()
                                                                         .getIntervalAndroid(
-                                                                            product),
+                                                                            product,),
                                                                 intervalCount: Platform
                                                                         .isIOS
                                                                     ? iosP
@@ -345,7 +340,7 @@ class ProductsState extends State<Products> {
                                                                         .first
                                                                         .billingPeriod
                                                                         .split(
-                                                                            "")[1],
+                                                                            '',)[1],
                                                                 price: product
                                                                     .price,
                                                                 onTap: () {
@@ -356,13 +351,12 @@ class ProductsState extends State<Products> {
                                                           ),
                                                         ),
                                                       );
-                                                    }).toList())),
+                                                    }).toList(),),
                                               ),
                                             ),
                                           ),
                                         ),
-                                        selectedProduct != null
-                                            ? Center(
+                                        if (selectedProduct != null) Center(
                                                 child: ListTile(
                                                   title: Text(
                                                     selectedProduct!.title,
@@ -374,10 +368,9 @@ class ProductsState extends State<Products> {
                                                     textAlign: TextAlign.center,
                                                   ),
                                                   trailing: Text(
-                                                      "${state.result.indexOf(selectedProduct!) + 1}/${state.result.length}"),
+                                                      '${state.result.indexOf(selectedProduct!) + 1}/${state.result.length}',),
                                                 ),
-                                              )
-                                            : Center(
+                                              ) else Center(
                                                 child: ListTile(
                                                   title: Text(
                                                     state.result[0].title,
@@ -388,9 +381,9 @@ class ProductsState extends State<Products> {
                                                     textAlign: TextAlign.center,
                                                   ),
                                                   trailing: Text(
-                                                      "1/${state.result.length}"),
+                                                      '1/${state.result.length}',),
                                                 ),
-                                              )
+                                              ),
                                       ],
                                     )
                                   : SizedBox(
@@ -398,28 +391,28 @@ class ProductsState extends State<Products> {
                                           MediaQuery.of(context).size.width *
                                               .8,
                                       child: Center(
-                                        child: Text("No active product found!!"
+                                        child: Text('No active product found!!'
                                             .tr()
-                                            .toString()),
+                                            .toString(),),
                                       ),
-                                    )
+                                    ),
                         ],
                       ),
                     ),
                   ),
                   Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
+                      padding: const EdgeInsets.only(top: 15),
                       child: selectedProduct != null
                           ? CustomButton(
-                              text: "CONTINUE".tr().toString(),
+                              text: 'CONTINUE'.tr().toString(),
                               onTap: () async {
                                 BlocProvider.of<BuyConsumableInAppProductsBloc>(
-                                        context)
+                                        context,)
                                     .add(RequestBuyConsumableProducts(
-                                        productDetails: selectedProduct!));
+                                        productDetails: selectedProduct!,),);
                               },
                               color: AppColors.textPrimary,
-                              active: true)
+                              active: true,)
                           : Padding(
                               padding: const EdgeInsets.only(bottom: 40),
                               child: Align(
@@ -427,17 +420,16 @@ class ProductsState extends State<Products> {
                                 child: InkWell(
                                     onTap: () {
                                       CustomSnackbar.showSnackBarSimple(
-                                          "You must choose a subscription to continue."
+                                          'You must choose a subscription to continue.'
                                               .tr()
                                               .toString(),
-                                          context);
+                                          context,);
                                     },
                                     child: Container(
                                         decoration: BoxDecoration(
                                           color: AppColors.secondaryColor
                                               .withValues(
-                                                  alpha: (.7 * 255).toDouble()),
-                                          shape: BoxShape.rectangle,
+                                                  alpha: (.7 * 255).toDouble(),),
                                           borderRadius:
                                               BorderRadius.circular(25),
                                         ),
@@ -449,14 +441,14 @@ class ProductsState extends State<Products> {
                                                 .75,
                                         child: Center(
                                             child: Text(
-                                          "CONTINUE".tr().toString(),
-                                          style: TextStyle(
+                                          'CONTINUE'.tr().toString(),
+                                          style: const TextStyle(
                                               fontSize: 15,
                                               color: AppColors.textPrimary,
-                                              fontWeight: FontWeight.bold),
-                                        )))),
+                                              fontWeight: FontWeight.bold,),
+                                        ),),),),
                               ),
-                            )),
+                            ),),
                   // Platform.isIOS
                   //     ? InkWell(
                   //         child: Container(
@@ -500,13 +492,13 @@ class ProductsState extends State<Products> {
                   //     : Container(),
 
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                         GestureDetector(
                             child: Text(
-                              "Privacy Policy".tr().toString(),
+                              'Privacy Policy'.tr().toString(),
                               style: const TextStyle(color: Colors.blue),
                             ),
                             onTap: () => Navigator.push(
@@ -515,13 +507,13 @@ class ProductsState extends State<Products> {
                                     builder: (context) =>
                                         const PrivacyPolicyPage(
                                       url: privacyUrl,
-                                      tittle: "Privacy Policy",
+                                      tittle: 'Privacy Policy',
                                     ),
                                   ),
-                                )),
+                                ),),
                         GestureDetector(
                             child: Text(
-                              "Terms & Conditions".tr().toString(),
+                              'Terms & Conditions'.tr().toString(),
                               style: const TextStyle(color: Colors.blue),
                             ),
                             onTap: () => Navigator.push(
@@ -530,10 +522,10 @@ class ProductsState extends State<Products> {
                                     builder: (context) =>
                                         const PrivacyPolicyPage(
                                       url: termConditionUrl,
-                                      tittle: "Terms & Conditions",
+                                      tittle: 'Terms & Conditions',
                                     ),
                                   ),
-                                )),
+                                ),),
                       ],
                     ),
                   ),
@@ -544,7 +536,7 @@ class ProductsState extends State<Products> {
         }
         return Scaffold(
           body: Center(
-            child: Text("No product Found".tr().toString()),
+            child: Text('No product Found'.tr().toString()),
           ),
         );
       },
@@ -569,12 +561,11 @@ class ProductsState extends State<Products> {
           : MediaQuery.of(context).size.width * .22,
       decoration: selectedProduct == product
           ? BoxDecoration(
-              shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
               color: Theme.of(context)
                   .primaryColor
                   .withValues(alpha: (0.5 * 255).toDouble()),
-              border: Border.all(width: 2, color: primaryColor))
+              border: Border.all(width: 2, color: primaryColor),)
           : null,
       duration: const Duration(milliseconds: 500),
       child: Column(
@@ -590,7 +581,7 @@ class ProductsState extends State<Products> {
                           : Colors.black
                       : primaryColor,
                   fontSize: 25,
-                  fontWeight: FontWeight.bold)),
+                  fontWeight: FontWeight.bold,),),
           Text(interval,
               style: TextStyle(
                   color: selectedProduct !=
@@ -600,7 +591,7 @@ class ProductsState extends State<Products> {
                           : Colors.black
                       : primaryColor,
                   fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+                  fontSize: 15,),),
           Text(price,
               style: TextStyle(
                   color: selectedProduct !=
@@ -610,7 +601,7 @@ class ProductsState extends State<Products> {
                           : Colors.black
                       : primaryColor,
                   fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+                  fontWeight: FontWeight.bold,),),
         ],
         //      )),
       ),

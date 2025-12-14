@@ -7,11 +7,9 @@
 // Then delete this file.
 
 @Deprecated('Use app_colors.dart instead. This file will be removed in a future version.')
-library deprecated_colors;
+library;
 
 import 'package:flutter/material.dart';
-
-import 'app_colors.dart';
 
 // Re-export from app_colors.dart for backward compatibility
 export 'app_colors.dart' show AppColors;

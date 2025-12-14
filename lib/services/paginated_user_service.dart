@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/utils/distance.dart' as distance;
+
+import '../common/utils/distance.dart' as distance;
+import '../models/user_model.dart';
 
 /// Paginated user service for efficient user loading and discovery
 class PaginatedUserService {
@@ -54,7 +55,7 @@ class PaginatedUserService {
         try {
           final userData = doc.data() as Map<String, dynamic>;
           debugPrint(
-              '👤 Processing user: ${doc.id} - ${userData['name'] ?? 'No name'}');
+              '👤 Processing user: ${doc.id} - ${userData['name'] ?? 'No name'}',);
 
           // Skip excluded users
           if (excludedUserIds.contains(doc.id)) {
@@ -71,7 +72,7 @@ class PaginatedUserService {
             final userIntent = user.lookingFor ?? 'Dating';
             if (userIntent != intentFilter) {
               debugPrint(
-                  '🎯 Skipping user ${user.name} - intent mismatch (user: $userIntent, filter: $intentFilter)');
+                  '🎯 Skipping user ${user.name} - intent mismatch (user: $userIntent, filter: $intentFilter)',);
               continue;
             }
           }
@@ -80,7 +81,7 @@ class PaginatedUserService {
           // Temporarily disable distance filter for testing
           users.add(user);
           debugPrint(
-              '✅ Added user to results: ${user.name} (intent: ${user.lookingFor})');
+              '✅ Added user to results: ${user.name} (intent: ${user.lookingFor})',);
         } catch (e) {
           debugPrint('❌ Error processing user ${doc.id}: $e');
           continue;
@@ -133,7 +134,7 @@ class PaginatedUserService {
           .where('age', isLessThanOrEqualTo: currentUser.ageRangeMax);
 
       debugPrint(
-          '🔍 Filtering by age: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}');
+          '🔍 Filtering by age: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}',);
     } else {
       debugPrint('🔍 No age filter applied');
     }
@@ -200,7 +201,7 @@ class PaginatedUserService {
 
   /// Check if user is within distance range
   Future<bool> _isWithinDistance(
-      UserModel currentUser, UserModel targetUser) async {
+      UserModel currentUser, UserModel targetUser,) async {
     try {
       // Skip distance check if location data is missing
       if (currentUser.coordinates == null ||
@@ -225,13 +226,13 @@ class PaginatedUserService {
 
       // Calculate distance
       final distanceKm = distance.calculateDistance(
-          currentLat, currentLng, targetLat, targetLng);
+          currentLat, currentLng, targetLat, targetLng,);
 
       // Use user's distance preference or default
       final maxDistance = currentUser.distanceRange ?? MAX_DISTANCE_KM;
 
       debugPrint(
-          '📍 Distance to ${targetUser.name}: ${(distanceKm * 0.621371).toStringAsFixed(1)} miles (max: ${(maxDistance * 0.621371).round()} miles)');
+          '📍 Distance to ${targetUser.name}: ${(distanceKm * 0.621371).toStringAsFixed(1)} miles (max: ${(maxDistance * 0.621371).round()} miles)',);
 
       return distanceKm <= maxDistance;
     } catch (e) {
@@ -243,7 +244,7 @@ class PaginatedUserService {
   /// Refresh user data (clear cache and fetch fresh data)
   Future<PaginatedResult<UserModel>> refreshUsers(UserModel currentUser) async {
     debugPrint('🔄 Refreshing user data');
-    return await getUsers(currentUser: currentUser);
+    return getUsers(currentUser: currentUser);
   }
 
   /// Get total count of available users (for UI display)
@@ -286,11 +287,6 @@ class PaginatedUserService {
 
 /// Result class for paginated data
 class PaginatedResult<T> {
-  final List<T> items;
-  final DocumentSnapshot? lastDocument;
-  final bool hasMore;
-  final int totalFetched;
-  final String? error;
 
   const PaginatedResult({
     required this.items,
@@ -299,27 +295,28 @@ class PaginatedResult<T> {
     required this.totalFetched,
     this.error,
   });
+  final List<T> items;
+  final DocumentSnapshot? lastDocument;
+  final bool hasMore;
+  final int totalFetched;
+  final String? error;
 
   bool get isSuccess => error == null;
   bool get isEmpty => items.isEmpty;
   int get length => items.length;
 
   @override
-  String toString() {
-    return 'PaginatedResult(items: ${items.length}, hasMore: $hasMore, totalFetched: $totalFetched, error: $error)';
-  }
+  String toString() => 'PaginatedResult(items: ${items.length}, hasMore: $hasMore, totalFetched: $totalFetched, error: $error)';
 }
 
 /// Extension methods for easier pagination handling
 extension PaginatedResultExtension<T> on PaginatedResult<T> {
   /// Combine with another paginated result (for loading more pages)
-  PaginatedResult<T> combineWith(PaginatedResult<T> other) {
-    return PaginatedResult<T>(
+  PaginatedResult<T> combineWith(PaginatedResult<T> other) => PaginatedResult<T>(
       items: [...items, ...other.items],
       lastDocument: other.lastDocument,
       hasMore: other.hasMore,
       totalFetched: totalFetched + other.totalFetched,
       error: other.error,
     );
-  }
 }

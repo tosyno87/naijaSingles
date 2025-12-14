@@ -6,31 +6,26 @@ import 'package:swipable_stack/swipable_stack.dart';
 import '../../../../common/constants/colors.dart';
 
 class SwipeButtons extends StatelessWidget {
+
+  const SwipeButtons({
+    required this.stackController, required this.onRewind, required this.hasRemoved, super.key,
+  });
   final SwipableStackController? stackController;
   final VoidCallback onRewind;
   final bool hasRemoved;
 
-  const SwipeButtons({
-    super.key,
-    required this.stackController,
-    required this.onRewind,
-    required this.hasRemoved,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
-        hasRemoved
-            ? FloatingActionButton(
+        if (hasRemoved) FloatingActionButton(
                 heroTag: UniqueKey(),
                 backgroundColor: Colors.white,
                 onPressed: () {
                   log('rewind pressed');
                   stackController?.rewind(
-                      duration: const Duration(milliseconds: 500));
+                      duration: const Duration(milliseconds: 500),);
                   onRewind();
                 },
                 child: Icon(
@@ -38,8 +33,7 @@ class SwipeButtons extends StatelessWidget {
                   color: hasRemoved ? Colors.amber : AppColors.secondaryColor,
                   size: 20,
                 ),
-              )
-            : FloatingActionButton(
+              ) else FloatingActionButton(
                 heroTag: UniqueKey(),
                 backgroundColor: Colors.white,
                 child: const Icon(
@@ -75,5 +69,4 @@ class SwipeButtons extends StatelessWidget {
         ),
       ],
     );
-  }
 }

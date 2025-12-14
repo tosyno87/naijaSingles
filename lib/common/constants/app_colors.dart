@@ -127,11 +127,10 @@ class AppColors {
 
   // 🌟 SHADOW DEFINITIONS
   static List<BoxShadow> get cardShadow => [
-        BoxShadow(
+        const BoxShadow(
           color: shadow,
           blurRadius: 20,
-          offset: const Offset(0, 8),
-          spreadRadius: 0,
+          offset: Offset(0, 8),
         ),
       ];
 
@@ -140,16 +139,14 @@ class AppColors {
           color: primaryGreen.withOpacity(0.3),
           blurRadius: 15,
           offset: const Offset(0, 6),
-          spreadRadius: 0,
         ),
       ];
 
   static List<BoxShadow> get iconShadow => [
-        BoxShadow(
+        const BoxShadow(
           color: shadow,
           blurRadius: 10,
-          offset: const Offset(0, 4),
-          spreadRadius: 0,
+          offset: Offset(0, 4),
         ),
       ];
 
@@ -158,7 +155,6 @@ class AppColors {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryGreen,
-          brightness: Brightness.light,
           primary: primaryGreen,
           secondary: accentGreen,
           surface: surfaceColor,

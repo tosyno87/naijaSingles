@@ -46,18 +46,14 @@ class RegionDetectionService {
   }
 
   /// Convert kilometers to miles
-  static double kilometersToMiles(double kilometers) {
-    return kilometers * 0.621371;
-  }
+  static double kilometersToMiles(double kilometers) => kilometers * 0.621371;
 
   /// Convert miles to kilometers
-  static double milesToKilometers(double miles) {
-    return miles * 1.60934;
-  }
+  static double milesToKilometers(double miles) => miles * 1.60934;
 
   /// Format distance with appropriate unit based on region
   static String formatDistance(
-      double distanceKm, Map<String, dynamic>? locationData) {
+      double distanceKm, Map<String, dynamic>? locationData,) {
     try {
       final isMiles = isMilesCountry(locationData);
 
@@ -74,7 +70,5 @@ class RegionDetectionService {
   }
 
   /// Get distance unit label based on region
-  static String getDistanceUnit(Map<String, dynamic>? locationData) {
-    return isMilesCountry(locationData) ? 'miles' : 'km';
-  }
+  static String getDistanceUnit(Map<String, dynamic>? locationData) => isMilesCountry(locationData) ? 'miles' : 'km';
 }

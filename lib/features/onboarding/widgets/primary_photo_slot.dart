@@ -4,18 +4,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../screens/enhanced_photo_upload_screen.dart';
 
 class PrimaryPhotoSlot extends StatelessWidget {
+
+  const PrimaryPhotoSlot({
+    required this.photo, required this.guidance, required this.onTap, super.key,
+    this.onRemove,
+  });
   final File? photo;
   final PhotoTypeGuidance guidance;
   final VoidCallback onTap;
   final VoidCallback? onRemove;
-
-  const PrimaryPhotoSlot({
-    super.key,
-    required this.photo,
-    required this.guidance,
-    required this.onTap,
-    this.onRemove,
-  });
 
   // Theme colors
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
@@ -25,8 +22,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
   static const Color goldAccent = Color(0xFFFFD700);
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
@@ -42,7 +38,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
             BoxShadow(
               color: goldAccent.withValues(alpha: 0.3),
               blurRadius: 8,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -66,8 +62,8 @@ class PrimaryPhotoSlot extends StatelessWidget {
               left: 0,
               right: 0,
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                decoration: const BoxDecoration(
                   color: goldAccent,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(13),
@@ -77,12 +73,12 @@ class PrimaryPhotoSlot extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.star,
                       color: Colors.white,
                       size: 16,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
                       'MAIN PHOTO',
                       style: GoogleFonts.montserrat(
@@ -92,8 +88,8 @@ class PrimaryPhotoSlot extends StatelessWidget {
                         letterSpacing: 0.5,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(
+                    const SizedBox(width: 4),
+                    const Icon(
                       Icons.star,
                       color: Colors.white,
                       size: 16,
@@ -108,24 +104,24 @@ class PrimaryPhotoSlot extends StatelessWidget {
               Positioned.fill(
                 top: 40, // Account for the badge
                 child: Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: goldAccent.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.face,
                           size: 36,
                           color: goldAccent,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         guidance.title,
                         style: GoogleFonts.montserrat(
@@ -134,10 +130,10 @@ class PrimaryPhotoSlot extends StatelessWidget {
                           color: textDarkBrown,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Flexible(
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             guidance.description,
                             textAlign: TextAlign.center,
@@ -150,16 +146,16 @@ class PrimaryPhotoSlot extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Container(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          "REQUIRED",
+                          'REQUIRED',
                           style: GoogleFonts.montserrat(
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
@@ -181,12 +177,12 @@ class PrimaryPhotoSlot extends StatelessWidget {
                 child: GestureDetector(
                   onTap: onRemove,
                   child: Container(
-                    padding: EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.7),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.close,
                       color: Colors.white,
                       size: 18,
@@ -201,7 +197,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                 bottom: 12,
                 left: 12,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: goldAccent,
                     borderRadius: BorderRadius.circular(12),
@@ -209,14 +205,14 @@ class PrimaryPhotoSlot extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.star,
                         color: Colors.white,
                         size: 12,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
-                        "Main",
+                        'Main',
                         style: GoogleFonts.montserrat(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -231,5 +227,4 @@ class PrimaryPhotoSlot extends StatelessWidget {
         ),
       ),
     );
-  }
 }

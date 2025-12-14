@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/services/user_privacy_service.dart';
 import '../helpers/firebase_test_setup.dart';
 
 void main() {
@@ -8,9 +7,7 @@ void main() {
     await FirebaseTestSetup.setupFirebase();
   });
 
-  tearDownAll(() {
-    FirebaseTestSetup.cleanup();
-  });
+  tearDownAll(FirebaseTestSetup.cleanup);
 
   group('Security and Privacy Tests', () {
     test('User data encryption validation', () {
@@ -85,7 +82,7 @@ void main() {
         'city_only',
         'state_only',
         'country_only',
-        'hidden'
+        'hidden',
       ];
 
       for (final level in locationPrivacyLevels) {
@@ -144,7 +141,7 @@ void main() {
         'public',
         'matches_only',
         'friends_only',
-        'private'
+        'private',
       ];
 
       for (final level in photoPrivacyLevels) {
@@ -185,7 +182,7 @@ void main() {
         'Fake profile',
         'Underage',
         'Cultural insensitivity',
-        'Other'
+        'Other',
       ];
 
       for (final reason in blockReasons) {
@@ -202,7 +199,7 @@ void main() {
         'Underage user',
         'Cultural insensitivity',
         'Privacy violation',
-        'Other'
+        'Other',
       ];
 
       for (final category in reportCategories) {
@@ -231,7 +228,7 @@ void main() {
         'government_id',
         'social_security',
         'passport',
-        'driver_license'
+        'driver_license',
       ];
 
       for (final method in verificationMethods) {
@@ -247,7 +244,7 @@ void main() {
         'racial slurs',
         'religious intolerance',
         'ethnic jokes',
-        'cultural appropriation'
+        'cultural appropriation',
       ];
 
       for (final content in inappropriateContent) {
@@ -264,7 +261,7 @@ void main() {
         'Ethnic stereotyping',
         'Cultural appropriation',
         'Hate speech',
-        'Harassment'
+        'Harassment',
       ];
 
       for (final category in moderationCategories) {
@@ -294,7 +291,7 @@ void main() {
         'US_only',
         'EU_only',
         'Global',
-        'User_choice'
+        'User_choice',
       ];
 
       for (final option in dataResidencyOptions) {
@@ -310,7 +307,7 @@ void main() {
         'email_verification',
         'two_factor_auth',
         'biometric_auth',
-        'social_login'
+        'social_login',
       ];
 
       for (final method in authMethods) {
@@ -340,7 +337,7 @@ void main() {
         'photos',
         'preferences',
         'cultural_info',
-        'professional_info'
+        'professional_info',
       ];
 
       for (final type in backupTypes) {
@@ -354,7 +351,7 @@ void main() {
         'selective_restore',
         'profile_only',
         'messages_only',
-        'photos_only'
+        'photos_only',
       ];
 
       for (final option in recoveryOptions) {

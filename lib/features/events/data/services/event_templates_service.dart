@@ -1,8 +1,7 @@
 import '../models/enhanced_event_model.dart';
 
 class EventTemplatesService {
-  static List<EventTemplate> getAfrocentricTemplates() {
-    return [
+  static List<EventTemplate> getAfrocentricTemplates() => [
       EventTemplate(
         id: 'afrobeats_party',
         name: 'Afrobeats Party',
@@ -17,8 +16,7 @@ class EventTemplatesService {
               'Join us for an unforgettable night of Afrobeats music, dancing, and good vibes. DJ will be spinning the latest hits from Nigeria, Ghana, and across Africa.',
           category: 'Music',
           tags: ['afrobeats', 'music', 'dance', 'nightlife', 'african'],
-          isFree: false,
-          ticketPrice: 25.0, // $25 for nightlife event
+          ticketPrice: 25, // $25 for nightlife event
           maxAttendees: 200,
         ),
       ),
@@ -54,8 +52,7 @@ class EventTemplatesService {
               'Taste authentic African dishes from different regions. Experience the diverse flavors of jollof rice, suya, injera, and many more traditional delicacies.',
           category: 'Food & Dining',
           tags: ['food', 'festival', 'cuisine', 'traditional', 'african'],
-          isFree: false,
-          ticketPrice: 15.0, // $15 for food festival
+          ticketPrice: 15, // $15 for food festival
           maxAttendees: 300,
         ),
       ),
@@ -77,10 +74,9 @@ class EventTemplatesService {
             'diaspora',
             'community',
             'professional',
-            'event'
+            'event',
           ],
-          isFree: false,
-          ticketPrice: 10.0, // $10 for networking event
+          ticketPrice: 10, // $10 for networking event
           maxAttendees: 80,
         ),
       ),
@@ -98,8 +94,7 @@ class EventTemplatesService {
               'Learn energetic African dance moves in a fun, supportive environment. Suitable for all skill levels. Come ready to move and groove!',
           category: 'Sports & Fitness',
           tags: ['dance', 'workshop', 'fitness', 'african', 'traditional'],
-          isFree: false,
-          ticketPrice: 20.0, // $20 for workshop
+          ticketPrice: 20, // $20 for workshop
           maxAttendees: 50,
         ),
       ),
@@ -121,10 +116,9 @@ class EventTemplatesService {
             'entrepreneurship',
             'conference',
             'networking',
-            'african'
+            'african',
           ],
-          isFree: false,
-          ticketPrice: 50.0, // $50 for business conference
+          ticketPrice: 50, // $50 for business conference
           maxAttendees: 120,
         ),
       ),
@@ -142,8 +136,7 @@ class EventTemplatesService {
               'Experience the beauty and creativity of African fashion. Featuring local designers, traditional wear, and contemporary African-inspired pieces.',
           category: 'Entertainment',
           tags: ['fashion', 'design', 'showcase', 'african', 'style'],
-          isFree: false,
-          ticketPrice: 30.0, // $30 for fashion show
+          ticketPrice: 30, // $30 for fashion show
           maxAttendees: 150,
         ),
       ),
@@ -179,8 +172,7 @@ class EventTemplatesService {
               'Meet amazing singles in a fun, structured environment. Enjoy quick conversations, great music, and the chance to make meaningful connections.',
           category: 'Social Gatherings',
           tags: ['dating', 'singles', 'networking', 'social', 'african'],
-          isFree: false,
-          ticketPrice: 20.0, // $20 for speed dating
+          ticketPrice: 20, // $20 for speed dating
           maxAttendees: 40,
         ),
       ),
@@ -198,8 +190,7 @@ class EventTemplatesService {
               'Learn to cook authentic African dishes from expert chefs. Includes ingredients, recipes, and a delicious meal to enjoy together.',
           category: 'Food & Dining',
           tags: ['cooking', 'food', 'learning', 'african cuisine', 'hands-on'],
-          isFree: false,
-          ticketPrice: 35.0, // $35 for cooking class
+          ticketPrice: 35, // $35 for cooking class
           maxAttendees: 20,
         ),
       ),
@@ -239,14 +230,13 @@ class EventTemplatesService {
             'cinema',
             'african films',
             'discussion',
-            'entertainment'
+            'entertainment',
           ],
           isFree: true, // Movie nights often free
           maxAttendees: 50,
         ),
       ),
     ];
-  }
 
   static EventTemplate? getTemplateById(String id) {
     try {
@@ -280,14 +270,6 @@ class EventTemplatesService {
 }
 
 class EventTemplate {
-  final String id;
-  final String name;
-  final String description;
-  final String category;
-  final String icon;
-  final int color;
-  final Duration suggestedDuration;
-  final EventCreationData defaultData;
 
   const EventTemplate({
     required this.id,
@@ -299,4 +281,12 @@ class EventTemplate {
     required this.suggestedDuration,
     required this.defaultData,
   });
+  final String id;
+  final String name;
+  final String description;
+  final String category;
+  final String icon;
+  final int color;
+  final Duration suggestedDuration;
+  final EventCreationData defaultData;
 }

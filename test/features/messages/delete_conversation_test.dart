@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:naijasingles/models/user_model.dart';
 
 void main() {
   group('Delete Conversation Tests', () {

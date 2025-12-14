@@ -52,7 +52,7 @@ class UserEventService {
       // await _createModerationRecord(eventRef.id); // REMOVED
 
       log('Created and published user event: ${eventRef.id}',
-          name: 'UserEventService');
+          name: 'UserEventService',);
       return eventRef.id;
     } catch (e) {
       log('Error creating event: $e', name: 'UserEventService');
@@ -181,7 +181,7 @@ class UserEventService {
           .map((doc) => EnhancedEventModel.fromFirestoreJson(
                 doc.data() as Map<String, dynamic>,
                 doc.id,
-              ))
+              ),)
           .where((event) => event.status != EventStatus.cancelled)
           .toList();
     } catch (e) {
@@ -203,18 +203,16 @@ class UserEventService {
           .get();
 
       final events = querySnapshot.docs
-          .map((doc) {
-            return EnhancedEventModel.fromFirestoreJson(
+          .map((doc) => EnhancedEventModel.fromFirestoreJson(
               doc.data() as Map<String, dynamic>,
               doc.id,
-            );
-          })
+            ),)
           .where((event) =>
-              event.isVisible && event.status != EventStatus.cancelled)
+              event.isVisible && event.status != EventStatus.cancelled,)
           .toList();
 
       log('Fetched ${events.length} published user events',
-          name: 'UserEventService');
+          name: 'UserEventService',);
       return events;
     } catch (e) {
       log('Error getting published events: $e', name: 'UserEventService');
@@ -251,7 +249,7 @@ class UserEventService {
           querySnapshot.docs.map((doc) => EnhancedEventModel.fromFirestoreJson(
                 doc.data() as Map<String, dynamic>,
                 doc.id,
-              )),
+              ),),
         );
       }
 
@@ -378,16 +376,16 @@ class UserEventService {
 
   /// Add event to user's events collection
   Future<void> _addToUserEvents(
-      String userId, String eventId, String role) async {
+      String userId, String eventId, String role,) async {
     await _userEventsCollection.doc(userId).set({
       'events': {
         eventId: {
           'role': role,
           'joinedAt': Timestamp.fromDate(DateTime.now()),
           'status': 'active',
-        }
-      }
-    }, SetOptions(merge: true));
+        },
+      },
+    }, SetOptions(merge: true),);
   }
 
   /// Remove event from user's events collection
@@ -424,7 +422,7 @@ class UserEventService {
     }
 
     // Additional validations
-    if (data.startDate!.isBefore(DateTime.now().add(Duration(hours: 1)))) {
+    if (data.startDate!.isBefore(DateTime.now().add(const Duration(hours: 1)))) {
       throw Exception('Event must start at least 1 hour from now');
     }
 
@@ -445,17 +443,17 @@ class UserEventService {
 
 // Exception classes
 class UserEventException implements Exception {
-  final String message;
   UserEventException(this.message);
+  final String message;
 
   @override
   String toString() => 'UserEventException: $message';
 }
 
 class EventValidationException extends UserEventException {
-  EventValidationException(String message) : super(message);
+  EventValidationException(super.message);
 }
 
 class EventPermissionException extends UserEventException {
-  EventPermissionException(String message) : super(message);
+  EventPermissionException(super.message);
 }

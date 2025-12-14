@@ -6,12 +6,11 @@ import '../../../../models/group_model.dart';
 import '../../../../services/group_service.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
-  final GroupModel group;
 
   const GroupDetailsScreen({
-    super.key,
-    required this.group,
+    required this.group, super.key,
   });
+  final GroupModel group;
 
   @override
   State<GroupDetailsScreen> createState() => _GroupDetailsScreenState();
@@ -89,8 +88,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       _loadMembers();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Failed to join group'),
+        const SnackBar(
+          content: Text('Failed to join group'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -110,8 +109,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       Navigator.pop(context);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Failed to leave group'),
+        const SnackBar(
+          content: Text('Failed to leave group'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -119,8 +118,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: CustomScrollView(
         slivers: [
@@ -138,15 +136,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildSliverAppBar() {
-    return SliverAppBar(
+  Widget _buildSliverAppBar() => SliverAppBar(
       expandedHeight: 200,
       pinned: true,
       backgroundColor: AppColors.primaryGreen,
       flexibleSpace: FlexibleSpaceBar(
-        background: Container(
+        background: DecoratedBox(
           decoration: BoxDecoration(
             gradient: _getCategoryGradient(),
           ),
@@ -158,9 +154,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   child: Image.network(
                     widget.group.imageUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildDefaultBackground();
-                    },
+                    errorBuilder: (context, error, stackTrace) => _buildDefaultBackground(),
                   ),
                 )
               else
@@ -253,10 +247,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           ),
       ],
     );
-  }
 
-  Widget _buildDefaultBackground() {
-    return Container(
+  Widget _buildDefaultBackground() => DecoratedBox(
       decoration: BoxDecoration(
         gradient: _getCategoryGradient(),
       ),
@@ -264,10 +256,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         child: Custom3DIcons.groups(size: 80, color: Colors.white),
       ),
     );
-  }
 
-  Widget _buildGroupInfo() {
-    return SliverToBoxAdapter(
+  Widget _buildGroupInfo() => SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(20),
@@ -345,14 +335,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ),
       ),
     );
-  }
 
   Widget _buildInfoChip({
     required String icon,
     required String label,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -375,14 +363,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -409,10 +395,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildActionButtons() {
-    return Row(
+  Widget _buildActionButtons() => Row(
       children: [
         if (!_isMember)
           Expanded(
@@ -437,7 +421,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
               label: const Text('Leave Group'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.error,
-                side: BorderSide(color: AppColors.error),
+                side: const BorderSide(color: AppColors.error),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -470,10 +454,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ],
     );
-  }
 
-  Widget _buildTabBar() {
-    return SliverToBoxAdapter(
+  Widget _buildTabBar() => SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
@@ -505,10 +487,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildTabContent() {
-    return SliverFillRemaining(
+  Widget _buildTabContent() => SliverFillRemaining(
       child: TabBarView(
         controller: _tabController,
         children: [
@@ -518,7 +498,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
   Widget _buildMembersTab() {
     if (_isLoading) {
@@ -539,8 +518,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     );
   }
 
-  Widget _buildMemberCard(Map<String, dynamic> member) {
-    return Container(
+  Widget _buildMemberCard(Map<String, dynamic> member) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -557,7 +535,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 ? NetworkImage(member['imageUrl'])
                 : null,
             child: member['imageUrl'] == null
-                ? Custom3DIcons.profile(size: 24)
+                ? Custom3DIcons.profile()
                 : null,
           ),
 
@@ -645,7 +623,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                       Icon(Icons.person_remove, color: Colors.red),
                       SizedBox(width: 8),
                       Text('Remove Member',
-                          style: TextStyle(color: Colors.red)),
+                          style: TextStyle(color: Colors.red),),
                     ],
                   ),
                 ),
@@ -654,10 +632,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildRoleBadge(String role, Color color) {
-    return Container(
+  Widget _buildRoleBadge(String role, Color color) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -673,10 +649,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildPostsTab() {
-    return const Center(
+  Widget _buildPostsTab() => const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -702,10 +676,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildEventsTab() {
-    return const Center(
+  Widget _buildEventsTab() => const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -731,9 +703,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
-  void _makeAdmin(String userId) async {
+  Future<void> _makeAdmin(String userId) async {
     final success = await _groupService.addAdmin(widget.group.id!, userId);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -746,7 +717,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     }
   }
 
-  void _removeAdmin(String userId) async {
+  Future<void> _removeAdmin(String userId) async {
     final success = await _groupService.removeAdmin(widget.group.id!, userId);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -775,7 +746,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       builder: (context) => AlertDialog(
         title: const Text('Delete Group'),
         content: Text(
-            'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.'),
+            'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.',),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -822,37 +793,37 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   LinearGradient _getCategoryGradient() {
     switch (widget.group.category.toLowerCase()) {
       case 'cultural':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.culture, AppColors.heritage],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'professional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.business, AppColors.success],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'social':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.community, AppColors.info],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'educational':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.primaryGreen, AppColors.primaryGreenLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'religious':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.warning, AppColors.error],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'regional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.textPrimary, AppColors.textSecondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

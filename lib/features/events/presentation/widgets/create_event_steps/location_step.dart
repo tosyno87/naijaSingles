@@ -4,12 +4,11 @@ import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class LocationStep extends StatefulWidget {
-  final EventCreationData eventData;
 
   const LocationStep({
-    Key? key,
-    required this.eventData,
-  }) : super(key: key);
+    required this.eventData, super.key,
+  });
+  final EventCreationData eventData;
 
   @override
   State<LocationStep> createState() => _LocationStepState();
@@ -71,8 +70,7 @@ class _LocationStepState extends State<LocationStep> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,10 +98,8 @@ class _LocationStepState extends State<LocationStep> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 24,
@@ -111,10 +107,8 @@ class _LocationStepState extends State<LocationStep> {
         color: const Color(0xFF333333),
       ),
     );
-  }
 
-  Widget _buildVenueNameField() {
-    return Column(
+  Widget _buildVenueNameField() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -170,10 +164,8 @@ class _LocationStepState extends State<LocationStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildAddressField() {
-    return Column(
+  Widget _buildAddressField() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -229,10 +221,8 @@ class _LocationStepState extends State<LocationStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildCityField() {
-    return Column(
+  Widget _buildCityField() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -288,10 +278,8 @@ class _LocationStepState extends State<LocationStep> {
         ),
       ],
     );
-  }
 
-  Widget _buildStateSelector() {
-    return Column(
+  Widget _buildStateSelector() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -394,7 +382,6 @@ class _LocationStepState extends State<LocationStep> {
         ),
       ],
     );
-  }
 
   Widget _buildLocationPreview() {
     if (widget.eventData.location == null ||
@@ -417,9 +404,9 @@ class _LocationStepState extends State<LocationStep> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.location_on,
-                color: const Color(0xFF008037),
+                color: Color(0xFF008037),
                 size: 24,
               ),
               const SizedBox(width: 8),

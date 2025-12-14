@@ -8,9 +8,9 @@ abstract class MatchEvent extends Equatable {
 }
 
 class LikeUserEvent extends MatchEvent {
-  final String toUserId;
 
   const LikeUserEvent({required this.toUserId});
+  final String toUserId;
 
   @override
   List<Object?> get props => [toUserId];
@@ -21,13 +21,13 @@ class LoadMatchesEvent extends MatchEvent {
 }
 
 class MatchCreatedEvent extends MatchEvent {
-  final String matchId;
-  final String otherUserId;
 
   const MatchCreatedEvent({
     required this.matchId,
     required this.otherUserId,
   });
+  final String matchId;
+  final String otherUserId;
 
   @override
   List<Object?> get props => [matchId, otherUserId];
@@ -38,18 +38,18 @@ class DismissMatchNotificationEvent extends MatchEvent {
 }
 
 class UnlikeUserEvent extends MatchEvent {
-  final String toUserId;
 
   const UnlikeUserEvent({required this.toUserId});
+  final String toUserId;
 
   @override
   List<Object?> get props => [toUserId];
 }
 
 class DeleteMatchEvent extends MatchEvent {
-  final String matchId;
 
   const DeleteMatchEvent({required this.matchId});
+  final String matchId;
 
   @override
   List<Object?> get props => [matchId];

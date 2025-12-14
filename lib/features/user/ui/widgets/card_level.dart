@@ -15,41 +15,33 @@ class CardLabel extends StatelessWidget {
     required this.alignment,
   });
 
-  factory CardLabel.right() {
-    return CardLabel._(
+  factory CardLabel.right() => CardLabel._(
       color: primaryColor,
       label: 'LIKE'.tr().toString(),
       angle: -_labelAngle,
       alignment: Alignment.topLeft,
     );
-  }
 
-  factory CardLabel.left() {
-    return CardLabel._(
+  factory CardLabel.left() => CardLabel._(
       color: Colors.black,
       label: 'NOPE'.tr().toString(),
       angle: _labelAngle,
       alignment: Alignment.topRight,
     );
-  }
 
-  factory CardLabel.up() {
-    return CardLabel._(
+  factory CardLabel.up() => CardLabel._(
       color: primaryColor,
       label: 'UP'.tr().toString(),
       angle: _labelAngle,
       alignment: const Alignment(0, 0.5),
     );
-  }
 
-  factory CardLabel.down() {
-    return CardLabel._(
+  factory CardLabel.down() => CardLabel._(
       color: primaryColor,
       label: 'DOWN'.tr().toString(),
       angle: -_labelAngle,
       alignment: const Alignment(0, -0.75),
     );
-  }
 
   final Color color;
   final String label;
@@ -57,8 +49,7 @@ class CardLabel extends StatelessWidget {
   final Alignment alignment;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       alignment: alignment,
       padding: const EdgeInsets.symmetric(
         vertical: 36,
@@ -89,5 +80,4 @@ class CardLabel extends StatelessWidget {
         ),
       ),
     );
-  }
 }

@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/services/group_reporting_service.dart';
+import '../common/constants/app_colors.dart';
+import '../services/group_reporting_service.dart';
 
 /// Modal for reporting a group
 class GroupReportModal extends StatefulWidget {
-  final String groupId;
-  final String groupName;
 
   const GroupReportModal({
-    super.key,
-    required this.groupId,
-    required this.groupName,
+    required this.groupId, required this.groupName, super.key,
   });
+  final String groupId;
+  final String groupName;
 
   @override
   State<GroupReportModal> createState() => _GroupReportModalState();
@@ -77,11 +75,10 @@ class _GroupReportModalState extends State<GroupReportModal> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
-                'Report submitted successfully. Thank you for helping keep our community safe.'),
+                'Report submitted successfully. Thank you for helping keep our community safe.',),
             backgroundColor: AppColors.primaryGreen,
-            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -104,14 +101,12 @@ class _GroupReportModalState extends State<GroupReportModal> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
+  Widget build(BuildContext context) => DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.5,
       maxChildSize: 0.9,
       expand: false,
-      builder: (context, scrollController) {
-        return Container(
+      builder: (context, scrollController) => DecoratedBox(
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -142,7 +137,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
                             color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.report_problem,
                             color: Colors.red,
                             size: 24,
@@ -186,8 +181,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.info_outline,
-                                color: Colors.orange, size: 20),
+                            const Icon(Icons.info_outline,
+                                color: Colors.orange, size: 20,),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -223,8 +218,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
                     ),
                     const SizedBox(height: 12),
 
-                    ...GroupReportingService.reportReasons.map((reason) {
-                      return RadioListTile<String>(
+                    ...GroupReportingService.reportReasons.map((reason) => RadioListTile<String>(
                         value: reason,
                         groupValue: _selectedReason,
                         onChanged: _hasUserReported
@@ -244,8 +238,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         ),
                         activeColor: AppColors.primaryGreen,
                         contentPadding: EdgeInsets.zero,
-                      );
-                    }).toList(),
+                      ),),
 
                     const SizedBox(height: 20),
 
@@ -280,7 +273,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: AppColors.primaryGreen),
+                          borderSide: const BorderSide(color: AppColors.primaryGreen),
                         ),
                         contentPadding: const EdgeInsets.all(12),
                       ),
@@ -312,7 +305,7 @@ class _GroupReportModalState extends State<GroupReportModal> {
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
+                                      Colors.white,),
                                 ),
                               )
                             : Text(
@@ -333,8 +326,6 @@ class _GroupReportModalState extends State<GroupReportModal> {
               ),
             ],
           ),
-        );
-      },
+        ),
     );
-  }
 }

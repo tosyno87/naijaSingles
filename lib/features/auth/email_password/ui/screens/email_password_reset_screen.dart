@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../common/widgets/custom_snackbar.dart';
-import '../../../../../common/widgets/auth_icon_container.dart';
-import '../../../../../common/widgets/afropeep_text_field.dart';
-import '../../../../../common/widgets/afropeep_primary_button.dart';
-import '../../../../../common/widgets/afropeep_app_bar.dart';
+
 import '../../../../../common/constants/app_colors.dart';
+import '../../../../../common/widgets/afropeep_app_bar.dart';
+import '../../../../../common/widgets/afropeep_primary_button.dart';
+import '../../../../../common/widgets/afropeep_text_field.dart';
+import '../../../../../common/widgets/auth_icon_container.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../bloc/email_auth_bloc.dart';
 
 class EmailPasswordResetScreen extends StatefulWidget {
-  const EmailPasswordResetScreen({Key? key}) : super(key: key);
+  const EmailPasswordResetScreen({super.key});
 
   @override
   State<EmailPasswordResetScreen> createState() =>
@@ -35,7 +36,7 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -59,17 +60,15 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
               );
             }
           },
-          builder: (context, state) {
-            return SafeArea(
+          builder: (context, state) => SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Center(
                   child: SingleChildScrollView(
                     child: Form(
                       key: _formKey,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // Lock reset icon using reusable widget
                           const AuthIconContainer(
@@ -106,10 +105,8 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
                             prefixIcon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
                             onChanged: () => setState(() {}),
-                            validationChecker: (text) {
-                              return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(text);
-                            },
+                            validationChecker: (text) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(text),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
@@ -161,8 +158,7 @@ class _EmailPasswordResetScreenState extends State<EmailPasswordResetScreen> {
                   ),
                 ),
               ),
-            );
-          },
+            ),
         ),
       ),
     );

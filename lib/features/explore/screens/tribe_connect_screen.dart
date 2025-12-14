@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../common/constants/app_colors.dart';
-import '../../../common/widgets/custom_3d_icons.dart';
+import '../../../common/data/repo/user_search_repo.dart';
 import '../../../common/routes/route_name.dart';
+import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
 import '../widgets/horizontal_profile_viewer.dart';
 import '../widgets/match_confirmation_modal.dart';
-import '../../../common/data/repo/user_search_repo.dart';
 
 class TribeConnectScreen extends StatefulWidget {
-  final UserModel currentUser;
-  final List<UserModel> users;
 
   const TribeConnectScreen({
-    super.key,
-    required this.currentUser,
-    required this.users,
+    required this.currentUser, required this.users, super.key,
   });
+  final UserModel currentUser;
+  final List<UserModel> users;
 
   @override
   State<TribeConnectScreen> createState() => _TribeConnectScreenState();
@@ -24,16 +23,13 @@ class TribeConnectScreen extends StatefulWidget {
 
 class _TribeConnectScreenState extends State<TribeConnectScreen> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: _buildAppBar(),
       body: _buildBody(),
     );
-  }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
+  PreferredSizeWidget _buildAppBar() => AppBar(
       backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       title: Text(
@@ -48,12 +44,11 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       actions: [
         IconButton(
           onPressed: _showFilters,
-          icon: Custom3DIcons.filter(size: 24),
+          icon: Custom3DIcons.filter(),
         ),
         const SizedBox(width: 8),
       ],
     );
-  }
 
   Widget _buildBody() {
     if (widget.users.isEmpty) {
@@ -70,8 +65,8 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         // Handle when all profiles are viewed
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'You\'ve seen all available profiles! Check back later for new connections.'),
+            content: const Text(
+                'You\'ve seen all available profiles! Check back later for new connections.',),
             backgroundColor: AppColors.primaryGreen,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -84,8 +79,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -131,7 +125,6 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         ],
       ),
     );
-  }
 
   Future<void> _refreshUsers() async {
     // TODO: Implement refresh logic
@@ -150,8 +143,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     );
   }
 
-  Widget _buildFilterSheet() {
-    return Container(
+  Widget _buildFilterSheet() => Container(
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -195,10 +187,8 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildFilterOption(String title, String value) {
-    return Padding(
+  Widget _buildFilterOption(String title, String value) => Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -222,7 +212,6 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         ],
       ),
     );
-  }
 
   Future<void> _handleConnect(UserModel user) async {
     try {
@@ -260,11 +249,11 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     showDialog(
       context: context,
       builder: (context) => MatchConfirmationModal(
-        currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty == true
+        currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty ?? false
             ? widget.currentUser.imageUrl![0]
             : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
         matchedUserImageUrl:
-            user.imageUrl?.isNotEmpty == true ? user.imageUrl![0] : '',
+            user.imageUrl?.isNotEmpty ?? false ? user.imageUrl![0] : '',
         matchedUserName: user.name ?? 'Unknown',
         matchedUserId: user.id ?? '',
       ),

@@ -7,7 +7,7 @@ abstract class ReportRepository {
       {required String reportedBy,
       required String reported,
       required String reason,
-      required String? moreReason});
+      required String? moreReason,});
 }
 
 class ReportRepositoryImpl extends ReportRepository {
@@ -16,14 +16,14 @@ class ReportRepositoryImpl extends ReportRepository {
       {required String reportedBy,
       required String reported,
       required String reason,
-      required String? moreReason}) async {
-    await firebaseFireStoreInstance.collection("Reports").add({
+      required String? moreReason,}) async {
+    await firebaseFireStoreInstance.collection('Reports').add({
       'reported_by': reportedBy,
       'victim_id': reported,
       'reason': reason,
       'details': moreReason,
-      'timestamp': FieldValue.serverTimestamp()
+      'timestamp': FieldValue.serverTimestamp(),
     });
-    return "done";
+    return 'done';
   }
 }

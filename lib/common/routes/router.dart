@@ -1,60 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/utils/large_image.dart';
-import 'package:naijasingles/features/auth/phone/ui/screens/phone_number.dart';
-import 'package:naijasingles/features/auth/phone/ui/screens/update_phonenumber.dart';
-import 'package:naijasingles/features/auth/welcome/welcome_screen.dart';
-import 'package:naijasingles/features/home/ui/screens/splash.dart';
-import 'package:naijasingles/features/auth/email_password/ui/screens/email_signup_screen.dart';
-import 'package:naijasingles/features/auth/email_password/ui/screens/email_login_screen.dart';
-import 'package:naijasingles/features/auth/email_password/ui/screens/email_password_reset_screen.dart';
-import 'package:naijasingles/features/explore/explore_screen.dart';
-import 'package:naijasingles/features/groups/ui/screens/groups_screen.dart';
-import 'package:naijasingles/features/group_chat/screens/group_list_screen.dart';
-import 'package:naijasingles/features/home/main_navigation_screen.dart';
-import 'package:naijasingles/features/onboarding/onboarding_main.dart';
-import 'package:naijasingles/features/profile/edit_profile_screen.dart';
-import 'package:naijasingles/features/chat/ui/screens/chat_page.dart';
-import 'package:naijasingles/features/home/ui/tab/tabbar.dart';
-import 'package:naijasingles/features/match/ui/screen/match_page.dart';
-import 'package:naijasingles/features/user/ui/screens/onboarding_flow.dart';
-import 'package:naijasingles/features/user/ui/screens/show_gender.dart';
-import 'package:naijasingles/features/user/ui/screens/update_user_location.dart';
-import 'package:naijasingles/features/user/ui/screens/user_location.dart';
-import 'package:naijasingles/features/user/ui/screens/user_nationality.dart';
-import 'package:naijasingles/features/user/ui/screens/user_profile.dart';
-import 'package:naijasingles/features/user/ui/screens/user_profile_pic_set.dart';
-import 'package:naijasingles/features/user/ui/screens/user_search_location.dart';
-import 'package:naijasingles/features/user/ui/screens/user_sexual_details.dart';
-import 'package:naijasingles/features/user/ui/screens/user_university.dart';
-import 'package:naijasingles/features/auth/auth_method/auth_method_selection_screen.dart';
-import 'package:naijasingles/features/auth/auth_method/sign_in_method_selection_screen.dart';
-import 'package:naijasingles/features/settings/blocked_users_screen.dart';
-import 'package:naijasingles/features/settings/notification_settings_screen.dart';
-import 'package:naijasingles/features/settings/safety_center_screen.dart';
-import 'package:naijasingles/features/settings/help_center_screen.dart';
-import 'package:naijasingles/features/settings/feedback_screen.dart';
-import 'package:naijasingles/features/settings/language_settings_screen.dart';
-import 'package:naijasingles/features/settings/location_settings_screen.dart';
-import 'package:naijasingles/features/settings/account_deletion_screen.dart';
-import 'package:naijasingles/features/profile/settings_screen.dart';
-import 'package:naijasingles/models/user_model.dart';
-import '../../features/home/ui/screens/user_filter/settings.dart';
-import 'package:naijasingles/features/events/presentation/screens/events_screen.dart';
-import 'package:naijasingles/features/events/presentation/screens/event_template_selection_screen.dart';
-import 'package:naijasingles/features/events/data/models/enhanced_event_model.dart';
-import 'package:naijasingles/features/events/data/models/event_model.dart';
-import 'package:naijasingles/features/events/presentation/screens/create_event_screen.dart';
-import 'package:naijasingles/features/events/presentation/screens/my_events_screen.dart';
-import 'package:naijasingles/features/events/presentation/screens/event_details_screen.dart';
-import 'package:naijasingles/features/events/presentation/bloc/event_creation_bloc.dart';
-import 'package:naijasingles/features/events/data/services/user_event_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/features/user/ui/screens/user_dob.dart';
-import 'package:naijasingles/features/user/ui/screens/user_gender.dart';
-import 'package:naijasingles/features/user/ui/screens/user_name.dart';
-import 'package:naijasingles/features/dating/screens/user_detail_screen.dart';
+
+import '../../features/auth/auth_method/auth_method_selection_screen.dart';
+import '../../features/auth/auth_method/sign_in_method_selection_screen.dart';
+import '../../features/auth/email_password/ui/screens/email_login_screen.dart';
+import '../../features/auth/email_password/ui/screens/email_password_reset_screen.dart';
+import '../../features/auth/email_password/ui/screens/email_signup_screen.dart';
 import '../../features/auth/phone/ui/screens/otp_page.dart';
+import '../../features/auth/phone/ui/screens/phone_number.dart';
+import '../../features/auth/phone/ui/screens/update_phonenumber.dart';
+import '../../features/auth/welcome/welcome_screen.dart';
+import '../../features/chat/ui/screens/chat_page.dart';
+import '../../features/dating/screens/user_detail_screen.dart';
+import '../../features/events/data/models/enhanced_event_model.dart';
+import '../../features/events/data/models/event_model.dart';
+import '../../features/events/data/services/user_event_service.dart';
+import '../../features/events/presentation/bloc/event_creation_bloc.dart';
+import '../../features/events/presentation/screens/create_event_screen.dart';
+import '../../features/events/presentation/screens/event_details_screen.dart';
+import '../../features/events/presentation/screens/event_template_selection_screen.dart';
+import '../../features/events/presentation/screens/events_screen.dart';
+import '../../features/events/presentation/screens/my_events_screen.dart';
+import '../../features/explore/explore_screen.dart';
+import '../../features/group_chat/screens/group_list_screen.dart';
+import '../../features/groups/ui/screens/groups_screen.dart';
+import '../../features/home/main_navigation_screen.dart';
+import '../../features/home/ui/screens/splash.dart';
+import '../../features/home/ui/screens/user_filter/settings.dart';
+import '../../features/home/ui/tab/tabbar.dart';
+import '../../features/match/ui/screen/match_page.dart';
+import '../../features/onboarding/onboarding_main.dart';
+import '../../features/profile/edit_profile_screen.dart';
+import '../../features/profile/settings_screen.dart';
+import '../../features/settings/account_deletion_screen.dart';
+import '../../features/settings/blocked_users_screen.dart';
+import '../../features/settings/feedback_screen.dart';
+import '../../features/settings/help_center_screen.dart';
+import '../../features/settings/language_settings_screen.dart';
+import '../../features/settings/location_settings_screen.dart';
+import '../../features/settings/notification_settings_screen.dart';
+import '../../features/settings/safety_center_screen.dart';
+import '../../features/user/ui/screens/onboarding_flow.dart';
+import '../../features/user/ui/screens/show_gender.dart';
+import '../../features/user/ui/screens/update_user_location.dart';
+import '../../features/user/ui/screens/user_dob.dart';
+import '../../features/user/ui/screens/user_gender.dart';
+import '../../features/user/ui/screens/user_location.dart';
+import '../../features/user/ui/screens/user_name.dart';
+import '../../features/user/ui/screens/user_nationality.dart';
+import '../../features/user/ui/screens/user_profile.dart';
+import '../../features/user/ui/screens/user_profile_pic_set.dart';
+import '../../features/user/ui/screens/user_search_location.dart';
+import '../../features/user/ui/screens/user_sexual_details.dart';
+import '../../features/user/ui/screens/user_university.dart';
+import '../../models/user_model.dart';
+import '../utils/large_image.dart';
+import 'route_name.dart';
 
 /// Transparent widget that handles Firebase auth callback deep links
 /// Immediately pops itself so no UI is visible to the user
@@ -96,7 +97,7 @@ abstract class AppRouter {
     RouteName.welcomeScreen: (context) {
       debugPrint('🎯 WelcomeScreen route builder called');
       try {
-        final widget = const WelcomeScreen();
+        const widget = WelcomeScreen();
         debugPrint('✅ WelcomeScreen widget created successfully');
         return widget;
       } catch (e, stackTrace) {
@@ -136,15 +137,15 @@ abstract class AppRouter {
     RouteName.searchLocationpage: (context) => const SearchLocation(),
     RouteName.updateLocationScreen: (context) => UpdateLocation(
         selectedLocation: ModalRoute.of(context)!.settings.arguments
-            as Map<dynamic, dynamic>),
+            as Map<dynamic, dynamic>,),
     RouteName.chatPageScreen: (context) => ChatPage(
         sender: (ModalRoute.of(context)!.settings.arguments as Map)['sender'],
         chatId: (ModalRoute.of(context)!.settings.arguments as Map)['chatID']
             .toString(),
-        second: (ModalRoute.of(context)!.settings.arguments as Map)['second']),
+        second: (ModalRoute.of(context)!.settings.arguments as Map)['second'],),
     RouteName.editProfileScreen: (context) => const EditProfileScreen(),
     RouteName.largeImageScreen: (context) => LargeImage(
-        largeImage: ModalRoute.of(context)!.settings.arguments as String),
+        largeImage: ModalRoute.of(context)!.settings.arguments as String,),
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.updatePhoneScreen: (context) =>
@@ -207,7 +208,7 @@ abstract class AppRouter {
           ),
           body: Center(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -243,7 +244,7 @@ abstract class AppRouter {
       }
       
       return OtpPage(
-        codeController: (argsMap['codeController']?.toString() ?? ''),
+        codeController: argsMap['codeController']?.toString() ?? '',
         verificationId: argsMap['verificationId']!.toString(),
         phoneNumber: argsMap['phoneNumber']!.toString(),
         updatePhoneNumber: argsMap['updatenumber'] ?? false,
@@ -251,13 +252,13 @@ abstract class AppRouter {
       );
     },
     RouteName.userDobScreen: (context) => UserDOB(
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,),
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
     RouteName.exploreScreen: (context) =>
-        const ExploreScreen(showBackButton: false), // No back button by default
+        const ExploreScreen(), // No back button by default
     RouteName.groupsScreen: (context) => const GroupsScreen(),
     RouteName.groupChatsScreen: (context) => const GroupListScreen(),
 
@@ -302,7 +303,7 @@ abstract class AppRouter {
       } else {
         // Fallback for any other type - this shouldn't happen but provides safety
         throw ArgumentError(
-            'Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}');
+            'Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}',);
       }
     },
 
@@ -318,7 +319,7 @@ abstract class AppRouter {
         );
       } else {
         throw ArgumentError(
-            'Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}');
+            'Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}',);
       }
     },
   };
@@ -376,7 +377,7 @@ abstract class AppRouter {
               backgroundColor: Colors.white,
               body: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -419,7 +420,7 @@ abstract class AppRouter {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

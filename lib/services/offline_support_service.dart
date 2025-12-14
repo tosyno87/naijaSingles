@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/features/messages/message_model.dart';
+
+import '../features/messages/message_model.dart';
+import '../models/user_model.dart';
 
 /// Industry-standard offline support service
 /// Features:
@@ -13,10 +15,10 @@ import 'package:naijasingles/features/messages/message_model.dart';
 /// - Cache management
 /// - Offline indicators
 class OfflineSupportService {
-  static final OfflineSupportService _instance =
-      OfflineSupportService._internal();
   factory OfflineSupportService() => _instance;
   OfflineSupportService._internal();
+  static final OfflineSupportService _instance =
+      OfflineSupportService._internal();
 
   // Cache keys
   static const String _cachedProfilesKey = 'cached_profiles';
@@ -67,7 +69,7 @@ class OfflineSupportService {
                 'occupation': profile.occupation,
                 'languages': profile.languages,
                 'religion': profile.religion,
-              })
+              },)
           .toList();
       final jsonString = jsonEncode(profilesJson);
 
@@ -102,7 +104,7 @@ class OfflineSupportService {
 
   /// Cache messages for offline viewing
   Future<void> cacheMessages(
-      String threadId, List<MessageThreadInfo> messages) async {
+      String threadId, List<MessageThreadInfo> messages,) async {
     try {
       final prefs = await SharedPreferences.getInstance();
 
@@ -117,7 +119,7 @@ class OfflineSupportService {
                 'timestamp': message.timestamp.toIso8601String(),
                 'unread': message.unread,
                 'avatarUrl': message.avatarUrl,
-              })
+              },)
           .toList();
       final jsonString = jsonEncode(messagesJson);
 
@@ -348,7 +350,7 @@ class OfflineSupportService {
 
   /// Check if cache is stale
   Future<bool> isCacheStale(
-      {Duration maxAge = const Duration(hours: 24)}) async {
+      {Duration maxAge = const Duration(hours: 24),}) async {
     try {
       final lastSync = await getLastSyncTime();
       if (lastSync == null) return true;
@@ -402,7 +404,7 @@ class OfflineSupportService {
       );
     } catch (e) {
       log('❌ Error getting cache stats: $e');
-      return CacheStats(
+      return const CacheStats(
         cachedProfiles: 0,
         queuedActions: 0,
         lastSync: null,
@@ -429,10 +431,6 @@ enum OfflineActionType {
 
 /// Offline action model
 class OfflineAction {
-  final String id;
-  final OfflineActionType type;
-  final Map<String, dynamic> data;
-  final DateTime timestamp;
 
   const OfflineAction({
     required this.id,
@@ -441,17 +439,7 @@ class OfflineAction {
     required this.timestamp,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type.name,
-      'data': data,
-      'timestamp': timestamp.toIso8601String(),
-    };
-  }
-
-  factory OfflineAction.fromJson(Map<String, dynamic> json) {
-    return OfflineAction(
+  factory OfflineAction.fromJson(Map<String, dynamic> json) => OfflineAction(
       id: json['id'],
       type: OfflineActionType.values.firstWhere(
         (e) => e.name == json['type'],
@@ -460,20 +448,24 @@ class OfflineAction {
       data: Map<String, dynamic>.from(json['data']),
       timestamp: DateTime.parse(json['timestamp']),
     );
-  }
+  final String id;
+  final OfflineActionType type;
+  final Map<String, dynamic> data;
+  final DateTime timestamp;
+
+  Map<String, dynamic> toJson() => {
+      'id': id,
+      'type': type.name,
+      'data': data,
+      'timestamp': timestamp.toIso8601String(),
+    };
 
   @override
-  String toString() {
-    return 'OfflineAction(${type.name}, $timestamp)';
-  }
+  String toString() => 'OfflineAction(${type.name}, $timestamp)';
 }
 
 /// Cache statistics
 class CacheStats {
-  final int cachedProfiles;
-  final int queuedActions;
-  final DateTime? lastSync;
-  final bool isOnline;
 
   const CacheStats({
     required this.cachedProfiles,
@@ -481,9 +473,11 @@ class CacheStats {
     required this.lastSync,
     required this.isOnline,
   });
+  final int cachedProfiles;
+  final int queuedActions;
+  final DateTime? lastSync;
+  final bool isOnline;
 
   @override
-  String toString() {
-    return 'CacheStats(profiles: $cachedProfiles, actions: $queuedActions, online: $isOnline)';
-  }
+  String toString() => 'CacheStats(profiles: $cachedProfiles, actions: $queuedActions, online: $isOnline)';
 }

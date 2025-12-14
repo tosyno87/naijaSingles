@@ -18,10 +18,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 /// - Quiet hours and do-not-disturb
 /// - Notification preferences per type
 class IndustryNotificationService {
-  static final IndustryNotificationService _instance =
-      IndustryNotificationService._internal();
   factory IndustryNotificationService() => _instance;
   IndustryNotificationService._internal();
+  static final IndustryNotificationService _instance =
+      IndustryNotificationService._internal();
 
   // Firebase instances
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -84,9 +84,7 @@ class IndustryNotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      
     );
 
     const InitializationSettings settings = InitializationSettings(
@@ -112,9 +110,6 @@ class IndustryNotificationService {
       'Matches',
       description: 'Notifications for new matches',
       importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-      showBadge: true,
     );
 
     const AndroidNotificationChannel messageChannel =
@@ -123,19 +118,13 @@ class IndustryNotificationService {
       'Messages',
       description: 'Notifications for new messages',
       importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-      showBadge: true,
     );
 
     const AndroidNotificationChannel likeChannel = AndroidNotificationChannel(
       _likeChannelId,
       'Likes',
       description: 'Notifications for profile likes',
-      importance: Importance.defaultImportance,
-      playSound: true,
       enableVibration: false,
-      showBadge: true,
     );
 
     const AndroidNotificationChannel generalChannel =
@@ -143,10 +132,8 @@ class IndustryNotificationService {
       _generalChannelId,
       'General',
       description: 'General app notifications',
-      importance: Importance.defaultImportance,
       playSound: false,
       enableVibration: false,
-      showBadge: true,
     );
 
     await _localNotifications
@@ -174,13 +161,7 @@ class IndustryNotificationService {
   Future<bool> _requestPermissions() async {
     // Request FCM permissions
     final settings = await _messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
+      
     );
 
     // Request local notification permissions
@@ -267,7 +248,7 @@ class IndustryNotificationService {
         .snapshots()
         .listen((snapshot) {
       final notifications = snapshot.docs
-          .map((doc) => AppNotification.fromFirestore(doc))
+          .map(AppNotification.fromFirestore)
           .toList();
 
       _notificationsController.add(notifications);
@@ -340,7 +321,6 @@ class IndustryNotificationService {
       channelDescription: _getChannelDescription(channelId),
       importance: Importance.high,
       priority: Priority.high,
-      showWhen: true,
       when: DateTime.now().millisecondsSinceEpoch,
       largeIcon: imagePath != null ? FilePathAndroidBitmap(imagePath) : null,
       styleInformation: imagePath != null
@@ -570,7 +550,6 @@ class IndustryNotificationService {
         type: type,
         avatarUrl: imageUrl,
         actionId: actionId,
-        isRead: false,
       );
 
       // Add to Firestore
@@ -638,17 +617,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 /// Enhanced notification model
-class AppNotification {
-  final String id;
-  final String title;
-  final String message;
-  final DateTime timestamp;
-  final String type;
-  final String? avatarUrl;
-  final String? actionId;
-  final bool isRead;
-  final Map<String, dynamic>? data;
-  final int priority; // 0-3 (low to high)
+class AppNotification { // 0-3 (low to high)
 
   AppNotification({
     required this.id,
@@ -678,9 +647,18 @@ class AppNotification {
       priority: data['priority'] ?? 1,
     );
   }
+  final String id;
+  final String title;
+  final String message;
+  final DateTime timestamp;
+  final String type;
+  final String? avatarUrl;
+  final String? actionId;
+  final bool isRead;
+  final Map<String, dynamic>? data;
+  final int priority;
 
-  Map<String, dynamic> toFirestore() {
-    return {
+  Map<String, dynamic> toFirestore() => {
       'title': title,
       'message': message,
       'timestamp': Timestamp.fromDate(timestamp),
@@ -691,7 +669,6 @@ class AppNotification {
       'data': data,
       'priority': priority,
     };
-  }
 
   IconData get typeIcon {
     switch (type) {
@@ -759,8 +736,7 @@ class AppNotification {
     bool? isRead,
     Map<String, dynamic>? data,
     int? priority,
-  }) {
-    return AppNotification(
+  }) => AppNotification(
       id: id ?? this.id,
       title: title ?? this.title,
       message: message ?? this.message,
@@ -772,20 +748,10 @@ class AppNotification {
       data: data ?? this.data,
       priority: priority ?? this.priority,
     );
-  }
 }
 
 /// Notification settings model
 class NotificationSettings {
-  final bool matchNotifications;
-  final bool messageNotifications;
-  final bool likeNotifications;
-  final bool superLikeNotifications;
-  final bool soundEnabled;
-  final bool vibrationEnabled;
-  final bool quietHoursEnabled;
-  final String quietHoursStart;
-  final String quietHoursEnd;
 
   NotificationSettings({
     required this.matchNotifications,
@@ -799,8 +765,7 @@ class NotificationSettings {
     required this.quietHoursEnd,
   });
 
-  factory NotificationSettings.defaultSettings() {
-    return NotificationSettings(
+  factory NotificationSettings.defaultSettings() => NotificationSettings(
       matchNotifications: true,
       messageNotifications: true,
       likeNotifications: true,
@@ -811,7 +776,6 @@ class NotificationSettings {
       quietHoursStart: '22:00',
       quietHoursEnd: '08:00',
     );
-  }
 
   factory NotificationSettings.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -827,9 +791,17 @@ class NotificationSettings {
       quietHoursEnd: data['quietHoursEnd'] ?? '08:00',
     );
   }
+  final bool matchNotifications;
+  final bool messageNotifications;
+  final bool likeNotifications;
+  final bool superLikeNotifications;
+  final bool soundEnabled;
+  final bool vibrationEnabled;
+  final bool quietHoursEnabled;
+  final String quietHoursStart;
+  final String quietHoursEnd;
 
-  Map<String, dynamic> toFirestore() {
-    return {
+  Map<String, dynamic> toFirestore() => {
       'matchNotifications': matchNotifications,
       'messageNotifications': messageNotifications,
       'likeNotifications': likeNotifications,
@@ -840,7 +812,6 @@ class NotificationSettings {
       'quietHoursStart': quietHoursStart,
       'quietHoursEnd': quietHoursEnd,
     };
-  }
 
   NotificationSettings copyWith({
     bool? matchNotifications,
@@ -852,8 +823,7 @@ class NotificationSettings {
     bool? quietHoursEnabled,
     String? quietHoursStart,
     String? quietHoursEnd,
-  }) {
-    return NotificationSettings(
+  }) => NotificationSettings(
       matchNotifications: matchNotifications ?? this.matchNotifications,
       messageNotifications: messageNotifications ?? this.messageNotifications,
       likeNotifications: likeNotifications ?? this.likeNotifications,
@@ -865,5 +835,4 @@ class NotificationSettings {
       quietHoursStart: quietHoursStart ?? this.quietHoursStart,
       quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
     );
-  }
 }

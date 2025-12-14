@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LanguageExchangeCard extends StatelessWidget {
+
+  const LanguageExchangeCard({
+    required this.nativeLanguage, required this.learningLanguage, required this.userName, required this.country, required this.city, required this.proficiency, required this.description, required this.isOnline, required this.isInPerson, required this.onConnect, super.key,
+  });
   final String nativeLanguage;
   final String learningLanguage;
   final String userName;
@@ -13,23 +17,8 @@ class LanguageExchangeCard extends StatelessWidget {
   final bool isInPerson;
   final VoidCallback onConnect;
 
-  const LanguageExchangeCard({
-    Key? key,
-    required this.nativeLanguage,
-    required this.learningLanguage,
-    required this.userName,
-    required this.country,
-    required this.city,
-    required this.proficiency,
-    required this.description,
-    required this.isOnline,
-    required this.isInPerson,
-    required this.onConnect,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -180,7 +169,7 @@ class LanguageExchangeCard extends StatelessWidget {
                     // Proficiency badge
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 8, vertical: 4,),
                       decoration: BoxDecoration(
                         color:
                             _getProficiencyColor(proficiency).withOpacity(0.1),
@@ -218,7 +207,7 @@ class LanguageExchangeCard extends StatelessWidget {
                     if (isOnline)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 8, vertical: 4,),
                         decoration: BoxDecoration(
                           color: Colors.blue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
@@ -247,7 +236,7 @@ class LanguageExchangeCard extends StatelessWidget {
                     if (isInPerson)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 8, vertical: 4,),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
@@ -305,7 +294,6 @@ class LanguageExchangeCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Color _getProficiencyColor(String proficiency) {
     switch (proficiency.toLowerCase()) {

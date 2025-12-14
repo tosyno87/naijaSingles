@@ -3,11 +3,6 @@ import 'package:dio/dio.dart';
 import '../models/event_model.dart';
 
 class MeetupService {
-  static const String _baseUrl = 'https://api.meetup.com';
-  // You'll get this from: https://secure.meetup.com/meetup_api/key/
-  static const String _apiKey = 'YOUR_MEETUP_API_KEY_HERE';
-
-  final Dio _dio;
 
   MeetupService() : _dio = Dio() {
     _dio.options.baseUrl = _baseUrl;
@@ -19,8 +14,13 @@ class MeetupService {
       requestBody: true,
       responseBody: true,
       logPrint: (obj) => log(obj.toString(), name: 'MeetupAPI'),
-    ));
+    ),);
   }
+  static const String _baseUrl = 'https://api.meetup.com';
+  // You'll get this from: https://secure.meetup.com/meetup_api/key/
+  static const String _apiKey = 'YOUR_MEETUP_API_KEY_HERE';
+
+  final Dio _dio;
 
   /// Fetch Afrocentric events from Meetup
   Future<List<EventModel>> fetchAfrocentricEvents({
@@ -40,7 +40,7 @@ class MeetupService {
       );
 
       log('🔍 Fetching Meetup events with params: $queryParams',
-          name: 'MeetupService');
+          name: 'MeetupService',);
 
       // Meetup API endpoint for finding events
       final response =
@@ -49,14 +49,13 @@ class MeetupService {
       if (response.statusCode == 200) {
         final data = response.data;
         final events = (data as List<dynamic>?)
-                ?.map((eventJson) => _convertMeetupToEventModel(eventJson))
-                .where((event) => event != null)
-                .cast<EventModel>()
+                ?.map((item) => _convertMeetupToEventModel(item as Map<String, dynamic>))
+                .whereType<EventModel>()
                 .toList() ??
             [];
 
         log('✅ Fetched ${events.length} Afrocentric events from Meetup',
-            name: 'MeetupService');
+            name: 'MeetupService',);
         return events;
       } else {
         throw MeetupException('Failed to fetch events: ${response.statusCode}');
@@ -66,7 +65,7 @@ class MeetupService {
 
       if (e is DioException) {
         log('🔄 API not configured, returning empty list',
-            name: 'MeetupService');
+            name: 'MeetupService',);
         return [];
       }
 
@@ -112,8 +111,6 @@ class MeetupService {
           (meetupEvent['updated'] as int?) ??
               DateTime.now().millisecondsSinceEpoch,
         ),
-        status: EventStatus.published,
-        isPublic: true,
         createdByUserId: 'meetup_import', // For imported events
       );
     } catch (e) {
@@ -155,8 +152,8 @@ class MeetupService {
         city: 'TBD',
         state: 'TBD',
         country: 'TBD',
-        latitude: 0.0,
-        longitude: 0.0,
+        latitude: 0,
+        longitude: 0,
       );
     }
 
@@ -255,7 +252,7 @@ class MeetupService {
       }
 
       log('🔍 Searching Meetup events with query: $query',
-          name: 'MeetupService');
+          name: 'MeetupService',);
 
       final response =
           await _dio.get('/find/events', queryParameters: queryParams);
@@ -263,18 +260,17 @@ class MeetupService {
       if (response.statusCode == 200) {
         final data = response.data;
         final events = (data as List<dynamic>?)
-                ?.map((eventJson) => _convertMeetupToEventModel(eventJson))
-                .where((event) => event != null)
-                .cast<EventModel>()
+                ?.map((item) => _convertMeetupToEventModel(item as Map<String, dynamic>))
+                .whereType<EventModel>()
                 .toList() ??
             [];
 
         log('✅ Found ${events.length} events for query: $query',
-            name: 'MeetupService');
+            name: 'MeetupService',);
         return events;
       } else {
         throw MeetupException(
-            'Failed to search events: ${response.statusCode}');
+            'Failed to search events: ${response.statusCode}',);
       }
     } catch (e) {
       log('❌ Error searching events: $e', name: 'MeetupService');
@@ -366,9 +362,9 @@ class MeetupService {
 }
 
 class MeetupException implements Exception {
-  final String message;
 
   const MeetupException(this.message);
+  final String message;
 
   @override
   String toString() => 'MeetupException: $message';

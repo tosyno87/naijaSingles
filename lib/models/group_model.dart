@@ -3,39 +3,12 @@ import 'package:flutter/foundation.dart';
 
 /// Model representing a cultural group in the app
 class GroupModel {
-  final String? id;
-  final String name;
-  final String description;
-  final String category;
-  final String? imageUrl;
-  final String creatorId;
-  final List<String> memberIds;
-  final List<String> adminIds;
-  final Map<String, dynamic>? culturalInfo;
-  final bool isPublic;
-  final int maxMembers;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String? location;
-  final List<String> tags;
-  final Map<String, dynamic>? settings;
 
   GroupModel({
-    this.id,
-    required this.name,
-    required this.description,
-    required this.category,
+    required this.name, required this.description, required this.category, required this.creatorId, required this.memberIds, required this.adminIds, required this.isPublic, required this.maxMembers, required this.createdAt, required this.updatedAt, required this.tags, this.id,
     this.imageUrl,
-    required this.creatorId,
-    required this.memberIds,
-    required this.adminIds,
     this.culturalInfo,
-    required this.isPublic,
-    required this.maxMembers,
-    required this.createdAt,
-    required this.updatedAt,
     this.location,
-    required this.tags,
     this.settings,
   });
 
@@ -69,8 +42,7 @@ class GroupModel {
   }
 
   /// Create GroupModel from JSON
-  factory GroupModel.fromJson(Map<String, dynamic> json) {
-    return GroupModel(
+  factory GroupModel.fromJson(Map<String, dynamic> json) => GroupModel(
       id: json['id'],
       name: json['name'] ?? '',
       description: json['description'] ?? '',
@@ -88,11 +60,25 @@ class GroupModel {
       tags: List<String>.from(json['tags'] ?? []),
       settings: json['settings'] as Map<String, dynamic>?,
     );
-  }
+  final String? id;
+  final String name;
+  final String description;
+  final String category;
+  final String? imageUrl;
+  final String creatorId;
+  final List<String> memberIds;
+  final List<String> adminIds;
+  final Map<String, dynamic>? culturalInfo;
+  final bool isPublic;
+  final int maxMembers;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String? location;
+  final List<String> tags;
+  final Map<String, dynamic>? settings;
 
   /// Convert GroupModel to Map for Firestore
-  Map<String, dynamic> toMap() {
-    return {
+  Map<String, dynamic> toMap() => {
       'name': name,
       'description': description,
       'category': category,
@@ -109,11 +95,9 @@ class GroupModel {
       'tags': tags,
       'settings': settings,
     };
-  }
 
   /// Convert GroupModel to JSON
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'description': description,
@@ -131,7 +115,6 @@ class GroupModel {
       'tags': tags,
       'settings': settings,
     };
-  }
 
   /// Create a copy of GroupModel with updated fields
   GroupModel copyWith({
@@ -151,8 +134,7 @@ class GroupModel {
     String? location,
     List<String>? tags,
     Map<String, dynamic>? settings,
-  }) {
-    return GroupModel(
+  }) => GroupModel(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -170,22 +152,15 @@ class GroupModel {
       tags: tags ?? this.tags,
       settings: settings ?? this.settings,
     );
-  }
 
   /// Check if user is a member of the group
-  bool isMember(String userId) {
-    return memberIds.contains(userId);
-  }
+  bool isMember(String userId) => memberIds.contains(userId);
 
   /// Check if user is an admin of the group
-  bool isAdmin(String userId) {
-    return adminIds.contains(userId);
-  }
+  bool isAdmin(String userId) => adminIds.contains(userId);
 
   /// Check if user is the creator of the group
-  bool isCreator(String userId) {
-    return creatorId == userId;
-  }
+  bool isCreator(String userId) => creatorId == userId;
 
   /// Get member count
   int get memberCount => memberIds.length;
@@ -232,9 +207,7 @@ class GroupModel {
   }
 
   @override
-  String toString() {
-    return 'GroupModel{id: $id, name: $name, category: $category, members: ${memberIds.length}}';
-  }
+  String toString() => 'GroupModel{id: $id, name: $name, category: $category, members: ${memberIds.length}}';
 
   @override
   bool operator ==(Object other) {

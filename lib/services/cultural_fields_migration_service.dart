@@ -13,10 +13,10 @@ class CulturalFieldsMigrationService {
       debugPrint('🔄 Starting cultural fields migration for all users...');
 
       final usersSnapshot = await _firestore.collection('users').get();
-      int totalUsers = usersSnapshot.docs.length;
+      final int totalUsers = usersSnapshot.docs.length;
       int migratedUsers = 0;
       int errorUsers = 0;
-      List<String> errors = [];
+      final List<String> errors = [];
 
       debugPrint('📊 Found $totalUsers users to migrate');
 
@@ -63,7 +63,7 @@ class CulturalFieldsMigrationService {
 
   /// Migrate a single user
   static Future<bool> _migrateUser(
-      String userId, Map<String, dynamic> userData) async {
+      String userId, Map<String, dynamic> userData,) async {
     try {
       // Check if user already has cultural fields
       if (_hasCulturalFields(userData)) {
@@ -86,17 +86,15 @@ class CulturalFieldsMigrationService {
   }
 
   /// Check if user already has cultural fields
-  static bool _hasCulturalFields(Map<String, dynamic> userData) {
-    return userData.containsKey('nationality') ||
+  static bool _hasCulturalFields(Map<String, dynamic> userData) => userData.containsKey('nationality') ||
         userData.containsKey('tribe') ||
         userData.containsKey('languages') ||
         userData.containsKey('religion') ||
         userData.containsKey('occupation');
-  }
 
   /// Extract cultural data from existing user data
   static Map<String, dynamic> _extractCulturalData(
-      Map<String, dynamic> userData) {
+      Map<String, dynamic> userData,) {
     final culturalData = <String, dynamic>{};
 
     // Extract nationality from living_in or other location fields

@@ -1,13 +1,15 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:developer';
+
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
 
 class AccountDeletionScreen extends StatefulWidget {
-  const AccountDeletionScreen({Key? key}) : super(key: key);
+  const AccountDeletionScreen({super.key});
 
   @override
   State<AccountDeletionScreen> createState() => _AccountDeletionScreenState();
@@ -83,8 +85,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -121,9 +122,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             const SizedBox(height: 24),
 
             // Password/Phone Confirmation (based on auth provider)
-            _isPhoneUser
-                ? _buildPhoneConfirmationSection()
-                : _buildPasswordConfirmationSection(),
+            if (_isPhoneUser) _buildPhoneConfirmationSection() else _buildPasswordConfirmationSection(),
             const SizedBox(height: 24),
 
             // Confirmation Checkboxes
@@ -140,10 +139,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildWarningHeader() {
-    return Container(
+  Widget _buildWarningHeader() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: errorColor.withOpacity(0.05),
@@ -159,7 +156,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               color: errorColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.warning,
               size: 40,
               color: errorColor,
@@ -188,10 +185,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildWhatGetsDeletedSection() {
-    return Container(
+  Widget _buildWhatGetsDeletedSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -209,7 +204,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.delete_forever, color: errorColor, size: 24),
+              const Icon(Icons.delete_forever, color: errorColor, size: 24),
               const SizedBox(width: 12),
               Text(
                 'What Gets Deleted',
@@ -237,7 +232,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.info, color: warningColor, size: 20),
+                const Icon(Icons.info, color: warningColor, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -255,14 +250,12 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildDeletionItem(String text) {
-    return Padding(
+  Widget _buildDeletionItem(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(Icons.check_circle, color: errorColor, size: 16),
+          const Icon(Icons.check_circle, color: errorColor, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -276,10 +269,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildDeletionReasonSection() {
-    return Container(
+  Widget _buildDeletionReasonSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -313,8 +304,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           ),
           const SizedBox(height: 16),
           ..._deletionReasons
-              .map((reason) => _buildReasonTile(reason))
-              .toList(),
+              .map(_buildReasonTile)
+              ,
           if (_selectedReason == 'Other') ...[
             const SizedBox(height: 16),
             TextFormField(
@@ -329,7 +320,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: primaryColor, width: 2),
+                  borderSide: const BorderSide(color: primaryColor, width: 2),
                 ),
                 contentPadding: const EdgeInsets.all(16),
               ),
@@ -339,7 +330,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildReasonTile(String reason) {
     final isSelected = _selectedReason == reason;
@@ -372,7 +362,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 shape: BoxShape.circle,
               ),
               child: isSelected
-                  ? Icon(Icons.check, color: Colors.white, size: 12)
+                  ? const Icon(Icons.check, color: Colors.white, size: 12)
                   : null,
             ),
             const SizedBox(width: 12),
@@ -392,8 +382,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     );
   }
 
-  Widget _buildPasswordConfirmationSection() {
-    return Container(
+  Widget _buildPasswordConfirmationSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -438,11 +427,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: primaryColor, width: 2),
+                borderSide: const BorderSide(color: primaryColor, width: 2),
               ),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              prefixIcon: Icon(Icons.lock, color: primaryColor),
+              prefixIcon: const Icon(Icons.lock, color: primaryColor),
               suffixIcon: IconButton(
                 icon: Icon(
                   _passwordVisible ? Icons.visibility : Icons.visibility_off,
@@ -457,10 +446,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildConfirmationSection() {
-    return Container(
+  Widget _buildConfirmationSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -503,15 +490,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildCheckboxTile({
     required bool value,
     required ValueChanged<bool?> onChanged,
     required String title,
     required String subtitle,
-  }) {
-    return Row(
+  }) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Checkbox(
@@ -545,7 +530,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       ],
     );
-  }
 
   Widget _buildDeleteButton() {
     // For phone users, don't require password
@@ -584,7 +568,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
@@ -613,8 +597,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     );
   }
 
-  Widget _buildAlternativeOptionsSection() {
-    return Container(
+  Widget _buildAlternativeOptionsSection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
@@ -626,7 +609,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb, color: primaryColor, size: 20),
+              const Icon(Icons.lightbulb, color: primaryColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Consider These Alternatives',
@@ -640,17 +623,15 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           ),
           const SizedBox(height: 12),
           _buildAlternativeItem(
-              '📴 Temporarily deactivate your account instead'),
+              '📴 Temporarily deactivate your account instead',),
           _buildAlternativeItem('🔒 Update your privacy settings'),
           _buildAlternativeItem('⚙️ Adjust your matching preferences'),
           _buildAlternativeItem('💬 Contact support for help with issues'),
         ],
       ),
     );
-  }
 
-  Widget _buildAlternativeItem(String text) {
-    return Padding(
+  Widget _buildAlternativeItem(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         text,
@@ -661,7 +642,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       ),
     );
-  }
 
   Future<void> _deleteAccount() async {
     setState(() => _isDeleting = true);
@@ -771,7 +751,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                     shape: BoxShape.circle,
                   ),
                   child:
-                      Icon(Icons.delete_forever, color: errorColor, size: 40),
+                      const Icon(Icons.delete_forever, color: errorColor, size: 40),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -804,12 +784,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: errorColor.withOpacity(0.2),
-                      width: 1,
                     ),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber_rounded, color: errorColor, size: 20),
+                      const Icon(Icons.warning_amber_rounded, color: errorColor, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -917,8 +896,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     }
   }
 
-  Widget _buildPhoneConfirmationSection() {
-    return Container(
+  Widget _buildPhoneConfirmationSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -960,7 +938,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: warningColor, size: 20),
+                const Icon(Icons.info_outline, color: warningColor, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -977,5 +955,4 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ],
       ),
     );
-  }
 }

@@ -137,70 +137,72 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   Widget _buildProfileHeader() {
+    // Get basic info
+    final age = widget.user.age;
+    final gender = widget.user.userGender ?? widget.user.editInfo?['userGender'];
+    final height = widget.user.editInfo?['heightDisplay'] ?? 
+                   widget.user.editInfo?['height_ft_in'];
+    final location = widget.user.living_in ?? 
+                     widget.user.editInfo?['locationName'];
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "${widget.user.name ?? 'Unknown'}, ${widget.user.age ?? 'N/A'}",
-                  style: GoogleFonts.montserrat(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-            ],
+          // Name only (age will be in details row)
+          Text(
+            widget.user.name ?? 'Unknown',
+            style: GoogleFonts.montserrat(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
-          if (widget.user.nationality != null || widget.user.living_in != null) ...[
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+          const SizedBox(height: 16),
+          // Hinge-style horizontal basic info row
+          if (age != null || gender != null || height != null || location != null)
+            Row(
               children: [
-                if (widget.user.nationality != null)
-                  _buildInfoChip(widget.user.nationality!, Icons.flag),
-                if (widget.user.living_in != null)
-                  _buildInfoChip(widget.user.living_in!, Icons.location_on),
+                if (age != null)
+                  _buildBasicInfoItem(Icons.cake, age.toString()),
+                if (gender != null) ...[
+                  if (age != null) const SizedBox(width: 16),
+                  _buildBasicInfoItem(Icons.person, gender.toString()),
+                ],
+                if (height != null && height.toString().isNotEmpty && height.toString() != '0') ...[
+                  if (age != null || gender != null) const SizedBox(width: 16),
+                  _buildBasicInfoItem(Icons.straighten, height.toString()),
+                ],
+                if (location != null) ...[
+                  if (age != null || gender != null || height != null) const SizedBox(width: 16),
+                  _buildBasicInfoItem(Icons.location_on, location.toString()),
+                ],
               ],
             ),
-          ],
         ],
       ),
     );
   }
 
-  Widget _buildInfoChip(String text, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.primaryGreen.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.3),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: AppColors.primaryGreen),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primaryGreen,
-            ),
+  Widget _buildBasicInfoItem(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 18, color: AppColors.textSecondary),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimary,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
+
 
   Widget _buildBioSection(String bio) {
     return Padding(
@@ -241,40 +243,34 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   Widget _buildDetailsSection() {
     final details = <Map<String, dynamic>>[];
 
-    // Education
-    if (widget.user.education != null && widget.user.education!.isNotEmpty) {
-      details.add({'icon': Icons.school, 'label': 'Education', 'value': widget.user.education!});
-    }
-
-    // Work/Job - check multiple fields for compatibility
+    // Work/Profession - briefcase icon (like Hinge)
     final workTitle = widget.user.job_title ?? 
                      widget.user.profession ?? 
                      widget.user.occupation;
     if (workTitle != null && workTitle.toString().isNotEmpty) {
-      details.add({'icon': Icons.work, 'label': 'Work', 'value': workTitle.toString()});
+      details.add({'icon': Icons.business_center, 'label': '', 'value': workTitle.toString()});
     }
 
-    // Religion
+    // Education - graduation cap icon (like Hinge)
+    if (widget.user.education != null && widget.user.education!.isNotEmpty) {
+      details.add({'icon': Icons.school, 'label': '', 'value': widget.user.education!});
+    }
+
+    // Religion - book icon (like Hinge)
     if (widget.user.religion != null && widget.user.religion!.isNotEmpty) {
-      details.add({'icon': Icons.favorite, 'label': 'Religion', 'value': widget.user.religion!});
+      details.add({'icon': Icons.menu_book, 'label': '', 'value': widget.user.religion!});
     }
 
-    // Height - check if available
-    final height = widget.user.editInfo?['heightDisplay'] ?? 
-                   widget.user.editInfo?['height_ft_in'];
-    if (height != null && height.toString().isNotEmpty && height.toString() != '0') {
-      details.add({'icon': Icons.height, 'label': 'Height', 'value': height.toString()});
+    // Relationship Intent (Relationship goals) - search icon (like Hinge)
+    final relationshipIntent = widget.user.editInfo?['relationshipIntent'] ??
+                              widget.user.editInfo?['preferences']?['relationshipIntent'];
+    if (relationshipIntent != null && relationshipIntent.toString().isNotEmpty) {
+      details.add({'icon': Icons.search, 'label': '', 'value': relationshipIntent.toString()});
     }
 
-    // Languages
-    if (widget.user.languages != null && widget.user.languages!.isNotEmpty) {
-      final languagesStr = widget.user.languages!.join(', ');
-      details.add({'icon': Icons.language, 'label': 'Languages', 'value': languagesStr});
-    }
-
-    // Tribe
+    // Tribe - group icon
     if (widget.user.tribe != null && widget.user.tribe!.isNotEmpty) {
-      details.add({'icon': Icons.group, 'label': 'Tribe', 'value': widget.user.tribe!});
+      details.add({'icon': Icons.group, 'label': '', 'value': widget.user.tribe!});
     }
 
     if (details.isEmpty) return const SizedBox.shrink();
@@ -284,15 +280,8 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Details',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          // Hinge-style details: just icon and value, no label
           ...details.map((detail) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
@@ -300,31 +289,17 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
                     Icon(
                       detail['icon'] as IconData,
                       size: 20,
-                      color: AppColors.primaryGreen,
+                      color: AppColors.textSecondary,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            detail['label'] as String,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            detail['value'] as String,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        detail['value'] as String,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ],

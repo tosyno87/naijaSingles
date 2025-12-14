@@ -118,14 +118,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
         return;
       }
     } else if (_currentPage == 4) {
-      // Bio page
-      if (controller.bio.trim().isEmpty || controller.bio.trim().length < 50) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Please write a bio (at least 50 characters)'),),
-        );
-        return;
-      }
+      // Bio page - Optional (Tinder standard: bio can be empty)
+      // No validation - users can skip bio
     } else if (_currentPage == 5) {
       // Enhanced Interests page
       if (controller.interests.length < 5) {
@@ -242,8 +236,6 @@ class _OnboardingMainState extends State<OnboardingMain> {
     // Define colors
     const Color backgroundColor = Colors.white; // Clean white
     const Color primaryColor = Color(0xFF008037); // Deep Green
-    const Color accentColor = Color(0xFFE74C3C); // Coral Red
-    const Color textColor = Color(0xFF333333);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -338,8 +330,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         canContinue = controller.nationality != null &&
                             controller.nationality!.isNotEmpty;
                         break;
-                      case 4: // Bio page
-                        canContinue = controller.isBioComplete();
+                      case 4: // Bio page - Optional (Tinder standard)
+                        canContinue = true; // Bio is optional
                         break;
                       case 5: // Interests page
                         canContinue = controller.areInterestsSelected();

@@ -3,11 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/data/repo/user_search_repo.dart';
-import '../../../common/routes/route_name.dart';
 import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
-import '../widgets/horizontal_profile_viewer.dart';
 import '../widgets/match_confirmation_modal.dart';
+import '../widgets/hinge_profile_card.dart';
 
 class TribeConnectScreen extends StatefulWidget {
 
@@ -22,6 +21,16 @@ class TribeConnectScreen extends StatefulWidget {
 }
 
 class _TribeConnectScreenState extends State<TribeConnectScreen> {
+  // Track which users have been passed/connected to avoid showing them again
+  final Set<String> _processedUserIds = <String>{};
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -33,7 +42,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       title: Text(
-        'Tribe Connect',
+        'Connect',
         style: GoogleFonts.montserrat(
           fontSize: 24,
           fontWeight: FontWeight.w600,
@@ -55,25 +64,26 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       return _buildEmptyState();
     }
 
-    return HorizontalProfileViewer(
-      users: widget.users,
-      currentUser: widget.currentUser,
-      onConnect: _handleConnect,
-      onPass: _handlePass,
-      onViewProfile: _handleViewProfile,
-      onAllProfilesViewed: () {
-        // Handle when all profiles are viewed
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-                'You\'ve seen all available profiles! Check back later for new connections.',),
-            backgroundColor: AppColors.primaryGreen,
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
+    // Filter out processed users
+    final availableUsers = widget.users
+        .where((user) => !_processedUserIds.contains(user.id))
+        .toList();
+
+    if (availableUsers.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    // Hinge-style vertical scrollable feed
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: availableUsers.length,
+      itemBuilder: (context, index) {
+        final user = availableUsers[index];
+        return HingeProfileCard(
+          user: user,
+          onConnect: () => _handleConnect(user),
+          onPass: () => _handlePass(user),
         );
       },
     );
@@ -215,6 +225,11 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
   Future<void> _handleConnect(UserModel user) async {
     try {
+      // Mark user as processed
+      setState(() {
+        _processedUserIds.add(user.id ?? '');
+      });
+
       final matchId = await UserSearchRepo.rightSwipe(widget.currentUser, user);
 
       if (matchId != null) {
@@ -223,26 +238,30 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         _showConnectConfirmation(user);
       }
     } catch (e) {
+      // Revert on error
+      setState(() {
+        _processedUserIds.remove(user.id ?? '');
+      });
       _showError('Failed to connect. Please try again.');
     }
   }
 
   Future<void> _handlePass(UserModel user) async {
     try {
+      // Mark user as processed
+      setState(() {
+        _processedUserIds.add(user.id ?? '');
+      });
+
       await UserSearchRepo.leftSwipe(widget.currentUser, user);
       _showPassConfirmation(user);
     } catch (e) {
+      // Revert on error
+      setState(() {
+        _processedUserIds.remove(user.id ?? '');
+      });
       _showError('Failed to pass. Please try again.');
     }
-  }
-
-  void _handleViewProfile(UserModel user) {
-    // Navigate to user detail screen
-    Navigator.pushNamed(
-      context,
-      RouteName.userDetailScreen,
-      arguments: user,
-    );
   }
 
   void _showMatchConfirmation(UserModel user) {

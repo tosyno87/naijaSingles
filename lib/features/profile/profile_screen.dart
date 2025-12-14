@@ -190,31 +190,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? const Center(child: CircularProgressIndicator(color: primaryColor))
           : SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                // Remove padding for seamless Hinge-style layout
+                padding: EdgeInsets.zero,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Simplified Photo Section
-                    _buildSimplifiedPhotoSection(),
-                    const SizedBox(height: 24),
-
-                    // Simplified Basic Info
-                    _buildSimplifiedBasicInfo(),
-                    const SizedBox(height: 16),
-
-                    // Simplified About Section
-                    _buildSimplifiedAbout(),
-                    const SizedBox(height: 16),
-
-                    // Simplified Interests
-                    _buildSimplifiedInterests(),
-                    const SizedBox(height: 16),
-
-                    // Simplified Location (includes nationality)
-                    _buildSimplifiedLocation(),
-                    const SizedBox(height: 32),
-
-                    // Single Edit Button
-                    _buildEditButton(),
+                    // Hinge-style large photo section (full width, no padding)
+                    _buildHingePhotoSection(),
+                    
+                    // Profile header (name, age, location) - integrated with photos
+                    _buildHingeProfileHeader(),
+                    
+                    // About section - seamless
+                    _buildHingeAboutSection(),
+                    
+                    // Details section - seamless
+                    _buildHingeDetailsSection(),
+                    
+                    // Interests section - seamless
+                    _buildHingeInterestsSection(),
+                    
+                    // Edit button with padding
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: _buildEditButton(),
+                    ),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -719,6 +719,367 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       return null;
     }
+  }
+
+  // Hinge-style photo section - large, full-width
+  Widget _buildHingePhotoSection() {
+    final photos = _userData?['photos'] as List<dynamic>? ??
+        _userData?['Pictures'] as List<dynamic>? ??
+        _userData?['imageUrl'] as List<dynamic>? ??
+        [];
+
+    if (photos.isEmpty) {
+      return Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        color: cardColor,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_a_photo_outlined,
+                size: 48,
+                color: primaryColor.withOpacity(0.6),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Add Photos',
+                style: GoogleFonts.montserrat(
+                  color: textSecondary,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6,
+      child: PageView.builder(
+        controller: _photoPageController,
+        itemCount: photos.length,
+        onPageChanged: (index) {
+          setState(() {
+            _currentPhotoIndex = index;
+          });
+        },
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: () => _showFullScreenPhoto(photos, index),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(
+                photos[index].toString(),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                  color: Colors.grey.shade300,
+                  child: const Icon(Icons.broken_image_outlined, size: 60),
+                ),
+              ),
+              // Photo indicator dots at bottom
+              if (photos.length > 1)
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      photos.length,
+                      (dotIndex) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: dotIndex == _currentPhotoIndex
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Hinge-style profile header
+  Widget _buildHingeProfileHeader() {
+    final name = _userData?['name'] ?? 'Your Name';
+    final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
+    final nationality = _userData?['nationality']?.toString() ?? '';
+    
+    String location = '';
+    if (_userData?['location'] != null) {
+      if (_userData!['location'] is String) {
+        location = _userData!['location'] as String;
+      } else if (_userData!['location'] is Map) {
+        location = _userData!['location']?['name']?.toString() ?? '';
+      }
+    }
+    if (location.isEmpty && _userData?['living_in'] != null) {
+      location = _userData!['living_in'].toString();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name + (age != null ? ', $age' : ''),
+            style: GoogleFonts.montserrat(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
+          ),
+          if (nationality.isNotEmpty || location.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (nationality.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: primaryColor.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.flag, size: 16, color: primaryColor),
+                        const SizedBox(width: 6),
+                        Text(
+                          nationality,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (location.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: primaryColor.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.location_on, size: 16, color: primaryColor),
+                        const SizedBox(width: 6),
+                        Text(
+                          location,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // Hinge-style about section
+  Widget _buildHingeAboutSection() {
+    final bio = _userData?['bio']?.toString() ?? '';
+    if (bio.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'About',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            bio,
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: textSecondary,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  // Hinge-style details section
+  Widget _buildHingeDetailsSection() {
+    final details = <Map<String, dynamic>>[];
+
+    if (_userData?['education'] != null &&
+        _userData!['education'].toString().isNotEmpty) {
+      details.add({
+        'icon': Icons.school,
+        'label': 'Education',
+        'value': _userData!['education'].toString()
+      });
+    }
+    if (_userData?['job_title'] != null &&
+        _userData!['job_title'].toString().isNotEmpty) {
+      details.add({
+        'icon': Icons.work,
+        'label': 'Work',
+        'value': _userData!['job_title'].toString()
+      });
+    }
+    if (_userData?['religion'] != null &&
+        _userData!['religion'].toString().isNotEmpty) {
+      details.add({
+        'icon': Icons.favorite,
+        'label': 'Religion',
+        'value': _userData!['religion'].toString()
+      });
+    }
+    if (_userData?['tribe'] != null && _userData!['tribe'].toString().isNotEmpty) {
+      details.add({
+        'icon': Icons.group,
+        'label': 'Tribe',
+        'value': _userData!['tribe'].toString()
+      });
+    }
+
+    if (details.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Details',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...details.map((detail) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      detail['icon'] as IconData,
+                      size: 20,
+                      color: primaryColor,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            detail['label'] as String,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            detail['value'] as String,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  // Hinge-style interests section
+  Widget _buildHingeInterestsSection() {
+    final interests = _userData?['interests'] as List<dynamic>? ?? [];
+    if (interests.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Interests',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: interests.map((interest) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: primaryColor.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Text(
+                    interest.toString(),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: primaryColor,
+                    ),
+                  ),
+                )).toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
   }
 
   // Full screen photo viewer

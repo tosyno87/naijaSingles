@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../models/enhanced_event_model.dart';
 
 class UserEventService {
@@ -392,18 +393,26 @@ class UserEventService {
       } catch (e, stackTrace) {
         log('❌ Error uploading image ${i + 1} ($imagePath)', name: 'UserEventService');
         log('❌ Error type: ${e.runtimeType}', name: 'UserEventService');
-        log('❌ Error message: $e', name: 'UserEventService');
+        log('❌ Error toString: ${e.toString()}', name: 'UserEventService');
         
-        // Check if it's a Firebase Storage error
-        if (e.toString().contains('firebase_storage')) {
-          log('❌ This is a Firebase Storage error', name: 'UserEventService');
-          if (e.toString().contains('permission-denied')) {
-            log('❌ Permission denied - check Firebase Storage rules', name: 'UserEventService');
-          } else if (e.toString().contains('object-not-found')) {
-            log('❌ Object not found - check file path', name: 'UserEventService');
-          } else if (e.toString().contains('unauthorized')) {
-            log('❌ Unauthorized - check Firebase Storage rules and authentication', name: 'UserEventService');
+        // Handle FirebaseException specifically
+        if (e is FirebaseException) {
+          log('❌ FirebaseException - Code: ${e.code}, Message: ${e.message}', name: 'UserEventService');
+          log('❌ Plugin: ${e.plugin}', name: 'UserEventService');
+          
+          if (e.code == 'permission-denied') {
+            log('❌ PERMISSION DENIED - Storage rules may be blocking upload', name: 'UserEventService');
+          } else if (e.code == 'unknown') {
+            log('❌ UNKNOWN ERROR - This could indicate:', name: 'UserEventService');
+            log('   - Storage bucket not configured correctly', name: 'UserEventService');
+            log('   - Network connectivity issue', name: 'UserEventService');
+            log('   - Firebase Storage not initialized properly', name: 'UserEventService');
+            log('   - Storage rules still propagating (wait a few minutes)', name: 'UserEventService');
+          } else if (e.code == 'unauthorized') {
+            log('❌ UNAUTHORIZED - User may not be authenticated', name: 'UserEventService');
           }
+        } else {
+          log('❌ Non-Firebase exception: $e', name: 'UserEventService');
         }
         
         log('❌ Stack trace: $stackTrace', name: 'UserEventService');

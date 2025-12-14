@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use, depend_on_referenced_packages
 
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -70,13 +71,25 @@ Future<void> main() async {
     await EnhancedNotificationService.initialize();
     log('🔔 Enhanced Notification Service initialized');
 
-    // Initialize seed events if database is empty
+    // Initialize seed events if database is empty (only if user is authenticated)
+    // Events seeding requires authentication per Firestore security rules
+    // This will be handled after user login in UserProvider or similar
     try {
-      final seedService = SeedEventsService();
-      await seedService.seedEventsIfEmpty();
-      log('🎉 Events seeding completed');
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        final seedService = SeedEventsService();
+        await seedService.seedEventsIfEmpty();
+        log('🎉 Events seeding completed');
+      } else {
+        log('⏭️ Skipping events seeding - no authenticated user (expected at app startup)');
+      }
     } catch (e) {
-      log('⚠️ Events seeding error: $e');
+      // Silently skip if permission denied (expected when no user is authenticated)
+      if (e.toString().contains('permission-denied')) {
+        log('⏭️ Skipping events seeding - requires authentication (expected)');
+      } else {
+        log('⚠️ Events seeding error: $e');
+      }
     }
   } catch (e) {
     log('❌ Firebase initialization error: $e');
@@ -84,10 +97,27 @@ Future<void> main() async {
 
   // Authentication state will be managed by the app flow
 
-  // Add debug logging for auth state changes
+  // Add debug logging for auth state changes and seed events on authentication
   FirebaseAuth.instance.authStateChanges().listen(
     (User? user) {
       log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
+      
+      // Seed events when user authenticates (seedEventsIfEmpty checks if events exist, so safe to call multiple times)
+      if (user != null) {
+        // Use unawaited to properly handle the future without blocking the stream listener
+        unawaited(
+          SeedEventsService().seedEventsIfEmpty().then((_) {
+            log('🎉 Events seeding completed (after authentication)');
+          }).catchError((e) {
+            // Silently skip if permission denied (shouldn't happen when authenticated, but handle gracefully)
+            if (e.toString().contains('permission-denied')) {
+              log('⚠️ Events seeding failed - permission denied (unexpected for authenticated user)');
+            } else {
+              log('⚠️ Events seeding error: $e');
+            }
+          }),
+        );
+      }
     },
     onError: (error) {
       log('❌ Auth state error: $error');

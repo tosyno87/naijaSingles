@@ -79,8 +79,9 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   Widget _buildPhotoSection(List<String> photos) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6, // 60% of screen height
+      height: screenHeight * 0.5, // 50% of screen height for photos
       child: PageView.builder(
         controller: _photoPageController,
         onPageChanged: (index) {

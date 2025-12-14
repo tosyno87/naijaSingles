@@ -93,10 +93,10 @@ class _OnboardingMainState extends State<OnboardingMain> {
         return;
       }
     } else if (_currentPage == 1) {
-      // Photo upload page (MOVED TO STEP 2)
+      // Photo upload page (MOVED TO STEP 2) - Tinder requires at least 1 photo
       if (!controller.isPhotoUploaded()) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please upload at least 3 photos')),
+          const SnackBar(content: Text('Please upload at least 1 photo')),
         );
         return;
       }

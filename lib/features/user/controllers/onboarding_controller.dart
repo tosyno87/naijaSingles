@@ -23,7 +23,7 @@ class OnboardingController extends ChangeNotifier {
   String _tribe = '';
   String _bio = '';
   List<String> _interests = [];
-  final List<File?> _profilePhotos = List.filled(5, null); // Support up to 5 photos
+  final List<File?> _profilePhotos = List.filled(9, null); // Support up to 9 photos (Tinder standard)
   bool _isLoading = false;
 
   // Additional user data (for compatibility with existing code)
@@ -375,9 +375,9 @@ class OnboardingController extends ChangeNotifier {
   }
 
   bool isPhotoUploaded() {
-    // Require at least 3 photos
+    // Tinder requires at least 1 photo to proceed
     final int photoCount = _profilePhotos.where((photo) => photo != null).length;
-    return photoCount >= 3;
+    return photoCount >= 1;
   }
 
   // Photo selection for a specific index with industry-standard cropping

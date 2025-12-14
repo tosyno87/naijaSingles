@@ -78,38 +78,30 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Photo grid - Tinder-style: Clean and minimal
+            // Photo grid - Tinder-style: Scrollable grid showing up to 9 photos
             Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Row(
-                    children: [
-                      Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.center,
+                  children: List.generate(9, (index) {
+                    final photo = index < uploadedPhotos.length 
+                        ? uploadedPhotos[index] 
+                        : null;
+                    return SizedBox(
+                      width: (MediaQuery.of(context).size.width - 72) / 3, // 3 columns
+                      child: AspectRatio(
+                        aspectRatio: 1.0,
                         child: _buildPhotoGridItem(
-                          photo: uploadedPhotos[0],
-                          index: 0,
-                          isMainPhoto: true,
+                          photo: photo,
+                          index: index,
+                          isMainPhoto: index == 0,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildPhotoGridItem(
-                          photo: uploadedPhotos[1],
-                          index: 1,
-                          isMainPhoto: false,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildPhotoGridItem(
-                          photo: uploadedPhotos[2],
-                          index: 2,
-                          isMainPhoto: false,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  }),
                 ),
               ),
             ),

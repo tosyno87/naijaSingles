@@ -241,15 +241,38 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   Widget _buildDetailsSection() {
     final details = <Map<String, dynamic>>[];
 
+    // Education
     if (widget.user.education != null && widget.user.education!.isNotEmpty) {
       details.add({'icon': Icons.school, 'label': 'Education', 'value': widget.user.education!});
     }
-    if (widget.user.job_title != null && widget.user.job_title!.isNotEmpty) {
-      details.add({'icon': Icons.work, 'label': 'Work', 'value': widget.user.job_title!});
+
+    // Work/Job - check multiple fields for compatibility
+    final workTitle = widget.user.job_title ?? 
+                     widget.user.profession ?? 
+                     widget.user.occupation;
+    if (workTitle != null && workTitle.toString().isNotEmpty) {
+      details.add({'icon': Icons.work, 'label': 'Work', 'value': workTitle.toString()});
     }
+
+    // Religion
     if (widget.user.religion != null && widget.user.religion!.isNotEmpty) {
       details.add({'icon': Icons.favorite, 'label': 'Religion', 'value': widget.user.religion!});
     }
+
+    // Height - check if available
+    final height = widget.user.editInfo?['heightDisplay'] ?? 
+                   widget.user.editInfo?['height_ft_in'];
+    if (height != null && height.toString().isNotEmpty && height.toString() != '0') {
+      details.add({'icon': Icons.height, 'label': 'Height', 'value': height.toString()});
+    }
+
+    // Languages
+    if (widget.user.languages != null && widget.user.languages!.isNotEmpty) {
+      final languagesStr = widget.user.languages!.join(', ');
+      details.add({'icon': Icons.language, 'label': 'Languages', 'value': languagesStr});
+    }
+
+    // Tribe
     if (widget.user.tribe != null && widget.user.tribe!.isNotEmpty) {
       details.add({'icon': Icons.group, 'label': 'Tribe', 'value': widget.user.tribe!});
     }

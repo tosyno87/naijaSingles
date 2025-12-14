@@ -944,36 +944,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildHingeDetailsSection() {
     final details = <Map<String, dynamic>>[];
 
-    if (_userData?['education'] != null &&
-        _userData!['education'].toString().isNotEmpty) {
-      details.add({
-        'icon': Icons.school,
-        'label': 'Education',
-        'value': _userData!['education'].toString()
-      });
+    // Helper to safely get value from root or editInfo
+    String? getValue(String key) {
+      final rootValue = _userData?[key];
+      if (rootValue != null && rootValue.toString().isNotEmpty) {
+        return rootValue.toString();
+      }
+      final editInfoValue = _userData?['editInfo']?[key];
+      if (editInfoValue != null && editInfoValue.toString().isNotEmpty) {
+        return editInfoValue.toString();
+      }
+      return null;
     }
-    if (_userData?['job_title'] != null &&
-        _userData!['job_title'].toString().isNotEmpty) {
-      details.add({
-        'icon': Icons.work,
-        'label': 'Work',
-        'value': _userData!['job_title'].toString()
-      });
+
+    // Education
+    final education = getValue('education');
+    if (education != null) {
+      details.add({'icon': Icons.school, 'label': 'Education', 'value': education});
     }
-    if (_userData?['religion'] != null &&
-        _userData!['religion'].toString().isNotEmpty) {
-      details.add({
-        'icon': Icons.favorite,
-        'label': 'Religion',
-        'value': _userData!['religion'].toString()
-      });
+
+    // Work/Job - check multiple fields for compatibility
+    final workTitle = getValue('job_title') ?? 
+                     getValue('profession') ?? 
+                     getValue('occupation');
+    if (workTitle != null) {
+      details.add({'icon': Icons.work, 'label': 'Work', 'value': workTitle});
     }
-    if (_userData?['tribe'] != null && _userData!['tribe'].toString().isNotEmpty) {
-      details.add({
-        'icon': Icons.group,
-        'label': 'Tribe',
-        'value': _userData!['tribe'].toString()
-      });
+
+    // Religion
+    final religion = getValue('religion');
+    if (religion != null) {
+      details.add({'icon': Icons.favorite, 'label': 'Religion', 'value': religion});
+    }
+
+    // Height
+    final height = getValue('heightDisplay') ?? 
+                   getValue('height_ft_in') ??
+                   getValue('height');
+    if (height != null && height != '0' && height != '0.0') {
+      // Format height display
+      String heightDisplay = height;
+      if (heightDisplay.contains('.')) {
+        // If it's a number, try to format it
+        try {
+          final heightNum = double.parse(heightDisplay);
+          if (heightNum > 0) {
+            heightDisplay = heightDisplay;
+          } else {
+            heightDisplay = ''; // Skip if invalid
+          }
+        } catch (e) {
+          // Keep original string if parsing fails
+        }
+      }
+      if (heightDisplay.isNotEmpty) {
+        details.add({'icon': Icons.height, 'label': 'Height', 'value': heightDisplay});
+      }
+    }
+
+    // Languages
+    final languages = _userData?['languages'];
+    if (languages is List && languages.isNotEmpty) {
+      final languagesList = languages.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+      if (languagesList.isNotEmpty) {
+        details.add({'icon': Icons.language, 'label': 'Languages', 'value': languagesList.join(', ')});
+      }
+    }
+
+    // Tribe
+    final tribe = getValue('tribe');
+    if (tribe != null) {
+      details.add({'icon': Icons.group, 'label': 'Tribe', 'value': tribe});
     }
 
     if (details.isEmpty) return const SizedBox.shrink();

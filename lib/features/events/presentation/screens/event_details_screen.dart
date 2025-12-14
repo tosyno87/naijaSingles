@@ -124,20 +124,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            if (widget.event.imageUrl != null && widget.event.imageUrl!.isNotEmpty) CachedNetworkImage(
-                    imageUrl: widget.event.imageUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const ColoredBox(
-                      color: Color(0xFFF5F5F5),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
-                        ),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) =>
-                        _buildPlaceholderImage(),
-                  ) else _buildPlaceholderImage(),
+            _buildEventHeaderImage(),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -217,6 +204,36 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       ),
     );
+
+  String? _getEventImageUrl() {
+    // Check if imageUrl exists and is not empty
+    if (widget.event.imageUrl != null && widget.event.imageUrl!.trim().isNotEmpty) {
+      return widget.event.imageUrl;
+    }
+    return null;
+  }
+
+  Widget _buildEventHeaderImage() {
+    final imageUrl = _getEventImageUrl();
+    
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => const ColoredBox(
+          color: Color(0xFFF5F5F5),
+          child: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+            ),
+          ),
+        ),
+        errorWidget: (context, url, error) => _buildPlaceholderImage(),
+      );
+    }
+    
+    return _buildPlaceholderImage();
+  }
 
   Widget _buildPlaceholderImage() => ColoredBox(
       color: const Color(0xFF008037),

@@ -17,6 +17,7 @@ class _PreferencesOnboardingScreenState
     extends State<PreferencesOnboardingScreen> {
   String _selectedInterestedIn = 'everyone';
   RangeValues _ageRange = const RangeValues(18, 50);
+  double _maxDistance = 50.0; // Default 50 miles (industry standard)
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _PreferencesOnboardingScreenState
       controller.ageRange[0].toDouble(),
       controller.ageRange[1].toDouble(),
     );
+    _maxDistance = controller.maxDistance.toDouble();
 
     // Debug logging
     AppLogger.debug('🔍 PreferencesOnboardingScreen initState:');
@@ -78,6 +80,20 @@ class _PreferencesOnboardingScreenState
           ),
           SizedBox(height: isTablet ? 20 : 16),
           _buildInterestedInOptions(),
+
+          SizedBox(height: isTablet ? 48 : 40),
+
+          // Distance Section (Industry Standard - Tinder, Bumble, Hinge)
+          Text(
+            'Maximum Distance',
+            style: GoogleFonts.montserrat(
+              fontSize: isTablet ? 22 : 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: isTablet ? 20 : 16),
+          _buildDistanceSlider(),
 
           SizedBox(height: isTablet ? 48 : 40),
 
@@ -226,6 +242,73 @@ class _PreferencesOnboardingScreenState
             AppLogger.debug(
                 '   Controller ageRange after setting: ${controller.ageRange}',);
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDistanceSlider() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
+    return Column(
+      children: [
+        Text(
+          _maxDistance.round() == 100 
+              ? '${_maxDistance.round()} miles (Anywhere)' 
+              : 'Within ${_maxDistance.round()} miles',
+          style: GoogleFonts.montserrat(
+            fontSize: isTablet ? 18 : 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF008037),
+          ),
+        ),
+        SizedBox(height: isTablet ? 20 : 16),
+        Slider(
+          value: _maxDistance,
+          min: 1,
+          max: 100,
+          divisions: 99,
+          activeColor: const Color(0xFF008037),
+          inactiveColor: Colors.grey.shade300,
+          label: _maxDistance.round() == 100 
+              ? 'Anywhere' 
+              : '${_maxDistance.round()} miles',
+          onChanged: (double value) {
+            setState(() {
+              _maxDistance = value;
+            });
+            // Save to controller immediately
+            final controller =
+                Provider.of<OnboardingController>(context, listen: false);
+            controller.setMaxDistance(value.round());
+
+            // Debug logging
+            AppLogger.debug(
+                '🔍 PreferencesOnboardingScreen: Max distance changed to: ${value.round()} miles',);
+          },
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: isTablet ? 24 : 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '1 mile',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              Text(
+                '100 miles',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

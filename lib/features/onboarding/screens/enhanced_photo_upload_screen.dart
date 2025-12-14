@@ -126,36 +126,97 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
             const Divider(height: 1, color: dividerColor),
 
-            // Photo list
+            // Photo grid - Tinder-style 3 photos side by side
             Expanded(
-              child: ListView.builder(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
-                itemCount: maxPhotos,
-                itemBuilder: (context, index) {
-                  final photo = index < uploadedPhotos.length 
-                      ? uploadedPhotos[index] 
-                      : null;
-                  final isFirstPhoto = index == 0;
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _buildPhotoCard(
-                      photo: photo,
-                      index: index,
-                      isMainPhoto: isFirstPhoto,
-                      onTap: () => _showAddPhotoOptions(index),
-                      onRemove: photo != null 
-                          ? () => _removePhoto(index)
-                          : null,
-                      onReorderUp: index > 0 && photo != null
-                          ? () => _movePhoto(index, index - 1)
-                          : null,
-                      onReorderDown: index < uploadedCount - 1 && photo != null
-                          ? () => _movePhoto(index, index + 1)
-                          : null,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Text(
+                      'Add at least 3 photos',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
                     ),
-                  );
-                },
+                    const SizedBox(height: 8),
+                    Text(
+                      'Profiles with 3+ photos get 5x more matches',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // 3-photo grid (Tinder style)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildPhotoGridItem(
+                            photo: uploadedPhotos[0],
+                            index: 0,
+                            isMainPhoto: true,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildPhotoGridItem(
+                            photo: uploadedPhotos[1],
+                            index: 1,
+                            isMainPhoto: false,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildPhotoGridItem(
+                            photo: uploadedPhotos[2],
+                            index: 2,
+                            isMainPhoto: false,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    // Additional photos (optional, shown below grid if added)
+                    if (uploadedCount > 3) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        'Additional Photos (Optional)',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: List.generate(
+                          maxPhotos - 3,
+                          (index) {
+                            final actualIndex = index + 3;
+                            final photo = actualIndex < uploadedPhotos.length 
+                                ? uploadedPhotos[actualIndex] 
+                                : null;
+                            return SizedBox(
+                              width: (MediaQuery.of(context).size.width - 64 - 36) / 3,
+                              child: _buildPhotoGridItem(
+                                photo: photo,
+                                index: actualIndex,
+                                isMainPhoto: false,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
 
@@ -176,32 +237,36 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      // Add photo button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton.icon(
-                          onPressed: () => _showAddPhotoOptions(uploadedCount),
-                          icon: const Icon(Icons.add_photo_alternate, size: 22),
-                          label: Text(
-                            uploadedCount == 0
-                                ? 'Add Your First Photo'
-                                : 'Add Another Photo',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                      // Only show "Add Photo" button if less than 3 photos
+                      if (uploadedCount < 3)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              // Find first empty slot
+                              int emptySlot = uploadedPhotos.indexWhere((p) => p == null);
+                              if (emptySlot == -1) emptySlot = uploadedCount;
+                              _showAddPhotoOptions(emptySlot);
+                            },
+                            icon: const Icon(Icons.add_photo_alternate, size: 22),
+                            label: Text(
+                              'Add Photo ${uploadedCount + 1}',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryGreen,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryGreen,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
                             ),
-                            elevation: 0,
                           ),
                         ),
-                      ),
                       // Removed Continue button - navigation handled by OnboardingMain wrapper
                       if (!hasMinimumPhotos && uploadedCount > 0)
                         Padding(
@@ -227,18 +292,16 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     );
   }
 
-  Widget _buildPhotoCard({
+  // Tinder-style photo grid item - Square (1:1) aspect ratio
+  Widget _buildPhotoGridItem({
     required File? photo,
     required int index,
     required bool isMainPhoto,
-    required VoidCallback onTap,
-    VoidCallback? onRemove,
-    VoidCallback? onReorderUp,
-    VoidCallback? onReorderDown,
-  }) => GestureDetector(
-      onTap: onTap,
+  }) {
+    return GestureDetector(
+      onTap: () => _showAddPhotoOptions(index),
       child: AspectRatio(
-        aspectRatio: isMainPhoto ? 1.0 : 0.75, // Square for main photo, 4:3 for others
+        aspectRatio: 1.0, // Square - Industry standard (Tinder, Bumble, Hinge)
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: photo == null ? Colors.grey.shade100 : Colors.transparent,
@@ -247,151 +310,130 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               color: isMainPhoto && photo != null
                   ? primaryGreen
                   : Colors.grey.shade300,
-              width: isMainPhoto && photo != null ? 2 : 1,
+              width: isMainPhoto && photo != null ? 2.5 : 1.5,
             ),
+            boxShadow: photo != null
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
           child: Stack(
             children: [
-              // Photo or empty state - fills entire container
+              // Photo - use BoxFit.contain to show full image without cropping
               if (photo != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.file(
-                    photo,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.cover, // Fill container completely
+                  child: Container(
+                    color: Colors.black, // Black background for better contrast
+                    child: Image.file(
+                      photo,
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.contain, // Show full photo without cropping
+                    ),
                   ),
                 )
-            else
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_photo_alternate,
-                      size: 48,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Add Photo',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // Main photo badge
-            if (isMainPhoto && photo != null)
-              Positioned(
-                top: 12,
-                left: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: primaryGreen,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+              else
+                // Empty state
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.star,
-                        color: Colors.white,
-                        size: 14,
+                      Icon(
+                        Icons.add_photo_alternate,
+                        size: 40,
+                        color: Colors.grey.shade400,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(height: 8),
                       Text(
-                        'Main Photo',
+                        'Add Photo',
                         style: GoogleFonts.montserrat(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade600,
                         ),
                       ),
+                      if (isMainPhoto)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            'Main',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: primaryGreen,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
-              ),
 
-            // Reorder buttons (only show if photo exists)
-            if (photo != null) ...[
-              // Move up button
-              if (onReorderUp != null)
+              // Main photo badge (only if photo exists)
+              if (isMainPhoto && photo != null)
                 Positioned(
-                  top: 12,
-                  right: 48,
-                  child: GestureDetector(
-                    onTap: onReorderUp,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_upward,
-                        color: Colors.white,
-                        size: 18,
-                      ),
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: primaryGreen,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Colors.white,
+                          size: 12,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Main',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
 
-              // Move down button
-              if (onReorderDown != null)
+              // Delete/Replace button (only if photo exists)
+              if (photo != null)
                 Positioned(
-                  top: 48,
-                  right: 48,
+                  top: 8,
+                  right: 8,
                   child: GestureDetector(
-                    onTap: onReorderDown,
+                    onTap: () => _removePhoto(index),
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_downward,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                ),
-
-              // Delete button
-              if (onRemove != null)
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: GestureDetector(
-                    onTap: onRemove,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withOpacity(0.7),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.close,
                         color: Colors.white,
-                        size: 18,
+                        size: 16,
                       ),
                     ),
                   ),
                 ),
             ],
-            ],
           ),
         ),
       ),
     );
+  }
 
   Future<void> _showAddPhotoOptions(int index) async {
     final controller = Provider.of<OnboardingController>(context, listen: false);

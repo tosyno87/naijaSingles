@@ -596,6 +596,55 @@ class _EnhancedAdditionalInfoScreenState
           SizedBox(height: isTablet ? 32 : 24),
 
           // Info card explaining importance
+          // Optional step indicator - Industry best practice (progressive disclosure)
+          Container(
+            padding: EdgeInsets.all(isTablet ? 20 : 16),
+            decoration: BoxDecoration(
+              color: afropeepGreen.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: afropeepGreen.withOpacity(0.3),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: afropeepGreen,
+                  size: isTablet ? 24 : 20,
+                ),
+                SizedBox(width: isTablet ? 16 : 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'This step is optional',
+                        style: GoogleFonts.montserrat(
+                          fontSize: isTablet ? 16 : 14,
+                          fontWeight: FontWeight.w600,
+                          color: afropeepGreen,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'You can skip this and complete it later in your profile settings. Adding more details helps us find better matches!',
+                        style: GoogleFonts.montserrat(
+                          fontSize: isTablet ? 14 : 12,
+                          color: textDarkBrown,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: isTablet ? 32 : 24),
+
           _buildInfoCard(
             'Why we ask for this information',
             'These details help us find better matches and show you to people looking for the same things. Your information is private and secure.',

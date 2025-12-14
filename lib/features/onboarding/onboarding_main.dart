@@ -24,15 +24,16 @@ class _OnboardingMainState extends State<OnboardingMain> {
   int _currentPage = 0;
   final int _totalPages = 8; // Updated to include location screen
 
+  // Reordered based on industry best practices: Photos should be Step 2
   final List<String> _pageNames = [
     'Basic Info',
+    'Profile Photo', // MOVED UP - Industry standard (Tinder, Bumble, Hinge)
     'Your Location',
     'Nationality',
     'Tell Your Story',
     'Your Interests',
-    'Profile Photo',
     'Dating Preferences',
-    'Additional Info',
+    'Additional Info (Optional)',
   ];
 
   @override
@@ -92,6 +93,14 @@ class _OnboardingMainState extends State<OnboardingMain> {
         return;
       }
     } else if (_currentPage == 1) {
+      // Photo upload page (MOVED TO STEP 2)
+      if (!controller.isPhotoUploaded()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please upload at least 3 photos')),
+        );
+        return;
+      }
+    } else if (_currentPage == 2) {
       // Location page
       if (controller.locationName == null ||
           controller.locationName!.trim().isEmpty) {
@@ -100,7 +109,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
         );
         return;
       }
-    } else if (_currentPage == 2) {
+    } else if (_currentPage == 3) {
       // Nationality selection page (tribe optional)
       if (controller.nationality == null || controller.nationality!.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -108,7 +117,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
         );
         return;
       }
-    } else if (_currentPage == 3) {
+    } else if (_currentPage == 4) {
       // Bio page
       if (controller.bio.trim().isEmpty || controller.bio.trim().length < 50) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -117,20 +126,12 @@ class _OnboardingMainState extends State<OnboardingMain> {
         );
         return;
       }
-    } else if (_currentPage == 4) {
+    } else if (_currentPage == 5) {
       // Enhanced Interests page
       if (controller.interests.length < 5) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('Please complete the interests selection process'),),
-        );
-        return;
-      }
-    } else if (_currentPage == 5) {
-      // Photo upload page
-      if (!controller.isPhotoUploaded()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please upload at least 3 photos')),
         );
         return;
       }
@@ -145,31 +146,9 @@ class _OnboardingMainState extends State<OnboardingMain> {
         return;
       }
     } else if (_currentPage == 7) {
-      // Enhanced additional info page
-      // Enhanced validation for new fields
-      if (controller.height <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please set your height')),
-        );
-        return;
-      }
-      if (controller.lookingFor.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Please select what brings you to Afropeep'),),
-        );
-        return;
-      }
-      // Only require relationship intent for dating users
-      if ((controller.lookingFor == 'Dating' ||
-              controller.lookingFor == 'Mixed') &&
-          controller.relationshipIntent.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Please select your relationship goals'),),
-        );
-        return;
-      }
+      // Enhanced additional info page - OPTIONAL (can be skipped)
+      // No validation required - users can complete this later in profile settings
+      // This follows industry best practices (progressive disclosure)
     }
 
     if (_currentPage < _totalPages - 1) {
@@ -326,11 +305,11 @@ class _OnboardingMainState extends State<OnboardingMain> {
                   },
                   children: const [
                     BasicInfoScreen(),
+                    EnhancedPhotoUploadScreen(), // MOVED TO STEP 2 - Industry best practice
                     LocationScreen(),
                     TribeSelectionScreen(),
                     EnhancedBioScreen(),
                     EnhancedInterestsScreen(),
-                    EnhancedPhotoUploadScreen(),
                     PreferencesOnboardingScreen(),
                     EnhancedAdditionalInfoScreen(),
                   ],
@@ -348,44 +327,30 @@ class _OnboardingMainState extends State<OnboardingMain> {
                       case 0:
                         canContinue = controller.isBasicInfoComplete();
                         break;
-                      case 1: // Location page
+                      case 1: // Photo page (MOVED TO STEP 2)
+                        canContinue = controller.isPhotoUploaded();
+                        break;
+                      case 2: // Location page
                         canContinue = controller.locationName != null &&
                             controller.locationName!.trim().isNotEmpty;
                         break;
-                      case 2: // Nationality page (tribe optional)
+                      case 3: // Nationality page (tribe optional)
                         canContinue = controller.nationality != null &&
                             controller.nationality!.isNotEmpty;
                         break;
-                      case 3: // Bio page
+                      case 4: // Bio page
                         canContinue = controller.isBioComplete();
                         break;
-                      case 4: // Interests page
+                      case 5: // Interests page
                         canContinue = controller.areInterestsSelected();
-                        break;
-                      case 5: // Photo page
-                        canContinue = controller.isPhotoUploaded();
                         break;
                       case 6: // Dating preferences page
                         canContinue = controller.interestedIn.isNotEmpty;
                         break;
-                      case 7: // Enhanced additional info page
-                        final isDatingUser =
-                            controller.lookingFor == 'Dating' ||
-                                controller.lookingFor == 'Mixed';
-                        
-                        // Always required fields: Height, Platform Purpose, Education, Language
-                        final hasRequiredFields = controller.height > 0 &&
-                            controller.lookingFor.isNotEmpty &&
-                            controller.educationLevel.isNotEmpty &&
-                            controller.spokenLanguages.isNotEmpty;
-                        
-                        // For dating users, require relationship intent and religion (most of the page)
-                        final hasDatingFields = !isDatingUser ||
-                            (controller.relationshipIntent.isNotEmpty &&
-                             controller.religion.isNotEmpty);
-                        
-                        // Require most fields: all base fields + conditional fields for dating users
-                        canContinue = hasRequiredFields && hasDatingFields;
+                      case 7: // Enhanced additional info page - OPTIONAL
+                        // Always allow continuing - this step is optional
+                        // Users can complete additional info later in profile settings
+                        canContinue = true;
                         break;
                     }
 
@@ -424,7 +389,9 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         child: Text(
                           _currentPage < _totalPages - 1
                               ? 'Continue'
-                              : 'Finish',
+                              : _currentPage == 7
+                                  ? 'Skip for now' // Optional step - can skip
+                                  : 'Finish',
                           style: GoogleFonts.montserrat(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,

@@ -45,6 +45,7 @@ class OnboardingController extends ChangeNotifier {
   // User preferences
   String _interestedIn = 'everyone'; // Default to everyone
   List<int> _ageRange = [18, 50]; // Default age range
+  int _maxDistance = 50; // Default max distance in miles (industry standard)
 
   // Additional profile fields
   double _height = 170; // Default height in cm
@@ -268,6 +269,13 @@ class OnboardingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  int get maxDistance => _maxDistance;
+
+  void setMaxDistance(int distance) {
+    _maxDistance = distance;
+    notifyListeners();
+  }
+
   // Additional profile setters
   void setHeight(double height, String unit) {
     _height = height;
@@ -377,35 +385,12 @@ class OnboardingController extends ChangeNotifier {
     try {
       log('📸 Starting photo pick for index $index with source: $source');
       
-      // Determine crop type based on photo index
-      CropType cropType;
-      String title;
-
-      switch (index) {
-        case 0:
-          cropType = CropType.square; // Main photo - square crop
-          title = 'Crop Main Photo';
-          break;
-        case 1:
-          cropType = CropType.portrait; // Full body - portrait crop
-          title = 'Crop Full Body Photo';
-          break;
-        case 2:
-          cropType = CropType.landscape; // Activity - landscape crop
-          title = 'Crop Activity Photo';
-          break;
-        case 3:
-          cropType = CropType.portrait; // Social - portrait crop
-          title = 'Crop Social Photo';
-          break;
-        case 4:
-          cropType = CropType.freeform; // Lifestyle - freeform crop
-          title = 'Crop Lifestyle Photo';
-          break;
-        default:
-          cropType = CropType.square;
-          title = 'Crop Photo';
-      }
+      // All photos use square (1:1) crop - Industry standard (Tinder, Bumble, Hinge)
+      // This is simpler and more flexible than forcing different aspect ratios
+      const CropType cropType = CropType.square;
+      final String title = index == 0 
+          ? 'Crop Main Photo' 
+          : 'Crop Photo ${index + 1}';
 
       // Pick and crop image with industry-standard settings and permission handling
       final File? croppedImage =
@@ -692,7 +677,7 @@ class OnboardingController extends ChangeNotifier {
         'ageRange': _ageRange,
         'lookingFor': _lookingFor,
         'relationshipIntent': _relationshipIntent,
-        'maximumDistance': 100, // Increased for better discovery
+        'maximumDistance': _maxDistance, // User-selected distance preference
       },
 
       // Legacy preference fields - CRITICAL FOR DISCOVERY
@@ -708,8 +693,8 @@ class OnboardingController extends ChangeNotifier {
         'min': _ageRange[0].toString(),
         'max': _ageRange[1].toString(),
       },
-      'maximum_distance': 62, // 100km = 62 miles for better discovery
-      'maxDistance': 62, // Alternative field name for compatibility
+      'maximum_distance': _maxDistance, // User-selected distance preference
+      'maxDistance': _maxDistance, // Alternative field name for compatibility
 
       // Location information - CRITICAL FOR DISCOVERY
       'location': {

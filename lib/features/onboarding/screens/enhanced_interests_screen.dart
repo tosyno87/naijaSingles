@@ -116,59 +116,40 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
 
           const SizedBox(height: 32),
 
-          // Interests dropdown
-          Text(
-            'Choose your interests',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: textDarkBrown,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: cardBackground,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: DropdownButton<String>(
-              hint: Text(
-                'Select an interest to add',
-                style: GoogleFonts.montserrat(
-                  color: textLightBrown,
-                  fontSize: 16,
-                ),
-              ),
-              isExpanded: true,
-              underline: const SizedBox(),
-              icon: const Icon(
-                Icons.arrow_drop_down,
-                color: afropeepGreen,
-              ),
-              dropdownColor: cardBackground,
-              items: _allInterests
-                  .where((interest) => !_selectedInterests.contains(interest))
-                  .map((String interest) => DropdownMenuItem<String>(
-                  value: interest,
-                  child: Text(
-                    interest,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      color: textDarkBrown,
-                      fontWeight: FontWeight.w500,
-                    ),
+          // Tag-based interests selection (industry standard - Tinder, Bumble, Hinge style)
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: _allInterests.map((interest) {
+              final isSelected = _selectedInterests.contains(interest);
+              
+              return FilterChip(
+                label: Text(
+                  interest,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected ? Colors.white : textDarkBrown,
                   ),
-                ),).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  _toggleInterest(newValue);
-                }
-              },
-            ),
+                ),
+                selected: isSelected,
+                onSelected: (selected) => _toggleInterest(interest),
+                selectedColor: afropeepGreen,
+                checkmarkColor: Colors.white,
+                backgroundColor: cardBackground,
+                side: BorderSide(
+                  color: isSelected 
+                      ? afropeepGreen 
+                      : Colors.grey.shade300,
+                  width: isSelected ? 2 : 1,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                visualDensity: VisualDensity.comfortable,
+              );
+            }).toList(),
           ),
 
           const SizedBox(height: 24),

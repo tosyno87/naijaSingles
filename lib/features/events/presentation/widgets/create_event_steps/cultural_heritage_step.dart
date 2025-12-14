@@ -116,12 +116,16 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           size: 24,
         ),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF333333),
+        Expanded(
+          child: Text(
+            title,
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF333333),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

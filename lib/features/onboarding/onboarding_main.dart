@@ -183,27 +183,18 @@ class _OnboardingMainState extends State<OnboardingMain> {
     debugPrint('   Interested In: ${controller.interestedIn}');
     debugPrint('   Age Range: ${controller.ageRange}');
 
-    // Show completion success message
+    // Show completion success message - Short and concise
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.celebration, color: Colors.white),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Profile Complete! 🎉 Welcome to Afropeep!',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        content: Text(
+          'Profile Complete! 🎉',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
         backgroundColor: Colors.green.shade600,
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

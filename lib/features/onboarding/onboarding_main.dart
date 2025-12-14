@@ -122,7 +122,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       // No validation - users can skip bio
     } else if (_currentPage == 5) {
       // Enhanced Interests page - Optional (Tinder standard: passions are optional)
-      // No validation - users can skip or select 0-5 interests
+      // No validation - users can skip or select any number of interests
     } else if (_currentPage == 6) {
       // Dating preferences page
       // Basic validation - these have defaults so they should always be set

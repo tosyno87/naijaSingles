@@ -14,7 +14,6 @@ class EnhancedInterestsScreen extends StatefulWidget {
 
 class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   List<String> _selectedInterests = [];
-  static const int _maxInterests = 5; // Tinder standard: 3-5 passions
 
   // Theme colors - Tinder style
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
@@ -171,22 +170,10 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
         Provider.of<OnboardingController>(context, listen: false)
             .removeInterest(interest);
       } else {
-        // Enforce maximum of 5 (Tinder standard)
-        if (_selectedInterests.length < _maxInterests) {
-          _selectedInterests.add(interest);
-          Provider.of<OnboardingController>(context, listen: false)
-              .addInterest(interest);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'You can select up to $_maxInterests interests',
-                style: GoogleFonts.montserrat(),
-              ),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
+        // No limit - users can select as many interests as they want
+        _selectedInterests.add(interest);
+        Provider.of<OnboardingController>(context, listen: false)
+            .addInterest(interest);
       }
     });
   }

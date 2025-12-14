@@ -431,7 +431,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   log('═══════════════════════════════════════════════════════');
                                   log('');
                                   
-                                  final bloc = context.read<PhoneAuthBloc>();
+                                  // Use BlocProvider.of to explicitly get the bloc from the widget tree
+                                  final bloc = BlocProvider.of<PhoneAuthBloc>(context);
                                   log('📤 Adding SendOtpToPhoneEvent to bloc...');
                                   bloc.add(
                                     SendOtpToPhoneEvent(

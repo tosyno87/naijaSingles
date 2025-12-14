@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../features/user/controllers/onboarding_controller.dart';
+import '../../../services/profile_image_cropper_service.dart';
 
 /// Enum representing different types of photos for user profiles
 enum PhotoType {
@@ -312,6 +313,27 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   _setAsMainPhoto(index);
                 },
               ),
+            // Hinge-style: Allow adjusting crop position after upload
+            ListTile(
+              leading: const Icon(Icons.tune, color: primaryGreen),
+              title: Text(
+                'Adjust Photo',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              subtitle: Text(
+                'Reposition and recrop',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                await _adjustPhotoCrop(index);
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.camera_alt, color: primaryGreen),
               title: Text(
@@ -419,5 +441,38 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   void _setAsMainPhoto(int index) {
     if (index == 0) return;
     _movePhoto(index, 0);
+  }
+
+  // Hinge-style: Allow adjusting/re-cropping existing photo
+  Future<void> _adjustPhotoCrop(int index) async {
+    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final currentPhoto = controller.profilePhotos[index];
+    
+    if (currentPhoto == null) return;
+    
+    // Re-open cropper with current photo to allow repositioning
+    // Note: We use the cropped photo, which limits adjustment,
+    // but this is the best we can do without storing original images
+    try {
+      final adjustedPhoto = await ProfileImageCropperService.cropImage(
+        imagePath: currentPhoto.path,
+        cropType: CropType.square,
+        title: index == 0 ? 'Adjust Main Photo' : 'Adjust Photo ${index + 1}',
+      );
+      
+      if (adjustedPhoto != null && mounted) {
+        controller.profilePhotos[index] = adjustedPhoto;
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to adjust photo: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

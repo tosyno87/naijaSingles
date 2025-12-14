@@ -329,7 +329,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               message:
                   'You haven\'t published any events yet.\nCreate your first event to get started!',
               icon: Icons.event_busy,
-              showCreateButton: true,
+              showCreateButton: false,
             );
           }
 
@@ -341,7 +341,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           message:
               'You haven\'t published any events yet.\nCreate your first event to get started!',
           icon: Icons.event_busy,
-          showCreateButton: true,
+          showCreateButton: false,
         );
       },
     );
@@ -371,7 +371,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               message:
                   'You don\'t have any draft events.\nSave an event as draft while creating it.',
               icon: Icons.drafts,
-              showCreateButton: true,
+              showCreateButton: false,
             );
           }
 
@@ -383,7 +383,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           message:
               'You don\'t have any draft events.\nSave an event as draft while creating it.',
           icon: Icons.drafts,
-          showCreateButton: true,
+          showCreateButton: false,
         );
       },
     );

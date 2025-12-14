@@ -372,15 +372,41 @@ class UserEventService {
         final ref = _storage.ref().child(fileName);
 
         // Upload file
+        log('📤 Starting upload task for image ${i + 1}...', name: 'UserEventService');
         final uploadTask = ref.putFile(file);
+        
+        // Monitor upload progress
+        uploadTask.snapshotEvents.listen((snapshot) {
+          final progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          log('📊 Upload progress for image ${i + 1}: ${progress.toStringAsFixed(1)}%', name: 'UserEventService');
+        });
+        
+        log('⏳ Waiting for upload to complete...', name: 'UserEventService');
         final snapshot = await uploadTask;
+        log('✅ Upload completed, getting download URL...', name: 'UserEventService');
+        
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
         uploadedUrls.add(downloadUrl);
         log('✅ Successfully uploaded image ${i + 1}: $downloadUrl', name: 'UserEventService');
       } catch (e, stackTrace) {
-        log('❌ Error uploading image ${i + 1} ($imagePath): $e', name: 'UserEventService');
-        log('Stack trace: $stackTrace', name: 'UserEventService');
+        log('❌ Error uploading image ${i + 1} ($imagePath)', name: 'UserEventService');
+        log('❌ Error type: ${e.runtimeType}', name: 'UserEventService');
+        log('❌ Error message: $e', name: 'UserEventService');
+        
+        // Check if it's a Firebase Storage error
+        if (e.toString().contains('firebase_storage')) {
+          log('❌ This is a Firebase Storage error', name: 'UserEventService');
+          if (e.toString().contains('permission-denied')) {
+            log('❌ Permission denied - check Firebase Storage rules', name: 'UserEventService');
+          } else if (e.toString().contains('object-not-found')) {
+            log('❌ Object not found - check file path', name: 'UserEventService');
+          } else if (e.toString().contains('unauthorized')) {
+            log('❌ Unauthorized - check Firebase Storage rules and authentication', name: 'UserEventService');
+          }
+        }
+        
+        log('❌ Stack trace: $stackTrace', name: 'UserEventService');
         // Continue with other images even if one fails
       }
     }

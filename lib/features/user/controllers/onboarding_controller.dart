@@ -11,6 +11,7 @@ import '../../../common/widgets/loading_transition_screen.dart';
 import '../../../common/providers/user_provider.dart';
 import '../../../services/profile_image_cropper_service.dart';
 import '../../../services/bulk_photo_picker_service.dart';
+import '../../../common/utils/app_logger.dart';
 
 class OnboardingController extends ChangeNotifier {
   // Basic user data
@@ -728,36 +729,36 @@ class OnboardingController extends ChangeNotifier {
     };
 
     // Debug logging to verify all data is being saved
-    print('🔍 Saving comprehensive user data:');
-    print('   Name: $_fullName');
-    print('   Age: $age');
-    print('   Gender: $_gender');
-    print('   Location: ${_locationName ?? 'Not set'}');
-    print(
+    AppLogger.info('🔍 Saving comprehensive user data:');
+    AppLogger.debug('   Name: $_fullName');
+    AppLogger.debug('   Age: $age');
+    AppLogger.debug('   Gender: $_gender');
+    AppLogger.debug('   Location: ${_locationName ?? 'Not set'}');
+    AppLogger.debug(
         '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}');
-    print('   Tribe: $_tribe');
-    print('   Bio: ${_bio.length} characters');
-    print('   Interests: ${_interests.length} items - $_interests');
-    print('   Height: $_height cm (${_getHeightFtIn()})');
-    print('   Looking for: $_lookingFor');
-    print('   Relationship intent: $_relationshipIntent');
-    print('   Interested in: $_interestedIn');
-    print('   Age range: $_ageRange');
-    print('   Show gender: $_interestedIn');
-    print('   Maximum distance: 62 miles');
-    print('   Additional fields:');
-    print('     Education: $_education');
-    print('     Occupation: $_occupation');
-    print('     Religion: $_religion');
-    print('     Languages: $_languages');
-    print('     Drinking: $_drinkingPreference');
-    print('     Smoking: $_smokingPreference');
-    print('     Nationality: $_nationality');
-    print(
+    AppLogger.debug('   Tribe: $_tribe');
+    AppLogger.debug('   Bio: ${_bio.length} characters');
+    AppLogger.debug('   Interests: ${_interests.length} items - $_interests');
+    AppLogger.debug('   Height: $_height cm (${_getHeightFtIn()})');
+    AppLogger.debug('   Looking for: $_lookingFor');
+    AppLogger.debug('   Relationship intent: $_relationshipIntent');
+    AppLogger.debug('   Interested in: $_interestedIn');
+    AppLogger.debug('   Age range: $_ageRange');
+    AppLogger.debug('   Show gender: $_interestedIn');
+    AppLogger.debug('   Maximum distance: 62 miles');
+    AppLogger.debug('   Additional fields:');
+    AppLogger.debug('     Education: $_education');
+    AppLogger.debug('     Occupation: $_occupation');
+    AppLogger.debug('     Religion: $_religion');
+    AppLogger.debug('     Languages: $_languages');
+    AppLogger.debug('     Drinking: $_drinkingPreference');
+    AppLogger.debug('     Smoking: $_smokingPreference');
+    AppLogger.debug('     Nationality: $_nationality');
+    AppLogger.debug(
         '   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos');
 
     // Save essential data to Firestore
-    print('🔍 Saving essential user data to Firestore...');
+    AppLogger.info('🔍 Saving essential user data to Firestore...');
     
     // Use set with merge: true to preserve existing fields (like email from account creation)
     // and add/update onboarding data
@@ -783,8 +784,8 @@ class OnboardingController extends ChangeNotifier {
       await user.updateDisplayName(_fullName);
     }
 
-    print('✅ Essential user data saved successfully');
-    print('✅ All onboarding data should now be available in profile');
+    AppLogger.info('✅ Essential user data saved successfully');
+    AppLogger.info('✅ All onboarding data should now be available in profile');
   }
 
   // Upload profile pictures with proper error handling
@@ -948,7 +949,7 @@ class OnboardingController extends ChangeNotifier {
 
   // Validation method to ensure all required onboarding data is present
   bool validateOnboardingData() {
-    print('🔍 Validating onboarding data completeness:');
+    AppLogger.debug('🔍 Validating onboarding data completeness:');
 
     bool isValid = true;
     List<String> missingFields = [];
@@ -1024,23 +1025,23 @@ class OnboardingController extends ChangeNotifier {
     }
 
     if (isValid) {
-      print('✅ All required onboarding data is present');
-      print('   Name: $_fullName');
-      print('   Age: $age years old');
-      print('   Gender: $_gender');
-      print('   Location: ${_locationName ?? 'Not set'}');
-      print('   Tribe: $_tribe');
-      print('   Bio: ${_bio.length} characters');
-      print('   Interests: ${_interests.length} selected');
-      print('   Height: $_height cm (${_getHeightFtIn()})');
-      print('   Looking for: $_lookingFor');
-      print('   Relationship intent: $_relationshipIntent');
-      print('   Interested in: $_interestedIn');
-      print('   Age range: ${_ageRange[0]}-${_ageRange[1]}');
-      print(
+      AppLogger.info('✅ All required onboarding data is present');
+      AppLogger.debug('   Name: $_fullName');
+      AppLogger.debug('   Age: $age years old');
+      AppLogger.debug('   Gender: $_gender');
+      AppLogger.debug('   Location: ${_locationName ?? 'Not set'}');
+      AppLogger.debug('   Tribe: $_tribe');
+      AppLogger.debug('   Bio: ${_bio.length} characters');
+      AppLogger.debug('   Interests: ${_interests.length} selected');
+      AppLogger.debug('   Height: $_height cm (${_getHeightFtIn()})');
+      AppLogger.debug('   Looking for: $_lookingFor');
+      AppLogger.debug('   Relationship intent: $_relationshipIntent');
+      AppLogger.debug('   Interested in: $_interestedIn');
+      AppLogger.debug('   Age range: ${_ageRange[0]}-${_ageRange[1]}');
+      AppLogger.debug(
           '   Photos: ${_profilePhotos.where((p) => p != null).length} uploaded');
     } else {
-      print('❌ Missing required fields: ${missingFields.join(', ')}');
+      AppLogger.warning('❌ Missing required fields: ${missingFields.join(', ')}');
     }
 
     return isValid;

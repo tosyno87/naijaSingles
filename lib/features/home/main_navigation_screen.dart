@@ -15,6 +15,7 @@ import 'package:naijasingles/common/constants/constants.dart';
 import 'package:naijasingles/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as developer;
+import '../../common/utils/app_logger.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final bool backgroundTasksRunning;
@@ -366,9 +367,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           setState(() {
             // Ensure index is within valid range
             _selectedIndex = index.clamp(0, _pages.length - 1);
-            print(
+            AppLogger.debug(
                 '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex');
-            print('📱 Pages length: ${_pages.length}');
+            AppLogger.debug('📱 Pages length: ${_pages.length}');
           });
         },
         backgroundColor: Colors.white,

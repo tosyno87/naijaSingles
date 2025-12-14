@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/user_model.dart';
 import '../constants/constants.dart';
+import '../utils/app_logger.dart';
 
 class UserProvider extends ChangeNotifier {
   UserProvider() {
@@ -45,28 +46,28 @@ class UserProvider extends ChangeNotifier {
               currentUser = userData;
               notifyListeners();
             } else {
-              print("User document does not exist for UID: ${user.uid}");
+              AppLogger.warning("User document does not exist for UID: ${user.uid}");
               currentUser = null;
               notifyListeners();
             }
           } catch (e) {
-            print("Error parsing user document: $e");
+            AppLogger.error("Error parsing user document", error: e);
             // Don't set currentUser to null here, keep existing data
           }
         }, onError: (error) {
           // Only log errors if user is still authenticated
           // Permission errors when user is logged out are expected
           if (_auth.currentUser != null) {
-            print("Error listening to user details: $error");
+            AppLogger.error("Error listening to user details", error: error);
           }
         });
       } catch (e) {
-        print("Exception in listenCurrentUserdetails: $e");
+        AppLogger.error("Exception in listenCurrentUserdetails", error: e);
       }
     } else {
       // User is not authenticated - ensure user data is cleared
       currentUser = null;
-      print("No authenticated user found");
+      AppLogger.debug("No authenticated user found");
     }
   }
 

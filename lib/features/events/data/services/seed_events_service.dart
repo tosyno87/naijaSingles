@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/event_model.dart';
+import '../../../../common/utils/app_logger.dart';
 
 class SeedEventsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -12,15 +13,15 @@ class SeedEventsService {
           await _firestore.collection('events').limit(1).get();
 
       if (existingEvents.docs.isNotEmpty) {
-        print('Events already exist, skipping seed');
+        AppLogger.debug('Events already exist, skipping seed');
         return;
       }
 
-      print('No events found, seeding with sample events...');
+      AppLogger.info('No events found, seeding with sample events...');
       await _seedSampleEvents();
-      print('Sample events seeded successfully');
+      AppLogger.info('Sample events seeded successfully');
     } catch (e) {
-      print('Error seeding events: $e');
+      AppLogger.error('Error seeding events', error: e);
     }
   }
 

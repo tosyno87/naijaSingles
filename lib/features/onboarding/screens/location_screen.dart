@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../user/controllers/onboarding_controller.dart';
+import '../../../common/utils/app_logger.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -124,8 +125,8 @@ class _LocationScreenState extends State<LocationScreen> {
         controller.setLocationCoordinates(
             position.latitude, position.longitude);
 
-        print('🔍 LocationScreen: GPS location set to "$location"');
-        print(
+        AppLogger.info('🔍 LocationScreen: GPS location set to "$location"');
+        AppLogger.info(
             '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}');
       }
     } catch (e) {
@@ -133,7 +134,7 @@ class _LocationScreenState extends State<LocationScreen> {
         _isLoadingLocation = false;
         _locationPermissionDenied = true;
       });
-      print('Error getting location: $e');
+      AppLogger.error('Error getting location', error: e);
     }
   }
 

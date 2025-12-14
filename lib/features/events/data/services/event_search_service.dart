@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/event_model.dart';
+import '../../../../common/utils/app_logger.dart';
 
 /// Helper class to store event with its recommendation score
 class ScoredEvent {
@@ -81,7 +82,7 @@ class EventSearchService {
 
       return events;
     } catch (e) {
-      print('Error searching events: $e');
+      AppLogger.error('Error searching events', error: e);
       return [];
     }
   }
@@ -103,7 +104,7 @@ class EventSearchService {
               doc.data() as Map<String, dynamic>, doc.id))
           .toList();
     } catch (e) {
-      print('Error getting trending events: $e');
+      AppLogger.error('Error getting trending events', error: e);
       return [];
     }
   }
@@ -161,7 +162,7 @@ class EventSearchService {
 
       return scoredEvents.take(limit).map((e) => e.event).toList();
     } catch (e) {
-      print('Error getting recommended events: $e');
+      AppLogger.error('Error getting recommended events', error: e);
       return [];
     }
   }

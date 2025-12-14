@@ -101,8 +101,6 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           _buildCulturalSignificanceField(),
           const SizedBox(height: 20),
           _buildDressCodeField(),
-          const SizedBox(height: 20),
-          _buildCulturalTemplates(),
           const SizedBox(height: 40),
         ],
       ),
@@ -517,115 +515,6 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
       ],
     );
 
-  Widget _buildCulturalTemplates() {
-    final templates = [
-      {
-        'name': 'Traditional Wedding Ceremony',
-        'icon': Icons.favorite,
-        'description': 'Celebrate cultural wedding traditions',
-        'heritage': 'Mixed Heritage',
-        'ageGroup': 'All Ages Welcome',
-      },
-      {
-        'name': 'Cultural Food Festival',
-        'icon': Icons.restaurant,
-        'description': 'Share traditional cuisine and recipes',
-        'heritage': 'Open to All Cultures',
-        'ageGroup': 'Family Friendly',
-      },
-      {
-        'name': 'Language Exchange Event',
-        'icon': Icons.translate,
-        'description': 'Practice African languages together',
-        'heritage': 'Diaspora',
-        'ageGroup': 'Adults Only (18+)',
-      },
-      {
-        'name': 'Professional Networking',
-        'icon': Icons.business,
-        'description': 'Connect African professionals',
-        'heritage': 'Open to All Cultures',
-        'ageGroup': 'Adults Only (18+)',
-      },
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Templates',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Start with a cultural event template',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: const Color(0xFF666666),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: templates.map((template) => GestureDetector(
-              onTap: () => _applyTemplate(template),
-              child: Container(
-                width: 150,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFF008037).withOpacity(0.3),
-                    width: 1.5,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      template['icon'] as IconData,
-                      color: const Color(0xFF008037),
-                      size: 24,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      template['name'] as String,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF333333),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      template['description'] as String,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: const Color(0xFF666666),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),).toList(),
-        ),
-      ],
-    );
-  }
-
-  void _applyTemplate(Map<String, dynamic> template) {
-    setState(() {
-      widget.eventData.metadata['culturalHeritage'] = template['heritage'];
-      widget.eventData.metadata['ageGroup'] = template['ageGroup'];
-      widget.eventData.category = 'Cultural Events';
-    });
-  }
 
   IconData _getHeritageIcon(String heritage) {
     switch (heritage) {

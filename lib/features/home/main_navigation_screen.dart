@@ -41,10 +41,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   // Define the pages to be shown for each tab
   // Order matches the BottomNavigationBarItems below
-  // NEW COMMUNITY-FIRST NAVIGATION
+  // CONNECT-FIRST NAVIGATION (Connect is the home page)
   final List<Widget> _pages = [
-    const CommunitiesHubScreen(), // Tab 0: Communities Hub (All community features)
-    const ExploreScreen(), // Tab 1: Connect (Dating/Friendship)
+    const ExploreScreen(), // Tab 0: Connect (Dating/Friendship) - HOME PAGE
+    const CommunitiesHubScreen(), // Tab 1: Communities Hub (All community features)
     const MessagesScreen(), // Tab 2: Messages
     const ProfileScreen(), // Tab 3: Profile
   ];
@@ -386,12 +386,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
         items: [
           BottomNavigationBarItem(
-            icon: Custom3DIcons.communities(),
-            label: 'Communities',
-          ),
-          BottomNavigationBarItem(
             icon: Custom3DIcons.connect(),
             label: 'Connect',
+          ),
+          BottomNavigationBarItem(
+            icon: Custom3DIcons.communities(),
+            label: 'Communities',
           ),
           BottomNavigationBarItem(
             icon: Custom3DIcons.messages(),

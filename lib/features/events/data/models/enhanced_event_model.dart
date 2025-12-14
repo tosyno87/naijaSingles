@@ -97,7 +97,11 @@ class EnhancedEventModel extends Equatable { // Extensible data
       description: json['description'] ?? '',
       startDate: (json['startDate'] as Timestamp).toDate(),
       endDate: (json['endDate'] as Timestamp).toDate(),
-      imageUrls: List<String>.from(json['imageUrls'] ?? []),
+      imageUrls: (json['imageUrls'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .where((url) => url.isNotEmpty)
+              .toList() ??
+          [],
       location: EventLocation.fromJson(json['location'] ?? {}),
       ticketUrl: json['ticketUrl'],
       isFree: json['isFree'] ?? true,
@@ -167,26 +171,30 @@ class EnhancedEventModel extends Equatable { // Extensible data
   }
 
   // Convert to EventModel for backward compatibility
-  event_model.EventModel toEventModel() => event_model.EventModel(
-      id: id,
-      externalId: externalId ?? id, // Use id if no externalId
-      name: name,
-      description: description,
-      startDate: startDate,
-      endDate: endDate,
-      imageUrl: imageUrls.isNotEmpty ? imageUrls.first : null,
-      location: event_model.EventLocation.fromJson(
-          location.toJson(),), // Convert location
-      ticketUrl: ticketUrl,
-      isFree: isFree,
-      category: category,
-      attendeeCount: attendeeCount,
-      rsvpCount: rsvpCount,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      status: _convertToEventModelStatus(status),
-      createdByUserId: createdByUserId ?? 'unknown',
-    );
+  event_model.EventModel toEventModel() {
+    // Use primaryImageUrl getter which filters empty strings
+    final url = primaryImageUrl.isNotEmpty ? primaryImageUrl : null;
+    return event_model.EventModel(
+        id: id,
+        externalId: externalId ?? id, // Use id if no externalId
+        name: name,
+        description: description,
+        startDate: startDate,
+        endDate: endDate,
+        imageUrl: url,
+        location: event_model.EventLocation.fromJson(
+            location.toJson(),), // Convert location
+        ticketUrl: ticketUrl,
+        isFree: isFree,
+        category: category,
+        attendeeCount: attendeeCount,
+        rsvpCount: rsvpCount,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        status: _convertToEventModelStatus(status),
+        createdByUserId: createdByUserId ?? 'unknown',
+      );
+  }
 
   // Convert EnhancedEventModel status to EventModel status
   event_model.EventStatus _convertToEventModelStatus(
@@ -345,8 +353,15 @@ class EnhancedEventModel extends Equatable { // Extensible data
     );
 
   // Helper getters
-  String get primaryImageUrl => imageUrls.isNotEmpty ? imageUrls.first : '';
-  bool get hasImages => imageUrls.isNotEmpty;
+  String get primaryImageUrl {
+    final validUrls = imageUrls.where((url) => url.isNotEmpty && url.trim().isNotEmpty).toList();
+    return validUrls.isNotEmpty ? validUrls.first : '';
+  }
+  
+  bool get hasImages {
+    final validUrls = imageUrls.where((url) => url.isNotEmpty && url.trim().isNotEmpty).toList();
+    return validUrls.isNotEmpty;
+  }
   bool get isPaid => !isFree && ticketPrice != null && ticketPrice! > 0;
   // isActive is already defined above as isVisible
   bool get canEdit {

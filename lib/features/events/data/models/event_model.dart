@@ -42,11 +42,33 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
     try {
       // Handle both imageUrl (singular) and imageUrls (plural) for backward compatibility
       String? imageUrl;
-      if (json['imageUrl'] != null) {
-        imageUrl = json['imageUrl'];
-      } else if (json['imageUrls'] != null &&
-          (json['imageUrls'] as List).isNotEmpty) {
-        imageUrl = (json['imageUrls'] as List).first;
+      
+      // Debug logging
+      AppLogger.debug('🔍 EventModel.fromFirestoreJson - Event ID: $docId');
+      AppLogger.debug('🔍 EventModel.fromFirestoreJson - json keys: ${json.keys.toList()}');
+      AppLogger.debug('🔍 EventModel.fromFirestoreJson - imageUrl: ${json['imageUrl']}');
+      AppLogger.debug('🔍 EventModel.fromFirestoreJson - imageUrls: ${json['imageUrls']}');
+      AppLogger.debug('🔍 EventModel.fromFirestoreJson - imageUrls type: ${json['imageUrls']?.runtimeType}');
+      
+      if (json['imageUrl'] != null && json['imageUrl'].toString().trim().isNotEmpty) {
+        imageUrl = json['imageUrl'].toString();
+        AppLogger.debug('✅ EventModel: Using imageUrl (singular): $imageUrl');
+      } else if (json['imageUrls'] != null && json['imageUrls'] is List) {
+        final imageUrlsList = json['imageUrls'] as List;
+        // Filter out empty strings and get first valid URL
+        final validUrls = imageUrlsList
+            .map((e) => e?.toString() ?? '')
+            .where((url) => url.trim().isNotEmpty)
+            .toList();
+        
+        if (validUrls.isNotEmpty) {
+          imageUrl = validUrls.first;
+          AppLogger.debug('✅ EventModel: Using imageUrls[0]: $imageUrl');
+        } else {
+          AppLogger.debug('❌ EventModel: imageUrls list is empty or contains only empty strings');
+        }
+      } else {
+        AppLogger.debug('❌ EventModel: No valid imageUrl or imageUrls found');
       }
 
       return EventModel(

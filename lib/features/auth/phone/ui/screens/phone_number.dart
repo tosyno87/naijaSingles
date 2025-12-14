@@ -389,59 +389,64 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         const SizedBox(height: 40),
 
                         // Continue button using reusable widget
-                        AfropeepPrimaryButton(
-                          text: "Continue",
-                          isLoading: _isLoading,
-                          onPressed: isValidNumber && !_isLoading
-                              ? () {
-                                  log('');
-                                  log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
-                                  log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
-                                  log('Phone input: "${phoneNumberController.text}"');
-                                  log('Country code: $countryCode');
-                                  log('');
-                                  
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
+                        // Wrap in Builder to get context from within BlocProvider tree
+                        Builder(
+                          builder: (builderContext) {
+                            return AfropeepPrimaryButton(
+                              text: "Continue",
+                              isLoading: _isLoading,
+                              onPressed: isValidNumber && !_isLoading
+                                  ? () {
+                                      log('');
+                                      log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
+                                      log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
+                                      log('Phone input: "${phoneNumberController.text}"');
+                                      log('Country code: $countryCode');
+                                      log('');
+                                      
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
 
-                                  // Remove spaces, dashes, and other formatting from phone number
-                                  final cleanPhoneNumber = phoneNumberController.text
-                                      .replaceAll(' ', '')
-                                      .replaceAll('-', '')
-                                      .replaceAll('(', '')
-                                      .replaceAll(')', '')
-                                      .trim();
-                                  
-                                  final fullPhoneNumber = countryCode + cleanPhoneNumber;
-                                  
-                                  log('');
-                                  log('═══════════════════════════════════════════════════════');
-                                  log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
-                                  log('═══════════════════════════════════════════════════════');
-                                  log('Country Code: $countryCode');
-                                  log('User Input: "${phoneNumberController.text}"');
-                                  log('Cleaned Input: "$cleanPhoneNumber"');
-                                  log('Full Number (sent to Firebase): "$fullPhoneNumber"');
-                                  log('');
-                                  log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
-                                  log('   "$fullPhoneNumber"');
-                                  log('');
-                                  log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
-                                  log('═══════════════════════════════════════════════════════');
-                                  log('');
-                                  
-                                  // Use BlocProvider.of to explicitly get the bloc from the widget tree
-                                  final bloc = BlocProvider.of<PhoneAuthBloc>(context);
-                                  log('📤 Adding SendOtpToPhoneEvent to bloc...');
-                                  bloc.add(
-                                    SendOtpToPhoneEvent(
-                                      phoneNumber: fullPhoneNumber,
-                                    ),
-                                  );
-                                  log('✅ Event added to bloc');
-                                }
-                              : null,
+                                      // Remove spaces, dashes, and other formatting from phone number
+                                      final cleanPhoneNumber = phoneNumberController.text
+                                          .replaceAll(' ', '')
+                                          .replaceAll('-', '')
+                                          .replaceAll('(', '')
+                                          .replaceAll(')', '')
+                                          .trim();
+                                      
+                                      final fullPhoneNumber = countryCode + cleanPhoneNumber;
+                                      
+                                      log('');
+                                      log('═══════════════════════════════════════════════════════');
+                                      log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
+                                      log('═══════════════════════════════════════════════════════');
+                                      log('Country Code: $countryCode');
+                                      log('User Input: "${phoneNumberController.text}"');
+                                      log('Cleaned Input: "$cleanPhoneNumber"');
+                                      log('Full Number (sent to Firebase): "$fullPhoneNumber"');
+                                      log('');
+                                      log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
+                                      log('   "$fullPhoneNumber"');
+                                      log('');
+                                      log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
+                                      log('═══════════════════════════════════════════════════════');
+                                      log('');
+                                      
+                                      // Use builderContext which is inside the BlocProvider tree
+                                      final bloc = BlocProvider.of<PhoneAuthBloc>(builderContext);
+                                      log('📤 Adding SendOtpToPhoneEvent to bloc...');
+                                      bloc.add(
+                                        SendOtpToPhoneEvent(
+                                          phoneNumber: fullPhoneNumber,
+                                        ),
+                                      );
+                                      log('✅ Event added to bloc');
+                                    }
+                                  : null,
+                            );
+                          },
                         ),
 
                         const SizedBox(height: 24),

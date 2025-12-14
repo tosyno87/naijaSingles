@@ -157,19 +157,63 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
           });
         },
         itemCount: photos.length,
-        itemBuilder: (context, index) => Container(
-          decoration: BoxDecoration(
+        itemBuilder: (context, index) {
+          final photoUrl = photos[index];
+          debugPrint('🖼️ Loading photo $index: $photoUrl');
+          
+          return ClipRRect(
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(20),
             ),
-            image: DecorationImage(
-              image: NetworkImage(photos[index]),
+            child: Image.network(
+              photoUrl,
               fit: BoxFit.cover,
-              onError: (exception, stackTrace) {
-                // Handle error
+              width: double.infinity,
+              height: double.infinity,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  color: Colors.grey[200],
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(0xFF008037),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                debugPrint('❌ Error loading photo $index ($photoUrl): $error');
+                return Container(
+                  color: Colors.grey[200],
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.broken_image,
+                          size: 60,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Failed to load',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               },
             ),
-          ),
           child: Stack(
             children: [
               // Photo indicator dots

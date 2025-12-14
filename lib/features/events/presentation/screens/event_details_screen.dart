@@ -47,9 +47,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       ),
       child: BlocBuilder<RSVPBloc, RSVPState>(
         builder: (context, state) {
-          // Load event attendees when the bloc is first created
+          // Load event RSVP status and attendees when the bloc is first created
           if (state is RSVPInitial) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
+              final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+              context.read<RSVPBloc>().add(LoadEventRSVPStatusEvent(
+                    userId: userId,
+                    eventId: widget.event.id,
+                  ),);
               context.read<RSVPBloc>().add(LoadEventAttendeesEvent(
                     eventId: widget.event.id,
                   ),);

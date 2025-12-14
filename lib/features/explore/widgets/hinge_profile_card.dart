@@ -356,61 +356,52 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
 
   Widget _buildActionButtons() {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Pass button
-          Expanded(
-            child: OutlinedButton(
-              onPressed: widget.onPass,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(
-                  color: AppColors.primaryGreen,
-                  width: 2,
+          // Pass button - circular, minimalistic
+          Material(
+            color: Colors.white,
+            shape: const CircleBorder(
+              side: BorderSide(color: AppColors.textSecondary, width: 1.5),
+            ),
+            child: InkWell(
+              onTap: widget.onPass,
+              customBorder: const CircleBorder(),
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: Text(
-                'Pass',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryGreen,
+                child: const Icon(
+                  Icons.close,
+                  color: AppColors.textSecondary,
+                  size: 24,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          // Connect button
-          Expanded(
-            flex: 2,
-            child: ElevatedButton(
-              onPressed: widget.onConnect,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+          const SizedBox(width: 24),
+          // Connect button - circular, minimalistic
+          Material(
+            color: AppColors.primaryGreen,
+            shape: const CircleBorder(),
+            child: InkWell(
+              onTap: widget.onConnect,
+              customBorder: const CircleBorder(),
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
                 ),
-                elevation: 0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.favorite, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Connect',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                child: const Icon(
+                  Icons.favorite,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
             ),
           ),

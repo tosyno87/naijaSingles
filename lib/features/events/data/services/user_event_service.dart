@@ -337,21 +337,34 @@ class UserEventService {
 
   /// Upload event images to Firebase Storage
   Future<List<String>> _uploadEventImages(List<String> imagePaths) async {
+    log('🖼️ _uploadEventImages called with ${imagePaths.length} image(s)', name: 'UserEventService');
+    
     final uploadedUrls = <String>[];
 
-    for (final imagePath in imagePaths) {
+    if (imagePaths.isEmpty) {
+      log('⚠️ No images to upload', name: 'UserEventService');
+      return uploadedUrls;
+    }
+
+    for (int i = 0; i < imagePaths.length; i++) {
+      final imagePath = imagePaths[i];
+      log('🖼️ Processing image ${i + 1}/${imagePaths.length}: $imagePath', name: 'UserEventService');
+      
       try {
         // Skip if it's already a URL (existing image)
         if (imagePath.startsWith('http')) {
+          log('✅ Image ${i + 1} is already a URL, skipping upload', name: 'UserEventService');
           uploadedUrls.add(imagePath);
           continue;
         }
 
         final file = File(imagePath);
         if (!await file.exists()) {
-          log('Image file not found: $imagePath', name: 'UserEventService');
+          log('❌ Image file not found: $imagePath', name: 'UserEventService');
           continue;
         }
+
+        log('📤 Uploading image ${i + 1} to Firebase Storage...', name: 'UserEventService');
 
         // Create unique filename
         final fileName =
@@ -364,13 +377,15 @@ class UserEventService {
         final downloadUrl = await snapshot.ref.getDownloadURL();
 
         uploadedUrls.add(downloadUrl);
-        log('Uploaded image: $downloadUrl', name: 'UserEventService');
-      } catch (e) {
-        log('Error uploading image $imagePath: $e', name: 'UserEventService');
+        log('✅ Successfully uploaded image ${i + 1}: $downloadUrl', name: 'UserEventService');
+      } catch (e, stackTrace) {
+        log('❌ Error uploading image ${i + 1} ($imagePath): $e', name: 'UserEventService');
+        log('Stack trace: $stackTrace', name: 'UserEventService');
         // Continue with other images even if one fails
       }
     }
 
+    log('✅ _uploadEventImages completed: ${uploadedUrls.length}/${imagePaths.length} images uploaded', name: 'UserEventService');
     return uploadedUrls;
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../user/controllers/onboarding_controller.dart';
+import '../../../common/constants/app_colors.dart';
 
 class EnhancedInterestsScreen extends StatefulWidget {
   const EnhancedInterestsScreen({super.key});
@@ -15,10 +16,8 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   List<String> _selectedInterests = [];
   static const int _maxInterests = 5; // Tinder standard: 3-5 passions
 
-  // MVP theme colors
+  // Theme colors - Tinder style
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
-  static const Color cardBackground = Color(0xFFF7E8DA);
-  static const Color textDarkBrown = Color(0xFF3A1D0F);
 
   // Simplified interests list - organized by category but presented as flat list
   final List<String> _allInterests = [
@@ -113,44 +112,50 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
             style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: textDarkBrown,
+              color: AppColors.textPrimary,
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
-          // Tag-based interests selection - Simple like Tinder
+          // Tag-based interests selection - Tinder style (compact, clean)
           Wrap(
-            spacing: 10,
-            runSpacing: 10,
+            spacing: 8,
+            runSpacing: 8,
             children: _allInterests.map((interest) {
               final isSelected = _selectedInterests.contains(interest);
               
-              return FilterChip(
-                label: Text(
-                  interest,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? Colors.white : textDarkBrown,
+              // Tinder style: Unselected = white/light gray, Selected = solid color
+              return GestureDetector(
+                onTap: () => _toggleInterest(interest),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected 
+                        ? afropeepGreen 
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected 
+                          ? afropeepGreen 
+                          : Colors.grey.shade300,
+                      width: isSelected ? 0 : 1,
+                    ),
+                  ),
+                  child: Text(
+                    interest,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: isSelected 
+                          ? Colors.white 
+                          : AppColors.textPrimary,
+                    ),
                   ),
                 ),
-                selected: isSelected,
-                onSelected: (selected) => _toggleInterest(interest),
-                selectedColor: afropeepGreen,
-                checkmarkColor: Colors.white,
-                backgroundColor: cardBackground,
-                side: BorderSide(
-                  color: isSelected 
-                      ? afropeepGreen 
-                      : Colors.grey.shade300,
-                  width: isSelected ? 2 : 1,
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                visualDensity: VisualDensity.comfortable,
               );
             }).toList(),
           ),

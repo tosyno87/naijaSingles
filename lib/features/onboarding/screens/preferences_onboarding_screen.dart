@@ -44,7 +44,7 @@ class _PreferencesOnboardingScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.all(isTablet ? 32 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +67,7 @@ class _PreferencesOnboardingScreenState
             ),
           ),
 
-          SizedBox(height: isTablet ? 48 : 40),
+          SizedBox(height: isTablet ? 40 : 32),
 
           // Interested In Section
           Text(
@@ -78,10 +78,10 @@ class _PreferencesOnboardingScreenState
               color: Colors.black87,
             ),
           ),
-          SizedBox(height: isTablet ? 20 : 16),
+          SizedBox(height: isTablet ? 16 : 12),
           _buildInterestedInOptions(),
 
-          SizedBox(height: isTablet ? 48 : 40),
+          SizedBox(height: isTablet ? 40 : 32),
 
           // Distance Section (Industry Standard - Tinder, Bumble, Hinge)
           Text(
@@ -92,10 +92,10 @@ class _PreferencesOnboardingScreenState
               color: Colors.black87,
             ),
           ),
-          SizedBox(height: isTablet ? 20 : 16),
+          SizedBox(height: isTablet ? 16 : 12),
           _buildDistanceSlider(),
 
-          SizedBox(height: isTablet ? 48 : 40),
+          SizedBox(height: isTablet ? 40 : 32),
 
           // Age Range Section
           Text(
@@ -106,10 +106,10 @@ class _PreferencesOnboardingScreenState
               color: Colors.black87,
             ),
           ),
-          SizedBox(height: isTablet ? 20 : 16),
+          SizedBox(height: isTablet ? 16 : 12),
           _buildAgeRangeSlider(),
 
-          const Spacer(),
+          SizedBox(height: isTablet ? 40 : 32),
         ],
       ),
     );
@@ -219,7 +219,7 @@ class _PreferencesOnboardingScreenState
             color: const Color(0xFF008037),
           ),
         ),
-        SizedBox(height: isTablet ? 20 : 16),
+          SizedBox(height: isTablet ? 16 : 12),
         RangeSlider(
           values: _ageRange,
           min: 18,
@@ -263,7 +263,7 @@ class _PreferencesOnboardingScreenState
             color: const Color(0xFF008037),
           ),
         ),
-        SizedBox(height: isTablet ? 20 : 16),
+        SizedBox(height: isTablet ? 16 : 12),
         Slider(
           value: _maxDistance,
           min: 1,

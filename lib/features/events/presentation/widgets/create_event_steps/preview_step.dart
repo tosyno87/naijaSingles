@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -100,16 +101,36 @@ class PreviewStep extends StatelessWidget {
               ),
               child: Stack(
                 children: [
+                  // Display the actual image
                   Container(
                     width: double.infinity,
                     height: double.infinity,
                     color: const Color(0xFFF0F0F0),
-                    child: const Icon(
-                      Icons.image,
-                      size: 48,
-                      color: Color(0xFF999999),
-                    ),
+                    child: eventData.imageUrls.first.startsWith('http')
+                        ? Image.network(
+                            eventData.imageUrls.first,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: 48,
+                                  color: Color(0xFF999999),
+                                ),
+                              ),
+                          )
+                        : Image.file(
+                            File(eventData.imageUrls.first),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: 48,
+                                  color: Color(0xFF999999),
+                                ),
+                              ),
+                          ),
                   ),
+                  // Show count badge if multiple images
                   if (eventData.imageUrls.length > 1)
                     Positioned(
                       top: 12,

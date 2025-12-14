@@ -349,7 +349,9 @@ class UserModel {
       editInfo: map['editInfo'] as Map?,
       streetView: map['streetView'] as Map?,
       isBot: map['isBot'] as bool? ?? false,
-      imageUrl: map['photos'] is List ? List<String>.from(map['photos']) : null,
+      imageUrl: map['photos'] is List
+          ? List<String>.from((map['photos'] as List).map((e) => e?.toString() ?? '').where((url) => url.isNotEmpty))
+          : null,
       distanceBW:
           map['distanceBW'] is num ? (map['distanceBW'] as num).toInt() : null,
       bio: map['bio']?.toString(),

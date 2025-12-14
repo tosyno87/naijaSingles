@@ -23,12 +23,24 @@ class TribeConnectScreen extends StatefulWidget {
 class _TribeConnectScreenState extends State<TribeConnectScreen> {
   // Track which users have been passed/connected to avoid showing them again
   final Set<String> _processedUserIds = <String>{};
-  final ScrollController _scrollController = ScrollController();
+  int _currentProfileIndex = 0;
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+  // Get current profile being shown
+  UserModel? get _currentProfile {
+    final availableUsers = widget.users
+        .where((user) => !_processedUserIds.contains(user.id))
+        .toList();
+    if (_currentProfileIndex < availableUsers.length) {
+      return availableUsers[_currentProfileIndex];
+    }
+    return null;
+  }
+
+  // Get all available (not yet processed) users
+  List<UserModel> get _availableUsers {
+    return widget.users
+        .where((user) => !_processedUserIds.contains(user.id))
+        .toList();
   }
 
   @override
@@ -64,28 +76,20 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       return _buildEmptyState();
     }
 
-    // Filter out processed users
-    final availableUsers = widget.users
-        .where((user) => !_processedUserIds.contains(user.id))
-        .toList();
+    final currentProfile = _currentProfile;
 
-    if (availableUsers.isEmpty) {
+    if (currentProfile == null || _availableUsers.isEmpty) {
       return _buildEmptyState();
     }
 
-    // Hinge-style vertical scrollable feed
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: availableUsers.length,
-      itemBuilder: (context, index) {
-        final user = availableUsers[index];
-        return HingeProfileCard(
-          user: user,
-          onConnect: () => _handleConnect(user),
-          onPass: () => _handlePass(user),
-        );
-      },
+    // Hinge-style: Show ONE profile at a time, scrollable vertically for details
+    // Pass/Connect buttons move to next profile
+    return SingleChildScrollView(
+      child: HingeProfileCard(
+        user: currentProfile,
+        onConnect: () => _handleConnect(currentProfile),
+        onPass: () => _handlePass(currentProfile),
+      ),
     );
   }
 
@@ -237,6 +241,9 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       } else {
         _showConnectConfirmation(user);
       }
+
+      // Move to next profile after a brief delay
+      _moveToNextProfile();
     } catch (e) {
       // Revert on error
       setState(() {
@@ -255,6 +262,9 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
       await UserSearchRepo.leftSwipe(widget.currentUser, user);
       _showPassConfirmation(user);
+
+      // Move to next profile after a brief delay
+      _moveToNextProfile();
     } catch (e) {
       // Revert on error
       setState(() {
@@ -262,6 +272,25 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       });
       _showError('Failed to pass. Please try again.');
     }
+  }
+
+  void _moveToNextProfile() {
+    // Small delay to show confirmation, then move to next
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          // Move to next available profile
+          // The available users list is recalculated each time, so we just increment index
+          final availableCount = _availableUsers.length;
+          if (availableCount > 0 && _currentProfileIndex < availableCount - 1) {
+            _currentProfileIndex++;
+          } else {
+            // All profiles processed, reset or show empty state
+            _currentProfileIndex = 0;
+          }
+        });
+      }
+    });
   }
 
   void _showMatchConfirmation(UserModel user) {

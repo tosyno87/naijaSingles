@@ -14,7 +14,7 @@ class ProfilePreviewScreen extends StatefulWidget {
 class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
   // Theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -42,7 +42,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ),
         title: Text(
           "Profile Preview",
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: afropeepGreen,
@@ -55,7 +55,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             icon: Icon(Icons.tips_and_updates, color: afropeepGreen, size: 18),
             label: Text(
               "Tips",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 color: afropeepGreen,
                 fontWeight: FontWeight.w500,
               ),
@@ -185,7 +185,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     SizedBox(width: 4),
                     Text(
                       "Main Photo",
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -279,7 +279,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             children: [
               Text(
                 "${controller.fullName}, ${controller.age}",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: textDarkBrown,
@@ -294,7 +294,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 ),
                 child: Text(
                   controller.tribe,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: afropeepGreen,
@@ -310,7 +310,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           if (controller.bio.isNotEmpty)
             Text(
               controller.bio,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textLightBrown,
                 height: 1.4,
@@ -323,7 +323,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           if (controller.interests.isNotEmpty) ...[
             Text(
               "Interests",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
@@ -346,7 +346,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                   ),
                   child: Text(
                     interest,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       color: textDarkBrown,
                       fontWeight: FontWeight.w500,
@@ -360,7 +360,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
                   "+${controller.interests.length - 6} more interests",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: textLightBrown,
                     fontStyle: FontStyle.italic,
@@ -431,7 +431,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 children: [
                   Text(
                     "Match Potential",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: textDarkBrown,
@@ -439,7 +439,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                   ),
                   Text(
                     "$scoreLabel ($score/100)",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: scoreColor,
                       fontWeight: FontWeight.w500,
@@ -482,14 +482,14 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 10,
               color: textLightBrown,
             ),
           ),
           Text(
             "$current/$total",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: isGood ? Colors.green : Colors.grey,
@@ -527,7 +527,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             Expanded(
               child: Text(
                 "Your profile looks great! You're ready to start matching.",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: Colors.green.shade700,
                   fontWeight: FontWeight.w500,
@@ -559,7 +559,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               SizedBox(width: 8),
               Text(
                 "Quick Improvements",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: textDarkBrown,
@@ -577,7 +577,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                         SizedBox(width: 4),
                         Text(
                           improvement,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 12,
                             color: Colors.blue.shade700,
                           ),
@@ -604,7 +604,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           SizedBox(height: 16),
           Text(
             "No Photos to Preview",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -613,7 +613,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           SizedBox(height: 8),
           Text(
             "Add some photos to see how your profile will look",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textLightBrown,
             ),
@@ -651,7 +651,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
               child: Text(
                 "Back to Editing",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: afropeepGreen,
@@ -673,7 +673,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               ),
               child: Text(
                 "Share Preview",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -700,7 +700,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
           children: [
             Text(
               "Profile Improvement Tips",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
@@ -759,7 +759,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: textDarkBrown,
@@ -768,7 +768,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                 SizedBox(height: 4),
                 Text(
                   description,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: textLightBrown,
                   ),
@@ -787,7 +787,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
       SnackBar(
         content: Text(
           "Profile sharing feature coming soon!",
-          style: GoogleFonts.poppins(),
+          style: GoogleFonts.montserrat(),
         ),
         backgroundColor: afropeepGreen,
       ),

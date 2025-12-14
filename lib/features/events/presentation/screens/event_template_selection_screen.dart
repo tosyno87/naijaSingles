@@ -9,7 +9,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final templates = EventTemplatesService.getAfrocentricTemplates();
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -57,7 +57,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Templates Grid
             Expanded(
               child: Padding(
@@ -77,7 +77,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Create from scratch button
             Padding(
               padding: const EdgeInsets.all(20),
@@ -157,7 +157,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Content
             Expanded(
               child: Padding(

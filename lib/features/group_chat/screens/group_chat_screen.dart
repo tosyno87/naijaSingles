@@ -38,7 +38,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   Future<void> _loadGroupDetails() async {
     try {
       final group = await _groupChatService.getGroupDetails(widget.groupId);
-      
+
       if (mounted) {
         setState(() {
           _group = group;
@@ -207,7 +207,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   Widget _buildMessageBubble(GroupMessage message) {
     final isSystemMessage = message.messageType == MessageType.system;
-    final isCurrentUser = message.senderId == FirebaseAuth.instance.currentUser?.uid;
+    final isCurrentUser =
+        message.senderId == FirebaseAuth.instance.currentUser?.uid;
 
     if (isSystemMessage) {
       return Container(
@@ -235,7 +236,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isCurrentUser) ...[
             CircleAvatar(
@@ -256,7 +258,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isCurrentUser ? AppColors.primaryGreen : Colors.grey[200],
+                color:
+                    isCurrentUser ? AppColors.primaryGreen : Colors.grey[200],
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -264,7 +267,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 children: [
                   if (!isCurrentUser)
                     Text(
-                      message.senderId, // In real app, you'd get the user's name
+                      message
+                          .senderId, // In real app, you'd get the user's name
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -416,37 +420,41 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                Text(
-                  'Group Info',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                  Text(
+                    'Group Info',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                _buildInfoRow(Icons.group, 'Name', _group!.name),
-                _buildInfoRow(Icons.description, 'Description', _group!.description),
-                _buildInfoRow(Icons.people, 'Members', '${_group!.memberCount}'),
-                _buildInfoRow(Icons.category, 'Type', _group!.type.name),
-                if (_group!.location != null)
-                  _buildInfoRow(Icons.location_on, 'Location', _group!.location!),
-                const SizedBox(height: 20),
-                Text(
-                  'Members',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                  const SizedBox(height: 20),
+                  _buildInfoRow(Icons.group, 'Name', _group!.name),
+                  _buildInfoRow(
+                      Icons.description, 'Description', _group!.description),
+                  _buildInfoRow(
+                      Icons.people, 'Members', '${_group!.memberCount}'),
+                  _buildInfoRow(Icons.category, 'Type', _group!.type.name),
+                  if (_group!.location != null)
+                    _buildInfoRow(
+                        Icons.location_on, 'Location', _group!.location!),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Members',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                ..._group!.memberIds.map((memberId) => _buildMemberTile(memberId)),
-              ],
+                  const SizedBox(height: 10),
+                  ..._group!.memberIds
+                      .map((memberId) => _buildMemberTile(memberId)),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

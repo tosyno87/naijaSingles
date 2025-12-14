@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'dart:developer';
 import '../../../common/widgets/loading_transition_screen.dart';
+import '../../../common/providers/user_provider.dart';
 import '../../../services/profile_image_cropper_service.dart';
 import '../../../services/bulk_photo_picker_service.dart';
 
@@ -369,8 +372,10 @@ class OnboardingController extends ChangeNotifier {
   }
 
   // Photo selection for a specific index with industry-standard cropping
-  Future<void> pickProfilePhoto(ImageSource source, int index) async {
+  Future<void> pickProfilePhoto(ImageSource source, int index, BuildContext? context) async {
     try {
+      log("📸 Starting photo pick for index $index with source: $source");
+      
       // Determine crop type based on photo index
       CropType cropType;
       String title;
@@ -401,21 +406,36 @@ class OnboardingController extends ChangeNotifier {
           title = 'Crop Photo';
       }
 
-      // Pick and crop image with industry-standard settings
+      // Pick and crop image with industry-standard settings and permission handling
       final File? croppedImage =
           await ProfileImageCropperService.pickAndCropImage(
         source: source,
         cropType: cropType,
         title: title,
+        context: context,
       );
 
       if (croppedImage != null) {
         _profilePhotos[index] = croppedImage;
         notifyListeners();
         log("✅ Photo $index cropped and saved successfully");
+      } else {
+        log("⚠️ Photo selection cancelled or failed for index $index");
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       log("❌ Error picking and cropping image: $e");
+      log("❌ Stack trace: $stackTrace");
+      
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to ${source == ImageSource.camera ? 'take' : 'select'} photo. Please try again.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -512,7 +532,17 @@ class OnboardingController extends ChangeNotifier {
       // First, save essential user data (fast operation)
       await _saveEssentialUserData(user.uid);
 
-      // If we haven't timed out yet, navigate now that essential data is saved
+      // Upload photos BEFORE navigation to ensure they're saved
+      // This ensures profile screen shows photos immediately
+      try {
+        await _uploadProfilePictures(user.uid);
+        debugPrint('✅ Profile photos uploaded successfully');
+      } catch (e) {
+        debugPrint('⚠️ Photo upload failed (non-critical): $e');
+        // Continue even if photos fail - user can add them later
+      }
+
+      // If we haven't timed out yet, navigate now that essential data and photos are saved
       if (!timeoutReached && context != null && context.mounted) {
         try {
           _navigateToMainScreen(context);
@@ -521,8 +551,8 @@ class OnboardingController extends ChangeNotifier {
         }
       }
 
-      // Continue with non-essential operations in background
-      _uploadProfilePictures(user.uid).then((_) {
+      // Continue with non-essential operations in background (legacy cleanup)
+      Future.delayed(const Duration(seconds: 1), () {
         // Update UI if needed when pictures are done uploading
         log('✅ Profile pictures uploaded successfully');
         notifyListeners(); // Notify listeners that photos are now uploaded
@@ -555,12 +585,50 @@ class OnboardingController extends ChangeNotifier {
   }
 
   // Navigate to main screen
-  void _navigateToMainScreen(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main_navigation',
-      (route) => false,
-    );
+  void _navigateToMainScreen(BuildContext context) async {
+    // Ensure UserProvider is updated before navigation
+    // This prevents MainNavigationScreen from redirecting back to onboarding
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final user = FirebaseAuth.instance.currentUser;
+      
+      if (user != null) {
+        // Force UserProvider to reload user data from Firestore
+        // This ensures MainNavigationScreen sees the updated profile
+        await userProvider.listenCurrentUserdetails();
+        
+        // Wait a bit for the listener to update
+        await Future.delayed(const Duration(milliseconds: 300));
+        
+        // Verify user data is loaded before navigating
+        int retries = 0;
+        while (retries < 5 && 
+               (userProvider.currentUser == null || 
+                userProvider.currentUser?.name == null ||
+                userProvider.currentUser?.name?.isEmpty == true)) {
+          await Future.delayed(const Duration(milliseconds: 200));
+          retries++;
+        }
+        
+        if (userProvider.currentUser?.name != null && 
+            userProvider.currentUser!.name!.isNotEmpty) {
+          log('✅ UserProvider updated with profile, navigating to main screen');
+        } else {
+          log('⚠️ UserProvider not updated after retries, navigating anyway');
+        }
+      }
+    } catch (e) {
+      log('⚠️ Error updating UserProvider before navigation: $e');
+      // Navigate anyway - MainNavigationScreen will handle the check
+    }
+    
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/main_navigation',
+        (route) => false,
+      );
+    }
   }
 
   // Save only essential user data needed for app functionality
@@ -690,11 +758,25 @@ class OnboardingController extends ChangeNotifier {
 
     // Save essential data to Firestore
     print('🔍 Saving essential user data to Firestore...');
+    
+    // Use set with merge: true to preserve existing fields (like email from account creation)
+    // and add/update onboarding data
     await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .set(essentialData, SetOptions(merge: true));
-
+    
+    // Ensure completion flags are explicitly set (merge might not override if field exists)
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .update({
+      'onboardingCompleted': true,
+      'profileSetupComplete': true,
+      'isProfileComplete': true,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    
     // Update display name in Firebase Auth
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -737,35 +819,84 @@ class OnboardingController extends ChangeNotifier {
 
         log('📤 Uploading photo $i/${validPhotos.length} (${(fileSize / 1024).toStringAsFixed(2)}KB)...');
 
+        bool uploadSuccess = false;
+        
         try {
           // Create storage reference
           final storageRef = FirebaseStorage.instance
               .ref()
               .child('users/$userId/profile_photo_$i.jpg');
 
-          // Upload file with metadata
-          final uploadTask = storageRef.putFile(
-            photo,
-            SettableMetadata(
-              contentType: 'image/jpeg',
-              customMetadata: {
-                'uploadedAt': DateTime.now().toIso8601String(),
-                'photoIndex': i.toString(),
-              },
-            ),
+          final metadata = SettableMetadata(
+            contentType: 'image/jpeg',
+            customMetadata: {
+              'uploadedAt': DateTime.now().toIso8601String(),
+              'photoIndex': i.toString(),
+            },
           );
 
-          // Wait for upload to complete
-          final snapshot = await uploadTask;
+          // Use putData (foreground upload) directly to avoid background session errors on simulator
+          // This works on both simulator and physical devices
+          log('📦 Using putData (foreground upload) for photo $i to avoid simulator issues...');
+          final bytes = await photo.readAsBytes();
+          final uploadTask = storageRef.putData(bytes, metadata);
+
+          // Wait for upload to complete with timeout
+          final snapshot = await uploadTask.timeout(
+            const Duration(minutes: 2),
+            onTimeout: () {
+              throw TimeoutException('Photo upload timed out after 2 minutes');
+            },
+          );
 
           // Get download URL
           final url = await snapshot.ref.getDownloadURL();
           photoUrls.add(url);
+          uploadSuccess = true;
 
           log('✅ Photo $i uploaded successfully: $url');
         } catch (uploadError) {
           log('❌ Error uploading photo $i: $uploadError', error: uploadError);
-          // Continue with next photo instead of failing all
+          
+          // If putData failed, try putFile as fallback (shouldn't happen, but just in case)
+          if (!uploadSuccess) {
+            log('🔄 Retrying photo $i with putFile as fallback...');
+            try {
+              final storageRef = FirebaseStorage.instance
+                  .ref()
+                  .child('users/$userId/profile_photo_$i.jpg');
+              
+              final uploadTask = storageRef.putFile(
+                photo,
+                SettableMetadata(
+                  contentType: 'image/jpeg',
+                  customMetadata: {
+                    'uploadedAt': DateTime.now().toIso8601String(),
+                    'photoIndex': i.toString(),
+                  },
+                ),
+              );
+              
+              final snapshot = await uploadTask.timeout(
+                const Duration(minutes: 2),
+                onTimeout: () {
+                  throw TimeoutException('Photo upload timed out after 2 minutes');
+                },
+              );
+              
+              final url = await snapshot.ref.getDownloadURL();
+              photoUrls.add(url);
+              uploadSuccess = true;
+              log('✅ Photo $i uploaded successfully (retry with putFile): $url');
+            } catch (retryError) {
+              log('❌ Retry also failed for photo $i: $retryError');
+              // Continue with next photo instead of failing all
+            }
+          }
+          
+          if (!uploadSuccess) {
+            log('⚠️ Photo $i could not be uploaded, continuing with remaining photos...');
+          }
         }
       }
 

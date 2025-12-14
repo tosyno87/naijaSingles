@@ -38,44 +38,48 @@ class DefaultFirebaseOptions {
 
   // Web configuration
   static FirebaseOptions get web => FirebaseOptions(
-    apiKey: SecureConfig.firebaseWebApiKey,
-    appId: '1:${SecureConfig.firebaseMessagingSenderId}:web:95ea92b8c7288e31704e49',
-    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
-    projectId: SecureConfig.firebaseProjectId,
-    authDomain: SecureConfig.firebaseAuthDomain,
-    storageBucket: SecureConfig.firebaseStorageBucket,
-  );
+        apiKey: SecureConfig.firebaseWebApiKey,
+        appId:
+            '1:${SecureConfig.firebaseMessagingSenderId}:web:95ea92b8c7288e31704e49',
+        messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+        projectId: SecureConfig.firebaseProjectId,
+        authDomain: SecureConfig.firebaseAuthDomain,
+        storageBucket: SecureConfig.firebaseStorageBucket,
+      );
 
   // Android configuration
   static FirebaseOptions get android => FirebaseOptions(
-    apiKey: SecureConfig.firebaseAndroidApiKey,
-    appId: '1:${SecureConfig.firebaseMessagingSenderId}:android:a62a339c4079bebc704e49',
-    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
-    projectId: SecureConfig.firebaseProjectId,
-    storageBucket: SecureConfig.firebaseStorageBucket,
-  );
+        apiKey: SecureConfig.firebaseAndroidApiKey,
+        appId:
+            '1:${SecureConfig.firebaseMessagingSenderId}:android:a62a339c4079bebc704e49',
+        messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+        projectId: SecureConfig.firebaseProjectId,
+        storageBucket: SecureConfig.firebaseStorageBucket,
+      );
 
   // iOS configuration
   static FirebaseOptions get ios => FirebaseOptions(
-    apiKey: SecureConfig.firebaseIosApiKey,
-    appId: '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
-    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
-    projectId: SecureConfig.firebaseProjectId,
-    storageBucket: SecureConfig.firebaseStorageBucket,
-    iosClientId: SecureConfig.firebaseIosClientId,
-    iosBundleId: SecureConfig.firebaseIosBundleId,
-  );
+        apiKey: SecureConfig.firebaseIosApiKey,
+        appId:
+            '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
+        messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+        projectId: SecureConfig.firebaseProjectId,
+        storageBucket: SecureConfig.firebaseStorageBucket,
+        iosClientId: SecureConfig.firebaseIosClientId,
+        iosBundleId: SecureConfig.firebaseIosBundleId,
+      );
 
   // macOS configuration
   static FirebaseOptions get macos => FirebaseOptions(
-    apiKey: SecureConfig.firebaseIosApiKey,
-    appId: '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
-    messagingSenderId: SecureConfig.firebaseMessagingSenderId,
-    projectId: SecureConfig.firebaseProjectId,
-    storageBucket: SecureConfig.firebaseStorageBucket,
-    iosClientId: SecureConfig.firebaseIosClientId,
-    iosBundleId: SecureConfig.firebaseIosBundleId,
-  );
+        apiKey: SecureConfig.firebaseIosApiKey,
+        appId:
+            '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
+        messagingSenderId: SecureConfig.firebaseMessagingSenderId,
+        projectId: SecureConfig.firebaseProjectId,
+        storageBucket: SecureConfig.firebaseStorageBucket,
+        iosClientId: SecureConfig.firebaseIosClientId,
+        iosBundleId: SecureConfig.firebaseIosBundleId,
+      );
 }
 
 /// Helper class to connect to Firebase emulators in development

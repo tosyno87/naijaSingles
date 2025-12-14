@@ -318,7 +318,8 @@ class UserSearchRepo {
           if (intentFilter != null && intentFilter.isNotEmpty) {
             final userIntent = temp.lookingFor ?? 'Dating';
             if (userIntent != intentFilter) {
-              debugPrint('Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)');
+              debugPrint(
+                  'Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)');
               continue;
             }
           }
@@ -326,7 +327,8 @@ class UserSearchRepo {
           if (distance <= currentUser.maxDistance! &&
               temp.id != currentUser.id &&
               !temp.isBlocked!) {
-            debugPrint("Adding user: ${temp.name} (intent: ${temp.lookingFor})");
+            debugPrint(
+                "Adding user: ${temp.name} (intent: ${temp.lookingFor})");
             userList.add(temp);
           } else {
             debugPrint(

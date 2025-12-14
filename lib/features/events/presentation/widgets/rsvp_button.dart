@@ -21,7 +21,8 @@ class RSVPButton extends StatefulWidget {
   State<RSVPButton> createState() => _RSVPButtonState();
 }
 
-class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateMixin {
+class _RSVPButtonState extends State<RSVPButton>
+    with SingleTickerProviderStateMixin {
   RSVPStatus _currentStatus = RSVPStatus.none;
   bool _isLoading = false;
   late AnimationController _animationController;
@@ -31,12 +32,12 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _currentStatus = widget.initialStatus ?? RSVPStatus.none;
-    
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    
+
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 0.95,
@@ -58,9 +59,9 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
   void _loadRSVPStatus() {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     context.read<RSVPBloc>().add(LoadEventRSVPStatusEvent(
-      userId: currentUserId,
-      eventId: widget.eventId,
-    ));
+          userId: currentUserId,
+          eventId: widget.eventId,
+        ));
   }
 
   void _handleRSVPTap() {
@@ -83,9 +84,9 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
     });
 
     context.read<RSVPBloc>().add(RSVPToEventEvent(
-      eventId: widget.eventId,
-      status: newStatus,
-    ));
+          eventId: widget.eventId,
+          status: newStatus,
+        ));
   }
 
   void _showRSVPOptions() {
@@ -105,7 +106,7 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
             _currentStatus = state.status;
             _isLoading = false;
           });
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -124,7 +125,7 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
           setState(() {
             _isLoading = false;
           });
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -138,7 +139,8 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
               ),
             ),
           );
-        } else if (state is EventRSVPStatusLoaded && state.eventId == widget.eventId) {
+        } else if (state is EventRSVPStatusLoaded &&
+            state.eventId == widget.eventId) {
           setState(() {
             _currentStatus = state.status;
             _isLoading = false;
@@ -328,7 +330,7 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
     required Color color,
   }) {
     final isSelected = _currentStatus == status;
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);

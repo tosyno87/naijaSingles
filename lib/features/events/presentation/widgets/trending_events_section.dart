@@ -170,7 +170,8 @@ class TrendingEventsSection extends StatelessWidget {
   Widget _buildEventDate(EventModel event) {
     final date = event.startDate;
     final formattedDate = '${date.day}/${date.month}/${date.year}';
-    final formattedTime = '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    final formattedTime =
+        '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
 
     return Row(
       children: [

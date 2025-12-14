@@ -71,23 +71,23 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
               // Header Section
               _buildHeaderSection(),
               const SizedBox(height: 24),
-              
+
               // Current Password
               _buildCurrentPasswordSection(),
               const SizedBox(height: 24),
-              
+
               // New Password
               _buildNewPasswordSection(),
               const SizedBox(height: 24),
-              
+
               // Confirm Password
               _buildConfirmPasswordSection(),
               const SizedBox(height: 24),
-              
+
               // Update Button
               _buildUpdateButton(),
               const SizedBox(height: 16),
-              
+
               // Password Requirements
               _buildPasswordRequirementsSection(),
             ],
@@ -199,14 +199,18 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: primaryColor, width: 2),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               prefixIcon: Icon(Icons.lock_outline, color: primaryColor),
               suffixIcon: IconButton(
                 icon: Icon(
-                  _currentPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  _currentPasswordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off,
                   color: textLight,
                 ),
-                onPressed: () => setState(() => _currentPasswordVisible = !_currentPasswordVisible),
+                onPressed: () => setState(
+                    () => _currentPasswordVisible = !_currentPasswordVisible),
               ),
             ),
             style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
@@ -270,14 +274,16 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: primaryColor, width: 2),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               prefixIcon: Icon(Icons.lock, color: primaryColor),
               suffixIcon: IconButton(
                 icon: Icon(
                   _newPasswordVisible ? Icons.visibility : Icons.visibility_off,
                   color: textLight,
                 ),
-                onPressed: () => setState(() => _newPasswordVisible = !_newPasswordVisible),
+                onPressed: () =>
+                    setState(() => _newPasswordVisible = !_newPasswordVisible),
               ),
             ),
             style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
@@ -357,14 +363,18 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: primaryColor, width: 2),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               prefixIcon: Icon(Icons.lock_outline, color: primaryColor),
               suffixIcon: IconButton(
                 icon: Icon(
-                  _confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  _confirmPasswordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off,
                   color: textLight,
                 ),
-                onPressed: () => setState(() => _confirmPasswordVisible = !_confirmPasswordVisible),
+                onPressed: () => setState(
+                    () => _confirmPasswordVisible = !_confirmPasswordVisible),
               ),
             ),
             style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
@@ -533,7 +543,8 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
           barrierDismissible: false,
           builder: (context) => AlertDialog(
             backgroundColor: cardColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 8,
             contentPadding: const EdgeInsets.all(24),
             title: Column(
@@ -545,7 +556,8 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                     color: successColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.check_circle, color: successColor, size: 30),
+                  child:
+                      Icon(Icons.check_circle, color: successColor, size: 30),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -634,16 +646,17 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
     } catch (e) {
       log('Error updating password: $e');
       setState(() => _isUpdating = false);
-      
+
       String errorMessage = 'Failed to update password';
       if (e.toString().contains('wrong-password')) {
         errorMessage = 'Current password is incorrect. Please try again.';
       } else if (e.toString().contains('weak-password')) {
-        errorMessage = 'The new password is too weak. Please choose a stronger password.';
+        errorMessage =
+            'The new password is too weak. Please choose a stronger password.';
       } else if (e.toString().contains('requires-recent-login')) {
         errorMessage = 'Please sign out and sign back in, then try again.';
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

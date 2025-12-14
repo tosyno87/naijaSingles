@@ -17,22 +17,30 @@ class ModernNotificationsScreen extends StatefulWidget {
   const ModernNotificationsScreen({Key? key}) : super(key: key);
 
   @override
-  State<ModernNotificationsScreen> createState() => _ModernNotificationsScreenState();
+  State<ModernNotificationsScreen> createState() =>
+      _ModernNotificationsScreenState();
 }
 
 class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService = IndustryNotificationService();
-  
+  final IndustryNotificationService _notificationService =
+      IndustryNotificationService();
+
   List<AppNotification> _notifications = [];
   int _unreadCount = 0;
   bool _isLoading = true;
   String _selectedFilter = 'all';
-  
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
-  final List<String> _filters = ['all', 'unread', 'matches', 'messages', 'likes'];
+
+  final List<String> _filters = [
+    'all',
+    'unread',
+    'matches',
+    'messages',
+    'likes'
+  ];
 
   @override
   void initState() {
@@ -81,7 +89,9 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
       case 'messages':
         return _notifications.where((n) => n.type == 'message').toList();
       case 'likes':
-        return _notifications.where((n) => n.type == 'like' || n.type == 'superLike').toList();
+        return _notifications
+            .where((n) => n.type == 'like' || n.type == 'superLike')
+            .toList();
       default:
         return _notifications;
     }
@@ -271,9 +281,11 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
                   if (count > 0) ...[
                     const SizedBox(width: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: isSelected ? Colors.white : AppColors.primaryGreen,
+                        color:
+                            isSelected ? Colors.white : AppColors.primaryGreen,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -281,7 +293,9 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
                         style: GoogleFonts.montserrat(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: isSelected ? AppColors.primaryGreen : Colors.white,
+                          color: isSelected
+                              ? AppColors.primaryGreen
+                              : Colors.white,
                         ),
                       ),
                     ),
@@ -298,7 +312,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
               checkmarkColor: Colors.white,
               backgroundColor: Colors.white,
               side: BorderSide(
-                color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
+                color:
+                    isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
                 width: 1,
               ),
               labelStyle: GoogleFonts.montserrat(
@@ -337,7 +352,9 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
       case 'messages':
         return _notifications.where((n) => n.type == 'message').length;
       case 'likes':
-        return _notifications.where((n) => n.type == 'like' || n.type == 'superLike').length;
+        return _notifications
+            .where((n) => n.type == 'like' || n.type == 'superLike')
+            .length;
       default:
         return _notifications.length;
     }
@@ -390,11 +407,13 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
   Widget _buildNotificationContent(AppNotification notification) {
     return Container(
       decoration: BoxDecoration(
-        color: notification.isRead ? Colors.white : AppColors.primaryGreen.withOpacity(0.05),
+        color: notification.isRead
+            ? Colors.white
+            : AppColors.primaryGreen.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: notification.isRead 
-              ? Colors.grey.shade200 
+          color: notification.isRead
+              ? Colors.grey.shade200
               : AppColors.primaryGreen.withOpacity(0.2),
           width: 1,
         ),
@@ -511,7 +530,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
             notification.title,
             style: GoogleFonts.montserrat(
               fontSize: 16,
-              fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.bold,
+              fontWeight:
+                  notification.isRead ? FontWeight.w500 : FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
@@ -540,7 +560,9 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
       notification.message,
       style: GoogleFonts.montserrat(
         fontSize: 14,
-        color: notification.isRead ? AppColors.textSecondary : AppColors.textPrimary,
+        color: notification.isRead
+            ? AppColors.textSecondary
+            : AppColors.textPrimary,
         height: 1.4,
       ),
       maxLines: 2,
@@ -677,10 +699,10 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
     setState(() {
       _isLoading = true;
     });
-    
+
     // Simulate refresh delay
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     setState(() {
       _isLoading = false;
     });
@@ -690,7 +712,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
     if (!notification.isRead) {
       _markAsRead(notification);
     }
-    
+
     // Navigate to appropriate screen based on notification type
     _navigateFromNotification(notification);
   }
@@ -699,7 +721,8 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
     // This would integrate with your app's navigation system
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Navigating to ${notification.type}: ${notification.actionId}'),
+        content: Text(
+            'Navigating to ${notification.type}: ${notification.actionId}'),
         duration: const Duration(seconds: 2),
         backgroundColor: AppColors.primaryGreen,
       ),
@@ -716,7 +739,7 @@ class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
 
   void _deleteNotification(AppNotification notification) {
     _notificationService.deleteNotification(notification.id);
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Notification deleted'),

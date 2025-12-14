@@ -19,7 +19,7 @@ class ProfileScreenAlternative extends StatelessWidget {
         icon: Icon(Icons.edit_outlined),
         label: Text(
           'Edit',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

@@ -26,12 +26,12 @@ class GroupSettingsScreen extends StatefulWidget {
 class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  
+
   // Controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  
+
   // State variables
   String _selectedType = '';
   List<String> _tags = [];
@@ -41,9 +41,24 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
 
   // Tag suggestions
   final List<String> _tagSuggestions = [
-    'music', 'nigerian', 'afrobeats', 'lagos', 'abuja', 'networking',
-    'business', 'tech', 'art', 'sports', 'fitness', 'food', 'travel',
-    'culture', 'language', 'education', 'career', 'entrepreneurship',
+    'music',
+    'nigerian',
+    'afrobeats',
+    'lagos',
+    'abuja',
+    'networking',
+    'business',
+    'tech',
+    'art',
+    'sports',
+    'fitness',
+    'food',
+    'travel',
+    'culture',
+    'language',
+    'education',
+    'career',
+    'entrepreneurship',
   ];
 
   @override
@@ -65,7 +80,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     _nameController.text = widget.group.name;
     _descriptionController.text = widget.group.description ?? '';
     _locationController.text = widget.group.location ?? '';
-    _selectedType = widget.group.type.toString().split('.').last; // Convert enum to string
+    _selectedType =
+        widget.group.type.toString().split('.').last; // Convert enum to string
     _tags = List<String>.from(widget.group.tags ?? []);
   }
 
@@ -73,7 +89,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     final isCreator = currentUserId == widget.group.creatorId;
     final isAdmin = widget.group.adminIds.contains(currentUserId ?? '');
-    
+
     setState(() {
       _canEdit = isCreator || isAdmin;
     });
@@ -92,7 +108,7 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
     try {
       // TODO: Handle image upload if _selectedImage is not null
       // For now, we'll just update the group without image changes
-      
+
       await _groupService.updateGroupSettings(
         groupId: widget.group.id,
         name: _nameController.text.trim(),

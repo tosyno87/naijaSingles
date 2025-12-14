@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class LocationStep extends StatefulWidget {
@@ -53,7 +54,9 @@ class _LocationStepState extends State<LocationStep> {
       address: _addressController.text,
       city: _cityController.text,
       state: _stateController.text,
-      country: _countryController.text.isEmpty ? 'United States' : _countryController.text, // Default to US, allow user input
+      country: _countryController.text.isEmpty
+          ? 'United States'
+          : _countryController.text, // Default to US, allow user input
     );
   }
 
@@ -84,19 +87,14 @@ class _LocationStepState extends State<LocationStep> {
             ),
           ),
           const SizedBox(height: 32),
-          
           _buildVenueNameField(),
           const SizedBox(height: 20),
-          
           _buildAddressField(),
           const SizedBox(height: 20),
-          
           _buildCityField(),
           const SizedBox(height: 20),
-          
           _buildStateSelector(),
           const SizedBox(height: 32),
-          
           _buildLocationPreview(),
           const SizedBox(height: 40),
         ],
@@ -138,21 +136,24 @@ class _LocationStepState extends State<LocationStep> {
             hintText: 'e.g., Lagos Continental Hotel',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 16,
-              color: const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+              color: const Color(0xFF008037)
+                  .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: AppColors.backgroundColor, // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
@@ -194,21 +195,24 @@ class _LocationStepState extends State<LocationStep> {
             hintText: 'e.g., 52A Kofo Abayomi Street',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 16,
-              color: const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+              color: const Color(0xFF008037)
+                  .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: AppColors.backgroundColor, // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
@@ -250,21 +254,24 @@ class _LocationStepState extends State<LocationStep> {
             hintText: 'e.g., Lagos',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 16,
-              color: const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+              color: const Color(0xFF008037)
+                  .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: AppColors.backgroundColor, // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
@@ -306,21 +313,24 @@ class _LocationStepState extends State<LocationStep> {
             hintText: 'Enter state (e.g., Lagos, Abuja, Kano)',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 16,
-              color: const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+              color: const Color(0xFF008037)
+                  .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: AppColors.backgroundColor, // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
@@ -331,9 +341,9 @@ class _LocationStepState extends State<LocationStep> {
             contentPadding: const EdgeInsets.all(16),
           ),
         ),
-        
+
         const SizedBox(height: 20),
-        
+
         // Country field
         Text(
           'Country *',
@@ -354,21 +364,24 @@ class _LocationStepState extends State<LocationStep> {
             hintText: 'Enter country (e.g., United States, Nigeria, Canada)',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 16,
-              color: const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+              color: const Color(0xFF008037)
+                  .withOpacity(0.7), // NaijaSingles green hint
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            fillColor: AppColors.backgroundColor, // NaijaSingles cream background
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
                 width: 1.5,
               ),
             ),

@@ -70,15 +70,15 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
             ),
           ),
           const SizedBox(height: 32),
-          
+
           // Photos Section
           _buildPhotosSection(),
           const SizedBox(height: 32),
-          
+
           // Ticketing Section
           _buildTicketingSection(),
           const SizedBox(height: 32),
-          
+
           // Capacity Section
           _buildCapacitySection(),
           const SizedBox(height: 40),
@@ -119,7 +119,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Image Upload Buttons
         Row(
           children: [
@@ -140,10 +140,9 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
             ),
           ],
         ),
-        
+
         // Image Preview Grid
-        if (widget.eventData.imageUrls.isNotEmpty)
-          _buildImagePreview(),
+        if (widget.eventData.imageUrls.isNotEmpty) _buildImagePreview(),
       ],
     );
   }
@@ -261,7 +260,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Free/Paid Toggle
         Container(
           decoration: BoxDecoration(
@@ -302,7 +301,7 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
             ],
           ),
         ),
-        
+
         // Price Input (only for paid events)
         if (!widget.eventData.isFree) ...[
           const SizedBox(height: 16),
@@ -314,7 +313,8 @@ class _AdvancedSettingsStepState extends State<AdvancedSettingsStep> {
             ),
             child: TextFormField(
               controller: _priceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],

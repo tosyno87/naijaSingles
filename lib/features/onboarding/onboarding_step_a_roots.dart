@@ -177,7 +177,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     ),
                     child: Text(
                       'Step 1 of 3',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: deepGreen,
@@ -195,7 +195,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                 children: [
                   Text(
                     'Your Cultural Roots',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.brown.shade800,
@@ -205,7 +205,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   const SizedBox(height: 12),
                   Text(
                     'Tell us about your cultural background to help us connect you with like-minded people.',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 15,
                       color: Colors.brown.shade600,
                     ),
@@ -262,7 +262,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           value: tribe,
                           child: Text(
                             tribe,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.black87,
@@ -272,7 +272,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       }).toList(),
                       decoration: InputDecoration(
                         labelText: 'Tribe or Ethnic Group',
-                        labelStyle: GoogleFonts.poppins(
+                        labelStyle: GoogleFonts.montserrat(
                           color: deepGreen,
                           fontSize: 16,
                         ),
@@ -296,7 +296,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           vertical: 14,
                         ),
                       ),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
@@ -313,12 +313,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                         controller: _tribeController,
                         decoration: InputDecoration(
                           labelText: 'Enter your tribe',
-                          labelStyle: GoogleFonts.poppins(
+                          labelStyle: GoogleFonts.montserrat(
                             color: deepGreen,
                             fontSize: 16,
                           ),
                           hintText: 'Type your tribe or ethnic group',
-                          hintStyle: GoogleFonts.poppins(
+                          hintStyle: GoogleFonts.montserrat(
                             color: Colors.grey[600],
                             fontSize: 14,
                           ),
@@ -342,7 +342,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             vertical: 14,
                           ),
                         ),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
@@ -359,7 +359,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     const SizedBox(height: 8),
                     Text(
                       'Select all languages that you speak',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: Colors.grey[700],
                       ),
@@ -375,7 +375,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           return Chip(
                             label: Text(
                               language,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -404,7 +404,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       value: _selectedLanguage,
                       hint: Text(
                         'Select a language',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           color: Colors.grey[600],
                           fontSize: 14,
                         ),
@@ -439,7 +439,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           value: language,
                           child: Text(
                             language,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.black87,
@@ -449,7 +449,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       }).toList(),
                       decoration: InputDecoration(
                         labelText: 'Add Language',
-                        labelStyle: GoogleFonts.poppins(
+                        labelStyle: GoogleFonts.montserrat(
                           color: deepGreen,
                           fontSize: 16,
                         ),
@@ -473,7 +473,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           vertical: 14,
                         ),
                       ),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
@@ -493,12 +493,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               controller: _customLanguageController,
                               decoration: InputDecoration(
                                 labelText: 'Enter language',
-                                labelStyle: GoogleFonts.poppins(
+                                labelStyle: GoogleFonts.montserrat(
                                   color: deepGreen,
                                   fontSize: 16,
                                 ),
                                 hintText: 'Type a language you speak',
-                                hintStyle: GoogleFonts.poppins(
+                                hintStyle: GoogleFonts.montserrat(
                                   color: Colors.grey[600],
                                   fontSize: 14,
                                 ),
@@ -524,7 +524,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                   vertical: 14,
                                 ),
                               ),
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black87,
@@ -566,7 +566,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             ),
                             child: Text(
                               'Add',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -636,7 +636,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     ),
                     child: Text(
                       'Continue',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -656,7 +656,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.montserrat(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
@@ -720,7 +720,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     children: [
                       Text(
                         option['title'],
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isSelected ? deepGreen : Colors.black87,
@@ -729,7 +729,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       const SizedBox(height: 4),
                       Text(
                         option['description'],
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: Colors.grey.shade700,
                         ),

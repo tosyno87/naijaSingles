@@ -142,7 +142,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                   ),
                   child: Text(
                     'Update Privacy',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),

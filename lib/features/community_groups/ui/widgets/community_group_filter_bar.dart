@@ -38,19 +38,23 @@ class CommunityGroupFilterBar extends StatelessWidget {
               children: [
                 _buildFilterChip('All', selectedCategory, onCategoryChanged),
                 const SizedBox(width: 8),
-                _buildFilterChip('Cultural', selectedCategory, onCategoryChanged),
+                _buildFilterChip(
+                    'Cultural', selectedCategory, onCategoryChanged),
                 const SizedBox(width: 8),
-                _buildFilterChip('Professional', selectedCategory, onCategoryChanged),
+                _buildFilterChip(
+                    'Professional', selectedCategory, onCategoryChanged),
                 const SizedBox(width: 8),
-                _buildFilterChip('Interest', selectedCategory, onCategoryChanged),
+                _buildFilterChip(
+                    'Interest', selectedCategory, onCategoryChanged),
                 const SizedBox(width: 8),
-                _buildFilterChip('Location', selectedCategory, onCategoryChanged),
+                _buildFilterChip(
+                    'Location', selectedCategory, onCategoryChanged),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Countries
           Text(
             'Countries',
@@ -73,7 +77,8 @@ class CommunityGroupFilterBar extends StatelessWidget {
                 const SizedBox(width: 8),
                 _buildFilterChip('Kenya', selectedCountry, onCountryChanged),
                 const SizedBox(width: 8),
-                _buildFilterChip('South Africa', selectedCountry, onCountryChanged),
+                _buildFilterChip(
+                    'South Africa', selectedCountry, onCountryChanged),
                 const SizedBox(width: 8),
                 _buildFilterChip('Ethiopia', selectedCountry, onCountryChanged),
               ],
@@ -84,9 +89,10 @@ class CommunityGroupFilterBar extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip(String label, String selected, Function(String) onChanged) {
+  Widget _buildFilterChip(
+      String label, String selected, Function(String) onChanged) {
     final isSelected = selected == label;
-    
+
     return GestureDetector(
       onTap: () => onChanged(label),
       child: Container(
@@ -98,13 +104,15 @@ class CommunityGroupFilterBar extends StatelessWidget {
             color: isSelected ? const Color(0xFF008037) : Colors.grey[300]!,
             width: 1,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: const Color(0xFF008037).withOpacity(0.2),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ] : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF008037).withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Text(
           label,

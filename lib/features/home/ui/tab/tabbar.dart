@@ -26,7 +26,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 // Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  
+
   // Handle non-call notifications in background
   if (message.data['type'] != 'Call') {
     // Handle other notification types
@@ -58,7 +58,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     initFirebase(context);
-    
+
     final Stream<List<PurchaseDetails>> purchaseUpdated = iap.purchaseStream;
     _subscription = purchaseUpdated.listen((purchaseDetailsList) async {
       for (var purchaseDetails in purchaseDetailsList) {
@@ -149,11 +149,11 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   void initFirebase(BuildContext context) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       String notificationId = message.data['notificationId'] ?? '';
-      
+
       if (shownNotificationForegroundIds.contains(notificationId)) {
         return;
       }
-      
+
       shownNotificationForegroundIds.add(notificationId);
       if (message != null) {
         // Handle non-call notifications only
@@ -166,31 +166,35 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       String notificationId = message.data['notificationId'] ?? '';
-      
+
       if (shownNotificationForegroundIds.contains(notificationId)) {
         return;
       }
-      
+
       shownNotificationForegroundIds.add(notificationId);
       // Handle non-call notifications only
       if (message.data['type'] != 'Call') {
         // Navigate to appropriate screen based on notification type
         if (message.data['type'] == 'message') {
-          Navigator.pushNamed(context, RouteName.tabScreen, arguments: "messages");
+          Navigator.pushNamed(context, RouteName.tabScreen,
+              arguments: "messages");
         } else {
-          Navigator.pushNamed(context, RouteName.tabScreen, arguments: "notification");
+          Navigator.pushNamed(context, RouteName.tabScreen,
+              arguments: "notification");
         }
       }
     });
 
-    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) async {
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) async {
       if (message != null) {
         String notificationId = message.data['notificationId'] ?? '';
-        
+
         if (shownNotificationForegroundIds.contains(notificationId)) {
           return;
         }
-        
+
         shownNotificationForegroundIds.add(notificationId);
         // Handle non-call notifications only
         if (message.data['type'] != 'Call') {
@@ -204,12 +208,12 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    
+
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
         if (didPop) return;
-        
+
         final shouldExit = await onWillPop(context);
         if (shouldExit && context.mounted) {
           if (Platform.isAndroid) {
@@ -229,9 +233,10 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               automaticallyImplyLeading: false,
               title: TabBar(
-                labelColor: themeProvider.isDarkMode ? Colors.white : primaryColor,
-                unselectedLabelColor: themeProvider.isDarkMode 
-                    ? Colors.grey[400] 
+                labelColor:
+                    themeProvider.isDarkMode ? Colors.white : primaryColor,
+                unselectedLabelColor: themeProvider.isDarkMode
+                    ? Colors.grey[400]
                     : Colors.grey[600],
                 indicatorColor: primaryColor,
                 indicatorWeight: 3,
@@ -271,7 +276,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
           ),
           body: TabBarView(
             children: [
-              Homepage(items: const {}, isPurchased: false), // Use existing Homepage
+              Homepage(
+                  items: const {}, isPurchased: false), // Use existing Homepage
               ExploreScreen(),
               MessagesScreen(),
               ProfileScreen(),

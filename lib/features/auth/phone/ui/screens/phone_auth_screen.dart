@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import '../../bloc/phone_auth_bloc.dart';
+import 'otp_page.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   final bool isSignIn;
@@ -24,7 +24,7 @@ class PhoneAuthScreen extends StatefulWidget {
 
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  String _selectedCountryCode = '+234'; // Default to Nigeria
+  String _selectedCountryCode = '+1'; // Default to US
   bool _isLoading = false;
   final TextEditingController _codeController = TextEditingController();
 
@@ -55,7 +55,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     ));
 
     // Define colors based on MVP styling
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Green
     const Color textColor = Color(0xFF3E1F0D); // Deep brown
     const Color textLightBrown = Color(0xFF8B6C59); // Light brown for subtitle
@@ -69,30 +69,31 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ),
         child: BlocConsumer<PhoneAuthBloc, PhoneAuthState>(
           listener: (context, state) {
-            if (state is PhoneAuthVerified) {
-              log("phone auth success listener called");
-              // Navigate to appropriate screen based on sign in or sign up
-              if (widget.isSignIn) {
-                Navigator.pushReplacementNamed(
-                    context, RouteName.mainNavigation);
-              } else {
-                Navigator.pushReplacementNamed(context, RouteName.onboarding);
-              }
-            }
+            // Don't handle PhoneAuthVerified here - let OTP screen handle it
+            // This prevents premature navigation before registration check completes
+            // The OTP screen will handle navigation after checking registration status
 
             if (state is PhoneAuthCodeSentSuccess) {
               log("phone auth code sent success listener called");
-              setState(() {
-                _isLoading = false;
-              });
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
 
-              Navigator.pushNamed(context, RouteName.otpScreen, arguments: {
-                'phoneNumber': _selectedCountryCode + _phoneController.text,
-                'codeController': _codeController.text,
-                'verificationId': state.verificationId,
-                'updatenumber': widget.updatePhoneNumber,
-                'isLogin': widget.isSignIn,
-              });
+                // Use direct MaterialPageRoute instead of named route to avoid router issues
+                // This ensures smooth transition without any "Page Not Found" flash
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => OtpPage(
+                      phoneNumber: _selectedCountryCode + _phoneController.text,
+                      verificationId: state.verificationId,
+                      codeController: _codeController.text,
+                      updatePhoneNumber: widget.updatePhoneNumber,
+                      isLogin: widget.isSignIn,
+                    ),
+                  ),
+                );
+              }
             }
 
             if (state is PhoneAuthError) {

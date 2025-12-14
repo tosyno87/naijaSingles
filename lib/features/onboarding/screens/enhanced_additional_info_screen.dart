@@ -16,7 +16,7 @@ class _EnhancedAdditionalInfoScreenState
     extends State<EnhancedAdditionalInfoScreen> {
   // Afropeep theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -40,7 +40,7 @@ class _EnhancedAdditionalInfoScreenState
   final TextEditingController _customLanguageController =
       TextEditingController();
 
-  // Platform purpose options - what brings users to NaijaSingles
+  // Platform purpose options - what brings users to Afropeep
   final List<Map<String, dynamic>> _platformPurposeOptions = [
     {
       'label': 'Dating & Romance',
@@ -624,8 +624,8 @@ class _EnhancedAdditionalInfoScreenState
 
           SizedBox(height: isTablet ? 32 : 24),
 
-          // Platform Purpose Section - What brings you to NaijaSingles?
-          _buildSectionHeader('What brings you to NaijaSingles?',
+          // Platform Purpose Section - What brings you to Afropeep?
+          _buildSectionHeader('What brings you to Afropeep?',
               'Help us understand how to serve you better'),
           SizedBox(height: isTablet ? 16 : 12),
           _buildPlatformPurposeDropdown(),
@@ -742,7 +742,7 @@ class _EnhancedAdditionalInfoScreenState
               'Languages', 'Primary language you speak fluently'),
           Text(
             _getLanguageSubtitle(),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 14 : 12,
               color: textLightBrown,
               fontStyle: FontStyle.italic,
@@ -793,7 +793,7 @@ class _EnhancedAdditionalInfoScreenState
                 controller: _customLanguageController,
                 decoration: InputDecoration(
                   hintText: 'Enter your language',
-                  hintStyle: GoogleFonts.poppins(
+                  hintStyle: GoogleFonts.montserrat(
                     fontSize: isTablet ? 15 : 13,
                     color: Colors.grey.shade600,
                   ),
@@ -811,7 +811,7 @@ class _EnhancedAdditionalInfoScreenState
                     ),
                   ),
                 ),
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: isTablet ? 16 : 14,
                   fontWeight: FontWeight.w500,
                   color: textDarkBrown,
@@ -842,7 +842,7 @@ class _EnhancedAdditionalInfoScreenState
             // Drinking
             Text(
               'Drinking',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: isTablet ? 16 : 14,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
@@ -868,7 +868,7 @@ class _EnhancedAdditionalInfoScreenState
             // Smoking
             Text(
               'Smoking',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: isTablet ? 16 : 14,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
@@ -911,7 +911,7 @@ class _EnhancedAdditionalInfoScreenState
                 SizedBox(width: 8),
                 Text(
                   'Progress: $completedFields of $totalFields fields completed',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: isTablet ? 14 : 12,
                     color: afropeepGreen,
                     fontWeight: FontWeight.w500,
@@ -931,7 +931,7 @@ class _EnhancedAdditionalInfoScreenState
       children: [
         Text(
           'Tell us more about you',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 32 : 28,
             fontWeight: FontWeight.bold,
             color: textDarkBrown,
@@ -940,7 +940,7 @@ class _EnhancedAdditionalInfoScreenState
         SizedBox(height: isTablet ? 8 : 6),
         Text(
           'Help us create better matches for you',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 18 : 16,
             color: textLightBrown,
           ),
@@ -977,7 +977,7 @@ class _EnhancedAdditionalInfoScreenState
                   children: [
                     Text(
                       'Profile completion: $completed of $total sections',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: afropeepGreen,
@@ -985,7 +985,7 @@ class _EnhancedAdditionalInfoScreenState
                     ),
                     Text(
                       'Complete profiles get 3x more matches!',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 12,
                         color: afropeepGreen,
                       ),
@@ -1019,7 +1019,7 @@ class _EnhancedAdditionalInfoScreenState
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.blue.shade800,
@@ -1028,7 +1028,7 @@ class _EnhancedAdditionalInfoScreenState
                 SizedBox(height: 4),
                 Text(
                   description,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: Colors.blue.shade700,
                   ),
@@ -1097,7 +1097,7 @@ class _EnhancedAdditionalInfoScreenState
                     children: [
                       Text(
                         option['label'],
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 16 : 14,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w500,
@@ -1108,7 +1108,7 @@ class _EnhancedAdditionalInfoScreenState
                         SizedBox(height: 2),
                         Text(
                           option['description'],
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: isTablet ? 12 : 11,
                             color: isSelected ? afropeepGreen : textLightBrown,
                           ),
@@ -1172,7 +1172,7 @@ class _EnhancedAdditionalInfoScreenState
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Text(
               hint,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: isTablet ? 15 : 13,
                 color: Colors.grey.shade600,
               ),
@@ -1218,7 +1218,7 @@ class _EnhancedAdditionalInfoScreenState
                     Expanded(
                       child: Text(
                         option['label'],
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 16 : 14,
                           fontWeight: FontWeight.w600,
                           color: textDarkBrown,
@@ -1251,7 +1251,7 @@ class _EnhancedAdditionalInfoScreenState
       children: [
         Text(
           title,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 22 : 18,
             fontWeight: FontWeight.w600,
             color: textDarkBrown,
@@ -1260,7 +1260,7 @@ class _EnhancedAdditionalInfoScreenState
         SizedBox(height: isTablet ? 6 : 4),
         Text(
           subtitle,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 14 : 12,
             color: textLightBrown,
           ),
@@ -1333,7 +1333,7 @@ class _EnhancedAdditionalInfoScreenState
                     Expanded(
                       child: Text(
                         option['label'],
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 16 : 14,
                           fontWeight: FontWeight.w600,
                           color: textDarkBrown,
@@ -1422,7 +1422,7 @@ class _EnhancedAdditionalInfoScreenState
                 Expanded(
                   child: Text(
                     option['label'],
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 15 : 13,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -1481,7 +1481,7 @@ class _EnhancedAdditionalInfoScreenState
                   SizedBox(width: 6),
                   Text(
                     option['label'],
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,

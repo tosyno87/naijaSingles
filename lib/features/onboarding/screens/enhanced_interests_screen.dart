@@ -15,7 +15,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   List<String> _selectedInterests = [];
 
   // MVP theme colors
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -98,7 +98,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
           // Header
           Text(
             "What are your interests?",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: textDarkBrown,
@@ -109,7 +109,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
 
           Text(
             "Select at least 5 interests to help us find your perfect matches",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textLightBrown,
             ),
@@ -120,7 +120,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
           // Interests dropdown
           Text(
             "Choose your interests",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -139,7 +139,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
             child: DropdownButton<String>(
               hint: Text(
                 "Select an interest to add",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color: textLightBrown,
                   fontSize: 16,
                 ),
@@ -158,7 +158,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                   value: interest,
                   child: Text(
                     interest,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: textDarkBrown,
                       fontWeight: FontWeight.w500,
@@ -205,7 +205,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                 const SizedBox(width: 8),
                 Text(
                   "${_selectedInterests.length} interests selected ${_selectedInterests.length >= 5 ? '✓' : '(minimum 5)'}",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: _selectedInterests.length >= 5
@@ -223,7 +223,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
           if (_selectedInterests.isNotEmpty) ...[
             Text(
               "Your selected interests:",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
@@ -247,7 +247,7 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
                     children: [
                       Text(
                         interest,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: afropeepGreen,

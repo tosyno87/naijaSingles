@@ -12,8 +12,10 @@ class UserEventService {
 
   // Collection references
   CollectionReference get _eventsCollection => _firestore.collection('events');
-  CollectionReference get _userEventsCollection => _firestore.collection('userEvents');
-  CollectionReference get _eventModerationCollection => _firestore.collection('event_moderation');
+  CollectionReference get _userEventsCollection =>
+      _firestore.collection('userEvents');
+  CollectionReference get _eventModerationCollection =>
+      _firestore.collection('event_moderation');
 
   /// Create a new user-generated event
   Future<String> createEvent(EventCreationData data) async {
@@ -33,10 +35,10 @@ class UserEventService {
 
       // Create event document reference
       final eventRef = _eventsCollection.doc();
-      
+
       // Update data with uploaded image URLs
       data.imageUrls = imageUrls;
-      
+
       // Create enhanced event model
       final event = data.toEventModel(eventRef.id, currentUser.uid);
 
@@ -49,7 +51,8 @@ class UserEventService {
       // No moderation needed - events are immediately published
       // await _createModerationRecord(eventRef.id); // REMOVED
 
-      log('Created and published user event: ${eventRef.id}', name: 'UserEventService');
+      log('Created and published user event: ${eventRef.id}',
+          name: 'UserEventService');
       return eventRef.id;
     } catch (e) {
       log('Error creating event: $e', name: 'UserEventService');
@@ -110,7 +113,9 @@ class UserEventService {
       );
 
       // Update in Firestore
-      await _eventsCollection.doc(eventId).update(updatedEvent.toFirestoreJson());
+      await _eventsCollection
+          .doc(eventId)
+          .update(updatedEvent.toFirestoreJson());
 
       // Update moderation record
       await _updateModerationRecord(eventId, 'updated');
@@ -197,14 +202,19 @@ class UserEventService {
           .limit(limit)
           .get();
 
-      final events = querySnapshot.docs.map((doc) {
-        return EnhancedEventModel.fromFirestoreJson(
-          doc.data() as Map<String, dynamic>,
-          doc.id,
-        );
-      }).where((event) => event.isVisible && event.status != EventStatus.cancelled).toList();
+      final events = querySnapshot.docs
+          .map((doc) {
+            return EnhancedEventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            );
+          })
+          .where((event) =>
+              event.isVisible && event.status != EventStatus.cancelled)
+          .toList();
 
-      log('Fetched ${events.length} published user events', name: 'UserEventService');
+      log('Fetched ${events.length} published user events',
+          name: 'UserEventService');
       return events;
     } catch (e) {
       log('Error getting published events: $e', name: 'UserEventService');
@@ -221,7 +231,9 @@ class UserEventService {
       }
 
       final userEventsData = userEventsDoc.data() as Map<String, dynamic>;
-      final eventIds = (userEventsData['events'] as Map<String, dynamic>?)?.keys.toList() ?? [];
+      final eventIds =
+          (userEventsData['events'] as Map<String, dynamic>?)?.keys.toList() ??
+              [];
 
       if (eventIds.isEmpty) {
         return [];
@@ -237,9 +249,9 @@ class UserEventService {
 
         events.addAll(
           querySnapshot.docs.map((doc) => EnhancedEventModel.fromFirestoreJson(
-            doc.data() as Map<String, dynamic>,
-            doc.id,
-          )),
+                doc.data() as Map<String, dynamic>,
+                doc.id,
+              )),
         );
       }
 
@@ -260,11 +272,11 @@ class UserEventService {
 
       // Create event document reference
       final eventRef = _eventsCollection.doc();
-      
+
       // Create event model with draft status
       final event = data.toEventModel(eventRef.id, currentUser.uid).copyWith(
-        status: EventStatus.draft,
-      );
+            status: EventStatus.draft,
+          );
 
       // Save event to Firestore
       await eventRef.set(event.toFirestoreJson());
@@ -344,7 +356,8 @@ class UserEventService {
         }
 
         // Create unique filename
-        final fileName = 'event_images/${DateTime.now().millisecondsSinceEpoch}_${imagePath.split('/').last}';
+        final fileName =
+            'event_images/${DateTime.now().millisecondsSinceEpoch}_${imagePath.split('/').last}';
         final ref = _storage.ref().child(fileName);
 
         // Upload file
@@ -364,7 +377,8 @@ class UserEventService {
   }
 
   /// Add event to user's events collection
-  Future<void> _addToUserEvents(String userId, String eventId, String role) async {
+  Future<void> _addToUserEvents(
+      String userId, String eventId, String role) async {
     await _userEventsCollection.doc(userId).set({
       'events': {
         eventId: {
@@ -414,7 +428,8 @@ class UserEventService {
       throw Exception('Event must start at least 1 hour from now');
     }
 
-    if (data.endDate!.difference(data.startDate!).inHours > 168) { // 7 days
+    if (data.endDate!.difference(data.startDate!).inHours > 168) {
+      // 7 days
       throw Exception('Event duration cannot exceed 7 days');
     }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class CulturalHeritageStep extends StatefulWidget {
@@ -17,11 +18,11 @@ class CulturalHeritageStep extends StatefulWidget {
 class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
   late TextEditingController _culturalSignificanceController;
   late TextEditingController _dressCodeController;
-  
+
   // Cultural heritage options
   final List<String> _culturalHeritages = [
     'Yoruba',
-    'Igbo', 
+    'Igbo',
     'Hausa',
     'Fulani',
     'Swahili',
@@ -93,22 +94,16 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
             ),
           ),
           const SizedBox(height: 24),
-          
           _buildCulturalHeritageSelector(),
           const SizedBox(height: 20),
-          
           _buildLanguageRequirements(),
           const SizedBox(height: 20),
-          
           _buildAgeGroupSelector(),
           const SizedBox(height: 20),
-          
           _buildCulturalSignificanceField(),
           const SizedBox(height: 20),
-          
           _buildDressCodeField(),
           const SizedBox(height: 20),
-          
           _buildCulturalTemplates(),
           const SizedBox(height: 40),
         ],
@@ -162,7 +157,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF6E5),
+            color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFF008037).withOpacity(0.3),
@@ -191,7 +186,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 size: 24,
               ),
               isExpanded: true,
-              dropdownColor: const Color(0xFFFFF6E5),
+              dropdownColor: AppColors.backgroundColor,
               items: _culturalHeritages.map((heritage) {
                 return DropdownMenuItem<String>(
                   value: heritage,
@@ -255,11 +250,14 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           spacing: 8,
           runSpacing: 8,
           children: _languages.map((language) {
-            final isSelected = (widget.eventData.metadata['languages'] as List<String>? ?? []).contains(language);
+            final isSelected =
+                (widget.eventData.metadata['languages'] as List<String>? ?? [])
+                    .contains(language);
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  final languages = List<String>.from(widget.eventData.metadata['languages'] ?? []);
+                  final languages = List<String>.from(
+                      widget.eventData.metadata['languages'] ?? []);
                   if (isSelected) {
                     languages.remove(language);
                   } else {
@@ -269,16 +267,17 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected 
-                    ? const Color(0xFF008037).withOpacity(0.1)
-                    : const Color(0xFFFFF6E5),
+                  color: isSelected
+                      ? const Color(0xFF008037).withOpacity(0.1)
+                      : AppColors.backgroundColor,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected 
-                      ? const Color(0xFF008037)
-                      : const Color(0xFF008037).withOpacity(0.3),
+                    color: isSelected
+                        ? const Color(0xFF008037)
+                        : const Color(0xFF008037).withOpacity(0.3),
                     width: 1.5,
                   ),
                 ),
@@ -286,9 +285,9 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                   language,
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
-                    color: isSelected 
-                      ? const Color(0xFF008037)
-                      : const Color(0xFF333333),
+                    color: isSelected
+                        ? const Color(0xFF008037)
+                        : const Color(0xFF333333),
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   ),
                 ),
@@ -325,7 +324,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF6E5),
+            color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFF008037).withOpacity(0.3),
@@ -354,7 +353,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 size: 24,
               ),
               isExpanded: true,
-              dropdownColor: const Color(0xFFFFF6E5),
+              dropdownColor: AppColors.backgroundColor,
               items: _ageGroups.map((ageGroup) {
                 return DropdownMenuItem<String>(
                   value: ageGroup,
@@ -426,13 +425,14 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
             color: const Color(0xFF333333),
           ),
           decoration: InputDecoration(
-            hintText: 'e.g., "This event celebrates our traditional harvest festival and brings together community members to honor our ancestors and share cultural knowledge..."',
+            hintText:
+                'e.g., "This event celebrates our traditional harvest festival and brings together community members to honor our ancestors and share cultural knowledge..."',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: AppColors.backgroundColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -495,13 +495,14 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
             color: const Color(0xFF333333),
           ),
           decoration: InputDecoration(
-            hintText: 'e.g., "Traditional attire encouraged", "Smart casual", "Formal wear required"',
+            hintText:
+                'e.g., "Traditional attire encouraged", "Smart casual", "Formal wear required"',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: AppColors.backgroundColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -593,7 +594,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                 width: 150,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF6E5),
+                  color: AppColors.backgroundColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: const Color(0xFF008037).withOpacity(0.3),

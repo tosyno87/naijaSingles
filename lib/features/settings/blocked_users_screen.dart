@@ -39,7 +39,8 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final blockedUsers = await SettingsService.getBlockedUsers(_currentUserId!);
+      final blockedUsers =
+          await SettingsService.getBlockedUsers(_currentUserId!);
       if (mounted) {
         setState(() {
           _blockedUsers = blockedUsers;
@@ -71,17 +72,18 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     );
 
     try {
-      final success = await SettingsService.unblockUser(_currentUserId!, user.id);
-      
+      final success =
+          await SettingsService.unblockUser(_currentUserId!, user.id);
+
       if (mounted) {
         Navigator.pop(context); // Close loading dialog
-        
+
         if (success) {
           // Remove from local list
           setState(() {
             _blockedUsers.removeWhere((u) => u.id == user.id);
           });
-          
+
           _showSnackBar('${user.name} has been unblocked', isError: false);
         } else {
           _showSnackBar('Failed to unblock ${user.name}', isError: true);
@@ -97,41 +99,42 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
 
   Future<bool> _showUnblockConfirmation(String userName) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Unblock User',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryGreen,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to unblock $userName? They will be able to see your profile and message you again.',
-          style: GoogleFonts.poppins(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.poppins(color: Colors.grey[600]),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              'Unblock User',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryGreen,
+              ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
+            content: Text(
+              'Are you sure you want to unblock $userName? They will be able to see your profile and message you again.',
+              style: GoogleFonts.montserrat(),
             ),
-            child: Text(
-              'Unblock',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.montserrat(color: Colors.grey[600]),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(
+                  'Unblock',
+                  style: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   @override
@@ -153,7 +156,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
         ),
         title: Text(
           'Blocked Users',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -184,7 +187,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             const SizedBox(height: 24),
             Text(
               'No Blocked Users',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
                 color: isDarkMode ? Colors.white : Colors.black,
@@ -194,7 +197,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             Text(
               'You haven\'t blocked anyone yet. Blocked users won\'t be able to see your profile or message you.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: Colors.grey[600],
                 height: 1.5,
@@ -218,7 +221,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                   Expanded(
                     child: Text(
                       'To block someone, go to their profile and tap the block button.',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: AppColors.primaryGreen,
                       ),
@@ -256,7 +259,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               Expanded(
                 child: Text(
                   'Blocked users can\'t see your profile or message you. You can unblock them anytime.',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
                   ),
@@ -273,7 +276,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             alignment: Alignment.centerLeft,
             child: Text(
               '${_blockedUsers.length} blocked user${_blockedUsers.length == 1 ? '' : 's'}',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: isDarkMode ? Colors.white : Colors.black,
@@ -347,7 +350,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                 children: [
                   Text(
                     user.name,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: isDarkMode ? Colors.white : Colors.black,
@@ -356,7 +359,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                   const SizedBox(height: 4),
                   Text(
                     'Blocked $timeAgo',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: Colors.grey[600],
                     ),
@@ -366,7 +369,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
                         'Reason: ${user.reason}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 12,
                           color: Colors.grey[500],
                           fontStyle: FontStyle.italic,
@@ -382,7 +385,8 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               onPressed: () => _unblockUser(user),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryGreen,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                   side: BorderSide(color: AppColors.primaryGreen),
@@ -390,7 +394,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               ),
               child: Text(
                 'Unblock',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontWeight: FontWeight.w500,
                 ),
               ),

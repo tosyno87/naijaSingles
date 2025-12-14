@@ -25,7 +25,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   GroupType _selectedType = GroupType.music;
   String? _selectedLocation;
   List<String> _selectedMembers = [];
@@ -35,10 +35,30 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
   // Popular tag suggestions
   final List<String> _tagSuggestions = [
-    'music', 'nigerian', 'afrobeats', 'lagos', 'abuja', 'community',
-    'friends', 'networking', 'events', 'culture', 'food', 'travel',
-    'sports', 'fitness', 'gaming', 'art', 'fashion', 'tech',
-    'business', 'career', 'study', 'support', 'local', 'international',
+    'music',
+    'nigerian',
+    'afrobeats',
+    'lagos',
+    'abuja',
+    'community',
+    'friends',
+    'networking',
+    'events',
+    'culture',
+    'food',
+    'travel',
+    'sports',
+    'fitness',
+    'gaming',
+    'art',
+    'fashion',
+    'tech',
+    'business',
+    'career',
+    'study',
+    'support',
+    'local',
+    'international',
   ];
 
   @override
@@ -166,6 +186,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       ],
     );
   }
+
   Widget _buildGroupTypeSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,12 +208,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             return GestureDetector(
               onTap: () => setState(() => _selectedType = type),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.primaryGreen : Colors.grey[100],
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? AppColors.primaryGreen : Colors.grey[300]!,
+                    color:
+                        isSelected ? AppColors.primaryGreen : Colors.grey[300]!,
                   ),
                 ),
                 child: Row(
@@ -328,7 +351,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppColors.primaryGreen,
                       borderRadius: BorderRadius.circular(20),
@@ -351,11 +375,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             runSpacing: 8,
             children: _selectedMembers.map((memberId) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGreen.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primaryGreen.withOpacity(0.3)),
+                  border: Border.all(
+                      color: AppColors.primaryGreen.withOpacity(0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -423,7 +449,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ),
             prefixIcon: const Icon(Icons.location_on),
           ),
-          onChanged: (value) => _selectedLocation = value.trim().isEmpty ? null : value.trim(),
+          onChanged: (value) =>
+              _selectedLocation = value.trim().isEmpty ? null : value.trim(),
         ),
       ],
     );
@@ -468,7 +495,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return 'Food';
       case GroupType.art:
         return 'Art';
-      
+
       // Lifestyle & Career Groups
       case GroupType.career:
         return 'Career';
@@ -480,7 +507,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return 'Reading';
       case GroupType.movies:
         return 'Movies';
-      
+
       // Social & Community Groups
       case GroupType.events:
         return 'Events';
@@ -492,7 +519,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return 'Study';
       case GroupType.local:
         return 'Local';
-      
+
       // Special Interest Groups
       case GroupType.tech:
         return 'Technology';
@@ -520,7 +547,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return Icons.restaurant;
       case GroupType.art:
         return Icons.palette;
-      
+
       // Lifestyle & Career Groups
       case GroupType.career:
         return Icons.work;
@@ -532,7 +559,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return Icons.menu_book;
       case GroupType.movies:
         return Icons.movie;
-      
+
       // Social & Community Groups
       case GroupType.events:
         return Icons.event;
@@ -544,7 +571,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return Icons.school;
       case GroupType.local:
         return Icons.location_on;
-      
+
       // Special Interest Groups
       case GroupType.tech:
         return Icons.computer;
@@ -564,8 +591,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => ContactPickerWidget(
-          groupName: _nameController.text.isNotEmpty 
-              ? _nameController.text 
+          groupName: _nameController.text.isNotEmpty
+              ? _nameController.text
               : 'New Group',
           groupId: '', // Will be set after group creation
           onInvitationsSent: (invitations) {
@@ -639,7 +666,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         await SuccessDialog.show(
           context: context,
           title: 'Group Created!',
-          message: 'Your group "${_nameController.text.trim()}" has been created successfully!',
+          message:
+              'Your group "${_nameController.text.trim()}" has been created successfully!',
           actionText: 'Open Group',
           onAction: () {
             Navigator.pop(context); // Close dialog

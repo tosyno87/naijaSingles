@@ -26,7 +26,6 @@ analyzer:
     undefined_setter: error
     undefined_name: error
     undefined_class: error
-    compilation_error: error
     # Treat these as warnings to avoid breaking CI
     invalid_use_of_protected_member: warning
     invalid_use_of_visible_for_testing_member: warning

@@ -30,16 +30,18 @@ class ModernNotificationBadge extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ModernNotificationBadge> createState() => _ModernNotificationBadgeState();
+  State<ModernNotificationBadge> createState() =>
+      _ModernNotificationBadgeState();
 }
 
 class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService = IndustryNotificationService();
-  
+  final IndustryNotificationService _notificationService =
+      IndustryNotificationService();
+
   int _unreadCount = 0;
   bool _hasNewNotifications = false;
-  
+
   late AnimationController _pulseController;
   late AnimationController _scaleController;
   late Animation<double> _pulseAnimation;
@@ -58,7 +60,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
+
     _pulseAnimation = Tween<double>(
       begin: 1.0,
       end: 1.2,
@@ -72,7 +74,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    
+
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 0.95,
@@ -90,11 +92,11 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
           _unreadCount = count;
           _hasNewNotifications = count > previousCount;
         });
-        
+
         // Start pulse animation for new notifications
         if (_hasNewNotifications && count > 0) {
           _pulseController.repeat(reverse: true);
-          
+
           // Stop pulsing after 3 seconds
           Future.delayed(const Duration(seconds: 3), () {
             if (mounted) {
@@ -144,7 +146,7 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
                     size: widget.iconSize,
                   ),
                 ),
-                
+
                 // Badge with pulse animation
                 if (widget.showBadge && _unreadCount > 0)
                   Positioned(
@@ -233,11 +235,13 @@ class FloatingNotificationBadge extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<FloatingNotificationBadge> createState() => _FloatingNotificationBadgeState();
+  State<FloatingNotificationBadge> createState() =>
+      _FloatingNotificationBadgeState();
 }
 
 class _FloatingNotificationBadgeState extends State<FloatingNotificationBadge> {
-  final IndustryNotificationService _notificationService = IndustryNotificationService();
+  final IndustryNotificationService _notificationService =
+      IndustryNotificationService();
   int _unreadCount = 0;
 
   @override

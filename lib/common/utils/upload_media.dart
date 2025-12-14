@@ -119,8 +119,9 @@ class _SelectMedia extends StatelessWidget {
       return file;
     }
     final dir = await path_provider.getTemporaryDirectory();
-    final targetPath = "${dir.absolute.path}/temp_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    
+    final targetPath =
+        "${dir.absolute.path}/temp_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
     // Improved compression with industry standards
     int quality;
     if (imageSize > 5) {
@@ -132,7 +133,7 @@ class _SelectMedia extends StatelessWidget {
     } else {
       quality = 70; // Small images
     }
-    
+
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventsScreenSimple extends StatefulWidget {
   const EventsScreenSimple({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class _EventsScreenSimpleState extends State<EventsScreenSimple> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+      backgroundColor: AppColors.backgroundColor, // NaijaSingles cream background
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),

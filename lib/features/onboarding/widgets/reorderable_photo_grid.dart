@@ -29,7 +29,7 @@ class ReorderablePhotoGrid extends StatefulWidget {
 
 class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
   // Theme colors
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -67,7 +67,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
               Expanded(
                 child: Text(
                   "Long press and drag photos to reorder them. Your first photo will be your main profile photo.",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: afropeepGreen,
                     fontWeight: FontWeight.w500,
@@ -170,7 +170,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                   fit: BoxFit.contain,
                 ),
               ),
-            
+
             // Primary photo badge
             if (isPrimary)
               Positioned(
@@ -193,7 +193,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                       SizedBox(width: 4),
                       Text(
                         'MAIN PHOTO',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -237,7 +237,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                       SizedBox(height: isPrimary ? 8 : 6),
                       Text(
                         guidance.title,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isPrimary ? 14 : 12,
                           fontWeight: FontWeight.w600,
                           color: textDarkBrown,
@@ -249,7 +249,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                           child: Text(
                             guidance.description,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 10,
                               color: textLightBrown,
                             ),
@@ -272,7 +272,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                         ),
                         child: Text(
                           isRequired ? "REQUIRED" : "OPTIONAL",
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: isPrimary ? 9 : 8,
                             fontWeight: FontWeight.w600,
                             color:
@@ -367,7 +367,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                         SizedBox(width: 2),
                         Text(
                           "Set Main",
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -404,7 +404,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
           SizedBox(width: 2),
           Text(
             _getQualityLabel(quality.qualityScore),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 10,
               fontWeight: FontWeight.w500,
               color: Colors.white,
@@ -472,7 +472,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
             SizedBox(width: 8),
             Text(
               "Drag to reorder photos",
-              style: GoogleFonts.poppins(fontSize: 14),
+              style: GoogleFonts.montserrat(fontSize: 14),
             ),
           ],
         ),
@@ -488,7 +488,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
       builder: (context) => AlertDialog(
         title: Text(
           "Set as Main Photo?",
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: textDarkBrown,
@@ -496,7 +496,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
         ),
         content: Text(
           "This photo will become your main profile photo and appear first to potential matches.",
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             color: textLightBrown,
           ),
@@ -506,7 +506,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               "Cancel",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 color: Colors.grey,
                 fontWeight: FontWeight.w500,
               ),
@@ -523,7 +523,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
             ),
             child: Text(
               "Set as Main",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontWeight: FontWeight.w600,
               ),
             ),

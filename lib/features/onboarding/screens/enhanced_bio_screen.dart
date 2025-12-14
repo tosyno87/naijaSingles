@@ -189,7 +189,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
           // Header
           Text(
             "Tell your story",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: textColor,
@@ -200,7 +200,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
 
           Text(
             "Share what makes you unique and what you're looking for. A great bio helps you connect with the right people!",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: Colors.black54,
               height: 1.4,
@@ -236,7 +236,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                       children: [
                         Text(
                           _getBioQualityMessage(quality.score),
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: _getBioQualityColor(quality.score),
@@ -246,7 +246,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                           const SizedBox(height: 4),
                           Text(
                             _getBioImprovementTip(quality),
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 12,
                               color: Colors.black54,
                             ),
@@ -257,7 +257,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                   ),
                   Text(
                     '${quality.score}/100',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: _getBioQualityColor(quality.score),
@@ -272,7 +272,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
           // Personality Prompts Section
           Text(
             "Get started with prompts",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: textColor,
@@ -286,7 +286,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               Expanded(
                 child: Text(
                   "Choose one prompt to get started",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: Colors.black54,
                   ),
@@ -302,7 +302,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                 ),
                 child: Text(
                   "Select 1",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: Colors.blue.shade700,
                     fontWeight: FontWeight.w500,
@@ -349,7 +349,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                       ],
                       Text(
                         prompt,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: isSelected ? primaryColor : Colors.black87,
                           fontWeight:
@@ -368,7 +368,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
           // Bio Text Field
           Text(
             "Your bio",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: textColor,
@@ -391,7 +391,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
             ),
             child: TextField(
               controller: _bioController,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: textColor,
                 height: 1.5,
@@ -401,7 +401,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               decoration: InputDecoration(
                 hintText:
                     "Write about yourself, your interests, and what you're looking for...",
-                hintStyle: GoogleFonts.poppins(
+                hintStyle: GoogleFonts.montserrat(
                   color: Colors.grey.shade400,
                   fontSize: 15,
                 ),
@@ -442,7 +442,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
             children: [
               Text(
                 _getCharacterCountMessage(),
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: _getCharacterCountColor(),
                   fontWeight: FontWeight.w500,
@@ -450,7 +450,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
               ),
               Text(
                 "$_currentLength/$_maxLength",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color:
                       _currentLength >= _minLength ? primaryColor : Colors.grey,
@@ -486,7 +486,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
                     const SizedBox(width: 8),
                     Text(
                       "Tips for a great bio",
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.blue.shade800,
@@ -538,7 +538,7 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: Colors.blue.shade900,
                 height: 1.3,

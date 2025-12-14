@@ -132,7 +132,8 @@ class ValidationService {
   /// Check if text contains profanity
   static bool _containsProfanity(String text) {
     final String lowerText = text.toLowerCase();
-    return _profanityWords.any((word) => lowerText.contains(word.toLowerCase()));
+    return _profanityWords
+        .any((word) => lowerText.contains(word.toLowerCase()));
   }
 
   /// Check if text contains special characters
@@ -146,15 +147,18 @@ class ValidationService {
   static String sanitizeText(String text) {
     return text
         .trim()
-        .replaceAll(RegExp(r'\s+'), ' ') // Replace multiple spaces with single space
-        .replaceAll(RegExp(r'[^\w\s\-]'), ''); // Remove special characters except allowed ones
+        .replaceAll(
+            RegExp(r'\s+'), ' ') // Replace multiple spaces with single space
+        .replaceAll(RegExp(r'[^\w\s\-]'),
+            ''); // Remove special characters except allowed ones
   }
 
   /// Check if group name is available (placeholder for future implementation)
   static Future<bool> isGroupNameAvailable(String groupName) async {
     // TODO: Implement actual check against Firestore
     // For now, return true (available)
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate network delay
+    await Future.delayed(
+        const Duration(milliseconds: 500)); // Simulate network delay
     return true;
   }
 
@@ -165,7 +169,8 @@ class ValidationService {
     }
 
     final String trimmedValue = value.trim();
-    final RegExp emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final RegExp emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
     if (!emailRegex.hasMatch(trimmedValue)) {
       return 'Please enter a valid email address';

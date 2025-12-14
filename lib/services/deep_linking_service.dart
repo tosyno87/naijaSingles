@@ -13,7 +13,7 @@ class DeepLinkingService {
   factory DeepLinkingService() => _instance;
   DeepLinkingService._internal();
 
-  final StreamController<DeepLinkData> _linkStreamController = 
+  final StreamController<DeepLinkData> _linkStreamController =
       StreamController<DeepLinkData>.broadcast();
 
   /// Initialize deep linking service
@@ -85,8 +85,8 @@ class DeepLinkingService {
         userName: userName,
       );
 
-      final String text = shareText ?? 
-          'Check out $userName\'s profile on NaijaSingles! $link';
+      final String text =
+          shareText ?? 'Check out $userName\'s profile on NaijaSingles! $link';
 
       await Share.share(
         text,
@@ -113,7 +113,7 @@ class DeepLinkingService {
         matchName: matchName,
       );
 
-      final String text = shareText ?? 
+      final String text = shareText ??
           'I have a new match with $matchName on NaijaSingles! $link';
 
       await Share.share(
@@ -143,8 +143,7 @@ class DeepLinkingService {
         eventDate: eventDate,
       );
 
-      final String text = shareText ?? 
-          'Join $eventName on $eventDate! $link';
+      final String text = shareText ?? 'Join $eventName on $eventDate! $link';
 
       await Share.share(
         text,
@@ -164,7 +163,8 @@ class DeepLinkingService {
       log('🔗 Handling incoming link: $link');
 
       // Parse link and navigate accordingly
-      if (link.host == 'naijasingles.app' || link.host == 'naijasingles.page.link') {
+      if (link.host == 'naijasingles.app' ||
+          link.host == 'naijasingles.page.link') {
         final deepLinkData = DeepLinkData.fromUri(link);
         _linkStreamController.add(deepLinkData);
       }

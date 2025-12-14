@@ -47,7 +47,7 @@ class _OnboardingPreferencesScreenState
           // Header
           Text(
             'Dating Preferences',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 32 : 28,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -56,7 +56,7 @@ class _OnboardingPreferencesScreenState
           SizedBox(height: isTablet ? 12 : 8),
           Text(
             'Help us find your perfect match',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 18 : 16,
               color: Colors.black54,
             ),
@@ -147,7 +147,7 @@ class _OnboardingPreferencesScreenState
       children: [
         Text(
           '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 18 : 16,
             fontWeight: FontWeight.w600,
             color: const Color(0xFF008037),

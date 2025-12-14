@@ -156,7 +156,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
       _loadSwipeItems();
       log("Loaded ${users.length} users from Firebase with intent filter: $_selectedIntent");
-      
+
       // Initialize undo state
       _updateUndoState();
     } catch (e) {
@@ -279,8 +279,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
     try {
       // Check if user can send super like
-      final eligibility = await _superLikeService.canSendSuperLike(_currentUser!.id!);
-      
+      final eligibility =
+          await _superLikeService.canSendSuperLike(_currentUser!.id!);
+
       if (!eligibility.canSend) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -417,48 +418,50 @@ class _ExploreScreenState extends State<ExploreScreen>
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: _intentOptions.map((intent) => 
-            RadioListTile<String>(
-              title: Text(
-                intent,
-                style: GoogleFonts.montserrat(
-                  color: kTextPrimary, // Dark brown text
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              subtitle: Text(
-                _getIntentDescription(intent),
-                style: GoogleFonts.montserrat(
-                  color: kTextSecondary,
-                  fontSize: 12,
-                ),
-              ),
-              value: intent,
-              groupValue: _selectedIntent,
-              activeColor: kPrimaryColor, // Green radio button
-              onChanged: (value) {
-                if (value != null && value != _selectedIntent) {
-                  setState(() => _selectedIntent = value);
-                  Navigator.pop(context);
-                  
-                  // Show loading indicator and reload users with new filter
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Filtering for $value...'),
-                      backgroundColor: kPrimaryColor,
-                      duration: const Duration(seconds: 2),
+          children: _intentOptions
+              .map(
+                (intent) => RadioListTile<String>(
+                  title: Text(
+                    intent,
+                    style: GoogleFonts.montserrat(
+                      color: kTextPrimary, // Dark brown text
+                      fontWeight: FontWeight.w500,
                     ),
-                  );
-                  
-                  // Reload users with the new intent filter
-                  _loadUsers();
-                } else if (value != null) {
-                  // Same intent selected, just close dialog
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ).toList(),
+                  ),
+                  subtitle: Text(
+                    _getIntentDescription(intent),
+                    style: GoogleFonts.montserrat(
+                      color: kTextSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                  value: intent,
+                  groupValue: _selectedIntent,
+                  activeColor: kPrimaryColor, // Green radio button
+                  onChanged: (value) {
+                    if (value != null && value != _selectedIntent) {
+                      setState(() => _selectedIntent = value);
+                      Navigator.pop(context);
+
+                      // Show loading indicator and reload users with new filter
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Filtering for $value...'),
+                          backgroundColor: kPrimaryColor,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+
+                      // Reload users with the new intent filter
+                      _loadUsers();
+                    } else if (value != null) {
+                      // Same intent selected, just close dialog
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+              )
+              .toList(),
         ),
         actions: [
           TextButton(
@@ -543,13 +546,13 @@ class _ExploreScreenState extends State<ExploreScreen>
                       // Undo button (always show if user is loaded)
                       _currentUser != null
                           ? IconButton(
-                              icon: Icon(
-                                Icons.undo, 
-                                color: _canUndo ? Colors.purple : Colors.grey, 
-                                size: 24
-                              ),
+                              icon: Icon(Icons.undo,
+                                  color: _canUndo ? Colors.purple : Colors.grey,
+                                  size: 24),
                               onPressed: _canUndo ? handleUndo : null,
-                              tooltip: _canUndo ? 'Undo last pass' : 'No pass to undo',
+                              tooltip: _canUndo
+                                  ? 'Undo last pass'
+                                  : 'No pass to undo',
                             )
                           : const SizedBox(width: 48),
 
@@ -591,13 +594,14 @@ class _ExploreScreenState extends State<ExploreScreen>
                       ),
                     ],
                   ),
-                  
+
                   // Current filter indicator
                   if (_selectedIntent != 'Dating')
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: kPrimaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
@@ -607,8 +611,8 @@ class _ExploreScreenState extends State<ExploreScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              _selectedIntent == 'Friendship' 
-                                  ? Icons.people 
+                              _selectedIntent == 'Friendship'
+                                  ? Icons.people
                                   : _selectedIntent == 'Networking'
                                       ? Icons.business_center
                                       : Icons.favorite,
@@ -650,7 +654,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                 children: [
                   // Main swipe content
                   _buildContent(),
-                  
+
                   // Mode-specific action buttons - only show if not loading and have users
                   if (!_isLoading && _users.isNotEmpty && _error == null)
                     Positioned(
@@ -663,7 +667,8 @@ class _ExploreScreenState extends State<ExploreScreen>
                           currentUser: _currentUser,
                           onSuperLike: () {
                             if (_matchEngine.currentItem != null) {
-                              final user = _matchEngine.currentItem?.content as UserModel;
+                              final user = _matchEngine.currentItem?.content
+                                  as UserModel;
                               handleSuperLike(user);
                               _matchEngine.currentItem?.superLike();
                             }
@@ -675,14 +680,16 @@ class _ExploreScreenState extends State<ExploreScreen>
                           },
                           onLike: () {
                             if (_matchEngine.currentItem != null) {
-                              final user = _matchEngine.currentItem?.content as UserModel;
+                              final user = _matchEngine.currentItem?.content
+                                  as UserModel;
                               handleLike(user);
                               _matchEngine.currentItem?.like();
                             }
                           },
                           onModeSpecificAction: () {
                             if (_matchEngine.currentItem != null) {
-                              final user = _matchEngine.currentItem?.content as UserModel;
+                              final user = _matchEngine.currentItem?.content
+                                  as UserModel;
                               _showModeActionSheet(user);
                             }
                           },
@@ -829,7 +836,6 @@ class _ExploreScreenState extends State<ExploreScreen>
       ),
     );
   }
-
 }
 
 // Profile Card Widget with fade-in animation
@@ -977,7 +983,7 @@ class _ProfileCardState extends State<ProfileCard>
                                 const SizedBox(width: 4),
                                 Text(
                                   '${photos.length}',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -1145,7 +1151,7 @@ class _ProfileCardState extends State<ProfileCard>
                             const SizedBox(width: 6),
                             Text(
                               'Tap to view profile',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 color: kPrimaryColor,
                                 fontWeight: FontWeight.w500,

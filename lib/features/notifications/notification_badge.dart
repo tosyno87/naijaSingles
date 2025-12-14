@@ -82,7 +82,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
                 child: Center(
                   child: Text(
                     _unreadCount > 9 ? '9+' : _unreadCount.toString(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,

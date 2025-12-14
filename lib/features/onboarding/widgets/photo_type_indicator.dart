@@ -11,7 +11,7 @@ class PhotoTypeIndicator extends StatelessWidget {
   });
 
   // Theme colors
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color textDarkBrown = Color(0xFF3A1D0F);
 
   @override
@@ -33,7 +33,7 @@ class PhotoTypeIndicator extends StatelessWidget {
           SizedBox(width: 3),
           Text(
             _getTypeLabel(),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 9,
               fontWeight: FontWeight.w600,
               color: Colors.white,

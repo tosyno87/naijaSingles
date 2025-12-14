@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:naijasingles/services/profile_image_cropper_service.dart';
 
 /// Industry-standard image upload service following Hinge/Bumble/Tinder best practices
-/// 
+///
 /// Features:
 /// - Smart compression based on image size and quality
 /// - Multiple aspect ratios for different photo types
@@ -15,20 +15,19 @@ import 'package:naijasingles/services/profile_image_cropper_service.dart';
 /// - Proper error handling and user feedback
 /// - Memory-efficient processing
 class IndustryStandardImageService {
-  
   /// Maximum file sizes (in MB) for different photo types
   static const Map<CropType, double> _maxFileSizes = {
-    CropType.square: 2.0,      // Profile photos - smaller for faster loading
-    CropType.portrait: 3.0,     // Full body photos - medium size
-    CropType.landscape: 4.0,    // Activity photos - larger for detail
-    CropType.freeform: 5.0,     // Lifestyle photos - largest
+    CropType.square: 2.0, // Profile photos - smaller for faster loading
+    CropType.portrait: 3.0, // Full body photos - medium size
+    CropType.landscape: 4.0, // Activity photos - larger for detail
+    CropType.freeform: 5.0, // Lifestyle photos - largest
   };
 
   /// Quality settings based on original image size
   static const Map<String, int> _qualitySettings = {
-    'high': 90,     // For images < 1MB
-    'medium': 75,   // For images 1-3MB
-    'low': 60,      // For images 3-5MB
+    'high': 90, // For images < 1MB
+    'medium': 75, // For images 1-3MB
+    'low': 60, // For images 3-5MB
     'very_low': 45, // For images > 5MB
   };
 
@@ -41,10 +40,11 @@ class IndustryStandardImageService {
   }) async {
     try {
       File? selectedImage;
-      
+
       if (showSourceDialog) {
         // Show source selection dialog
-        selectedImage = await ProfileImageCropperService.showImagePickerWithCrop(
+        selectedImage =
+            await ProfileImageCropperService.showImagePickerWithCrop(
           context: context,
           cropType: cropType,
           title: title,
@@ -74,7 +74,7 @@ class IndustryStandardImageService {
       // Get original image size
       final originalSize = await _getFileSizeInMB(imageFile);
       final maxSize = _maxFileSizes[cropType] ?? 2.0;
-      
+
       // If image is already small enough, return as is
       if (originalSize <= maxSize) {
         return imageFile;
@@ -82,12 +82,13 @@ class IndustryStandardImageService {
 
       // Determine compression quality
       final quality = _getCompressionQuality(originalSize);
-      
+
       // Get temporary directory
       final tempDir = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final randomSuffix = Random().nextInt(1000);
-      final outputPath = '${tempDir.path}/optimized_${timestamp}_$randomSuffix.jpg';
+      final outputPath =
+          '${tempDir.path}/optimized_${timestamp}_$randomSuffix.jpg';
 
       // Compress image
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
@@ -105,7 +106,8 @@ class IndustryStandardImageService {
       }
 
       final compressedSize = await _getFileSizeInMB(File(compressedFile.path));
-      debugPrint('Image optimization: ${originalSize.toStringAsFixed(2)}MB -> ${compressedSize.toStringAsFixed(2)}MB (${quality}% quality)');
+      debugPrint(
+          'Image optimization: ${originalSize.toStringAsFixed(2)}MB -> ${compressedSize.toStringAsFixed(2)}MB (${quality}% quality)');
 
       return File(compressedFile.path);
     } catch (e) {
@@ -126,11 +128,11 @@ class IndustryStandardImageService {
   static int _getMinWidth(CropType cropType) {
     switch (cropType) {
       case CropType.square:
-        return 400;  // Profile photos - smaller for faster loading
+        return 400; // Profile photos - smaller for faster loading
       case CropType.portrait:
-        return 600;  // Full body photos - medium resolution
+        return 600; // Full body photos - medium resolution
       case CropType.landscape:
-        return 800;  // Activity photos - higher resolution
+        return 800; // Activity photos - higher resolution
       case CropType.freeform:
         return 1000; // Lifestyle photos - highest resolution
     }
@@ -140,13 +142,13 @@ class IndustryStandardImageService {
   static int _getMinHeight(CropType cropType) {
     switch (cropType) {
       case CropType.square:
-        return 400;  // 1:1 aspect ratio
+        return 400; // 1:1 aspect ratio
       case CropType.portrait:
-        return 800;  // 3:4 aspect ratio
+        return 800; // 3:4 aspect ratio
       case CropType.landscape:
-        return 600;  // 4:3 aspect ratio
+        return 600; // 4:3 aspect ratio
       case CropType.freeform:
-        return 600;  // Flexible aspect ratio
+        return 600; // Flexible aspect ratio
     }
   }
 
@@ -163,19 +165,20 @@ class IndustryStandardImageService {
     Function(int, int)? onProgress,
   }) async {
     final List<File> optimizedImages = [];
-    
+
     for (int i = 0; i < imageFiles.length; i++) {
       onProgress?.call(i + 1, imageFiles.length);
-      
+
       try {
         final optimizedImage = await _optimizeImage(imageFiles[i], cropType);
         optimizedImages.add(optimizedImage);
       } catch (e) {
         debugPrint('Error optimizing image ${i + 1}: $e');
-        optimizedImages.add(imageFiles[i]); // Add original if optimization fails
+        optimizedImages
+            .add(imageFiles[i]); // Add original if optimization fails
       }
     }
-    
+
     return optimizedImages;
   }
 
@@ -214,7 +217,7 @@ class IndustryStandardImageService {
     try {
       final sizeInMB = await _getFileSizeInMB(imageFile);
       final bytes = await imageFile.readAsBytes();
-      
+
       return {
         'fileSize': sizeInMB,
         'fileSizeBytes': bytes.length,

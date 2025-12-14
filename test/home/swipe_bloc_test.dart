@@ -25,8 +25,10 @@ void main() {
     setUp(() {
       mockMatchService = MockMatchService();
       // Mock the MatchService methods
-      when(() => mockMatchService.hasUserLiked(any())).thenAnswer((_) async => false);
-      when(() => mockMatchService.getUsersWhoLikedMe()).thenAnswer((_) async => []);
+      when(() => mockMatchService.hasUserLiked(any()))
+          .thenAnswer((_) async => false);
+      when(() => mockMatchService.getUsersWhoLikedMe())
+          .thenAnswer((_) async => []);
     });
 
     blocTest<SwipeBloc, SwipeblocState>(

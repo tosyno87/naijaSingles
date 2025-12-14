@@ -10,7 +10,7 @@ class RotatingGreetingWidget extends StatelessWidget {
     return SizedBox(
       height: 30,
       child: DefaultTextStyle(
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.montserrat(
           fontSize: 18,
           fontWeight: FontWeight.w500,
           color: const Color(0xFF3E1F0D), // Deep brown color

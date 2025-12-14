@@ -28,8 +28,10 @@ void main() {
       // Verify photo slots are present - handle multiple text widgets
       expect(find.text('Main Photo'), findsOneWidget);
       expect(find.text('Full Body'), findsOneWidget);
-      expect(find.text('Activity'), findsAtLeastNWidgets(1)); // At least one Activity text
-      expect(find.text('Social'), findsAtLeastNWidgets(1)); // At least one Social text
+      expect(find.text('Activity'),
+          findsAtLeastNWidgets(1)); // At least one Activity text
+      expect(find.text('Social'),
+          findsAtLeastNWidgets(1)); // At least one Social text
       expect(find.text('Lifestyle'), findsOneWidget);
     });
 
@@ -48,11 +50,16 @@ void main() {
 
       // Verify the photo guide section is present
       expect(find.text('Quick Photo Guide'), findsOneWidget);
-      
+
       // Verify photo tips are visible in the guide
-      expect(find.text('Main Photo: Clear face shot with a genuine smile'), findsOneWidget);
-      expect(find.text('Full Body: Show your style in a natural setting'), findsOneWidget);
-      expect(find.text('Activity: Doing something you love or are passionate about'), findsOneWidget);
+      expect(find.text('Main Photo: Clear face shot with a genuine smile'),
+          findsOneWidget);
+      expect(find.text('Full Body: Show your style in a natural setting'),
+          findsOneWidget);
+      expect(
+          find.text(
+              'Activity: Doing something you love or are passionate about'),
+          findsOneWidget);
     });
 
     testWidgets('Primary photo slot has special styling',

@@ -5,95 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../../../common/widgets/afropeep_logo.dart';
+import '../../../common/widgets/afropeep_primary_button.dart';
 import '../../../common/constants/app_colors.dart';
 import '../phone/ui/screens/phone_number.dart';
 import '../google_login/google_login_bloc.dart';
 import '../google_login/google_login_events.dart';
 import '../google_login/google_login_states.dart';
-
-// Auth button variant enum for styling
-enum AuthButtonVariant { primary, secondary }
-
-// Modern dating app style auth button widget
-class _AfropeepAuthButton extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final Color backgroundColor;
-  final Color textColor;
-  final VoidCallback? onTap;
-  final bool isLoading;
-  final AuthButtonVariant variant;
-
-  const _AfropeepAuthButton({
-    required this.icon,
-    required this.text,
-    required this.backgroundColor,
-    required this.textColor,
-    required this.variant,
-    this.onTap,
-    this.isLoading = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isPrimary = variant == AuthButtonVariant.primary;
-
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          minimumSize: const Size.fromHeight(56),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28), // Pill shape
-          ),
-          elevation: isPrimary ? 4 : 0,
-          shadowColor: isPrimary
-              ? Colors.black.withOpacity(0.15)
-              : Colors.transparent,
-        ),
-        child: isLoading
-            ? SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  color: textColor,
-                  strokeWidth: 2,
-                ),
-              )
-            : Align(
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Icon(
-                      icon,
-                      size: 22,
-                      color: textColor,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        text,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ),
-    );
-  }
-}
 
 class SignInMethodSelectionScreen extends StatelessWidget {
   const SignInMethodSelectionScreen({super.key});
@@ -158,10 +75,10 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                         children: [
                           const SizedBox(height: 16),
 
-                          // Afropeep Logo - small size
-                          const AfropeepLogo(size: 64),
+                          // Afropeep Logo - larger size for better visibility
+                          const AfropeepLogo(size: 100),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 32),
 
                           // Header text - "Sign in"
                           Text(
@@ -193,13 +110,13 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                           // Button order: Apple (iOS only) → Google → Phone (primary)
                           // Apple Sign In Button (iOS only) - Secondary (first on iOS)
                           if (Platform.isIOS) ...[
-                            _AfropeepAuthButton(
+                            AfropeepPrimaryButton(
                               icon: Icons.apple,
                               text: "Continue with Apple",
                               backgroundColor: appleBlack,
                               textColor: Colors.white,
                               variant: AuthButtonVariant.secondary,
-                              onTap: () {
+                              onPressed: () {
                                 CustomSnackbar.showSnackBarSimple(
                                   "Apple Sign In will be implemented soon",
                                   context,
@@ -225,14 +142,14 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                                 }
                               },
                               builder: (context, state) {
-                                return _AfropeepAuthButton(
+                                return AfropeepPrimaryButton(
                                   icon: Icons.g_mobiledata_rounded,
                                   text: "Continue with Google",
                                   backgroundColor: googleBlue,
                                   textColor: Colors.white,
                                   variant: AuthButtonVariant.secondary,
                                   isLoading: state is GoogleLoginLoading,
-                                  onTap: () {
+                                  onPressed: () {
                                     BlocProvider.of<GoogleLoginBloc>(context)
                                         .add(
                                       const GoogleLoginRequested(),
@@ -246,13 +163,13 @@ class SignInMethodSelectionScreen extends StatelessWidget {
                           const SizedBox(height: 12),
 
                           // Phone Number Button - Primary (last, most prominent)
-                          _AfropeepAuthButton(
+                          AfropeepPrimaryButton(
                             icon: Icons.phone_outlined,
                             text: "Continue with Phone",
                             backgroundColor: primaryColor,
                             textColor: Colors.white,
                             variant: AuthButtonVariant.primary,
-                            onTap: () {
+                            onPressed: () {
                               // Use pushReplacement to remove this screen from stack
                               // This prevents both screens from being visible during transition
                               Navigator.pushReplacement(

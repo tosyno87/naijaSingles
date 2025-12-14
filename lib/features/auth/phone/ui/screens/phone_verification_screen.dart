@@ -66,7 +66,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
         ),
         title: Text(
           "Phone Verification",
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: primaryColor,
@@ -107,7 +107,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   Text(
                     "Verify Your Phone Number",
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: textColor,
@@ -119,7 +119,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   Text(
                     "We'll send you a verification code to confirm your identity",
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: Colors.black54,
                     ),
@@ -149,8 +149,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                               countryCode = code.dialCode!;
                             });
                           },
-                          initialSelection: 'NG',
-                          favorite: const ['NG', 'US', 'GB', 'CA'],
+                          initialSelection: 'US',
+                          favorite: const ['US', 'NG', 'GB', 'CA'],
                           showCountryOnly: false,
                           showOnlyCountryWhenClosed: false,
                           alignLeft: false,
@@ -272,7 +272,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                                 )
                               : Text(
                                   "Continue",
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),

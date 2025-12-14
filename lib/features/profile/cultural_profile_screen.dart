@@ -65,7 +65,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         ),
         title: Text(
           'Profile',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -89,7 +89,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primaryGreen))
           : SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
@@ -191,7 +192,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           // Name and Cultural Badge
           Text(
             name,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -219,7 +220,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                 Flexible(
                   child: Text(
                     _getNationalityText(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -231,7 +232,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          
+
           // Tribe Badge
           if (_getTribeText().isNotEmpty)
             Container(
@@ -251,7 +252,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   const SizedBox(width: 6),
                   Text(
                     _getTribeText(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: Colors.white.withOpacity(0.9),
@@ -270,7 +271,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               const SizedBox(width: 8),
               Text(
                 'Community Verified',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -310,7 +311,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Nationality & Tribe',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -358,7 +359,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
   Widget _buildCommunityInvolvement() {
     final groupsJoined = _userData?['groupsJoined'] as List<dynamic>? ?? [];
-    final eventsOrganized = _userData?['eventsOrganized'] as List<dynamic>? ?? [];
+    final eventsOrganized =
+        _userData?['eventsOrganized'] as List<dynamic>? ?? [];
     final communityRole = _userData?['communityRole']?.toString() ?? 'Member';
 
     return Container(
@@ -387,7 +389,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Community Involvement',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -410,7 +412,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ),
             child: Text(
               communityRole,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryGreen,
@@ -476,7 +478,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Professional Profile',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -485,14 +487,15 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               if (isMentor) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     'Mentor',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -503,25 +506,22 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-
           _buildInfoRow(
             'Industry',
             industry,
             Custom3DIcons.work(size: 20),
           ),
           const SizedBox(height: 12),
-
           _buildInfoRow(
             'Position',
             position,
             Custom3DIcons.skills(size: 20),
           ),
           const SizedBox(height: 12),
-
           if (skills.isNotEmpty) ...[
             Text(
               'Skills',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -533,7 +533,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               runSpacing: 8,
               children: skills.take(5).map((skill) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -544,7 +545,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   ),
                   child: Text(
                     skill.toString(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.primaryGreen,
@@ -561,7 +562,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
   Widget _buildCulturalInterests() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
-    final culturalInterests = _userData?['culturalInterests'] as List<dynamic>? ?? [];
+    final culturalInterests =
+        _userData?['culturalInterests'] as List<dynamic>? ?? [];
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -593,7 +595,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Cultural Interests',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -602,11 +604,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-
           if (culturalInterests.isNotEmpty) ...[
             Text(
               'Cultural Activities',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -618,7 +619,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               runSpacing: 8,
               children: culturalInterests.map((interest) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -629,7 +631,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   ),
                   child: Text(
                     interest.toString(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.primaryGreen,
@@ -640,11 +642,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ),
             const SizedBox(height: 16),
           ],
-
           if (interests.isNotEmpty) ...[
             Text(
               'General Interests',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -656,7 +657,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               runSpacing: 8,
               children: interests.take(8).map((interest) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.textSecondary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -667,7 +669,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                   ),
                   child: Text(
                     interest.toString(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
@@ -717,7 +719,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Connection Preferences',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -726,21 +728,18 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-
           _buildInfoRow(
             'Looking For',
             lookingFor,
             Custom3DIcons.search(size: 20),
           ),
           const SizedBox(height: 12),
-
           _buildInfoRow(
             'Age Range',
             ageRangeText,
             Custom3DIcons.age(size: 20),
           ),
           const SizedBox(height: 12),
-
           _buildInfoRow(
             'Max Distance',
             maxDistanceText,
@@ -754,7 +753,8 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   Widget _buildCulturalContributions() {
     final storiesShared = _userData?['storiesShared'] as List<dynamic>? ?? [];
     final eventsCreated = _userData?['eventsCreated'] as List<dynamic>? ?? [];
-    final mentorshipProvided = _userData?['mentorshipProvided'] as List<dynamic>? ?? [];
+    final mentorshipProvided =
+        _userData?['mentorshipProvided'] as List<dynamic>? ?? [];
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -782,7 +782,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Cultural Contributions',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -791,7 +791,6 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-
           Row(
             children: [
               Expanded(
@@ -835,7 +834,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             children: [
               Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -843,7 +842,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
               ),
               Text(
                 value,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: AppColors.textPrimary,
@@ -860,7 +859,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: AppColors.primaryGreen.withOpacity(0.05),
+        color: AppColors.primaryGreen.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
@@ -873,7 +872,7 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           const SizedBox(height: 8),
           Text(
             value,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryGreen,
@@ -881,10 +880,10 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
           ),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -897,19 +896,30 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     if (_userData?['living_in']?.isNotEmpty == true) {
       // If living_in contains country info, use it
       final location = _userData!['living_in'].toString().toLowerCase();
-      if (location.contains('nigeria') || location.contains('lagos') || location.contains('abuja')) {
+      if (location.contains('nigeria') ||
+          location.contains('lagos') ||
+          location.contains('abuja')) {
         return '🇳🇬 Nigerian';
       } else if (location.contains('ghana') || location.contains('accra')) {
         return '🇬🇭 Ghanaian';
       } else if (location.contains('kenya') || location.contains('nairobi')) {
         return '🇰🇪 Kenyan';
-      } else if (location.contains('south africa') || location.contains('johannesburg') || location.contains('cape town')) {
+      } else if (location.contains('south africa') ||
+          location.contains('johannesburg') ||
+          location.contains('cape town')) {
         return '🇿🇦 South African';
-      } else if (location.contains('uk') || location.contains('london') || location.contains('manchester')) {
+      } else if (location.contains('uk') ||
+          location.contains('london') ||
+          location.contains('manchester')) {
         return '🇬🇧 British-Nigerian';
-      } else if (location.contains('usa') || location.contains('america') || location.contains('new york') || location.contains('atlanta')) {
+      } else if (location.contains('usa') ||
+          location.contains('america') ||
+          location.contains('new york') ||
+          location.contains('atlanta')) {
         return '🇺🇸 American-Nigerian';
-      } else if (location.contains('canada') || location.contains('toronto') || location.contains('vancouver')) {
+      } else if (location.contains('canada') ||
+          location.contains('toronto') ||
+          location.contains('vancouver')) {
         return '🇨🇦 Canadian-Nigerian';
       }
     }
@@ -921,21 +931,32 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     if (_userData?['profession']?.isNotEmpty == true) {
       final profession = _userData!['profession'].toString().toLowerCase();
       // Check if profession field contains tribe info
-      if (profession.contains('yoruba') || profession.contains('igbo') || profession.contains('hausa')) {
+      if (profession.contains('yoruba') ||
+          profession.contains('igbo') ||
+          profession.contains('hausa')) {
         return profession;
       }
     }
-    
+
     // Simulate tribe based on name patterns (for demo purposes)
     final name = _userData?['name']?.toString().toLowerCase() ?? '';
-    if (name.contains('ade') || name.contains('tunde') || name.contains('kemi') || name.contains('yemi')) {
+    if (name.contains('ade') ||
+        name.contains('tunde') ||
+        name.contains('kemi') ||
+        name.contains('yemi')) {
       return '🏛️ Yoruba';
-    } else if (name.contains('chi') || name.contains('nkechi') || name.contains('chukwu') || name.contains('nnamdi')) {
+    } else if (name.contains('chi') ||
+        name.contains('nkechi') ||
+        name.contains('chukwu') ||
+        name.contains('nnamdi')) {
       return '🏛️ Igbo';
-    } else if (name.contains('ahmed') || name.contains('fatima') || name.contains('hassan') || name.contains('aisha')) {
+    } else if (name.contains('ahmed') ||
+        name.contains('fatima') ||
+        name.contains('hassan') ||
+        name.contains('aisha')) {
       return '🏛️ Hausa';
     }
-    
+
     return '🏛️ Yoruba'; // Default tribe for demo
   }
 
@@ -943,9 +964,11 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   String _getAgeRangeText() {
     try {
       // Check preferences.ageRange first (new format)
-      if (_userData?['preferences'] != null && _userData!['preferences'] is Map) {
+      if (_userData?['preferences'] != null &&
+          _userData!['preferences'] is Map) {
         final preferences = _userData!['preferences'] as Map;
-        if (preferences['ageRange'] != null && preferences['ageRange'] is List) {
+        if (preferences['ageRange'] != null &&
+            preferences['ageRange'] is List) {
           final ageRange = preferences['ageRange'] as List;
           if (ageRange.length >= 2) {
             return '${ageRange[0]} - ${ageRange[1]} years';
@@ -981,31 +1004,32 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
     try {
       // Get user's location data for region detection
       final locationData = _userData?['location'] as Map<String, dynamic>?;
-      
+
       // Get max distance from various possible fields
       double? distanceKm;
-      
+
       // Check preferences.maxDistance first
-      if (_userData?['preferences'] != null && _userData!['preferences'] is Map) {
+      if (_userData?['preferences'] != null &&
+          _userData!['preferences'] is Map) {
         final preferences = _userData!['preferences'] as Map;
         if (preferences['maxDistance'] != null) {
           distanceKm = (preferences['maxDistance'] as num).toDouble();
         }
       }
-      
+
       // Check maxDistance field directly
       if (distanceKm == null && _userData?['maxDistance'] != null) {
         distanceKm = (_userData!['maxDistance'] as num).toDouble();
       }
-      
+
       // Check max_distance field
       if (distanceKm == null && _userData?['max_distance'] != null) {
         distanceKm = (_userData!['max_distance'] as num).toDouble();
       }
-      
+
       // Default to 50km if no distance found
       distanceKm ??= 50.0;
-      
+
       // Format distance with proper unit based on region
       return RegionDetectionService.formatDistance(distanceKm, locationData);
     } catch (e) {

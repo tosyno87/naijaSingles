@@ -68,7 +68,8 @@ class CommunityGroupCard extends StatelessWidget {
                       ),
                       if (group.isVerified)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -99,7 +100,7 @@ class CommunityGroupCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Content
           Padding(
             padding: const EdgeInsets.all(16),
@@ -117,16 +118,17 @@ class CommunityGroupCard extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Tags
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
                   children: group.tags.take(4).map((tag) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFF008037).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -142,9 +144,9 @@ class CommunityGroupCard extends StatelessWidget {
                     );
                   }).toList(),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Footer with stats and join button
                 Row(
                   children: [
@@ -162,9 +164,9 @@ class CommunityGroupCard extends StatelessWidget {
                         color: Colors.grey[600],
                       ),
                     ),
-                    
+
                     const Spacer(),
-                    
+
                     // Member count
                     Icon(
                       Icons.people,
@@ -179,16 +181,17 @@ class CommunityGroupCard extends StatelessWidget {
                         color: Colors.grey[600],
                       ),
                     ),
-                    
+
                     const SizedBox(width: 16),
-                    
+
                     // Join button
                     ElevatedButton(
                       onPressed: onJoin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF008037),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),

@@ -36,7 +36,7 @@ class CropMediaState extends State<CropMedia>
   @override
   void initState() {
     super.initState();
-    
+
     // Set aspect ratio based on checktype for better user experience
     double aspectRatio = 1.0; // Default square
     if (widget.checktype == 'profile') {
@@ -46,7 +46,7 @@ class CropMediaState extends State<CropMedia>
     } else if (widget.checktype == 'activity') {
       aspectRatio = 1.33; // 4:3 for activity photos
     }
-    
+
     controller = CropController(aspectRatio: aspectRatio);
 
     // Initialize animation controller
@@ -266,28 +266,29 @@ class CropMediaState extends State<CropMedia>
   Future<void> _finished() async {
     try {
       final image = await controller.croppedBitmap();
-      
+
       // Use JPEG format for better compression and smaller file sizes
       final data = await image.toByteData(format: ImageByteFormat.rawRgba);
       if (data == null) {
         throw Exception('Failed to get image data');
       }
-      
+
       // Convert to JPEG for better compression
       final bytes = data.buffer.asUint8List();
       Directory tempDir = await getTemporaryDirectory();
       String tempPath = tempDir.path;
       Random random = Random();
       int randomNumber = random.nextInt(1000);
-      var filePath = '$tempPath/cropped_${DateTime.now().millisecondsSinceEpoch}_$randomNumber.jpg';
-      
+      var filePath =
+          '$tempPath/cropped_${DateTime.now().millisecondsSinceEpoch}_$randomNumber.jpg';
+
       // Write as JPEG with proper quality
       final file = File(filePath);
       await file.writeAsBytes(bytes);
-      
+
       // Compress the final image for optimal size
       final compressedFile = await _compressImage(file);
-      
+
       // ignore: use_build_context_synchronously
       Navigator.pop(context, compressedFile);
     } catch (e) {
@@ -296,13 +297,14 @@ class CropMediaState extends State<CropMedia>
       Navigator.pop(context);
     }
   }
-  
+
   /// Compress the cropped image to optimal size
   Future<File> _compressImage(File imageFile) async {
     try {
       final tempDir = await getTemporaryDirectory();
-      final compressedPath = '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      
+      final compressedPath =
+          '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
       // Use flutter_image_compress for better compression
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         imageFile.absolute.path,
@@ -313,7 +315,7 @@ class CropMediaState extends State<CropMedia>
         format: CompressFormat.jpeg,
         keepExif: false, // Remove EXIF data for privacy
       );
-      
+
       if (compressedFile != null) {
         return File(compressedFile.path);
       } else {

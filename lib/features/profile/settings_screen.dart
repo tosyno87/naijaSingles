@@ -31,7 +31,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -43,7 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: Text(
           'Settings',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: textPrimary,
@@ -103,7 +102,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.block_outlined,
                 title: 'Blocked Users',
                 subtitle: 'Manage blocked accounts',
-                onTap: () => Navigator.pushNamed(context, RouteName.blockedUsers),
+                onTap: () =>
+                    Navigator.pushNamed(context, RouteName.blockedUsers),
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -132,7 +132,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.notifications_outlined,
                 title: 'Notifications',
                 subtitle: 'Manage your notification preferences',
-                onTap: () => Navigator.pushNamed(context, RouteName.notificationSettings),
+                onTap: () => Navigator.pushNamed(
+                    context, RouteName.notificationSettings),
               ),
               _buildDivider(),
               _buildSettingsItem(
@@ -222,7 +223,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   child: Text(
                     'Sign Out',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.red.shade700,
@@ -247,16 +248,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     foregroundColor: Colors.red.shade700,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                          color: Colors.red.shade300,
-                          width: 2),
+                      side: BorderSide(color: Colors.red.shade300, width: 2),
                     ),
                     elevation: 2,
                     shadowColor: Colors.black.withOpacity(0.1),
                   ),
                   child: Text(
                     'Delete Account',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.red.shade700,
@@ -276,7 +275,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.montserrat(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: textPrimary,
@@ -341,7 +340,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
@@ -350,7 +349,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: textSecondary,
                       ),
@@ -404,7 +403,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(width: 16),
             Text(
               'Sign Out',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
@@ -414,7 +413,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         content: Text(
           'Are you sure you want to sign out of your account?',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             color: textSecondary,
             height: 1.4,
@@ -436,7 +435,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: textSecondary,
@@ -463,7 +462,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Sign Out',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14, // Slightly smaller to fit better
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -487,7 +486,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: Text(
           'Delete Account',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.red.shade700,
@@ -500,7 +499,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Warning text with high contrast against cardColor
             Text(
               'This action cannot be undone. Deleting your account will:',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color:
@@ -521,7 +520,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 '• Delete all your matches and conversations\n'
                 '• Cancel any active subscriptions\n'
                 '• Make your profile invisible to other users',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: Colors.red.shade800, // High contrast red for warnings
@@ -547,7 +546,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: textSecondary,
@@ -573,7 +572,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Delete',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -598,7 +597,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: Text(
           'Final Confirmation',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.red.shade700,
@@ -606,7 +605,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         content: Text(
           'Type "DELETE" to confirm account deletion:',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             color: textSecondary,
           ),
@@ -627,7 +626,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: textSecondary,
@@ -661,7 +660,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Confirm Delete',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 13, // Smaller to fit the longer text
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -708,7 +707,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 20),
                 Text(
                   'Signing out...',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: textPrimary,
@@ -742,7 +741,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(
           content: Text(
             'Failed to sign out. Please try again.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
@@ -779,8 +778,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           borderRadius: BorderRadius.circular(16),
         ),
         title: Text(
-          'About NaijaSingles',
-          style: GoogleFonts.poppins(
+          'About Afropeep',
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: textPrimary,
@@ -792,7 +791,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Version 1.0.0',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: primaryColor,
@@ -800,8 +799,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'NaijaSingles is a dating app designed to connect Nigerian singles worldwide. Find meaningful connections, chat with matches, and discover love.',
-              style: GoogleFonts.poppins(
+              'Afropeep is a dating app designed to connect Nigerian singles worldwide. Find meaningful connections, chat with matches, and discover love.',
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
                 height: 1.5,
@@ -809,8 +808,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              '© 2024 NaijaSingles. All rights reserved.',
-              style: GoogleFonts.poppins(
+              '© 2024 Afropeep. All rights reserved.',
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: textSecondary,
               ),
@@ -822,7 +821,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Close',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: primaryColor,
@@ -833,5 +832,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
 }

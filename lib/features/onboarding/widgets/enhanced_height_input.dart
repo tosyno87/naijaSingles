@@ -81,7 +81,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     onPressed: () => Navigator.pop(context),
                     child: Text(
                       'Cancel',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 16 : 14,
                         color: Colors.grey.shade600,
                       ),
@@ -89,7 +89,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   ),
                   Text(
                     'Select Height',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 20 : 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -102,7 +102,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     },
                     child: Text(
                       'Done',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF008037),
@@ -183,7 +183,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   children: [
                     Text(
                       'Height',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 14 : 12,
                         color: Colors.grey.shade600,
                       ),
@@ -191,7 +191,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     const SizedBox(height: 4),
                     Text(
                       _getHeightDisplay(),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 18 : 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -203,7 +203,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   children: [
                     Text(
                       'Tap to change',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 14 : 12,
                         color: const Color(0xFF008037),
                       ),
@@ -226,7 +226,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
         // Helper text
         Text(
           'Tap above to select your height with an easy-to-use picker',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 14 : 12,
             color: Colors.grey.shade600,
           ),
@@ -282,7 +282,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   child: Text(
                     'cm',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
                       color:
@@ -315,7 +315,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   child: Text(
                     'ft/in',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
                       color:
@@ -356,7 +356,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
           },
           decoration: InputDecoration(
             hintText: _heightUnit == 'cm' ? 'e.g., 170' : "e.g., 5'10",
-            hintStyle: GoogleFonts.poppins(
+            hintStyle: GoogleFonts.montserrat(
               color: Colors.grey.shade500,
               fontSize: isTablet ? 16 : 14,
             ),
@@ -379,7 +379,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
               vertical: isTablet ? 20 : 16,
             ),
           ),
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 16 : 14,
             color: Colors.black87,
           ),

@@ -437,18 +437,20 @@ class ChatService {
 
       final threadData = threadDoc.data() as Map<String, dynamic>;
       final userIds = List<String>.from(threadData['userIds'] ?? []);
-      
+
       if (userIds.length != 2) {
-        debugPrint('❌ Invalid chat thread: Expected 2 users, got ${userIds.length}');
+        debugPrint(
+            '❌ Invalid chat thread: Expected 2 users, got ${userIds.length}');
         return false;
       }
-      
+
       // Verify current user is part of this chat
       if (!userIds.contains(currentUserId)) {
-        debugPrint('❌ Permission denied: User $currentUserId not part of chat $threadId');
+        debugPrint(
+            '❌ Permission denied: User $currentUserId not part of chat $threadId');
         return false;
       }
-      
+
       final otherUserId = userIds.firstWhere((id) => id != currentUserId);
       debugPrint('🗑️ Deleting chat between $currentUserId and $otherUserId');
 
@@ -462,7 +464,8 @@ class ChatService {
       // Unmatch users - remove from both users' matches collections
       await _unmatchUsers(currentUserId!, otherUserId);
 
-      debugPrint('✅ Chat deleted and users unmatched: $currentUserId <-> $otherUserId');
+      debugPrint(
+          '✅ Chat deleted and users unmatched: $currentUserId <-> $otherUserId');
       return true;
     } catch (e) {
       debugPrint('❌ Error deleting chat thread: $e');
@@ -473,7 +476,8 @@ class ChatService {
   // Helper method to delete all messages in a thread
   Future<void> _deleteAllMessagesInThread(String threadId) async {
     try {
-      final messagesRef = _chatThreadsCollection.doc(threadId).collection('messages');
+      final messagesRef =
+          _chatThreadsCollection.doc(threadId).collection('messages');
       final messagesSnapshot = await messagesRef.get();
 
       if (messagesSnapshot.docs.isEmpty) {
@@ -484,19 +488,21 @@ class ChatService {
       // Delete messages in batches to avoid hitting Firestore limits
       const batchSize = 500;
       final docs = messagesSnapshot.docs;
-      
+
       for (int i = 0; i < docs.length; i += batchSize) {
         final batch = _firestore.batch();
-        final endIndex = (i + batchSize < docs.length) ? i + batchSize : docs.length;
-        
+        final endIndex =
+            (i + batchSize < docs.length) ? i + batchSize : docs.length;
+
         for (int j = i; j < endIndex; j++) {
           batch.delete(docs[j].reference);
         }
-        
+
         await batch.commit();
-        debugPrint('🗑️ Deleted ${endIndex - i} messages from thread $threadId');
+        debugPrint(
+            '🗑️ Deleted ${endIndex - i} messages from thread $threadId');
       }
-      
+
       debugPrint('✅ All messages deleted from thread $threadId');
     } catch (e) {
       debugPrint('❌ Error deleting messages: $e');
@@ -523,7 +529,8 @@ class ChatService {
   }
 
   // Remove from new matches collection
-  Future<void> _removeFromMatchesCollection(String userId1, String userId2) async {
+  Future<void> _removeFromMatchesCollection(
+      String userId1, String userId2) async {
     try {
       final matchesQuery = await _firestore
           .collection('matches')
@@ -543,7 +550,8 @@ class ChatService {
   }
 
   // Remove from legacy Matches collection
-  Future<void> _removeFromLegacyMatchesCollection(String userId1, String userId2) async {
+  Future<void> _removeFromLegacyMatchesCollection(
+      String userId1, String userId2) async {
     try {
       final legacyMatchesQuery = await _firestore
           .collection('Matches')
@@ -563,7 +571,8 @@ class ChatService {
   }
 
   // Remove from user subcollections
-  Future<void> _removeFromUserSubcollections(String userId1, String userId2) async {
+  Future<void> _removeFromUserSubcollections(
+      String userId1, String userId2) async {
     try {
       // Remove from user1's matches subcollection
       try {
@@ -575,9 +584,10 @@ class ChatService {
             .delete();
         debugPrint('🗑️ Removed $userId2 from $userId1 matches subcollection');
       } catch (e) {
-        debugPrint('⚠️ Could not remove from $userId1 matches subcollection: $e');
+        debugPrint(
+            '⚠️ Could not remove from $userId1 matches subcollection: $e');
       }
-      
+
       // Remove from user2's matches subcollection
       try {
         await _firestore
@@ -588,7 +598,8 @@ class ChatService {
             .delete();
         debugPrint('🗑️ Removed $userId1 from $userId2 matches subcollection');
       } catch (e) {
-        debugPrint('⚠️ Could not remove from $userId2 matches subcollection: $e');
+        debugPrint(
+            '⚠️ Could not remove from $userId2 matches subcollection: $e');
       }
     } catch (e) {
       debugPrint('❌ Error removing from user subcollections: $e');
@@ -610,7 +621,7 @@ class ChatService {
       } catch (e) {
         debugPrint('⚠️ Could not remove like $userId2 -> $userId1: $e');
       }
-      
+
       // Remove user1 from user2's LikedBy collection
       try {
         await _firestore

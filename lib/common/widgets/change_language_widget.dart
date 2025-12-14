@@ -185,7 +185,9 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const Tabbar(isPaymentSuccess: false)));
+                                                  const Tabbar(
+                                                      isPaymentSuccess:
+                                                          false)));
                                     },
                                   );
                                   break;

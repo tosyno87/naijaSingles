@@ -74,8 +74,9 @@ class RSVPModel extends Equatable {
       eventId: json['eventId'] ?? '',
       status: RSVPStatusExtension.fromString(json['status'] ?? 'none'),
       rsvpDate: DateTime.fromMillisecondsSinceEpoch(
-        json['rsvpDate']?.millisecondsSinceEpoch ?? 
-        json['timestamp']?.millisecondsSinceEpoch ?? 0,
+        json['rsvpDate']?.millisecondsSinceEpoch ??
+            json['timestamp']?.millisecondsSinceEpoch ??
+            0,
       ),
       userProfile: json['userProfile'],
       notes: json['notes'],
@@ -88,7 +89,8 @@ class RSVPModel extends Equatable {
       'eventId': eventId,
       'status': status.value,
       'rsvpDate': rsvpDate,
-      'timestamp': rsvpDate, // Add timestamp field for Firestore rules compatibility
+      'timestamp':
+          rsvpDate, // Add timestamp field for Firestore rules compatibility
       'userProfile': userProfile,
       'notes': notes,
     };

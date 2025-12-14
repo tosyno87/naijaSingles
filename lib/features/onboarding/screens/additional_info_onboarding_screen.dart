@@ -89,7 +89,7 @@ class _AdditionalInfoOnboardingScreenState
           // Header
           Text(
             'Tell us more about you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 32 : 28,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -98,7 +98,7 @@ class _AdditionalInfoOnboardingScreenState
           SizedBox(height: isTablet ? 12 : 8),
           Text(
             'Help us create better matches for you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 18 : 16,
               color: Colors.black54,
             ),
@@ -156,7 +156,7 @@ class _AdditionalInfoOnboardingScreenState
       children: [
         Text(
           title,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 22 : 18,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -165,7 +165,7 @@ class _AdditionalInfoOnboardingScreenState
         SizedBox(height: isTablet ? 8 : 4),
         Text(
           subtitle,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 16 : 14,
             color: Colors.black54,
           ),
@@ -274,7 +274,7 @@ class _AdditionalInfoOnboardingScreenState
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: isTablet ? 18 : 16,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color: isSelected ? const Color(0xFF008037) : Colors.black87,

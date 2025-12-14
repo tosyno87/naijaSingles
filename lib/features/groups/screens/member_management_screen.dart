@@ -23,8 +23,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   late TabController _tabController;
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _inviteMessageController = TextEditingController();
-  
+  final TextEditingController _inviteMessageController =
+      TextEditingController();
+
   List<Map<String, dynamic>> _searchResults = [];
   bool _isSearching = false;
   bool _isLoading = false;
@@ -126,7 +127,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           hintStyle: GoogleFonts.montserrat(color: Colors.grey[600]),
           prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
         onChanged: _onSearchChanged,
       ),
@@ -140,7 +142,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     final creatorId = widget.group.creatorId;
 
     if (members.isEmpty) {
-      return _buildEmptyState('No members yet', 'Invite people to join your group');
+      return _buildEmptyState(
+          'No members yet', 'Invite people to join your group');
     }
 
     return ListView.builder(
@@ -228,7 +231,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
           child: _isSearching
               ? const Center(child: CircularProgressIndicator())
               : _searchResults.isEmpty
-                  ? _buildEmptyState('No search results', 'Try searching for users to invite')
+                  ? _buildEmptyState(
+                      'No search results', 'Try searching for users to invite')
                   : _buildSearchResults(),
         ),
       ],
@@ -292,7 +296,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                     const SizedBox(width: 8),
                     if (isCreator)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.amber,
                           borderRadius: BorderRadius.circular(12),
@@ -308,7 +313,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                       )
                     else if (isAdmin)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: AppColors.primaryGreen,
                           borderRadius: BorderRadius.circular(12),
@@ -346,7 +352,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                     value: 'promote',
                     child: Row(
                       children: [
-                        Icon(Icons.admin_panel_settings, color: AppColors.primaryGreen),
+                        Icon(Icons.admin_panel_settings,
+                            color: AppColors.primaryGreen),
                         SizedBox(width: 8),
                         Text('Promote to Admin'),
                       ],
@@ -399,9 +406,10 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppColors.primaryGreen,
-                backgroundImage: user['photoUrl'] != null && user['photoUrl'].isNotEmpty
-                    ? NetworkImage(user['photoUrl'])
-                    : null,
+                backgroundImage:
+                    user['photoUrl'] != null && user['photoUrl'].isNotEmpty
+                        ? NetworkImage(user['photoUrl'])
+                        : null,
                 child: user['photoUrl'] == null || user['photoUrl'].isEmpty
                     ? Text(
                         user['displayName'].substring(0, 1).toUpperCase(),
@@ -503,10 +511,12 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       _isSearching = true;
     });
 
-    _groupService.searchUsersForInvitation(
+    _groupService
+        .searchUsersForInvitation(
       query: query,
       groupId: widget.group.id,
-    ).then((results) {
+    )
+        .then((results) {
       if (mounted) {
         setState(() {
           _searchResults = results;
@@ -604,7 +614,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Remove Member'),
-        content: Text('Are you sure you want to remove this member from the group?'),
+        content:
+            Text('Are you sure you want to remove this member from the group?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -657,7 +668,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       await _groupService.sendGroupInvitation(
         groupId: widget.group.id,
         userId: userId,
-        message: _inviteMessageController.text.isNotEmpty ? _inviteMessageController.text : null,
+        message: _inviteMessageController.text.isNotEmpty
+            ? _inviteMessageController.text
+            : null,
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -726,7 +739,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   bool _canManageMember(String memberId) {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     if (currentUserId == null) return false;
-    
+
     // Only creator can manage members
     return widget.group.creatorId == currentUserId;
   }

@@ -43,11 +43,11 @@ class _MainNavigationState extends State<MainNavigation> {
         selectedItemColor: deepGreen,
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: GoogleFonts.poppins(
+        selectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
-        unselectedLabelStyle: GoogleFonts.poppins(
+        unselectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
         ),
         items: const [

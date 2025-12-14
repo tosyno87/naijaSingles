@@ -43,7 +43,7 @@ class GroupModel {
   factory GroupModel.fromDocument(DocumentSnapshot doc) {
     try {
       final data = doc.data() as Map<String, dynamic>;
-      
+
       return GroupModel(
         id: doc.id,
         name: data['name'] ?? '',
@@ -196,10 +196,10 @@ class GroupModel {
   /// Get cultural info for display
   String get culturalDisplay {
     if (culturalInfo == null) return 'General';
-    
+
     final nationality = culturalInfo!['nationality'] ?? '';
     final tribe = culturalInfo!['tribe'] ?? '';
-    
+
     if (nationality.isNotEmpty && tribe.isNotEmpty) {
       return '$nationality - $tribe';
     } else if (nationality.isNotEmpty) {
@@ -207,7 +207,7 @@ class GroupModel {
     } else if (tribe.isNotEmpty) {
       return tribe;
     }
-    
+
     return 'General';
   }
 
@@ -259,7 +259,8 @@ class GroupCategories {
   ];
 
   static const Map<String, String> categoryDescriptions = {
-    'Cultural': 'Groups focused on cultural heritage, traditions, and celebrations',
+    'Cultural':
+        'Groups focused on cultural heritage, traditions, and celebrations',
     'Professional': 'Professional networking and career development groups',
     'Social': 'Social groups for making friends and social connections',
     'Educational': 'Groups focused on learning and education',

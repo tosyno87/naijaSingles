@@ -108,7 +108,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     ),
                     child: Text(
                       'Step 3 of 3',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: deepGreen,
@@ -123,7 +123,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
               // Header
               Text(
                 'Your Values & Preferences',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.brown.shade800,
@@ -133,7 +133,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
               const SizedBox(height: 12),
               Text(
                 'Tell us what matters most to you in relationships.',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 15,
                   color: Colors.brown.shade600,
                 ),
@@ -161,7 +161,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     const SizedBox(height: 8),
                     Text(
                       'Select at least 3 values that are important to you',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: Colors.grey[700],
                       ),
@@ -225,7 +225,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     const SizedBox(height: 8),
                     Text(
                       'Select any absolute dealbreakers for you',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: Colors.grey[700],
                       ),
@@ -294,7 +294,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                             Expanded(
                               child: Text(
                                 'Please select at least 3 values that matter to you',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   color: Colors.amber[800],
                                 ),
@@ -319,7 +319,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     icon: const Icon(Icons.arrow_back, size: 16),
                     label: Text(
                       'Back',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -369,7 +369,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                       ),
                       child: Text(
                         'Finish',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -390,7 +390,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.montserrat(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
@@ -459,7 +459,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     Expanded(
                       child: Text(
                         label,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: isSelected ? deepGreen : Colors.black87,
                           fontWeight:

@@ -47,7 +47,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         children: [
           // Tab Bar
           _buildTabBar(),
-          
+
           // Tab Content
           Expanded(
             child: _buildTabContent(),
@@ -76,7 +76,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           final index = entry.key;
           final tab = entry.value;
           final isSelected = index == _selectedTabIndex;
-          
+
           return Expanded(
             child: GestureDetector(
               onTap: () => setState(() => _selectedTabIndex = index),
@@ -120,43 +120,53 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
     final faqs = [
       {
         'question': 'How do I create a profile?',
-        'answer': 'To create your profile, tap on the profile icon and fill in your basic information, add photos, and write a bio that represents you.',
+        'answer':
+            'To create your profile, tap on the profile icon and fill in your basic information, add photos, and write a bio that represents you.',
       },
       {
         'question': 'How does matching work?',
-        'answer': 'Our matching system shows you potential matches based on your location, age preferences, and interests. Swipe right to like someone or left to pass.',
+        'answer':
+            'Our matching system shows you potential matches based on your location, age preferences, and interests. Swipe right to like someone or left to pass.',
       },
       {
         'question': 'How do I start a conversation?',
-        'answer': 'Once you match with someone, you can start chatting! Go to your Messages tab and tap on their profile to begin the conversation.',
+        'answer':
+            'Once you match with someone, you can start chatting! Go to your Messages tab and tap on their profile to begin the conversation.',
       },
       {
         'question': 'Can I change my location?',
-        'answer': 'Yes! Go to Settings > Location to update your location settings. You can also enable location services for more accurate matching.',
+        'answer':
+            'Yes! Go to Settings > Location to update your location settings. You can also enable location services for more accurate matching.',
       },
       {
         'question': 'How do I report someone?',
-        'answer': 'If someone is behaving inappropriately, go to their profile and tap the report button. We take all reports seriously and will investigate.',
+        'answer':
+            'If someone is behaving inappropriately, go to their profile and tap the report button. We take all reports seriously and will investigate.',
       },
       {
         'question': 'How do I block someone?',
-        'answer': 'To block someone, go to their profile and tap the block button. Blocked users won\'t be able to see your profile or message you.',
+        'answer':
+            'To block someone, go to their profile and tap the block button. Blocked users won\'t be able to see your profile or message you.',
       },
       {
         'question': 'How do I delete my account?',
-        'answer': 'Go to Settings > Account > Delete Account. Please note that this action is permanent and cannot be undone.',
+        'answer':
+            'Go to Settings > Account > Delete Account. Please note that this action is permanent and cannot be undone.',
       },
       {
         'question': 'Is my personal information safe?',
-        'answer': 'Yes, we take your privacy seriously. We use encryption to protect your data and never share your personal information with third parties.',
+        'answer':
+            'Yes, we take your privacy seriously. We use encryption to protect your data and never share your personal information with third parties.',
       },
       {
         'question': 'How do I change my notification settings?',
-        'answer': 'Go to Settings > Notifications to customize which notifications you receive and when you receive them.',
+        'answer':
+            'Go to Settings > Notifications to customize which notifications you receive and when you receive them.',
       },
       {
         'question': 'What should I do if I encounter a bug?',
-        'answer': 'If you find a bug, please report it through Settings > Send Feedback. Include as much detail as possible to help us fix it quickly.',
+        'answer':
+            'If you find a bug, please report it through Settings > Send Feedback. Include as much detail as possible to help us fix it quickly.',
       },
     ];
 
@@ -267,20 +277,20 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Email Support Option
           _buildContactOption(
             icon: Icons.email,
             title: 'Email Support',
             subtitle: 'Get help via email',
-            description: 'support@naijasingles.com',
-            onTap: () => _sendEmail('support@naijasingles.com'),
+            description: 'support@afropeep.com',
+            onTap: () => _sendEmail('support@afropeep.com'),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Send Feedback Option
           _buildContactOption(
             icon: Icons.feedback,
@@ -289,9 +299,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             description: 'Help us improve the app',
             onTap: () => Navigator.pushNamed(context, '/feedback'),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Support Info
           Container(
             padding: const EdgeInsets.all(16),
@@ -517,7 +527,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: (guide['steps'] as List<String>).asMap().entries.map((entry) {
+              children:
+                  (guide['steps'] as List<String>).asMap().entries.map((entry) {
                 final index = entry.key + 1;
                 final step = entry.value;
                 return Padding(
@@ -569,9 +580,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: email,
-      query: 'subject=NaijaSingles Support Request',
+      query: 'subject=Afropeep Support Request',
     );
-    
+
     try {
       if (await canLaunchUrl(emailUri)) {
         await launchUrl(emailUri);

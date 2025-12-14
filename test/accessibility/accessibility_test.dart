@@ -46,7 +46,7 @@ void main() {
       // Test that buttons are accessible
       final button = find.text('Get Started');
       expect(button, findsOneWidget);
-      
+
       // Test that text fields have proper labels
       final textField = find.byType(TextField);
       expect(textField, findsOneWidget);
@@ -95,7 +95,7 @@ void main() {
       // Test that list tiles are tappable
       final communitiesTile = find.text('Communities');
       expect(communitiesTile, findsOneWidget);
-      
+
       // Test navigation accessibility
       await tester.tap(communitiesTile);
       await tester.pumpAndSettle();
@@ -274,7 +274,7 @@ void main() {
       final nameField = find.byType(TextFormField).first;
       await tester.tap(nameField);
       await tester.pumpAndSettle();
-      
+
       // Test that focus moves properly
       expect(nameField, findsOneWidget);
     });
@@ -369,14 +369,16 @@ void main() {
             children: [
               CircularProgressIndicator(),
               Text('Loading your matches...'),
-              LinearProgressIndicator(value: 0.5), // Fixed value to prevent infinite animation
+              LinearProgressIndicator(
+                  value: 0.5), // Fixed value to prevent infinite animation
               Text('Uploading photos...'),
             ],
           ),
         ),
       ));
 
-      await tester.pump(); // Use pump() instead of pumpAndSettle() to avoid timeout
+      await tester
+          .pump(); // Use pump() instead of pumpAndSettle() to avoid timeout
 
       // Test loading indicators
       expect(find.byType(CircularProgressIndicator), findsOneWidget);

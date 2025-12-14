@@ -146,7 +146,8 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
     );
   }
 
-  Widget _buildActionCard(String title, String subtitle, Widget icon, Color color, VoidCallback? onTap) {
+  Widget _buildActionCard(String title, String subtitle, Widget icon,
+      Color color, VoidCallback? onTap) {
     return Material(
       color: Colors.transparent,
       child: InkWell(

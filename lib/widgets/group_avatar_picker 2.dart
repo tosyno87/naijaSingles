@@ -65,7 +65,8 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
                           fit: BoxFit.cover,
                           width: widget.size,
                           height: widget.size,
-                          errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildDefaultAvatar(),
                         )
                       : _buildDefaultAvatar(),
             ),
@@ -280,7 +281,8 @@ class _GroupAvatarPickerState extends State<GroupAvatarPicker> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Invalid image. Please select a valid image file (max 10MB).'),
+                content: Text(
+                    'Invalid image. Please select a valid image file (max 10MB).'),
                 backgroundColor: Colors.red,
               ),
             );

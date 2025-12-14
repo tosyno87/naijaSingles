@@ -14,7 +14,7 @@ class PhotoUploadScreen extends StatefulWidget {
 class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -27,8 +27,10 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   Future<void> _pickImage(ImageSource source, int index) async {
     final controller =
         Provider.of<OnboardingController>(context, listen: false);
-    await controller.pickProfilePhoto(source, index);
-    setState(() {});
+    await controller.pickProfilePhoto(source, index, context);
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _showImageSourceDialog(int index) {
@@ -46,7 +48,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           children: [
             Text(
               "Select Photo",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
@@ -107,7 +109,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: textDarkBrown,
@@ -115,7 +117,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 ),
                 Text(
                   subtitle,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: textLightBrown,
                   ),
@@ -177,7 +179,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                       const SizedBox(height: 8),
                       Text(
                         isRequired ? "Required" : "Add Photo",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: isRequired
@@ -233,7 +235,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         children: [
           Text(
             "Add Your Profile Photos",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -244,7 +246,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
           Text(
             "Upload at least 3 photos to complete your profile",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textLightBrown,
             ),
@@ -263,7 +265,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             ),
             child: Text(
               "$uploadedCount/5 photos uploaded (minimum 3)",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: hasMinimumPhotos ? afropeepGreen : Colors.red,
@@ -316,7 +318,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               children: [
                 Text(
                   "Tips for great profile photos:",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.blue.shade800,
@@ -361,7 +363,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: Colors.blue.shade900,
               ),

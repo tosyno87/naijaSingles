@@ -181,7 +181,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                   opacity: _fadeAnimation,
                   child: Text(
                     "💚 It's a Match!",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF4E2B1B),
@@ -197,7 +197,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                   opacity: _fadeAnimation,
                   child: Text(
                     "You and ${widget.matchedUserName} like each other",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: const Color(0xFF4E2B1B).withValues(alpha: 0.8),
                     ),
@@ -306,7 +306,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
             ),
             child: Text(
               'Keep Exploring',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: _isProcessing ? Colors.grey : const Color(0xFF008037),
@@ -341,7 +341,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                   )
                 : Text(
                     'Send Message',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -379,7 +379,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                 )
               : Text(
                   'Send Message',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -407,7 +407,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
           ),
           child: Text(
             'Keep Exploring',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: _isProcessing ? Colors.grey : const Color(0xFF008037),

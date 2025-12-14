@@ -50,19 +50,22 @@ void main() {
 
     group('Mode-Specific Compatibility Engine', () {
       test('should calculate different scores for different modes', () {
-        final datingScore = ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+        final datingScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
           currentUser,
           targetUser,
           'Dating',
         );
 
-        final friendshipScore = ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+        final friendshipScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
           currentUser,
           targetUser,
           'Friendship',
         );
 
-        final networkingScore = ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+        final networkingScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
           currentUser,
           targetUser,
           'Networking',
@@ -79,24 +82,29 @@ void main() {
         expect(networkingScore, inInclusiveRange(0.0, 1.0));
 
         print('Dating Score: ${(datingScore * 100).toStringAsFixed(1)}%');
-        print('Friendship Score: ${(friendshipScore * 100).toStringAsFixed(1)}%');
-        print('Networking Score: ${(networkingScore * 100).toStringAsFixed(1)}%');
+        print(
+            'Friendship Score: ${(friendshipScore * 100).toStringAsFixed(1)}%');
+        print(
+            'Networking Score: ${(networkingScore * 100).toStringAsFixed(1)}%');
       });
 
       test('should return compatibility breakdown', () {
-        final datingBreakdown = ModeSpecificCompatibilityEngine.getCompatibilityBreakdown(
+        final datingBreakdown =
+            ModeSpecificCompatibilityEngine.getCompatibilityBreakdown(
           currentUser,
           targetUser,
           'Dating',
         );
 
-        final friendshipBreakdown = ModeSpecificCompatibilityEngine.getCompatibilityBreakdown(
+        final friendshipBreakdown =
+            ModeSpecificCompatibilityEngine.getCompatibilityBreakdown(
           currentUser,
           targetUser,
           'Friendship',
         );
 
-        final networkingBreakdown = ModeSpecificCompatibilityEngine.getCompatibilityBreakdown(
+        final networkingBreakdown =
+            ModeSpecificCompatibilityEngine.getCompatibilityBreakdown(
           currentUser,
           targetUser,
           'Networking',
@@ -126,17 +134,20 @@ void main() {
 
     group('Mode-Specific Filtering Service', () {
       test('should return different preferences for different modes', () {
-        final datingPrefs = ModeSpecificFilteringService.getModeSpecificPreferences(
+        final datingPrefs =
+            ModeSpecificFilteringService.getModeSpecificPreferences(
           currentUser,
           'Dating',
         );
 
-        final friendshipPrefs = ModeSpecificFilteringService.getModeSpecificPreferences(
+        final friendshipPrefs =
+            ModeSpecificFilteringService.getModeSpecificPreferences(
           currentUser,
           'Friendship',
         );
 
-        final networkingPrefs = ModeSpecificFilteringService.getModeSpecificPreferences(
+        final networkingPrefs =
+            ModeSpecificFilteringService.getModeSpecificPreferences(
           currentUser,
           'Networking',
         );
@@ -146,11 +157,13 @@ void main() {
         expect(datingPrefs['ageRange']['max'], equals(28)); // 30 - 2
 
         // Friendship should have expanded age range
-        expect(friendshipPrefs['ageRange']['min'], equals(18)); // 20 - 5, clamped to 18
+        expect(friendshipPrefs['ageRange']['min'],
+            equals(18)); // 20 - 5, clamped to 18
         expect(friendshipPrefs['ageRange']['max'], equals(35)); // 30 + 5
 
         // Networking should have most expanded age range
-        expect(networkingPrefs['ageRange']['min'], equals(18)); // 20 - 10, clamped to 18
+        expect(networkingPrefs['ageRange']['min'],
+            equals(18)); // 20 - 10, clamped to 18
         expect(networkingPrefs['ageRange']['max'], equals(40)); // 30 + 10
 
         // Distance preferences should be different
@@ -160,7 +173,6 @@ void main() {
       });
 
       test('should validate mode matches correctly', () {
-        
         // Test dating validation
         expect(
           ModeSpecificFilteringService.validateModeMatch(targetUser, 'Dating'),
@@ -169,21 +181,28 @@ void main() {
 
         // Test friendship validation (should fail because user is looking for dating)
         expect(
-          ModeSpecificFilteringService.validateModeMatch(targetUser, 'Friendship'),
+          ModeSpecificFilteringService.validateModeMatch(
+              targetUser, 'Friendship'),
           isFalse,
         );
 
         // Test networking validation (should fail because user is looking for dating)
         expect(
-          ModeSpecificFilteringService.validateModeMatch(targetUser, 'Networking'),
+          ModeSpecificFilteringService.validateModeMatch(
+              targetUser, 'Networking'),
           isFalse,
         );
       });
 
       test('should return mode-specific suggestions', () {
-        final datingSuggestions = ModeSpecificFilteringService.getModeSpecificSuggestions('Dating');
-        final friendshipSuggestions = ModeSpecificFilteringService.getModeSpecificSuggestions('Friendship');
-        final networkingSuggestions = ModeSpecificFilteringService.getModeSpecificSuggestions('Networking');
+        final datingSuggestions =
+            ModeSpecificFilteringService.getModeSpecificSuggestions('Dating');
+        final friendshipSuggestions =
+            ModeSpecificFilteringService.getModeSpecificSuggestions(
+                'Friendship');
+        final networkingSuggestions =
+            ModeSpecificFilteringService.getModeSpecificSuggestions(
+                'Networking');
 
         expect(datingSuggestions, isNotEmpty);
         expect(friendshipSuggestions, isNotEmpty);
@@ -217,14 +236,16 @@ void main() {
           },
         );
 
-        final networkingScore = ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+        final networkingScore =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
           currentUser,
           networkingUser,
           'Networking',
         );
 
         expect(networkingScore, inInclusiveRange(0.0, 1.0));
-        print('Networking User Score: ${(networkingScore * 100).toStringAsFixed(1)}%');
+        print(
+            'Networking User Score: ${(networkingScore * 100).toStringAsFixed(1)}%');
       });
 
       test('should handle edge cases gracefully', () {
@@ -237,7 +258,8 @@ void main() {
           showGender: 'male',
         );
 
-        final score = ModeSpecificCompatibilityEngine.calculateModeCompatibility(
+        final score =
+            ModeSpecificCompatibilityEngine.calculateModeCompatibility(
           currentUser,
           minimalUser,
           'Dating',

@@ -14,11 +14,11 @@ class FeedbackScreen extends StatefulWidget {
 class _FeedbackScreenState extends State<FeedbackScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   final _formKey = GlobalKey<FormState>();
   final _feedbackController = TextEditingController();
   final _emailController = TextEditingController();
-  
+
   // Afropeep MVP Color Scheme
   static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
@@ -96,27 +96,27 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               // Header Section
               _buildHeaderSection(),
               const SizedBox(height: 24),
-              
+
               // Rating Section
               _buildRatingSection(),
               const SizedBox(height: 24),
-              
+
               // Category Selection
               _buildCategorySection(),
               const SizedBox(height: 24),
-              
+
               // Email Field
               _buildEmailField(),
               const SizedBox(height: 24),
-              
+
               // Feedback Text Area
               _buildFeedbackField(),
               const SizedBox(height: 24),
-              
+
               // Submit Button
               _buildSubmitButton(),
               const SizedBox(height: 16),
-              
+
               // Tips Section
               _buildTipsSection(),
             ],
@@ -167,7 +167,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Help us improve NaijaSingles by sharing your thoughts, reporting bugs, or suggesting new features.',
+            'Help us improve Afropeep by sharing your thoughts, reporting bugs, or suggesting new features.',
             style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textSecondary,
@@ -207,7 +207,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'How would you rate your overall experience with NaijaSingles?',
+            'How would you rate your overall experience with Afropeep?',
             style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textSecondary,
@@ -224,7 +224,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   child: Icon(
                     Icons.star,
                     size: 40,
-                    color: index < _rating ? Colors.amber : Colors.grey.shade300,
+                    color:
+                        index < _rating ? Colors.amber : Colors.grey.shade300,
                   ),
                 ),
               );
@@ -293,7 +294,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: primaryColor, width: 2),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
             items: _categories.map((category) {
               return DropdownMenuItem(
@@ -366,7 +368,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: primaryColor, width: 2),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               prefixIcon: Icon(Icons.email, color: primaryColor),
             ),
             style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
@@ -374,7 +377,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email address';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                  .hasMatch(value)) {
                 return 'Please enter a valid email address';
               }
               return null;
@@ -630,7 +634,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           barrierDismissible: false,
           builder: (context) => AlertDialog(
             backgroundColor: cardColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 8,
             contentPadding: const EdgeInsets.all(24),
             title: Column(
@@ -642,7 +647,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     color: successColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.check_circle, color: successColor, size: 40),
+                  child:
+                      Icon(Icons.check_circle, color: successColor, size: 40),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -659,7 +665,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Your feedback has been submitted successfully. We appreciate you taking the time to help us improve NaijaSingles.',
+                  'Your feedback has been submitted successfully. We appreciate you taking the time to help us improve Afropeep.',
                   style: GoogleFonts.montserrat(
                     color: textSecondary,
                     fontSize: 16,

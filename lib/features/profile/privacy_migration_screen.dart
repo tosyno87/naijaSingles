@@ -264,7 +264,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                         const SizedBox(width: 12),
                         Text(
                           'Migrating...',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -273,7 +273,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     )
                   : Text(
                       'Update My Privacy Settings',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -354,7 +354,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               ),
               child: Text(
                 'Manage Privacy Settings',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),

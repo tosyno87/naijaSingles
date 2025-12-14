@@ -7,7 +7,6 @@ import 'package:naijasingles/services/profile_image_cropper_service.dart';
 /// Hinge-style bulk photo picker service
 /// Allows users to select multiple photos at once, then crop them individually
 class BulkPhotoPickerService {
-  
   /// Pick multiple photos at once (Hinge style)
   static Future<List<File>> pickMultiplePhotos({
     required BuildContext context,
@@ -32,7 +31,8 @@ class BulkPhotoPickerService {
       final limitedImages = images.take(maxPhotos).toList();
 
       // Convert to File objects
-      final List<File> files = limitedImages.map((image) => File(image.path)).toList();
+      final List<File> files =
+          limitedImages.map((image) => File(image.path)).toList();
 
       return files;
     } catch (e) {
@@ -42,7 +42,8 @@ class BulkPhotoPickerService {
   }
 
   /// Show bulk photo source selection dialog
-  static Future<ImageSource?> _showBulkPhotoSourceDialog(BuildContext context) async {
+  static Future<ImageSource?> _showBulkPhotoSourceDialog(
+      BuildContext context) async {
     return showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: Colors.white,
@@ -56,7 +57,7 @@ class BulkPhotoPickerService {
           children: [
             Text(
               'Select Photos',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF3A1D0F),
@@ -65,7 +66,7 @@ class BulkPhotoPickerService {
             const SizedBox(height: 8),
             Text(
               'Choose up to 5 photos from your gallery',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: Color(0xFF8B6C59),
               ),
@@ -102,10 +103,10 @@ class BulkPhotoPickerService {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF007A33).withValues(alpha: 0.1),
+          color: const Color(0xFF008037).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF007A33).withValues(alpha: 0.3),
+            color: const Color(0xFF008037).withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -114,12 +115,12 @@ class BulkPhotoPickerService {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF007A33).withValues(alpha: 0.2),
+                color: const Color(0xFF008037).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF007A33),
+                color: const Color(0xFF008037),
                 size: 24,
               ),
             ),
@@ -130,7 +131,7 @@ class BulkPhotoPickerService {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF3A1D0F),
@@ -138,7 +139,7 @@ class BulkPhotoPickerService {
                   ),
                   Text(
                     subtitle,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: Color(0xFF8B6C59),
                     ),
@@ -148,7 +149,7 @@ class BulkPhotoPickerService {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: const Color(0xFF007A33),
+              color: const Color(0xFF008037),
               size: 16,
             ),
           ],
@@ -163,14 +164,14 @@ class BulkPhotoPickerService {
     required BuildContext context,
   }) async {
     final List<File> croppedPhotos = [];
-    
+
     for (int i = 0; i < selectedPhotos.length; i++) {
       final photo = selectedPhotos[i];
-      
+
       // Determine crop type based on photo index
       CropType cropType;
       String title;
-      
+
       switch (i) {
         case 0:
           cropType = CropType.square; // Main photo - square crop

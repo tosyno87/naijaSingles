@@ -37,7 +37,8 @@ class GroupDetailsScreen extends StatefulWidget {
 class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final UserService _userService = UserService();
-  final GroupNotificationService _notificationService = GroupNotificationService();
+  final GroupNotificationService _notificationService =
+      GroupNotificationService();
   final GroupUnreadService _unreadService = GroupUnreadService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
@@ -175,7 +176,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           .collection('unifiedGroups')
           .doc(widget.group.id)
           .collection('messages')
-          .orderBy('timestamp', descending: false) // Oldest first for proper display
+          .orderBy('timestamp',
+              descending: false) // Oldest first for proper display
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -185,7 +187,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             itemCount: 3, // Show 3 shimmer messages
             itemBuilder: (context, index) {
               return MessageShimmer(
-                isCurrentUser: index % 2 == 0, // Alternate between user and other
+                isCurrentUser:
+                    index % 2 == 0, // Alternate between user and other
               );
             },
           );
@@ -224,7 +227,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         }
 
         final messages = snapshot.data?.docs ?? [];
-        
+
         if (messages.isEmpty) {
           return Center(
             child: Column(
@@ -277,15 +280,16 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             final messageDoc = messages[index];
             final messageData = messageDoc.data() as Map<String, dynamic>;
             final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
-            
+
             return MessageBubble(
               messageId: messageDoc.id,
               text: messageData['text'] ?? '',
               senderId: messageData['senderId'] ?? '',
-              senderName: messageData['senderId'] == currentUserId 
+              senderName: messageData['senderId'] == currentUserId
                   ? (FirebaseAuth.instance.currentUser?.displayName ?? 'You')
                   : (messageData['senderName'] ?? 'Unknown'),
-              timestamp: (messageData['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+              timestamp: (messageData['timestamp'] as Timestamp?)?.toDate() ??
+                  DateTime.now(),
               isCurrentUser: messageData['senderId'] == currentUserId,
             );
           },
@@ -349,7 +353,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               borderRadius: BorderRadius.circular(24),
             ),
             child: IconButton(
-              onPressed: _messageController.text.trim().isEmpty ? null : _sendMessage,
+              onPressed:
+                  _messageController.text.trim().isEmpty ? null : _sendMessage,
               icon: const Icon(
                 Icons.send,
                 color: Colors.white,
@@ -384,7 +389,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       });
 
       // Increment unread count for other members
-      await _unreadService.incrementUnreadCount(widget.group.id, excludeUserId: currentUser.uid);
+      await _unreadService.incrementUnreadCount(widget.group.id,
+          excludeUserId: currentUser.uid);
 
       _messageController.clear();
       setState(() {}); // Update send button state
@@ -479,7 +485,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 child: Image.network(
                   widget.group.imageUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildDefaultAvatar(),
                 ),
               )
             : _buildDefaultAvatar(),
@@ -727,7 +734,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       future: _userService.getUserProfile(memberId),
       builder: (context, snapshot) {
         final userProfile = snapshot.data;
-        final displayName = userProfile?.displayName ?? (isCurrentUser ? 'You' : 'Member');
+        final displayName =
+            userProfile?.displayName ?? (isCurrentUser ? 'You' : 'Member');
         final avatarUrl = userProfile?.avatarUrl;
         final initials = userProfile?.initials ?? (isCurrentUser ? 'Y' : 'M');
 
@@ -760,7 +768,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             children: [
               if (isCreator)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen,
                     borderRadius: BorderRadius.circular(8),
@@ -777,7 +786,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               if (isAdmin && !isCreator) ...[
                 const SizedBox(width: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(8),
@@ -1002,7 +1012,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
     try {
       await _groupService.leaveGroup(widget.group.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1027,7 +1037,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   Future<void> _joinGroup() async {
     try {
       await _groupService.joinGroup(widget.group.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1035,7 +1045,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             backgroundColor: AppColors.success,
           ),
         );
-        Navigator.pop(context, true); // Return true to indicate group was joined
+        Navigator.pop(
+            context, true); // Return true to indicate group was joined
       }
     } catch (e) {
       if (mounted) {
@@ -1052,7 +1063,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               message = 'Failed to join group. Please try again.';
           }
         } else {
-          message = 'Failed to join group. Please check your connection and try again.';
+          message =
+              'Failed to join group. Please check your connection and try again.';
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1067,25 +1079,27 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   Future<bool> _showLeaveConfirmation() async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Leave Group'),
-        content: Text('Are you sure you want to leave "${widget.group.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Leave Group'),
+            content:
+                Text('Are you sure you want to leave "${widget.group.name}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(
+                  'Leave',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              'Leave',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   void _showGroupOptions() {
@@ -1104,7 +1118,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GroupSettingsScreen(group: widget.group),
+                    builder: (context) =>
+                        GroupSettingsScreen(group: widget.group),
                   ),
                 );
               },
@@ -1243,7 +1258,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                   ),
                 ),
                 title: Text(
-                  widget.group.imageUrl != null ? 'Change Group Photo' : 'Add Group Photo',
+                  widget.group.imageUrl != null
+                      ? 'Change Group Photo'
+                      : 'Add Group Photo',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -1286,8 +1303,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   bool _canEditGroup() {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    return currentUserId == widget.group.creatorId || 
-           widget.group.adminIds.contains(currentUserId);
+    return currentUserId == widget.group.creatorId ||
+        widget.group.adminIds.contains(currentUserId);
   }
 
   void _editGroupPhoto() {

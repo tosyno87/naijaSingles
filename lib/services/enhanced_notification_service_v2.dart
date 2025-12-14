@@ -138,8 +138,8 @@ class EnhancedNotificationServiceV2 {
 
     // Request local notification permissions
     // Request notification permissions for Android
-    final androidImplementation = _localNotifications
-        .resolvePlatformSpecificImplementation<
+    final androidImplementation =
+        _localNotifications.resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
     if (androidImplementation != null) {
       await androidImplementation.requestNotificationsPermission();

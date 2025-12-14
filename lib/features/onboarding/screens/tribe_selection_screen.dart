@@ -17,7 +17,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
 
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -89,7 +89,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
           // Description text
           Text(
             "This helps us connect you with people from similar backgrounds",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textLightBrown,
             ),
@@ -114,7 +114,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                 value: _selectedTribe,
                 hint: Text(
                   "Select your tribe",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     color: textLightBrown,
                     fontSize: 16,
                   ),
@@ -122,7 +122,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                 isExpanded: true,
                 icon: Icon(Icons.arrow_drop_down, color: afropeepGreen),
                 dropdownColor: cardBackground,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color: textDarkBrown,
                   fontSize: 16,
                 ),
@@ -142,7 +142,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
             const SizedBox(height: 24),
             Text(
               "Please specify your tribe",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: textDarkBrown,
@@ -151,7 +151,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
             const SizedBox(height: 12),
             TextField(
               controller: _otherTribeController,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: textDarkBrown,
               ),
@@ -159,7 +159,7 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                 filled: true,
                 fillColor: cardBackground,
                 hintText: "Enter your tribe",
-                hintStyle: GoogleFonts.poppins(
+                hintStyle: GoogleFonts.montserrat(
                   color: textLightBrown,
                 ),
                 border: OutlineInputBorder(

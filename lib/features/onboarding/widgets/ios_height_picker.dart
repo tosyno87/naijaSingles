@@ -134,7 +134,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                     child: Text(
                       'Centimeters',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
                         color: _selectedUnit == 'cm'
@@ -161,7 +161,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                     child: Text(
                       'Feet & Inches',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
                         color: _selectedUnit == 'ft'
@@ -195,7 +195,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             ),
             child: Text(
               _getHeightDisplay(),
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: isTablet ? 24 : 20,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF008037),
@@ -233,7 +233,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             _selectedUnit == 'cm'
                 ? 'Scroll to select your height in centimeters'
                 : 'Scroll to select your height in feet and inches',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 14 : 12,
               color: Colors.grey.shade600,
             ),
@@ -276,7 +276,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
               children: [
                 Text(
                   '$cm cm',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: isTablet ? 20 : 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
@@ -284,7 +284,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                 ),
                 Text(
                   '$feet\'$inches"',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: isTablet ? 14 : 12,
                     color: Colors.grey.shade600,
                   ),
@@ -329,7 +329,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                     children: [
                       Text(
                         '$feet',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 24 : 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -337,7 +337,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                       ),
                       Text(
                         'feet',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 12 : 10,
                           color: Colors.grey.shade600,
                         ),
@@ -383,7 +383,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                     children: [
                       Text(
                         '$index',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 24 : 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -391,7 +391,7 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
                       ),
                       Text(
                         'inches',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 12 : 10,
                           color: Colors.grey.shade600,
                         ),

@@ -114,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: false,
         title: Text(
           'Profile',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: textPrimary,
@@ -250,7 +250,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 8),
             Text(
               'Add Photos',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 color: textSecondary,
                 fontSize: 16,
               ),
@@ -324,7 +324,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Text(
                   '${_currentPhotoIndex + 1}/${photos.length}',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -415,7 +415,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               name,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
@@ -455,7 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               'About Me',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: textPrimary,
@@ -464,7 +464,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 12),
             Text(
               bio.isEmpty ? 'Tell others about yourself...' : bio,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: bio.isEmpty ? textSecondary : textPrimary,
                 height: 1.5,
@@ -498,7 +498,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 12),
                 Text(
                   'Interests',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: textPrimary,
@@ -510,7 +510,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (interests.isEmpty)
               Text(
                 'No interests added yet',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: textSecondary,
                   fontStyle: FontStyle.italic,
@@ -531,7 +531,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Text(
                       interest.toString(),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: primaryColor,
@@ -545,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   '+${interests.length - 6} more',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: textSecondary,
                     fontStyle: FontStyle.italic,
@@ -602,7 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 12),
                 Text(
                   'Location',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: textPrimary,
@@ -635,7 +635,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Expanded(
           child: Text(
             '$label: $value',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textPrimary,
             ),
@@ -663,7 +663,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(width: 6),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 12,
               color: primaryColor,
               fontWeight: FontWeight.w500,
@@ -706,7 +706,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 12),
             Text(
               'Edit Profile',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -788,7 +788,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           '${_currentIndex + 1} of ${widget.photos.length}',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -826,7 +826,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                         const SizedBox(height: 16),
                         Text(
                           'Photo unavailable',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             color: Colors.grey.shade400,
                             fontSize: 16,
                           ),

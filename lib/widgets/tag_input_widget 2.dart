@@ -195,7 +195,7 @@ class _TagInputWidgetState extends State<TagInputWidget> {
 
   void _addTag() {
     final String tag = _controller.text.trim();
-    
+
     if (tag.isEmpty) return;
 
     // Validate tag

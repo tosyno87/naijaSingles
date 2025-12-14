@@ -1,7 +1,5 @@
-
 /// Service for validating cultural data fields
 class CulturalDataValidationService {
-  
   /// Validate nationality field
   static ValidationResult validateNationality(String? nationality) {
     if (nationality == null || nationality.trim().isEmpty) {
@@ -115,7 +113,8 @@ class CulturalDataValidationService {
     }
 
     // Check for duplicates
-    final uniqueLanguages = languages.map((e) => e.trim().toLowerCase()).toSet();
+    final uniqueLanguages =
+        languages.map((e) => e.trim().toLowerCase()).toSet();
     if (uniqueLanguages.length != languages.length) {
       return ValidationResult(
         isValid: false,
@@ -244,7 +243,9 @@ class CulturalDataValidationService {
     return {
       'nationality': nationality?.trim() ?? '',
       'tribe': tribe?.trim() ?? '',
-      'languages': languages?.map((e) => e.trim()).where((e) => e.isNotEmpty).toList() ?? [],
+      'languages':
+          languages?.map((e) => e.trim()).where((e) => e.isNotEmpty).toList() ??
+              [],
       'religion': religion?.trim() ?? '',
       'occupation': occupation?.trim() ?? '',
     };

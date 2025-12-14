@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../data/models/enhanced_event_model.dart';
 
 class MyEventCard extends StatelessWidget {
@@ -72,7 +73,7 @@ class MyEventCard extends StatelessWidget {
     print('🖼️ Event ${event.id} - hasImages: ${event.hasImages}');
     print('🖼️ Event ${event.id} - imageUrls: ${event.imageUrls}');
     print('🖼️ Event ${event.id} - primaryImageUrl: ${event.primaryImageUrl}');
-    
+
     return Container(
       height: 200, // Increased height for better poster visibility
       width: double.infinity,
@@ -98,7 +99,8 @@ class MyEventCard extends StatelessWidget {
                   event.primaryImageUrl,
                   width: double.infinity,
                   height: double.infinity,
-                  fit: BoxFit.cover, // Perfect for posters - fills space while maintaining aspect ratio
+                  fit: BoxFit
+                      .cover, // Perfect for posters - fills space while maintaining aspect ratio
                   filterQuality: FilterQuality.high, // High quality rendering
                   isAntiAlias: true, // Smooth edges
                   loadingBuilder: (context, child, loadingProgress) {
@@ -115,7 +117,8 @@ class MyEventCard extends StatelessWidget {
                               width: 40,
                               height: 40,
                               child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
                                     ? loadingProgress.cumulativeBytesLoaded /
                                         loadingProgress.expectedTotalBytes!
                                     : null,
@@ -140,7 +143,8 @@ class MyEventCard extends StatelessWidget {
                     );
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    print('❌ Error loading image for event ${event.id}: $error');
+                    print(
+                        '❌ Error loading image for event ${event.id}: $error');
                     print('❌ Image URL: ${event.primaryImageUrl}');
                     return Container(
                       width: double.infinity,
@@ -191,7 +195,7 @@ class MyEventCard extends StatelessWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     const Color(0xFF008037).withOpacity(0.1),
-                    const Color(0xFFFFF6E5),
+                    AppColors.backgroundColor,
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -228,7 +232,7 @@ class MyEventCard extends StatelessWidget {
                 ),
               ),
             ),
-          
+
           // Gradient overlay for better text readability on posters
           if (event.hasImages)
             Positioned(
@@ -253,14 +257,14 @@ class MyEventCard extends StatelessWidget {
                 ),
               ),
             ),
-          
+
           // Status badge
           Positioned(
             top: 12,
             left: 12,
             child: _buildStatusBadge(),
           ),
-          
+
           // Image count badge for multiple images
           if (event.imageUrls.length > 1)
             Positioned(
@@ -477,7 +481,7 @@ class MyEventCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              event.isFree 
+              event.isFree
                   ? 'Free Event'
                   : '₦${event.ticketPrice?.toStringAsFixed(0) ?? '0'}',
               style: GoogleFonts.montserrat(
@@ -594,9 +598,7 @@ class MyEventCard extends StatelessWidget {
               ),
             ),
           ),
-        
         if (isDraft && onPublish != null) const SizedBox(width: 8),
-        
         if (onEdit != null)
           Expanded(
             child: OutlinedButton(
@@ -618,9 +620,7 @@ class MyEventCard extends StatelessWidget {
               ),
             ),
           ),
-        
         if (onEdit != null) const SizedBox(width: 8),
-        
         if (onDelete != null)
           IconButton(
             onPressed: onDelete,
@@ -630,9 +630,7 @@ class MyEventCard extends StatelessWidget {
             ),
             tooltip: 'Delete Event',
           ),
-        
         const Spacer(),
-        
         IconButton(
           onPressed: onShare,
           icon: const Icon(
@@ -641,7 +639,6 @@ class MyEventCard extends StatelessWidget {
           ),
           tooltip: 'Share Event',
         ),
-        
         IconButton(
           onPressed: onAnalytics,
           icon: const Icon(
@@ -656,7 +653,7 @@ class MyEventCard extends StatelessWidget {
 
   void _showFullScreenPoster(BuildContext context) {
     if (!event.hasImages) return;
-    
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Scaffold(

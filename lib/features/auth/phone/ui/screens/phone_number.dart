@@ -10,6 +10,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
 import 'package:naijasingles/common/widgets/custom_snackbar.dart';
+import 'package:naijasingles/common/widgets/auth_icon_container.dart';
+import 'package:naijasingles/common/widgets/afropeep_primary_button.dart';
+import 'package:naijasingles/common/widgets/afropeep_app_bar.dart';
+import 'package:naijasingles/common/constants/app_colors.dart';
 import '../../bloc/phone_auth_bloc.dart';
 import 'otp_page.dart';
 
@@ -78,13 +82,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
       statusBarColor: Colors.transparent,
     ));
 
-    // Define colors based on MVP styling
-    const Color backgroundColor = Colors.white; // White background (MVP color)
-    const Color primaryColor = Color(0xFF008037); // Deep Green
-    const Color textColor = Color(0xFF3E1F0D); // Deep brown
-    const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
-    const Color iconBackgroundColor =
-        Color(0xFFDFF5E2); // Light green for icon background
+    // Using centralized AppColors - no need for local color constants
 
     return RepositoryProvider(
       create: (context) => PhoneAuthRepository(),
@@ -94,23 +92,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 RepositoryProvider.of<PhoneAuthRepository>(context)),
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: backgroundColor,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: primaryColor),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            title: Text(
-              widget.isSignIn ? "Sign In with Phone" : "Sign Up with Phone",
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: primaryColor,
-              ),
-            ),
-            centerTitle: true,
+          backgroundColor: AppColors.backgroundColor,
+          appBar: AfropeepAppBar(
+            title: widget.isSignIn ? "Sign In with Phone" : "Sign Up with Phone",
           ),
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
             listener: (context, state) {
@@ -192,26 +176,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Phone icon with Afrocentric style
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: iconBackgroundColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: primaryColor.withValues(alpha: 0.2),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.phone_android,
-                            color: primaryColor,
-                            size: 50,
-                          ),
+                        // Phone icon using reusable widget
+                        const AuthIconContainer(
+                          icon: Icons.phone_android,
                         ),
 
                         const SizedBox(height: 32),
@@ -249,7 +216,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           style: GoogleFonts.montserrat(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
-                            color: primaryColor,
+                            color: AppColors.primaryGreen,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -258,7 +225,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                           "We'll send you a verification code",
                           style: GoogleFonts.montserrat(
                             fontSize: 16,
-                            color: subtextColor,
+                            color: AppColors.textSecondary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -279,7 +246,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             ],
                             border: Border.all(
                               color: isValidNumber
-                                  ? primaryColor
+                                  ? AppColors.primaryGreen
                                   : Colors.transparent,
                               width: isValidNumber ? 1.5 : 0,
                             ),
@@ -312,7 +279,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   showOnlyCountryWhenClosed: false,
                                   alignLeft: false,
                                   textStyle: GoogleFonts.montserrat(
-                                    color: const Color(0xFF3E1F0D),
+                                    color: AppColors.textPrimary,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -393,7 +360,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   keyboardType: TextInputType.phone,
                                   style: GoogleFonts.montserrat(
                                     fontSize: 16,
-                                    color: textColor,
+                                    color: AppColors.textPrimary,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   decoration: InputDecoration(
@@ -421,104 +388,59 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
                         const SizedBox(height: 40),
 
-                        // Continue button with enhanced debugging
-                        Builder(
-                          builder: (context) {
-                            final isButtonEnabled = isValidNumber && !_isLoading;
-                            
-                            return SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton(
-                                onPressed: isButtonEnabled
-                                    ? () {
-                                        log('');
-                                        log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
-                                        log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
-                                        log('Phone input: "${phoneNumberController.text}"');
-                                        log('Country code: $countryCode');
-                                        log('');
-                                        
-                                        setState(() {
-                                          _isLoading = true;
-                                        });
+                        // Continue button using reusable widget
+                        AfropeepPrimaryButton(
+                          text: "Continue",
+                          isLoading: _isLoading,
+                          onPressed: isValidNumber && !_isLoading
+                              ? () {
+                                  log('');
+                                  log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
+                                  log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
+                                  log('Phone input: "${phoneNumberController.text}"');
+                                  log('Country code: $countryCode');
+                                  log('');
+                                  
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
 
-                                        // Remove spaces, dashes, and other formatting from phone number
-                                        final cleanPhoneNumber = phoneNumberController.text
-                                            .replaceAll(' ', '')
-                                            .replaceAll('-', '')
-                                            .replaceAll('(', '')
-                                            .replaceAll(')', '')
-                                            .trim();
-                                        
-                                        final fullPhoneNumber = countryCode + cleanPhoneNumber;
-                                        
-                                        log('');
-                                        log('═══════════════════════════════════════════════════════');
-                                        log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
-                                        log('═══════════════════════════════════════════════════════');
-                                        log('Country Code: $countryCode');
-                                        log('User Input: "${phoneNumberController.text}"');
-                                        log('Cleaned Input: "$cleanPhoneNumber"');
-                                        log('Full Number (sent to Firebase): "$fullPhoneNumber"');
-                                        log('');
-                                        log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
-                                        log('   "$fullPhoneNumber"');
-                                        log('');
-                                        log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
-                                        log('═══════════════════════════════════════════════════════');
-                                        log('');
-                                        
-                                        final bloc = context.read<PhoneAuthBloc>();
-                                        log('📤 Adding SendOtpToPhoneEvent to bloc...');
-                                        bloc.add(
-                                          SendOtpToPhoneEvent(
-                                            phoneNumber: fullPhoneNumber,
-                                          ),
-                                        );
-                                        log('✅ Event added to bloc');
-                                      }
-                                    : () {
-                                        // Log why button is disabled
-                                        log('🚫 Button disabled!');
-                                        log('   isValidNumber: $isValidNumber');
-                                        log('   isLoading: $_isLoading');
-                                        log('   Phone input: "${phoneNumberController.text}" (length: ${phoneNumberController.text.trim().length})');
-                                        log('   Button requires: min 6 characters');
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isButtonEnabled
-                                      ? primaryColor
-                                      : Colors.grey.shade400,
-                                  foregroundColor: Colors.white,
-                                  disabledBackgroundColor: Colors.grey.shade400,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  elevation: isButtonEnabled ? 3 : 1,
-                                  shadowColor: isButtonEnabled
-                                      ? primaryColor.withValues(alpha: 0.3)
-                                      : Colors.transparent,
-                                ),
-                                child: _isLoading
-                                    ? const SizedBox(
-                                        height: 24,
-                                        width: 24,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : Text(
-                                        "Continue",
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                              ),
-                            );
-                          },
+                                  // Remove spaces, dashes, and other formatting from phone number
+                                  final cleanPhoneNumber = phoneNumberController.text
+                                      .replaceAll(' ', '')
+                                      .replaceAll('-', '')
+                                      .replaceAll('(', '')
+                                      .replaceAll(')', '')
+                                      .trim();
+                                  
+                                  final fullPhoneNumber = countryCode + cleanPhoneNumber;
+                                  
+                                  log('');
+                                  log('═══════════════════════════════════════════════════════');
+                                  log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
+                                  log('═══════════════════════════════════════════════════════');
+                                  log('Country Code: $countryCode');
+                                  log('User Input: "${phoneNumberController.text}"');
+                                  log('Cleaned Input: "$cleanPhoneNumber"');
+                                  log('Full Number (sent to Firebase): "$fullPhoneNumber"');
+                                  log('');
+                                  log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
+                                  log('   "$fullPhoneNumber"');
+                                  log('');
+                                  log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
+                                  log('═══════════════════════════════════════════════════════');
+                                  log('');
+                                  
+                                  final bloc = context.read<PhoneAuthBloc>();
+                                  log('📤 Adding SendOtpToPhoneEvent to bloc...');
+                                  bloc.add(
+                                    SendOtpToPhoneEvent(
+                                      phoneNumber: fullPhoneNumber,
+                                    ),
+                                  );
+                                  log('✅ Event added to bloc');
+                                }
+                              : null,
                         ),
 
                         const SizedBox(height: 24),
@@ -545,7 +467,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   : "Already have an account? ",
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
-                                color: textColor,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             GestureDetector(
@@ -563,7 +485,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                 style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: primaryColor,
+                                  color: AppColors.primaryGreen,
                                 ),
                               ),
                             ),

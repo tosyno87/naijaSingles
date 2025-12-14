@@ -45,15 +45,16 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               var usr = await phoneAuthRepository.getRegisterUser();
               log('👤 Retrieved user data: ${usr.name ?? "no name"}');
               
-              // If user has name or has completed onboarding, they're fully registered
+              // Only consider user registered if they have a name (completed onboarding)
               if (usr.name != null && usr.name!.isNotEmpty) {
-                log("✅ User already registered with profile: ${usr.name}");
+                log("✅ User already registered with complete profile: ${usr.name}");
                 emit(AlreadyRegistered(user: usr));
               } else {
-                // User document exists but profile incomplete - still consider them registered
-                // This handles edge cases where onboarding was interrupted
-                log("⚠️ User document exists but profile incomplete - treating as registered");
-                emit(AlreadyRegistered(user: usr));
+                // User document exists but profile incomplete (no name) - treat as new registration
+                // This ensures users complete onboarding even if document exists
+                log("⚠️ User document exists but has no name - treating as new registration");
+                log("⚠️ Redirecting to onboarding to complete profile");
+                emit(NewRegistration(token: event.token, user: user));
               }
             } catch (getUserError) {
               log('❌ Error getting user data: $getUserError');

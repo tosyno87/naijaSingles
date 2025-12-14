@@ -52,7 +52,7 @@ class _BioScreenState extends State<BioScreen> {
         children: [
           Text(
             "Tell us about yourself",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: textColor,
@@ -63,7 +63,7 @@ class _BioScreenState extends State<BioScreen> {
 
           Text(
             "Share a bit about who you are, what you enjoy, and what you're looking for",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: Colors.black54,
             ),
@@ -86,7 +86,7 @@ class _BioScreenState extends State<BioScreen> {
             ),
             child: TextField(
               controller: _bioController,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: textColor,
               ),
@@ -94,7 +94,7 @@ class _BioScreenState extends State<BioScreen> {
               maxLength: _maxLength,
               decoration: InputDecoration(
                 hintText: "Write your bio here...",
-                hintStyle: GoogleFonts.poppins(
+                hintStyle: GoogleFonts.montserrat(
                   color: Colors.grey.shade400,
                 ),
                 border: OutlineInputBorder(
@@ -128,7 +128,7 @@ class _BioScreenState extends State<BioScreen> {
             children: [
               Text(
                 "$_currentLength/$_maxLength",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: _currentLength >= 20 ? primaryColor : Colors.grey,
                 ),
@@ -154,7 +154,7 @@ class _BioScreenState extends State<BioScreen> {
               children: [
                 Text(
                   "Tips for a great bio:",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.amber.shade800,
@@ -196,7 +196,7 @@ class _BioScreenState extends State<BioScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: Colors.amber.shade900,
               ),

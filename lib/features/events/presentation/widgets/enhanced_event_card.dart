@@ -25,14 +25,20 @@ class EnhancedEventCard extends StatelessWidget {
   // Helper getters to work with both event types
   String get eventId => event is EnhancedEventModel ? event.id : event.id;
   String get eventName => event is EnhancedEventModel ? event.name : event.name;
-  String get eventDescription => event is EnhancedEventModel ? event.description : event.description;
-  DateTime get startDate => event is EnhancedEventModel ? event.startDate : event.startDate;
-  DateTime get endDate => event is EnhancedEventModel ? event.endDate : event.endDate;
-  String get category => event is EnhancedEventModel ? event.category : event.category;
+  String get eventDescription =>
+      event is EnhancedEventModel ? event.description : event.description;
+  DateTime get startDate =>
+      event is EnhancedEventModel ? event.startDate : event.startDate;
+  DateTime get endDate =>
+      event is EnhancedEventModel ? event.endDate : event.endDate;
+  String get category =>
+      event is EnhancedEventModel ? event.category : event.category;
   bool get isFree => event is EnhancedEventModel ? event.isFree : event.isFree;
-  int get attendeeCount => event is EnhancedEventModel ? event.attendeeCount : event.attendeeCount;
-  int get rsvpCount => event is EnhancedEventModel ? event.rsvpCount : event.rsvpCount;
-  
+  int get attendeeCount =>
+      event is EnhancedEventModel ? event.attendeeCount : event.attendeeCount;
+  int get rsvpCount =>
+      event is EnhancedEventModel ? event.rsvpCount : event.rsvpCount;
+
   String? get primaryImageUrl {
     if (event is EnhancedEventModel) {
       return event.primaryImageUrl.isNotEmpty ? event.primaryImageUrl : null;
@@ -40,19 +46,19 @@ class EnhancedEventCard extends StatelessWidget {
       return event.imageUrl;
     }
   }
-  
+
   dynamic get location {
     return event is EnhancedEventModel ? event.location : event.location;
   }
-  
+
   bool get isUserGenerated {
     return event is EnhancedEventModel ? event.isUserGenerated : false;
   }
-  
+
   bool get isPromoted {
     return event is EnhancedEventModel ? event.isPromoted : false;
   }
-  
+
   double? get ticketPrice {
     return event is EnhancedEventModel ? event.ticketPrice : null;
   }
@@ -153,7 +159,7 @@ class EnhancedEventCard extends StatelessWidget {
                 color: const Color(0xFF999999),
               ),
             ),
-          
+
           // Badges
           Positioned(
             top: 12,
@@ -162,7 +168,8 @@ class EnhancedEventCard extends StatelessWidget {
               children: [
                 if (isUserGenerated)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(12),
@@ -190,7 +197,8 @@ class EnhancedEventCard extends StatelessWidget {
                 if (isPromoted) ...[
                   if (isUserGenerated) const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.purple.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(12),
@@ -219,7 +227,7 @@ class EnhancedEventCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Price badge
           if (!isFree && ticketPrice != null)
             Positioned(
@@ -347,7 +355,9 @@ class EnhancedEventCard extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                location?.displayAddress ?? location?.shortAddress ?? 'Location TBA',
+                location?.displayAddress ??
+                    location?.shortAddress ??
+                    'Location TBA',
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: const Color(0xFF666666),

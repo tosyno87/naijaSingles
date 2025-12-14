@@ -77,7 +77,7 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
                       fontSize: 20,
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
-                      fontFamily: GoogleFonts.poppins().fontFamily),
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 )),
             Stack(alignment: Alignment.center, children: [
               Row(
@@ -159,7 +159,7 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
                         color: Colors.white,
                         fontSize: 19,
                         fontWeight: FontWeight.w500,
-                        fontFamily: GoogleFonts.poppins().fontFamily),
+                        fontFamily: GoogleFonts.montserrat().fontFamily),
                   ),
                 ),
               ),
@@ -193,7 +193,7 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
                         color: const Color(0xffFD3858),
                         fontSize: 19,
                         fontWeight: FontWeight.bold,
-                        fontFamily: GoogleFonts.poppins().fontFamily),
+                        fontFamily: GoogleFonts.montserrat().fontFamily),
                   ),
                 ),
               ),

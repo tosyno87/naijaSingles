@@ -18,7 +18,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
   });
 
   // Theme colors
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -59,7 +59,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
               ),
-            
+
             // Primary photo badge
             Positioned(
               top: 0,
@@ -85,7 +85,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                     SizedBox(width: 4),
                     Text(
                       'MAIN PHOTO',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -128,7 +128,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                       SizedBox(height: 8),
                       Text(
                         guidance.title,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: textDarkBrown,
@@ -141,7 +141,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                           child: Text(
                             guidance.description,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 11,
                               color: textLightBrown,
                             ),
@@ -160,7 +160,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                         ),
                         child: Text(
                           "REQUIRED",
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
                             color: Colors.red,
@@ -217,7 +217,7 @@ class PrimaryPhotoSlot extends StatelessWidget {
                       SizedBox(width: 4),
                       Text(
                         "Main",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,

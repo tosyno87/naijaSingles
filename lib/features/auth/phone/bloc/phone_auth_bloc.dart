@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -68,44 +69,97 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
 
   FutureOr<void> _onSendOtp(
       SendOtpToPhoneEvent event, Emitter<PhoneAuthState> emit) async {
+    log('');
+    log('🎯🎯🎯 EVENT RECEIVED IN BLOC! 🎯🎯🎯');
+    log('Event: SendOtpToPhoneEvent');
+    log('Phone: ${event.phoneNumber}');
+    log('');
+    
     emit(PhoneAuthLoading());
     try {
+      // Normalize phone number: remove spaces, dashes, and parentheses
+      // Firebase test phone numbers must match exactly (with country code, no spaces)
+      final normalizedPhone = event.phoneNumber
+          .replaceAll(' ', '')
+          .replaceAll('-', '')
+          .replaceAll('(', '')
+          .replaceAll(')', '')
+          .trim();
+      
+      log('');
+      log('═══════════════════════════════════════════════════════');
+      log('🔥 FIREBASE PHONE AUTH CALLED');
+      log('═══════════════════════════════════════════════════════');
+      log('Phone Number Received: ${event.phoneNumber}');
+      log('Normalized Phone: $normalizedPhone');
+      log('');
+      log('✅ Make sure this EXACT number is in Firebase Console:');
+      log('   "$normalizedPhone"');
+      log('');
+      log('⚠️  Firebase Console may show formatted numbers like:');
+      log('   "+234 800 000 0000" or "+234-800-000-0000"');
+      log('   But internally it stores: "$normalizedPhone"');
+      log('   Your app MUST send: "$normalizedPhone"');
+      log('═══════════════════════════════════════════════════════');
+      log('');
+      
       // For iOS, we need to handle the verification differently
       if (Platform.isIOS) {
         // First, get a reCAPTCHA verification ID
         await phoneAuthRepository.verifyPhone(
-          phoneNumber: event.phoneNumber,
+          phoneNumber: normalizedPhone,
           verificationCompleted: (PhoneAuthCredential credential) async {
+            log('✅ Phone verification completed automatically');
             add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
           },
           codeSent: (String verificationId, int? resendToken) {
+            log('📨 Verification code sent. Verification ID: $verificationId');
             add(OnPhoneOtpSent(
                 verificationId: verificationId,
                 token: resendToken,
-                phoneNumber: event.phoneNumber));
+                phoneNumber: normalizedPhone));
           },
           verificationFailed: (FirebaseAuthException e) {
-            add(OnPhoneAuthErrorEvent(error: e.code));
+            log('❌ Phone verification failed: ${e.code} - ${e.message}');
+            log('💡 Error code: ${e.code}');
+            if (e.code == 'invalid-phone-number') {
+              log('⚠️ INVALID PHONE NUMBER FORMAT');
+              log('   Expected format: +1234567890 (with + and country code, no spaces)');
+              log('   Your number: $normalizedPhone');
+              log('   Make sure it matches EXACTLY in Firebase Console test numbers');
+            } else if (e.code == 'missing-verification-code') {
+              log('⚠️ Missing verification code - test number might not be configured');
+            } else if (e.code == 'quota-exceeded') {
+              log('⚠️ Quota exceeded - too many requests');
+            }
+            add(OnPhoneAuthErrorEvent(error: '${e.code}: ${e.message ?? e.toString()}'));
           },
-          codeAutoRetrievalTimeout: (String verificationId) {},
+          codeAutoRetrievalTimeout: (String verificationId) {
+            log('⏱️ Code auto-retrieval timeout: $verificationId');
+          },
         );
       } else {
         // Android flow remains the same
         await phoneAuthRepository.verifyPhone(
-          phoneNumber: event.phoneNumber,
+          phoneNumber: normalizedPhone,
           verificationCompleted: (PhoneAuthCredential credential) async {
+            log('✅ Phone verification completed automatically');
             add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
           },
           codeSent: (String verificationId, int? resendToken) {
+            log('📨 Verification code sent. Verification ID: $verificationId');
             add(OnPhoneOtpSent(
                 verificationId: verificationId,
                 token: resendToken,
-                phoneNumber: ''));
+                phoneNumber: normalizedPhone));
           },
           verificationFailed: (FirebaseAuthException e) {
-            add(OnPhoneAuthErrorEvent(error: e.code));
+            log('❌ Phone verification failed: ${e.code} - ${e.message}');
+            add(OnPhoneAuthErrorEvent(error: '${e.code}: ${e.message ?? e.toString()}'));
           },
-          codeAutoRetrievalTimeout: (String verificationId) {},
+          codeAutoRetrievalTimeout: (String verificationId) {
+            log('⏱️ Code auto-retrieval timeout: $verificationId');
+          },
         );
       }
     } catch (e) {

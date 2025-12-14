@@ -204,14 +204,13 @@ class EventCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: event.isFree 
+        color: event.isFree
             ? const Color(0xFF4CAF50).withOpacity(0.1)
             : const Color(0xFFFF9800).withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: event.isFree 
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFFF9800),
+          color:
+              event.isFree ? const Color(0xFF4CAF50) : const Color(0xFFFF9800),
           width: 1,
         ),
       ),
@@ -220,9 +219,8 @@ class EventCard extends StatelessWidget {
         style: GoogleFonts.montserrat(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: event.isFree 
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFFF9800),
+          color:
+              event.isFree ? const Color(0xFF4CAF50) : const Color(0xFFFF9800),
         ),
       ),
     );
@@ -243,7 +241,7 @@ class EventCard extends StatelessWidget {
         const SizedBox(height: 8),
         _buildDetailRow(
           icon: Icons.location_on,
-          text: event.location.displayAddress.isNotEmpty 
+          text: event.location.displayAddress.isNotEmpty
               ? event.location.displayAddress
               : 'Location TBA',
         ),
@@ -277,7 +275,7 @@ class EventCard extends StatelessWidget {
 
   Widget _buildEventDescription() {
     if (event.description.isEmpty) return const SizedBox.shrink();
-    
+
     return Text(
       event.description,
       style: GoogleFonts.montserrat(
@@ -353,36 +351,36 @@ class EventCard extends StatelessWidget {
   String _formatEventDate() {
     final now = DateTime.now();
     final eventDate = event.startDate;
-    
+
     if (eventDate.year == now.year &&
         eventDate.month == now.month &&
         eventDate.day == now.day) {
       return 'Today';
     }
-    
+
     final tomorrow = now.add(const Duration(days: 1));
     if (eventDate.year == tomorrow.year &&
         eventDate.month == tomorrow.month &&
         eventDate.day == tomorrow.day) {
       return 'Tomorrow';
     }
-    
+
     final difference = eventDate.difference(now).inDays;
     if (difference < 7) {
       return DateFormat('EEEE, MMM d').format(eventDate);
     }
-    
+
     return DateFormat('MMM d, yyyy').format(eventDate);
   }
 
   String _formatEventTime() {
     final startTime = DateFormat('h:mm a').format(event.startDate);
-    
+
     if (event.startDate.day == event.endDate.day) {
       final endTime = DateFormat('h:mm a').format(event.endDate);
       return '$startTime - $endTime';
     }
-    
+
     return 'Starts at $startTime';
   }
 }
@@ -476,7 +474,7 @@ class CompactEventCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    event.location.displayAddress.isNotEmpty 
+                    event.location.displayAddress.isNotEmpty
                         ? event.location.displayAddress
                         : 'Location TBA',
                     style: GoogleFonts.montserrat(

@@ -108,7 +108,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         elevation: 0,
         title: Text(
           'Notifications',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.brown.shade800,
@@ -124,7 +124,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               onPressed: _markAllAsRead,
               child: Text(
                 'Mark all read',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: deepGreen,
@@ -152,7 +152,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           const SizedBox(height: 16),
           Text(
             'Loading notifications...',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: Colors.grey[700],
             ),
@@ -175,7 +175,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           const SizedBox(height: 16),
           Text(
             'No notifications yet',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.grey[700],
@@ -184,7 +184,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           const SizedBox(height: 8),
           Text(
             'We\'ll notify you when something happens',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: Colors.grey[600],
             ),
@@ -278,7 +278,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 children: [
                   Text(
                     notification.title,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: isRead ? FontWeight.w500 : FontWeight.bold,
                       color: Colors.black87,
@@ -287,7 +287,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 4),
                   Text(
                     notification.message,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: isRead ? Colors.grey[600] : Colors.black87,
                     ),
@@ -297,7 +297,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 6),
                   Text(
                     notification.getRelativeTime(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       color: Colors.grey[500],
                     ),

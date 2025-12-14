@@ -33,7 +33,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           children: [
             Text(
               'Dating Preferences',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -42,7 +42,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             const SizedBox(height: 8),
             Text(
               'Help us find your perfect match',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: Colors.black54,
               ),
@@ -52,7 +52,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             // Interested In Section
             Text(
               'I\'m interested in',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
@@ -66,7 +66,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             // Age Range Section
             Text(
               'Age Range',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
@@ -91,7 +91,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                 ),
                 child: Text(
                   'Continue',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -141,7 +141,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
         child: Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             color: isSelected ? const Color(0xFF008037) : Colors.black87,
@@ -156,7 +156,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
       children: [
         Text(
           '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: const Color(0xFF008037),

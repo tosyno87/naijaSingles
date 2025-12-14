@@ -46,7 +46,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
 
     // Debug: Print current controller state
     debugPrint('🔍 OnboardingMain: Current page: $_currentPage');
-    debugPrint('🔍 OnboardingMain: Controller instance: ${controller.hashCode}');
+    debugPrint(
+        '🔍 OnboardingMain: Controller instance: ${controller.hashCode}');
     debugPrint('🔍 OnboardingMain: Controller state:');
     debugPrint(
         '   Name: "${controller.fullName}" (length: ${controller.fullName.length})');
@@ -56,7 +57,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
     debugPrint('   Location: "${controller.locationName ?? 'Not set'}"');
     debugPrint(
         '   Tribe: "${controller.tribe}" (length: ${controller.tribe.length})');
-    debugPrint('   Bio: "${controller.bio}" (length: ${controller.bio.length})');
+    debugPrint(
+        '   Bio: "${controller.bio}" (length: ${controller.bio.length})');
     debugPrint('   Interests: ${controller.interests}');
     debugPrint(
         '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5');
@@ -153,7 +155,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (controller.lookingFor.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text("Please select what brings you to NaijaSingles")),
+              content: Text("Please select what brings you to Afropeep")),
         );
         return;
       }
@@ -222,8 +224,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
             SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Profile Complete! 🎉 Welcome to NaijaSingles!',
-                style: GoogleFonts.poppins(
+                'Profile Complete! 🎉 Welcome to Afropeep!',
+                style: GoogleFonts.montserrat(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),
@@ -276,7 +278,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
             : null,
         title: Text(
           _pageNames[_currentPage],
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: primaryColor,
@@ -381,7 +383,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                           '🔍 Continue labelLarge state for page $_currentPage:');
                       debugPrint('   canContinue: $canContinue');
                       if (_currentPage == 5) {
-                        debugPrint('   interestedIn: "${controller.interestedIn}"');
+                        debugPrint(
+                            '   interestedIn: "${controller.interestedIn}"');
                         debugPrint('   ageRange: ${controller.ageRange}');
                       } else if (_currentPage == 6) {
                         debugPrint('   height: ${controller.height}');
@@ -410,7 +413,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
                           _currentPage < _totalPages - 1
                               ? "Continue"
                               : "Finish",
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),

@@ -462,7 +462,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF6E5).withOpacity(0.5), // Light cream fill
+        color: AppColors.backgroundColor.withOpacity(0.5), // Light cream fill
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: AppColors.primaryGreen,

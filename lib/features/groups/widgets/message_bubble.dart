@@ -28,9 +28,8 @@ class MessageBubble extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isCurrentUser 
-            ? MainAxisAlignment.end 
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isCurrentUser) ...[
@@ -55,9 +54,8 @@ class MessageBubble extends StatelessWidget {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isCurrentUser 
-                    ? AppColors.primaryGreen 
-                    : Colors.grey[100],
+                color:
+                    isCurrentUser ? AppColors.primaryGreen : Colors.grey[100],
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(20),
                   topRight: const Radius.circular(20),
@@ -99,8 +97,8 @@ class MessageBubble extends StatelessWidget {
                     timeago.format(timestamp),
                     style: GoogleFonts.montserrat(
                       fontSize: 10,
-                      color: isCurrentUser 
-                          ? Colors.white.withOpacity(0.7) 
+                      color: isCurrentUser
+                          ? Colors.white.withOpacity(0.7)
                           : Colors.grey[600],
                     ),
                   ),
@@ -114,8 +112,11 @@ class MessageBubble extends StatelessWidget {
               radius: 16,
               backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
               child: Text(
-                (FirebaseAuth.instance.currentUser?.displayName ?? 'You').isNotEmpty 
-                    ? (FirebaseAuth.instance.currentUser?.displayName ?? 'You')[0].toUpperCase()
+                (FirebaseAuth.instance.currentUser?.displayName ?? 'You')
+                        .isNotEmpty
+                    ? (FirebaseAuth.instance.currentUser?.displayName ??
+                            'You')[0]
+                        .toUpperCase()
                     : '?',
                 style: GoogleFonts.montserrat(
                   fontSize: 12,

@@ -157,11 +157,11 @@ class MentorshipRequest {
       message: data['message'] ?? '',
       status: data['status'] ?? 'Pending',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      respondedAt: data['respondedAt'] != null 
-          ? (data['respondedAt'] as Timestamp).toDate() 
+      respondedAt: data['respondedAt'] != null
+          ? (data['respondedAt'] as Timestamp).toDate()
           : null,
-      completedAt: data['completedAt'] != null 
-          ? (data['completedAt'] as Timestamp).toDate() 
+      completedAt: data['completedAt'] != null
+          ? (data['completedAt'] as Timestamp).toDate()
           : null,
       feedback: data['feedback'],
     );
@@ -177,8 +177,10 @@ class MentorshipRequest {
       'message': message,
       'status': status,
       'createdAt': Timestamp.fromDate(createdAt),
-      'respondedAt': respondedAt != null ? Timestamp.fromDate(respondedAt!) : null,
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'respondedAt':
+          respondedAt != null ? Timestamp.fromDate(respondedAt!) : null,
+      'completedAt':
+          completedAt != null ? Timestamp.fromDate(completedAt!) : null,
       'feedback': feedback,
     };
   }

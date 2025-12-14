@@ -23,7 +23,6 @@ class TribeConnectScreen extends StatefulWidget {
 }
 
 class _TribeConnectScreenState extends State<TribeConnectScreen> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +70,8 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         // Handle when all profiles are viewed
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('You\'ve seen all available profiles! Check back later for new connections.'),
+            content: Text(
+                'You\'ve seen all available profiles! Check back later for new connections.'),
             backgroundColor: AppColors.primaryGreen,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -227,7 +227,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   Future<void> _handleConnect(UserModel user) async {
     try {
       final matchId = await UserSearchRepo.rightSwipe(widget.currentUser, user);
-      
+
       if (matchId != null) {
         _showMatchConfirmation(user);
       } else {
@@ -256,7 +256,6 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
     );
   }
 
-
   void _showMatchConfirmation(UserModel user) {
     showDialog(
       context: context,
@@ -264,7 +263,8 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
         currentUserImageUrl: widget.currentUser.imageUrl?.isNotEmpty == true
             ? widget.currentUser.imageUrl![0]
             : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-        matchedUserImageUrl: user.imageUrl?.isNotEmpty == true ? user.imageUrl![0] : '',
+        matchedUserImageUrl:
+            user.imageUrl?.isNotEmpty == true ? user.imageUrl![0] : '',
         matchedUserName: user.name ?? 'Unknown',
         matchedUserId: user.id ?? '',
       ),
@@ -298,7 +298,6 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
       ),
     );
   }
-
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

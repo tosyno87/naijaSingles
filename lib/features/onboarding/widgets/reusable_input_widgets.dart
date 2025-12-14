@@ -65,7 +65,7 @@ class SelectionOption extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: screenWidth > 600 ? 18 : 16,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color: isSelected ? const Color(0xFF008037) : Colors.black87,
@@ -105,7 +105,7 @@ class SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: screenWidth > 600 ? 22 : 18,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -115,7 +115,7 @@ class SectionHeader extends StatelessWidget {
           SizedBox(height: screenWidth > 600 ? 8 : 4),
           Text(
             subtitle!,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: screenWidth > 600 ? 16 : 14,
               color: Colors.black54,
             ),
@@ -229,7 +229,7 @@ class _HeightInputState extends State<HeightInput> {
                   child: Text(
                     'cm',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: screenWidth > 600 ? 16 : 14,
                       fontWeight: FontWeight.w600,
                       color:
@@ -258,7 +258,7 @@ class _HeightInputState extends State<HeightInput> {
                   child: Text(
                     'ft/in',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: screenWidth > 600 ? 16 : 14,
                       fontWeight: FontWeight.w600,
                       color:
@@ -280,7 +280,7 @@ class _HeightInputState extends State<HeightInput> {
           onChanged: _onHeightChanged,
           decoration: InputDecoration(
             hintText: _selectedUnit == 'cm' ? 'e.g., 170' : "e.g., 5'10",
-            hintStyle: GoogleFonts.poppins(
+            hintStyle: GoogleFonts.montserrat(
               color: Colors.grey.shade500,
               fontSize: screenWidth > 600 ? 16 : 14,
             ),
@@ -303,7 +303,7 @@ class _HeightInputState extends State<HeightInput> {
               vertical: screenWidth > 600 ? 20 : 16,
             ),
           ),
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: screenWidth > 600 ? 16 : 14,
             color: Colors.black87,
           ),
@@ -316,7 +316,7 @@ class _HeightInputState extends State<HeightInput> {
           _selectedUnit == 'cm'
               ? 'Height: ${_height.round()} cm (${_convertToFeetInches(_height)})'
               : 'Height: ${_convertToFeetInches(_height)} (${_height.round()} cm)',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: screenWidth > 600 ? 14 : 12,
             color: Colors.grey.shade600,
           ),
@@ -371,7 +371,7 @@ class ContinueButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: screenWidth > 600 ? 18 : 16,
             fontWeight: FontWeight.w600,
             color: Colors.white,

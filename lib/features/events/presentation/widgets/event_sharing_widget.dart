@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../data/models/event_model.dart';
 
 class EventSharingWidget extends StatelessWidget {
@@ -70,7 +71,7 @@ class EventSharingWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF6E5),
+        color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: const Color(0xFF008037).withOpacity(0.2),
@@ -119,7 +120,7 @@ class EventSharingWidget extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  event.location.displayAddress.isNotEmpty 
+                  event.location.displayAddress.isNotEmpty
                       ? event.location.displayAddress
                       : 'Location TBA',
                   style: GoogleFonts.montserrat(
@@ -352,9 +353,10 @@ class EventSharingWidget extends StatelessWidget {
   }
 
   void _copyLink(BuildContext context) {
-    final link = event.ticketUrl ?? 'https://naijasingles.com/events/${event.id}';
+    final link =
+        event.ticketUrl ?? 'https://naijasingles.com/events/${event.id}';
     Clipboard.setData(ClipboardData(text: link));
-    
+
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -380,11 +382,13 @@ class EventSharingWidget extends StatelessWidget {
   void _shareWithImage(BuildContext context) {
     if (event.imageUrl != null && event.imageUrl!.isNotEmpty) {
       Share.shareXFiles(
-        [XFile.fromData(
-          Uint8List(0), // Placeholder - would need to download image
-          name: 'event_image.jpg',
-          mimeType: 'image/jpeg',
-        )],
+        [
+          XFile.fromData(
+            Uint8List(0), // Placeholder - would need to download image
+            name: 'event_image.jpg',
+            mimeType: 'image/jpeg',
+          )
+        ],
         text: _buildShareText(),
       );
     } else {
@@ -410,7 +414,7 @@ class EventSharingWidget extends StatelessWidget {
     // For now, we'll copy text and show instructions
     final shareText = _buildInstagramShareText();
     Clipboard.setData(ClipboardData(text: shareText));
-    
+
     Navigator.pop(context);
     _showInstagramInstructions(context);
   }
@@ -480,7 +484,7 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
 #NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 ''';
-    
+
     // Twitter has character limit, so truncate if necessary
     if (baseText.length > 240) {
       return '''
@@ -492,7 +496,7 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 #NaijaSingles #AfrocentricEvents
 ''';
     }
-    
+
     return baseText;
   }
 

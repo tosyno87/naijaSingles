@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class BasicInfoStep extends StatefulWidget {
@@ -18,7 +19,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   late TextEditingController _tagController;
-  
+
   // Validation states
   bool _isNameValid = true;
   bool _isDescriptionValid = true;
@@ -45,7 +46,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.eventData.name);
-    _descriptionController = TextEditingController(text: widget.eventData.description);
+    _descriptionController =
+        TextEditingController(text: widget.eventData.description);
     _tagController = TextEditingController();
 
     _nameController.addListener(() {
@@ -97,7 +99,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         _descriptionError = 'Event description must be at least 10 characters';
       } else if (description.length > 2000) {
         _isDescriptionValid = false;
-        _descriptionError = 'Event description must be less than 2000 characters';
+        _descriptionError =
+            'Event description must be less than 2000 characters';
       } else {
         _isDescriptionValid = true;
         _descriptionError = null;
@@ -114,16 +117,12 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         children: [
           _buildSectionTitle('Event Details'),
           const SizedBox(height: 20),
-          
           _buildEventNameField(),
           const SizedBox(height: 20),
-          
           _buildDescriptionField(),
           const SizedBox(height: 20),
-          
           _buildCategorySelector(),
           const SizedBox(height: 20),
-          
           _buildTagsSection(),
           const SizedBox(height: 40),
         ],
@@ -144,7 +143,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
 
   Widget _buildEventNameField() {
     final currentLength = _nameController.text.length;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -162,7 +161,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: _isNameValid ? const Color(0xFF008037).withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                color: _isNameValid
+                    ? const Color(0xFF008037).withOpacity(0.1)
+                    : Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _isNameValid ? const Color(0xFF008037) : Colors.red,
@@ -189,24 +190,29 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             color: const Color(0xFF333333),
           ),
           decoration: InputDecoration(
-            hintText: 'e.g., "Lagos Singles Mixer Night" or "Tech Networking Brunch"',
+            hintText:
+                'e.g., "Lagos Singles Mixer Night" or "Tech Networking Brunch"',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: AppColors.backgroundColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _isNameValid ? const Color(0xFF008037).withOpacity(0.3) : Colors.red.withOpacity(0.5),
+                color: _isNameValid
+                    ? const Color(0xFF008037).withOpacity(0.3)
+                    : Colors.red.withOpacity(0.5),
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _isNameValid ? const Color(0xFF008037).withOpacity(0.3) : Colors.red.withOpacity(0.5),
+                color: _isNameValid
+                    ? const Color(0xFF008037).withOpacity(0.3)
+                    : Colors.red.withOpacity(0.5),
                 width: 1.5,
               ),
             ),
@@ -241,7 +247,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
 
   Widget _buildDescriptionField() {
     final currentLength = _descriptionController.text.length;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -259,10 +265,14 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: _isDescriptionValid ? const Color(0xFF008037).withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                color: _isDescriptionValid
+                    ? const Color(0xFF008037).withOpacity(0.1)
+                    : Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _isDescriptionValid ? const Color(0xFF008037) : Colors.red,
+                  color: _isDescriptionValid
+                      ? const Color(0xFF008037)
+                      : Colors.red,
                   width: 1,
                 ),
               ),
@@ -271,7 +281,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 style: GoogleFonts.montserrat(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: _isDescriptionValid ? const Color(0xFF008037) : Colors.red,
+                  color: _isDescriptionValid
+                      ? const Color(0xFF008037)
+                      : Colors.red,
                 ),
               ),
             ),
@@ -287,31 +299,37 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             color: const Color(0xFF333333),
           ),
           decoration: InputDecoration(
-            hintText: 'Describe your event in detail. What can attendees expect?\n\nExample: Join us for an exciting evening of networking and fun! We\'ll have great music, delicious food, and opportunities to meet amazing people.',
+            hintText:
+                'Describe your event in detail. What can attendees expect?\n\nExample: Join us for an exciting evening of networking and fun! We\'ll have great music, delicious food, and opportunities to meet amazing people.',
             hintStyle: GoogleFonts.montserrat(
               fontSize: 14,
               color: const Color(0xFF008037).withOpacity(0.6),
             ),
             filled: true,
-            fillColor: const Color(0xFFFFF6E5),
+            fillColor: AppColors.backgroundColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _isDescriptionValid ? const Color(0xFF008037).withOpacity(0.3) : Colors.red.withOpacity(0.5),
+                color: _isDescriptionValid
+                    ? const Color(0xFF008037).withOpacity(0.3)
+                    : Colors.red.withOpacity(0.5),
                 width: 1.5,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _isDescriptionValid ? const Color(0xFF008037).withOpacity(0.3) : Colors.red.withOpacity(0.5),
+                color: _isDescriptionValid
+                    ? const Color(0xFF008037).withOpacity(0.3)
+                    : Colors.red.withOpacity(0.5),
                 width: 1.5,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: _isDescriptionValid ? const Color(0xFF008037) : Colors.red,
+                color:
+                    _isDescriptionValid ? const Color(0xFF008037) : Colors.red,
                 width: 2,
               ),
             ),
@@ -354,21 +372,25 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            color: AppColors.backgroundColor, // NaijaSingles cream background
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+              color: const Color(0xFF008037)
+                  .withOpacity(0.3), // NaijaSingles green border
               width: 1.5,
             ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: widget.eventData.category.isEmpty ? null : widget.eventData.category,
+              value: widget.eventData.category.isEmpty
+                  ? null
+                  : widget.eventData.category,
               hint: Text(
                 'Select a category',
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
-                  color: const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+                  color: const Color(0xFF008037)
+                      .withOpacity(0.7), // NaijaSingles green hint
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -383,7 +405,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 size: 24,
               ),
               isExpanded: true,
-              dropdownColor: const Color(0xFFFFF6E5), // NaijaSingles cream dropdown
+              dropdownColor:
+                  AppColors.backgroundColor, // NaijaSingles cream dropdown
               items: _categories.map((category) {
                 return DropdownMenuItem<String>(
                   value: category,
@@ -433,7 +456,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           ),
         ),
         const SizedBox(height: 12),
-        
+
         // Tag input field
         Row(
           children: [
@@ -449,27 +472,32 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   hintText: 'Enter a tag',
                   hintStyle: GoogleFonts.montserrat(
                     fontSize: 16,
-                    color: const Color(0xFF008037).withOpacity(0.7), // NaijaSingles green hint
+                    color: const Color(0xFF008037)
+                        .withOpacity(0.7), // NaijaSingles green hint
                   ),
                   filled: true,
-                  fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+                  fillColor:
+                      AppColors.backgroundColor, // NaijaSingles cream background
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                      color: const Color(0xFF008037)
+                          .withOpacity(0.3), // NaijaSingles green border
                       width: 1.5,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: const Color(0xFF008037).withOpacity(0.3), // NaijaSingles green border
+                      color: const Color(0xFF008037)
+                          .withOpacity(0.3), // NaijaSingles green border
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF008037), width: 2),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF008037), width: 2),
                   ),
                   contentPadding: const EdgeInsets.all(16),
                 ),
@@ -484,7 +512,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF008037),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -501,9 +530,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Display tags
         if (widget.eventData.tags.isNotEmpty)
           Wrap(
@@ -511,7 +540,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             runSpacing: 8,
             children: widget.eventData.tags.map((tag) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFF008037).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -544,7 +574,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               );
             }).toList(),
           ),
-        
+
         if (widget.eventData.tags.length >= 10)
           Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -563,7 +593,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
 
   void _addTag(String tag) {
     final trimmedTag = tag.trim();
-    if (trimmedTag.isNotEmpty && 
+    if (trimmedTag.isNotEmpty &&
         !widget.eventData.tags.contains(trimmedTag) &&
         widget.eventData.tags.length < 10) {
       setState(() {

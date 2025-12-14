@@ -45,7 +45,7 @@ class GroupCard extends StatelessWidget {
                     // Group Image
                     _buildGroupImage(),
                     const SizedBox(width: 12),
-                    
+
                     // Group Info
                     Expanded(
                       child: Column(
@@ -56,7 +56,7 @@ class GroupCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   group.name,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.textPrimary,
@@ -71,7 +71,7 @@ class GroupCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             group.categoryDisplay,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryGreen,
@@ -80,18 +80,18 @@ class GroupCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // Join Button
                     if (showJoinButton) _buildJoinButton(),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Description
                 Text(
                   group.description,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                     height: 1.4,
@@ -99,27 +99,27 @@ class GroupCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Footer Row
                 Row(
                   children: [
                     // Cultural Info
                     if (group.culturalInfo != null) _buildCulturalInfo(),
-                    
+
                     const Spacer(),
-                    
+
                     // Member Count
                     _buildMemberCount(),
-                    
+
                     const SizedBox(width: 8),
-                    
+
                     // Location
                     if (group.location != null) _buildLocation(),
                   ],
                 ),
-                
+
                 // Tags
                 if (group.tags.isNotEmpty) ...[
                   const SizedBox(height: 12),
@@ -194,7 +194,7 @@ class GroupCard extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             'Admin',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: AppColors.warning,
@@ -221,7 +221,7 @@ class GroupCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               'Join',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -251,7 +251,7 @@ class GroupCard extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             group.culturalDisplay,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 10,
               fontWeight: FontWeight.w500,
               color: AppColors.culture,
@@ -274,7 +274,7 @@ class GroupCard extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           '${group.memberCount}',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
@@ -296,7 +296,7 @@ class GroupCard extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           group.location!,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
@@ -325,7 +325,7 @@ class GroupCard extends StatelessWidget {
           ),
           child: Text(
             tag,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 10,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,

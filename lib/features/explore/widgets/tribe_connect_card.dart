@@ -40,7 +40,7 @@ class TribeConnectCard extends StatelessWidget {
         children: [
           // Profile Image Section
           _buildProfileImage(),
-          
+
           // Profile Information
           Padding(
             padding: const EdgeInsets.all(16),
@@ -363,7 +363,8 @@ class TribeConnectCard extends StatelessWidget {
         Wrap(
           spacing: 6,
           runSpacing: 6,
-          children: interests.map((interest) => _buildInterestTag(interest)).toList(),
+          children:
+              interests.map((interest) => _buildInterestTag(interest)).toList(),
         ),
       ],
     );
@@ -415,7 +416,9 @@ class TribeConnectCard extends StatelessWidget {
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: mutualInterests.map((interest) => _buildMutualInterestTag(interest)).toList(),
+            children: mutualInterests
+                .map((interest) => _buildMutualInterestTag(interest))
+                .toList(),
           ),
         ],
       ),
@@ -587,25 +590,26 @@ class TribeConnectCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isPrimary 
-              ? color 
-              : isDestructive 
+          color: isPrimary
+              ? color
+              : isDestructive
                   ? Colors.transparent
                   : color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDestructive 
-                ? color.withOpacity(0.4)
-                : color.withOpacity(0.3),
+            color:
+                isDestructive ? color.withOpacity(0.4) : color.withOpacity(0.3),
             width: isDestructive ? 1 : 1.5,
           ),
-          boxShadow: isPrimary ? [
-            BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ] : null,
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           children: [
@@ -616,9 +620,9 @@ class TribeConnectCard extends StatelessWidget {
               style: GoogleFonts.montserrat(
                 fontSize: 11,
                 fontWeight: isPrimary ? FontWeight.w600 : FontWeight.w500,
-                color: isPrimary 
-                    ? Colors.white 
-                    : isDestructive 
+                color: isPrimary
+                    ? Colors.white
+                    : isDestructive
                         ? color.withOpacity(0.8)
                         : color,
               ),
@@ -634,19 +638,30 @@ class TribeConnectCard extends StatelessWidget {
     if (user.living_in?.isNotEmpty == true) {
       // If living_in contains country info, use it
       final location = user.living_in!.toLowerCase();
-      if (location.contains('nigeria') || location.contains('lagos') || location.contains('abuja')) {
+      if (location.contains('nigeria') ||
+          location.contains('lagos') ||
+          location.contains('abuja')) {
         return 'Nigerian';
       } else if (location.contains('ghana') || location.contains('accra')) {
         return 'Ghanaian';
       } else if (location.contains('kenya') || location.contains('nairobi')) {
         return 'Kenyan';
-      } else if (location.contains('south africa') || location.contains('johannesburg') || location.contains('cape town')) {
+      } else if (location.contains('south africa') ||
+          location.contains('johannesburg') ||
+          location.contains('cape town')) {
         return 'South African';
-      } else if (location.contains('uk') || location.contains('london') || location.contains('manchester')) {
+      } else if (location.contains('uk') ||
+          location.contains('london') ||
+          location.contains('manchester')) {
         return 'British-Nigerian';
-      } else if (location.contains('usa') || location.contains('america') || location.contains('new york') || location.contains('atlanta')) {
+      } else if (location.contains('usa') ||
+          location.contains('america') ||
+          location.contains('new york') ||
+          location.contains('atlanta')) {
         return 'American-Nigerian';
-      } else if (location.contains('canada') || location.contains('toronto') || location.contains('vancouver')) {
+      } else if (location.contains('canada') ||
+          location.contains('toronto') ||
+          location.contains('vancouver')) {
         return 'Canadian-Nigerian';
       }
     }
@@ -658,21 +673,32 @@ class TribeConnectCard extends StatelessWidget {
     if (user.profession?.isNotEmpty == true) {
       final profession = user.profession!.toLowerCase();
       // Check if profession field contains tribe info
-      if (profession.contains('yoruba') || profession.contains('igbo') || profession.contains('hausa')) {
+      if (profession.contains('yoruba') ||
+          profession.contains('igbo') ||
+          profession.contains('hausa')) {
         return profession;
       }
     }
-    
+
     // Simulate tribe based on name patterns (for demo purposes)
     final name = user.name?.toLowerCase() ?? '';
-    if (name.contains('ade') || name.contains('tunde') || name.contains('kemi') || name.contains('yemi')) {
+    if (name.contains('ade') ||
+        name.contains('tunde') ||
+        name.contains('kemi') ||
+        name.contains('yemi')) {
       return 'Yoruba';
-    } else if (name.contains('chi') || name.contains('nkechi') || name.contains('chukwu') || name.contains('nnamdi')) {
+    } else if (name.contains('chi') ||
+        name.contains('nkechi') ||
+        name.contains('chukwu') ||
+        name.contains('nnamdi')) {
       return 'Igbo';
-    } else if (name.contains('ahmed') || name.contains('fatima') || name.contains('hassan') || name.contains('aisha')) {
+    } else if (name.contains('ahmed') ||
+        name.contains('fatima') ||
+        name.contains('hassan') ||
+        name.contains('aisha')) {
       return 'Hausa';
     }
-    
+
     return 'Yoruba'; // Default tribe for demo
   }
 
@@ -696,7 +722,7 @@ class TribeConnectCard extends StatelessWidget {
     if (user.lookingFor?.isNotEmpty == true) {
       interests.add(user.lookingFor!);
     }
-    
+
     if (interests.isEmpty) {
       return ['Culture', 'Music', 'Community'];
     }
@@ -706,7 +732,7 @@ class TribeConnectCard extends StatelessWidget {
   List<String> _getMutualInterests() {
     // Simulate cultural connections - in real app, this would compare with current user
     List<String> connections = [];
-    
+
     // Add nationality connection
     final nationality = _getNationalityText();
     if (nationality.contains('Nigerian')) {
@@ -716,29 +742,29 @@ class TribeConnectCard extends StatelessWidget {
     } else if (nationality.contains('Kenyan')) {
       connections.add('🇰🇪 Kenyan');
     }
-    
+
     // Add tribe connection
     final tribe = _getTribeText();
     if (tribe.isNotEmpty) {
       connections.add('🏛️ $tribe');
     }
-    
+
     // Add some common interests
     final interests = _getInterests();
     if (interests.isNotEmpty) {
       connections.add('🎵 ${interests.first}');
     }
-    
+
     return connections.take(2).toList();
   }
 
   String _getLastSeenText() {
     if (user.lastSeen == null) return 'Recently active';
-    
+
     final now = DateTime.now();
     final lastSeen = user.lastSeen!;
     final difference = now.difference(lastSeen);
-    
+
     if (difference.inMinutes < 60) {
       return 'Active now';
     } else if (difference.inHours < 24) {

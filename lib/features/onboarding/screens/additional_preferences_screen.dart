@@ -105,7 +105,7 @@ class _AdditionalPreferencesScreenState
                     // Header
                     Text(
                       'Tell us more about you',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 32 : 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -114,7 +114,7 @@ class _AdditionalPreferencesScreenState
                     SizedBox(height: isTablet ? 12 : 8),
                     Text(
                       'Help us create better matches for you',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 18 : 16,
                         color: Colors.black54,
                       ),
@@ -240,7 +240,7 @@ class _AdditionalPreferencesScreenState
       SnackBar(
         content: Text(
           'Preferences saved successfully!',
-          style: GoogleFonts.poppins(),
+          style: GoogleFonts.montserrat(),
         ),
         backgroundColor: const Color(0xFF008037),
         behavior: SnackBarBehavior.floating,

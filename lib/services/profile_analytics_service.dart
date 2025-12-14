@@ -10,7 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - User behavior analysis
 /// - A/B testing support
 class ProfileAnalyticsService {
-  static final ProfileAnalyticsService _instance = ProfileAnalyticsService._internal();
+  static final ProfileAnalyticsService _instance =
+      ProfileAnalyticsService._internal();
   factory ProfileAnalyticsService() => _instance;
   ProfileAnalyticsService._internal();
 
@@ -99,7 +100,8 @@ class ProfileAnalyticsService {
   }
 
   /// Track message sent
-  Future<void> trackMessageSent(String threadId, String senderId, String receiverId) async {
+  Future<void> trackMessageSent(
+      String threadId, String senderId, String receiverId) async {
     try {
       log('💬 Tracking message sent: $threadId');
 
@@ -180,13 +182,15 @@ class ProfileAnalyticsService {
       final totalViews = viewsSnapshot.docs.length;
       final totalLikes = likesSnapshot.docs.length;
       final totalPasses = passesSnapshot.docs.length;
-      final totalMatches = matchesSnapshot.docs.length + matchesSnapshot2.docs.length;
+      final totalMatches =
+          matchesSnapshot.docs.length + matchesSnapshot2.docs.length;
 
       // Calculate like rate
       final likeRate = totalViews > 0 ? (totalLikes / totalViews) * 100 : 0.0;
 
       // Calculate match rate
-      final matchRate = totalLikes > 0 ? (totalMatches / totalLikes) * 100 : 0.0;
+      final matchRate =
+          totalLikes > 0 ? (totalMatches / totalLikes) * 100 : 0.0;
 
       // Get daily analytics
       final dailyAnalytics = await _getDailyAnalytics(userId);
@@ -291,25 +295,26 @@ class ProfileAnalyticsService {
 
       for (final doc in viewsSnapshot.docs) {
         final viewerId = doc.data()['viewerId'] as String;
-        
+
         // Get viewer's demographic data
-        final viewerDoc = await _firestore.collection('users').doc(viewerId).get();
+        final viewerDoc =
+            await _firestore.collection('users').doc(viewerId).get();
         if (viewerDoc.exists) {
           final viewerData = viewerDoc.data()!;
-          
+
           // Age group
           final age = viewerData['age'] as int?;
           if (age != null) {
             final ageGroup = _getAgeGroup(age);
             ageGroups[ageGroup] = (ageGroups[ageGroup] ?? 0) + 1;
           }
-          
+
           // Gender
           final gender = viewerData['gender'] as String?;
           if (gender != null) {
             genderGroups[gender] = (genderGroups[gender] ?? 0) + 1;
           }
-          
+
           // Location
           final location = viewerData['locationName'] as String?;
           if (location != null) {
@@ -388,13 +393,16 @@ class ProfileAnalyticsService {
       // Get daily active users (last 24 hours)
       final now = DateTime.now();
       final yesterday = now.subtract(const Duration(days: 1));
-      
+
       final dauSnapshot = await _firestore
           .collection('analytics')
           .where('timestamp', isGreaterThan: yesterday)
           .get();
-      
-      final activeUsers = dauSnapshot.docs.map((doc) => doc.data()['viewerId'] as String).toSet().length;
+
+      final activeUsers = dauSnapshot.docs
+          .map((doc) => doc.data()['viewerId'] as String)
+          .toSet()
+          .length;
 
       return AppAnalytics(
         totalUsers: totalUsers,
@@ -419,24 +427,24 @@ class ProfileAnalyticsService {
   Future<double> getUserEngagementScore(String userId) async {
     try {
       final analytics = await getProfileAnalytics(userId);
-      
+
       // Calculate engagement score based on various factors
       double score = 0.0;
-      
+
       // Profile completeness (30%)
       final profileCompleteness = await _calculateProfileCompleteness(userId);
       score += 0.3 * profileCompleteness;
-      
+
       // Activity level (25%)
       final activityLevel = await _calculateActivityLevel(userId);
       score += 0.25 * activityLevel;
-      
+
       // Response rate (25%)
       score += 0.25 * analytics.matchRate / 100;
-      
+
       // Profile quality (20%)
       score += 0.2 * analytics.likeRate / 100;
-      
+
       return score.clamp(0.0, 1.0);
     } catch (e) {
       log('❌ Error calculating engagement score: $e');
@@ -449,20 +457,27 @@ class ProfileAnalyticsService {
     try {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists) return 0.0;
-      
+
       final userData = userDoc.data()!;
       int completedFields = 0;
       int totalFields = 8; // Total number of important fields
-      
-      if (userData['name'] != null && userData['name'].toString().isNotEmpty) completedFields++;
+
+      if (userData['name'] != null && userData['name'].toString().isNotEmpty)
+        completedFields++;
       if (userData['age'] != null) completedFields++;
-      if (userData['bio'] != null && userData['bio'].toString().isNotEmpty) completedFields++;
-      if (userData['photos'] != null && (userData['photos'] as List).isNotEmpty) completedFields++;
-      if (userData['nationality'] != null && userData['nationality'].toString().isNotEmpty) completedFields++;
-      if (userData['tribe'] != null && userData['tribe'].toString().isNotEmpty) completedFields++;
-      if (userData['occupation'] != null && userData['occupation'].toString().isNotEmpty) completedFields++;
-      if (userData['interests'] != null && (userData['interests'] as List).isNotEmpty) completedFields++;
-      
+      if (userData['bio'] != null && userData['bio'].toString().isNotEmpty)
+        completedFields++;
+      if (userData['photos'] != null && (userData['photos'] as List).isNotEmpty)
+        completedFields++;
+      if (userData['nationality'] != null &&
+          userData['nationality'].toString().isNotEmpty) completedFields++;
+      if (userData['tribe'] != null && userData['tribe'].toString().isNotEmpty)
+        completedFields++;
+      if (userData['occupation'] != null &&
+          userData['occupation'].toString().isNotEmpty) completedFields++;
+      if (userData['interests'] != null &&
+          (userData['interests'] as List).isNotEmpty) completedFields++;
+
       return completedFields / totalFields;
     } catch (e) {
       log('❌ Error calculating profile completeness: $e');
@@ -475,15 +490,15 @@ class ProfileAnalyticsService {
     try {
       final now = DateTime.now();
       final last7Days = now.subtract(const Duration(days: 7));
-      
+
       final activitySnapshot = await _firestore
           .collection('analytics')
           .where('userId', isEqualTo: userId)
           .where('timestamp', isGreaterThan: last7Days)
           .get();
-      
+
       final activityCount = activitySnapshot.docs.length;
-      
+
       // Normalize activity score (0-1)
       return (activityCount / 20).clamp(0.0, 1.0); // 20 activities = 1.0 score
     } catch (e) {

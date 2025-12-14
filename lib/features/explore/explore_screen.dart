@@ -44,7 +44,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final user = userProvider.currentUser;
-      
+
       if (user != null) {
         if (mounted && !_disposed) {
           setState(() {
@@ -83,7 +83,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       }
 
       final users = await UserSearchRepo.getUserList(_currentUser!);
-      
+
       if (mounted && !_disposed) {
         setState(() {
           _users = users;

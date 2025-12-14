@@ -6,7 +6,8 @@ import 'dart:developer';
 /// Stub implementation of biometric authentication service
 /// This is used when local_auth packages are not available due to dependency conflicts
 class BiometricAuthService {
-  static final BiometricAuthService _instance = BiometricAuthService._internal();
+  static final BiometricAuthService _instance =
+      BiometricAuthService._internal();
   factory BiometricAuthService() => _instance;
   BiometricAuthService._internal();
 
@@ -127,7 +128,8 @@ class BiometricAuthService {
       'enrolled': false,
       'recommended': false,
       'lastAuth': null,
-      'message': 'Biometric authentication temporarily disabled due to dependency conflict',
+      'message':
+          'Biometric authentication temporarily disabled due to dependency conflict',
     };
   }
 
@@ -164,6 +166,6 @@ class BiometricAuthService {
   /// Get biometric authentication help text
   String getBiometricHelpText() {
     return 'Biometric authentication is temporarily disabled due to dependency conflicts. '
-           'This feature will be re-enabled in a future update.';
+        'This feature will be re-enabled in a future update.';
   }
 }

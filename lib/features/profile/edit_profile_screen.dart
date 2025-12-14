@@ -9,10 +9,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:developer';
 import '../onboarding/widgets/afropeep_height_dropdown.dart';
+import '../../common/constants/app_colors.dart';
 
-// Color constants to match registration screens
-const Color primaryColor = Color(0xFF008037); // Deep green
-const Color textColor = Color(0xFF333333); // Dark text
+// Using centralized AppColors instead of local constants
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -88,10 +87,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // Define colors based on Afropeep MVP
-  final Color backgroundColor = Colors.white; // Clean white background
-  final Color primaryColor = const Color(0xFF008037); // Afropeep green
-  final Color textColor = Colors.black87;
+  // Using centralized AppColors
+  // backgroundColor = AppColors.backgroundColor
+  // primaryColor = AppColors.primaryGreen
+  // textColor = AppColors.textPrimary
   final Color errorColor = Colors.red.shade700;
 
   @override
@@ -307,10 +306,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             Text(
               'Select Image Source',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: textColor,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 20),
@@ -348,19 +347,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: AppColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 32, color: primaryColor),
+            Icon(icon, size: 32, color: AppColors.primaryGreen),
             const SizedBox(height: 8),
             Text(
               label,
-              style: GoogleFonts.poppins(
-                color: textColor,
+              style: GoogleFonts.montserrat(
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -399,22 +398,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return AlertDialog(
           title: Text(
             'Remove Photo',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w600,
-              color: textColor,
+              color: AppColors.textPrimary,
             ),
           ),
           content: Text(
             'Are you sure you want to remove this photo?',
-            style: GoogleFonts.poppins(
-              color: textColor,
+            style: GoogleFonts.montserrat(
+              color: AppColors.textPrimary,
             ),
           ),
           actions: <Widget>[
             TextButton(
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color: Colors.grey.shade700,
                 ),
               ),
@@ -425,7 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextButton(
               child: Text(
                 'Remove',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color: errorColor,
                   fontWeight: FontWeight.w600,
                 ),
@@ -548,10 +547,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           'Interested In',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: textColor,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -564,18 +563,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             return ChoiceChip(
               label: Text(
                 option,
-                style: GoogleFonts.poppins(
-                  color: isSelected ? Colors.white : textColor,
+                style: GoogleFonts.montserrat(
+                  color: isSelected ? Colors.white : AppColors.textPrimary,
                   fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                 ),
               ),
               selected: isSelected,
-              selectedColor: primaryColor,
-              backgroundColor: Colors.white,
+              selectedColor: AppColors.primaryGreen,
+              backgroundColor: AppColors.backgroundColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
-                  color: isSelected ? primaryColor : Colors.grey.shade300,
+                  color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
                 ),
               ),
               onSelected: (selected) {
@@ -608,10 +607,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             return Theme(
               data: Theme.of(context).copyWith(
                 colorScheme: ColorScheme.light(
-                  primary: primaryColor,
+                  primary: AppColors.primaryGreen,
                   onPrimary: Colors.white,
                   surface: Colors.white,
-                  onSurface: textColor,
+                  onSurface: AppColors.textPrimary,
                 ),
               ),
               child: child!,
@@ -643,16 +642,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today, color: primaryColor),
+            Icon(Icons.calendar_today, color: AppColors.primaryGreen),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 _selectedDOB != null
                     ? DateFormat('MMMM d, yyyy').format(_selectedDOB!)
                     : 'Select your date of birth',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color:
-                      _selectedDOB != null ? textColor : Colors.grey.shade600,
+                      _selectedDOB != null ? AppColors.textPrimary : Colors.grey.shade600,
                 ),
               ),
             ),
@@ -660,15 +659,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '$_age years',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -688,10 +687,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           'About Me',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: textColor,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -711,15 +710,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           child: TextField(
             controller: _bioController,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
-              color: textColor,
+              color: AppColors.textPrimary,
             ),
             maxLines: 8, // Match registration max lines
             maxLength: maxLength,
             decoration: InputDecoration(
               hintText: "Write your bio here...", // Match registration hint
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: GoogleFonts.montserrat(
                 color: Colors.grey.shade400,
               ),
               border: OutlineInputBorder(
@@ -728,7 +727,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: primaryColor, width: 2),
+                borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
               counterText: "", // Hide default counter
@@ -748,16 +747,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             Text(
               "Minimum 20 characters", // Match registration requirement
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
-                color: currentLength >= 20 ? primaryColor : Colors.grey,
+                color: currentLength >= 20 ? AppColors.primaryGreen : Colors.grey,
               ),
             ),
             Text(
               "$currentLength/$maxLength",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
-                color: currentLength >= 20 ? primaryColor : Colors.grey,
+                color: currentLength >= 20 ? AppColors.primaryGreen : Colors.grey,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -770,7 +769,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               "Bio should be at least 20 characters",
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: Colors.red,
               ),
@@ -793,19 +792,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       controller: controller,
       maxLines: maxLines,
       maxLength: maxLength,
-      style: GoogleFonts.poppins(color: textColor),
+      style: GoogleFonts.montserrat(color: AppColors.textPrimary),
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: GoogleFonts.poppins(color: Colors.grey.shade700),
+        labelStyle: GoogleFonts.montserrat(color: Colors.grey.shade700),
         helperText: helperText,
-        helperStyle: GoogleFonts.poppins(fontSize: 12),
-        prefixIcon: Icon(prefixIcon, color: primaryColor),
+        helperStyle: GoogleFonts.montserrat(fontSize: 12),
+        prefixIcon: Icon(prefixIcon, color: AppColors.primaryGreen),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: primaryColor, width: 2),
+          borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
         ),
         filled: true,
         fillColor: Colors.white,
@@ -820,24 +819,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: primaryColor.withValues(alpha: 0.05),
+        color: AppColors.primaryGreen.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           Icon(
             icon,
-            color: primaryColor.withValues(alpha: 0.7),
+            color: AppColors.primaryGreen.withValues(alpha: 0.7),
             size: 20,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: textColor,
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -845,7 +844,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.1),
+              color: AppColors.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -853,15 +852,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 Icon(
                   Icons.lock_outline,
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                   size: 12,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   'Set',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 10,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -878,10 +877,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.montserrat(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: primaryColor,
+          color: AppColors.primaryGreen,
         ),
       ),
     );
@@ -904,17 +903,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
           'Edit Profile',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primaryGreen,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -926,13 +925,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: primaryColor),
+                  CircularProgressIndicator(color: AppColors.primaryGreen),
                   const SizedBox(height: 16),
                   Text(
                     'Updating profile...',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
-                      color: textColor,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -956,7 +955,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Please upload at least 3 photos',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             color: errorColor,
                             fontSize: 12,
                           ),
@@ -1058,7 +1057,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: _formValid
-                                ? primaryColor.withValues(alpha: 0.3)
+                                ? AppColors.primaryGreen.withValues(alpha: 0.3)
                                 : Colors.grey.withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
@@ -1069,7 +1068,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         onPressed: _formValid ? _saveProfile : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              _formValid ? primaryColor : Colors.grey.shade400,
+                              _formValid ? AppColors.primaryGreen : Colors.grey.shade400,
                           disabledBackgroundColor: Colors.grey.shade400,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -1089,7 +1088,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               _formValid
                                   ? 'Save Profile'
                                   : 'Complete Required Fields',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
@@ -1125,7 +1124,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 const SizedBox(width: 8),
                                 Text(
                                   'Complete these requirements to save:',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.orange.shade700,
@@ -1186,14 +1185,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Icon(
                         Icons.add_photo_alternate,
                         size: 32,
-                        color: primaryColor.withValues(alpha: 0.7),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.7),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Add Photo',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 12,
-                          color: primaryColor.withValues(alpha: 0.7),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -1226,7 +1225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                 loadingProgress
                                                     .expectedTotalBytes!
                                             : null,
-                                        color: primaryColor,
+                                        color: AppColors.primaryGreen,
                                         strokeWidth: 2,
                                       ),
                                     ),
@@ -1248,7 +1247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         const SizedBox(height: 4),
                                         Text(
                                           'Failed to load',
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.montserrat(
                                             fontSize: 10,
                                             color: Colors.grey.shade600,
                                           ),
@@ -1301,18 +1300,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return ChoiceChip(
           label: Text(
             gender,
-            style: GoogleFonts.poppins(
-              color: isSelected ? Colors.white : textColor,
+            style: GoogleFonts.montserrat(
+              color: isSelected ? Colors.white : AppColors.textPrimary,
               fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
             ),
           ),
           selected: isSelected,
-          selectedColor: primaryColor,
-          backgroundColor: Colors.white,
+          selectedColor: AppColors.primaryGreen,
+          backgroundColor: AppColors.backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
-              color: isSelected ? primaryColor : Colors.grey.shade300,
+              color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
             ),
           ),
           onSelected: (selected) {
@@ -1354,15 +1353,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               hintText: 'Select your tribe/ethnicity (optional)',
-              hintStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-              prefixIcon: Icon(Icons.people, color: primaryColor),
+              hintStyle: GoogleFonts.montserrat(color: Colors.grey.shade600),
+              prefixIcon: Icon(Icons.people, color: AppColors.primaryGreen),
             ),
             items: _tribes.map((tribe) {
               return DropdownMenuItem<String>(
                 value: tribe,
                 child: Text(
                   tribe,
-                  style: GoogleFonts.poppins(color: textColor),
+                  style: GoogleFonts.montserrat(color: AppColors.textPrimary),
                 ),
               );
             }).toList(),
@@ -1376,9 +1375,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               // Tribe is now optional - no validation required
               return null;
             },
-            icon: Icon(Icons.arrow_drop_down, color: primaryColor),
+            icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
             dropdownColor: Colors.white,
-            style: GoogleFonts.poppins(fontSize: 16, color: textColor),
+            style: GoogleFonts.montserrat(fontSize: 16, color: AppColors.textPrimary),
           ),
         ),
         if (_selectedTribe == 'Other') ...[
@@ -1387,14 +1386,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             controller: _otherTribeController,
             decoration: InputDecoration(
               labelText: 'Specify your tribe/ethnicity',
-              labelStyle: GoogleFonts.poppins(color: Colors.grey.shade700),
+              labelStyle: GoogleFonts.montserrat(color: Colors.grey.shade700),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               filled: true,
               fillColor: Colors.white,
             ),
-            style: GoogleFonts.poppins(),
+            style: GoogleFonts.montserrat(),
             validator: (value) {
               // Tribe is now optional - no validation required even for "Other"
               return null;
@@ -1415,24 +1414,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             Text(
               'Age Range',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: textColor,
+                color: AppColors.textPrimary,
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
                 '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                 ),
               ),
             ),
@@ -1441,14 +1440,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SizedBox(height: 16),
         SliderTheme(
           data: SliderThemeData(
-            activeTrackColor: primaryColor,
+            activeTrackColor: AppColors.primaryGreen,
             inactiveTrackColor: Colors.grey.shade300,
             thumbColor: Colors.white,
             thumbShape: const RoundSliderThumbShape(
               enabledThumbRadius: 8,
               elevation: 4,
             ),
-            overlayColor: primaryColor.withValues(alpha: 0.2),
+            overlayColor: AppColors.primaryGreen.withValues(alpha: 0.2),
             trackHeight: 4,
             rangeThumbShape: const RoundRangeSliderThumbShape(
               enabledThumbRadius: 8,
@@ -1457,8 +1456,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
             rangeValueIndicatorShape:
                 const PaddleRangeSliderValueIndicatorShape(),
-            valueIndicatorColor: primaryColor,
-            valueIndicatorTextStyle: GoogleFonts.poppins(
+            valueIndicatorColor: AppColors.primaryGreen,
+            valueIndicatorTextStyle: GoogleFonts.montserrat(
               color: Colors.white,
               fontSize: 12,
             ),
@@ -1547,7 +1546,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 13,
                 color: isCompleted
                     ? Colors.green.shade700

@@ -40,7 +40,7 @@ class MediaSharingService {
 
       // Upload image to storage
       final imageUrl = await _uploadImage(imagePath);
-      
+
       // Create thumbnail
       final thumbnailUrl = await _createImageThumbnail(imagePath);
 
@@ -97,7 +97,7 @@ class MediaSharingService {
 
       // Upload video to storage
       final videoUrl = await _uploadVideo(videoPath);
-      
+
       // Create video thumbnail
       final thumbnailUrl = await _createVideoThumbnail(videoPath);
 
@@ -211,7 +211,7 @@ class MediaSharingService {
 
       // Upload file to storage
       final fileUrl = await _uploadFile(filePath);
-      
+
       // Get file info
       final file = File(filePath);
       final fileName = file.path.split('/').last;
@@ -336,7 +336,7 @@ class MediaSharingService {
       final file = File(imagePath);
       final fileName = 'images/${DateTime.now().millisecondsSinceEpoch}.jpg';
       final ref = _storage.ref().child(fileName);
-      
+
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
     } catch (e) {
@@ -351,7 +351,7 @@ class MediaSharingService {
       final file = File(videoPath);
       final fileName = 'videos/${DateTime.now().millisecondsSinceEpoch}.mp4';
       final ref = _storage.ref().child(fileName);
-      
+
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
     } catch (e) {
@@ -366,7 +366,7 @@ class MediaSharingService {
       final file = File(audioPath);
       final fileName = 'audio/${DateTime.now().millisecondsSinceEpoch}.m4a';
       final ref = _storage.ref().child(fileName);
-      
+
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
     } catch (e) {
@@ -379,9 +379,10 @@ class MediaSharingService {
   Future<String> _uploadFile(String filePath) async {
     try {
       final file = File(filePath);
-      final fileName = 'files/${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
+      final fileName =
+          'files/${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
       final ref = _storage.ref().child(fileName);
-      
+
       final uploadTask = await ref.putFile(file);
       return await uploadTask.ref.getDownloadURL();
     } catch (e) {
@@ -438,12 +439,10 @@ class MediaSharingService {
   }
 
   /// Update thread metadata
-  Future<void> _updateThreadMetadata(String threadId, String lastMessageText, String senderId) async {
+  Future<void> _updateThreadMetadata(
+      String threadId, String lastMessageText, String senderId) async {
     try {
-      await _firestore
-          .collection('chatThreads')
-          .doc(threadId)
-          .update({
+      await _firestore.collection('chatThreads').doc(threadId).update({
         'lastMessageText': lastMessageText,
         'lastMessageSenderId': senderId,
         'lastUpdated': FieldValue.serverTimestamp(),
@@ -463,10 +462,10 @@ class MediaSharingService {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return MediaMessage.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return MediaMessage.fromMap(doc.id, doc.data());
+          }).toList();
+        });
   }
 
   /// Delete media message
@@ -478,7 +477,7 @@ class MediaSharingService {
           .collection('messages')
           .doc(messageId)
           .delete();
-      
+
       log('✅ Media message deleted successfully');
     } catch (e) {
       log('❌ Error deleting media message: $e');
@@ -564,18 +563,20 @@ class MediaMessage {
   /// Get file size in human readable format
   String get fileSizeFormatted {
     if (fileSize < 1024) return '$fileSize B';
-    if (fileSize < 1024 * 1024) return '${(fileSize / 1024).toStringAsFixed(1)} KB';
-    if (fileSize < 1024 * 1024 * 1024) return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (fileSize < 1024 * 1024)
+      return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    if (fileSize < 1024 * 1024 * 1024)
+      return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)} MB';
     return '${(fileSize / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   /// Get duration in human readable format
   String get durationFormatted {
     if (duration == null) return '';
-    
+
     final minutes = (duration! / 60).floor();
     final seconds = (duration! % 60).floor();
-    
+
     if (minutes > 0) {
       return '${minutes}:${seconds.toString().padLeft(2, '0')}';
     } else {

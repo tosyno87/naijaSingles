@@ -78,7 +78,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
             SnackBar(
               content: Text(
                 "You can select up to 10 interests",
-                style: GoogleFonts.poppins(),
+                style: GoogleFonts.montserrat(),
               ),
               backgroundColor: Colors.red.shade400,
             ),
@@ -116,7 +116,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
             children: [
               Text(
                 "Select Your Interests",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: textColor,
@@ -127,7 +127,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
 
               Text(
                 "Choose up to 10 interests to help us match you with like-minded people",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: Colors.black54,
                 ),
@@ -138,7 +138,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
               // Search box
               TextField(
                 controller: _searchController,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   color: textColor,
                 ),
@@ -146,7 +146,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                   filled: true,
                   fillColor: Colors.white,
                   hintText: "Search interests",
-                  hintStyle: GoogleFonts.poppins(
+                  hintStyle: GoogleFonts.montserrat(
                     color: Colors.grey.shade400,
                   ),
                   prefixIcon: const Icon(
@@ -178,7 +178,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
               // Selected count
               Text(
                 "${_selectedInterests.length}/10 selected",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: _selectedInterests.length >= 3
@@ -196,7 +196,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
               ? Center(
                   child: Text(
                     "No interests found",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: Colors.grey,
                     ),
@@ -244,7 +244,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                             child: Text(
                               interest,
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: isSelected ? Colors.white : textColor,

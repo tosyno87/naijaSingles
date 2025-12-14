@@ -2,9 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/afropeep_logo.dart';
 import '../../../auth/auth_status/bloc/authstatus_bloc.dart';
@@ -31,123 +30,178 @@ class SplashState extends State<Splash> {
     });
   }
 
-  void _checkAuthAndNavigate() {
+  Future<void> _checkAuthAndNavigate() async {
     try {
       if (!mounted || _hasNavigated) return;
 
       // Safety check for Navigator state during hot reload
-      if (!Navigator.canPop(context) && Navigator.of(context).widget.initialRoute == null) {
+      if (!Navigator.canPop(context) &&
+          Navigator.of(context).widget.initialRoute == null) {
         log("Navigator state issue detected, skipping navigation");
         return;
       }
 
-      // Always navigate to the welcome screen regardless of authentication status
-      _hasNavigated = true;
-      log("Navigating to welcome screen as default home");
-      Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
-
-      // Original authentication logic (commented out)
-      /*
+      // Trigger auth check - navigation will be handled by BlocListener
       final authBloc = BlocProvider.of<AuthstatusBloc>(context);
-      final state = authBloc.state;
+      authBloc.add(AuthRequestEvent());
       
-      log("Current auth state: $state");
+      // Wait for auth state to be determined with timeout
+      // The BlocListener will handle navigation when state changes
+      final maxWaitTime = Duration(seconds: 3);
+      final startTime = DateTime.now();
       
-      if (state is AuthenticatedState) {
-        _hasNavigated = true;
-        log("User is authenticated, navigating to main screen");
-        Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
-      } else if (state is UnauthenticatedState) {
-        _hasNavigated = true;
-        log("User is not authenticated, navigating to welcome screen");
-        Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
-      } else if (state is AuthFailed) {
-        _hasNavigated = true;
-        log("Authentication failed: ${state.message}");
-        // Show error and navigate to login
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Authentication error: ${state.message}")),
-        );
-        Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+      while (DateTime.now().difference(startTime) < maxWaitTime && !_hasNavigated) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (!mounted) return;
+        
+        final currentState = authBloc.state;
+        if (currentState is AuthenticatedState || 
+            currentState is UnauthenticatedState || 
+            currentState is AuthFailed) {
+          // State is determined, BlocListener should have handled it
+          // If not, handle it here
+          if (!_hasNavigated && mounted) {
+            if (currentState is AuthenticatedState) {
+              _hasNavigated = true;
+              log("Timeout fallback: User authenticated, navigating to main screen");
+              Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
+              return;
+            } else {
+              _hasNavigated = true;
+              log("Timeout fallback: Navigating to welcome screen");
+              Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+              return;
+            }
+          }
+        }
       }
-      */
+      
+      // Final fallback: navigate to welcome screen if still stuck
+      if (!mounted || _hasNavigated) return;
+      
+      _hasNavigated = true;
+      log("Final fallback: Navigating to welcome screen");
+      Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
     } catch (e) {
       log("Error in _checkAuthAndNavigate: $e");
+      if (mounted && !_hasNavigated) {
+        _hasNavigated = true;
+        Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    // Modern splash screen colors - white background matching app theme
+    const Color backgroundColor = Colors.white; // White background (MVP color)
+    const Color primaryGreen = Color(0xFF008037); // Afropeep green
+    const Color textColor = Color(0xFF3B3B3B); // Dark brown/charcoal (not pure black)
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
       body: BlocListener<AuthstatusBloc, AuthstatusState>(
         listener: (context, state) {
-          log("Auth state changed in splash: $state");
+          log("Auth state changed in splash listener: $state");
 
-          // Disable automatic navigation based on auth state
-          // We always want to go to welcome screen now
+          // Only handle if we haven't navigated yet
           if (!mounted || _hasNavigated) return;
 
           // Safety check for Navigator state during hot reload
-          if (!Navigator.canPop(context) && Navigator.of(context).widget.initialRoute == null) {
+          if (!Navigator.canPop(context) &&
+              Navigator.of(context).widget.initialRoute == null) {
             log("Navigator state issue detected in listener, skipping navigation");
             return;
           }
 
-          // Force navigation to welcome screen
-          _hasNavigated = true;
-          Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
-
-          // Original auth-based navigation (commented out)
-          /*
+          // Navigate based on auth state
           if (state is AuthenticatedState) {
             _hasNavigated = true;
             log("User authenticated in listener: ${state.user.uid}");
             Navigator.pushReplacementNamed(context, RouteName.mainNavigation);
           } else if (state is UnauthenticatedState) {
             _hasNavigated = true;
-            log("User not authenticated in listener");
-            Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+            log("User not authenticated in listener - going to welcome");
+            Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
           } else if (state is AuthFailed) {
             _hasNavigated = true;
             log("Authentication failed in listener: ${state.message}");
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Authentication error: ${state.message}")),
-            );
-            Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Authentication error: ${state.message}")),
+              );
+              Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
+            }
           }
-          */
+          // If still loading or initial state, wait for _checkAuthAndNavigate to handle it
         },
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo
-              const AfropeepLogo(size: 100),
-
-              const SizedBox(height: 20),
-
-              // App name
-              Text(
-                "Afropeep",
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B), // Dark text on white background
-                  letterSpacing: 1.2,
+        child: Stack(
+          children: [
+            // Optional: Very subtle gradient from white to soft green tint at bottom
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.05, // 5% opacity for very subtle effect
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        backgroundColor,
+                        Color(0xFF27A957).withOpacity(0.1), // Very subtle green tint at bottom
+                      ],
+                      stops: const [0.7, 1.0],
+                    ),
+                  ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 40),
+            // Main content - centered with breathing space
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo - green on light background
+                  // If logo image is transparent, it will show in its natural color
+                  // If we need to force green, we'd use ColorFilter, but let's try without first
+                  const AfropeepLogo(size: 120),
 
-              // Loading indicator
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  const SizedBox(height: 24),
+
+                  // App name - single wordmark in dark brown/charcoal
+                  Text(
+                    "Afropeep",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                      color: textColor, // Dark brown/charcoal, not pure black
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // Subtle loading indicator at bottom (only shown if initialization takes time)
+            Positioned(
+              bottom: 60,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      primaryGreen.withOpacity(0.6), // Soft green, not too prominent
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -19,7 +19,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -121,10 +121,12 @@ class _LocationScreenState extends State<LocationScreen> {
         final controller =
             Provider.of<OnboardingController>(context, listen: false);
         controller.setLocationName(location);
-        controller.setLocationCoordinates(position.latitude, position.longitude);
+        controller.setLocationCoordinates(
+            position.latitude, position.longitude);
 
         print('🔍 LocationScreen: GPS location set to "$location"');
-        print('🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}');
+        print(
+            '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}');
       }
     } catch (e) {
       setState(() {
@@ -141,18 +143,18 @@ class _LocationScreenState extends State<LocationScreen> {
       builder: (context) => AlertDialog(
         title: Text(
           'Location Services Disabled',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
         ),
         content: Text(
           'Please enable location services to use GPS location detection.',
-          style: GoogleFonts.poppins(),
+          style: GoogleFonts.montserrat(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'OK',
-              style: GoogleFonts.poppins(color: afropeepGreen),
+              style: GoogleFonts.montserrat(color: afropeepGreen),
             ),
           ),
         ],
@@ -166,18 +168,18 @@ class _LocationScreenState extends State<LocationScreen> {
       builder: (context) => AlertDialog(
         title: Text(
           'Location Permission Required',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
         ),
         content: Text(
           'Please enable location permissions in your device settings to use GPS location detection.',
-          style: GoogleFonts.poppins(),
+          style: GoogleFonts.montserrat(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'OK',
-              style: GoogleFonts.poppins(color: afropeepGreen),
+              style: GoogleFonts.montserrat(color: afropeepGreen),
             ),
           ),
         ],
@@ -195,7 +197,7 @@ class _LocationScreenState extends State<LocationScreen> {
           // Header
           Text(
             "Where are you located?",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: textDarkBrown,
@@ -206,7 +208,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
           Text(
             "This helps us connect you with people nearby",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textLightBrown,
             ),
@@ -233,7 +235,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 _isLoadingLocation
                     ? 'Getting Location...'
                     : 'Use My Current Location',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -275,7 +277,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       children: [
                         Text(
                           'Your Location',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 12,
                             color: textLightBrown,
                             fontWeight: FontWeight.w500,
@@ -283,7 +285,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         ),
                         Text(
                           _currentLocation!,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             color: textDarkBrown,
                             fontWeight: FontWeight.w600,
@@ -322,7 +324,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 Expanded(
                   child: Text(
                     "Your location helps us show you people nearby. We only show your city, never your exact location.",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: textDarkBrown,
                     ),

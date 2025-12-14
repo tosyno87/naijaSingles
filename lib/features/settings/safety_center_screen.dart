@@ -54,15 +54,15 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
             // Header Section
             _buildHeaderSection(),
             const SizedBox(height: 24),
-            
+
             // Quick Actions
             _buildQuickActionsSection(),
             const SizedBox(height: 24),
-            
+
             // Safety Tips
             _buildSafetyTipsSection(),
             const SizedBox(height: 24),
-            
+
             // Report & Block Tools
             _buildReportToolsSection(),
           ],
@@ -229,27 +229,32 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
       {
         'icon': Icons.location_on,
         'title': 'Meet in Public Places',
-        'description': 'Always meet your date in a public, well-lit location for the first few dates.',
+        'description':
+            'Always meet your date in a public, well-lit location for the first few dates.',
       },
       {
         'icon': Icons.people,
         'title': 'Tell Someone Your Plans',
-        'description': 'Let a friend or family member know where you\'re going and who you\'re meeting.',
+        'description':
+            'Let a friend or family member know where you\'re going and who you\'re meeting.',
       },
       {
         'icon': Icons.phone,
         'title': 'Keep Personal Info Private',
-        'description': 'Don\'t share your home address, workplace, or financial information too early.',
+        'description':
+            'Don\'t share your home address, workplace, or financial information too early.',
       },
       {
         'icon': Icons.warning,
         'title': 'Trust Your Instincts',
-        'description': 'If something feels wrong or uncomfortable, trust your gut and leave the situation.',
+        'description':
+            'If something feels wrong or uncomfortable, trust your gut and leave the situation.',
       },
       {
         'icon': Icons.no_drinks,
         'title': 'Watch Your Drink',
-        'description': 'Never leave your drink unattended and don\'t accept drinks from strangers.',
+        'description':
+            'Never leave your drink unattended and don\'t accept drinks from strangers.',
       },
     ];
 

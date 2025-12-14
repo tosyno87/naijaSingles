@@ -51,6 +51,9 @@ class _OtpPageState extends State<OtpPage> {
   
   // Local state to track OTP code length for button enable/disable
   String _currentOtpCode = '';
+  
+  // Flag to prevent multiple navigation attempts
+  bool _hasNavigated = false;
 
   @override
   void dispose() {
@@ -292,35 +295,110 @@ class _OtpPageState extends State<OtpPage> {
                         return const SizedBox.shrink();
                       },
                       listener: (context, state) {
+                        // Prevent multiple navigation attempts
+                        if (_hasNavigated || !mounted) {
+                          log('⚠️ Navigation already happened or widget unmounted, ignoring state: ${state.runtimeType}');
+                          return;
+                        }
+                        
                         if (state is AlreadyRegistered) {
-                          log("state user ${state.user}");
+                          log('');
+                          log('═══════════════════════════════════════════════════════');
+                          log('✅ REGISTRATION CHECK: User Already Registered');
+                          log('═══════════════════════════════════════════════════════');
+                          log('User ID: ${state.user.id ?? "Unknown"}');
+                          log('Name: ${state.user.name ?? "No name"}');
+                          log('Is Login Flow: ${widget.isLogin}');
+                          log('Is Sign-In: ${widget.isLogin}');
+                          log('═══════════════════════════════════════════════════════');
+                          log('');
+                          
+                          // CRITICAL: If this is a sign-up flow (not login), ALWAYS send to onboarding
+                          // Even if user exists, they should complete onboarding during sign-up
+                          if (!widget.isLogin) {
+                            log('⚠️ Sign-up flow detected - redirecting to onboarding regardless of registration status');
+                            if (!_hasNavigated && mounted) {
+                              _hasNavigated = true;
+                              log('✅ Navigating to onboarding for sign-up flow');
+                              Future.microtask(() {
+                                if (mounted) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                      RouteName.onboarding,
+                                      (route) => false);
+                                }
+                              });
+                            }
+                            return;
+                          }
+                          
+                          // Double-check that user actually has a name (fully registered)
+                          if (state.user.name == null || state.user.name!.isEmpty) {
+                            log('⚠️ User marked as registered but has no name - treating as new registration');
+                            if (!_hasNavigated && mounted) {
+                              _hasNavigated = true;
+                              log('✅ Redirecting to onboarding for incomplete profile');
+                              Future.microtask(() {
+                                if (mounted) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                      RouteName.onboarding,
+                                      (route) => false);
+                                }
+                              });
+                            }
+                            return;
+                          }
+                          
+                          // Only proceed to main navigation if this is a LOGIN flow AND user has complete profile
+                          _hasNavigated = true;
                           Provider.of<UserProvider>(context, listen: false)
                               .currentUser = state.user;
 
-                          // If this is a login flow, go to main navigation
-                          if (widget.isLogin) {
-                            Navigator.of(context)
-                                .pushReplacementNamed(RouteName.mainNavigation);
-                          } else {
-                            // For registration or phone update
-                            Navigator.of(context).pushReplacementNamed(
-                                RouteName.tabScreen,
-                                arguments: state.user);
-                          }
+                          // Small delay to ensure all state is properly set
+                          Future.microtask(() {
+                            if (!mounted) return;
+                            
+                            // This should only be reached for LOGIN flows with complete profiles
+                            log("✅ Navigating to main navigation for existing user login");
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                RouteName.mainNavigation,
+                                (route) => false);
+                          });
                         } else if (state is NewRegistration) {
+                          log('');
+                          log('═══════════════════════════════════════════════════════');
+                          log('📝 REGISTRATION CHECK: New User Registration');
+                          log('═══════════════════════════════════════════════════════');
+                          log('Is Login Flow: ${widget.isLogin}');
+                          log('═══════════════════════════════════════════════════════');
+                          log('');
+                          
                           if (widget.isLogin) {
                             // If trying to login with a number that doesn't have an account
-                            CustomSnackbar.showSnackBarSimple(
-                              "No account found with this phone number. Please sign up first.",
-                              context,
-                            );
-                            Navigator.pop(context);
+                            if (!_hasNavigated && mounted) {
+                              _hasNavigated = true;
+                              CustomSnackbar.showSnackBarSimple(
+                                "No account found with this phone number. Please sign up first.",
+                                context,
+                              );
+                              Future.microtask(() {
+                                if (mounted) {
+                                  Navigator.pop(context);
+                                }
+                              });
+                            }
                           } else {
                             // New user sign-up - navigate to onboarding to create profile
-                            log('✅ New user registration - navigating to onboarding');
-                            Navigator.pop(context);
-                            Navigator.pushReplacementNamed(
-                                context, RouteName.onboarding);
+                            if (!_hasNavigated && mounted) {
+                              _hasNavigated = true;
+                              log('✅ Navigating to onboarding for new user');
+                              Future.microtask(() {
+                                if (mounted) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                      RouteName.onboarding,
+                                      (route) => false);
+                                }
+                              });
+                            }
                           }
                         } else if (state is RegistrationFailed) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -387,39 +465,54 @@ class _OtpPageState extends State<OtpPage> {
                         );
                       },
                       listener: (context, state) {
+                        // Prevent navigation if already navigated
+                        if (_hasNavigated || !mounted) return;
+                        
                         if (state is PhoneAuthVerified) {
                           try {
                             if (state.user != null) {
+                              log("✅ Phone verified, checking registration status...");
                               state.user!.getIdToken().then((value) async {
-                                if (value != null) {
-                                  log("Got token after phone verification");
+                                if (value != null && mounted && !_hasNavigated) {
+                                  log("Got token after phone verification, dispatching CheckRegistration");
                                   BlocProvider.of<RegistrationBloc>(context)
                                       .add(CheckRegistration(token: value));
-                                } else {
+                                } else if (value == null) {
                                   log("Error: Token is null after phone verification");
-                                  CustomSnackbar.showSnackBarSimple(
-                                      'Authentication error: Token is null',
-                                      context);
+                                  if (mounted) {
+                                    CustomSnackbar.showSnackBarSimple(
+                                        'Authentication error: Token is null',
+                                        context);
+                                  }
                                 }
                               }).catchError((error) {
                                 log("Error getting token after phone verification: $error");
-                                CustomSnackbar.showSnackBarSimple(
-                                    'Authentication error: $error', context);
+                                if (mounted && !_hasNavigated) {
+                                  CustomSnackbar.showSnackBarSimple(
+                                      'Authentication error: $error', context);
+                                }
                               });
                             } else {
                               log("Error: User is null after phone verification");
-                              CustomSnackbar.showSnackBarSimple(
-                                  'Authentication error: User is null',
-                                  context);
+                              if (mounted && !_hasNavigated) {
+                                CustomSnackbar.showSnackBarSimple(
+                                    'Authentication error: User is null',
+                                    context);
+                              }
                             }
                           } catch (e) {
                             log("Exception during token retrieval after phone verification: $e");
-                            CustomSnackbar.showSnackBarSimple(
-                                'Authentication error: $e', context);
+                            if (mounted && !_hasNavigated) {
+                              CustomSnackbar.showSnackBarSimple(
+                                  'Authentication error: $e', context);
+                            }
                           }
                         } else if (state is PhoneupdateSuccess) {
-                          Navigator.pushReplacementNamed(
-                              context, RouteName.tabScreen);
+                          if (!_hasNavigated && mounted) {
+                            _hasNavigated = true;
+                            Navigator.pushReplacementNamed(
+                                context, RouteName.tabScreen);
+                          }
                         } else if (state is PhoneAuthError) {
                           CustomSnackbar.showSnackBarSimple(
                               state.error, context);

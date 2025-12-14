@@ -97,7 +97,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     // Define colors
-    const Color backgroundColor = Color(0xFFFFF6E5); // Warm cream/beige
+    const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color accentColor = Color(0xFFE74C3C); // Coral Red
     const Color textColor = Color(0xFF333333);
@@ -115,7 +115,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         ),
         title: Text(
           "Verify OTP",
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: primaryColor,
@@ -156,7 +156,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   Text(
                     "Verification Code",
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: textColor,
@@ -170,14 +170,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     textAlign: TextAlign.center,
                     text: TextSpan(
                       text: "Enter the code sent to ",
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         color: Colors.black54,
                       ),
                       children: [
                         TextSpan(
                           text: widget.phoneNumber,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: textColor,
@@ -232,7 +232,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     children: [
                       Text(
                         "Didn't receive code? ",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: Colors.black54,
                         ),
@@ -242,7 +242,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               onPressed: _resendOtp,
                               child: Text(
                                 "Resend",
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: primaryColor,
@@ -251,7 +251,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             )
                           : Text(
                               _formatTime(_remainingTime),
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: accentColor,
@@ -342,7 +342,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   )
                                 : Text(
                                     "Verify",
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.montserrat(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),

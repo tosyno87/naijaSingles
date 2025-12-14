@@ -86,7 +86,7 @@ class _OnboardingAdditionalPreferencesScreenState
           // Header
           Text(
             'Tell us more about you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 32 : 28,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -95,7 +95,7 @@ class _OnboardingAdditionalPreferencesScreenState
           SizedBox(height: isTablet ? 12 : 8),
           Text(
             'Help us create better matches for you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 18 : 16,
               color: Colors.black54,
             ),

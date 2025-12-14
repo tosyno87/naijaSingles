@@ -116,7 +116,7 @@ class _OnboardingDataVerificationScreenState
       appBar: AppBar(
         title: Text(
           'Onboarding Data Verification',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -168,7 +168,7 @@ class _OnboardingDataVerificationScreenState
                       ),
                       child: Text(
                         'Refresh Data',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -195,7 +195,7 @@ class _OnboardingDataVerificationScreenState
           children: [
             Text(
               'Data Completeness Summary',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -219,7 +219,7 @@ class _OnboardingDataVerificationScreenState
 
             Text(
               '${completionPercentage.toStringAsFixed(1)}% Complete',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: completionPercentage >= 80
@@ -234,7 +234,7 @@ class _OnboardingDataVerificationScreenState
 
             Text(
               '${_presentFields.length} of ${_expectedFields.length} fields present',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: Colors.grey.shade600,
               ),
@@ -258,7 +258,7 @@ class _OnboardingDataVerificationScreenState
                 const SizedBox(width: 8),
                 Text(
                   'Present Fields (${_presentFields.length})',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.green,
@@ -270,7 +270,7 @@ class _OnboardingDataVerificationScreenState
             if (_presentFields.isEmpty)
               Text(
                 'No fields found',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: Colors.grey.shade600,
                   fontStyle: FontStyle.italic,
@@ -284,7 +284,7 @@ class _OnboardingDataVerificationScreenState
                   return Chip(
                     label: Text(
                       field,
-                      style: GoogleFonts.poppins(fontSize: 12),
+                      style: GoogleFonts.montserrat(fontSize: 12),
                     ),
                     backgroundColor: Colors.green.shade100,
                     side: BorderSide(color: Colors.green.shade300),
@@ -310,7 +310,7 @@ class _OnboardingDataVerificationScreenState
                 const SizedBox(width: 8),
                 Text(
                   'Missing Fields (${_missingFields.length})',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.red,
@@ -322,7 +322,7 @@ class _OnboardingDataVerificationScreenState
             if (_missingFields.isEmpty)
               Text(
                 'All expected fields are present! 🎉',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: Colors.green.shade600,
                   fontWeight: FontWeight.w500,
@@ -336,7 +336,7 @@ class _OnboardingDataVerificationScreenState
                   return Chip(
                     label: Text(
                       field,
-                      style: GoogleFonts.poppins(fontSize: 12),
+                      style: GoogleFonts.montserrat(fontSize: 12),
                     ),
                     backgroundColor: Colors.red.shade100,
                     side: BorderSide(color: Colors.red.shade300),
@@ -358,7 +358,7 @@ class _OnboardingDataVerificationScreenState
           children: [
             Text(
               'Sample Data Values',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -367,7 +367,7 @@ class _OnboardingDataVerificationScreenState
             if (_userData == null)
               Text(
                 'No data available',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: Colors.grey.shade600,
                   fontStyle: FontStyle.italic,
@@ -411,7 +411,7 @@ class _OnboardingDataVerificationScreenState
             width: 120,
             child: Text(
               '$label:',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey.shade700,
@@ -421,7 +421,7 @@ class _OnboardingDataVerificationScreenState
           Expanded(
             child: Text(
               value?.toString() ?? 'null',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: value != null ? Colors.black87 : Colors.red,
               ),

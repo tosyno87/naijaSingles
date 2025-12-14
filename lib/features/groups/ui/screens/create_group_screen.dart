@@ -18,9 +18,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _tagController = TextEditingController();
-  
+
   final GroupService _groupService = GroupService();
-  
+
   String _selectedCategory = 'Cultural';
   bool _isPublic = true;
   int _maxMembers = 100;
@@ -48,8 +48,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         category: _selectedCategory,
         isPublic: _isPublic,
         maxMembers: _maxMembers,
-        location: _locationController.text.trim().isEmpty 
-            ? null 
+        location: _locationController.text.trim().isEmpty
+            ? null
             : _locationController.text.trim(),
         tags: _tags,
         culturalInfo: {
@@ -66,7 +66,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       if (groupId != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Group "${_nameController.text.trim()}" created successfully!'),
+            content: Text(
+                'Group "${_nameController.text.trim()}" created successfully!'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -111,7 +112,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       appBar: AppBar(
         title: Text(
           'Create Group',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 22,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -132,9 +133,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   children: [
                     // Group Image Section
                     _buildGroupImageSection(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Group Name
                     _buildTextField(
                       controller: _nameController,
@@ -154,9 +155,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Description
                     _buildTextField(
                       controller: _descriptionController,
@@ -177,14 +178,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Category Selection
                     _buildCategorySelection(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Location
                     _buildTextField(
                       controller: _locationController,
@@ -192,22 +193,22 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       hint: 'City, Country',
                       icon: Icons.location_on,
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Tags
                     _buildTagsSection(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Section Divider
                     _buildSectionDivider('Group Settings'),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Group Settings
                     _buildGroupSettings(),
-                    
+
                     const SizedBox(height: 100), // Space for bottom button
                   ],
                 ),
@@ -286,7 +287,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textPrimary,
@@ -305,7 +306,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             validator: validator,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: GoogleFonts.montserrat(
                 color: AppColors.textSecondary,
                 fontSize: 14,
               ),
@@ -349,7 +350,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       children: [
         Text(
           'Category',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textPrimary,
@@ -396,7 +397,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     const SizedBox(width: 8),
                     Text(
                       category,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         color: AppColors.textPrimary,
                         fontSize: 14,
                       ),
@@ -410,7 +411,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             },
             icon: Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
             dropdownColor: Colors.white,
-            style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
+            style:
+                GoogleFonts.montserrat(color: AppColors.textPrimary, fontSize: 14),
           ),
         ),
       ],
@@ -423,14 +425,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       children: [
         Text(
           'Tags (${_tags.length}/5)',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Tags Display
         if (_tags.isNotEmpty) ...[
           Wrap(
@@ -440,7 +442,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               return Chip(
                 label: Text(
                   tag,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: AppColors.primaryGreen,
@@ -465,7 +467,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
           const SizedBox(height: 12),
         ],
-        
+
         // Add Tag Input
         if (_tags.length < 5)
           Row(
@@ -481,7 +483,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     controller: _tagController,
                     decoration: InputDecoration(
                       hintText: 'Add tag...',
-                      hintStyle: GoogleFonts.poppins(
+                      hintStyle: GoogleFonts.montserrat(
                         color: AppColors.textSecondary,
                         fontSize: 14,
                       ),
@@ -500,7 +502,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+                        borderSide:
+                            BorderSide(color: AppColors.primaryGreen, width: 2),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -554,7 +557,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
@@ -575,7 +578,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
         // Public/Private Toggle
         Container(
           padding: const EdgeInsets.all(16),
@@ -598,7 +600,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   children: [
                     Text(
                       'Public Group',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -606,7 +608,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     ),
                     Text(
                       'Anyone can find and join this group',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -624,9 +626,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Max Members
         Container(
           padding: const EdgeInsets.all(16),
@@ -648,7 +650,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   const SizedBox(width: 12),
                   Text(
                     'Maximum Members',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -669,7 +671,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               ),
               Text(
                 '$_maxMembers members',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                 ),
@@ -719,7 +721,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                             const SizedBox(width: 8),
                             Text(
                               'Create Group',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,

@@ -28,7 +28,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -150,7 +150,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           // Name section
           Text(
             "What's your name?",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -161,7 +161,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
           TextField(
             controller: _nameController,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textDarkBrown,
             ),
@@ -169,7 +169,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               filled: true,
               fillColor: cardBackground,
               hintText: "Enter your full name",
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: GoogleFonts.montserrat(
                 color: textLightBrown,
               ),
               border: OutlineInputBorder(
@@ -201,7 +201,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           // Date of birth section
           Text(
             "When were you born?",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -214,7 +214,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           TextField(
             controller: _dobController,
             readOnly: true, // Make it read-only
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textDarkBrown,
             ),
@@ -222,7 +222,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               filled: true,
               fillColor: cardBackground,
               hintText: "Select your date of birth",
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: GoogleFonts.montserrat(
                 color: textLightBrown,
               ),
               border: OutlineInputBorder(
@@ -252,7 +252,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               alignment: Alignment.centerRight,
               child: Text(
                 "Age: ${Provider.of<OnboardingController>(context).age}",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: afropeepGreen,
@@ -266,7 +266,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           // Gender section
           Text(
             "What's your gender?",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -287,7 +287,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               value: _selectedGender.isEmpty ? null : _selectedGender,
               hint: Text(
                 "Select your gender",
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color: textLightBrown,
                   fontSize: 16,
                 ),
@@ -304,7 +304,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   value: gender,
                   child: Text(
                     gender,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: textDarkBrown,
                       fontWeight: FontWeight.w500,

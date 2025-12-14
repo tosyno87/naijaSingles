@@ -228,7 +228,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   return Center(
                     child: Text(
                       'Error loading messages',
-                      style: GoogleFonts.poppins(color: Colors.red),
+                      style: GoogleFonts.montserrat(color: Colors.red),
                     ),
                   );
                 }
@@ -248,7 +248,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'No messages yet',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             color: Colors.grey[600],
                           ),
@@ -328,7 +328,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         controller: _messageController,
                         decoration: InputDecoration(
                           hintText: 'Type a message...',
-                          hintStyle: GoogleFonts.poppins(
+                          hintStyle: GoogleFonts.montserrat(
                             fontSize: 14,
                             color: Colors.grey[500],
                           ),
@@ -343,7 +343,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                             vertical: 12,
                           ),
                         ),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: Colors.black87,
                         ),
@@ -397,7 +397,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               _formatDate(timestamp),
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: Colors.grey[600],
               ),
@@ -467,7 +467,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 children: [
                   Text(
                     message.text,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 15,
                       color: isMe ? Colors.white : Colors.black87,
                       height: 1.4,
@@ -479,7 +479,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     children: [
                       Text(
                         _formatTime(message.timestamp),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 11,
                           color: isMe
                               ? Colors.white.withValues(alpha: 0.8)
@@ -635,7 +635,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         SnackBar(
           content: Text(
             'User profile not available',
-            style: GoogleFonts.poppins(color: Colors.white),
+            style: GoogleFonts.montserrat(color: Colors.white),
           ),
           backgroundColor: Colors.red,
         ),
@@ -662,7 +662,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Loading profile...',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     color: textPrimary,
                   ),
@@ -710,7 +710,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           SnackBar(
             content: Text(
               'User profile not found',
-              style: GoogleFonts.poppins(color: Colors.white),
+              style: GoogleFonts.montserrat(color: Colors.white),
             ),
             backgroundColor: Colors.red,
           ),
@@ -725,7 +725,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         SnackBar(
           content: Text(
             'Failed to load profile',
-            style: GoogleFonts.poppins(color: Colors.white),
+            style: GoogleFonts.montserrat(color: Colors.white),
           ),
           backgroundColor: Colors.red,
         ),
@@ -806,11 +806,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Title with Poppins font
             Text(
               'Block ${widget.userName}?',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFF2D3748),
@@ -818,11 +818,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            
+
             // Description with MVP colors
             Text(
               'This will remove them from your matches, delete this conversation, and prevent future contact.',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: const Color(0xFF718096),
                 height: 1.5,
@@ -830,7 +830,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            
+
             // MVP-styled action buttons
             Row(
               children: [
@@ -855,7 +855,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                       ),
                       child: Text(
                         'Cancel',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -864,7 +864,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                
+
                 // Block button with gradient and shadow
                 Expanded(
                   child: Container(
@@ -897,7 +897,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                       ),
                       child: Text(
                         'Block',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -908,11 +908,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Info text
             Text(
               'You can unblock them later in Settings',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: const Color(0xFFA0AEC0),
               ),
@@ -1092,7 +1092,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             const SizedBox(height: 20),
             Text(
               'Blocking user...',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xFF2D3748),
@@ -1139,7 +1139,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     Expanded(
                       child: Text(
                         '${widget.userName} has been blocked',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1157,7 +1157,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               duration: const Duration(seconds: 3),
             ),
           );
-          
+
           // Navigate back to messages list after a short delay
           Future.delayed(const Duration(seconds: 1), () {
             if (mounted) {

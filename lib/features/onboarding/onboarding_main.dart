@@ -371,10 +371,20 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         final isDatingUser =
                             controller.lookingFor == 'Dating' ||
                                 controller.lookingFor == 'Mixed';
-                        canContinue = controller.height > 0 &&
+                        
+                        // Always required fields: Height, Platform Purpose, Education, Language
+                        final hasRequiredFields = controller.height > 0 &&
                             controller.lookingFor.isNotEmpty &&
-                            (!isDatingUser ||
-                                controller.relationshipIntent.isNotEmpty);
+                            controller.educationLevel.isNotEmpty &&
+                            controller.spokenLanguages.isNotEmpty;
+                        
+                        // For dating users, require relationship intent and religion (most of the page)
+                        final hasDatingFields = !isDatingUser ||
+                            (controller.relationshipIntent.isNotEmpty &&
+                             controller.religion.isNotEmpty);
+                        
+                        // Require most fields: all base fields + conditional fields for dating users
+                        canContinue = hasRequiredFields && hasDatingFields;
                         break;
                     }
 

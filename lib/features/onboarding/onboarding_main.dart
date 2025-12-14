@@ -251,6 +251,28 @@ class _OnboardingMainState extends State<OnboardingMain> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          // Skip button (like Tinder) - only show on optional screens
+          // Required screens: 0 (Basic Info), 1 (Photos), 2 (Location), 3 (Nationality), 6 (Preferences)
+          // Optional screens: 4 (Bio), 5 (Interests), 7 (Additional Info)
+          if (_currentPage == 4 || _currentPage == 5 || _currentPage == 7)
+            TextButton(
+              onPressed: () {
+                // Skip onboarding - complete it immediately
+                _completeOnboarding();
+              },
+              child: Text(
+                'Skip',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+          if (_currentPage == 4 || _currentPage == 5 || _currentPage == 7)
+            const SizedBox(width: 8),
+        ],
       ),
       body: Stack(
         children: [
@@ -374,10 +396,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
                         ),
                         child: Text(
                           _currentPage < _totalPages - 1
-                              ? 'Continue'
-                              : _currentPage == 7
-                                  ? 'Skip for now' // Optional step - can skip
-                                  : 'Finish',
+                              ? 'Next'
+                              : 'Finish',
                           style: GoogleFonts.montserrat(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,

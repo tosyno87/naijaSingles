@@ -35,9 +35,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   Widget build(BuildContext context) {
     // Safely convert imageUrl to List<String>
     final imageUrl = widget.user.imageUrl;
-    final photos = imageUrl is List
-        ? List<String>.from(imageUrl.map((e) => e.toString()).where((url) => url.isNotEmpty))
-        : <String>[];
+    final photos = _extractPhotos(imageUrl);
     final bio = widget.user.bio ?? widget.user.editInfo?['userBio']?.toString() ?? '';
     final interests = _extractInterests();
 
@@ -57,8 +55,8 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Photo carousel section - horizontal swipeable
-          if (photos.isNotEmpty) _buildPhotoSection(photos),
+          // Photo carousel section - horizontal swipeable, or placeholder if no photos
+          if (photos.isNotEmpty) _buildPhotoSection(photos) else _buildPhotoPlaceholder(),
 
           // Profile header (name, age, location)
           _buildProfileHeader(),
@@ -78,6 +76,54 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
           // Action buttons
           _buildActionButtons(),
         ],
+      ),
+    );
+  }
+
+  List<String> _extractPhotos(dynamic imageUrl) {
+    if (imageUrl == null) return [];
+    if (imageUrl is! List) return [];
+    if (imageUrl.isEmpty) return [];
+    
+    return imageUrl
+        .map((e) => e?.toString() ?? '')
+        .where((url) => url.isNotEmpty && url.trim().isNotEmpty)
+        .toList()
+        .cast<String>();
+  }
+
+  Widget _buildPhotoPlaceholder() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    return SizedBox(
+      height: screenHeight * 0.5,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.person,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No photos available',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

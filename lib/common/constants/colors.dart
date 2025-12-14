@@ -12,15 +12,6 @@ library deprecated_colors;
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
-// 
-// All colors have been moved to lib/common/constants/app_colors.dart
-// This file is kept for backward compatibility during migration.
-//
-// TODO: Migrate all imports from 'constants/colors.dart' to 'constants/app_colors.dart'
-// Then delete this file.
-
-@Deprecated('Use app_colors.dart instead. This file will be removed in a future version.')
-library deprecated_colors;
 
 // Re-export from app_colors.dart for backward compatibility
 export 'app_colors.dart' show AppColors;

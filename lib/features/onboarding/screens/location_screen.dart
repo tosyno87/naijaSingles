@@ -143,20 +143,62 @@ class _LocationScreenState extends State<LocationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: Text(
           'Location Services Disabled',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
         ),
         content: Text(
-          'Please enable location services to use GPS location detection.',
-          style: GoogleFonts.montserrat(),
+          'Location is required to find matches nearby. Please enable location services in your device settings.',
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: textDarkBrown,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'OK',
-              style: GoogleFonts.montserrat(color: afropeepGreen),
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: textLightBrown,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final opened = await Geolocator.openLocationSettings();
+              if (!opened && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Please enable location services manually in your device settings',
+                      style: GoogleFonts.montserrat(),
+                    ),
+                    backgroundColor: afropeepGreen,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: afropeepGreen,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Open Settings',
+              style: GoogleFonts.montserrat(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -168,20 +210,62 @@ class _LocationScreenState extends State<LocationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: Text(
           'Location Permission Required',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
         ),
         content: Text(
-          'Please enable location permissions in your device settings to use GPS location detection.',
-          style: GoogleFonts.montserrat(),
+          'Location is required to find matches nearby. Please enable location permissions in your device settings to continue.',
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: textDarkBrown,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'OK',
-              style: GoogleFonts.montserrat(color: afropeepGreen),
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: textLightBrown,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final opened = await Geolocator.openLocationSettings();
+              if (!opened && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Please enable location permissions manually in your device settings',
+                      style: GoogleFonts.montserrat(),
+                    ),
+                    backgroundColor: afropeepGreen,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: afropeepGreen,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Open Settings',
+              style: GoogleFonts.montserrat(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

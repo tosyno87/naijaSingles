@@ -119,7 +119,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   BasicInfoStep(eventData: _eventData),
                   CulturalHeritageStep(eventData: _eventData),
                   DateTimeStep(eventData: _eventData),
-                  LocationStep(eventData: _eventData),
+                  LocationStep(
+                    eventData: _eventData,
+                    onLocationChanged: () => setState(() {}),
+                  ),
                   AdvancedSettingsStep(eventData: _eventData),
                   PreviewStep(eventData: _eventData),
                 ],
@@ -254,7 +257,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             child: BlocBuilder<EventCreationBloc, EventCreationState>(
               builder: (context, state) {
                 final isLoading = state is EventCreationLoading;
-                final isDisabled = isLoading || _isSubmitting;
+                final isCurrentStepValid = _isCurrentStepValid();
+                final isDisabled = isLoading || _isSubmitting || !isCurrentStepValid;
 
                 return ElevatedButton(
                   onPressed: isDisabled ? null : _handleNextStep,
@@ -326,18 +330,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  bool _validateCurrentStep() {
+  bool _validateCurrentStep({bool showErrors = true}) {
     switch (_currentStep) {
       case 0: // Basic Info
-        return _validateBasicInfo();
+        return _validateBasicInfo(showErrors: showErrors);
       case 1: // Cultural Heritage
-        return _validateCulturalHeritage();
+        return _validateCulturalHeritage(showErrors: showErrors);
       case 2: // Date & Time
-        return _validateDateTime();
+        return _validateDateTime(showErrors: showErrors);
       case 3: // Location
-        return _validateLocation();
+        return _validateLocation(showErrors: showErrors);
       case 4: // Advanced Settings
-        return _validateAdvancedSettings();
+        return _validateAdvancedSettings(showErrors: showErrors);
       case 5: // Preview
         return true;
       default:
@@ -345,74 +349,108 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  bool _validateBasicInfo() {
+  /// Check if current step is valid without showing errors (for button state)
+  bool _isCurrentStepValid() {
+    return _validateCurrentStep(showErrors: false);
+  }
+
+  bool _validateBasicInfo({bool showErrors = true}) {
     if (_eventData.name.trim().isEmpty) {
-      _showError('Please enter an event name');
+      if (showErrors) _showError('Please enter an event name');
       return false;
     }
     if (_eventData.description.trim().isEmpty) {
-      _showError('Please enter an event description');
+      if (showErrors) _showError('Please enter an event description');
       return false;
     }
     if (_eventData.category.trim().isEmpty) {
-      _showError('Please select an event category');
+      if (showErrors) _showError('Please select an event category');
       return false;
     }
     return true;
   }
 
-  bool _validateCulturalHeritage() {
+  bool _validateCulturalHeritage({bool showErrors = true}) {
     if (_eventData.metadata['culturalHeritage'] == null ||
         _eventData.metadata['culturalHeritage'].toString().trim().isEmpty) {
-      _showError('Please select a cultural heritage');
+      if (showErrors) _showError('Please select a cultural heritage');
       return false;
     }
     if (_eventData.metadata['ageGroup'] == null ||
         _eventData.metadata['ageGroup'].toString().trim().isEmpty) {
-      _showError('Please select a target age group');
+      if (showErrors) _showError('Please select a target age group');
       return false;
     }
     return true;
   }
 
-  bool _validateDateTime() {
+  bool _validateDateTime({bool showErrors = true}) {
     if (_eventData.startDate == null) {
-      _showError('Please select a start date and time');
+      if (showErrors) _showError('Please select a start date and time');
       return false;
     }
     if (_eventData.endDate == null) {
-      _showError('Please select an end date and time');
+      if (showErrors) _showError('Please select an end date and time');
       return false;
     }
     if (_eventData.startDate!
         .isBefore(DateTime.now().add(const Duration(hours: 1)))) {
-      _showError('Event must start at least 1 hour from now');
+      if (showErrors) _showError('Event must start at least 1 hour from now');
       return false;
     }
     if (_eventData.endDate!.isBefore(_eventData.startDate!)) {
-      _showError('End date must be after start date');
+      if (showErrors) _showError('End date must be after start date');
       return false;
     }
     return true;
   }
 
-  bool _validateLocation() {
+  bool _validateLocation({bool showErrors = true}) {
     if (_eventData.location == null) {
-      _showError('Please select an event location');
+      if (showErrors) _showError('Please select an event location');
       return false;
     }
+    
+    final location = _eventData.location!;
+    
+    // Check all required fields
+    if (location.name == null || location.name!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a venue name');
+      return false;
+    }
+    
+    if (location.address == null || location.address!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a street address');
+      return false;
+    }
+    
+    if (location.city == null || location.city!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a city');
+      return false;
+    }
+    
+    if (location.state == null || location.state!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a state');
+      return false;
+    }
+    
+    if (location.country == null || location.country!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a country');
+      return false;
+    }
+    
     return true;
   }
 
-  bool _validateAdvancedSettings() {
+  bool _validateAdvancedSettings({bool showErrors = true}) {
     // Advanced settings are optional, but validate if user has made changes
     if (!_eventData.isFree &&
         (_eventData.ticketPrice == null || _eventData.ticketPrice! <= 0)) {
-      _showError('Please enter a valid ticket price for paid events');
+      if (showErrors) _showError('Please enter a valid ticket price for paid events');
       return false;
     }
     if (_eventData.maxAttendees <= 0) {
-      _showError('Please enter a valid maximum number of attendees');
+      if (showErrors) _showError('Please enter a valid maximum number of attendees');
       return false;
     }
     return true;

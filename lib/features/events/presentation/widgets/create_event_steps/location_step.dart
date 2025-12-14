@@ -6,9 +6,12 @@ import '../../../data/models/enhanced_event_model.dart';
 class LocationStep extends StatefulWidget {
 
   const LocationStep({
-    required this.eventData, super.key,
+    required this.eventData,
+    this.onLocationChanged,
+    super.key,
   });
   final EventCreationData eventData;
+  final VoidCallback? onLocationChanged;
 
   @override
   State<LocationStep> createState() => _LocationStepState();
@@ -57,6 +60,8 @@ class _LocationStepState extends State<LocationStep> {
           ? 'United States'
           : _countryController.text, // Default to US, allow user input
     );
+    // Notify parent that location changed (triggers button state update)
+    widget.onLocationChanged?.call();
   }
 
   @override

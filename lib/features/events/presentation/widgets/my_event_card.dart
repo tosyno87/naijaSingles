@@ -184,7 +184,7 @@ class MyEventCard extends StatelessWidget {
                           );
                         },
                       )
-                    : Image.file(
+                      : Image.file(
                         File(event.primaryImageUrl),
                         width: double.infinity,
                         height: double.infinity,

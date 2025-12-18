@@ -386,12 +386,26 @@ class UserEventService {
         // Upload file
         log('📤 Starting upload task for image ${i + 1}...', name: 'UserEventService');
         log('📤 File size: ${await file.length()} bytes', name: 'UserEventService');
-        final uploadTask = ref.putFile(file);
+        
+        // Read file as bytes - sometimes putFile fails on iOS Simulator
+        final fileBytes = await file.readAsBytes();
+        log('📤 File bytes read: ${fileBytes.length} bytes', name: 'UserEventService');
+        
+        // Try using putData instead of putFile (more reliable on iOS Simulator)
+        final metadata = SettableMetadata(
+          contentType: 'image/jpeg',
+          cacheControl: 'public, max-age=31536000',
+        );
+        
+        log('📤 Uploading with putData...', name: 'UserEventService');
+        final uploadTask = ref.putData(fileBytes, metadata);
         
         // Monitor upload progress
         uploadTask.snapshotEvents.listen((snapshot) {
           final progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           log('📊 Upload progress for image ${i + 1}: ${progress.toStringAsFixed(1)}%', name: 'UserEventService');
+        }, onError: (error) {
+          log('❌ Upload progress error for image ${i + 1}: $error', name: 'UserEventService');
         });
         
         log('⏳ Waiting for upload to complete...', name: 'UserEventService');
@@ -399,7 +413,7 @@ class UserEventService {
         log('✅ Upload completed, getting download URL...', name: 'UserEventService');
         
         final downloadUrl = await snapshot.ref.getDownloadURL();
-
+        
         uploadedUrls.add(downloadUrl);
         log('✅ Successfully uploaded image ${i + 1}: $downloadUrl', name: 'UserEventService');
       } catch (e, stackTrace) {

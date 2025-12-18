@@ -27,7 +27,7 @@ import 'features/user/controllers/onboarding_controller.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
 import 'services/enhanced_notification_service.dart';
-
+import 'services/secure_storage_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +42,15 @@ Future<void> main() async {
     log('❌ Secure configuration error: $e');
     log('💡 Make sure you have created a .env file with your Firebase configuration');
     // Continue anyway in development mode
+  }
+
+  // Initialize Secure Storage Service
+  try {
+    await SecureStorageService().initialize();
+    log('🔐 Secure storage service initialized successfully');
+  } catch (e) {
+    log('❌ Secure storage initialization error: $e');
+    // Continue anyway - secure storage will use defaults
   }
 
   // Initialize Firebase with error handling
@@ -101,7 +110,7 @@ Future<void> main() async {
   FirebaseAuth.instance.authStateChanges().listen(
     (User? user) {
       log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
-      
+
       // Seed events when user authenticates (seedEventsIfEmpty checks if events exist, so safe to call multiple times)
       if (user != null) {
         // Use unawaited to properly handle the future without blocking the stream listener
@@ -134,7 +143,7 @@ Future<void> main() async {
     log('⚠️ Auto-login error: $e');
   }
   */
-  
+
   // Ensure clean start: Sign out any existing authenticated user
   // This ensures new builds start with no user authenticated
   try {
@@ -231,30 +240,30 @@ class MyApp extends StatelessWidget {
 
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) => MaterialApp(
-          navigatorKey: navigatorKey, // Add navigator key
-          title: 'Afropeep',
-          debugShowCheckedModeBanner: false,
-          theme: themeProvider.isDarkMode
-              ? MyThemes.darkTheme
-              : MyThemes.lightTheme,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          initialRoute: RouteName.welcomeScreen, // Direct to WelcomeScreen - no splash flash
-          onGenerateRoute: AppRouter.generateRoute,
-          // Add safety check for Navigator during hot reload
-          builder: (context, child) {
-            // Ensure Navigator has proper state during hot reload
-            if (child == null) {
-              return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-            return child;
-          },
-        ),
+        navigatorKey: navigatorKey, // Add navigator key
+        title: 'Afropeep',
+        debugShowCheckedModeBanner: false,
+        theme:
+            themeProvider.isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        initialRoute: RouteName
+            .welcomeScreen, // Direct to WelcomeScreen - no splash flash
+        onGenerateRoute: AppRouter.generateRoute,
+        // Add safety check for Navigator during hot reload
+        builder: (context, child) {
+          // Ensure Navigator has proper state during hot reload
+          if (child == null) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          return child;
+        },
+      ),
     );
   }
 }

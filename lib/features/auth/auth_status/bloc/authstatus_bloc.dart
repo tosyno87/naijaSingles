@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../services/secure_storage_service.dart';
 
 part 'authstatus_event.dart';
 part 'authstatus_state.dart';
@@ -27,6 +28,17 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
   Future<void> _logout(LogoutEvent event, Emitter<AuthstatusState> emit) async {
     try {
       emit(AuthLoadingState());
+      
+      // Clear secure storage before signing out
+      try {
+        final secureStorage = SecureStorageService();
+        await secureStorage.clearAuthData();
+        log('✅ Secure storage cleared on logout');
+      } catch (e) {
+        log('⚠️ Error clearing secure storage: $e');
+        // Continue with logout even if secure storage clear fails
+      }
+      
       await phoneAuthRepository.signOut();
       log('user singout sucessfully');
       emit(UnauthenticatedState());
@@ -37,7 +49,9 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
 
 //for login status of user
   FutureOr<void> _isLoggedin(
-      AuthRequestEvent event, Emitter<AuthstatusState> emit,) async {
+    AuthRequestEvent event,
+    Emitter<AuthstatusState> emit,
+  ) async {
     try {
       emit(AuthLoadingState());
 
@@ -57,6 +71,20 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
             try {
               final token = await user.getIdToken(true);
               log('Token retrieved successfully: ${token != null}');
+              
+              // Store authentication data securely
+              if (token != null) {
+                try {
+                  final secureStorage = SecureStorageService();
+                  await secureStorage.storeAuthToken(token);
+                  await secureStorage.storeUserId(user.uid);
+                  log('✅ Authentication data stored securely');
+                } catch (e) {
+                  log('⚠️ Error storing auth data securely: $e');
+                  // Continue even if secure storage fails
+                }
+              }
+              
               emit(AuthenticatedState(user: user));
             } catch (tokenError) {
               log('Error retrieving token: $tokenError');

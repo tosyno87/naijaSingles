@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import '../../../config/app_config.dart';
 
 import '../../../models/user_model.dart';
+import '../../../services/secure_storage_service.dart';
 import '../../constants/constants.dart';
 
 class PhoneAuthRepository {
@@ -46,6 +47,15 @@ class PhoneAuthRepository {
 
   // sign out
   Future<void> signOut() async {
+    // Clear secure storage before signing out
+    try {
+      final secureStorage = SecureStorageService();
+      await secureStorage.clearAuthData();
+      log('✅ Secure storage cleared on sign out');
+    } catch (e) {
+      log('⚠️ Error clearing secure storage on sign out: $e');
+      // Continue with sign out even if secure storage clear fails
+    }
     await auth.signOut();
   }
 
@@ -117,15 +127,43 @@ class PhoneAuthRepository {
         return null;
       }
 
-      return await user.getIdToken(true); // Force refresh the token
+      final token = await user.getIdToken(true); // Force refresh the token
+      
+      // Store token securely for offline use
+      if (token != null) {
+        try {
+          final secureStorage = SecureStorageService();
+          await secureStorage.storeAuthToken(token);
+          await secureStorage.storeUserId(user.uid);
+          log('✅ Token stored securely');
+        } catch (e) {
+          log('⚠️ Error storing token securely: $e');
+          // Continue even if secure storage fails
+        }
+      }
+      
+      return token;
     } catch (e) {
       log('Error getting token: $e');
       return null;
     }
   }
+  
+  /// Get cached token from secure storage (for offline use)
+  /// Returns null if no cached token exists
+  Future<String?> getCachedToken() async {
+    try {
+      final secureStorage = SecureStorageService();
+      return await secureStorage.getAuthToken();
+    } catch (e) {
+      log('Error getting cached token: $e');
+      return null;
+    }
+  }
 
-  Future<UserModel> registration(
-      {required Map<String, dynamic> userData,}) async {
+  Future<UserModel> registration({
+    required Map<String, dynamic> userData,
+  }) async {
     final User? user = auth.currentUser;
 
     userData.addAll({
@@ -150,27 +188,24 @@ class PhoneAuthRepository {
   Future<bool> userDetails(String userId) async {
     try {
       // Try direct document access first (faster and more reliable)
-      final docSnapshot = await firebaseFireStoreInstance
-          .collection('users')
-          .doc(userId)
-          .get();
+      final docSnapshot =
+          await firebaseFireStoreInstance.collection('users').doc(userId).get();
 
       if (docSnapshot.exists) {
         final userData = docSnapshot.data();
         log('✅ User document exists for: $userId');
         log('📄 User data keys: ${userData?.keys.toList()}');
-        
+
         // Check if user has completed onboarding or has basic profile data
         // A user is considered registered if they have ANY of these indicators:
-        final bool hasBasicProfile = userData != null && (
-          userData.containsKey('name') ||
-          userData.containsKey('onboardingCompleted') ||
-          userData.containsKey('profileSetupComplete') ||
-          userData.containsKey('location') ||
-          userData.containsKey('photos') ||
-          userData.containsKey('Pictures')
-        );
-        
+        final bool hasBasicProfile = userData != null &&
+            (userData.containsKey('name') ||
+                userData.containsKey('onboardingCompleted') ||
+                userData.containsKey('profileSetupComplete') ||
+                userData.containsKey('location') ||
+                userData.containsKey('photos') ||
+                userData.containsKey('Pictures'));
+
         if (hasBasicProfile) {
           log('✅ User has profile data - considered registered');
           return true;
@@ -211,7 +246,7 @@ class PhoneAuthRepository {
 
     try {
       log('🔍 Fetching user data for: ${fbuser.uid}');
-      
+
       // Try direct document access first (faster and more reliable)
       final docSnapshot = await firebaseFireStoreInstance
           .collection('users')
@@ -254,9 +289,10 @@ class PhoneAuthRepository {
   Future<void> deleteUserStorageCollection(String userId) async {
     try {
       log('🗑️ Starting storage deletion for user: $userId');
-      
+
       // Initialize Firebase Storage
-      final FirebaseStorage storage = FirebaseStorage.instanceFor(bucket: bucketId);
+      final FirebaseStorage storage =
+          FirebaseStorage.instanceFor(bucket: bucketId);
 
       // Get a reference to the user's collection
       final Reference userCollectionRef = storage.ref().child('users/$userId');

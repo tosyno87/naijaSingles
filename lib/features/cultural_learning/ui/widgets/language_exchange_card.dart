@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LanguageExchangeCard extends StatelessWidget {
+
+  const LanguageExchangeCard({
+    required this.nativeLanguage, required this.learningLanguage, required this.userName, required this.country, required this.city, required this.proficiency, required this.description, required this.isOnline, required this.isInPerson, required this.onConnect, super.key,
+  });
   final String nativeLanguage;
   final String learningLanguage;
   final String userName;
@@ -13,23 +17,8 @@ class LanguageExchangeCard extends StatelessWidget {
   final bool isInPerson;
   final VoidCallback onConnect;
 
-  const LanguageExchangeCard({
-    Key? key,
-    required this.nativeLanguage,
-    required this.learningLanguage,
-    required this.userName,
-    required this.country,
-    required this.city,
-    required this.proficiency,
-    required this.description,
-    required this.isOnline,
-    required this.isInPerson,
-    required this.onConnect,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -87,14 +76,14 @@ class LanguageExchangeCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Arrow
                 const Icon(
                   Icons.arrow_forward,
                   color: Color(0xFF008037),
                   size: 20,
                 ),
-                
+
                 // Learning language
                 Expanded(
                   child: Column(
@@ -122,7 +111,7 @@ class LanguageExchangeCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Content
           Padding(
             padding: const EdgeInsets.all(16),
@@ -179,9 +168,11 @@ class LanguageExchangeCard extends StatelessWidget {
                     ),
                     // Proficiency badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4,),
                       decoration: BoxDecoration(
-                        color: _getProficiencyColor(proficiency).withOpacity(0.1),
+                        color:
+                            _getProficiencyColor(proficiency).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -195,9 +186,9 @@ class LanguageExchangeCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Description
                 Text(
                   description,
@@ -207,15 +198,16 @@ class LanguageExchangeCard extends StatelessWidget {
                     height: 1.4,
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Meeting preferences
                 Row(
                   children: [
                     if (isOnline)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4,),
                         decoration: BoxDecoration(
                           color: Colors.blue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
@@ -243,7 +235,8 @@ class LanguageExchangeCard extends StatelessWidget {
                     if (isOnline && isInPerson) const SizedBox(width: 8),
                     if (isInPerson)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4,),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
@@ -270,9 +263,9 @@ class LanguageExchangeCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Connect button
                 SizedBox(
                   width: double.infinity,
@@ -301,7 +294,6 @@ class LanguageExchangeCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Color _getProficiencyColor(String proficiency) {
     switch (proficiency.toLowerCase()) {

@@ -12,9 +12,9 @@ class BlocUserListInitial extends BlocUserListState {}
 class BlockUserLoadingState extends BlocUserListState {}
 
 class BlockUserLoadedState extends BlocUserListState {
-  final List<BlockUserModel> users;
 
   const BlockUserLoadedState(this.users);
+  final List<BlockUserModel> users;
 
   @override
   List<Object> get props => [users];

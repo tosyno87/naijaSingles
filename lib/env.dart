@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart' show DefaultFirebaseOptions;
+import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+import 'env/development.dart';
 import 'env/production.dart';
 import 'env/staging.dart';
-import 'env/development.dart';
+import 'firebase_options.dart';
 
 /// Environment configuration enum
 enum Env { dev, staging, prod }
@@ -10,13 +12,16 @@ enum Env { dev, staging, prod }
 /// Environment detection based on compile-time flags
 class Environment {
   static Env get current => () {
-    const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-    switch (flavor) {
-      case 'staging': return Env.staging;
-      case 'production': return Env.prod;
-      default: return Env.dev;
-    }
-  }();
+        const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
+        switch (flavor) {
+          case 'staging':
+            return Env.staging;
+          case 'production':
+            return Env.prod;
+          default:
+            return Env.dev;
+        }
+      }();
 
   /// Get the appropriate configuration based on current environment
   static T config<T>() {
@@ -52,7 +57,7 @@ class Environment {
   // Convenience getters for commonly used values
   static Color get primaryGreen => config<Color>();
   static String get appNamePostfix => config<String>();
-  
+
   static String get appName {
     switch (current) {
       case Env.staging:
@@ -88,9 +93,10 @@ class Environment {
 
   static String get firebaseProjectId {
     // Allow override via environment variable first
-    const fromEnv = String.fromEnvironment('FIREBASE_PROJECT_ID', defaultValue: '');
+    const fromEnv =
+        String.fromEnvironment('FIREBASE_PROJECT_ID');
     if (fromEnv.isNotEmpty) return fromEnv;
-    
+
     // Fall back to environment-specific defaults
     switch (current) {
       case Env.staging:
@@ -192,25 +198,26 @@ class Environment {
 
   /// Check if current environment is production
   static bool get isProduction => current == Env.prod;
-  
+
   /// Check if current environment is staging
   static bool get isStaging => current == Env.staging;
-  
+
   /// Check if current environment is development
   static bool get isDevelopment => current == Env.dev;
 
   /// Get Firebase options for current environment
-  static DefaultFirebaseOptions get firebaseOptions => DefaultFirebaseOptions.currentPlatform;
+  static FirebaseOptions get firebaseOptions =>
+      DefaultFirebaseOptions.currentPlatform;
 
   /// Debug information about current environment
   static Map<String, dynamic> get debugInfo => {
-    'environment': environment,
-    'flavor': String.fromEnvironment('FLAVOR', defaultValue: 'dev'),
-    'firebaseProjectId': firebaseProjectId,
-    'appVersion': appVersion,
-    'appName': appName,
-    'enableDebugLogs': enableDebugLogs,
-    'enableAnalytics': enableAnalytics,
-    'enableCrashlytics': enableCrashlytics,
-  };
+        'environment': environment,
+        'flavor': const String.fromEnvironment('FLAVOR', defaultValue: 'dev'),
+        'firebaseProjectId': firebaseProjectId,
+        'appVersion': appVersion,
+        'appName': appName,
+        'enableDebugLogs': enableDebugLogs,
+        'enableAnalytics': enableAnalytics,
+        'enableCrashlytics': enableCrashlytics,
+      };
 }

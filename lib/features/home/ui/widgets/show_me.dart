@@ -7,13 +7,11 @@ import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
 
 class ShowmeWidget extends StatefulWidget {
+  const ShowmeWidget({
+    required this.currentUser, required this.changeValues, super.key,
+  });
   final UserModel currentUser;
   final Map<String, dynamic> changeValues;
-  const ShowmeWidget({
-    super.key,
-    required this.currentUser,
-    required this.changeValues,
-  });
 
   @override
   State<ShowmeWidget> createState() => _ShowmeWidgetState();
@@ -25,30 +23,29 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Show me".tr().toString(),
+              'Show me'.tr().toString(),
               style: TextStyle(
                   fontSize: 18,
                   color: themeProvider.isDarkMode ? Colors.white : primaryColor,
-                  fontWeight: FontWeight.w500),
+                  fontWeight: FontWeight.w500,),
             ),
             ListTile(
               title: DropdownButton(
                 iconEnabledColor: primaryColor,
                 iconDisabledColor: AppColors.secondaryColor,
-                iconSize: 24,
                 icon: const Icon(Icons.keyboard_arrow_down_outlined),
                 isExpanded: true,
                 items: [
                   DropdownMenuItem(
-                    value: "men",
+                    value: 'men',
                     child: Text(
-                      "Men".tr().toString(),
-                      style: TextStyle(
+                      'Men'.tr().toString(),
+                      style: const TextStyle(
                         color: AppColors.secondaryColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -56,21 +53,21 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
                     ),
                   ),
                   DropdownMenuItem(
-                      value: "women",
-                      child: Text("Women".tr().toString(),
-                          style: TextStyle(
+                      value: 'women',
+                      child: Text('Women'.tr().toString(),
+                          style: const TextStyle(
                             color: AppColors.secondaryColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                          ))),
+                          ),),),
                   DropdownMenuItem(
-                      value: "everyone",
-                      child: Text("Everyone".tr().toString(),
-                          style: TextStyle(
+                      value: 'everyone',
+                      child: Text('Everyone'.tr().toString(),
+                          style: const TextStyle(
                             color: AppColors.secondaryColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                          ))),
+                          ),),),
                 ],
                 onChanged: (val) {
                   widget.changeValues.addAll({

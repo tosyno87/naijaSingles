@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../user/controllers/onboarding_controller.dart';
 
 class PreferencesScreen extends StatefulWidget {
-  const PreferencesScreen({Key? key}) : super(key: key);
+  const PreferencesScreen({super.key});
 
   @override
   State<PreferencesScreen> createState() => _PreferencesScreenState();
@@ -15,8 +15,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   RangeValues _ageRange = const RangeValues(18, 50);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -27,13 +26,13 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Dating Preferences',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -42,7 +41,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             const SizedBox(height: 8),
             Text(
               'Help us find your perfect match',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: Colors.black54,
               ),
@@ -52,7 +51,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             // Interested In Section
             Text(
               'I\'m interested in',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
@@ -66,7 +65,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             // Age Range Section
             Text(
               'Age Range',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
@@ -91,7 +90,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                 ),
                 child: Text(
                   'Continue',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -103,10 +102,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildInterestedInOptions() {
-    return Column(
+  Widget _buildInterestedInOptions() => Column(
       children: [
         _buildInterestedInOption('Men', 'men'),
         const SizedBox(height: 12),
@@ -115,7 +112,6 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         _buildInterestedInOption('Everyone', 'everyone'),
       ],
     );
-  }
 
   Widget _buildInterestedInOption(String label, String value) {
     final isSelected = _selectedInterestedIn == value;
@@ -141,7 +137,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
         child: Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             color: isSelected ? const Color(0xFF008037) : Colors.black87,
@@ -151,12 +147,11 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     );
   }
 
-  Widget _buildAgeRangeSlider() {
-    return Column(
+  Widget _buildAgeRangeSlider() => Column(
       children: [
         Text(
           '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: const Color(0xFF008037),
@@ -178,7 +173,6 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ),
       ],
     );
-  }
 
   void _savePreferences() {
     final controller =

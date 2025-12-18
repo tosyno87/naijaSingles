@@ -2,32 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class EventsLoadingShimmer extends StatelessWidget {
-  final int itemCount;
 
   const EventsLoadingShimmer({
-    Key? key,
+    super.key,
     this.itemCount = 5,
-  }) : super(key: key);
+  });
+  final int itemCount;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
+  Widget build(BuildContext context) => ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: itemCount,
-      itemBuilder: (context, index) {
-        return Padding(
+      itemBuilder: (context, index) => Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: _buildShimmerCard(),
-        );
-      },
+        ),
     );
-  }
 
-  Widget _buildShimmerCard() {
-    return Shimmer.fromColors(
+  Widget _buildShimmerCard() => Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -162,10 +157,8 @@ class EventsLoadingShimmer extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildDetailRowShimmer() {
-    return Row(
+  Widget _buildDetailRowShimmer() => Row(
       children: [
         // Icon placeholder
         Container(
@@ -188,34 +181,28 @@ class EventsLoadingShimmer extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 // Compact shimmer for lists
 class CompactEventShimmer extends StatelessWidget {
-  final int itemCount;
 
   const CompactEventShimmer({
-    Key? key,
+    super.key,
     this.itemCount = 8,
-  }) : super(key: key);
+  });
+  final int itemCount;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
+  Widget build(BuildContext context) => ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: itemCount,
-      itemBuilder: (context, index) {
-        return Padding(
+      itemBuilder: (context, index) => Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: _buildCompactShimmerCard(),
-        );
-      },
+        ),
     );
-  }
 
-  Widget _buildCompactShimmerCard() {
-    return Shimmer.fromColors(
+  Widget _buildCompactShimmerCard() => Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
       child: Container(
@@ -291,16 +278,14 @@ class CompactEventShimmer extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 // Filter bar shimmer
 class FilterBarShimmer extends StatelessWidget {
-  const FilterBarShimmer({Key? key}) : super(key: key);
+  const FilterBarShimmer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       height: 120,
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
@@ -311,10 +296,8 @@ class FilterBarShimmer extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildFilterRowShimmer({bool isSmaller = false}) {
-    return Shimmer.fromColors(
+  Widget _buildFilterRowShimmer({bool isSmaller = false}) => Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
       child: SizedBox(
@@ -323,8 +306,7 @@ class FilterBarShimmer extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           itemCount: 6,
-          itemBuilder: (context, index) {
-            return Padding(
+          itemBuilder: (context, index) => Padding(
               padding: EdgeInsets.only(right: index == 5 ? 0 : 12),
               child: Container(
                 width: isSmaller ? 80 : 100,
@@ -333,26 +315,22 @@ class FilterBarShimmer extends StatelessWidget {
                   borderRadius: BorderRadius.circular(isSmaller ? 18 : 20),
                 ),
               ),
-            );
-          },
+            ),
         ),
       ),
     );
-  }
 }
 
 // Search results shimmer
 class SearchResultsShimmer extends StatelessWidget {
-  final String query;
 
   const SearchResultsShimmer({
-    Key? key,
-    required this.query,
-  }) : super(key: key);
+    required this.query, super.key,
+  });
+  final String query;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
@@ -388,10 +366,9 @@ class SearchResultsShimmer extends StatelessWidget {
             ],
           ),
         ),
-        Expanded(
+        const Expanded(
           child: CompactEventShimmer(itemCount: 3),
         ),
       ],
     );
-  }
 }

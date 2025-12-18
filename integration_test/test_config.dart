@@ -169,7 +169,7 @@ class DiasporaTestConfig {
               'uid': 'test_diaspora_user_${DateTime.now().millisecondsSinceEpoch}',
               'phoneNumber': methodCall.arguments['phoneNumber'],
               'displayName': 'Test Diaspora User',
-            }
+            },
           };
         default:
           return null;

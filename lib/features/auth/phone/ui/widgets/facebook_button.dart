@@ -5,8 +5,8 @@ import '../../../../../common/constants/colors.dart';
 import '../../../../../common/providers/theme_provider.dart';
 
 class FaceBookButton extends StatelessWidget {
+  const FaceBookButton({required this.onTap, super.key});
   final VoidCallback onTap;
-  const FaceBookButton({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -14,15 +14,14 @@ class FaceBookButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       child: Material(
-        elevation: 2.0,
+        elevation: 2,
         borderRadius: const BorderRadius.all(Radius.circular(30)),
         child: Padding(
-          padding: const EdgeInsets.all(6.0),
+          padding: const EdgeInsets.all(6),
           child: InkWell(
               onTap: onTap,
               child: Container(
                   decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.circular(25),
                       gradient: !themeProvider.isDarkMode
                           ? LinearGradient(
@@ -30,25 +29,25 @@ class FaceBookButton extends StatelessWidget {
                               end: Alignment.bottomLeft,
                               colors: [
                                   primaryColor.withValues(
-                                      alpha: (.5 * 255).toDouble()),
+                                      alpha: (.5 * 255).toDouble(),),
                                   primaryColor.withValues(
-                                      alpha: (.8 * 255).toDouble()),
+                                      alpha: (.8 * 255).toDouble(),),
                                   primaryColor,
-                                  primaryColor
-                                ])
-                          : LinearGradient(
+                                  primaryColor,
+                                ],)
+                          : const LinearGradient(
                               begin: Alignment.topRight,
                               end: Alignment.bottomLeft,
-                              colors: [primaryColor, primaryColor])),
+                              colors: [primaryColor, primaryColor],),),
                   height: MediaQuery.of(context).size.height * .065,
                   width: MediaQuery.of(context).size.width * .8,
                   child: Center(
                       child: Text(
-                    "LOG IN WITH FACEBOOK".tr().toString(),
-                    style: TextStyle(
+                    'LOG IN WITH FACEBOOK'.tr().toString(),
+                    style: const TextStyle(
                         color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold),
-                  )))),
+                        fontWeight: FontWeight.bold,),
+                  ),),),),
         ),
       ),
     );

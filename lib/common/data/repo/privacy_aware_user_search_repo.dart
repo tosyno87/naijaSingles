@@ -1,14 +1,13 @@
-import 'package:naijasingles/common/utils/distance.dart' as distance;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/features/match/services/likes_service.dart';
 
-import '../../constants/constants.dart';
-import '../../../services/user_privacy_service.dart';
+import '../../../features/match/services/likes_service.dart';
+import '../../../models/user_model.dart';
 import '../../../services/location_privacy_service.dart';
+import '../../../services/user_privacy_service.dart';
+import '../../constants/constants.dart';
+import '../../utils/distance.dart' as distance;
 
 /// Privacy-aware user search repository that respects user privacy settings
 class PrivacyAwareUserSearchRepo {
@@ -29,8 +28,8 @@ class PrivacyAwareUserSearchRepo {
   static Map likedMap = {};
   static Map disLikedMap = {};
 
-  static getAccessItems() async {
-    db.collection("Item_access").snapshots().listen((doc) {
+  static Future<void> getAccessItems() async {
+    db.collection('Item_access').snapshots().listen((doc) {
       if (doc.docs.isNotEmpty) {
         items = doc.docs[0].data();
       }
@@ -54,7 +53,7 @@ class PrivacyAwareUserSearchRepo {
   static Future<List<UserModel>> getUserList(
     UserModel currentUser,
   ) async {
-    List<String> checkedUserIds = [];
+    final List<String> checkedUserIds = [];
 
     try {
       debugPrint('🔍 Getting privacy-aware user list for: ${currentUser.id}');
@@ -85,7 +84,7 @@ class PrivacyAwareUserSearchRepo {
       // If no privacy-aware users found, fallback to traditional method
       if (userList.isEmpty) {
         debugPrint(
-            '📋 No privacy-aware users found, falling back to traditional search');
+            '📋 No privacy-aware users found, falling back to traditional search',);
         userList = await _getFallbackUsers(currentUser, checkedUserIds);
       }
 
@@ -99,14 +98,14 @@ class PrivacyAwareUserSearchRepo {
 
   /// Get users using privacy-aware public profiles
   static Future<List<UserModel>> _getPrivacyAwareUsers(
-      UserModel currentUser, List<String> checkedUserIds) async {
-    List<UserModel> userList = [];
+      UserModel currentUser, List<String> checkedUserIds,) async {
+    final List<UserModel> userList = [];
 
     try {
       // Get all users (we'll filter by privacy settings)
       final querySnapshot = await _buildPrivacyAwareQuery(currentUser).get();
       debugPrint(
-          '🔍 Privacy query returned ${querySnapshot.docs.length} documents');
+          '🔍 Privacy query returned ${querySnapshot.docs.length} documents',);
 
       for (var doc in querySnapshot.docs) {
         try {
@@ -125,7 +124,7 @@ class PrivacyAwareUserSearchRepo {
           }
 
           // Create UserModel from filtered data
-          UserModel user =
+          final UserModel user =
               await _createUserModelFromFilteredData(filteredUserData, userId);
 
           // Calculate distance if location is available
@@ -133,11 +132,11 @@ class PrivacyAwareUserSearchRepo {
               user.longitude != null &&
               currentUser.latitude != null &&
               currentUser.longitude != null) {
-            var calculatedDistance = distance.calculateDistance(
+            final calculatedDistance = distance.calculateDistance(
                 currentUser.latitude!,
                 currentUser.longitude!,
                 user.latitude!,
-                user.longitude!);
+                user.longitude!,);
             user.distanceBW = calculatedDistance.round();
 
             // Apply distance filter
@@ -147,15 +146,15 @@ class PrivacyAwareUserSearchRepo {
           }
 
           // Apply other filters
-          if (user.isBlocked == true) {
+          if (user.isBlocked ?? false) {
             continue;
           }
 
-          debugPrint("✅ Adding privacy-aware user: ${user.name}");
+          debugPrint('✅ Adding privacy-aware user: ${user.name}');
           userList.add(user);
         } catch (e) {
           debugPrint(
-              '⚠️ Error processing privacy-aware document ${doc.id}: $e');
+              '⚠️ Error processing privacy-aware document ${doc.id}: $e',);
           continue;
         }
       }
@@ -169,23 +168,23 @@ class PrivacyAwareUserSearchRepo {
 
   /// Fallback to traditional user loading (for users not yet migrated)
   static Future<List<UserModel>> _getFallbackUsers(
-      UserModel currentUser, List<String> checkedUserIds) async {
-    List<UserModel> userList = [];
+      UserModel currentUser, List<String> checkedUserIds,) async {
+    final List<UserModel> userList = [];
 
     try {
       final querySnapshot = await _buildTraditionalQuery(currentUser).get();
       debugPrint(
-          '📋 Fallback query returned ${querySnapshot.docs.length} documents');
+          '📋 Fallback query returned ${querySnapshot.docs.length} documents',);
 
       for (var doc in querySnapshot.docs) {
         try {
-          UserModel temp = UserModel.fromDocument(doc);
+          final UserModel temp = UserModel.fromDocument(doc);
 
-          var calculatedDistance = distance.calculateDistance(
+          final calculatedDistance = distance.calculateDistance(
               currentUser.latitude!,
               currentUser.longitude!,
               temp.latitude!,
-              temp.longitude!);
+              temp.longitude!,);
           temp.distanceBW = calculatedDistance.round();
 
           if (checkedUserIds.contains(temp.id)) {
@@ -195,7 +194,7 @@ class PrivacyAwareUserSearchRepo {
           if (calculatedDistance <= currentUser.maxDistance! &&
               temp.id != currentUser.id &&
               !temp.isBlocked!) {
-            debugPrint("📋 Adding fallback user: ${temp.name}");
+            debugPrint('📋 Adding fallback user: ${temp.name}');
             userList.add(temp);
           }
         } catch (e) {
@@ -234,9 +233,9 @@ class PrivacyAwareUserSearchRepo {
     if (currentUser.ageRange != null) {
       query = query
           .where('age',
-              isGreaterThanOrEqualTo: int.parse(currentUser.ageRange!['min']))
+              isGreaterThanOrEqualTo: int.parse(currentUser.ageRange!['min']),)
           .where('age',
-              isLessThanOrEqualTo: int.parse(currentUser.ageRange!['max']))
+              isLessThanOrEqualTo: int.parse(currentUser.ageRange!['max']),)
           .orderBy('age', descending: false);
     }
 
@@ -245,13 +244,11 @@ class PrivacyAwareUserSearchRepo {
 
   /// Create UserModel from privacy-filtered data (public method)
   static Future<UserModel> createUserModelFromFilteredData(
-      Map<String, dynamic> data, String userId) async {
-    return await _createUserModelFromFilteredData(data, userId);
-  }
+      Map<String, dynamic> data, String userId,) async => _createUserModelFromFilteredData(data, userId);
 
   /// Create UserModel from privacy-filtered data (private implementation)
   static Future<UserModel> _createUserModelFromFilteredData(
-      Map<String, dynamic> data, String userId) async {
+      Map<String, dynamic> data, String userId,) async {
     // Handle location data based on privacy settings
     double? latitude;
     double? longitude;
@@ -281,14 +278,14 @@ class PrivacyAwareUserSearchRepo {
       showMyAge: data['showMyAge'] ?? true,
       latitude: latitude,
       longitude: longitude,
-      imageUrl: data['photos'] ?? data['Pictures'] ?? [],
+      imageUrl: data['photos'] is List
+          ? List<String>.from((data['photos'] as List).map((e) => e?.toString() ?? '').where((url) => url.toString().isNotEmpty))
+          : data['Pictures'] is List
+              ? List<String>.from((data['Pictures'] as List).map((e) => e?.toString() ?? '').where((url) => url.toString().isNotEmpty))
+              : [],
       isBlocked: data['isBlocked'] ?? false,
       // Only include data that user has chosen to share
       sexualOrientation: data['sexualOrientation'], // Only if privacy allows
-      address: null, // Never expose exact address in discovery
-      phoneNumber: null, // Never expose phone in discovery
-      coordinates: null, // Use GeoHash instead
-      currentCoordinates: null, // Use GeoHash instead
     );
   }
 
@@ -317,7 +314,7 @@ class PrivacyAwareUserSearchRepo {
 
       debugPrint('🗺️ Searching ${nearbyGeoHashes.length} GeoHash areas');
 
-      List<UserModel> nearbyUsers = [];
+      final List<UserModel> nearbyUsers = [];
 
       // Query users in nearby GeoHash areas
       for (String geoHash in nearbyGeoHashes) {
@@ -335,7 +332,7 @@ class PrivacyAwareUserSearchRepo {
                   await _privacyService.getFilteredUserData(doc.id);
               if (filteredData != null) {
                 final user = await _createUserModelFromFilteredData(
-                    filteredData, doc.id);
+                    filteredData, doc.id,);
 
                 // Calculate actual distance
                 if (user.latitude != null && user.longitude != null) {
@@ -374,9 +371,9 @@ class PrivacyAwareUserSearchRepo {
   // Keep existing methods for compatibility
   static Future<List<String>> getLikedByList(UserModel currentUser) async {
     final snapshot =
-        await docRef.doc(currentUser.id).collection("LikedBy").get();
+        await docRef.doc(currentUser.id).collection('LikedBy').get();
 
-    List<String> likedByList = [];
+    final List<String> likedByList = [];
     for (var doc in snapshot.docs) {
       likedByList.add(doc.id);
     }
@@ -385,9 +382,9 @@ class PrivacyAwareUserSearchRepo {
 
   static Future<List<UserModel>> getMatches(UserModel currentUser) async {
     final snapshot =
-        await docRef.doc(currentUser.id).collection("Matches").get();
+        await docRef.doc(currentUser.id).collection('Matches').get();
 
-    List<UserModel> matchesList = [];
+    final List<UserModel> matchesList = [];
     for (var doc in snapshot.docs) {
       try {
         // Get privacy-filtered data for matches

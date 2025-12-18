@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/services/unified_group_service.dart';
+import '../common/constants/app_colors.dart';
+import '../services/unified_group_service.dart';
 
 /// Modal for displaying detailed group information
 class GroupInfoModal extends StatelessWidget {
-  final UnifiedGroup group;
 
   const GroupInfoModal({
-    super.key,
-    required this.group,
+    required this.group, super.key,
   });
+  final UnifiedGroup group;
 
   @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
+  Widget build(BuildContext context) => DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.5,
       maxChildSize: 0.9,
-      builder: (context, scrollController) {
-        return Container(
+      builder: (context, scrollController) => DecoratedBox(
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -39,7 +36,7 @@ class GroupInfoModal extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              
+
               // Header
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -62,7 +59,7 @@ class GroupInfoModal extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Content
               Expanded(
                 child: SingleChildScrollView(
@@ -89,13 +86,10 @@ class GroupInfoModal extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+        ),
     );
-  }
 
-  Widget _buildGroupHeader() {
-    return Row(
+  Widget _buildGroupHeader() => Row(
       children: [
         // Group avatar
         Container(
@@ -115,14 +109,15 @@ class GroupInfoModal extends StatelessWidget {
                   child: Image.network(
                     group.imageUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildDefaultAvatar(),
                   ),
                 )
               : _buildDefaultAvatar(),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Group info
         Expanded(
           child: Column(
@@ -168,18 +163,14 @@ class GroupInfoModal extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildDefaultAvatar() {
-    return Icon(
+  Widget _buildDefaultAvatar() => const Icon(
       Icons.group,
       size: 40,
       color: AppColors.primaryGreen,
     );
-  }
 
-  Widget _buildDescriptionSection() {
-    return Column(
+  Widget _buildDescriptionSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -210,10 +201,8 @@ class GroupInfoModal extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildDetailsSection() {
-    return Column(
+  Widget _buildDetailsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -244,14 +233,12 @@ class GroupInfoModal extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildDetailRow({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(
           icon,
@@ -283,7 +270,6 @@ class GroupInfoModal extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildTagsSection() {
     if (group.tags.isEmpty) return const SizedBox.shrink();
@@ -303,8 +289,7 @@ class GroupInfoModal extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: group.tags.map((tag) {
-            return Container(
+          children: group.tags.map((tag) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: AppColors.primaryGreen.withOpacity(0.1),
@@ -321,15 +306,13 @@ class GroupInfoModal extends StatelessWidget {
                   color: AppColors.primaryGreen,
                 ),
               ),
-            );
-          }).toList(),
+            ),).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildSettingsSection() {
-    return Column(
+  Widget _buildSettingsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -356,15 +339,13 @@ class GroupInfoModal extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildSettingRow({
     required IconData icon,
     required String label,
     required String value,
     required Color valueColor,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(
           icon,
@@ -391,10 +372,8 @@ class GroupInfoModal extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildStatsSection() {
-    return Column(
+  Widget _buildStatsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -429,15 +408,13 @@ class GroupInfoModal extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildStatCard({
     required IconData icon,
     required String label,
     required String value,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -470,7 +447,6 @@ class GroupInfoModal extends StatelessWidget {
         ],
       ),
     );
-  }
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();

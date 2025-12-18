@@ -139,10 +139,10 @@ class MatchService {
   ];
 
   /// Get personalized matches based on user preferences
-  /// 
+  ///
   /// [controller] - The onboarding controller containing user preferences
   /// [limit] - Maximum number of matches to return (default: 5)
-  /// 
+  ///
   /// Returns a list of MatchedUser objects sorted by compatibility
   static List<MatchedUser> getPersonalizedMatches(
     OnboardingController controller, {
@@ -157,7 +157,7 @@ class MatchService {
     final List<MatchedUser> filteredMatches = List.from(_allPotentialMatches);
 
     // Apply filters based on user preferences
-    if (controller.tribe != null && controller.tribe!.isNotEmpty) {
+    if (controller.tribe.isNotEmpty) {
       // Prioritize matches from the same tribe but don't exclude others
       filteredMatches.sort((a, b) {
         if (a.tribe == controller.tribe && b.tribe != controller.tribe) {
@@ -216,11 +216,11 @@ class MatchService {
   }
 
   /// Get matches based on specific criteria (for Friendship/Networking tabs)
-  /// 
+  ///
   /// [category] - The category to filter by (nearby, same_tribe, shared_interests)
   /// [controller] - The onboarding controller containing user preferences
   /// [limit] - Maximum number of matches to return (default: 5)
-  /// 
+  ///
   /// Returns a list of MatchedUser objects filtered by the specified category
   static List<MatchedUser> getMatchesByCategory(
     String category,
@@ -251,7 +251,7 @@ class MatchService {
 
       case 'same_tribe':
         // Get matches from the same tribe
-        if (controller.tribe != null && controller.tribe!.isNotEmpty) {
+        if (controller.tribe.isNotEmpty) {
           matches = _allPotentialMatches
               .where((match) => match.tribe == controller.tribe)
               .toList();
@@ -290,16 +290,14 @@ class MatchService {
   }
 
   /// Get all available match categories
-  static List<String> getAvailableCategories() {
-    return ['nearby', 'same_tribe', 'shared_interests'];
-  }
+  static List<String> getAvailableCategories() => ['nearby', 'same_tribe', 'shared_interests'];
 
   /// Calculate match compatibility score between two users
   static double calculateMatchScore(
     MatchedUser user1,
     MatchedUser user2,
   ) {
-    double score = 0.0;
+    double score = 0;
     int factors = 0;
 
     // Location compatibility (30% weight)
@@ -342,14 +340,14 @@ class MatchService {
     final totalMatches = _allPotentialMatches.length;
     final tribes = _allPotentialMatches.map((m) => m.tribe).toSet();
     final locations = _allPotentialMatches.map((m) => m.location).toSet();
-    
+
     return {
       'totalMatches': totalMatches,
       'uniqueTribes': tribes.length,
       'uniqueLocations': locations.length,
-      'averageAge': _allPotentialMatches
-          .map((m) => m.age)
-          .reduce((a, b) => a + b) / totalMatches,
+      'averageAge':
+          _allPotentialMatches.map((m) => m.age).reduce((a, b) => a + b) /
+              totalMatches,
     };
   }
 }

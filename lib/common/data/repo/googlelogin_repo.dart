@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../constants/constants.dart';
+import '../../utils/app_logger.dart';
 
 abstract class GoogleLoginRepository {
   Future<User?> signInWithGoogle();
@@ -44,7 +45,7 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
       // Return the user
       return userCredential.user;
     } catch (e) {
-      print('Google Sign-In Error: $e');
+      AppLogger.error('Google Sign-In Error', error: e);
       // Handle specific errors if needed
       if (e is FirebaseAuthException) {
         if (e.code == 'account-exists-with-different-credential') {

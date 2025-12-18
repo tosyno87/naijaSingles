@@ -13,7 +13,7 @@ class UserRepo {
     // log('editinfo-----------$editInfo');
     try {
       await firebaseFireStoreInstance
-          .collection("users")
+          .collection('users')
           .doc(userId)
           .set({'editInfo': editInfo}, SetOptions(merge: true));
       log('User data updated successfully');
@@ -27,7 +27,7 @@ class UserRepo {
     log('filterinfo-----------$changeValues');
     try {
       await firebaseFireStoreInstance
-          .collection("users")
+          .collection('users')
           .doc(userId)
           .set(changeValues, SetOptions(merge: true));
       log('User filter updated successfully');
@@ -39,8 +39,8 @@ class UserRepo {
 
 // For unmatch user after match
   static Future unmatchUser(UserModel currentUser, String userId) async {
-    var collectionRefrence = firebaseFireStoreInstance.collection("users");
-    var chatCollection = firebaseFireStoreInstance.collection("chats");
+    final collectionRefrence = firebaseFireStoreInstance.collection('users');
+    final chatCollection = firebaseFireStoreInstance.collection('chats');
     await collectionRefrence
         .doc(currentUser.id)
         .collection('CheckedUser')
@@ -89,7 +89,7 @@ class UserRepo {
     log('filterinfo-----------$userIds');
     try {
       // Create a reference to the user's document in Firestore.
-      DocumentReference userDocRef =
+      final DocumentReference userDocRef =
           firebaseFireStoreInstance.collection('users').doc(userId);
       await userDocRef.update({
         'streetView': {
@@ -106,17 +106,17 @@ class UserRepo {
 
   static Future<Map<String, dynamic>> getStreetViewData(String userId) async {
     try {
-      User? user = firebaseAuthInstance.currentUser;
+      final User? user = firebaseAuthInstance.currentUser;
       if (user != null) {
-        DocumentSnapshot userSnapshot = await firebaseFireStoreInstance
+        final DocumentSnapshot userSnapshot = await firebaseFireStoreInstance
             .collection('users')
             .doc(userId)
             .get();
-        Map<String, dynamic>? userData =
+        final Map<String, dynamic>? userData =
             userSnapshot.data() as Map<String, dynamic>?;
 
         if (userData != null && userData.containsKey('streetView')) {
-          Map<String, dynamic> streetViewMap = userData['streetView'];
+          final Map<String, dynamic> streetViewMap = userData['streetView'];
 
           return {
             'option': streetViewMap['option'] ?? 'None',

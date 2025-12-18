@@ -1,8 +1,8 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/colors.dart';
@@ -11,7 +11,7 @@ import '../providers/theme_provider.dart';
 import '../routes/route_name.dart';
 
 class LanguageSelectionDropdown extends StatefulWidget {
-  const LanguageSelectionDropdown({Key? key}) : super(key: key);
+  const LanguageSelectionDropdown({super.key});
 
   @override
   State<LanguageSelectionDropdown> createState() =>
@@ -58,11 +58,11 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Padding(
-      padding: const EdgeInsets.only(left: 25.0, right: 25),
+      padding: const EdgeInsets.only(left: 25, right: 25),
       child: Card(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
+          borderRadius: BorderRadius.circular(5),
           side: BorderSide(
             color: AppColors.secondaryColor
                 .withValues(alpha: (0.2 * 255).toDouble()),
@@ -89,9 +89,9 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
 
             final List<String> languages = data.keys
                 .where((key) => data[key] == true)
-                .map((language) => capitalizeFirstLetter(language))
+                .map(capitalizeFirstLetter)
                 .toList();
-            log("languages is $languages");
+            log('languages is $languages');
 
             // Set initial selectedLanguage to the first language in the list
             if (selectedLanguage.isEmpty && languages.isNotEmpty) {
@@ -107,13 +107,12 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
             try {
               return Padding(
                 padding: const EdgeInsets.only(
-                    left: 15.0, right: 15.0, top: 5, bottom: 5),
+                    left: 15, right: 15, top: 5, bottom: 5,),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Change Language".tr().toString(),
+                      'Change Language'.tr().toString(),
                       style: TextStyle(
                         fontSize: 16,
                         color: themeProvider.isDarkMode
@@ -125,7 +124,6 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                     DropdownButton<String>(
                       iconDisabledColor: primaryColor,
                       iconEnabledColor: primaryColor,
-                      iconSize: 24,
                       icon: const Icon(Icons.keyboard_arrow_down_outlined),
                       value: selectedLanguage,
                       hint: const Text('Select a language'),
@@ -179,8 +177,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                             break;
                         }
                       },
-                      items: languages.map((language) {
-                        return DropdownMenuItem<String>(
+                      items: languages.map((language) => DropdownMenuItem<String>(
                           value: language,
                           child: Text(
                             language.tr().toString(),
@@ -189,10 +186,9 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                                     ? Colors.white70
                                     : Colors.pink,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500),
+                                fontWeight: FontWeight.w500,),
                           ),
-                        );
-                      }).toList(),
+                        ),).toList(),
                     ),
                   ],
                 ),
@@ -200,9 +196,9 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
             } catch (e) {
               return Center(
                   child: Text(
-                "Unable to load".tr().toString(),
-                style: TextStyle(color: primaryColor),
-              ));
+                'Unable to load'.tr().toString(),
+                style: const TextStyle(color: primaryColor),
+              ),);
             }
           },
         ),
@@ -213,5 +209,5 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
 
 void _refreshPage(BuildContext context, {required String lCode, cCode}) {
   EasyLocalization.of(context)!.setLocale(Locale(lCode, cCode));
-  Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+  Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
 }

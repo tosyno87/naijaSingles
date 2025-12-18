@@ -4,14 +4,12 @@ import '../bloc/events_bloc.dart';
 import 'advanced_search_dialog.dart';
 
 class EventFilterBar extends StatefulWidget {
-  final EventFilter currentFilter;
-  final Function(EventFilter) onFilterChanged;
 
   const EventFilterBar({
-    Key? key,
-    required this.currentFilter,
-    required this.onFilterChanged,
-  }) : super(key: key);
+    required this.currentFilter, required this.onFilterChanged, super.key,
+  });
+  final EventFilter currentFilter;
+  final Function(EventFilter) onFilterChanged;
 
   @override
   State<EventFilterBar> createState() => _EventFilterBarState();
@@ -19,7 +17,7 @@ class EventFilterBar extends StatefulWidget {
 
 class _EventFilterBarState extends State<EventFilterBar> {
   final ScrollController _scrollController = ScrollController();
-  
+
   static const List<String> categories = [
     'All',
     'Music',
@@ -47,8 +45,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       height: 160,
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
@@ -61,10 +58,8 @@ class _EventFilterBarState extends State<EventFilterBar> {
         ],
       ),
     );
-  }
 
-  Widget _buildCategoryFilters() {
-    return SizedBox(
+  Widget _buildCategoryFilters() => SizedBox(
       height: 40,
       child: ListView.builder(
         controller: _scrollController,
@@ -73,12 +68,14 @@ class _EventFilterBarState extends State<EventFilterBar> {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          final isSelected = category == 'All' 
+          final isSelected = category == 'All'
               ? widget.currentFilter.category == null
-              : widget.currentFilter.category?.toLowerCase() == category.toLowerCase();
-          
+              : widget.currentFilter.category?.toLowerCase() ==
+                  category.toLowerCase();
+
           return Padding(
-            padding: EdgeInsets.only(right: index == categories.length - 1 ? 0 : 12),
+            padding:
+                EdgeInsets.only(right: index == categories.length - 1 ? 0 : 12),
             child: _buildFilterChip(
               label: category,
               isSelected: isSelected,
@@ -88,10 +85,8 @@ class _EventFilterBarState extends State<EventFilterBar> {
         },
       ),
     );
-  }
 
-  Widget _buildTimeFilters() {
-    return SizedBox(
+  Widget _buildTimeFilters() => SizedBox(
       height: 36,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -100,9 +95,10 @@ class _EventFilterBarState extends State<EventFilterBar> {
         itemBuilder: (context, index) {
           final timeFilter = timeFilters[index];
           final isSelected = _isTimeFilterSelected(timeFilter);
-          
+
           return Padding(
-            padding: EdgeInsets.only(right: index == timeFilters.length - 1 ? 0 : 8),
+            padding:
+                EdgeInsets.only(right: index == timeFilters.length - 1 ? 0 : 8),
             child: _buildTimeFilterChip(
               label: timeFilter,
               isSelected: isSelected,
@@ -112,71 +108,62 @@ class _EventFilterBarState extends State<EventFilterBar> {
         },
       ),
     );
-  }
 
   Widget _buildFilterChip({
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? const Color(0xFF008037)
-              : Colors.white,
+          color: isSelected ? const Color(0xFF008037) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected 
-                ? const Color(0xFF008037)
-                : const Color(0xFFE0E0E0),
+            color:
+                isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
             width: 1.5,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: const Color(0xFF008037).withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ] : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF008037).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Text(
           label,
           style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: isSelected 
-                ? Colors.white
-                : const Color(0xFF666666),
+            color: isSelected ? Colors.white : const Color(0xFF666666),
           ),
         ),
       ),
     );
-  }
 
   Widget _buildTimeFilterChip({
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected 
+          color: isSelected
               ? const Color(0xFF008037).withOpacity(0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected 
-                ? const Color(0xFF008037)
-                : const Color(0xFFE0E0E0),
-            width: 1,
+            color:
+                isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
           ),
         ),
         child: Row(
@@ -186,7 +173,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
               Icon(
                 Icons.money_off,
                 size: 16,
-                color: isSelected 
+                color: isSelected
                     ? const Color(0xFF008037)
                     : const Color(0xFF666666),
               ),
@@ -196,7 +183,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: isSelected 
+                color: isSelected
                     ? const Color(0xFF008037)
                     : const Color(0xFF666666),
               ),
@@ -205,7 +192,6 @@ class _EventFilterBarState extends State<EventFilterBar> {
         ),
       ),
     );
-  }
 
   void _onCategorySelected(String category) {
     final newFilter = widget.currentFilter.copyWith(
@@ -216,19 +202,18 @@ class _EventFilterBarState extends State<EventFilterBar> {
 
   void _onTimeFilterSelected(String timeFilter) {
     EventFilter newFilter;
-    
+
     switch (timeFilter) {
       case 'All Time':
         newFilter = widget.currentFilter.copyWith(
-          startDate: null,
-          endDate: null,
           freeOnly: false,
         );
         break;
       case 'Today':
         final today = DateTime.now();
         final startOfDay = DateTime(today.year, today.month, today.day);
-        final endOfDay = DateTime(today.year, today.month, today.day, 23, 59, 59);
+        final endOfDay =
+            DateTime(today.year, today.month, today.day, 23, 59, 59);
         newFilter = widget.currentFilter.copyWith(
           startDate: startOfDay,
           endDate: endOfDay,
@@ -238,16 +223,18 @@ class _EventFilterBarState extends State<EventFilterBar> {
       case 'This Week':
         final now = DateTime.now();
         final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-        final endOfWeek = startOfWeek.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+        final endOfWeek = startOfWeek
+            .add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
         newFilter = widget.currentFilter.copyWith(
-          startDate: DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day),
+          startDate:
+              DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day),
           endDate: endOfWeek,
           freeOnly: false,
         );
         break;
       case 'This Month':
         final now = DateTime.now();
-        final startOfMonth = DateTime(now.year, now.month, 1);
+        final startOfMonth = DateTime(now.year, now.month);
         final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
         newFilter = widget.currentFilter.copyWith(
           startDate: startOfMonth,
@@ -263,38 +250,38 @@ class _EventFilterBarState extends State<EventFilterBar> {
       default:
         return;
     }
-    
+
     widget.onFilterChanged(newFilter);
   }
 
   bool _isTimeFilterSelected(String timeFilter) {
     switch (timeFilter) {
       case 'All Time':
-        return widget.currentFilter.startDate == null && 
-               widget.currentFilter.endDate == null && 
-               !widget.currentFilter.freeOnly;
+        return widget.currentFilter.startDate == null &&
+            widget.currentFilter.endDate == null &&
+            !widget.currentFilter.freeOnly;
       case 'Today':
         if (widget.currentFilter.startDate == null) return false;
         final today = DateTime.now();
         final filterDate = widget.currentFilter.startDate!;
         return filterDate.year == today.year &&
-               filterDate.month == today.month &&
-               filterDate.day == today.day;
+            filterDate.month == today.month &&
+            filterDate.day == today.day;
       case 'This Week':
         if (widget.currentFilter.startDate == null) return false;
         final now = DateTime.now();
         final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
         final filterDate = widget.currentFilter.startDate!;
         return filterDate.year == startOfWeek.year &&
-               filterDate.month == startOfWeek.month &&
-               filterDate.day == startOfWeek.day;
+            filterDate.month == startOfWeek.month &&
+            filterDate.day == startOfWeek.day;
       case 'This Month':
         if (widget.currentFilter.startDate == null) return false;
         final now = DateTime.now();
         final filterDate = widget.currentFilter.startDate!;
         return filterDate.year == now.year &&
-               filterDate.month == now.month &&
-               filterDate.day == 1;
+            filterDate.month == now.month &&
+            filterDate.day == 1;
       case 'Free Only':
         return widget.currentFilter.freeOnly;
       default:
@@ -302,8 +289,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
     }
   }
 
-  Widget _buildAdvancedSearchButton() {
-    return Container(
+  Widget _buildAdvancedSearchButton() => Container(
       height: 32,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -315,7 +301,8 @@ class _EventFilterBarState extends State<EventFilterBar> {
                 widget.onFilterChanged(const EventFilter());
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFF008037).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
@@ -324,10 +311,10 @@ class _EventFilterBarState extends State<EventFilterBar> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.clear,
                       size: 14,
-                      color: const Color(0xFF008037),
+                      color: Color(0xFF008037),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -363,7 +350,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.tune,
                     size: 14,
                     color: Colors.white,
@@ -384,19 +371,16 @@ class _EventFilterBarState extends State<EventFilterBar> {
         ],
       ),
     );
-  }
 }
 
 // Custom filter dialog for advanced filtering
 class AdvancedFilterDialog extends StatefulWidget {
-  final EventFilter currentFilter;
-  final Function(EventFilter) onApplyFilter;
 
   const AdvancedFilterDialog({
-    Key? key,
-    required this.currentFilter,
-    required this.onApplyFilter,
-  }) : super(key: key);
+    required this.currentFilter, required this.onApplyFilter, super.key,
+  });
+  final EventFilter currentFilter;
+  final Function(EventFilter) onApplyFilter;
 
   @override
   State<AdvancedFilterDialog> createState() => _AdvancedFilterDialogState();
@@ -420,8 +404,7 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
+  Widget build(BuildContext context) => Dialog(
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -452,10 +435,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
         ),
       ),
     );
-  }
 
-  Widget _buildLocationFilter() {
-    return Column(
+  Widget _buildLocationFilter() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -491,10 +472,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
         ),
       ],
     );
-  }
 
-  Widget _buildDateRangeFilter() {
-    return Column(
+  Widget _buildDateRangeFilter() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -512,7 +491,7 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
               child: _buildDateButton(
                 label: 'Start Date',
                 date: _tempFilter.startDate,
-                onTap: () => _selectStartDate(),
+                onTap: _selectStartDate,
               ),
             ),
             const SizedBox(width: 12),
@@ -520,21 +499,19 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
               child: _buildDateButton(
                 label: 'End Date',
                 date: _tempFilter.endDate,
-                onTap: () => _selectEndDate(),
+                onTap: _selectEndDate,
               ),
             ),
           ],
         ),
       ],
     );
-  }
 
   Widget _buildDateButton({
     required String label,
     required DateTime? date,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -554,12 +531,12 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              date != null 
+              date != null
                   ? '${date.day}/${date.month}/${date.year}'
                   : 'Select date',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: date != null 
+                color: date != null
                     ? const Color(0xFF333333)
                     : const Color(0xFF999999),
               ),
@@ -568,10 +545,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
         ),
       ),
     );
-  }
 
-  Widget _buildFreeOnlyFilter() {
-    return Row(
+  Widget _buildFreeOnlyFilter() => Row(
       children: [
         Checkbox(
           value: _tempFilter.freeOnly,
@@ -591,10 +566,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
         ),
       ],
     );
-  }
 
-  Widget _buildActionButtons() {
-    return Row(
+  Widget _buildActionButtons() => Row(
       children: [
         Expanded(
           child: TextButton(
@@ -640,7 +613,6 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
         ),
       ],
     );
-  }
 
   Future<void> _selectStartDate() async {
     final date = await showDatePicker(
@@ -648,18 +620,16 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
       initialDate: _tempFilter.startDate ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF008037),
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
-    
+
     if (date != null) {
       setState(() {
         _tempFilter = _tempFilter.copyWith(startDate: date);
@@ -670,21 +640,20 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
   Future<void> _selectEndDate() async {
     final date = await showDatePicker(
       context: context,
-      initialDate: _tempFilter.endDate ?? DateTime.now().add(const Duration(days: 7)),
+      initialDate:
+          _tempFilter.endDate ?? DateTime.now().add(const Duration(days: 7)),
       firstDate: _tempFilter.startDate ?? DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF008037),
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
-    
+
     if (date != null) {
       setState(() {
         _tempFilter = _tempFilter.copyWith(endDate: date);

@@ -13,13 +13,11 @@ class BlockByAdmin extends StatefulWidget {
 
 class _BlockByAdminState extends State<BlockByAdmin> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
@@ -35,19 +33,19 @@ class _BlockByAdminState extends State<BlockByAdmin> {
                         height: 50,
                         width: 100,
                         child: Image.asset(
-                          "asset/hookup4u-Logo-BP.png",
+                          'asset/hookup4u-Logo-BP.png',
                           fit: BoxFit.contain,
-                        )),
+                        ),),
                   ),
                   const SizedBox(height: 20),
-                  Icon(
+                  const Icon(
                     Icons.lock_outlined,
                     size: 80,
                     color: primaryColor,
                   ),
                   Text(
-                    "Oops".tr().toString(),
-                    style: TextStyle(
+                    'Oops'.tr().toString(),
+                    style: const TextStyle(
                       color: primaryColor,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -59,7 +57,7 @@ class _BlockByAdminState extends State<BlockByAdmin> {
             const SizedBox(height: 20),
             Text(
               "Sorry, you can't access the application!".tr().toString(),
-              style: TextStyle(color: primaryColor, fontSize: 22),
+              style: const TextStyle(color: primaryColor, fontSize: 22),
             ),
             const SizedBox(height: 12),
             Text(
@@ -74,7 +72,7 @@ class _BlockByAdminState extends State<BlockByAdmin> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "For more info,mail".tr().toString(),
+                  'For more info,mail'.tr().toString(),
                   style: const TextStyle(fontSize: 16),
                 ),
                 TextButton(
@@ -92,5 +90,4 @@ class _BlockByAdminState extends State<BlockByAdmin> {
         ),
       ),
     );
-  }
 }

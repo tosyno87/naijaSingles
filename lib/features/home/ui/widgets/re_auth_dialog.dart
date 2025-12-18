@@ -3,24 +3,23 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
-import 'package:naijasingles/common/providers/theme_provider.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/constants/colors.dart';
+import '../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/providers/user_provider.dart';
+import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
+
 class ReAuthDialog extends StatefulWidget {
-  final String verificationId;
-  final FirebaseAuth auth;
 
   const ReAuthDialog({
-    super.key,
-    required this.verificationId,
-    required this.auth,
+    required this.verificationId, required this.auth, super.key,
   });
+  final String verificationId;
+  final FirebaseAuth auth;
 
   @override
   State<ReAuthDialog> createState() => _ReAuthDialogState();
@@ -36,28 +35,27 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
       titlePadding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
       title: RichText(
         text: TextSpan(
-            text: "Enter the code sent to ".tr().toString(),
+            text: 'Enter the code sent to '.tr().toString(),
             children: [
               TextSpan(
                   text: widget.auth.currentUser?.phoneNumber,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: primaryColor,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.bold,
                       textBaseline: TextBaseline.alphabetic,
-                      fontSize: 15)),
+                      fontSize: 15,),),
             ],
             style: TextStyle(
                 fontFamily: 'Gellix',
                 color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
-                fontSize: 18)),
+                fontSize: 18,),),
         textAlign: TextAlign.center,
       ),
       content: PinCodeTextField(
         controller: otpController,
         keyboardType: TextInputType.number,
         length: 6,
-        obscureText: false,
         animationType: AnimationType.fade,
         pinTheme: PinTheme(
             shape: PinCodeFieldShape.box,
@@ -69,7 +67,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
             selectedColor: Colors.green,
             selectedFillColor: Colors.white,
             activeFillColor: Colors.white,
-            activeColor: Colors.green),
+            activeColor: Colors.green,),
         //shape: PinCodeFieldShape.underline,
         animationDuration: const Duration(milliseconds: 300),
         //fieldHeight: 50,
@@ -84,14 +82,14 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
           onPressed: () async {
             Navigator.pop(context);
           },
-          child: Text(
+          child: const Text(
             'Cancel',
             style: TextStyle(color: primaryColor),
           ),
         ),
         TextButton(
           onPressed: () async {
-            String otp = otpController.text.trim();
+            final String otp = otpController.text.trim();
             if (otp.isNotEmpty) {
               // Call your reauthentication method here
               // For demonstration purpose, I'm just printing the OTP
@@ -100,17 +98,17 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
                   context: context,
                   auth: widget.auth,
                   verificationId: widget.verificationId,
-                  verificationCode: otp);
+                  verificationCode: otp,);
             } else {
               CustomSnackbar.showSnackBarSimple(
-                "otp can not empty".tr().toString(),
+                'otp can not empty'.tr().toString(),
                 context,
               );
             }
           },
           child: Text(
             'Submit'.tr().toString(),
-            style: TextStyle(color: primaryColor),
+            style: const TextStyle(color: primaryColor),
           ),
         ),
       ],
@@ -127,7 +125,7 @@ Future<void> reauthenticateWithPhone({
   required String verificationCode,
 }) async {
   try {
-    AuthCredential credential = PhoneAuthProvider.credential(
+    final AuthCredential credential = PhoneAuthProvider.credential(
       verificationId: verificationId,
       smsCode: verificationCode,
     );
@@ -142,7 +140,7 @@ Future<void> reauthenticateWithPhone({
     log('Error re-authenticating user: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(
-        "Something Went Wrong".tr().toString(),
+        'Something Went Wrong'.tr().toString(),
         context,
       );
     }
@@ -165,12 +163,15 @@ Future<void> deleteUserAndNavigateToLogin(
     if (context.mounted) {
       // Show success message
       CustomSnackbar.showSnackBarSimple(
-        "Account deleted Successfully".tr().toString(),
+        'Account deleted Successfully'.tr().toString(),
         context,
       );
-      // Navigate to login screen
-      Navigator.pushReplacementNamed(context, RouteName.loginScreen)
-          .then((value) {
+      // Navigate to welcome screen to show all sign-in options
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteName.welcomeScreen,
+        (route) => false,
+      ).then((value) {
         // Update user provider
         Provider.of<UserProvider>(context, listen: false).currentUser = null;
       });
@@ -179,7 +180,7 @@ Future<void> deleteUserAndNavigateToLogin(
     log('Error deleting user account: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(
-        "Something Went Wrong".tr().toString(),
+        'Something Went Wrong'.tr().toString(),
         context,
       );
     }

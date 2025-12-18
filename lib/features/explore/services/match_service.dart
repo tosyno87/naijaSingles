@@ -32,7 +32,7 @@ class MatchService {
 
   // Create a message thread between matched users
   Future<String> createMessageThread(
-      String currentUserId, String matchedUserId) async {
+      String currentUserId, String matchedUserId,) async {
     // Create a unique thread ID by combining both user IDs (sorted to ensure consistency)
     final List<String> userIds = [currentUserId, matchedUserId];
     userIds

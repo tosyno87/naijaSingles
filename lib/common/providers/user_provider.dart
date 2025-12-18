@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/user_model.dart';
 import '../constants/constants.dart';
+import '../utils/app_logger.dart';
 
 class UserProvider extends ChangeNotifier {
   UserProvider() {
@@ -14,7 +15,7 @@ class UserProvider extends ChangeNotifier {
   }
   final FirebaseAuth _auth = firebaseAuthInstance;
   final CollectionReference _userCollection =
-      firebaseFireStoreInstance.collection("users");
+      firebaseFireStoreInstance.collection('users');
 
   UserModel? _currentUser;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
@@ -29,6 +30,10 @@ class UserProvider extends ChangeNotifier {
   // for listining all details of user
 
   Future<void> listenCurrentUserdetails() async {
+    // Cancel any existing subscription before starting a new one
+    _userSubscription?.cancel();
+    _userSubscription = null;
+    
     final user = _auth.currentUser;
     if (user != null) {
       try {
@@ -41,22 +46,28 @@ class UserProvider extends ChangeNotifier {
               currentUser = userData;
               notifyListeners();
             } else {
-              print("User document does not exist for UID: ${user.uid}");
+              AppLogger.warning('User document does not exist for UID: ${user.uid}');
               currentUser = null;
               notifyListeners();
             }
           } catch (e) {
-            print("Error parsing user document: $e");
+            AppLogger.error('Error parsing user document', error: e);
             // Don't set currentUser to null here, keep existing data
           }
         }, onError: (error) {
-          print("Error listening to user details: $error");
-        });
+          // Only log errors if user is still authenticated
+          // Permission errors when user is logged out are expected
+          if (_auth.currentUser != null) {
+            AppLogger.error('Error listening to user details', error: error);
+          }
+        },);
       } catch (e) {
-        print("Exception in listenCurrentUserdetails: $e");
+        AppLogger.error('Exception in listenCurrentUserdetails', error: e);
       }
     } else {
-      print("No authenticated user found");
+      // User is not authenticated - ensure user data is cleared
+      currentUser = null;
+      AppLogger.debug('No authenticated user found');
     }
   }
 
@@ -64,10 +75,13 @@ class UserProvider extends ChangeNotifier {
   void listenAuthChanges() {
     authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
+        // User logged in - start listening to user details
         listenCurrentUserdetails();
       } else {
-        // User is logged out
-        // Handle this case as needed
+        // User is logged out - cancel any active subscriptions and clear user data
+        _userSubscription?.cancel();
+        _userSubscription = null;
+        currentUser = null;
       }
     });
   }
@@ -75,6 +89,9 @@ class UserProvider extends ChangeNotifier {
 // you can cancel listen to user if requieed
   void cancelCurrentUserSubscription() {
     _userSubscription?.cancel();
-    authStateSubscription!.cancel();
+    _userSubscription = null;
+    authStateSubscription?.cancel();
+    authStateSubscription = null;
+    currentUser = null;
   }
 }

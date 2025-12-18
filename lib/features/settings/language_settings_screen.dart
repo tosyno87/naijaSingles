@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer';
 
 class LanguageSettingsScreen extends StatefulWidget {
-  const LanguageSettingsScreen({Key? key}) : super(key: key);
+  const LanguageSettingsScreen({super.key});
 
   @override
   State<LanguageSettingsScreen> createState() => _LanguageSettingsScreenState();
@@ -79,7 +80,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final savedLanguage = prefs.getString('selected_language') ?? 'en';
-      
+
       setState(() {
         _selectedLanguage = savedLanguage;
         _isLoading = false;
@@ -111,7 +112,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
 
       // Show success message
       if (mounted) {
-        final language = _languages.firstWhere((lang) => lang['code'] == languageCode);
+        final language =
+            _languages.firstWhere((lang) => lang['code'] == languageCode);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -130,11 +132,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       // Note: In a full implementation, you would trigger app-wide language change here
       // For now, we'll show a restart dialog
       _showRestartDialog();
-
     } catch (e) {
       log('Error changing language: $e');
       setState(() => _isSaving = false);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -171,7 +172,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 color: primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.language, color: primaryColor, size: 30),
+              child: const Icon(Icons.language, color: primaryColor, size: 30),
             ),
             const SizedBox(height: 16),
             Text(
@@ -204,12 +205,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: primaryColor.withOpacity(0.2),
-                  width: 1,
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: primaryColor, size: 20),
+                  const Icon(Icons.info_outline, color: primaryColor, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -256,14 +256,13 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -286,29 +285,27 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   // Header Section
                   _buildHeaderSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Available Languages
                   _buildAvailableLanguagesSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Coming Soon Languages
                   _buildComingSoonLanguagesSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Language Info
                   _buildLanguageInfoSection(),
                 ],
               ),
             ),
     );
-  }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             color: primaryColor,
             strokeWidth: 3,
           ),
@@ -323,10 +320,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildHeaderSection() {
-    return Container(
+  Widget _buildHeaderSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -348,7 +343,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               color: primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.language,
               size: 40,
               color: primaryColor,
@@ -366,7 +361,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Select your preferred language for the NaijaSingles app. We support multiple Nigerian languages to make your experience more comfortable.',
+            'Select your preferred language for the Afropeep app. We support multiple Nigerian languages to make your experience more comfortable.',
             style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textSecondary,
@@ -377,11 +372,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildAvailableLanguagesSection() {
-    final availableLanguages = _languages.where((lang) => lang['isAvailable'] == true).toList();
-    
+    final availableLanguages =
+        _languages.where((lang) => lang['isAvailable'] == true).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -394,16 +389,19 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ...availableLanguages.map((language) => _buildLanguageCard(language, true)).toList(),
+        ...availableLanguages
+            .map((language) => _buildLanguageCard(language, true))
+            ,
       ],
     );
   }
 
   Widget _buildComingSoonLanguagesSection() {
-    final comingSoonLanguages = _languages.where((lang) => lang['isAvailable'] == false).toList();
-    
+    final comingSoonLanguages =
+        _languages.where((lang) => lang['isAvailable'] == false).toList();
+
     if (comingSoonLanguages.isEmpty) return const SizedBox.shrink();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -416,14 +414,16 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ...comingSoonLanguages.map((language) => _buildLanguageCard(language, false)).toList(),
+        ...comingSoonLanguages
+            .map((language) => _buildLanguageCard(language, false))
+            ,
       ],
     );
   }
 
   Widget _buildLanguageCard(Map<String, dynamic> language, bool isAvailable) {
     final isSelected = _selectedLanguage == language['code'];
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -455,7 +455,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isAvailable ? Colors.transparent : Colors.grey.shade100,
+                    color:
+                        isAvailable ? Colors.transparent : Colors.grey.shade100,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -469,7 +470,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                
+
                 // Language Info
                 Expanded(
                   child: Column(
@@ -494,7 +495,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       if (!isAvailable) ...[
                         const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4,),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -512,11 +514,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                     ],
                   ),
                 ),
-                
+
                 // Selection Indicator
                 if (isAvailable) ...[
                   if (_isSaving && isSelected)
-                    SizedBox(
+                    const SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
@@ -528,11 +530,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                     Container(
                       width: 24,
                       height: 24,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: primaryColor,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.check,
                         color: Colors.white,
                         size: 16,
@@ -543,7 +545,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300, width: 2),
+                        border:
+                            Border.all(color: Colors.grey.shade300, width: 2),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -556,8 +559,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     );
   }
 
-  Widget _buildLanguageInfoSection() {
-    return Container(
+  Widget _buildLanguageInfoSection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
@@ -569,7 +571,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: primaryColor, size: 20),
+              const Icon(Icons.info_outline, color: primaryColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Language Support',
@@ -582,17 +584,18 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildInfoItem('🇳🇬 Nigerian languages are prioritized for local users'),
-          _buildInfoItem('🔄 App restart may be required for full language change'),
-          _buildInfoItem('📱 More languages will be added based on user demand'),
+          _buildInfoItem(
+              '🇳🇬 Nigerian languages are prioritized for local users',),
+          _buildInfoItem(
+              '🔄 App restart may be required for full language change',),
+          _buildInfoItem(
+              '📱 More languages will be added based on user demand',),
           _buildInfoItem('🌍 Help us translate by sending feedback'),
         ],
       ),
     );
-  }
 
-  Widget _buildInfoItem(String text) {
-    return Padding(
+  Widget _buildInfoItem(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         text,
@@ -603,5 +606,4 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ),
       ),
     );
-  }
 }

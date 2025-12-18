@@ -12,38 +12,33 @@ import '../../../home/bloc/searchuser_bloc.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 
 class UnMatcheWidget extends StatelessWidget {
+  const UnMatcheWidget(
+      {required this.currentUser, required this.user, required this.fromChatPage, super.key,});
   final UserModel currentUser;
   final UserModel user;
   final bool fromChatPage;
-  const UnMatcheWidget(
-      {super.key,
-      required this.currentUser,
-      required this.user,
-      required this.fromChatPage});
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
+  Widget build(BuildContext context) => InkWell(
       onTap: () => showDialog(
         context: context,
-        builder: (BuildContext ctx) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
+        builder: (BuildContext ctx) => ClipRRect(
+            borderRadius: BorderRadius.circular(10),
             child: AlertDialog(
               title: Text(
                 'Unmatch'.tr().toString(),
-                style: TextStyle(fontSize: 18, color: primaryColor),
+                style: const TextStyle(fontSize: 18, color: primaryColor),
               ),
               content: Text(
-                  "Do you want to unmatch with"
-                      .tr(args: ["${user.name}".toString()]).toString(),
-                  style: const TextStyle(fontSize: 16)),
+                  'Do you want to unmatch with'
+                      .tr(args: ['${user.name}'.toString()]).toString(),
+                  style: const TextStyle(fontSize: 16),),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: Text(
                     'No'.tr().toString(),
-                    style: TextStyle(color: primaryColor),
+                    style: const TextStyle(color: primaryColor),
                   ),
                 ),
                 TextButton(
@@ -56,9 +51,9 @@ class UnMatcheWidget extends StatelessWidget {
                     BlocProvider.of<MatchUserBloc>(context)
                         .add(LoadMatchUserEvent(currentUser: currentUser));
                     CustomSnackbar.showSnackBarSimple(
-                        "unmatched"
-                            .tr(args: ["${user.name}".toString()]).toString(),
-                        context);
+                        'unmatched'
+                            .tr(args: ['${user.name}'.toString()]).toString(),
+                        context,);
                     if (fromChatPage) {
                       Navigator.pop(context);
                       Navigator.pop(context);
@@ -68,27 +63,25 @@ class UnMatcheWidget extends StatelessWidget {
                   },
                   child: Text(
                     'Yes'.tr().toString(),
-                    style: TextStyle(color: primaryColor),
+                    style: const TextStyle(color: primaryColor),
                   ),
                 ),
               ],
             ),
-          );
-        },
+          ),
       ),
       child: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: Center(
             child: Text(
-              "UNMATCH WITH"
-                  .tr(args: ["${user.name}".toUpperCase()]).toString(),
+              'UNMATCH WITH'
+                  .tr(args: ['${user.name}'.toUpperCase()]).toString(),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.secondaryColor),
+                  color: AppColors.secondaryColor,),
             ),
-          )),
+          ),),
     );
-  }
 }

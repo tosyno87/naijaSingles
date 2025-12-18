@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/services/unified_group_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/features/group_chat/screens/create_group_screen.dart';
-import 'package:naijasingles/features/groups/screens/group_details_screen.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../services/unified_group_service.dart';
+import '../../group_chat/screens/create_group_screen.dart';
+import 'group_details_screen.dart';
 
 /// Unified Groups Screen that combines Cultural Groups and Group Chats
 /// This eliminates redundancy and creates synergy between features
@@ -19,13 +20,13 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     with TickerProviderStateMixin {
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final TextEditingController _searchController = TextEditingController();
-  
+
   List<UnifiedGroup> _groups = [];
   List<UnifiedGroup> _userGroups = [];
   bool _isLoading = false;
   bool _isSearching = false;
   GroupType? _selectedType;
-  
+
   late TabController _tabController;
 
   @override
@@ -44,16 +45,17 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
   Future<void> _loadGroups() async {
     setState(() => _isLoading = true);
-    
+
     try {
       // Load public groups for discovery
-      final publicGroupsStream = _groupService.getPublicGroups(type: _selectedType);
+      final publicGroupsStream =
+          _groupService.getPublicGroups(type: _selectedType);
       final publicGroups = await publicGroupsStream.first;
-      
+
       // Load user's groups
       final userGroupsStream = _groupService.getUserGroups();
       final userGroups = await userGroupsStream.first;
-      
+
       setState(() {
         _groups = publicGroups;
         _userGroups = userGroups;
@@ -79,13 +81,13 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
 
     setState(() => _isSearching = true);
-    
+
     try {
       final searchResults = await _groupService.searchGroups(
         query: _searchController.text.trim(),
         type: _selectedType,
       );
-      
+
       setState(() {
         _groups = searchResults;
         _isSearching = false;
@@ -106,7 +108,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   Future<void> _joinGroup(UnifiedGroup group) async {
     try {
       await _groupService.joinGroup(group.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -146,7 +148,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   Widget _buildActionButton(UnifiedGroup group) {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final isMember = group.isMember(currentUserId);
-    
+
     return ElevatedButton(
       onPressed: () async {
         if (isMember) {
@@ -166,9 +168,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       ),
       child: Text(
-        isMember 
-          ? (group.enableChat ? 'Enter Chat' : 'View Group')
-          : 'Join',
+        isMember ? (group.enableChat ? 'Enter Chat' : 'View Group') : 'Join',
         style: GoogleFonts.montserrat(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -216,8 +216,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
@@ -263,13 +262,13 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         children: [
           // Search Bar
           _buildSearchBar(),
-          
+
           // Type Filter
           _buildTypeFilter(),
-          
+
           // Tab Bar
           _buildTabBar(),
-          
+
           // Tab Content
           Expanded(
             child: TabBarView(
@@ -284,10 +283,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildSearchBar() {
-    return Container(
+  Widget _buildSearchBar() => Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -308,7 +305,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
             color: AppColors.textSecondary,
             fontSize: 14,
           ),
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.search,
             color: AppColors.primaryGreen,
             size: 20,
@@ -319,7 +316,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                     _searchController.clear();
                     _loadGroups();
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.clear,
                     color: AppColors.textSecondary,
                     size: 18,
@@ -334,10 +331,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildTypeFilter() {
-    return Container(
+  Widget _buildTypeFilter() => Container(
       height: 50,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: ListView.builder(
@@ -347,7 +342,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           final type = index == 0 ? null : GroupType.values[index - 1];
           final isSelected = _selectedType == type;
           final label = type == null ? 'All' : _getTypeLabel(type);
-          
+
           return Container(
             margin: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
@@ -368,21 +363,19 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
               selectedColor: AppColors.primaryGreen,
               side: BorderSide(
                 color: isSelected ? AppColors.primaryGreen : AppColors.border,
-                width: 1,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              labelPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              labelPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             ),
           );
         },
       ),
     );
-  }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildTabBar() => Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -391,12 +384,12 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        indicator: UnderlineTabIndicator(
+        indicator: const UnderlineTabIndicator(
           borderSide: BorderSide(
             color: AppColors.primaryGreen,
             width: 3,
           ),
-          insets: const EdgeInsets.symmetric(horizontal: 16),
+          insets: EdgeInsets.symmetric(horizontal: 16),
         ),
         indicatorSize: TabBarIndicatorSize.label,
         labelColor: AppColors.primaryGreen,
@@ -416,7 +409,6 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ],
       ),
     );
-  }
 
   Widget _buildDiscoverTab() {
     if (_isLoading) {
@@ -450,7 +442,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         itemCount: _groups.length,
         itemBuilder: (context, index) {
           final group = _groups[index];
-          return _buildGroupCard(group, showJoinButton: true);
+          return _buildGroupCard(group);
         },
       ),
     );
@@ -525,9 +517,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
 
     // Filter groups created by current user
-    final createdGroups = _userGroups.where((group) {
-      return group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? '');
-    }).toList();
+    final createdGroups = _userGroups.where((group) => group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? '')).toList();
 
     if (createdGroups.isEmpty) {
       return _buildEmptyState(
@@ -537,7 +527,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
           color: Colors.grey[400],
         ),
         title: 'No Groups Created',
-        subtitle: 'Create your first community and start building your network!',
+        subtitle:
+            'Create your first community and start building your network!',
         actionButton: _buildCreateButton(),
       );
     }
@@ -550,14 +541,15 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         itemCount: createdGroups.length,
         itemBuilder: (context, index) {
           final group = createdGroups[index];
-          return _buildGroupCard(group, showJoinButton: false, showAdminBadge: true);
+          return _buildGroupCard(group,
+              showJoinButton: false, showAdminBadge: true,);
         },
       ),
     );
   }
 
-  Widget _buildGroupCard(UnifiedGroup group, {bool showJoinButton = true, bool showAdminBadge = false}) {
-    return Container(
+  Widget _buildGroupCard(UnifiedGroup group,
+      {bool showJoinButton = true, bool showAdminBadge = false,}) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -649,16 +641,12 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
             ),
           ],
         ),
-        trailing: showJoinButton
-            ? _buildActionButton(group)
-            : null,
+        trailing: showJoinButton ? _buildActionButton(group) : null,
         onTap: () => _navigateToGroupDetails(group),
       ),
     );
-  }
 
-  Widget _buildGroupAvatar(UnifiedGroup group) {
-    return Container(
+  Widget _buildGroupAvatar(UnifiedGroup group) => Container(
       width: 50,
       height: 50,
       decoration: BoxDecoration(
@@ -671,10 +659,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         size: 24,
       ),
     );
-  }
 
-  Widget _buildTypeChip(GroupType type) {
-    return Container(
+  Widget _buildTypeChip(GroupType type) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: _getTypeColor(type).withOpacity(0.1),
@@ -689,10 +675,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildCreateButton() {
-    return SizedBox(
+  Widget _buildCreateButton() => SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: _navigateToCreateGroup,
@@ -714,15 +698,13 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       ),
     );
-  }
 
   Widget _buildEmptyState({
     required Widget icon,
     required String title,
     required String subtitle,
     Widget? actionButton,
-  }) {
-    return Center(
+  }) => Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -773,10 +755,8 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildGroupInfoSheet(UnifiedGroup group) {
-    return Container(
+  Widget _buildGroupInfoSheet(UnifiedGroup group) => Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -808,24 +788,25 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
                 ),
                 const SizedBox(height: 20),
                 _buildInfoRow(Icons.group, 'Name', group.name),
-                _buildInfoRow(Icons.description, 'Description', group.description),
+                _buildInfoRow(
+                    Icons.description, 'Description', group.description,),
                 _buildInfoRow(Icons.category, 'Type', group.typeDisplayName),
-                _buildInfoRow(Icons.people, 'Members', '${group.memberCount}/${group.maxMembers}'),
+                _buildInfoRow(Icons.people, 'Members',
+                    '${group.memberCount}/${group.maxMembers}',),
                 if (group.location != null)
                   _buildInfoRow(Icons.location_on, 'Location', group.location!),
                 if (group.tags.isNotEmpty)
                   _buildInfoRow(Icons.tag, 'Tags', group.tags.join(', ')),
-                _buildInfoRow(Icons.chat, 'Chat', group.enableChat ? 'Enabled' : 'Disabled'),
+                _buildInfoRow(Icons.chat, 'Chat',
+                    group.enableChat ? 'Enabled' : 'Disabled',),
               ],
             ),
           ),
         ],
       ),
     );
-  }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
+  Widget _buildInfoRow(IconData icon, String label, String value) => Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
@@ -851,7 +832,6 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         ],
       ),
     );
-  }
 
   String _getTypeLabel(GroupType type) {
     switch (type) {
@@ -866,7 +846,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return 'Food';
       case GroupType.art:
         return 'Art';
-      
+
       // Lifestyle & Career Groups
       case GroupType.career:
         return 'Career';
@@ -878,7 +858,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return 'Reading';
       case GroupType.movies:
         return 'Movies';
-      
+
       // Social & Community Groups
       case GroupType.events:
         return 'Events';
@@ -890,7 +870,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return 'Study';
       case GroupType.local:
         return 'Local';
-      
+
       // Special Interest Groups
       case GroupType.tech:
         return 'Technology';
@@ -918,7 +898,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return Colors.red;
       case GroupType.art:
         return Colors.pink;
-      
+
       // Lifestyle & Career Groups
       case GroupType.career:
         return Colors.indigo;
@@ -930,7 +910,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return Colors.brown;
       case GroupType.movies:
         return Colors.teal;
-      
+
       // Social & Community Groups
       case GroupType.events:
         return Colors.amber;
@@ -942,7 +922,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return Colors.deepOrange;
       case GroupType.local:
         return Colors.lightGreen;
-      
+
       // Special Interest Groups
       case GroupType.tech:
         return Colors.blueGrey;
@@ -970,7 +950,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return Icons.restaurant;
       case GroupType.art:
         return Icons.palette;
-      
+
       // Lifestyle & Career Groups
       case GroupType.career:
         return Icons.work;
@@ -982,7 +962,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return Icons.menu_book;
       case GroupType.movies:
         return Icons.movie;
-      
+
       // Social & Community Groups
       case GroupType.events:
         return Icons.event;
@@ -994,7 +974,7 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         return Icons.school;
       case GroupType.local:
         return Icons.location_on;
-      
+
       // Special Interest Groups
       case GroupType.tech:
         return Icons.computer;

@@ -67,7 +67,7 @@ class _UserProfilePicState extends State<UserProfilePic>
 
   @override
   Widget build(BuildContext context) {
-    var userData =
+    final userData =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
@@ -91,52 +91,44 @@ class _UserProfilePicState extends State<UserProfilePic>
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
 
                       // Header section
-                      _fadeAnimation != null
-                          ? FadeTransition(
+                      if (_fadeAnimation != null) FadeTransition(
                               opacity: _fadeAnimation!,
                               child: _buildHeaderSection(),
-                            )
-                          : _buildHeaderSection(),
+                            ) else _buildHeaderSection(),
 
                       const SizedBox(height: 40),
 
                       // Main photo upload section
-                      _fadeAnimation != null
-                          ? FadeTransition(
+                      if (_fadeAnimation != null) FadeTransition(
                               opacity: _fadeAnimation!,
                               child: _buildMainPhotoSection(),
-                            )
-                          : _buildMainPhotoSection(),
+                            ) else _buildMainPhotoSection(),
 
                       const SizedBox(height: 24),
 
                       // Photo grid section
-                      _fadeAnimation != null
-                          ? FadeTransition(
+                      if (_fadeAnimation != null) FadeTransition(
                               opacity: _fadeAnimation!,
                               child: _buildPhotoGridSection(),
-                            )
-                          : _buildPhotoGridSection(),
+                            ) else _buildPhotoGridSection(),
 
                       const SizedBox(height: 24),
 
                       // Tips section
-                      _fadeAnimation != null
-                          ? FadeTransition(
+                      if (_fadeAnimation != null) FadeTransition(
                               opacity: _fadeAnimation!,
                               child: _buildTipsSection(),
-                            )
-                          : _buildTipsSection(),
+                            ) else _buildTipsSection(),
 
                       const SizedBox(
-                          height: 100), // Space for the bottom labelLarge
+                          height: 100,), // Space for the bottom labelLarge
                     ],
                   ),
                 ),
@@ -145,7 +137,7 @@ class _UserProfilePicState extends State<UserProfilePic>
 
             // Continue labelLarge fixed at the bottom
             Container(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -161,13 +153,13 @@ class _UserProfilePicState extends State<UserProfilePic>
                 child: ElevatedButton(
                   onPressed: canContinue
                       ? () {
-                          log("userdata is ${userData.toString()}");
+                          log('userdata is ${userData.toString()}');
                           Navigator.pushNamed(
                               context, RouteName.allowLocationScreen,
                               arguments: {
                                 'userData': userData,
-                                'profilePic': photos[selectedPhotoIndex]
-                              });
+                                'profilePic': photos[selectedPhotoIndex],
+                              },);
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -182,11 +174,11 @@ class _UserProfilePicState extends State<UserProfilePic>
                     ),
                   ),
                   child: Text(
-                    canContinue ? "CONTINUE" : "ADD AT LEAST 1 PHOTO",
+                    canContinue ? 'CONTINUE' : 'ADD AT LEAST 1 PHOTO',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
@@ -199,12 +191,11 @@ class _UserProfilePicState extends State<UserProfilePic>
   }
 
   // Header section with title and subtitle
-  Widget _buildHeaderSection() {
-    return Column(
+  Widget _buildHeaderSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Let them see you",
+          'Let them see you',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
@@ -213,7 +204,7 @@ class _UserProfilePicState extends State<UserProfilePic>
         ),
         const SizedBox(height: 12),
         Text(
-          "Profiles with clear photos get more matches.",
+          'Profiles with clear photos get more matches.',
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey[600],
@@ -222,11 +213,9 @@ class _UserProfilePicState extends State<UserProfilePic>
         ),
       ],
     );
-  }
 
   // Main photo upload section
-  Widget _buildMainPhotoSection() {
-    return Center(
+  Widget _buildMainPhotoSection() => Center(
       child: GestureDetector(
         onTap: () => _pickImage(selectedPhotoIndex),
         child: Container(
@@ -246,7 +235,6 @@ class _UserProfilePicState extends State<UserProfilePic>
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
-                  spreadRadius: 0,
                   offset: const Offset(0, 2),
                 ),
             ],
@@ -297,7 +285,7 @@ class _UserProfilePicState extends State<UserProfilePic>
                         painter: DashedBorderPainter(
                           color: Colors.grey[300]!,
                           strokeWidth: 2,
-                          gap: 5.0,
+                          gap: 5,
                         ),
                         size: const Size(280, 350),
                       ),
@@ -328,7 +316,7 @@ class _UserProfilePicState extends State<UserProfilePic>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            "Tap to add photo",
+                            'Tap to add photo',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey[600],
@@ -342,15 +330,13 @@ class _UserProfilePicState extends State<UserProfilePic>
         ),
       ),
     );
-  }
 
   // Photo grid section
-  Widget _buildPhotoGridSection() {
-    return Column(
+  Widget _buildPhotoGridSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Your photos (${photoCount}/3)",
+          'Your photos ($photoCount/3)',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -359,8 +345,7 @@ class _UserProfilePicState extends State<UserProfilePic>
         ),
         const SizedBox(height: 12),
         Row(
-          children: List.generate(3, (index) {
-            return Expanded(
+          children: List.generate(3, (index) => Expanded(
               child: GestureDetector(
                 onTap: () {
                   if (photos[index] != null) {
@@ -433,16 +418,13 @@ class _UserProfilePicState extends State<UserProfilePic>
                         ),
                 ),
               ),
-            );
-          }),
+            ),),
         ),
       ],
     );
-  }
 
   // Tips section
-  Widget _buildTipsSection() {
-    return Container(
+  Widget _buildTipsSection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFE8F5E9),
@@ -462,7 +444,7 @@ class _UserProfilePicState extends State<UserProfilePic>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Tips for great photos:",
+                  'Tips for great photos:',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -471,10 +453,10 @@ class _UserProfilePicState extends State<UserProfilePic>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "• Choose photos where your face is clearly visible\n"
-                  "• Avoid group shots as your main photo\n"
-                  "• Add at least one full-body photo\n"
-                  "• Show your interests and personality",
+                  '• Choose photos where your face is clearly visible\n'
+                  '• Avoid group shots as your main photo\n'
+                  '• Add at least one full-body photo\n'
+                  '• Show your interests and personality',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[800],
@@ -487,7 +469,6 @@ class _UserProfilePicState extends State<UserProfilePic>
         ],
       ),
     );
-  }
 
   // Method to pick an image
   Future<void> _pickImage(int index) async {
@@ -504,15 +485,15 @@ class _UserProfilePicState extends State<UserProfilePic>
 
 // Custom painter for dashed border
 class DashedBorderPainter extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-  final double gap;
 
   DashedBorderPainter({
     required this.color,
     required this.strokeWidth,
     required this.gap,
   });
+  final Color color;
+  final double strokeWidth;
+  final double gap;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -526,11 +507,11 @@ class DashedBorderPainter extends CustomPainter {
 
     // Draw right line
     _drawDashedLine(
-        canvas, paint, Offset(size.width, 0), Offset(size.width, size.height));
+        canvas, paint, Offset(size.width, 0), Offset(size.width, size.height),);
 
     // Draw bottom line
     _drawDashedLine(
-        canvas, paint, Offset(size.width, size.height), Offset(0, size.height));
+        canvas, paint, Offset(size.width, size.height), Offset(0, size.height),);
 
     // Draw left line
     _drawDashedLine(canvas, paint, Offset(0, size.height), const Offset(0, 0));

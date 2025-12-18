@@ -2,14 +2,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/models/user_model.dart';
+
 import '../../../../common/constants/colors.dart';
+import '../../../../models/user_model.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
 
 class MatchedPage extends StatefulWidget {
+  MatchedPage({required this.name, required this.currentUser, super.key});
   String name;
   UserModel currentUser;
-  MatchedPage({super.key, required this.name, required this.currentUser});
 
   @override
   MAtchState createState() => MAtchState();
@@ -37,12 +38,10 @@ class MAtchState extends State<MatchedPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Card(
               color: Theme.of(context).primaryColor,
@@ -50,18 +49,17 @@ class MAtchState extends State<MatchedPage> {
               child: Text(
                 "It's a match\n With ${widget.name} ".tr().toString(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                     color: primaryColor,
                     fontSize: 30,
                     fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.none),
+                    decoration: TextDecoration.none,),
               ),
             ),
             Center(
                 child: Image.asset(
               image!.assetName,
-            )),
+            ),),
           ],
-        ));
-  }
+        ),);
 }

@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/models/user_model.dart';
+import '../models/user_model.dart';
 
 /// Industry-standard advanced search service
 /// Features:
@@ -12,9 +12,10 @@ import 'package:naijasingles/models/user_model.dart';
 /// - Saved searches
 /// - Real-time search suggestions
 class AdvancedSearchService {
-  static final AdvancedSearchService _instance = AdvancedSearchService._internal();
   factory AdvancedSearchService() => _instance;
   AdvancedSearchService._internal();
+  static final AdvancedSearchService _instance =
+      AdvancedSearchService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -50,14 +51,16 @@ class AdvancedSearchService {
 
       // Execute query
       final QuerySnapshot snapshot = await query.get();
-      
+
       // Convert to UserModel list
       final List<UserModel> users = snapshot.docs
-          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+          .map((doc) =>
+              UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),)
           .toList();
 
       // Apply additional filtering (for complex criteria)
-      final List<UserModel> filteredUsers = _applyAdditionalFilters(users, criteria);
+      final List<UserModel> filteredUsers =
+          _applyAdditionalFilters(users, criteria);
 
       log('🔍 Found ${filteredUsers.length} users matching criteria');
       return filteredUsers;
@@ -71,7 +74,8 @@ class AdvancedSearchService {
   Query _applyFilters(Query query, SearchCriteria criteria) {
     // Age range filter
     if (criteria.ageRange != null) {
-      query = query.where('age', isGreaterThanOrEqualTo: criteria.ageRange!.min);
+      query =
+          query.where('age', isGreaterThanOrEqualTo: criteria.ageRange!.min);
       query = query.where('age', isLessThanOrEqualTo: criteria.ageRange!.max);
     }
 
@@ -112,13 +116,17 @@ class AdvancedSearchService {
 
     // Height range filter
     if (criteria.heightRange != null) {
-      query = query.where('height', isGreaterThanOrEqualTo: criteria.heightRange!.min);
-      query = query.where('height', isLessThanOrEqualTo: criteria.heightRange!.max);
+      query = query.where('height',
+          isGreaterThanOrEqualTo: criteria.heightRange!.min,);
+      query =
+          query.where('height', isLessThanOrEqualTo: criteria.heightRange!.max);
     }
 
     // Relationship intent filter
-    if (criteria.relationshipIntent != null && criteria.relationshipIntent!.isNotEmpty) {
-      query = query.where('relationshipIntent', isEqualTo: criteria.relationshipIntent);
+    if (criteria.relationshipIntent != null &&
+        criteria.relationshipIntent!.isNotEmpty) {
+      query = query.where('relationshipIntent',
+          isEqualTo: criteria.relationshipIntent,);
     }
 
     // Looking for filter
@@ -145,7 +153,7 @@ class AdvancedSearchService {
   Query _applyLocationFilter(Query query, LocationCriteria location) {
     // This is a simplified version. In production, you'd use GeoFirestore
     // or implement proper geospatial queries
-    
+
     if (location.city != null && location.city!.isNotEmpty) {
       query = query.where('locationName', isEqualTo: location.city);
     }
@@ -178,13 +186,14 @@ class AdvancedSearchService {
   }
 
   /// Apply additional filters that can't be done in Firestore
-  List<UserModel> _applyAdditionalFilters(List<UserModel> users, SearchCriteria criteria) {
-    return users.where((user) {
+  List<UserModel> _applyAdditionalFilters(
+      List<UserModel> users, SearchCriteria criteria,) => users.where((user) {
       // Interest matching
       if (criteria.interests != null && criteria.interests!.isNotEmpty) {
-        final userInterests = user.editInfo?['interests'] as List<String>? ?? [];
+        final userInterests =
+            user.editInfo?['interests'] as List<String>? ?? [];
         final hasMatchingInterest = criteria.interests!.any(
-          (interest) => userInterests.contains(interest),
+          userInterests.contains,
         );
         if (!hasMatchingInterest) return false;
       }
@@ -193,7 +202,7 @@ class AdvancedSearchService {
       if (criteria.languages != null && criteria.languages!.isNotEmpty) {
         final userLanguages = user.languages ?? [];
         final hasMatchingLanguage = criteria.languages!.any(
-          (language) => userLanguages.contains(language),
+          userLanguages.contains,
         );
         if (!hasMatchingLanguage) return false;
       }
@@ -209,7 +218,6 @@ class AdvancedSearchService {
 
       return true;
     }).toList();
-  }
 
   /// Search suggestions based on user input
   Future<List<String>> getSearchSuggestions(String query) async {
@@ -222,7 +230,7 @@ class AdvancedSearchService {
       final tribeQuery = await _firestore
           .collection('users')
           .where('tribe', isGreaterThanOrEqualTo: query)
-          .where('tribe', isLessThanOrEqualTo: query + '\uf8ff')
+          .where('tribe', isLessThanOrEqualTo: '$query\uf8ff')
           .limit(5)
           .get();
 
@@ -240,8 +248,8 @@ class AdvancedSearchService {
       for (final doc in interestQuery.docs) {
         final interests = List<String>.from(doc.data()['interests'] ?? []);
         suggestions.addAll(
-          interests.where((interest) => 
-              interest.toLowerCase().contains(query.toLowerCase())),
+          interests.where((interest) =>
+              interest.toLowerCase().contains(query.toLowerCase()),),
         );
       }
 
@@ -294,7 +302,8 @@ class AdvancedSearchService {
           id: doc.id,
           name: data['name'] ?? '',
           criteria: SearchCriteria.fromMap(data['criteria'] ?? {}),
-          createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          createdAt:
+              (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         );
       }).toList();
     } catch (e) {
@@ -342,7 +351,8 @@ class AdvancedSearchService {
           id: doc.id,
           query: data['query'] ?? '',
           resultCount: data['resultCount'] ?? 0,
-          searchedAt: (data['searchedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          searchedAt:
+              (data['searchedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         );
       }).toList();
     } catch (e) {
@@ -398,22 +408,6 @@ class AdvancedSearchService {
 
 /// Search criteria model
 class SearchCriteria {
-  final AgeRange? ageRange;
-  final String? gender;
-  final String? interestedIn;
-  final String? tribe;
-  final String? nationality;
-  final String? religion;
-  final String? education;
-  final String? occupation;
-  final HeightRange? heightRange;
-  final String? relationshipIntent;
-  final String? lookingFor;
-  final List<String>? interests;
-  final List<String>? languages;
-  final List<String>? bioKeywords;
-  final LocationCriteria? location;
-  final SearchSortBy sortBy;
 
   const SearchCriteria({
     this.ageRange,
@@ -434,8 +428,50 @@ class SearchCriteria {
     this.sortBy = SearchSortBy.lastActive,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
+  factory SearchCriteria.fromMap(Map<String, dynamic> map) => SearchCriteria(
+      ageRange:
+          map['ageRange'] != null ? AgeRange.fromMap(map['ageRange']) : null,
+      gender: map['gender'],
+      interestedIn: map['interestedIn'],
+      tribe: map['tribe'],
+      nationality: map['nationality'],
+      religion: map['religion'],
+      education: map['education'],
+      occupation: map['occupation'],
+      heightRange: map['heightRange'] != null
+          ? HeightRange.fromMap(map['heightRange'])
+          : null,
+      relationshipIntent: map['relationshipIntent'],
+      lookingFor: map['lookingFor'],
+      interests: List<String>.from(map['interests'] ?? []),
+      languages: List<String>.from(map['languages'] ?? []),
+      bioKeywords: List<String>.from(map['bioKeywords'] ?? []),
+      location: map['location'] != null
+          ? LocationCriteria.fromMap(map['location'])
+          : null,
+      sortBy: SearchSortBy.values.firstWhere(
+        (e) => e.name == map['sortBy'],
+        orElse: () => SearchSortBy.lastActive,
+      ),
+    );
+  final AgeRange? ageRange;
+  final String? gender;
+  final String? interestedIn;
+  final String? tribe;
+  final String? nationality;
+  final String? religion;
+  final String? education;
+  final String? occupation;
+  final HeightRange? heightRange;
+  final String? relationshipIntent;
+  final String? lookingFor;
+  final List<String>? interests;
+  final List<String>? languages;
+  final List<String>? bioKeywords;
+  final LocationCriteria? location;
+  final SearchSortBy sortBy;
+
+  Map<String, dynamic> toMap() => {
       'ageRange': ageRange?.toMap(),
       'gender': gender,
       'interestedIn': interestedIn,
@@ -453,49 +489,22 @@ class SearchCriteria {
       'location': location?.toMap(),
       'sortBy': sortBy.name,
     };
-  }
-
-  factory SearchCriteria.fromMap(Map<String, dynamic> map) {
-    return SearchCriteria(
-      ageRange: map['ageRange'] != null ? AgeRange.fromMap(map['ageRange']) : null,
-      gender: map['gender'],
-      interestedIn: map['interestedIn'],
-      tribe: map['tribe'],
-      nationality: map['nationality'],
-      religion: map['religion'],
-      education: map['education'],
-      occupation: map['occupation'],
-      heightRange: map['heightRange'] != null ? HeightRange.fromMap(map['heightRange']) : null,
-      relationshipIntent: map['relationshipIntent'],
-      lookingFor: map['lookingFor'],
-      interests: List<String>.from(map['interests'] ?? []),
-      languages: List<String>.from(map['languages'] ?? []),
-      bioKeywords: List<String>.from(map['bioKeywords'] ?? []),
-      location: map['location'] != null ? LocationCriteria.fromMap(map['location']) : null,
-      sortBy: SearchSortBy.values.firstWhere(
-        (e) => e.name == map['sortBy'],
-        orElse: () => SearchSortBy.lastActive,
-      ),
-    );
-  }
 
   @override
-  String toString() {
-    return 'SearchCriteria(ageRange: $ageRange, gender: $gender, tribe: $tribe, sortBy: $sortBy)';
-  }
+  String toString() => 'SearchCriteria(ageRange: $ageRange, gender: $gender, tribe: $tribe, sortBy: $sortBy)';
 }
 
 /// Age range model
 class AgeRange {
-  final int min;
-  final int max;
 
   const AgeRange({required this.min, required this.max});
 
-  Map<String, dynamic> toMap() => {'min': min, 'max': max};
-
   factory AgeRange.fromMap(Map<String, dynamic> map) =>
       AgeRange(min: map['min'], max: map['max']);
+  final int min;
+  final int max;
+
+  Map<String, dynamic> toMap() => {'min': min, 'max': max};
 
   @override
   String toString() => 'AgeRange($min-$max)';
@@ -503,15 +512,15 @@ class AgeRange {
 
 /// Height range model
 class HeightRange {
-  final double min;
-  final double max;
 
   const HeightRange({required this.min, required this.max});
 
-  Map<String, dynamic> toMap() => {'min': min, 'max': max};
-
   factory HeightRange.fromMap(Map<String, dynamic> map) =>
       HeightRange(min: map['min'], max: map['max']);
+  final double min;
+  final double max;
+
+  Map<String, dynamic> toMap() => {'min': min, 'max': max};
 
   @override
   String toString() => 'HeightRange($min-$max)';
@@ -519,11 +528,6 @@ class HeightRange {
 
 /// Location criteria model
 class LocationCriteria {
-  final String? city;
-  final String? country;
-  final double? latitude;
-  final double? longitude;
-  final double? radiusKm;
 
   const LocationCriteria({
     this.city,
@@ -533,14 +537,6 @@ class LocationCriteria {
     this.radiusKm,
   });
 
-  Map<String, dynamic> toMap() => {
-    'city': city,
-    'country': country,
-    'latitude': latitude,
-    'longitude': longitude,
-    'radiusKm': radiusKm,
-  };
-
   factory LocationCriteria.fromMap(Map<String, dynamic> map) =>
       LocationCriteria(
         city: map['city'],
@@ -549,6 +545,19 @@ class LocationCriteria {
         longitude: map['longitude'],
         radiusKm: map['radiusKm'],
       );
+  final String? city;
+  final String? country;
+  final double? latitude;
+  final double? longitude;
+  final double? radiusKm;
+
+  Map<String, dynamic> toMap() => {
+        'city': city,
+        'country': country,
+        'latitude': latitude,
+        'longitude': longitude,
+        'radiusKm': radiusKm,
+      };
 
   @override
   String toString() => 'LocationCriteria(city: $city, radius: ${radiusKm}km)';
@@ -565,10 +574,6 @@ enum SearchSortBy {
 
 /// Saved search model
 class SavedSearch {
-  final String id;
-  final String name;
-  final SearchCriteria criteria;
-  final DateTime createdAt;
 
   const SavedSearch({
     required this.id,
@@ -576,6 +581,10 @@ class SavedSearch {
     required this.criteria,
     required this.createdAt,
   });
+  final String id;
+  final String name;
+  final SearchCriteria criteria;
+  final DateTime createdAt;
 
   @override
   String toString() => 'SavedSearch($name)';
@@ -583,10 +592,6 @@ class SavedSearch {
 
 /// Search history model
 class SearchHistory {
-  final String id;
-  final String query;
-  final int resultCount;
-  final DateTime searchedAt;
 
   const SearchHistory({
     required this.id,
@@ -594,6 +599,10 @@ class SearchHistory {
     required this.resultCount,
     required this.searchedAt,
   });
+  final String id;
+  final String query;
+  final int resultCount;
+  final DateTime searchedAt;
 
   @override
   String toString() => 'SearchHistory($query: $resultCount results)';

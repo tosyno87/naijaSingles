@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
+import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/custom_button.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 
 class UserNationality extends StatefulWidget {
-  final Map<String, dynamic> userData;
   const UserNationality(this.userData, {super.key});
+  final Map<String, dynamic> userData;
 
   @override
   _UserNationalityState createState() => _UserNationalityState();
@@ -217,7 +217,7 @@ class _UserNationalityState extends State<UserNationality> {
     'Vietnam',
     'Yemen',
     'Zambia',
-    'Zimbabwe'
+    'Zimbabwe',
   ];
 
   List<String> filteredCountries = [];
@@ -249,7 +249,7 @@ class _UserNationalityState extends State<UserNationality> {
       } else {
         filteredCountries = countries
             .where((country) =>
-                country.toLowerCase().contains(query.toLowerCase()))
+                country.toLowerCase().contains(query.toLowerCase()),)
             .toList();
       }
     });
@@ -294,7 +294,7 @@ class _UserNationalityState extends State<UserNationality> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -318,7 +318,7 @@ class _UserNationalityState extends State<UserNationality> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Where are you from?",
+                    'Where are you from?',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -360,7 +360,7 @@ class _UserNationalityState extends State<UserNationality> {
                         focusNode: _searchFocusNode,
                         cursorColor: const Color(0xFF27AE60),
                         decoration: InputDecoration(
-                          hintText: "Search your country",
+                          hintText: 'Search your country',
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Colors.grey[400]),
                         ),
@@ -397,7 +397,7 @@ class _UserNationalityState extends State<UserNationality> {
                   const Text('Are you in the diaspora?'),
                   Switch(
                     value: isDiaspora,
-                    activeColor: const Color(0xFF27AE60),
+                    activeThumbColor: const Color(0xFF27AE60),
                     onChanged: (val) {
                       setState(() {
                         isDiaspora = val;
@@ -414,7 +414,7 @@ class _UserNationalityState extends State<UserNationality> {
                 child: filteredCountries.isEmpty
                     ? Center(
                         child: Text(
-                          "No countries found",
+                          'No countries found',
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,
@@ -432,7 +432,7 @@ class _UserNationalityState extends State<UserNationality> {
                             onTap: () => _selectCountry(country),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 16),
+                                  vertical: 12, horizontal: 16,),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? const Color(0xFFE8F5E9)
@@ -473,7 +473,7 @@ class _UserNationalityState extends State<UserNationality> {
 
               // Continue labelLarge
               Padding(
-                padding: const EdgeInsets.only(bottom: 24.0, top: 10.0),
+                padding: const EdgeInsets.only(bottom: 24, top: 10),
                 child: AnimatedOpacity(
                   opacity: selectedCountry.isNotEmpty ? 1.0 : 0.7,
                   duration: const Duration(milliseconds: 200),
@@ -490,10 +490,10 @@ class _UserNationalityState extends State<UserNationality> {
                         log(widget.userData.toString());
                         Navigator.pushNamed(
                             context, RouteName.sexualorientationScreen,
-                            arguments: widget.userData);
+                            arguments: widget.userData,);
                       } else {
                         CustomSnackbar.showSnackBarSimple(
-                            "Please select your country", context);
+                            'Please select your country', context,);
                       }
                     },
                     text: 'CONTINUE',

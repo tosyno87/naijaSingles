@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/services/user_privacy_service.dart';
 import '../helpers/firebase_test_setup.dart';
 
 void main() {
@@ -8,9 +7,7 @@ void main() {
     await FirebaseTestSetup.setupFirebase();
   });
 
-  tearDownAll(() {
-    FirebaseTestSetup.cleanup();
-  });
+  tearDownAll(FirebaseTestSetup.cleanup);
 
   group('Security and Privacy Tests', () {
     test('User data encryption validation', () {
@@ -21,18 +18,18 @@ void main() {
         'ssn': 'XXX-XX-XXXX', // Mock SSN
         'passport_number': 'A1234567',
       };
-      
+
       for (final entry in sensitiveData.entries) {
         final key = entry.key;
         final value = entry.value;
-        
+
         // Sensitive data should not be stored in plain text
         expect(value, isNotEmpty);
-        
+
         // Test that sensitive fields are identified
         if (key.contains('ssn') || key.contains('passport')) {
-        // These should be masked or encrypted (test passes if value is not empty)
-        expect(value, isNotEmpty);
+          // These should be masked or encrypted (test passes if value is not empty)
+          expect(value, isNotEmpty);
         }
       }
     });
@@ -46,11 +43,11 @@ void main() {
         tribe: 'Yoruba',
         age: 25,
       );
-      
+
       // Immigration status should be optional and private
       expect(user.nationality, isNotEmpty);
       expect(user.tribe, isNotEmpty);
-      
+
       // Test privacy settings
       final privacySettings = {
         'show_immigration_status': false,
@@ -58,7 +55,7 @@ void main() {
         'show_professional_info': true,
         'show_location': false,
       };
-      
+
       for (final setting in privacySettings.entries) {
         expect(setting.value, isA<bool>());
       }
@@ -73,21 +70,21 @@ void main() {
         longitude: -84.3880,
         address: 'Atlanta, GA',
       );
-      
+
       // Location should be configurable
       expect(user.latitude, isNotNull);
       expect(user.longitude, isNotNull);
       expect(user.address, isNotEmpty);
-      
+
       // Test location privacy levels
       final locationPrivacyLevels = [
         'exact_location',
         'city_only',
         'state_only',
         'country_only',
-        'hidden'
+        'hidden',
       ];
-      
+
       for (final level in locationPrivacyLevels) {
         expect(level, isNotEmpty);
         expect(level.length, greaterThan(3));
@@ -104,13 +101,13 @@ void main() {
         religion: 'Christian',
         languages: ['English', 'Yoruba'],
       );
-      
+
       // Cultural data should be protected
       expect(user.nationality, isNotEmpty);
       expect(user.tribe, isNotEmpty);
       expect(user.religion, isNotEmpty);
       expect(user.languages, isNotEmpty);
-      
+
       // Test cultural privacy settings
       final culturalPrivacySettings = {
         'show_nationality': true,
@@ -118,7 +115,7 @@ void main() {
         'show_religion': false, // Very sensitive
         'show_languages': true,
       };
-      
+
       for (final setting in culturalPrivacySettings.entries) {
         expect(setting.value, isA<bool>());
       }
@@ -135,18 +132,18 @@ void main() {
           'https://example.com/photo3.jpg',
         ],
       );
-      
+
       expect(user.imageUrl, isNotEmpty);
       expect(user.imageUrl!.length, greaterThan(0));
-      
+
       // Test photo privacy levels
       final photoPrivacyLevels = [
         'public',
         'matches_only',
         'friends_only',
-        'private'
+        'private',
       ];
-      
+
       for (final level in photoPrivacyLevels) {
         expect(level, isNotEmpty);
         expect(level.length, greaterThan(3));
@@ -163,14 +160,14 @@ void main() {
         'cultural_info': 'Cultural background',
         'professional_info': 'Career information',
       };
-      
+
       for (final entry in userData.entries) {
         final dataType = entry.key;
         final data = entry.value;
-        
+
         expect(dataType, isNotEmpty);
         expect(data, isNotEmpty);
-        
+
         // All data types should be deletable
         expect(dataType, isNot(equals('permanent')));
       }
@@ -185,14 +182,14 @@ void main() {
         'Fake profile',
         'Underage',
         'Cultural insensitivity',
-        'Other'
+        'Other',
       ];
-      
+
       for (final reason in blockReasons) {
         expect(reason, isNotEmpty);
         expect(reason.length, greaterThanOrEqualTo(3));
       }
-      
+
       // Test report categories
       final reportCategories = [
         'Inappropriate content',
@@ -202,9 +199,9 @@ void main() {
         'Underage user',
         'Cultural insensitivity',
         'Privacy violation',
-        'Other'
+        'Other',
       ];
-      
+
       for (final category in reportCategories) {
         expect(category, isNotEmpty);
         expect(category.length, greaterThanOrEqualTo(4));
@@ -214,7 +211,7 @@ void main() {
     test('Age verification system', () {
       // Test that age verification is properly implemented
       final testAges = [17, 18, 19, 25, 30, 45, 65];
-      
+
       for (final age in testAges) {
         if (age < 18) {
           // Underage users should be blocked
@@ -224,16 +221,16 @@ void main() {
           expect(age, greaterThanOrEqualTo(18));
         }
       }
-      
+
       // Test age verification methods
       final verificationMethods = [
         'date_of_birth',
         'government_id',
         'social_security',
         'passport',
-        'driver_license'
+        'driver_license',
       ];
-      
+
       for (final method in verificationMethods) {
         expect(method, isNotEmpty);
         expect(method.length, greaterThan(5));
@@ -247,15 +244,15 @@ void main() {
         'racial slurs',
         'religious intolerance',
         'ethnic jokes',
-        'cultural appropriation'
+        'cultural appropriation',
       ];
-      
+
       for (final content in inappropriateContent) {
         expect(content, isNotEmpty);
         // This content should be flagged for moderation
         expect(content.toLowerCase(), isNot(equals('appropriate')));
       }
-      
+
       // Test moderation categories
       final moderationCategories = [
         'Cultural insensitivity',
@@ -264,9 +261,9 @@ void main() {
         'Ethnic stereotyping',
         'Cultural appropriation',
         'Hate speech',
-        'Harassment'
+        'Harassment',
       ];
-      
+
       for (final category in moderationCategories) {
         expect(category, isNotEmpty);
         expect(category.length, greaterThan(5));
@@ -282,21 +279,21 @@ void main() {
         'LGPD', // Brazil
         'PDPA', // Singapore
       ];
-      
+
       for (final regulation in complianceRegulations) {
         expect(regulation, isNotEmpty);
         expect(regulation.length, greaterThan(3));
         expect(regulation, matches(RegExp(r'^[A-Z]+$')));
       }
-      
+
       // Test data residency requirements
       final dataResidencyOptions = [
         'US_only',
         'EU_only',
         'Global',
-        'User_choice'
+        'User_choice',
       ];
-      
+
       for (final option in dataResidencyOptions) {
         expect(option, isNotEmpty);
         expect(option.length, greaterThan(3));
@@ -310,14 +307,14 @@ void main() {
         'email_verification',
         'two_factor_auth',
         'biometric_auth',
-        'social_login'
+        'social_login',
       ];
-      
+
       for (final method in authMethods) {
         expect(method, isNotEmpty);
         expect(method.length, greaterThan(5));
       }
-      
+
       // Test password requirements
       final passwordRequirements = {
         'min_length': 8,
@@ -326,7 +323,7 @@ void main() {
         'require_numbers': true,
         'require_special_chars': true,
       };
-      
+
       for (final requirement in passwordRequirements.entries) {
         expect(requirement.value, isNotNull);
       }
@@ -340,23 +337,23 @@ void main() {
         'photos',
         'preferences',
         'cultural_info',
-        'professional_info'
+        'professional_info',
       ];
-      
+
       for (final type in backupTypes) {
         expect(type, isNotEmpty);
         expect(type.length, greaterThan(5));
       }
-      
+
       // Test recovery options
       final recoveryOptions = [
         'full_restore',
         'selective_restore',
         'profile_only',
         'messages_only',
-        'photos_only'
+        'photos_only',
       ];
-      
+
       for (final option in recoveryOptions) {
         expect(option, isNotEmpty);
         expect(option.length, greaterThan(5));

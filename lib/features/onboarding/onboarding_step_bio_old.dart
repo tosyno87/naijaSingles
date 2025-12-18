@@ -11,14 +11,13 @@ import 'shared_styles.dart';
 /// This screen collects basic information about the user including
 /// full name, age, location, and a short bio.
 class OnboardingStepBio extends StatefulWidget {
-  final VoidCallback onNext;
-  final Color backgroundColor;
 
   const OnboardingStepBio({
-    Key? key,
-    required this.onNext,
+    required this.onNext, super.key,
     this.backgroundColor = OnboardingStyles.backgroundColor,
-  }) : super(key: key);
+  });
+  final VoidCallback onNext;
+  final Color backgroundColor;
 
   @override
   State<OnboardingStepBio> createState() => _OnboardingStepBioState();
@@ -77,10 +76,8 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
         _locationController.text = controller.locationName!;
       }
 
-      if (controller.bio != null) {
-        _bioController.text = controller.bio!;
-      }
-    });
+      _bioController.text = controller.bio;
+        });
   }
 
   @override
@@ -105,8 +102,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (BuildContext context) {
-        return SafeArea(
+      builder: (BuildContext context) => SafeArea(
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
@@ -122,7 +118,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                   children: [
                     Text(
                       'Select Your Age',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -164,7 +160,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           Navigator.pop(context);
                         },
                         borderRadius: BorderRadius.circular(8),
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: isSelected ? deepGreen : Colors.white,
                             borderRadius: BorderRadius.circular(8),
@@ -176,7 +172,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           child: Center(
                             child: Text(
                               age.toString(),
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
@@ -209,7 +205,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                     ),
                     child: Text(
                       'Done',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -219,8 +215,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
               ],
             ),
           ),
-        );
-      },
+        ),
     );
   }
 
@@ -267,14 +262,14 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 12, vertical: 6,),
                       decoration: BoxDecoration(
                         color: deepGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         'Step 1 of 4',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: deepGreen,
@@ -289,7 +284,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                 // Header
                 Text(
                   'Tell us about yourself',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.brown.shade800,
@@ -299,7 +294,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                 const SizedBox(height: 12),
                 Text(
                   'Let\'s start with some basic information to set up your profile.',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 15,
                     color: Colors.brown.shade600,
                   ),
@@ -333,7 +328,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           const SizedBox(width: 8),
                           Text(
                             'Your Full Name',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -346,7 +341,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         key: _nameKey,
                         controller: _nameController,
                         textInputAction: TextInputAction.next,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           color: Colors.black87,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -354,11 +349,11 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         decoration: InputDecoration(
                           labelText: 'Full Name',
                           hintText: 'e.g. Oluwaseun Johnson',
-                          hintStyle: GoogleFonts.poppins(
+                          hintStyle: GoogleFonts.montserrat(
                             color: Colors.grey[600],
                             fontSize: 14,
                           ),
-                          labelStyle: GoogleFonts.poppins(
+                          labelStyle: GoogleFonts.montserrat(
                             color: deepGreen,
                             fontSize: 16,
                           ),
@@ -380,7 +375,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.red[400]!, width: 1),
+                                BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -430,7 +425,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           const SizedBox(width: 8),
                           Text(
                             'Your Age',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -445,7 +440,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
+                              horizontal: 16, vertical: 16,),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey[400]!),
                             borderRadius: BorderRadius.circular(12),
@@ -465,7 +460,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                   children: [
                                     Text(
                                       'Age',
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.montserrat(
                                         color: deepGreen,
                                         fontSize: 12,
                                       ),
@@ -474,7 +469,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                                       _selectedAge != null
                                           ? _selectedAge.toString()
                                           : 'Select your age',
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.montserrat(
                                         color: _selectedAge != null
                                             ? Colors.black87
                                             : Colors.grey[600],
@@ -497,10 +492,10 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                       ),
                       if (_selectedAge == null && _autoValidate)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8.0, left: 16.0),
+                          padding: const EdgeInsets.only(top: 8, left: 16),
                           child: Text(
                             'Please select your age',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               color: Colors.red[700],
                               fontSize: 12,
                             ),
@@ -539,7 +534,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           const SizedBox(width: 8),
                           Text(
                             'Your Location',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -552,7 +547,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         key: _locationKey,
                         controller: _locationController,
                         textInputAction: TextInputAction.next,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           color: Colors.black87,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -560,11 +555,11 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         decoration: InputDecoration(
                           labelText: 'City, Country',
                           hintText: 'e.g. Lagos, Nigeria',
-                          hintStyle: GoogleFonts.poppins(
+                          hintStyle: GoogleFonts.montserrat(
                             color: Colors.grey[600],
                             fontSize: 14,
                           ),
-                          labelStyle: GoogleFonts.poppins(
+                          labelStyle: GoogleFonts.montserrat(
                             color: deepGreen,
                             fontSize: 16,
                           ),
@@ -586,7 +581,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.red[400]!, width: 1),
+                                BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -647,7 +642,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           const SizedBox(width: 8),
                           Text(
                             'About You',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -658,7 +653,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                       const SizedBox(height: 8),
                       Text(
                         'Write a short bio to introduce yourself',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: Colors.grey[700],
                         ),
@@ -668,7 +663,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         key: _bioKey,
                         controller: _bioController,
                         textInputAction: TextInputAction.done,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           color: Colors.black87,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -676,7 +671,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         decoration: InputDecoration(
                           hintText:
                               'Tell others about yourself, your interests, and what you\'re looking for...',
-                          hintStyle: GoogleFonts.poppins(
+                          hintStyle: GoogleFonts.montserrat(
                             color: Colors.grey[600],
                             fontSize: 14,
                           ),
@@ -698,7 +693,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                BorderSide(color: Colors.red[400]!, width: 1),
+                                BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -742,14 +737,14 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           if (_selectedAge != null) {
                             final now = DateTime.now();
                             final dob = DateTime(
-                                now.year - _selectedAge!, now.month, now.day);
+                                now.year - _selectedAge!, now.month, now.day,);
                             controller.updateDateOfBirth(dob);
                           }
 
                           // Save location (in a real app, we would also save lat/lng)
                           // For now, we'll just use a placeholder for lat/lng
                           controller.updateLocation(
-                              0.0, 0.0, _locationController.text.trim());
+                              0, 0, _locationController.text.trim(),);
 
                           // Save bio
                           controller.updateBio(_bioController.text.trim());
@@ -777,7 +772,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                       ),
                       child: Text(
                         'Continue',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),

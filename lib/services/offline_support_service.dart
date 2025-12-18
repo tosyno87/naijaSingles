@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/features/messages/message_model.dart';
+
+import '../features/messages/message_model.dart';
+import '../models/user_model.dart';
 
 /// Industry-standard offline support service
 /// Features:
@@ -13,9 +15,10 @@ import 'package:naijasingles/features/messages/message_model.dart';
 /// - Cache management
 /// - Offline indicators
 class OfflineSupportService {
-  static final OfflineSupportService _instance = OfflineSupportService._internal();
   factory OfflineSupportService() => _instance;
   OfflineSupportService._internal();
+  static final OfflineSupportService _instance =
+      OfflineSupportService._internal();
 
   // Cache keys
   static const String _cachedProfilesKey = 'cached_profiles';
@@ -47,30 +50,32 @@ class OfflineSupportService {
   Future<void> cacheProfiles(List<UserModel> profiles) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Convert profiles to JSON using basic serialization
-      final profilesJson = profiles.map((profile) => {
-        'id': profile.id,
-        'name': profile.name,
-        'userGender': profile.userGender,
-        'age': profile.age,
-        'showGender': profile.showGender,
-        'maxDistance': profile.maxDistance,
-        'latitude': profile.latitude,
-        'longitude': profile.longitude,
-        'imageUrl': profile.imageUrl,
-        'bio': profile.bio,
-        'nationality': profile.nationality,
-        'tribe': profile.tribe,
-        'occupation': profile.occupation,
-        'languages': profile.languages,
-        'religion': profile.religion,
-      }).toList();
+      final profilesJson = profiles
+          .map((profile) => {
+                'id': profile.id,
+                'name': profile.name,
+                'userGender': profile.userGender,
+                'age': profile.age,
+                'showGender': profile.showGender,
+                'maxDistance': profile.maxDistance,
+                'latitude': profile.latitude,
+                'longitude': profile.longitude,
+                'imageUrl': profile.imageUrl,
+                'bio': profile.bio,
+                'nationality': profile.nationality,
+                'tribe': profile.tribe,
+                'occupation': profile.occupation,
+                'languages': profile.languages,
+                'religion': profile.religion,
+              },)
+          .toList();
       final jsonString = jsonEncode(profilesJson);
-      
+
       // Store in cache
       await prefs.setString(_cachedProfilesKey, jsonString);
-      
+
       log('💾 Cached ${profiles.length} profiles for offline viewing');
     } catch (e) {
       log('❌ Error caching profiles: $e');
@@ -82,12 +87,13 @@ class OfflineSupportService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_cachedProfilesKey);
-      
+
       if (jsonString == null) return [];
 
       final List<dynamic> profilesJson = jsonDecode(jsonString);
-      final profiles = profilesJson.map((json) => UserModel.fromJson(json)).toList();
-      
+      final profiles =
+          profilesJson.map((json) => UserModel.fromJson(json)).toList();
+
       log('📱 Retrieved ${profiles.length} cached profiles');
       return profiles;
     } catch (e) {
@@ -97,26 +103,29 @@ class OfflineSupportService {
   }
 
   /// Cache messages for offline viewing
-  Future<void> cacheMessages(String threadId, List<MessageThreadInfo> messages) async {
+  Future<void> cacheMessages(
+      String threadId, List<MessageThreadInfo> messages,) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Convert messages to JSON using basic serialization
-      final messagesJson = messages.map((message) => {
-        'threadId': message.threadId,
-        'otherUserId': message.otherUserId,
-        'otherUserName': message.otherUserName,
-        'lastMessage': message.lastMessage,
-        'lastMessageSenderId': message.lastMessageSenderId,
-        'timestamp': message.timestamp.toIso8601String(),
-        'unread': message.unread,
-        'avatarUrl': message.avatarUrl,
-      }).toList();
+      final messagesJson = messages
+          .map((message) => {
+                'threadId': message.threadId,
+                'otherUserId': message.otherUserId,
+                'otherUserName': message.otherUserName,
+                'lastMessage': message.lastMessage,
+                'lastMessageSenderId': message.lastMessageSenderId,
+                'timestamp': message.timestamp.toIso8601String(),
+                'unread': message.unread,
+                'avatarUrl': message.avatarUrl,
+              },)
+          .toList();
       final jsonString = jsonEncode(messagesJson);
-      
+
       // Store in cache with thread ID
       await prefs.setString('${_cachedMessagesKey}_$threadId', jsonString);
-      
+
       log('💾 Cached ${messages.length} messages for thread $threadId');
     } catch (e) {
       log('❌ Error caching messages: $e');
@@ -128,7 +137,7 @@ class OfflineSupportService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString('${_cachedMessagesKey}_$threadId');
-      
+
       if (jsonString == null) return [];
 
       final List<dynamic> messagesJson = jsonDecode(jsonString);
@@ -145,7 +154,7 @@ class OfflineSupportService {
           avatarUrl: data['avatarUrl'] as String?,
         );
       }).toList();
-      
+
       log('📱 Retrieved ${messages.length} cached messages for thread $threadId');
       return messages;
     } catch (e) {
@@ -158,7 +167,7 @@ class OfflineSupportService {
   Future<void> cacheUserProfile(UserModel profile) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Convert profile to JSON using basic serialization
       final profileJson = {
         'id': profile.id,
@@ -177,10 +186,10 @@ class OfflineSupportService {
         'languages': profile.languages,
         'religion': profile.religion,
       };
-      
+
       final jsonString = jsonEncode(profileJson);
       await prefs.setString(_cachedUserProfileKey, jsonString);
-      
+
       log('💾 Cached user profile for offline viewing');
     } catch (e) {
       log('❌ Error caching user profile: $e');
@@ -192,12 +201,12 @@ class OfflineSupportService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_cachedUserProfileKey);
-      
+
       if (jsonString == null) return null;
 
       final profileJson = jsonDecode(jsonString);
       final profile = UserModel.fromJson(profileJson);
-      
+
       log('📱 Retrieved cached user profile');
       return profile;
     } catch (e) {
@@ -210,22 +219,22 @@ class OfflineSupportService {
   Future<void> queueOfflineAction(OfflineAction action) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Get existing actions
       final actionsJson = prefs.getString(_offlineActionsKey) ?? '[]';
       final List<dynamic> actions = jsonDecode(actionsJson);
-      
+
       // Add new action
       actions.add(action.toJson());
-      
+
       // Limit number of actions
       if (actions.length > _maxOfflineActions) {
         actions.removeRange(0, actions.length - _maxOfflineActions);
       }
-      
+
       // Save back to preferences
       await prefs.setString(_offlineActionsKey, jsonEncode(actions));
-      
+
       log('📝 Queued offline action: ${action.type}');
     } catch (e) {
       log('❌ Error queuing offline action: $e');
@@ -238,7 +247,7 @@ class OfflineSupportService {
       final prefs = await SharedPreferences.getInstance();
       final actionsJson = prefs.getString(_offlineActionsKey) ?? '[]';
       final List<dynamic> actions = jsonDecode(actionsJson);
-      
+
       return actions.map((json) => OfflineAction.fromJson(json)).toList();
     } catch (e) {
       log('❌ Error getting queued actions: $e');
@@ -251,13 +260,12 @@ class OfflineSupportService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_offlineActionsKey);
-      
+
       log('🗑️ Cleared queued offline actions');
     } catch (e) {
       log('❌ Error clearing queued actions: $e');
     }
   }
-
 
   /// Start background sync
   Future<void> _startBackgroundSync() async {
@@ -308,7 +316,7 @@ class OfflineSupportService {
     // This would integrate with your actual services
     // For now, we'll just log the action
     log('🔄 Executing offline action: ${action.type}');
-    
+
     switch (action.type) {
       case OfflineActionType.like:
         // Execute like action
@@ -330,9 +338,9 @@ class OfflineSupportService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final timeString = prefs.getString(_lastSyncKey);
-      
+
       if (timeString == null) return null;
-      
+
       return DateTime.parse(timeString);
     } catch (e) {
       log('❌ Error getting last sync time: $e');
@@ -341,14 +349,15 @@ class OfflineSupportService {
   }
 
   /// Check if cache is stale
-  Future<bool> isCacheStale({Duration maxAge = const Duration(hours: 24)}) async {
+  Future<bool> isCacheStale(
+      {Duration maxAge = const Duration(hours: 24),}) async {
     try {
       final lastSync = await getLastSyncTime();
       if (lastSync == null) return true;
-      
+
       final now = DateTime.now();
       final difference = now.difference(lastSync);
-      
+
       return difference > maxAge;
     } catch (e) {
       log('❌ Error checking cache staleness: $e');
@@ -360,14 +369,14 @@ class OfflineSupportService {
   Future<void> clearCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Clear all cache keys
       await prefs.remove(_cachedProfilesKey);
       await prefs.remove(_cachedMessagesKey);
       await prefs.remove(_cachedUserProfileKey);
       await prefs.remove(_offlineActionsKey);
       await prefs.remove(_lastSyncKey);
-      
+
       log('🗑️ Cleared all cached data');
     } catch (e) {
       log('❌ Error clearing cache: $e');
@@ -378,15 +387,15 @@ class OfflineSupportService {
   Future<CacheStats> getCacheStats() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final profilesJson = prefs.getString(_cachedProfilesKey) ?? '[]';
       final profilesCount = (jsonDecode(profilesJson) as List).length;
-      
+
       final actionsJson = prefs.getString(_offlineActionsKey) ?? '[]';
       final actionsCount = (jsonDecode(actionsJson) as List).length;
-      
+
       final lastSync = await getLastSyncTime();
-      
+
       return CacheStats(
         cachedProfiles: profilesCount,
         queuedActions: actionsCount,
@@ -395,7 +404,7 @@ class OfflineSupportService {
       );
     } catch (e) {
       log('❌ Error getting cache stats: $e');
-      return CacheStats(
+      return const CacheStats(
         cachedProfiles: 0,
         queuedActions: 0,
         lastSync: null,
@@ -422,10 +431,6 @@ enum OfflineActionType {
 
 /// Offline action model
 class OfflineAction {
-  final String id;
-  final OfflineActionType type;
-  final Map<String, dynamic> data;
-  final DateTime timestamp;
 
   const OfflineAction({
     required this.id,
@@ -434,17 +439,7 @@ class OfflineAction {
     required this.timestamp,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type.name,
-      'data': data,
-      'timestamp': timestamp.toIso8601String(),
-    };
-  }
-
-  factory OfflineAction.fromJson(Map<String, dynamic> json) {
-    return OfflineAction(
+  factory OfflineAction.fromJson(Map<String, dynamic> json) => OfflineAction(
       id: json['id'],
       type: OfflineActionType.values.firstWhere(
         (e) => e.name == json['type'],
@@ -453,20 +448,24 @@ class OfflineAction {
       data: Map<String, dynamic>.from(json['data']),
       timestamp: DateTime.parse(json['timestamp']),
     );
-  }
+  final String id;
+  final OfflineActionType type;
+  final Map<String, dynamic> data;
+  final DateTime timestamp;
+
+  Map<String, dynamic> toJson() => {
+      'id': id,
+      'type': type.name,
+      'data': data,
+      'timestamp': timestamp.toIso8601String(),
+    };
 
   @override
-  String toString() {
-    return 'OfflineAction(${type.name}, $timestamp)';
-  }
+  String toString() => 'OfflineAction(${type.name}, $timestamp)';
 }
 
 /// Cache statistics
 class CacheStats {
-  final int cachedProfiles;
-  final int queuedActions;
-  final DateTime? lastSync;
-  final bool isOnline;
 
   const CacheStats({
     required this.cachedProfiles,
@@ -474,9 +473,11 @@ class CacheStats {
     required this.lastSync,
     required this.isOnline,
   });
+  final int cachedProfiles;
+  final int queuedActions;
+  final DateTime? lastSync;
+  final bool isOnline;
 
   @override
-  String toString() {
-    return 'CacheStats(profiles: $cachedProfiles, actions: $queuedActions, online: $isOnline)';
-  }
+  String toString() => 'CacheStats(profiles: $cachedProfiles, actions: $queuedActions, online: $isOnline)';
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../widgets/cultural_story_card.dart';
 import '../widgets/language_exchange_card.dart';
 
 class CulturalLearningScreen extends StatefulWidget {
-  const CulturalLearningScreen({Key? key}) : super(key: key);
+  const CulturalLearningScreen({super.key});
 
   @override
   State<CulturalLearningScreen> createState() => _CulturalLearningScreenState();
@@ -27,9 +28,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+  Widget build(BuildContext context) => Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -49,10 +49,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildHeader() {
-    return Container(
+  Widget _buildHeader() => Container(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,10 +74,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildTabBar() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -115,10 +111,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildCulturalStoriesTab() {
-    return ListView(
+  Widget _buildCulturalStoriesTab() => ListView(
       padding: const EdgeInsets.all(20),
       children: [
         CulturalStoryCard(
@@ -126,7 +120,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           author: 'Amina Okafor',
           country: 'Nigeria',
           category: 'Food',
-          content: 'Discover the secrets behind Nigeria\'s most beloved dish. From the perfect rice-to-tomato ratio to the traditional cooking methods passed down through generations...',
+          content:
+              'Discover the secrets behind Nigeria\'s most beloved dish. From the perfect rice-to-tomato ratio to the traditional cooking methods passed down through generations...',
           likesCount: 234,
           commentsCount: 45,
           isVerified: true,
@@ -145,7 +140,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           author: 'Kwame Asante',
           country: 'Ghana',
           category: 'Traditions',
-          content: 'Learn about the ancient art of Kente weaving, its cultural significance, and the stories woven into each pattern. A journey through Ghana\'s textile heritage...',
+          content:
+              'Learn about the ancient art of Kente weaving, its cultural significance, and the stories woven into each pattern. A journey through Ghana\'s textile heritage...',
           likesCount: 189,
           commentsCount: 32,
           isVerified: true,
@@ -164,7 +160,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           author: 'Naisula Lekishon',
           country: 'Kenya',
           category: 'Art',
-          content: 'Explore the intricate world of Maasai beadwork, where every color and pattern tells a story of community, age, and social status...',
+          content:
+              'Explore the intricate world of Maasai beadwork, where every color and pattern tells a story of community, age, and social status...',
           likesCount: 156,
           commentsCount: 28,
           isVerified: false,
@@ -179,10 +176,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildLanguageExchangeTab() {
-    return ListView(
+  Widget _buildLanguageExchangeTab() => ListView(
       padding: const EdgeInsets.all(20),
       children: [
         LanguageExchangeCard(
@@ -192,7 +187,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           country: 'Nigeria',
           city: 'Lagos',
           proficiency: 'Advanced',
-          description: 'Native Yoruba speaker looking to help others learn while improving my English. Love discussing culture and traditions!',
+          description:
+              'Native Yoruba speaker looking to help others learn while improving my English. Love discussing culture and traditions!',
           isOnline: true,
           isInPerson: false,
           onConnect: () {
@@ -212,7 +208,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           country: 'USA',
           city: 'New York',
           proficiency: 'Beginner',
-          description: 'American learning Swahili for travel to East Africa. Would love to practice with native speakers and learn about the culture.',
+          description:
+              'American learning Swahili for travel to East Africa. Would love to practice with native speakers and learn about the culture.',
           isOnline: true,
           isInPerson: true,
           onConnect: () {
@@ -232,7 +229,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
           country: 'Ghana',
           city: 'Accra',
           proficiency: 'Intermediate',
-          description: 'Ghanaian Twi speaker learning French for business opportunities. Happy to share Twi culture and language in exchange.',
+          description:
+              'Ghanaian Twi speaker learning French for business opportunities. Happy to share Twi culture and language in exchange.',
           isOnline: true,
           isInPerson: false,
           onConnect: () {
@@ -246,10 +244,8 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildCulturalEventsTab() {
-    return Center(
+  Widget _buildCulturalEventsTab() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -279,5 +275,4 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
         ],
       ),
     );
-  }
 }

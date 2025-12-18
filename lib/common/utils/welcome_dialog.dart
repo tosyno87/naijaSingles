@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
+
 import '../constants/colors.dart';
+import '../routes/route_name.dart';
 
 Future showWelcomDialog(context) async {
   showDialog(
@@ -14,16 +15,15 @@ Future showWelcomDialog(context) async {
         });
         return Center(
             child: Container(
-                width: 150.0,
-                height: 100.0,
+                width: 150,
+                height: 100,
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(20)),
+                    borderRadius: BorderRadius.circular(20),),
                 child: Column(
                   children: <Widget>[
                     Image.asset(
-                      "asset/auth/verified.jpg",
+                      'asset/auth/verified.jpg',
                       height: 60,
                       color: primaryColor,
                       colorBlendMode: BlendMode.color,
@@ -34,9 +34,9 @@ Future showWelcomDialog(context) async {
                       style: const TextStyle(
                           decoration: TextDecoration.none,
                           color: Colors.black,
-                          fontSize: 20),
-                    )
+                          fontSize: 20,),
+                    ),
                   ],
-                )));
-      });
+                ),),);
+      },);
 }

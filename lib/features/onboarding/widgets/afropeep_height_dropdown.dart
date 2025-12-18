@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AfropeepHeightDropdown extends StatefulWidget {
+
+  const AfropeepHeightDropdown({
+    required this.onChanged, super.key,
+    this.initialHeightFtIn,
+    this.initialHeightCm,
+  });
   final String? initialHeightFtIn;
   final int? initialHeightCm;
   final Function(String heightFtIn, int heightCm) onChanged;
-
-  const AfropeepHeightDropdown({
-    Key? key,
-    this.initialHeightFtIn,
-    this.initialHeightCm,
-    required this.onChanged,
-  }) : super(key: key);
 
   @override
   State<AfropeepHeightDropdown> createState() => _AfropeepHeightDropdownState();
@@ -142,8 +141,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
                 dropdownColor: Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
-                items: _heightOptions.map((option) {
-                  return DropdownMenuItem<String>(
+                items: _heightOptions.map((option) => DropdownMenuItem<String>(
                     value: option['ft_in'],
                     child: Container(
                       width: double.infinity,
@@ -160,8 +158,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
                         ),
                       ),
                     ),
-                  );
-                }).toList(),
+                  ),).toList(),
                 onChanged: (String? newValue) {
                   if (newValue != null) {
                     final selectedOption = _heightOptions.firstWhere(

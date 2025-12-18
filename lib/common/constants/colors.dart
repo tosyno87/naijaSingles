@@ -1,47 +1,46 @@
+// ⚠️ DEPRECATED: This file is deprecated. Use app_colors.dart instead.
+//
+// All colors have been moved to lib/common/constants/app_colors.dart
+// This file is kept for backward compatibility during migration.
+//
+// TODO: Migrate all imports from 'constants/colors.dart' to 'constants/app_colors.dart'
+// Then delete this file.
+
+@Deprecated('Use app_colors.dart instead. This file will be removed in a future version.')
+library;
+
 import 'package:flutter/material.dart';
 
-// Afropeep MVP Color Scheme - Consistent across the app
-const Color primaryColor = Color(0xFF008037); // Deep green
-const Color backgroundColor = Color(0xFFFFF6E5); // Light cream
-const Color cardColor = Color(0xFFFFFFFF); // White for cards
-const Color textPrimary = Color(0xFF5D4037); // Brown
-const Color textSecondary = Color(0xFF8D6E63); // Light brown
-const Color textLight = Color(0xFF9E9E9E); // Gray
+// Re-export from app_colors.dart for backward compatibility
+export 'app_colors.dart' show AppColors;
 
-// Legacy colors - deprecated, use above colors instead
-@Deprecated('Use Colors.grey instead')
-const Color secondaryColor = Colors.grey;
-@Deprecated('Use primaryColor instead')
-const Color darkPrimaryColor = Color(0x222E8B57);
-@Deprecated('Use textPrimary or textSecondary instead')
-const Color textColor = Colors.white;
+// Deprecated top-level constants - use AppColors from app_colors.dart instead
+@Deprecated('Use AppColors.primaryGreen from app_colors.dart')
+const Color primaryColor = Color(0xFF008037);
 
-// Accent colors for specific use cases
-const Color successColor = Color(0xFF4CAF50); // Green for success states
-const Color errorColor = Color(0xFFFF5A5F); // Red for errors/dislike
-const Color warningColor = Color(0xFFFF9800); // Orange for warnings
-const Color infoColor = Color(0xFF2196F3); // Blue for info
+@Deprecated('Use AppColors.backgroundColor (white) from app_colors.dart. Old cream color is deprecated.')
+const Color backgroundColor = Colors.white; // Updated to white (was cream)
 
-// Opacity variations of primary colors
-const Color primaryColorLight = Color(0x1A008037); // 10% opacity
-const Color primaryColorMedium = Color(0x4D008037); // 30% opacity
-const Color backgroundColorDark = Color(0xFFFDF1E7); // Slightly darker cream
+@Deprecated('Use AppColors.cardColor from app_colors.dart')
+const Color cardColor = Color(0xFFFFFFFF);
 
-// AppColors class for backward compatibility
-class AppColors {
-  static const Color primaryColor = Color(0xFF008037);
-  static const Color backgroundColor = Color(0xFFFFF6E5);
-  static const Color cardColor = Color(0xFFFFFFFF);
-  static const Color textPrimary = Color(0xFF5D4037);
-  static const Color textSecondary = Color(0xFF8D6E63);
-  static const Color textLight = Color(0xFF9E9E9E);
-  static const Color accentColor = Color(0xFFFF5A5F);
-  static const Color errorColor = Color(0xFFFF5A5F);
-  static const Color successColor = Color(0xFF4CAF50);
-  static const Color warningColor = Color(0xFFFF9800);
-  static const Color infoColor = Color(0xFF2196F3);
-  static const Color secondaryColor = Color(0xFF8D6E63); // Add this back
+@Deprecated('Use AppColors.textPrimary from app_colors.dart')
+const Color textPrimary = Color(0xFF5D4037);
 
-  @Deprecated('Use AppColors.textSecondary instead')
-  static const Color secondryColor = textSecondary;
-}
+@Deprecated('Use AppColors.textSecondary from app_colors.dart')
+const Color textSecondary = Color(0xFF8D6E63);
+
+@Deprecated('Use AppColors.textTertiary from app_colors.dart')
+const Color textLight = Color(0xFF9E9E9E);
+
+@Deprecated('Use AppColors.error from app_colors.dart')
+const Color errorColor = Color(0xFFFF5A5F);
+
+@Deprecated('Use AppColors.success from app_colors.dart')
+const Color successColor = Color(0xFF4CAF50);
+
+@Deprecated('Use AppColors.warning from app_colors.dart')
+const Color warningColor = Color(0xFFFF9800);
+
+@Deprecated('Use AppColors.info from app_colors.dart')
+const Color infoColor = Color(0xFF2196F3);

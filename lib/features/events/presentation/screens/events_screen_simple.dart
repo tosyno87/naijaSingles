@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class EventsScreenSimple extends StatefulWidget {
-  const EventsScreenSimple({Key? key}) : super(key: key);
+  const EventsScreenSimple({super.key});
 
   @override
   State<EventsScreenSimple> createState() => _EventsScreenSimpleState();
@@ -10,9 +11,8 @@ class EventsScreenSimple extends StatefulWidget {
 
 class _EventsScreenSimpleState extends State<EventsScreenSimple> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+  Widget build(BuildContext context) => Scaffold(
+      backgroundColor: AppColors.backgroundColor, // NaijaSingles cream background
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -41,10 +41,10 @@ class _EventsScreenSimpleState extends State<EventsScreenSimple> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.event,
                         size: 80,
-                        color: const Color(0xFF008037),
+                        color: Color(0xFF008037),
                       ),
                       const SizedBox(height: 20),
                       Text(
@@ -73,5 +73,4 @@ class _EventsScreenSimpleState extends State<EventsScreenSimple> {
         ),
       ),
     );
-  }
 }

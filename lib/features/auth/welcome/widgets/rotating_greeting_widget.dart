@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RotatingGreetingWidget extends StatelessWidget {
-  const RotatingGreetingWidget({Key? key}) : super(key: key);
+  const RotatingGreetingWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       height: 30,
       child: DefaultTextStyle(
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.montserrat(
           fontSize: 18,
           fontWeight: FontWeight.w500,
           color: const Color(0xFF3E1F0D), // Deep brown color
@@ -21,55 +20,38 @@ class RotatingGreetingWidget extends StatelessWidget {
           animatedTexts: [
             FadeAnimatedText(
               'Nnoo',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
             FadeAnimatedText(
               'Karibu',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
             FadeAnimatedText(
               'Barka da zuwa',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
             FadeAnimatedText(
               'Wamkelekile',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
             FadeAnimatedText(
               'Akwaaba',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
             FadeAnimatedText(
               'Bienvenue',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
             FadeAnimatedText(
               'Muraho',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
             FadeAnimatedText(
               'Salam',
-              duration: const Duration(seconds: 2),
               fadeInEnd: 0.2,
-              fadeOutBegin: 0.8,
             ),
           ],
         ),
       ),
     );
-  }
 }

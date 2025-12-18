@@ -10,8 +10,8 @@ import '../../../../common/utils/custom_toast.dart';
 import '../../../../common/widgets/image_widget.dart';
 
 class Layout extends StatelessWidget {
+  const Layout({required this.documentSnapshot, super.key});
   final DocumentSnapshot documentSnapshot;
-  const Layout({super.key, required this.documentSnapshot});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +27,9 @@ class Layout extends StatelessWidget {
                     children: <Widget>[
                       Container(
                         margin: const EdgeInsets.only(
-                            top: 2.0, bottom: 2.0, right: 15),
+                            top: 2, bottom: 2, right: 15,),
                         height: 150,
-                        width: 150.0,
+                        width: 150,
                         color: AppColors.secondaryColor
                             .withValues(alpha: (.5 * 255).toDouble()),
                         padding: const EdgeInsets.all(5),
@@ -44,17 +44,17 @@ class Layout extends StatelessWidget {
                             Container(
                               alignment: Alignment.bottomRight,
                               child: documentSnapshot.get('isRead') == false
-                                  ? Icon(
+                                  ? const Icon(
                                       Icons.done,
                                       color: AppColors.secondaryColor,
                                       size: 15,
                                     )
-                                  : Icon(
+                                  : const Icon(
                                       Icons.done_all,
                                       color: primaryColor,
                                       size: 15,
                                     ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -65,41 +65,41 @@ class Layout extends StatelessWidget {
                                 ? DateFormat.yMMMd('en_US')
                                     .add_jm()
                                     .format(
-                                        documentSnapshot.get('time').toDate())
+                                        documentSnapshot.get('time').toDate(),)
                                     .toString()
-                                : "",
-                            style: TextStyle(
+                                : '',
+                            style: const TextStyle(
                               color: AppColors.secondaryColor,
-                              fontSize: 13.0,
+                              fontSize: 13,
                               fontWeight: FontWeight.w600,
-                            )),
-                      )
+                            ),),
+                      ),
                     ],
                   ),
                   onTap: () {
                     Navigator.pushNamed(context, RouteName.largeImageScreen,
-                        arguments: documentSnapshot.get('image_url'));
+                        arguments: documentSnapshot.get('image_url'),);
                   },
                 )
               : GestureDetector(
                   onLongPress: () {
                     Clipboard.setData(
-                        ClipboardData(text: documentSnapshot.get('text')));
+                        ClipboardData(text: documentSnapshot.get('text')),);
                     CustomToast.showToast('Message Copied'.tr().toString());
                   },
                   child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 10.0),
+                          horizontal: 10, vertical: 10,),
                       width: MediaQuery.of(context).size.width * 0.65,
                       margin: const EdgeInsets.only(
-                          top: 8.0, bottom: 8.0, left: 80.0, right: 10),
+                          top: 8, bottom: 8, left: 80, right: 10,),
                       decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
                               ? AppColors.secondaryColor
                                   .withValues(alpha: (.5 * 255).toDouble())
                               : primaryColor.withValues(
-                                  alpha: (.1 * 255).toDouble()),
-                          borderRadius: BorderRadius.circular(15)),
+                                  alpha: (.1 * 255).toDouble(),),
+                          borderRadius: BorderRadius.circular(15),),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -109,7 +109,7 @@ class Layout extends StatelessWidget {
                               color: themeProvider.isDarkMode
                                   ? Colors.white
                                   : Colors.black87,
-                              fontSize: 16.0,
+                              fontSize: 16,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -122,33 +122,31 @@ class Layout extends StatelessWidget {
                                         .add_jm()
                                         .format(documentSnapshot
                                             .get('time')
-                                            .toDate())
+                                            .toDate(),)
                                         .toString()
-                                    : "",
-                                style: TextStyle(
+                                    : '',
+                                style: const TextStyle(
                                   color: AppColors.secondaryColor,
-                                  fontSize: 13.0,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               const SizedBox(
                                 width: 5,
                               ),
-                              documentSnapshot.get('isRead') == false
-                                  ? Icon(
+                              if (documentSnapshot.get('isRead') == false) const Icon(
                                       Icons.done,
                                       color: AppColors.secondaryColor,
                                       size: 15,
-                                    )
-                                  : Icon(
+                                    ) else const Icon(
                                       Icons.done_all,
                                       color: primaryColor,
                                       size: 15,
-                                    )
+                                    ),
                             ],
                           ),
                         ],
-                      )),
+                      ),),
                 ),
         ),
       ],

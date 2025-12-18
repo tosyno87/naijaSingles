@@ -11,7 +11,7 @@ void main() {
       print('🧪 Testing swipe card functionality...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 5));
+      await tester.pumpAndSettle(const Duration(seconds: 5));
 
       // Look for swipeable cards
       final gestureDetectors = find.byType(GestureDetector);
@@ -22,11 +22,11 @@ void main() {
         
         // Test swipe gesture
         if (gestureDetectors.evaluate().isNotEmpty) {
-          await tester.drag(gestureDetectors.first, Offset(-300, 0));
+          await tester.drag(gestureDetectors.first, const Offset(-300, 0));
           await tester.pumpAndSettle();
           print('✅ Left swipe gesture executed');
           
-          await tester.drag(gestureDetectors.first, Offset(300, 0));
+          await tester.drag(gestureDetectors.first, const Offset(300, 0));
           await tester.pumpAndSettle();
           print('✅ Right swipe gesture executed');
         }
@@ -43,7 +43,7 @@ void main() {
       print('🧪 Testing like and dislike buttons...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for like/dislike buttons (typically with heart/X icons)
       final heartIcons = find.byIcon(Icons.favorite);
@@ -84,7 +84,7 @@ void main() {
       print('🧪 Testing match notification...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for match-related UI elements
       final matchTexts = find.textContaining('Match');
@@ -109,7 +109,7 @@ void main() {
       print('🧪 Testing user profile view...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for profile images
       final images = find.byType(Image);
@@ -145,7 +145,7 @@ void main() {
       print('🧪 Testing filter and preferences...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for filter/settings icons
       final filterIcons = find.byIcon(Icons.filter_list);

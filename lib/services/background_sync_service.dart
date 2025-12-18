@@ -14,9 +14,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// - Battery optimization
 /// - Network-aware syncing
 class BackgroundSyncService {
-  static final BackgroundSyncService _instance = BackgroundSyncService._internal();
   factory BackgroundSyncService() => _instance;
   BackgroundSyncService._internal();
+  static final BackgroundSyncService _instance =
+      BackgroundSyncService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -103,15 +104,14 @@ class BackgroundSyncService {
 
       if (localProfileData != null) {
         // Compare with remote data
-        final remoteDoc = await _firestore.collection('users').doc(userId).get();
-        
+        final remoteDoc =
+            await _firestore.collection('users').doc(userId).get();
+
         if (remoteDoc.exists) {
           final remoteData = remoteDoc.data()!;
           final localData = Map<String, dynamic>.from(
-            Map<String, dynamic>.from(remoteData)..addAll(
-              Map<String, dynamic>.from(localProfileData as Map)
-            )
-          );
+              Map<String, dynamic>.from(remoteData)
+                ..addAll(Map<String, dynamic>.from(localProfileData as Map)),);
 
           // Update remote with local changes
           await _firestore.collection('users').doc(userId).update(localData);
@@ -121,7 +121,8 @@ class BackgroundSyncService {
       // Download latest profile data
       final profileDoc = await _firestore.collection('users').doc(userId).get();
       if (profileDoc.exists) {
-        await prefs.setString('user_profile_$userId', profileDoc.data().toString());
+        await prefs.setString(
+            'user_profile_$userId', profileDoc.data().toString(),);
       }
 
       log('✅ User profile synced');
@@ -143,7 +144,7 @@ class BackgroundSyncService {
 
       for (final threadDoc in threadsSnapshot.docs) {
         final threadId = threadDoc.id;
-        
+
         // Get local messages
         final prefs = await SharedPreferences.getInstance();
         final localMessagesKey = 'messages_$threadId';
@@ -160,11 +161,10 @@ class BackgroundSyncService {
 
         // Merge local and remote messages
         final allMessages = <Map<String, dynamic>>[];
-        
+
         if (localMessages != null) {
-          final localMessagesList = List<Map<String, dynamic>>.from(
-            localMessages as List
-          );
+          final localMessagesList =
+              List<Map<String, dynamic>>.from(localMessages as List);
           allMessages.addAll(localMessagesList);
         }
 
@@ -177,12 +177,14 @@ class BackgroundSyncService {
         // Remove duplicates and sort by timestamp
         final uniqueMessages = <String, Map<String, dynamic>>{};
         for (final message in allMessages) {
-          final messageId = message['id'] as String? ?? message['timestamp'].toString();
+          final messageId =
+              message['id'] as String? ?? message['timestamp'].toString();
           uniqueMessages[messageId] = message;
         }
 
         final sortedMessages = uniqueMessages.values.toList()
-          ..sort((a, b) => (b['timestamp'] as Timestamp).compareTo(a['timestamp'] as Timestamp));
+          ..sort((a, b) => (b['timestamp'] as Timestamp)
+              .compareTo(a['timestamp'] as Timestamp),);
 
         // Save merged messages locally
         await prefs.setString(localMessagesKey, sortedMessages.toString());
@@ -207,7 +209,8 @@ class BackgroundSyncService {
 
       // Save matches locally
       final prefs = await SharedPreferences.getInstance();
-      final matchesData = matchesSnapshot.docs.map((doc) => doc.data()).toList();
+      final matchesData =
+          matchesSnapshot.docs.map((doc) => doc.data()).toList();
       await prefs.setString('matches_$userId', matchesData.toString());
 
       log('✅ Matches synced');
@@ -238,7 +241,8 @@ class BackgroundSyncService {
       if (userDoc.exists) {
         final preferences = userDoc.data()?['preferences'];
         if (preferences != null) {
-          await prefs.setString('user_preferences_$userId', preferences.toString());
+          await prefs.setString(
+              'user_preferences_$userId', preferences.toString(),);
         }
       }
 
@@ -254,7 +258,7 @@ class BackgroundSyncService {
       log('📝 Adding sync task to queue: ${task.type}');
 
       _syncQueue.add(task);
-      
+
       // Save to local storage
       final prefs = await SharedPreferences.getInstance();
       final tasksJson = _syncQueue.map((task) => task.toMap()).toList();
@@ -284,7 +288,7 @@ class BackgroundSyncService {
           await _executeSyncTask(task);
         } catch (e) {
           log('❌ Error executing sync task ${task.type}: $e');
-          
+
           // Re-queue failed task if it hasn't exceeded retry limit
           if (task.retryCount < 3) {
             task.retryCount++;
@@ -383,10 +387,8 @@ class BackgroundSyncService {
 
       if (tasksJson != null) {
         final tasksData = jsonDecode(tasksJson);
-        final tasksList = List<Map<String, dynamic>>.from(
-          tasksData as List
-        );
-        
+        final tasksList = List<Map<String, dynamic>>.from(tasksData as List);
+
         for (final taskMap in tasksList) {
           _syncQueue.add(SyncTask.fromMap(taskMap));
         }
@@ -413,7 +415,7 @@ class BackgroundSyncService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final timeString = prefs.getString('last_sync_time');
-      
+
       if (timeString != null) {
         return DateTime.parse(timeString);
       }
@@ -437,15 +439,13 @@ class BackgroundSyncService {
   }
 
   /// Get sync status
-  SyncStatus getSyncStatus() {
-    return SyncStatus(
+  SyncStatus getSyncStatus() => SyncStatus(
       isSyncing: _isSyncing,
       queueLength: _syncQueue.length,
-      lastSyncTime: _lastSyncTimes.values.isNotEmpty 
+      lastSyncTime: _lastSyncTimes.values.isNotEmpty
           ? _lastSyncTimes.values.reduce((a, b) => a.isAfter(b) ? a : b)
           : null,
     );
-  }
 
   /// Dispose resources
   void dispose() {
@@ -464,12 +464,6 @@ enum SyncTaskType {
 
 /// Sync task model
 class SyncTask {
-  final String id;
-  final SyncTaskType type;
-  final String userId;
-  final Map<String, dynamic> data;
-  final DateTime createdAt;
-  int retryCount;
 
   SyncTask({
     required this.id,
@@ -480,19 +474,7 @@ class SyncTask {
     this.retryCount = 0,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'type': type.name,
-      'userId': userId,
-      'data': data,
-      'createdAt': createdAt.toIso8601String(),
-      'retryCount': retryCount,
-    };
-  }
-
-  factory SyncTask.fromMap(Map<String, dynamic> map) {
-    return SyncTask(
+  factory SyncTask.fromMap(Map<String, dynamic> map) => SyncTask(
       id: map['id'],
       type: SyncTaskType.values.firstWhere(
         (e) => e.name == map['type'],
@@ -503,28 +485,38 @@ class SyncTask {
       createdAt: DateTime.parse(map['createdAt']),
       retryCount: map['retryCount'] ?? 0,
     );
-  }
+  final String id;
+  final SyncTaskType type;
+  final String userId;
+  final Map<String, dynamic> data;
+  final DateTime createdAt;
+  int retryCount;
+
+  Map<String, dynamic> toMap() => {
+      'id': id,
+      'type': type.name,
+      'userId': userId,
+      'data': data,
+      'createdAt': createdAt.toIso8601String(),
+      'retryCount': retryCount,
+    };
 
   @override
-  String toString() {
-    return 'SyncTask(${type.name}, retries: $retryCount)';
-  }
+  String toString() => 'SyncTask(${type.name}, retries: $retryCount)';
 }
 
 /// Sync status model
 class SyncStatus {
-  final bool isSyncing;
-  final int queueLength;
-  final DateTime? lastSyncTime;
 
   const SyncStatus({
     required this.isSyncing,
     required this.queueLength,
     this.lastSyncTime,
   });
+  final bool isSyncing;
+  final int queueLength;
+  final DateTime? lastSyncTime;
 
   @override
-  String toString() {
-    return 'SyncStatus(syncing: $isSyncing, queue: $queueLength, lastSync: $lastSyncTime)';
-  }
+  String toString() => 'SyncStatus(syncing: $isSyncing, queue: $queueLength, lastSync: $lastSyncTime)';
 }

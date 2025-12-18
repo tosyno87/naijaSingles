@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/services/performance_monitor.dart';
-import 'package:naijasingles/services/optimized_match_service.dart';
+
+import 'optimized_match_service.dart';
+import 'performance_monitor.dart';
 
 /// Super like service that provides premium highlighting and instant notifications
 /// Implements Priority 3: User Experience Enhancements
@@ -29,8 +29,7 @@ class SuperLikeService {
   Future<SuperLikeResult> sendSuperLike({
     required String fromUserId,
     required String toUserId,
-  }) async {
-    return await PerformanceMonitor.measure('send_super_like', () async {
+  }) async => PerformanceMonitor.measure('send_super_like', () async {
       try {
         debugPrint('⭐ Sending super like: $fromUserId → $toUserId');
 
@@ -38,7 +37,7 @@ class SuperLikeService {
         final canSend = await canSendSuperLike(fromUserId);
         if (!canSend.canSend) {
           return SuperLikeResult.failed(
-              canSend.reason ?? 'Cannot send super like');
+              canSend.reason ?? 'Cannot send super like',);
         }
 
         // Check if already super liked this user
@@ -46,7 +45,7 @@ class SuperLikeService {
             await _getExistingSuperLike(fromUserId, toUserId);
         if (existingSuperLike != null) {
           return SuperLikeResult.failed(
-              'You have already super liked this user');
+              'You have already super liked this user',);
         }
 
         // Check if already liked this user normally
@@ -104,7 +103,6 @@ class SuperLikeService {
         return SuperLikeResult.failed('Error: ${e.toString()}');
       }
     });
-  }
 
   /// Check if user can send a super like
   Future<SuperLikeEligibility> canSendSuperLike(String userId) async {
@@ -149,7 +147,7 @@ class SuperLikeService {
       final querySnapshot = await _superLikesCollection
           .where('fromUserId', isEqualTo: userId)
           .where('timestamp',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),)
           .get();
 
       return querySnapshot.docs.length;
@@ -160,8 +158,7 @@ class SuperLikeService {
   }
 
   /// Get super likes received by a user
-  Future<List<SuperLike>> getReceivedSuperLikes(String userId) async {
-    return await PerformanceMonitor.measure('get_received_super_likes',
+  Future<List<SuperLike>> getReceivedSuperLikes(String userId) async => PerformanceMonitor.measure('get_received_super_likes',
         () async {
       try {
         final querySnapshot = await _superLikesCollection
@@ -172,22 +169,20 @@ class SuperLikeService {
             .get();
 
         final superLikes = querySnapshot.docs
-            .map((doc) => SuperLike.fromDocument(doc))
+            .map(SuperLike.fromDocument)
             .toList();
 
         debugPrint(
-            '📬 Found ${superLikes.length} super likes for user $userId');
+            '📬 Found ${superLikes.length} super likes for user $userId',);
         return superLikes;
       } catch (e) {
         debugPrint('❌ Error getting received super likes: $e');
         return [];
       }
     });
-  }
 
   /// Get super likes sent by a user
-  Future<List<SuperLike>> getSentSuperLikes(String userId) async {
-    return await PerformanceMonitor.measure('get_sent_super_likes', () async {
+  Future<List<SuperLike>> getSentSuperLikes(String userId) async => PerformanceMonitor.measure('get_sent_super_likes', () async {
       try {
         final querySnapshot = await _superLikesCollection
             .where('fromUserId', isEqualTo: userId)
@@ -196,26 +191,24 @@ class SuperLikeService {
             .get();
 
         final superLikes = querySnapshot.docs
-            .map((doc) => SuperLike.fromDocument(doc))
+            .map(SuperLike.fromDocument)
             .toList();
 
         debugPrint(
-            '📤 Found ${superLikes.length} sent super likes for user $userId');
+            '📤 Found ${superLikes.length} sent super likes for user $userId',);
         return superLikes;
       } catch (e) {
         debugPrint('❌ Error getting sent super likes: $e');
         return [];
       }
     });
-  }
 
   /// Respond to a super like (like back or pass)
   Future<SuperLikeResponse> respondToSuperLike({
     required String superLikeId,
     required String respondingUserId,
     required bool isLike,
-  }) async {
-    return await PerformanceMonitor.measure('respond_to_super_like', () async {
+  }) async => PerformanceMonitor.measure('respond_to_super_like', () async {
       try {
         debugPrint('💫 Responding to super like: $superLikeId (like: $isLike)');
 
@@ -241,11 +234,11 @@ class SuperLikeService {
         if (isLike) {
           // Create match since both users liked each other
           final matchResult = await _matchService.handleLike(
-              respondingUserId, superLike.fromUserId);
+              respondingUserId, superLike.fromUserId,);
 
           if (matchResult.isSuccess && matchResult.isMatch) {
             debugPrint(
-                '🎉 Super like resulted in match: ${matchResult.matchId}');
+                '🎉 Super like resulted in match: ${matchResult.matchId}',);
 
             return SuperLikeResponse.success(
               isMatch: true,
@@ -262,19 +255,18 @@ class SuperLikeService {
               'isSuperLikeResponse': true,
             });
 
-            return SuperLikeResponse.success(isMatch: false);
+            return SuperLikeResponse.success();
           }
         } else {
           // User passed on the super like
           debugPrint('👎 User passed on super like: $superLikeId');
-          return SuperLikeResponse.success(isMatch: false);
+          return SuperLikeResponse.success();
         }
       } catch (e) {
         debugPrint('❌ Error responding to super like: $e');
         return SuperLikeResponse.failed('Error: ${e.toString()}');
       }
     });
-  }
 
   /// Create a super like document
   Future<String?> _createSuperLike({
@@ -291,7 +283,7 @@ class SuperLikeService {
         'toUserId': toUserId,
         'fromUserName': fromUserData['name'] ?? 'Unknown',
         'fromUserImageUrl':
-            (fromUserData['imageUrl'] as List?)?.isNotEmpty == true
+            (fromUserData['imageUrl'] as List?)?.isNotEmpty ?? false
                 ? fromUserData['imageUrl'][0]
                 : '',
         'toUserName': toUserData['name'] ?? 'Unknown',
@@ -299,7 +291,7 @@ class SuperLikeService {
         'isActive': true,
         'responded': false,
         'highlightUntil': Timestamp.fromDate(
-            DateTime.now().add(SUPER_LIKE_HIGHLIGHT_DURATION)),
+            DateTime.now().add(SUPER_LIKE_HIGHLIGHT_DURATION),),
       });
 
       return superLikeRef.id;
@@ -357,11 +349,11 @@ class SuperLikeService {
 
   /// Check for instant match when super like is sent
   Future<String?> _checkForInstantMatch(
-      String fromUserId, String toUserId) async {
+      String fromUserId, String toUserId,) async {
     try {
       // Check if recipient has already liked the sender
       final reverseLikeDoc =
-          await _likesCollection.doc('${toUserId}_likes_${fromUserId}').get();
+          await _likesCollection.doc('${toUserId}_likes_$fromUserId').get();
 
       if (reverseLikeDoc.exists) {
         // Create match
@@ -382,7 +374,7 @@ class SuperLikeService {
 
   /// Get existing super like between two users
   Future<SuperLike?> _getExistingSuperLike(
-      String fromUserId, String toUserId) async {
+      String fromUserId, String toUserId,) async {
     try {
       final querySnapshot = await _superLikesCollection
           .where('fromUserId', isEqualTo: fromUserId)
@@ -405,7 +397,7 @@ class SuperLikeService {
   Future<bool> _hasAlreadyLiked(String fromUserId, String toUserId) async {
     try {
       final likeDoc =
-          await _likesCollection.doc('${fromUserId}_likes_${toUserId}').get();
+          await _likesCollection.doc('${fromUserId}_likes_$toUserId').get();
       return likeDoc.exists;
     } catch (e) {
       debugPrint('❌ Error checking existing like: $e');
@@ -484,7 +476,7 @@ class SuperLikeService {
       if (expiredQuery.docs.isNotEmpty) {
         await batch.commit();
         debugPrint(
-            '🧹 Cleaned up ${expiredQuery.docs.length} expired super like highlights');
+            '🧹 Cleaned up ${expiredQuery.docs.length} expired super like highlights',);
       }
     } catch (e) {
       debugPrint('❌ Error cleaning up expired highlights: $e');
@@ -494,18 +486,6 @@ class SuperLikeService {
 
 /// Represents a super like between two users
 class SuperLike {
-  final String id;
-  final String fromUserId;
-  final String toUserId;
-  final String fromUserName;
-  final String fromUserImageUrl;
-  final String toUserName;
-  final DateTime timestamp;
-  final bool isActive;
-  final bool responded;
-  final String? responseType;
-  final DateTime? respondedAt;
-  final DateTime? highlightUntil;
 
   const SuperLike({
     required this.id,
@@ -539,6 +519,18 @@ class SuperLike {
       highlightUntil: (data['highlightUntil'] as Timestamp?)?.toDate(),
     );
   }
+  final String id;
+  final String fromUserId;
+  final String toUserId;
+  final String fromUserName;
+  final String fromUserImageUrl;
+  final String toUserName;
+  final DateTime timestamp;
+  final bool isActive;
+  final bool responded;
+  final String? responseType;
+  final DateTime? respondedAt;
+  final DateTime? highlightUntil;
 
   bool get isHighlighted =>
       highlightUntil != null && DateTime.now().isBefore(highlightUntil!);
@@ -546,18 +538,11 @@ class SuperLike {
   bool get wasPassed => responseType == 'pass';
 
   @override
-  String toString() {
-    return 'SuperLike($fromUserName → $toUserName, responded: $responded, active: $isActive)';
-  }
+  String toString() => 'SuperLike($fromUserName → $toUserName, responded: $responded, active: $isActive)';
 }
 
 /// Result of sending a super like
 class SuperLikeResult {
-  final bool isSuccess;
-  final String? superLikeId;
-  final bool isInstantMatch;
-  final String? matchId;
-  final String? error;
 
   const SuperLikeResult._({
     required this.isSuccess,
@@ -571,34 +556,29 @@ class SuperLikeResult {
     required String superLikeId,
     bool isInstantMatch = false,
     String? matchId,
-  }) {
-    return SuperLikeResult._(
+  }) => SuperLikeResult._(
       isSuccess: true,
       superLikeId: superLikeId,
       isInstantMatch: isInstantMatch,
       matchId: matchId,
     );
-  }
 
-  factory SuperLikeResult.failed(String error) {
-    return SuperLikeResult._(
+  factory SuperLikeResult.failed(String error) => SuperLikeResult._(
       isSuccess: false,
       error: error,
     );
-  }
+  final bool isSuccess;
+  final String? superLikeId;
+  final bool isInstantMatch;
+  final String? matchId;
+  final String? error;
 
   @override
-  String toString() {
-    return 'SuperLikeResult(success: $isSuccess, instantMatch: $isInstantMatch, error: $error)';
-  }
+  String toString() => 'SuperLikeResult(success: $isSuccess, instantMatch: $isInstantMatch, error: $error)';
 }
 
 /// Response to a super like
 class SuperLikeResponse {
-  final bool isSuccess;
-  final bool isMatch;
-  final String? matchId;
-  final String? error;
 
   const SuperLikeResponse._({
     required this.isSuccess,
@@ -610,59 +590,45 @@ class SuperLikeResponse {
   factory SuperLikeResponse.success({
     bool isMatch = false,
     String? matchId,
-  }) {
-    return SuperLikeResponse._(
+  }) => SuperLikeResponse._(
       isSuccess: true,
       isMatch: isMatch,
       matchId: matchId,
     );
-  }
 
-  factory SuperLikeResponse.failed(String error) {
-    return SuperLikeResponse._(
+  factory SuperLikeResponse.failed(String error) => SuperLikeResponse._(
       isSuccess: false,
       error: error,
     );
-  }
+  final bool isSuccess;
+  final bool isMatch;
+  final String? matchId;
+  final String? error;
 
   @override
-  String toString() {
-    return 'SuperLikeResponse(success: $isSuccess, match: $isMatch, error: $error)';
-  }
+  String toString() => 'SuperLikeResponse(success: $isSuccess, match: $isMatch, error: $error)';
 }
 
 /// Super like eligibility check result
 class SuperLikeEligibility {
+
+  const SuperLikeEligibility({
+    required this.canSend,
+    required this.remainingCount, required this.nextResetTime, this.reason,
+  });
   final bool canSend;
   final String? reason;
   final int remainingCount;
   final DateTime nextResetTime;
 
-  const SuperLikeEligibility({
-    required this.canSend,
-    this.reason,
-    required this.remainingCount,
-    required this.nextResetTime,
-  });
-
   Duration get timeUntilReset => nextResetTime.difference(DateTime.now());
 
   @override
-  String toString() {
-    return 'SuperLikeEligibility(canSend: $canSend, remaining: $remainingCount, reason: $reason)';
-  }
+  String toString() => 'SuperLikeEligibility(canSend: $canSend, remaining: $remainingCount, reason: $reason)';
 }
 
 /// Statistics about super like usage
 class SuperLikeStats {
-  final int sentCount;
-  final int receivedCount;
-  final int dailyUsedCount;
-  final int dailyLimit;
-  final double responseRate;
-  final double matchRate;
-  final bool isPremium;
-  final DateTime nextResetTime;
 
   const SuperLikeStats({
     required this.sentCount,
@@ -675,25 +641,30 @@ class SuperLikeStats {
     required this.nextResetTime,
   });
 
-  factory SuperLikeStats.empty() {
-    return SuperLikeStats(
+  factory SuperLikeStats.empty() => SuperLikeStats(
       sentCount: 0,
       receivedCount: 0,
       dailyUsedCount: 0,
       dailyLimit: SuperLikeService.FREE_SUPER_LIKES_PER_DAY,
-      responseRate: 0.0,
-      matchRate: 0.0,
+      responseRate: 0,
+      matchRate: 0,
       isPremium: false,
       nextResetTime: DateTime.now().add(const Duration(days: 1)),
     );
-  }
+  final int sentCount;
+  final int receivedCount;
+  final int dailyUsedCount;
+  final int dailyLimit;
+  final double responseRate;
+  final double matchRate;
+  final bool isPremium;
+  final DateTime nextResetTime;
 
   int get remainingToday => (dailyLimit - dailyUsedCount).clamp(0, dailyLimit);
   bool get canSendMore => remainingToday > 0;
 
   @override
-  String toString() {
-    return 'SuperLikeStats(\n'
+  String toString() => 'SuperLikeStats(\n'
         '  Sent: $sentCount\n'
         '  Received: $receivedCount\n'
         '  Daily Used: $dailyUsedCount/$dailyLimit\n'
@@ -701,5 +672,4 @@ class SuperLikeStats {
         '  Match Rate: ${(matchRate * 100).toStringAsFixed(1)}%\n'
         '  Premium: $isPremium\n'
         ')';
-  }
 }

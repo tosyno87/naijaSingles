@@ -15,6 +15,7 @@ analyzer:
     - "**/*.freezed.dart"
     - "**/*.gr.dart"
     - "**/*.generated.dart"
+    - "**/*_old.dart"  # Exclude old/backup files
   errors:
     # Critical errors that should always fail the build
     missing_required_param: error
@@ -26,19 +27,17 @@ analyzer:
     undefined_setter: error
     undefined_name: error
     undefined_class: error
-    compilation_error: error
     # Treat these as warnings to avoid breaking CI
     invalid_use_of_protected_member: warning
     invalid_use_of_visible_for_testing_member: warning
     invalid_override: warning
     invalid_implementation_override: warning
-    missing_concrete_implementation: warning
-    missing_interface_implementation: warning
     abstract_super_member_reference: warning
     super_in_invalid_context: warning
     non_type_in_catch_clause: warning
     mixin_of_non_class: warning
-    mixin_application_with_invalid_superclass: warning
+    # Note: missing_concrete_implementation, missing_interface_implementation, 
+    # and mixin_application_with_invalid_superclass are not valid error codes in current Dart version
 
 linter:
   # Essential rules that improve code quality without being too strict for CI

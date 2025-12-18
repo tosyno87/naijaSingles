@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
 
-import '../common/data/repo/user_search_repo.dart';
 import '../common/data/repo/privacy_aware_user_search_repo.dart';
+import '../common/data/repo/user_search_repo.dart';
+import '../models/user_model.dart';
 import 'privacy_migration_service.dart';
 import 'user_privacy_service.dart';
 
@@ -14,7 +14,7 @@ class DiscoveryService {
 
   /// Get user list for discovery (privacy-aware)
   static Future<List<UserModel>> getUsersForDiscovery(
-      UserModel currentUser) async {
+      UserModel currentUser,) async {
     try {
       debugPrint('🔍 Starting user discovery for: ${currentUser.name}');
       debugPrint('🔍 Current user ID: ${currentUser.id}');
@@ -31,7 +31,7 @@ class DiscoveryService {
         debugPrint('🔒 Using privacy-aware discovery');
         final users = await PrivacyAwareUserSearchRepo.getUserList(currentUser);
         debugPrint(
-            '🔒 Privacy-aware discovery returned: ${users.length} users');
+            '🔒 Privacy-aware discovery returned: ${users.length} users',);
         return users;
       } else {
         debugPrint('📋 Using traditional discovery (user not migrated)');
@@ -71,14 +71,14 @@ class DiscoveryService {
       if (isMigrated) {
         debugPrint('🔒 Using privacy-aware nearby search');
         return await PrivacyAwareUserSearchRepo.getUsersNearby(
-            currentUser, radiusMiles);
+            currentUser, radiusMiles,);
       } else {
         debugPrint('📋 Privacy system not available, using traditional search');
         // Fallback to traditional getUserList with distance filtering
         final allUsers = await UserSearchRepo.getUserList(currentUser);
         return allUsers
             .where((user) =>
-                user.distanceBW != null && user.distanceBW! <= radiusMiles)
+                user.distanceBW != null && user.distanceBW! <= radiusMiles,)
             .toList();
       }
     } catch (e) {
@@ -101,7 +101,7 @@ class DiscoveryService {
         return await PrivacyAwareUserSearchRepo.getMatches(currentUser);
       } else {
         debugPrint(
-            '📋 Using traditional matches - loading from user subcollection');
+            '📋 Using traditional matches - loading from user subcollection',);
         // Fallback: Load matches from user's Matches subcollection
         return await _getTraditionalMatches(currentUser);
       }
@@ -113,14 +113,14 @@ class DiscoveryService {
 
   /// Get traditional matches from user's subcollection
   static Future<List<UserModel>> _getTraditionalMatches(
-      UserModel currentUser) async {
+      UserModel currentUser,) async {
     try {
       final snapshot = await PrivacyAwareUserSearchRepo.docRef
           .doc(currentUser.id)
-          .collection("Matches")
+          .collection('Matches')
           .get();
 
-      List<UserModel> matchesList = [];
+      final List<UserModel> matchesList = [];
       for (var doc in snapshot.docs) {
         try {
           // Get user data from main collection
@@ -155,7 +155,7 @@ class DiscoveryService {
 
   /// Get discovery statistics
   static Future<Map<String, dynamic>> getDiscoveryStats(
-      UserModel currentUser) async {
+      UserModel currentUser,) async {
     try {
       final isMigrated =
           await _migrationService.isUserMigrated(currentUser.id!);
@@ -188,7 +188,7 @@ class DiscoveryService {
       final success = await _migrationService.migrateUserData(userId);
       if (success) {
         debugPrint(
-            '✅ Migration successful, discovery will now use privacy-aware system');
+            '✅ Migration successful, discovery will now use privacy-aware system',);
         return true;
       } else {
         debugPrint('❌ Migration failed');

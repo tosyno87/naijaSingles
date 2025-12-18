@@ -12,9 +12,9 @@ class SearchuserForMapInitial extends SearchUserForMapState {}
 class SearchUserLoadingForMapState extends SearchUserForMapState {}
 
 class SearchUserLoadUserForMapState extends SearchUserForMapState {
-  final List<UserModel> users;
 
   const SearchUserLoadUserForMapState(this.users);
+  final List<UserModel> users;
 
   @override
   List<Object> get props => [users];

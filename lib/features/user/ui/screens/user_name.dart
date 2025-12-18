@@ -1,10 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_button.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 
 class UserName extends StatefulWidget {
   const UserName({super.key});
@@ -56,7 +56,7 @@ class UserNameState extends State<UserName> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -88,7 +88,7 @@ class UserNameState extends State<UserName> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "This is the first thing your future match will see!",
+                    'This is the first thing your future match will see!',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -114,7 +114,7 @@ class UserNameState extends State<UserName> {
                   cursorColor: const Color(0xFF27AE60),
                   style: const TextStyle(fontSize: 20),
                   decoration: InputDecoration(
-                    hintText: "Enter your first name",
+                    hintText: 'Enter your first name',
                     border: InputBorder.none,
                     hintStyle: TextStyle(color: Colors.grey[400]),
                   ),
@@ -130,7 +130,7 @@ class UserNameState extends State<UserName> {
 
               // Continue labelLarge
               Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
+                padding: const EdgeInsets.only(bottom: 24),
                 child: AnimatedOpacity(
                   opacity: username.isNotEmpty ? 1.0 : 0.7,
                   duration: const Duration(milliseconds: 200),
@@ -142,10 +142,10 @@ class UserNameState extends State<UserName> {
                         userData.addAll({'UserName': username});
                         log(userData.toString());
                         Navigator.pushNamed(context, RouteName.userDobScreen,
-                            arguments: userData);
+                            arguments: userData,);
                       } else {
                         CustomSnackbar.showSnackBarSimple(
-                            "Please enter your name", context);
+                            'Please enter your name', context,);
                       }
                     },
                     text: 'CONTINUE',

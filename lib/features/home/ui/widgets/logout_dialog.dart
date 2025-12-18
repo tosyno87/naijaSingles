@@ -2,19 +2,19 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/providers/user_provider.dart';
+import '../../../../common/routes/route_name.dart';
 
 void showLogoutDialog(BuildContext context) {
   final FirebaseAuth auth = firebaseAuthInstance;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   Future<void> clearUserData() async {
     // Clear any cached user data
-    UserProvider userProvider =
+    final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
     userProvider.currentUser = null; // Reset user data in provider
     userProvider.cancelCurrentUserSubscription(); // Cancel any subscriptions
@@ -30,34 +30,38 @@ void showLogoutDialog(BuildContext context) {
 
   showDialog(
     context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
+    builder: (BuildContext context) => AlertDialog(
         title: Text('Logout'.tr().toString()),
         content: Text('Do you want to logout your account?'.tr().toString()),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text('No'.tr().toString(),
-                style: TextStyle(color: primaryColor)),
+                style: const TextStyle(color: primaryColor),),
           ),
           TextButton(
             onPressed: () async {
-              // Clear any cached user data
+              // Cancel subscriptions and clear user data BEFORE sign out
               await clearUserData();
               // Sign out from Firebase Auth
               await auth.signOut();
+              // Small delay to ensure subscriptions are fully canceled
+              await Future.delayed(const Duration(milliseconds: 100));
               if (context.mounted) {
-                // Navigate to the login screen
-                Navigator.pushReplacementNamed(context, RouteName.loginScreen);
+                // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteName.welcomeScreen,
+                  (route) => false,
+                );
               }
             },
             child: Text(
               'Yes'.tr().toString(),
-              style: TextStyle(color: primaryColor),
+              style: const TextStyle(color: primaryColor),
             ),
           ),
         ],
-      );
-    },
+      ),
   );
 }

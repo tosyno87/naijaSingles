@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class LocationSettingsScreen extends StatefulWidget {
-  const LocationSettingsScreen({Key? key}) : super(key: key);
+  const LocationSettingsScreen({super.key});
 
   @override
   State<LocationSettingsScreen> createState() => _LocationSettingsScreenState();
@@ -33,7 +34,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
   bool _preciseLocationEnabled = true;
   bool _showLocationInProfile = true;
   bool _allowLocationBasedMatching = true;
-  double _maxDistance = 31.0; // miles (converted from 50km)
+  double _maxDistance = 31; // miles (converted from 50km)
   String _currentLocation = 'Unknown';
   Position? _currentPosition;
 
@@ -50,9 +51,12 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
 
       // Load settings from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      _preciseLocationEnabled = prefs.getBool('precise_location_enabled') ?? true;
-      _showLocationInProfile = prefs.getBool('show_location_in_profile') ?? true;
-      _allowLocationBasedMatching = prefs.getBool('allow_location_matching') ?? true;
+      _preciseLocationEnabled =
+          prefs.getBool('precise_location_enabled') ?? true;
+      _showLocationInProfile =
+          prefs.getBool('show_location_in_profile') ?? true;
+      _allowLocationBasedMatching =
+          prefs.getBool('allow_location_matching') ?? true;
       _maxDistance = prefs.getDouble('max_distance') ?? 31.0;
 
       // Load current location
@@ -89,7 +93,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
       );
 
       // Get address from coordinates
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
         _currentPosition!.latitude,
         _currentPosition!.longitude,
       );
@@ -115,7 +119,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('precise_location_enabled', _preciseLocationEnabled);
       await prefs.setBool('show_location_in_profile', _showLocationInProfile);
-      await prefs.setBool('allow_location_matching', _allowLocationBasedMatching);
+      await prefs.setBool(
+          'allow_location_matching', _allowLocationBasedMatching,);
       await prefs.setDouble('max_distance', _maxDistance);
 
       // Update user document in Firestore
@@ -172,14 +177,13 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -215,37 +219,35 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                   // Header Section
                   _buildHeaderSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Current Location
                   _buildCurrentLocationSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Location Permissions
                   _buildLocationPermissionsSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Matching Preferences
                   _buildMatchingPreferencesSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Privacy Settings
                   _buildPrivacySettingsSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Location Info
                   _buildLocationInfoSection(),
                 ],
               ),
             ),
     );
-  }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             color: primaryColor,
             strokeWidth: 3,
           ),
@@ -260,10 +262,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildHeaderSection() {
-    return Container(
+  Widget _buildHeaderSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -285,7 +285,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
               color: primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.location_on,
               size: 40,
               color: primaryColor,
@@ -314,10 +314,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildCurrentLocationSection() {
-    return Container(
+  Widget _buildCurrentLocationSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -335,7 +333,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.my_location, color: primaryColor, size: 24),
+              const Icon(Icons.my_location, color: primaryColor, size: 24),
               const SizedBox(width: 12),
               Text(
                 'Current Location',
@@ -378,7 +376,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
               ElevatedButton.icon(
                 onPressed: _isUpdatingLocation ? null : _refreshLocation,
                 icon: _isUpdatingLocation
-                    ? SizedBox(
+                    ? const SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(
@@ -386,7 +384,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                           strokeWidth: 2,
                         ),
                       )
-                    : Icon(Icons.refresh, size: 18),
+                    : const Icon(Icons.refresh, size: 18),
                 label: Text(
                   _isUpdatingLocation ? 'Updating...' : 'Refresh',
                   style: GoogleFonts.montserrat(fontSize: 14),
@@ -394,7 +392,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -406,10 +405,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildLocationPermissionsSection() {
-    return Container(
+  Widget _buildLocationPermissionsSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -446,10 +443,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildMatchingPreferencesSection() {
-    return Container(
+  Widget _buildMatchingPreferencesSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -498,8 +493,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
               Expanded(
                 child: Slider(
                   value: _maxDistance,
-                  min: 1.0,
-                  max: 62.0, // 100km = 62 miles
+                  min: 1,
+                  max: 62, // 100km = 62 miles
                   divisions: 99,
                   activeColor: primaryColor,
                   inactiveColor: primaryColor.withOpacity(0.3),
@@ -511,7 +506,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -537,10 +533,8 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildPrivacySettingsSection() {
-    return Container(
+  Widget _buildPrivacySettingsSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -577,7 +571,6 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildSwitchTile({
     required String title,
@@ -585,8 +578,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
     required IconData icon,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Container(
           width: 48,
@@ -624,15 +616,13 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: primaryColor,
+          activeThumbColor: primaryColor,
           activeTrackColor: primaryColor.withOpacity(0.3),
         ),
       ],
     );
-  }
 
-  Widget _buildLocationInfoSection() {
-    return Container(
+  Widget _buildLocationInfoSection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
@@ -644,7 +634,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: primaryColor, size: 20),
+              const Icon(Icons.info_outline, color: primaryColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Location Privacy',
@@ -657,17 +647,16 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildInfoItem('🔒 Your exact location is never shared with other users'),
+          _buildInfoItem(
+              '🔒 Your exact location is never shared with other users',),
           _buildInfoItem('📍 Only approximate distance is shown to matches'),
           _buildInfoItem('🎯 Location data helps improve match quality'),
           _buildInfoItem('⚙️ You can disable location features anytime'),
         ],
       ),
     );
-  }
 
-  Widget _buildInfoItem(String text) {
-    return Padding(
+  Widget _buildInfoItem(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         text,
@@ -678,5 +667,4 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         ),
       ),
     );
-  }
 }

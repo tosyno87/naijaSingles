@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../bloc/events_bloc.dart';
 import '../../data/services/location_service.dart';
 
 class AdvancedSearchDialog extends StatefulWidget {
-  final EventFilter currentFilter;
-  final Function(EventFilter) onFilterApplied;
 
   const AdvancedSearchDialog({
-    Key? key,
-    required this.currentFilter,
-    required this.onFilterApplied,
-  }) : super(key: key);
+    required this.currentFilter, required this.onFilterApplied, super.key,
+  });
+  final EventFilter currentFilter;
+  final Function(EventFilter) onFilterApplied;
 
   @override
   State<AdvancedSearchDialog> createState() => _AdvancedSearchDialogState();
@@ -39,19 +38,19 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
   ];
 
   static const List<double> radiusOptions = [5, 10, 25, 50, 100];
-  static const double defaultRadiusKm = 25.0;
-  
+  static const double defaultRadiusKm = 25;
+
   // Conversion methods
   double _kmToMiles(double km) => km * 0.621371;
   double _milesToKm(double miles) => miles * 1.60934;
-  
+
   List<double> get _radiusOptionsInCurrentUnit {
     if (_useMiles) {
-      return radiusOptions.map((km) => _kmToMiles(km)).toList();
+      return radiusOptions.map(_kmToMiles).toList();
     }
     return radiusOptions;
   }
-  
+
   String _getRadiusUnit() => _useMiles ? 'miles' : 'km';
 
   @override
@@ -76,14 +75,13 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
+  Widget build(BuildContext context) => Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.95,
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+          color: AppColors.backgroundColor, // NaijaSingles cream background
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -98,7 +96,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             _buildHeader(),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -119,16 +118,13 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ),
       ),
     );
-  }
 
-  Widget _buildHeader() {
-    return Container(
+  Widget _buildHeader() => Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 16, 16),
       decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(
             color: Color(0xFFE0E0E0),
-            width: 1,
           ),
         ),
       ),
@@ -160,10 +156,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ],
       ),
     );
-  }
 
-  Widget _buildCategorySection() {
-    return Column(
+  Widget _buildCategorySection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -176,8 +170,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: _selectedCategory,
-          dropdownColor: const Color(0xFFFFF6E5),
+          initialValue: _selectedCategory,
+          dropdownColor: AppColors.backgroundColor,
           style: GoogleFonts.montserrat(color: const Color(0xFF333333)),
           decoration: InputDecoration(
             border: OutlineInputBorder(
@@ -188,16 +182,17 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFF008037)),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            fillColor: AppColors.backgroundColor, // NaijaSingles cream background
             filled: true,
           ),
-          items: categories.map((category) {
-            return DropdownMenuItem(
+          items: categories.map((category) => DropdownMenuItem(
               value: category == 'All' ? null : category,
-              child: Text(category, style: GoogleFonts.montserrat(color: const Color(0xFF333333))),
-            );
-          }).toList(),
+              child: Text(category,
+                  style:
+                      GoogleFonts.montserrat(color: const Color(0xFF333333)),),
+            ),).toList(),
           onChanged: (value) {
             setState(() {
               _selectedCategory = value;
@@ -206,10 +201,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ),
       ],
     );
-  }
 
-  Widget _buildDateRangeSection() {
-    return Column(
+  Widget _buildDateRangeSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -250,44 +243,37 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ),
       ],
     );
-  }
 
   Widget _buildDateField({
     required String label,
     required DateTime? date,
     required Function(DateTime?) onDateSelected,
-  }) {
-    return InkWell(
+  }) => InkWell(
       onTap: () async {
         final selectedDate = await showDatePicker(
           context: context,
           initialDate: date ?? DateTime.now(),
           firstDate: DateTime.now(),
           lastDate: DateTime.now().add(const Duration(days: 365)),
-          builder: (context, child) {
-            return Theme(
+          builder: (context, child) => Theme(
               data: Theme.of(context).copyWith(
                 colorScheme: const ColorScheme.light(
                   primary: Color(0xFF008037), // NaijaSingles green
-                  onPrimary: Colors.white,
-                  surface: Color(0xFFFFF6E5), // NaijaSingles cream background
                   onSurface: Color(0xFF333333), // Dark text
                   secondary: Color(0xFF008037),
                   onSecondary: Colors.white,
-                ),
-                dialogBackgroundColor: const Color(0xFFFFF6E5), // Cream background
+                ), // Cream background
                 textTheme: Theme.of(context).textTheme.copyWith(
-                  bodyLarge: GoogleFonts.montserrat(
-                    color: const Color(0xFF333333),
-                  ),
-                  bodyMedium: GoogleFonts.montserrat(
-                    color: const Color(0xFF333333),
-                  ),
-                ),
+                      bodyLarge: GoogleFonts.montserrat(
+                        color: const Color(0xFF333333),
+                      ),
+                      bodyMedium: GoogleFonts.montserrat(
+                        color: const Color(0xFF333333),
+                      ),
+                    ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.backgroundColor),
               ),
               child: child!,
-            );
-          },
+            ),
         );
         onDateSelected(selectedDate);
       },
@@ -296,24 +282,22 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         decoration: BoxDecoration(
           border: Border.all(color: const Color(0xFFE0E0E0)),
           borderRadius: BorderRadius.circular(12),
-          color: const Color(0xFFFFF6E5), // NaijaSingles cream background
+          color: AppColors.backgroundColor, // NaijaSingles cream background
         ),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.calendar_today,
               size: 20,
-              color: const Color(0xFF333333),
+              color: Color(0xFF333333),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                date != null 
-                    ? '${date.day}/${date.month}/${date.year}'
-                    : label,
+                date != null ? '${date.day}/${date.month}/${date.year}' : label,
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
-                  color: date != null 
+                  color: date != null
                       ? const Color(0xFF333333)
                       : const Color(0xFF666666),
                 ),
@@ -323,10 +307,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ),
       ),
     );
-  }
 
-  Widget _buildLocationSection() {
-    return Column(
+  Widget _buildLocationSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -352,8 +334,9 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFF008037)),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            fillColor: AppColors.backgroundColor, // NaijaSingles cream background
             filled: true,
             prefixIcon: const Icon(Icons.location_on, color: Color(0xFF333333)),
           ),
@@ -366,19 +349,22 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               children: [
                 Text(
                   'Within ',
-                  style: GoogleFonts.montserrat(fontSize: 14, color: const Color(0xFF333333)),
+                  style: GoogleFonts.montserrat(
+                      fontSize: 14, color: const Color(0xFF333333),),
                 ),
                 DropdownButton<double>(
                   value: _radiusKm,
-                  dropdownColor: const Color(0xFFFFF6E5),
+                  dropdownColor: AppColors.backgroundColor,
                   style: GoogleFonts.montserrat(color: const Color(0xFF333333)),
-                  items: _radiusOptionsInCurrentUnit.map((radius) {
-                    return DropdownMenuItem(
-                      value: _useMiles ? _milesToKm(radius) : radius, // Store in km internally
-                      child: Text('${radius.toStringAsFixed(1)} ${_getRadiusUnit()}', 
-                        style: GoogleFonts.montserrat(color: const Color(0xFF333333))),
-                    );
-                  }).toList(),
+                  items: _radiusOptionsInCurrentUnit.map((radius) => DropdownMenuItem(
+                      value: _useMiles
+                          ? _milesToKm(radius)
+                          : radius, // Store in km internally
+                      child: Text(
+                          '${radius.toStringAsFixed(1)} ${_getRadiusUnit()}',
+                          style: GoogleFonts.montserrat(
+                              color: const Color(0xFF333333),),),
+                    ),).toList(),
                   onChanged: (value) {
                     setState(() {
                       _radiusKm = value;
@@ -387,7 +373,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 ),
                 Text(
                   ' of location',
-                  style: GoogleFonts.montserrat(fontSize: 14, color: const Color(0xFF333333)),
+                  style: GoogleFonts.montserrat(
+                      fontSize: 14, color: const Color(0xFF333333),),
                 ),
               ],
             ),
@@ -396,7 +383,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               children: [
                 Text(
                   'Distance unit: ',
-                  style: GoogleFonts.montserrat(fontSize: 12, color: const Color(0xFF666666)),
+                  style: GoogleFonts.montserrat(
+                      fontSize: 12, color: const Color(0xFF666666),),
                 ),
                 GestureDetector(
                   onTap: () {
@@ -413,9 +401,12 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _useMiles ? const Color(0xFF008037) : Colors.transparent,
+                      color: _useMiles
+                          ? const Color(0xFF008037)
+                          : Colors.transparent,
                       border: Border.all(color: const Color(0xFF008037)),
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -423,7 +414,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                       _useMiles ? 'Miles' : 'Kilometers',
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
-                        color: _useMiles ? Colors.white : const Color(0xFF008037),
+                        color:
+                            _useMiles ? Colors.white : const Color(0xFF008037),
                       ),
                     ),
                   ),
@@ -440,7 +432,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF008037),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -451,10 +444,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ),
       ],
     );
-  }
 
-  Widget _buildPriceSection() {
-    return Column(
+  Widget _buildPriceSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -481,35 +472,31 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           isSelected: _filter.paidOnly ?? false,
           onTap: () {
             setState(() {
-              _filter = _filter.copyWith(paidOnly: !(_filter.paidOnly ?? false));
+              _filter =
+                  _filter.copyWith(paidOnly: !(_filter.paidOnly ?? false));
             });
           },
         ),
       ],
     );
-  }
-
-
 
   Widget _buildModernFilterChip({
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected 
+          color: isSelected
               ? const Color(0xFF008037).withOpacity(0.1)
               : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected 
-                ? const Color(0xFF008037)
-                : const Color(0xFFE0E0E0),
+            color:
+                isSelected ? const Color(0xFF008037) : const Color(0xFFE0E0E0),
             width: 1.5,
           ),
           boxShadow: [
@@ -528,14 +515,13 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected 
+                  color: isSelected
                       ? const Color(0xFF008037)
                       : const Color(0xFFCCCCCC),
                   width: 2,
                 ),
-                color: isSelected 
-                    ? const Color(0xFF008037)
-                    : Colors.transparent,
+                color:
+                    isSelected ? const Color(0xFF008037) : Colors.transparent,
               ),
               child: isSelected
                   ? const Icon(
@@ -552,7 +538,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: isSelected 
+                  color: isSelected
                       ? const Color(0xFF008037)
                       : const Color(0xFF333333),
                 ),
@@ -562,16 +548,13 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ),
       ),
     );
-  }
 
-  Widget _buildActionButtons() {
-    return Container(
+  Widget _buildActionButtons() => Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       decoration: const BoxDecoration(
         border: Border(
           top: BorderSide(
             color: Color(0xFFE0E0E0),
-            width: 1,
           ),
         ),
       ),
@@ -624,7 +607,6 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         ],
       ),
     );
-  }
 
   void _clearFilters() {
     setState(() {
@@ -638,25 +620,27 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
     });
   }
 
-  void _useCurrentLocation() async {
+  Future<void> _useCurrentLocation() async {
     try {
       final location = await LocationService().getCurrentLocation();
       if (location != null) {
         setState(() {
           _locationController.text = 'Current Location';
-          _radiusKm = _radiusKm ?? defaultRadiusKm; // Default to 25km if not set
+          _radiusKm =
+              _radiusKm ?? defaultRadiusKm; // Default to 25km if not set
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Location set to current position'),
-            backgroundColor: const Color(0xFF008037),
+            backgroundColor: Color(0xFF008037),
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Unable to get current location. Please check permissions.'),
+          const SnackBar(
+            content: Text(
+                'Unable to get current location. Please check permissions.',),
             backgroundColor: Colors.red,
           ),
         );
@@ -671,12 +655,12 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
     }
   }
 
-  void _applyFilters() async {
+  Future<void> _applyFilters() async {
     // Get user's current location if location filter is being used
     double? userLatitude;
     double? userLongitude;
     double? radiusKm = _radiusKm;
-    
+
     if (_locationController.text.trim().isNotEmpty) {
       if (_locationController.text.trim() == 'Current Location') {
         // Use current location with radius
@@ -690,8 +674,9 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
         } catch (e) {
           // If location access fails, show a message but continue with text-based filtering
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Location access denied. Using text-based location filtering.'),
+            const SnackBar(
+              content: Text(
+                  'Location access denied. Using text-based location filtering.',),
               backgroundColor: Colors.orange,
             ),
           );
@@ -708,7 +693,9 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
       category: _selectedCategory,
       startDate: _startDate,
       endDate: _endDate,
-      location: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
+      location: _locationController.text.trim().isEmpty
+          ? null
+          : _locationController.text.trim(),
       radiusKm: radiusKm,
       latitude: userLatitude,
       longitude: userLongitude,

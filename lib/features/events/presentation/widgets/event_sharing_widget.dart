@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../../../common/constants/app_colors.dart';
 import '../../data/models/event_model.dart';
 
 class EventSharingWidget extends StatelessWidget {
-  final EventModel event;
 
   const EventSharingWidget({
-    Key? key,
-    required this.event,
-  }) : super(key: key);
+    required this.event, super.key,
+  });
+  final EventModel event;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -64,17 +64,14 @@ class EventSharingWidget extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildEventPreview() {
-    return Container(
+  Widget _buildEventPreview() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF6E5),
+        color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: const Color(0xFF008037).withOpacity(0.2),
-          width: 1,
         ),
       ),
       child: Column(
@@ -93,10 +90,10 @@ class EventSharingWidget extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.calendar_today,
                 size: 16,
-                color: const Color(0xFF666666),
+                color: Color(0xFF666666),
               ),
               const SizedBox(width: 6),
               Text(
@@ -111,15 +108,15 @@ class EventSharingWidget extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.location_on,
                 size: 16,
-                color: const Color(0xFF666666),
+                color: Color(0xFF666666),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  event.location.displayAddress.isNotEmpty 
+                  event.location.displayAddress.isNotEmpty
                       ? event.location.displayAddress
                       : 'Location TBA',
                   style: GoogleFonts.montserrat(
@@ -153,10 +150,8 @@ class EventSharingWidget extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildSharingOptions(BuildContext context) {
-    return Column(
+  Widget _buildSharingOptions(BuildContext context) => Column(
       children: [
         Row(
           children: [
@@ -205,15 +200,13 @@ class EventSharingWidget extends StatelessWidget {
         _buildSocialMediaOptions(context),
       ],
     );
-  }
 
   Widget _buildShareOption({
     required IconData icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -222,7 +215,6 @@ class EventSharingWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: const Color(0xFFE0E0E0),
-            width: 1,
           ),
         ),
         child: Column(
@@ -262,10 +254,8 @@ class EventSharingWidget extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildSocialMediaOptions(BuildContext context) {
-    return Column(
+  Widget _buildSocialMediaOptions(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -308,15 +298,13 @@ class EventSharingWidget extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildSocialButton({
     required IconData icon,
     required Color color,
     required String label,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Column(
         children: [
@@ -343,7 +331,6 @@ class EventSharingWidget extends StatelessWidget {
         ],
       ),
     );
-  }
 
   void _shareGeneral(BuildContext context) {
     final shareText = _buildShareText();
@@ -352,9 +339,10 @@ class EventSharingWidget extends StatelessWidget {
   }
 
   void _copyLink(BuildContext context) {
-    final link = event.ticketUrl ?? 'https://naijasingles.com/events/${event.id}';
+    final link =
+        event.ticketUrl ?? 'https://naijasingles.com/events/${event.id}';
     Clipboard.setData(ClipboardData(text: link));
-    
+
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -380,11 +368,13 @@ class EventSharingWidget extends StatelessWidget {
   void _shareWithImage(BuildContext context) {
     if (event.imageUrl != null && event.imageUrl!.isNotEmpty) {
       Share.shareXFiles(
-        [XFile.fromData(
-          Uint8List(0), // Placeholder - would need to download image
-          name: 'event_image.jpg',
-          mimeType: 'image/jpeg',
-        )],
+        [
+          XFile.fromData(
+            Uint8List(0), // Placeholder - would need to download image
+            name: 'event_image.jpg',
+            mimeType: 'image/jpeg',
+          ),
+        ],
         text: _buildShareText(),
       );
     } else {
@@ -410,7 +400,7 @@ class EventSharingWidget extends StatelessWidget {
     // For now, we'll copy text and show instructions
     final shareText = _buildInstagramShareText();
     Clipboard.setData(ClipboardData(text: shareText));
-    
+
     Navigator.pop(context);
     _showInstagramInstructions(context);
   }
@@ -421,8 +411,7 @@ class EventSharingWidget extends StatelessWidget {
     Navigator.pop(context);
   }
 
-  String _buildShareText() {
-    return '''
+  String _buildShareText() => '''
 🎉 ${event.name}
 
 📅 ${DateFormat('EEEE, MMMM d, yyyy at h:mm a').format(event.startDate)}
@@ -433,10 +422,8 @@ ${event.ticketUrl ?? 'Check out NaijaSingles app for more details!'}
 
 #NaijaSingles #AfrocentricEvents
 ''';
-  }
 
-  String _buildDetailedShareText() {
-    return '''
+  String _buildDetailedShareText() => '''
 🎉 Don't miss this amazing event!
 
 ${event.name}
@@ -454,10 +441,8 @@ Get tickets: ${event.ticketUrl ?? 'Check NaijaSingles app'}
 
 #NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 ''';
-  }
 
-  String _buildSocialShareText() {
-    return '''
+  String _buildSocialShareText() => '''
 🎉 Excited about this event: ${event.name}
 
 📅 ${DateFormat('MMM d, h:mm a').format(event.startDate)}
@@ -468,7 +453,6 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
 ${event.ticketUrl ?? ''}
 ''';
-  }
 
   String _buildTwitterShareText() {
     final baseText = '''
@@ -480,7 +464,7 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 
 #NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')}
 ''';
-    
+
     // Twitter has character limit, so truncate if necessary
     if (baseText.length > 240) {
       return '''
@@ -492,12 +476,11 @@ ${event.isFree ? '🆓 FREE' : '🎫 Paid'}
 #NaijaSingles #AfrocentricEvents
 ''';
     }
-    
+
     return baseText;
   }
 
-  String _buildInstagramShareText() {
-    return '''
+  String _buildInstagramShareText() => '''
 🎉 ${event.name}
 
 📅 ${DateFormat('EEEE, MMMM d').format(event.startDate)}
@@ -506,10 +489,8 @@ ${event.isFree ? '🆓 FREE EVENT' : '🎫 Paid Event'}
 
 #NaijaSingles #AfrocentricEvents #${event.category.replaceAll(' ', '')} #Event #Culture #Community
 ''';
-  }
 
-  String _buildWhatsAppShareText() {
-    return '''
+  String _buildWhatsAppShareText() => '''
 🎉 *${event.name}*
 
 📅 *Date:* ${DateFormat('EEEE, MMMM d, yyyy').format(event.startDate)}
@@ -525,7 +506,6 @@ Get more details: ${event.ticketUrl ?? 'NaijaSingles app'}
 
 #NaijaSingles #AfrocentricEvents
 ''';
-  }
 
   void _showInstagramInstructions(BuildContext context) {
     showDialog(

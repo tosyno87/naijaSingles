@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// Service for managing unread message counts and indicators for groups
 class GroupUnreadService {
-  static final GroupUnreadService _instance = GroupUnreadService._internal();
   factory GroupUnreadService() => _instance;
   GroupUnreadService._internal();
+  static final GroupUnreadService _instance = GroupUnreadService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -48,7 +48,7 @@ class GroupUnreadService {
         'count': 0,
         'lastReadAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      }, SetOptions(merge: true),);
 
       // Mark all unread messages as read
       final unreadMessages = await _firestore
@@ -74,21 +74,20 @@ class GroupUnreadService {
   }
 
   /// Increment unread count for a group (called when new message arrives)
-  Future<void> incrementUnreadCount(String groupId, {String? excludeUserId}) async {
+  Future<void> incrementUnreadCount(String groupId,
+      {String? excludeUserId,}) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null || currentUserId == excludeUserId) return;
 
       // Get all group members
-      final groupDoc = await _firestore
-          .collection('unifiedGroups')
-          .doc(groupId)
-          .get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
 
       if (!groupDoc.exists) return;
 
       final memberIds = List<String>.from(groupDoc.data()?['memberIds'] ?? []);
-      
+
       // Increment unread count for all members except sender
       final batch = _firestore.batch();
       for (final memberId in memberIds) {
@@ -97,12 +96,15 @@ class GroupUnreadService {
               .collection('group_unread_counts')
               .doc('${groupId}_$memberId');
 
-          batch.set(unreadDocRef, {
-            'groupId': groupId,
-            'userId': memberId,
-            'count': FieldValue.increment(1),
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+          batch.set(
+              unreadDocRef,
+              {
+                'groupId': groupId,
+                'userId': memberId,
+                'count': FieldValue.increment(1),
+                'updatedAt': FieldValue.serverTimestamp(),
+              },
+              SetOptions(merge: true),);
         }
       }
       await batch.commit();

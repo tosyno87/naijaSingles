@@ -10,11 +10,11 @@ class BuyConsumableInitialState extends BuyConsumableStates {}
 class BuyConsumableLoadingState extends BuyConsumableStates {}
 
 class BuyConsumableSuccessState extends BuyConsumableStates {
-  final dynamic result;
   BuyConsumableSuccessState({required this.result});
+  final dynamic result;
 }
 
 class BuyConsumableFailedState extends BuyConsumableStates {
-  final String? msg;
   BuyConsumableFailedState({this.msg});
+  final String? msg;
 }

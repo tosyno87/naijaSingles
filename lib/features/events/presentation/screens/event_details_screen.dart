@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../common/utils/app_logger.dart';
 import '../bloc/rsvp_bloc.dart';
 import '../widgets/event_attendees_list.dart';
 import '../../data/models/event_model.dart';
@@ -13,12 +14,11 @@ import '../../data/models/rsvp_model.dart';
 import '../../data/services/events_firestore_service.dart';
 
 class EventDetailsScreen extends StatefulWidget {
-  final EventModel event;
 
   const EventDetailsScreen({
-    Key? key,
-    required this.event,
-  }) : super(key: key);
+    required this.event, super.key,
+  });
+  final EventModel event;
 
   @override
   State<EventDetailsScreen> createState() => _EventDetailsScreenState();
@@ -41,23 +41,27 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
+  Widget build(BuildContext context) => BlocProvider(
       create: (context) => RSVPBloc(
         firestoreService: EventsFirestoreService(),
         currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
       ),
       child: BlocBuilder<RSVPBloc, RSVPState>(
         builder: (context, state) {
-          // Load event attendees when the bloc is first created
+          // Load event RSVP status and attendees when the bloc is first created
           if (state is RSVPInitial) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
+              final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+              context.read<RSVPBloc>().add(LoadEventRSVPStatusEvent(
+                    userId: userId,
+                    eventId: widget.event.id,
+                  ),);
               context.read<RSVPBloc>().add(LoadEventAttendeesEvent(
-                eventId: widget.event.id,
-              ));
+                    eventId: widget.event.id,
+                  ),);
             });
           }
-          
+
           return Scaffold(
             backgroundColor: Colors.white,
             body: CustomScrollView(
@@ -74,10 +78,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         },
       ),
     );
-  }
 
-  Widget _buildSliverAppBar() {
-    return SliverAppBar(
+  Widget _buildSliverAppBar() => SliverAppBar(
       expandedHeight: 350,
       pinned: true,
       backgroundColor: Colors.transparent,
@@ -101,7 +103,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.white, size: 20),
+            icon:
+                const Icon(Icons.share_outlined, color: Colors.white, size: 20),
             onPressed: _shareEvent,
           ),
         ),
@@ -112,7 +115,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.white, size: 20),
+            icon: const Icon(Icons.favorite_border,
+                color: Colors.white, size: 20,),
             onPressed: _toggleFavorite,
           ),
         ),
@@ -121,21 +125,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            widget.event.imageUrl != null && widget.event.imageUrl!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: widget.event.imageUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: const Color(0xFFF5F5F5),
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
-                        ),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => _buildPlaceholderImage(),
-                  )
-                : _buildPlaceholderImage(),
+            _buildEventHeaderImage(),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -158,7 +148,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 children: [
                   Text(
                     widget.event.name,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -171,14 +161,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     children: [
                       // Category chip
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: const Color(0xFF008037),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
                           widget.event.category,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -188,16 +179,17 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       const SizedBox(width: 8),
                       // Paid/Free chip
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
-                          color: widget.event.isFree 
+                          color: widget.event.isFree
                               ? Colors.grey.withOpacity(0.8)
                               : const Color(0xFFEF476F).withOpacity(0.9),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
                           widget.event.isFree ? 'FREE' : 'PAID',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -213,10 +205,45 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       ),
     );
+
+  String? _getEventImageUrl() {
+    // Check if imageUrl exists and is not empty
+    final imageUrl = widget.event.imageUrl;
+    AppLogger.debug('🔍 EventDetails._getEventImageUrl - Event ID: ${widget.event.id}');
+    AppLogger.debug('🔍 EventDetails._getEventImageUrl - imageUrl type: ${imageUrl.runtimeType}');
+    AppLogger.debug('🔍 EventDetails._getEventImageUrl - imageUrl value: $imageUrl');
+    
+    if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+      AppLogger.debug('✅ EventDetails: Using imageUrl: $imageUrl');
+      return imageUrl;
+    }
+    AppLogger.debug('❌ EventDetails: imageUrl is null or empty. Event ID: ${widget.event.id}');
+    return null;
   }
 
-  Widget _buildPlaceholderImage() {
-    return Container(
+  Widget _buildEventHeaderImage() {
+    final imageUrl = _getEventImageUrl();
+    
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => const ColoredBox(
+          color: Color(0xFFF5F5F5),
+          child: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+            ),
+          ),
+        ),
+        errorWidget: (context, url, error) => _buildPlaceholderImage(),
+      );
+    }
+    
+    return _buildPlaceholderImage();
+  }
+
+  Widget _buildPlaceholderImage() => ColoredBox(
       color: const Color(0xFF008037),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -238,10 +265,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildEventDetails() {
-    return Container(
+  Widget _buildEventDetails() => DecoratedBox(
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -265,12 +290,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-
-
-  Widget _buildStatsRow() {
-    return Padding(
+  Widget _buildStatsRow() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -287,20 +308,19 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           ),
           _buildStatItem(
             icon: Icons.share,
-            value: '${(widget.event.rsvpCount * 0.3).round()}', // Mock share count
+            value:
+                '${(widget.event.rsvpCount * 0.3).round()}', // Mock share count
             label: 'Shares',
           ),
         ],
       ),
     );
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String value,
     required String label,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(
           icon,
@@ -310,7 +330,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: const Color(0xFF3E1F0D),
@@ -318,17 +338,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 12,
             color: const Color(0xFF666666),
           ),
         ),
       ],
     );
-  }
 
-  Widget _buildDateTimeCard() {
-    return Container(
+  Widget _buildDateTimeCard() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -363,7 +381,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               children: [
                 Text(
                   'Date & Time',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF3E1F0D),
@@ -372,7 +390,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 const SizedBox(height: 4),
                 Text(
                   _formatEventDateTime(),
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: const Color(0xFF666666),
                   ),
@@ -383,10 +401,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildLocationCard() {
-    return Container(
+  Widget _buildLocationCard() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -427,7 +443,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     children: [
                       Text(
                         'Location',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF3E1F0D),
@@ -435,10 +451,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        widget.event.location.displayAddress.isNotEmpty 
+                        widget.event.location.displayAddress.isNotEmpty
                             ? widget.event.location.displayAddress
                             : 'Location TBA',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: const Color(0xFF666666),
                         ),
@@ -458,12 +474,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       ),
     );
-  }
-
 
   Widget _buildEventDescription() {
     if (widget.event.description.isEmpty) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -471,7 +485,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         children: [
           Text(
             'About This Event',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF3E1F0D),
@@ -496,7 +510,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               children: [
                 Text(
                   widget.event.description,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     color: const Color(0xFF666666),
                     height: 1.5,
@@ -519,7 +533,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Text(
                           _showFullDescription ? 'Show Less' : 'Read More',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xFF008037),
@@ -537,9 +551,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     );
   }
 
-
-  Widget _buildEventAttendees() {
-    return Padding(
+  Widget _buildEventAttendees() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,7 +568,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               ),
               const Spacer(),
               TextButton(
-                onPressed: () => _showAllAttendees(),
+                onPressed: _showAllAttendees,
                 child: Text(
                   'See All',
                   style: GoogleFonts.montserrat(
@@ -576,10 +588,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildSimilarEvents() {
-    return Padding(
+  Widget _buildSimilarEvents() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -593,13 +603,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          Container(
+          SizedBox(
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: 5, // Mock similar events
-              itemBuilder: (context, index) {
-                return Container(
+              itemBuilder: (context, index) => Container(
                   width: 200,
                   margin: EdgeInsets.only(right: index == 4 ? 0 : 16),
                   decoration: BoxDecoration(
@@ -648,23 +657,20 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ],
                     ),
                   ),
-                );
-              },
+                ),
             ),
           ),
         ],
       ),
     );
-  }
 
-  Widget _buildBottomActionBar() {
-    return BlocBuilder<RSVPBloc, RSVPState>(
+  Widget _buildBottomActionBar() => BlocBuilder<RSVPBloc, RSVPState>(
       builder: (context, state) {
         bool isGoing = false;
         if (state is EventRSVPStatusLoaded) {
           isGoing = state.status == RSVPStatus.going;
         }
-        
+
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -681,7 +687,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             child: SizedBox(
               width: double.infinity,
               height: 56,
-              child: Container(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: const Color(0xFF008037),
                   borderRadius: BorderRadius.circular(20),
@@ -699,9 +705,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     onTap: () {
                       // Trigger RSVP action
                       context.read<RSVPBloc>().add(RSVPToEventEvent(
-                        eventId: widget.event.id,
-                        status: isGoing ? RSVPStatus.notGoing : RSVPStatus.going,
-                      ));
+                            eventId: widget.event.id,
+                            status: isGoing
+                                ? RSVPStatus.notGoing
+                                : RSVPStatus.going,
+                          ),);
                     },
                     borderRadius: BorderRadius.circular(20),
                     child: Center(
@@ -716,7 +724,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                           const SizedBox(width: 8),
                           Text(
                             isGoing ? 'Going' : 'I\'m Going',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -733,7 +741,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         );
       },
     );
-  }
 
   IconData _getCategoryIcon() {
     switch (widget.event.category.toLowerCase()) {
@@ -761,14 +768,16 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   String _formatEventDateTime() {
-    final startDate = DateFormat('EEEE, MMMM d, yyyy').format(widget.event.startDate);
+    final startDate =
+        DateFormat('EEEE, MMMM d, yyyy').format(widget.event.startDate);
     final startTime = DateFormat('h:mm a').format(widget.event.startDate);
-    
+
     if (widget.event.startDate.day == widget.event.endDate.day) {
       final endTime = DateFormat('h:mm a').format(widget.event.endDate);
       return '$startDate\n$startTime - $endTime';
     } else {
-      final endDate = DateFormat('EEEE, MMMM d, yyyy').format(widget.event.endDate);
+      final endDate =
+          DateFormat('EEEE, MMMM d, yyyy').format(widget.event.endDate);
       final endTime = DateFormat('h:mm a').format(widget.event.endDate);
       return '$startDate at $startTime\nto $endDate at $endTime';
     }
@@ -808,21 +817,24 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
     );
   }
 
-  void _openMaps() async {
-    if (widget.event.location.latitude != null && widget.event.location.longitude != null) {
-      final url = 'https://www.google.com/maps/search/?api=1&query=${widget.event.location.latitude},${widget.event.location.longitude}';
+  Future<void> _openMaps() async {
+    if (widget.event.location.latitude != null &&
+        widget.event.location.longitude != null) {
+      final url =
+          'https://www.google.com/maps/search/?api=1&query=${widget.event.location.latitude},${widget.event.location.longitude}';
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
       }
     } else if (widget.event.location.displayAddress.isNotEmpty) {
-      final encodedAddress = Uri.encodeComponent(widget.event.location.displayAddress);
-      final url = 'https://www.google.com/maps/search/?api=1&query=$encodedAddress';
+      final encodedAddress =
+          Uri.encodeComponent(widget.event.location.displayAddress);
+      final url =
+          'https://www.google.com/maps/search/?api=1&query=$encodedAddress';
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
       }
     }
   }
-
 
   void _showAllAttendees() {
     showModalBottomSheet(
@@ -833,8 +845,7 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
         initialChildSize: 0.7,
         maxChildSize: 0.9,
         minChildSize: 0.5,
-        builder: (context, scrollController) {
-          return Container(
+        builder: (context, scrollController) => DecoratedBox(
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -871,8 +882,7 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
                 ),
               ],
             ),
-          );
-        },
+          ),
       ),
     );
   }

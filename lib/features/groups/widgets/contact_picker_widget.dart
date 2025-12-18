@@ -1,8 +1,9 @@
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:contacts_service/contacts_service.dart';
-import 'package:naijasingles/services/contact_invitation_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../services/contact_invitation_service.dart';
 
 /// Modern contact picker widget for group member invitations
 /// Features:
@@ -12,16 +13,13 @@ import 'package:naijasingles/common/constants/app_colors.dart';
 /// - Permission handling
 /// - Industry-standard UI
 class ContactPickerWidget extends StatefulWidget {
+
+  const ContactPickerWidget({
+    required this.groupName, required this.groupId, required this.onInvitationsSent, super.key,
+  });
   final String groupName;
   final String groupId;
   final Function(List<Map<String, dynamic>>) onInvitationsSent;
-
-  const ContactPickerWidget({
-    super.key,
-    required this.groupName,
-    required this.groupId,
-    required this.onInvitationsSent,
-  });
 
   @override
   State<ContactPickerWidget> createState() => _ContactPickerWidgetState();
@@ -35,7 +33,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
 
   List<Contact> _contacts = [];
   List<Contact> _filteredContacts = [];
-  List<Contact> _selectedContacts = [];
+  final List<Contact> _selectedContacts = [];
   bool _isLoading = false;
   bool _showEmailOption = false;
 
@@ -43,7 +41,8 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   void initState() {
     super.initState();
     _loadContacts();
-    _messageController.text = 'You are invited to join "${widget.groupName}" group!';
+    _messageController.text =
+        'You are invited to join "${widget.groupName}" group!';
   }
 
   @override
@@ -89,7 +88,8 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
         _filteredContacts = _contacts.where((contact) {
           final name = contact.displayName?.toLowerCase() ?? '';
           final phone = contact.phones?.first.value?.toLowerCase() ?? '';
-          return name.contains(query.toLowerCase()) || phone.contains(query.toLowerCase());
+          return name.contains(query.toLowerCase()) ||
+              phone.contains(query.toLowerCase());
         }).toList();
       }
     });
@@ -171,7 +171,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
     if (mounted) {
       widget.onInvitationsSent(invitations);
       Navigator.pop(context);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${invitations.length} invitations sent successfully!'),
@@ -182,8 +182,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -225,7 +224,8 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
               decoration: InputDecoration(
                 hintText: 'Search contacts...',
                 hintStyle: GoogleFonts.montserrat(color: Colors.grey[400]),
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
+                prefixIcon:
+                    const Icon(Icons.search, color: AppColors.primaryGreen),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey[300]!),
@@ -274,7 +274,8 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                 decoration: InputDecoration(
                   hintText: 'Enter email address',
                   hintStyle: GoogleFonts.montserrat(color: Colors.grey[400]),
-                  prefixIcon: const Icon(Icons.email, color: AppColors.primaryGreen),
+                  prefixIcon:
+                      const Icon(Icons.email, color: AppColors.primaryGreen),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: Colors.grey[300]!),
@@ -346,17 +347,21 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
                         itemCount: _filteredContacts.length,
                         itemBuilder: (context, index) {
                           final contact = _filteredContacts[index];
-                          final isSelected = _selectedContacts.contains(contact);
-                          final phone = _contactService.getPrimaryPhone(contact);
+                          final isSelected =
+                              _selectedContacts.contains(contact);
+                          final phone =
+                              _contactService.getPrimaryPhone(contact);
 
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: isSelected 
-                                  ? AppColors.primaryGreen 
+                              backgroundColor: isSelected
+                                  ? AppColors.primaryGreen
                                   : Colors.grey[300],
                               child: Icon(
                                 Icons.person,
-                                color: isSelected ? Colors.white : Colors.grey[600],
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey[600],
                               ),
                             ),
                             title: Text(
@@ -391,5 +396,4 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
         ],
       ),
     );
-  }
 }

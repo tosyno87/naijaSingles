@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/features/match/models/match_model.dart';
-import 'package:naijasingles/services/performance_monitor.dart';
+import '../features/match/models/match_model.dart';
+import 'performance_monitor.dart';
 
 /// Match expiration service that manages match lifecycle and cleanup
 /// Implements Priority 3: User Experience Enhancements
@@ -50,89 +50,78 @@ class MatchExpirationService {
 
   /// Check if a match has expired
   bool isMatchExpired(MatchModel match) {
-    if (match.matchedAt == null) return false;
-
-    final matchAge = DateTime.now().difference(match.matchedAt!);
+    final matchAge = DateTime.now().difference(match.matchedAt);
     return matchAge > MATCH_EXPIRY_DURATION;
   }
 
   /// Check if a match is approaching expiration
   bool isMatchNearExpiry(MatchModel match) {
-    if (match.matchedAt == null) return false;
-
-    final matchAge = DateTime.now().difference(match.matchedAt!);
+    final matchAge = DateTime.now().difference(match.matchedAt);
     return matchAge > WARNING_THRESHOLD && matchAge <= MATCH_EXPIRY_DURATION;
   }
 
   /// Get time remaining before match expires
   Duration? getTimeUntilExpiry(MatchModel match) {
-    if (match.matchedAt == null) return null;
-
-    final matchAge = DateTime.now().difference(match.matchedAt!);
+    final matchAge = DateTime.now().difference(match.matchedAt);
     final timeRemaining = MATCH_EXPIRY_DURATION - matchAge;
 
     return timeRemaining.isNegative ? Duration.zero : timeRemaining;
   }
 
   /// Get expired matches for a user
-  Future<List<MatchModel>> getExpiredMatches(String userId) async {
-    return await PerformanceMonitor.measure('get_expired_matches', () async {
+  Future<List<MatchModel>> getExpiredMatches(String userId) async => PerformanceMonitor.measure('get_expired_matches', () async {
       try {
         final querySnapshot = await _matchesCollection
             .where('users', arrayContains: userId)
             .where('matchedAt',
                 isLessThan: Timestamp.fromDate(
-                    DateTime.now().subtract(MATCH_EXPIRY_DURATION)))
+                    DateTime.now().subtract(MATCH_EXPIRY_DURATION),),)
             .get();
 
         final expiredMatches = querySnapshot.docs
-            .map((doc) => MatchModel.fromDocument(doc))
-            .where((match) => isMatchExpired(match))
+            .map(MatchModel.fromDocument)
+            .where(isMatchExpired)
             .toList();
 
         debugPrint(
-            '📋 Found ${expiredMatches.length} expired matches for user $userId');
+            '📋 Found ${expiredMatches.length} expired matches for user $userId',);
         return expiredMatches;
       } catch (e) {
         debugPrint('❌ Error getting expired matches: $e');
         return [];
       }
     });
-  }
 
   /// Get matches approaching expiration for a user
-  Future<List<MatchModel>> getMatchesNearExpiry(String userId) async {
-    return await PerformanceMonitor.measure('get_matches_near_expiry',
+  Future<List<MatchModel>> getMatchesNearExpiry(String userId) async => PerformanceMonitor.measure('get_matches_near_expiry',
         () async {
       try {
         final querySnapshot = await _matchesCollection
             .where('users', arrayContains: userId)
             .where('matchedAt',
                 isLessThan: Timestamp.fromDate(
-                    DateTime.now().subtract(WARNING_THRESHOLD)))
+                    DateTime.now().subtract(WARNING_THRESHOLD),),)
             .where('matchedAt',
                 isGreaterThan: Timestamp.fromDate(
-                    DateTime.now().subtract(MATCH_EXPIRY_DURATION)))
+                    DateTime.now().subtract(MATCH_EXPIRY_DURATION),),)
             .get();
 
         final nearExpiryMatches = querySnapshot.docs
-            .map((doc) => MatchModel.fromDocument(doc))
-            .where((match) => isMatchNearExpiry(match))
+            .map(MatchModel.fromDocument)
+            .where(isMatchNearExpiry)
             .toList();
 
         debugPrint(
-            '⚠️ Found ${nearExpiryMatches.length} matches near expiry for user $userId');
+            '⚠️ Found ${nearExpiryMatches.length} matches near expiry for user $userId',);
         return nearExpiryMatches;
       } catch (e) {
         debugPrint('❌ Error getting matches near expiry: $e');
         return [];
       }
     });
-  }
 
   /// Archive an expired match
-  Future<bool> archiveExpiredMatch(String matchId) async {
-    return await PerformanceMonitor.measure('archive_expired_match', () async {
+  Future<bool> archiveExpiredMatch(String matchId) async => PerformanceMonitor.measure('archive_expired_match', () async {
       try {
         final matchDoc = await _matchesCollection.doc(matchId).get();
         if (!matchDoc.exists) {
@@ -169,7 +158,7 @@ class MatchExpirationService {
           batch.delete(_usersCollection
               .doc(userId)
               .collection('Matches')
-              .doc(otherUserId));
+              .doc(otherUserId),);
         }
 
         // Archive chat thread if it exists and has no messages
@@ -201,11 +190,9 @@ class MatchExpirationService {
         return false;
       }
     });
-  }
 
   /// Extend match expiration (premium feature)
-  Future<bool> extendMatchExpiration(String matchId, Duration extension) async {
-    return await PerformanceMonitor.measure('extend_match_expiration',
+  Future<bool> extendMatchExpiration(String matchId, Duration extension) async => PerformanceMonitor.measure('extend_match_expiration',
         () async {
       try {
         final matchDoc = await _matchesCollection.doc(matchId).get();
@@ -219,7 +206,7 @@ class MatchExpirationService {
         final newExpiry = currentExpiry != null
             ? Timestamp.fromDate(currentExpiry.toDate().add(extension))
             : Timestamp.fromDate(
-                DateTime.now().add(MATCH_EXPIRY_DURATION).add(extension));
+                DateTime.now().add(MATCH_EXPIRY_DURATION).add(extension),);
 
         await _matchesCollection.doc(matchId).update({
           'expiresAt': newExpiry,
@@ -228,14 +215,13 @@ class MatchExpirationService {
         });
 
         debugPrint(
-            '✅ Extended match $matchId expiration by ${extension.inDays} days');
+            '✅ Extended match $matchId expiration by ${extension.inDays} days',);
         return true;
       } catch (e) {
         debugPrint('❌ Error extending match expiration: $e');
         return false;
       }
     });
-  }
 
   /// Perform scheduled cleanup of expired matches
   Future<void> _performScheduledCleanup() async {
@@ -247,7 +233,7 @@ class MatchExpirationService {
         final expiredQuery = await _matchesCollection
             .where('matchedAt',
                 isLessThan: Timestamp.fromDate(
-                    DateTime.now().subtract(MATCH_EXPIRY_DURATION)))
+                    DateTime.now().subtract(MATCH_EXPIRY_DURATION),),)
             .limit(100) // Process in batches
             .get();
 
@@ -269,12 +255,12 @@ class MatchExpirationService {
         }
 
         debugPrint(
-            '✅ Cleanup complete: $archivedCount archived, $skippedCount skipped');
+            '✅ Cleanup complete: $archivedCount archived, $skippedCount skipped',);
 
         // Record cleanup metrics
         PerformanceMonitor.recordFirestoreOperation('match_cleanup',
             readCount: expiredQuery.docs.length,
-            writeCount: archivedCount * 3); // Estimate writes per archive
+            writeCount: archivedCount * 3,); // Estimate writes per archive
       } catch (e) {
         debugPrint('❌ Error in scheduled cleanup: $e');
       }
@@ -282,8 +268,7 @@ class MatchExpirationService {
   }
 
   /// Get match expiration statistics for a user
-  Future<MatchExpirationStats> getExpirationStats(String userId) async {
-    return await PerformanceMonitor.measure('get_expiration_stats', () async {
+  Future<MatchExpirationStats> getExpirationStats(String userId) async => PerformanceMonitor.measure('get_expiration_stats', () async {
       try {
         // Get all user matches
         final allMatches = await _matchesCollection
@@ -293,7 +278,7 @@ class MatchExpirationService {
         int activeMatches = 0;
         int nearExpiryMatches = 0;
         int expiredMatches = 0;
-        int matchesWithMessages = 0;
+        const int matchesWithMessages = 0;
 
         for (final doc in allMatches.docs) {
           final match = MatchModel.fromDocument(doc);
@@ -325,7 +310,6 @@ class MatchExpirationService {
         return MatchExpirationStats.empty();
       }
     });
-  }
 
   /// Send expiration warning notifications
   Future<void> sendExpirationWarnings() async {
@@ -337,10 +321,10 @@ class MatchExpirationService {
         final warningQuery = await _matchesCollection
             .where('matchedAt',
                 isLessThan: Timestamp.fromDate(
-                    DateTime.now().subtract(WARNING_THRESHOLD)))
+                    DateTime.now().subtract(WARNING_THRESHOLD),),)
             .where('matchedAt',
                 isGreaterThan: Timestamp.fromDate(
-                    DateTime.now().subtract(MATCH_EXPIRY_DURATION)))
+                    DateTime.now().subtract(MATCH_EXPIRY_DURATION),),)
             .where('expirationWarningSent', isEqualTo: false)
             .limit(50)
             .get();
@@ -376,8 +360,7 @@ class MatchExpirationService {
   }
 
   /// Restore an archived match (premium feature)
-  Future<bool> restoreArchivedMatch(String matchId) async {
-    return await PerformanceMonitor.measure('restore_archived_match', () async {
+  Future<bool> restoreArchivedMatch(String matchId) async => PerformanceMonitor.measure('restore_archived_match', () async {
       try {
         final archivedDoc = await _expiredMatchesCollection.doc(matchId).get();
         if (!archivedDoc.exists) {
@@ -431,17 +414,10 @@ class MatchExpirationService {
         return false;
       }
     });
-  }
 }
 
 /// Statistics about match expiration for a user
 class MatchExpirationStats {
-  final int activeMatches;
-  final int nearExpiryMatches;
-  final int expiredMatches;
-  final int archivedMatches;
-  final int matchesWithMessages;
-  final int totalMatches;
 
   const MatchExpirationStats({
     required this.activeMatches,
@@ -452,8 +428,7 @@ class MatchExpirationStats {
     required this.totalMatches,
   });
 
-  factory MatchExpirationStats.empty() {
-    return const MatchExpirationStats(
+  factory MatchExpirationStats.empty() => const MatchExpirationStats(
       activeMatches: 0,
       nearExpiryMatches: 0,
       expiredMatches: 0,
@@ -461,7 +436,12 @@ class MatchExpirationStats {
       matchesWithMessages: 0,
       totalMatches: 0,
     );
-  }
+  final int activeMatches;
+  final int nearExpiryMatches;
+  final int expiredMatches;
+  final int archivedMatches;
+  final int matchesWithMessages;
+  final int totalMatches;
 
   double get messageRate =>
       totalMatches > 0 ? matchesWithMessages / totalMatches : 0.0;
@@ -469,8 +449,7 @@ class MatchExpirationStats {
       totalMatches > 0 ? expiredMatches / totalMatches : 0.0;
 
   @override
-  String toString() {
-    return 'MatchExpirationStats(\n'
+  String toString() => 'MatchExpirationStats(\n'
         '  Active: $activeMatches\n'
         '  Near Expiry: $nearExpiryMatches\n'
         '  Expired: $expiredMatches\n'
@@ -480,5 +459,4 @@ class MatchExpirationStats {
         '  Message Rate: ${(messageRate * 100).toStringAsFixed(1)}%\n'
         '  Expiration Rate: ${(expirationRate * 100).toStringAsFixed(1)}%\n'
         ')';
-  }
 }

@@ -18,49 +18,17 @@ enum SecurityEventType {
 
 /// Security event data structure
 class SecurityEvent {
-  final String id;
-  final SecurityEventType type;
-  final String userId;
-  final String? targetUserId;
-  final String description;
-  final Map<String, dynamic> metadata;
-  final DateTime timestamp;
-  final String severity; // 'low', 'medium', 'high', 'critical'
-  final String? ipAddress;
-  final String? userAgent;
 
   SecurityEvent({
     required this.id,
     required this.type,
     required this.userId,
-    this.targetUserId,
-    required this.description,
-    required this.metadata,
-    required this.timestamp,
-    required this.severity,
+    required this.description, required this.metadata, required this.timestamp, required this.severity, this.targetUserId,
     this.ipAddress,
     this.userAgent,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'type': type.name,
-      'userId': userId,
-      'targetUserId': targetUserId,
-      'description': description,
-      'metadata': metadata,
-      'timestamp': Timestamp.fromDate(timestamp),
-      'severity': severity,
-      'ipAddress': ipAddress,
-      'userAgent': userAgent,
-      'processed': false,
-      'alertSent': false,
-    };
-  }
-
-  factory SecurityEvent.fromMap(Map<String, dynamic> map, String id) {
-    return SecurityEvent(
+  factory SecurityEvent.fromMap(Map<String, dynamic> map, String id) => SecurityEvent(
       id: id,
       type: SecurityEventType.values.firstWhere(
         (e) => e.name == map['type'],
@@ -75,7 +43,31 @@ class SecurityEvent {
       ipAddress: map['ipAddress'],
       userAgent: map['userAgent'],
     );
-  }
+  final String id;
+  final SecurityEventType type;
+  final String userId;
+  final String? targetUserId;
+  final String description;
+  final Map<String, dynamic> metadata;
+  final DateTime timestamp;
+  final String severity; // 'low', 'medium', 'high', 'critical'
+  final String? ipAddress;
+  final String? userAgent;
+
+  Map<String, dynamic> toMap() => {
+      'id': id,
+      'type': type.name,
+      'userId': userId,
+      'targetUserId': targetUserId,
+      'description': description,
+      'metadata': metadata,
+      'timestamp': Timestamp.fromDate(timestamp),
+      'severity': severity,
+      'ipAddress': ipAddress,
+      'userAgent': userAgent,
+      'processed': false,
+      'alertSent': false,
+    };
 }
 
 /// Service for logging security events and monitoring violations
@@ -105,9 +97,6 @@ class SecurityLoggingService {
         metadata: metadata ?? {},
         timestamp: DateTime.now(),
         severity: severity,
-        // In a real app, you'd get these from the request context
-        ipAddress: null,
-        userAgent: null,
       );
 
       await _firestore
@@ -156,7 +145,6 @@ class SecurityLoggingService {
         'rule': rule,
         'timestamp': DateTime.now().toIso8601String(),
       },
-      severity: 'medium',
     );
   }
 
@@ -232,7 +220,6 @@ class SecurityLoggingService {
         'description': description,
         'timestamp': DateTime.now().toIso8601String(),
       },
-      severity: 'medium',
     );
   }
 
@@ -319,7 +306,7 @@ class SecurityLoggingService {
 
       if (recentViolations.docs.length >= 5) {
         await _sendRepeatedViolationAlert(
-            event.userId, event.type, recentViolations.docs.length);
+            event.userId, event.type, recentViolations.docs.length,);
       }
     } catch (e) {
       debugPrint('Error checking repeated violations: $e');
@@ -328,7 +315,7 @@ class SecurityLoggingService {
 
   /// Send repeated violation alert
   Future<void> _sendRepeatedViolationAlert(
-      String userId, SecurityEventType type, int count) async {
+      String userId, SecurityEventType type, int count,) async {
     try {
       await _firestore.collection('admin_alerts').add({
         'type': 'repeated_violations',
@@ -390,7 +377,7 @@ class SecurityLoggingService {
 
   /// Get security events for a user (admin function)
   Future<List<SecurityEvent>> getUserSecurityEvents(String userId,
-      {int limit = 50}) async {
+      {int limit = 50,}) async {
     try {
       final query = await _firestore
           .collection('security_logs')
@@ -419,8 +406,8 @@ class SecurityLoggingService {
           .where('timestamp', isGreaterThan: Timestamp.fromDate(startDate))
           .get();
 
-      Map<String, int> eventCounts = {};
-      Map<String, int> severityCounts = {};
+      final Map<String, int> eventCounts = {};
+      final Map<String, int> severityCounts = {};
 
       for (var doc in events.docs) {
         final data = doc.data();

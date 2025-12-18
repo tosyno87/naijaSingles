@@ -11,11 +11,11 @@ class GetInAppProductsInitialState extends GetInAppProductsStates {}
 class GetInAppProductsLoadingState extends GetInAppProductsStates {}
 
 class GetInAppProductsSuccessState extends GetInAppProductsStates {
-  final List<ProductDetails> result;
   GetInAppProductsSuccessState({required this.result});
+  final List<ProductDetails> result;
 }
 
 class GetInAppProductsFailedState extends GetInAppProductsStates {
-  final String? msg;
   GetInAppProductsFailedState({this.msg});
+  final String? msg;
 }

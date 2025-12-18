@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 
 /// Provides locale management for the app.
 class LanguageProvider extends ChangeNotifier {
+
+  /// Creates a [LanguageProvider].
+  LanguageProvider(this.context);
   /// The [BuildContext] used by EasyLocalization.
   BuildContext context;
 
   /// Currently selected locale.
   Locale _currentLocale = const Locale('en', 'US');
-
-  /// Creates a [LanguageProvider].
-  LanguageProvider(this.context);
 
   /// Returns the current locale.
   Locale get currentLocale => _currentLocale;

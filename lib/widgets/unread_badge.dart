@@ -3,18 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// Widget for displaying unread message count badge
 class UnreadBadge extends StatelessWidget {
-  final int count;
-  final double? size;
-  final Color? backgroundColor;
-  final Color? textColor;
 
   const UnreadBadge({
-    super.key,
-    required this.count,
+    required this.count, super.key,
     this.size,
     this.backgroundColor,
     this.textColor,
   });
+  final int count;
+  final double? size;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -55,16 +54,15 @@ class UnreadBadge extends StatelessWidget {
 
 /// Widget for displaying unread indicator dot
 class UnreadDot extends StatelessWidget {
-  final bool hasUnread;
-  final double? size;
-  final Color? color;
 
   const UnreadDot({
-    super.key,
-    required this.hasUnread,
+    required this.hasUnread, super.key,
     this.size,
     this.color,
   });
+  final bool hasUnread;
+  final double? size;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +91,6 @@ class UnreadDot extends StatelessWidget {
 
 /// Widget for displaying unread indicator with optional badge
 class UnreadIndicator extends StatelessWidget {
-  final int? count;
-  final bool showDot;
-  final double? badgeSize;
-  final double? dotSize;
-  final Color? badgeColor;
-  final Color? dotColor;
-  final Color? textColor;
 
   const UnreadIndicator({
     super.key,
@@ -111,6 +102,13 @@ class UnreadIndicator extends StatelessWidget {
     this.dotColor,
     this.textColor,
   });
+  final int? count;
+  final bool showDot;
+  final double? badgeSize;
+  final double? dotSize;
+  final Color? badgeColor;
+  final Color? dotColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {

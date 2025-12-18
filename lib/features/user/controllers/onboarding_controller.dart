@@ -1,13 +1,19 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:developer';
+import 'package:provider/provider.dart';
+
+import '../../../common/providers/user_provider.dart';
+import '../../../common/utils/app_logger.dart';
 import '../../../common/widgets/loading_transition_screen.dart';
-import '../../../services/profile_image_cropper_service.dart';
 import '../../../services/bulk_photo_picker_service.dart';
+import '../../../services/profile_image_cropper_service.dart';
 
 class OnboardingController extends ChangeNotifier {
   // Basic user data
@@ -17,7 +23,7 @@ class OnboardingController extends ChangeNotifier {
   String _tribe = '';
   String _bio = '';
   List<String> _interests = [];
-  List<File?> _profilePhotos = List.filled(5, null); // Support up to 5 photos
+  final List<File?> _profilePhotos = List.filled(9, null); // Support up to 9 photos (Tinder standard)
   bool _isLoading = false;
 
   // Additional user data (for compatibility with existing code)
@@ -39,14 +45,15 @@ class OnboardingController extends ChangeNotifier {
   // User preferences
   String _interestedIn = 'everyone'; // Default to everyone
   List<int> _ageRange = [18, 50]; // Default age range
+  int _maxDistance = 50; // Default max distance in miles (industry standard)
 
   // Additional profile fields
-  double _height = 170.0; // Default height in cm
+  double _height = 170; // Default height in cm
   String _heightUnit = 'cm'; // 'cm' or 'ft'
   String _lookingFor = 'Dating'; // Dating, Friendship, Networking
   String _relationshipIntent =
       'Not sure yet'; // Short-term, Long-term, Casual, Not sure yet
-  
+
   // Location coordinates - CRITICAL FOR DISCOVERY
   double? _latitude;
   double? _longitude;
@@ -63,7 +70,7 @@ class OnboardingController extends ChangeNotifier {
   String get bio => _bio;
   List<String> get interests => _interests;
   List<File?> get profilePhotos => _profilePhotos;
-  
+
   // Location getters - CRITICAL FOR DISCOVERY
   double? get latitude => _latitude;
   double? get longitude => _longitude;
@@ -111,9 +118,9 @@ class OnboardingController extends ChangeNotifier {
       return '${_height.round()} cm';
     } else {
       // Convert cm to feet and inches
-      double totalInches = _height / 2.54;
-      int feet = (totalInches / 12).floor();
-      int inches = (totalInches % 12).round();
+      final double totalInches = _height / 2.54;
+      final int feet = (totalInches / 12).floor();
+      final int inches = (totalInches % 12).round();
       return '$feet\'$inches"';
     }
   }
@@ -262,6 +269,13 @@ class OnboardingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  int get maxDistance => _maxDistance;
+
+  void setMaxDistance(int distance) {
+    _maxDistance = distance;
+    notifyListeners();
+  }
+
   // Additional profile setters
   void setHeight(double height, String unit) {
     _height = height;
@@ -328,7 +342,7 @@ class OnboardingController extends ChangeNotifier {
     _smokingPreference = preference;
     notifyListeners();
   }
-  
+
   // Location setters - CRITICAL FOR DISCOVERY
   void setLocationCoordinates(double latitude, double longitude) {
     _latitude = latitude;
@@ -349,9 +363,7 @@ class OnboardingController extends ChangeNotifier {
         age >= 18; // Ensure user is at least 18
   }
 
-  bool isTribeSelected() {
-    return _tribe.isNotEmpty;
-  }
+  bool isTribeSelected() => _tribe.isNotEmpty;
 
   bool isBioComplete() {
     return _bio.length >= 50; // Updated minimum bio length for dating context
@@ -363,58 +375,53 @@ class OnboardingController extends ChangeNotifier {
   }
 
   bool isPhotoUploaded() {
-    // Require at least 3 photos
-    int photoCount = _profilePhotos.where((photo) => photo != null).length;
-    return photoCount >= 3;
+    // Tinder requires at least 1 photo to proceed
+    final int photoCount = _profilePhotos.where((photo) => photo != null).length;
+    return photoCount >= 1;
   }
 
   // Photo selection for a specific index with industry-standard cropping
-  Future<void> pickProfilePhoto(ImageSource source, int index) async {
+  Future<void> pickProfilePhoto(ImageSource source, int index, BuildContext? context) async {
     try {
-      // Determine crop type based on photo index
-      CropType cropType;
-      String title;
+      log('📸 Starting photo pick for index $index with source: $source');
       
-      switch (index) {
-        case 0:
-          cropType = CropType.square; // Main photo - square crop
-          title = 'Crop Main Photo';
-          break;
-        case 1:
-          cropType = CropType.portrait; // Full body - portrait crop
-          title = 'Crop Full Body Photo';
-          break;
-        case 2:
-          cropType = CropType.landscape; // Activity - landscape crop
-          title = 'Crop Activity Photo';
-          break;
-        case 3:
-          cropType = CropType.portrait; // Social - portrait crop
-          title = 'Crop Social Photo';
-          break;
-        case 4:
-          cropType = CropType.freeform; // Lifestyle - freeform crop
-          title = 'Crop Lifestyle Photo';
-          break;
-        default:
-          cropType = CropType.square;
-          title = 'Crop Photo';
-      }
+      // All photos use square (1:1) crop - Industry standard (Tinder, Bumble, Hinge)
+      // This is simpler and more flexible than forcing different aspect ratios
+      const CropType cropType = CropType.square;
+      final String title = index == 0 
+          ? 'Crop Main Photo' 
+          : 'Crop Photo ${index + 1}';
 
-      // Pick and crop image with industry-standard settings
-      final File? croppedImage = await ProfileImageCropperService.pickAndCropImage(
+      // Pick and crop image with industry-standard settings and permission handling
+      final File? croppedImage =
+          await ProfileImageCropperService.pickAndCropImage(
         source: source,
         cropType: cropType,
         title: title,
+        context: context,
       );
 
       if (croppedImage != null) {
         _profilePhotos[index] = croppedImage;
         notifyListeners();
-        log("✅ Photo $index cropped and saved successfully");
+        log('✅ Photo $index cropped and saved successfully');
+      } else {
+        log('⚠️ Photo selection cancelled or failed for index $index');
       }
-    } catch (e) {
-      log("❌ Error picking and cropping image: $e");
+    } catch (e, stackTrace) {
+      log('❌ Error picking and cropping image: $e');
+      log('❌ Stack trace: $stackTrace');
+      
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to ${source == ImageSource.camera ? 'take' : 'select'} photo. Please try again.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -422,28 +429,31 @@ class OnboardingController extends ChangeNotifier {
   Future<void> pickMultiplePhotos(BuildContext context) async {
     try {
       // Pick multiple photos at once
-      final List<File> selectedPhotos = await BulkPhotoPickerService.pickMultiplePhotos(
+      final List<File> selectedPhotos =
+          await BulkPhotoPickerService.pickMultiplePhotos(
         context: context,
-        maxPhotos: 5,
       );
 
       if (selectedPhotos.isEmpty) return;
 
       // Crop each photo individually
-      final List<File> croppedPhotos = await BulkPhotoPickerService.cropSelectedPhotos(
+      final List<File> croppedPhotos =
+          await BulkPhotoPickerService.cropSelectedPhotos(
         selectedPhotos: selectedPhotos,
         context: context,
       );
 
       // Add cropped photos to profile photos
-      for (int i = 0; i < croppedPhotos.length && i < _profilePhotos.length; i++) {
+      for (int i = 0;
+          i < croppedPhotos.length && i < _profilePhotos.length;
+          i++) {
         _profilePhotos[i] = croppedPhotos[i];
       }
 
       notifyListeners();
-      log("✅ Bulk photo selection completed: ${croppedPhotos.length} photos added");
+      log('✅ Bulk photo selection completed: ${croppedPhotos.length} photos added');
     } catch (e) {
-      log("❌ Error in bulk photo selection: $e");
+      log('❌ Error in bulk photo selection: $e');
     }
   }
 
@@ -463,11 +473,11 @@ class OnboardingController extends ChangeNotifier {
 
       // Validate onboarding data before saving
       debugPrint('🔍 Validating onboarding data before save...');
-      bool isDataValid = validateOnboardingData();
+      final bool isDataValid = validateOnboardingData();
 
       if (!isDataValid) {
         debugPrint(
-            '❌ Onboarding data validation failed - some required fields are missing');
+            '❌ Onboarding data validation failed - some required fields are missing',);
         // Still proceed with save but log the issues
       }
 
@@ -477,7 +487,7 @@ class OnboardingController extends ChangeNotifier {
 
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        throw Exception("User not authenticated");
+        throw Exception('User not authenticated');
       }
 
       // Show loading screen if context is provided
@@ -507,7 +517,17 @@ class OnboardingController extends ChangeNotifier {
       // First, save essential user data (fast operation)
       await _saveEssentialUserData(user.uid);
 
-      // If we haven't timed out yet, navigate now that essential data is saved
+      // Upload photos BEFORE navigation to ensure they're saved
+      // This ensures profile screen shows photos immediately
+      try {
+        await _uploadProfilePictures(user.uid);
+        debugPrint('✅ Profile photos uploaded successfully');
+      } catch (e) {
+        debugPrint('⚠️ Photo upload failed (non-critical): $e');
+        // Continue even if photos fail - user can add them later
+      }
+
+      // If we haven't timed out yet, navigate now that essential data and photos are saved
       if (!timeoutReached && context != null && context.mounted) {
         try {
           _navigateToMainScreen(context);
@@ -516,10 +536,15 @@ class OnboardingController extends ChangeNotifier {
         }
       }
 
-      // Continue with non-essential operations in background
-      _uploadProfilePictures(user.uid).then((_) {
+      // Continue with non-essential operations in background (legacy cleanup)
+      Future.delayed(const Duration(seconds: 1), () {
         // Update UI if needed when pictures are done uploading
-        debugPrint('✅ Profile pictures uploaded successfully');
+        log('✅ Profile pictures uploaded successfully');
+        notifyListeners(); // Notify listeners that photos are now uploaded
+      }).catchError((error) {
+        log('❌ Failed to upload profile pictures: $error', error: error);
+        // Update error state for potential retry
+        notifyListeners();
       });
 
       _isLoading = false;
@@ -529,7 +554,7 @@ class OnboardingController extends ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      log("Error saving user data: $e");
+      log('Error saving user data: $e');
 
       // If there's an error but context is provided, still navigate
       if (context != null && context.mounted) {
@@ -545,12 +570,50 @@ class OnboardingController extends ChangeNotifier {
   }
 
   // Navigate to main screen
-  void _navigateToMainScreen(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main_navigation',
-      (route) => false,
-    );
+  Future<void> _navigateToMainScreen(BuildContext context) async {
+    // Ensure UserProvider is updated before navigation
+    // This prevents MainNavigationScreen from redirecting back to onboarding
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final user = FirebaseAuth.instance.currentUser;
+      
+      if (user != null) {
+        // Force UserProvider to reload user data from Firestore
+        // This ensures MainNavigationScreen sees the updated profile
+        await userProvider.listenCurrentUserdetails();
+        
+        // Wait a bit for the listener to update
+        await Future.delayed(const Duration(milliseconds: 300));
+        
+        // Verify user data is loaded before navigating
+        int retries = 0;
+        while (retries < 5 && 
+               (userProvider.currentUser == null || 
+                userProvider.currentUser?.name == null ||
+                (userProvider.currentUser?.name?.isEmpty ?? false))) {
+          await Future.delayed(const Duration(milliseconds: 200));
+          retries++;
+        }
+        
+        if (userProvider.currentUser?.name != null && 
+            userProvider.currentUser!.name!.isNotEmpty) {
+          log('✅ UserProvider updated with profile, navigating to main screen');
+        } else {
+          log('⚠️ UserProvider not updated after retries, navigating anyway');
+        }
+      }
+    } catch (e) {
+      log('⚠️ Error updating UserProvider before navigation: $e');
+      // Navigate anyway - MainNavigationScreen will handle the check
+    }
+    
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/main_navigation',
+        (route) => false,
+      );
+    }
   }
 
   // Save only essential user data needed for app functionality
@@ -593,13 +656,6 @@ class OnboardingController extends ChangeNotifier {
       'dealbreakers': _dealbreakers,
       'drinkingPreference': _drinkingPreference,
       'smokingPreference': _smokingPreference,
-      
-      // Cultural fields for database consistency
-      'tribe': _tribe,
-      'nationality': _nationality,
-      'languages': _languages,
-      'religion': _religion,
-      'occupation': _occupation,
 
       // System fields
       'lastActive': DateTime.now().toIso8601String(),
@@ -621,7 +677,7 @@ class OnboardingController extends ChangeNotifier {
         'ageRange': _ageRange,
         'lookingFor': _lookingFor,
         'relationshipIntent': _relationshipIntent,
-        'maximumDistance': 100, // Increased for better discovery
+        'maximumDistance': _maxDistance, // User-selected distance preference
       },
 
       // Legacy preference fields - CRITICAL FOR DISCOVERY
@@ -630,15 +686,15 @@ class OnboardingController extends ChangeNotifier {
         'min': _ageRange[0].toString(),
         'max': _ageRange[1].toString(),
       },
-      
+
       // Additional discovery fields - CRITICAL FOR USER DISCOVERY
       'userGender': _gender, // Required for gender filtering
       'age_range': {
         'min': _ageRange[0].toString(),
         'max': _ageRange[1].toString(),
       },
-      'maximum_distance': 62, // 100km = 62 miles for better discovery
-      'maxDistance': 62, // Alternative field name for compatibility
+      'maximum_distance': _maxDistance, // User-selected distance preference
+      'maxDistance': _maxDistance, // Alternative field name for compatibility
 
       // Location information - CRITICAL FOR DISCOVERY
       'location': {
@@ -657,92 +713,206 @@ class OnboardingController extends ChangeNotifier {
     };
 
     // Debug logging to verify all data is being saved
-    print('🔍 Saving comprehensive user data:');
-    print('   Name: $_fullName');
-    print('   Age: $age');
-    print('   Gender: $_gender');
-    print('   Location: ${_locationName ?? 'Not set'}');
-    print('   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}');
-    print('   Tribe: $_tribe');
-    print('   Bio: ${_bio.length} characters');
-    print('   Interests: ${_interests.length} items - $_interests');
-    print('   Height: $_height cm (${_getHeightFtIn()})');
-    print('   Looking for: $_lookingFor');
-    print('   Relationship intent: $_relationshipIntent');
-    print('   Interested in: $_interestedIn');
-    print('   Age range: $_ageRange');
-    print('   Show gender: $_interestedIn');
-    print('   Maximum distance: 62 miles');
-    print('   Additional fields:');
-    print('     Education: $_education');
-    print('     Occupation: $_occupation');
-    print('     Religion: $_religion');
-    print('     Languages: $_languages');
-    print('     Drinking: $_drinkingPreference');
-    print('     Smoking: $_smokingPreference');
-    print('     Nationality: $_nationality');
-    print(
-        '   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos');
+    AppLogger.info('🔍 Saving comprehensive user data:');
+    AppLogger.debug('   Name: $_fullName');
+    AppLogger.debug('   Age: $age');
+    AppLogger.debug('   Gender: $_gender');
+    AppLogger.debug('   Location: ${_locationName ?? 'Not set'}');
+    AppLogger.debug(
+        '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}',);
+    AppLogger.debug('   Tribe: $_tribe');
+    AppLogger.debug('   Bio: ${_bio.length} characters');
+    AppLogger.debug('   Interests: ${_interests.length} items - $_interests');
+    AppLogger.debug('   Height: $_height cm (${_getHeightFtIn()})');
+    AppLogger.debug('   Looking for: $_lookingFor');
+    AppLogger.debug('   Relationship intent: $_relationshipIntent');
+    AppLogger.debug('   Interested in: $_interestedIn');
+    AppLogger.debug('   Age range: $_ageRange');
+    AppLogger.debug('   Show gender: $_interestedIn');
+    AppLogger.debug('   Maximum distance: 62 miles');
+    AppLogger.debug('   Additional fields:');
+    AppLogger.debug('     Education: $_education');
+    AppLogger.debug('     Occupation: $_occupation');
+    AppLogger.debug('     Religion: $_religion');
+    AppLogger.debug('     Languages: $_languages');
+    AppLogger.debug('     Drinking: $_drinkingPreference');
+    AppLogger.debug('     Smoking: $_smokingPreference');
+    AppLogger.debug('     Nationality: $_nationality');
+    AppLogger.debug(
+        '   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos',);
 
     // Save essential data to Firestore
-    print('🔍 Saving essential user data to Firestore...');
+    AppLogger.info('🔍 Saving essential user data to Firestore...');
+    
+    // Use set with merge: true to preserve existing fields (like email from account creation)
+    // and add/update onboarding data
     await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .set(essentialData, SetOptions(merge: true));
-
+    
+    // Ensure completion flags are explicitly set (merge might not override if field exists)
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .update({
+      'onboardingCompleted': true,
+      'profileSetupComplete': true,
+      'isProfileComplete': true,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    
     // Update display name in Firebase Auth
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       await user.updateDisplayName(_fullName);
     }
 
-    print('✅ Essential user data saved successfully');
-    print('✅ All onboarding data should now be available in profile');
+    AppLogger.info('✅ Essential user data saved successfully');
+    AppLogger.info('✅ All onboarding data should now be available in profile');
   }
 
-  // Upload profile pictures in the background
+  // Upload profile pictures with proper error handling
   Future<void> _uploadProfilePictures(String userId) async {
-    List<String> photoUrls = [];
-    List<File> validPhotos = _profilePhotos.whereType<File>().toList();
+    final List<String> photoUrls = [];
+    final List<File> validPhotos = _profilePhotos.whereType<File>().toList();
 
     if (validPhotos.isEmpty) {
+      log('⚠️ No photos to upload');
       return;
     }
 
-    print('📸 Uploading ${validPhotos.length} profile pictures');
+    log('📸 Starting upload of ${validPhotos.length} profile pictures for user: $userId');
 
     try {
       for (int i = 0; i < validPhotos.length; i++) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('users/$userId/profile_photo_$i.jpg');
+        final photo = validPhotos[i];
 
-        await storageRef.putFile(validPhotos[i]);
-        String url = await storageRef.getDownloadURL();
-        photoUrls.add(url);
+        // Validate file exists and is readable
+        if (!photo.existsSync()) {
+          log('❌ Photo $i does not exist at path: ${photo.path}');
+          continue;
+        }
+
+        // Check file size (max 10MB)
+        final fileSize = await photo.length();
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (fileSize > maxSize) {
+          log('❌ Photo $i is too large: ${(fileSize / 1024 / 1024).toStringAsFixed(2)}MB (max 10MB)');
+          continue;
+        }
+
+        log('📤 Uploading photo $i/${validPhotos.length} (${(fileSize / 1024).toStringAsFixed(2)}KB)...');
+
+        bool uploadSuccess = false;
+        
+        try {
+          // Create storage reference
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('users/$userId/profile_photo_$i.jpg');
+
+          final metadata = SettableMetadata(
+            contentType: 'image/jpeg',
+            customMetadata: {
+              'uploadedAt': DateTime.now().toIso8601String(),
+              'photoIndex': i.toString(),
+            },
+          );
+
+          // Use putData (foreground upload) directly to avoid background session errors on simulator
+          // This works on both simulator and physical devices
+          log('📦 Using putData (foreground upload) for photo $i to avoid simulator issues...');
+          final bytes = await photo.readAsBytes();
+          final uploadTask = storageRef.putData(bytes, metadata);
+
+          // Wait for upload to complete with timeout
+          final snapshot = await uploadTask.timeout(
+            const Duration(minutes: 2),
+            onTimeout: () {
+              throw TimeoutException('Photo upload timed out after 2 minutes');
+            },
+          );
+
+          // Get download URL
+          final url = await snapshot.ref.getDownloadURL();
+          photoUrls.add(url);
+          uploadSuccess = true;
+
+          log('✅ Photo $i uploaded successfully: $url');
+        } catch (uploadError) {
+          log('❌ Error uploading photo $i: $uploadError', error: uploadError);
+          
+          // If putData failed, try putFile as fallback (shouldn't happen, but just in case)
+          if (!uploadSuccess) {
+            log('🔄 Retrying photo $i with putFile as fallback...');
+            try {
+              final storageRef = FirebaseStorage.instance
+                  .ref()
+                  .child('users/$userId/profile_photo_$i.jpg');
+              
+              final uploadTask = storageRef.putFile(
+                photo,
+                SettableMetadata(
+                  contentType: 'image/jpeg',
+                  customMetadata: {
+                    'uploadedAt': DateTime.now().toIso8601String(),
+                    'photoIndex': i.toString(),
+                  },
+                ),
+              );
+              
+              final snapshot = await uploadTask.timeout(
+                const Duration(minutes: 2),
+                onTimeout: () {
+                  throw TimeoutException('Photo upload timed out after 2 minutes');
+                },
+              );
+              
+              final url = await snapshot.ref.getDownloadURL();
+              photoUrls.add(url);
+              uploadSuccess = true;
+              log('✅ Photo $i uploaded successfully (retry with putFile): $url');
+            } catch (retryError) {
+              log('❌ Retry also failed for photo $i: $retryError');
+              // Continue with next photo instead of failing all
+            }
+          }
+          
+          if (!uploadSuccess) {
+            log('⚠️ Photo $i could not be uploaded, continuing with remaining photos...');
+          }
+        }
       }
 
       // Update photos list for compatibility
-      _photos = photoUrls;
-
-      // Update Firestore with photo URLs
       if (photoUrls.isNotEmpty) {
+        _photos = photoUrls;
+
+        // Update Firestore with photo URLs
         final photoData = {
-          'profilePicture': photoUrls[0],
-          'photos': photoUrls,
-          'Pictures': photoUrls,
-          'imageUrl': photoUrls,
+          'profilePicture': photoUrls[0], // Main profile picture
+          'photos': photoUrls, // Array of all photo URLs
+          'Pictures': photoUrls, // Legacy field name
+          'imageUrl': photoUrls, // Alternative field name
+          'profilePhotoCount': photoUrls.length,
+          'lastPhotoUpdate': FieldValue.serverTimestamp(),
         };
 
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userId)
-            .update(photoData);
+            .set(photoData, SetOptions(merge: true));
+
+        log('✅ Successfully updated Firestore with ${photoUrls.length} photo URLs');
+      } else {
+        log('⚠️ No photos were successfully uploaded');
+        throw Exception('Failed to upload any profile photos');
       }
     } catch (e) {
-      log("Error uploading profile pictures: $e");
-      // Don't rethrow - this is a background operation
+      log('❌ Critical error in _uploadProfilePictures: $e', error: e);
+      // Re-throw so calling code can handle it
+      rethrow;
     }
   }
 
@@ -755,18 +925,18 @@ class OnboardingController extends ChangeNotifier {
 
   // Helper method to get ft/in format from height in cm
   String _getHeightFtIn() {
-    double totalInches = _height / 2.54;
-    int feet = (totalInches / 12).floor();
-    int inches = (totalInches % 12).round();
+    final double totalInches = _height / 2.54;
+    final int feet = (totalInches / 12).floor();
+    final int inches = (totalInches % 12).round();
     return '$feet\'$inches"';
   }
 
   // Validation method to ensure all required onboarding data is present
   bool validateOnboardingData() {
-    print('🔍 Validating onboarding data completeness:');
+    AppLogger.debug('🔍 Validating onboarding data completeness:');
 
     bool isValid = true;
-    List<String> missingFields = [];
+    final List<String> missingFields = [];
 
     // Required fields validation
     if (_fullName.isEmpty) {
@@ -824,7 +994,7 @@ class OnboardingController extends ChangeNotifier {
       missingFields.add('Location');
       isValid = false;
     }
-    
+
     // Location coordinates validation - CRITICAL FOR DISCOVERY
     if (_latitude == null || _longitude == null) {
       missingFields.add('Location Coordinates');
@@ -832,38 +1002,37 @@ class OnboardingController extends ChangeNotifier {
     }
 
     // Check if at least one photo is uploaded
-    bool hasPhotos = _profilePhotos.any((photo) => photo != null);
+    final bool hasPhotos = _profilePhotos.any((photo) => photo != null);
     if (!hasPhotos) {
       missingFields.add('Profile Photos');
       isValid = false;
     }
 
     if (isValid) {
-      print('✅ All required onboarding data is present');
-      print('   Name: $_fullName');
-      print('   Age: $age years old');
-      print('   Gender: $_gender');
-      print('   Location: ${_locationName ?? 'Not set'}');
-      print('   Tribe: $_tribe');
-      print('   Bio: ${_bio.length} characters');
-      print('   Interests: ${_interests.length} selected');
-      print('   Height: $_height cm (${_getHeightFtIn()})');
-      print('   Looking for: $_lookingFor');
-      print('   Relationship intent: $_relationshipIntent');
-      print('   Interested in: $_interestedIn');
-      print('   Age range: ${_ageRange[0]}-${_ageRange[1]}');
-      print(
-          '   Photos: ${_profilePhotos.where((p) => p != null).length} uploaded');
+      AppLogger.info('✅ All required onboarding data is present');
+      AppLogger.debug('   Name: $_fullName');
+      AppLogger.debug('   Age: $age years old');
+      AppLogger.debug('   Gender: $_gender');
+      AppLogger.debug('   Location: ${_locationName ?? 'Not set'}');
+      AppLogger.debug('   Tribe: $_tribe');
+      AppLogger.debug('   Bio: ${_bio.length} characters');
+      AppLogger.debug('   Interests: ${_interests.length} selected');
+      AppLogger.debug('   Height: $_height cm (${_getHeightFtIn()})');
+      AppLogger.debug('   Looking for: $_lookingFor');
+      AppLogger.debug('   Relationship intent: $_relationshipIntent');
+      AppLogger.debug('   Interested in: $_interestedIn');
+      AppLogger.debug('   Age range: ${_ageRange[0]}-${_ageRange[1]}');
+      AppLogger.debug(
+          '   Photos: ${_profilePhotos.where((p) => p != null).length} uploaded',);
     } else {
-      print('❌ Missing required fields: ${missingFields.join(', ')}');
+      AppLogger.warning('❌ Missing required fields: ${missingFields.join(', ')}');
     }
 
     return isValid;
   }
 
   // Method to get a summary of all onboarding data for debugging
-  Map<String, dynamic> getOnboardingDataSummary() {
-    return {
+  Map<String, dynamic> getOnboardingDataSummary() => {
       'fullName': _fullName,
       'age': age,
       'gender': _gender,
@@ -881,5 +1050,4 @@ class OnboardingController extends ChangeNotifier {
       'photosCount': _profilePhotos.where((p) => p != null).length,
       'hasAllRequiredData': validateOnboardingData(),
     };
-  }
 }

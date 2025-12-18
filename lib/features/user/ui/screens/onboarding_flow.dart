@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../controllers/onboarding_controller.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../controllers/onboarding_controller.dart';
 
 /// A multi-step onboarding flow with cultural focus for NaijaSingles app.
 ///
 /// This widget provides a 3-screen onboarding experience using PageView
 /// with a shared OnboardingController to maintain state across screens.
 class OnboardingFlow extends StatefulWidget {
-  const OnboardingFlow({Key? key}) : super(key: key);
+  const OnboardingFlow({super.key});
 
   @override
   State<OnboardingFlow> createState() => _OnboardingFlowState();
@@ -62,14 +62,14 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             // Progress indicator
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
                 children: List.generate(
                   3,
                   (index) => Expanded(
                     child: Container(
                       height: 4,
-                      margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
                       decoration: BoxDecoration(
                         color: _currentPage >= index
                             ? primaryColor
@@ -107,13 +107,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
             // Navigation labelLarges
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Back labelLarge (hidden on first page)
-                  _currentPage > 0
-                      ? TextButton(
+                  if (_currentPage > 0) TextButton(
                           onPressed: () {
                             _pageController.previousPage(
                               duration: const Duration(milliseconds: 300),
@@ -127,8 +126,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                               fontSize: 16,
                             ),
                           ),
-                        )
-                      : const SizedBox(width: 80),
+                        ) else const SizedBox(width: 80),
 
                   // Next/Finish labelLarge
                   ElevatedButton(
@@ -136,8 +134,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0,
-                        vertical: 12.0,
+                        horizontal: 32,
+                        vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -183,9 +181,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   /// Build the cultural identity screen (Page 1)
-  Widget _buildCulturalIdentityScreen(OnboardingController controller) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+  Widget _buildCulturalIdentityScreen(OnboardingController controller) => SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -221,7 +218,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               'Kanuri',
               'Ibibio',
               'Tiv',
-              'Other'
+              'Other',
             ],
             onChanged: (value) {
               if (value != null) controller.updateTribe(value);
@@ -243,14 +240,14 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               'Pidgin',
               'French',
               'Arabic',
-              'Other'
+              'Other',
             ]
                 .map((language) => _buildSelectionChip(
                       label: language,
                       isSelected: controller.languages.contains(language),
                       onSelected: (selected) {
-                        List<String> updatedLanguages = [
-                          ...controller.languages
+                        final List<String> updatedLanguages = [
+                          ...controller.languages,
                         ];
                         if (selected) {
                           updatedLanguages.add(language);
@@ -259,7 +256,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         }
                         controller.updateLanguages(updatedLanguages);
                       },
-                    ))
+                    ),)
                 .toList(),
           ),
           const SizedBox(height: 24),
@@ -272,11 +269,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               'Nigerian',
               'Nigerian Diaspora',
               'Other African',
-              'Other'
+              'Other',
             ],
             onChanged: (value) {
               if (value != null) {
-                bool isDiaspora = value == 'Nigerian Diaspora';
+                final bool isDiaspora = value == 'Nigerian Diaspora';
                 controller.updateNationality(value, isDiaspora);
               }
             },
@@ -286,12 +283,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ],
       ),
     );
-  }
 
   /// Build the relationship intent screen (Page 2)
-  Widget _buildRelationshipIntentScreen(OnboardingController controller) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+  Widget _buildRelationshipIntentScreen(OnboardingController controller) => SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -344,12 +339,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ],
       ),
     );
-  }
 
   /// Build the lifestyle and values screen (Page 3)
-  Widget _buildLifestyleValuesScreen(OnboardingController controller) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+  Widget _buildLifestyleValuesScreen(OnboardingController controller) => SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -386,13 +379,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               'Amapiano',
               'Fuji',
               'Juju',
-              'Traditional'
+              'Traditional',
             ]
                 .map((genre) => _buildSelectionChip(
                       label: genre,
                       isSelected: controller.genres.contains(genre),
                       onSelected: (selected) {
-                        List<String> updatedGenres = [...controller.genres];
+                        final List<String> updatedGenres = [...controller.genres];
                         if (selected) {
                           updatedGenres.add(genre);
                         } else {
@@ -400,7 +393,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         }
                         controller.updateGenres(updatedGenres);
                       },
-                    ))
+                    ),)
                 .toList(),
           ),
           const SizedBox(height: 24),
@@ -416,7 +409,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               'Afro-fusion',
               'Minimalist',
               'Vintage',
-              'Other'
+              'Other',
             ],
             onChanged: (value) {
               if (value != null) controller.updateFashionStyle(value);
@@ -436,7 +429,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               'Nightlife & clubbing',
               'Family gatherings',
               'Religious activities',
-              'Sports & fitness'
+              'Sports & fitness',
             ],
             onChanged: (value) {
               if (value != null) controller.updateWeekendVibe(value);
@@ -458,13 +451,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               'Career',
               'Community',
               'Independence',
-              'Creativity'
+              'Creativity',
             ]
                 .map((value) => _buildSelectionChip(
                       label: value,
                       isSelected: controller.values.contains(value),
                       onSelected: (selected) {
-                        List<String> updatedValues = [...controller.values];
+                        final List<String> updatedValues = [...controller.values];
                         if (selected) {
                           updatedValues.add(value);
                         } else {
@@ -472,19 +465,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         }
                         controller.updateValues(updatedValues);
                       },
-                    ))
+                    ),)
                 .toList(),
           ),
           const SizedBox(height: 40),
         ],
       ),
     );
-  }
 
   /// Build a label for input fields
-  Widget _buildInputLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+  Widget _buildInputLabel(String label) => Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         label,
         style: const TextStyle(
@@ -494,7 +485,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ),
       ),
     );
-  }
 
   /// Build a dropdown field
   Widget _buildDropdownField<T>({
@@ -502,12 +492,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     required List<T> items,
     required ValueChanged<T?> onChanged,
     required String hint,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  }) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: DropdownButton<T>(
@@ -515,24 +504,20 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         hint: Text(hint),
         isExpanded: true,
         underline: const SizedBox(),
-        items: items.map((T item) {
-          return DropdownMenuItem<T>(
+        items: items.map((T item) => DropdownMenuItem<T>(
             value: item,
             child: Text(item.toString()),
-          );
-        }).toList(),
+          ),).toList(),
         onChanged: onChanged,
       ),
     );
-  }
 
   /// Build a selection chip for multi-select options
   Widget _buildSelectionChip({
     required String label,
     required bool isSelected,
     required ValueChanged<bool> onSelected,
-  }) {
-    return FilterChip(
+  }) => FilterChip(
       label: Text(label),
       selected: isSelected,
       onSelected: onSelected,
@@ -549,7 +534,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         ),
       ),
     );
-  }
 
   /// Build an intent selection card
   Widget _buildIntentCard({
@@ -564,11 +548,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     return GestureDetector(
       onTap: () => controller.updateIntent(intentValue),
       child: Container(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color:
               isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.white,
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? primaryColor : Colors.grey.shade300,
             width: isSelected ? 2.0 : 1.0,
@@ -577,7 +561,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isSelected ? primaryColor : Colors.grey.shade100,
                 shape: BoxShape.circle,

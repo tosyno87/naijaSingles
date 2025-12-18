@@ -1,27 +1,28 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../data/models/rsvp_model.dart';
 import '../bloc/rsvp_bloc.dart';
 
 class RSVPButton extends StatefulWidget {
+
+  const RSVPButton({
+    required this.eventId, super.key,
+    this.compact = false,
+    this.initialStatus,
+  });
   final String eventId;
   final bool compact;
   final RSVPStatus? initialStatus;
-
-  const RSVPButton({
-    Key? key,
-    required this.eventId,
-    this.compact = false,
-    this.initialStatus,
-  }) : super(key: key);
 
   @override
   State<RSVPButton> createState() => _RSVPButtonState();
 }
 
-class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateMixin {
+class _RSVPButtonState extends State<RSVPButton>
+    with SingleTickerProviderStateMixin {
   RSVPStatus _currentStatus = RSVPStatus.none;
   bool _isLoading = false;
   late AnimationController _animationController;
@@ -31,19 +32,19 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _currentStatus = widget.initialStatus ?? RSVPStatus.none;
-    
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    
+
     _scaleAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: 0.95,
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
-    ));
+    ),);
 
     // Load current RSVP status
     _loadRSVPStatus();
@@ -58,9 +59,9 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
   void _loadRSVPStatus() {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     context.read<RSVPBloc>().add(LoadEventRSVPStatusEvent(
-      userId: currentUserId,
-      eventId: widget.eventId,
-    ));
+          userId: currentUserId,
+          eventId: widget.eventId,
+        ),);
   }
 
   void _handleRSVPTap() {
@@ -83,9 +84,9 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
     });
 
     context.read<RSVPBloc>().add(RSVPToEventEvent(
-      eventId: widget.eventId,
-      status: newStatus,
-    ));
+          eventId: widget.eventId,
+          status: newStatus,
+        ),);
   }
 
   void _showRSVPOptions() {
@@ -97,15 +98,14 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BlocListener<RSVPBloc, RSVPState>(
+  Widget build(BuildContext context) => BlocListener<RSVPBloc, RSVPState>(
       listener: (context, state) {
         if (state is RSVPSuccess && state.eventId == widget.eventId) {
           setState(() {
             _currentStatus = state.status;
             _isLoading = false;
           });
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -124,7 +124,7 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
           setState(() {
             _isLoading = false;
           });
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -138,7 +138,8 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
               ),
             ),
           );
-        } else if (state is EventRSVPStatusLoaded && state.eventId == widget.eventId) {
+        } else if (state is EventRSVPStatusLoaded &&
+            state.eventId == widget.eventId) {
           setState(() {
             _currentStatus = state.status;
             _isLoading = false;
@@ -147,15 +148,12 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
       },
       child: AnimatedBuilder(
         animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
+        builder: (context, child) => Transform.scale(
             scale: _scaleAnimation.value,
             child: _buildButton(),
-          );
-        },
+          ),
       ),
     );
-  }
 
   Widget _buildButton() {
     if (widget.compact) {
@@ -164,8 +162,7 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
     return _buildFullButton();
   }
 
-  Widget _buildCompactButton() {
-    return GestureDetector(
+  Widget _buildCompactButton() => GestureDetector(
       onTap: _handleRSVPTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -208,10 +205,8 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
         ),
       ),
     );
-  }
 
-  Widget _buildFullButton() {
-    return SizedBox(
+  Widget _buildFullButton() => SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _isLoading ? null : _handleRSVPTap,
@@ -257,10 +252,8 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
         ),
       ),
     );
-  }
 
-  Widget _buildRSVPOptionsSheet() {
-    return Container(
+  Widget _buildRSVPOptionsSheet() => DecoratedBox(
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -299,15 +292,15 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
                 ),
                 _buildRSVPOption(
                   status: RSVPStatus.interested,
-                  title: "Interested",
-                  subtitle: "Save for later consideration",
+                  title: 'Interested',
+                  subtitle: 'Save for later consideration',
                   icon: Icons.star,
                   color: const Color(0xFFFF9800),
                 ),
                 _buildRSVPOption(
                   status: RSVPStatus.notGoing,
                   title: "Can't Go",
-                  subtitle: "Remove from your events",
+                  subtitle: 'Remove from your events',
                   icon: Icons.cancel,
                   color: const Color(0xFFF44336),
                 ),
@@ -318,7 +311,6 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
         ],
       ),
     );
-  }
 
   Widget _buildRSVPOption({
     required RSVPStatus status,
@@ -328,7 +320,7 @@ class _RSVPButtonState extends State<RSVPButton> with SingleTickerProviderStateM
     required Color color,
   }) {
     final isSelected = _currentStatus == status;
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);

@@ -2,21 +2,18 @@ import 'package:flutter/material.dart';
 
 /// Shimmer loading widget for message bubbles
 class MessageShimmer extends StatelessWidget {
-  final bool isCurrentUser;
 
   const MessageShimmer({
-    super.key,
-    required this.isCurrentUser,
+    required this.isCurrentUser, super.key,
   });
+  final bool isCurrentUser;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isCurrentUser 
-            ? MainAxisAlignment.end 
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isCurrentUser) ...[
@@ -59,10 +56,8 @@ class MessageShimmer extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildShimmerBox(double width, double height) {
-    return Container(
+  Widget _buildShimmerBox(double width, double height) => Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
@@ -70,10 +65,8 @@ class MessageShimmer extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
     );
-  }
 
-  Widget _buildShimmerCircle(double size) {
-    return Container(
+  Widget _buildShimmerCircle(double size) => Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
@@ -81,5 +74,4 @@ class MessageShimmer extends StatelessWidget {
         shape: BoxShape.circle,
       ),
     );
-  }
 }

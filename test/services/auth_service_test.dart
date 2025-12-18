@@ -31,7 +31,7 @@ void main() {
       when(() => mockFirebaseAuth.signInWithEmailAndPassword(
             email: any(named: 'email'),
             password: any(named: 'password'),
-          )).thenAnswer((_) async => mockCredential);
+          ),).thenAnswer((_) async => mockCredential);
 
       final result = await authService.signInWithEmail(
         email: 'test@example.com',
@@ -45,7 +45,7 @@ void main() {
       when(() => mockFirebaseAuth.signInWithEmailAndPassword(
             email: any(named: 'email'),
             password: any(named: 'password'),
-          )).thenThrow(
+          ),).thenThrow(
         FirebaseAuthException(
           code: 'wrong-password',
           message: 'The password is invalid',
@@ -67,7 +67,7 @@ void main() {
       when(() => mockFirebaseAuth.signInWithEmailAndPassword(
             email: 'test@example.com',
             password: any(named: 'password'),
-          )).thenAnswer((_) async => mockCredential);
+          ),).thenAnswer((_) async => mockCredential);
 
       await authService.signInWithEmail(
         email: '  test@example.com  ',
@@ -77,16 +77,16 @@ void main() {
       verify(() => mockFirebaseAuth.signInWithEmailAndPassword(
             email: 'test@example.com',
             password: 'password123',
-          )).called(1);
+          ),).called(1);
     });
   });
 
   group('verifyPhoneNumber', () {
     test('forwards all parameters to Firebase', () async {
-      final verificationCompleted = (PhoneAuthCredential credential) {};
-      final verificationFailed = (FirebaseAuthException e) {};
-      final codeSent = (String verificationId, int? resendToken) {};
-      final codeAutoRetrievalTimeout = (String verificationId) {};
+      void verificationCompleted(PhoneAuthCredential credential) {}
+      void verificationFailed(FirebaseAuthException e) {}
+      void codeSent(String verificationId, int? resendToken) {}
+      void codeAutoRetrievalTimeout(String verificationId) {}
 
       when(() => mockFirebaseAuth.verifyPhoneNumber(
             phoneNumber: any(named: 'phoneNumber'),
@@ -95,8 +95,7 @@ void main() {
             codeSent: any(named: 'codeSent'),
             codeAutoRetrievalTimeout: any(named: 'codeAutoRetrievalTimeout'),
             timeout: any(named: 'timeout'),
-            forceResendingToken: null,
-          )).thenAnswer((_) async {});
+          ),).thenAnswer((_) async {});
 
       await authService.verifyPhoneNumber(
         phone: '+12179044453',
@@ -113,8 +112,7 @@ void main() {
             codeSent: codeSent,
             codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
             timeout: any(named: 'timeout'),
-            forceResendingToken: null,
-          )).called(1);
+          ),).called(1);
     });
   });
 
@@ -141,7 +139,7 @@ void main() {
           .thenThrow(FirebaseAuthException(
         code: 'invalid-verification-code',
         message: 'The verification code is invalid',
-      ));
+      ),);
 
       expect(
         () => authService.signInWithCredential(

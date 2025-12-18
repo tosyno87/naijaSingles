@@ -33,7 +33,7 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Row(
               children: [
                 Expanded(
@@ -56,11 +56,11 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                                     user.imageUrl!.isNotEmpty
                                 ? user.imageUrl!.first
                                 : null,
-                          ));
+                          ),);
                       _controller.clear();
                     }
                   },
-                )
+                ),
               ],
             ),
           ),
@@ -86,7 +86,7 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                         title: Text(entry.userName),
                         subtitle: Text(entry.content),
                         trailing: Text(DateFormat('MMM d, HH:mm')
-                            .format(entry.timestamp.toDate())),
+                            .format(entry.timestamp.toDate()),),
                       );
                     },
                   );
@@ -96,7 +96,7 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                 return const SizedBox.shrink();
               },
             ),
-          )
+          ),
         ],
       ),
     );
@@ -107,10 +107,8 @@ class DiaryFeedPage extends StatelessWidget {
   const DiaryFeedPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
+  Widget build(BuildContext context) => BlocProvider(
       create: (_) => DiaryBloc(repository: DiaryRepository()),
       child: const DiaryFeedScreen(),
     );
-  }
 }

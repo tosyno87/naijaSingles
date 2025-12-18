@@ -1,9 +1,4 @@
 class BlockUserModel {
-  final String name;
-  final String imageUrl;
-  final String id;
-  final String chatID;
-  final DateTime blockedTimestamp;
 
   BlockUserModel({
     required this.id,
@@ -12,4 +7,9 @@ class BlockUserModel {
     required this.imageUrl,
     required this.blockedTimestamp,
   });
+  final String name;
+  final String imageUrl;
+  final String id;
+  final String chatID;
+  final DateTime blockedTimestamp;
 }

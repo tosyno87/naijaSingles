@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SafetyCenterScreen extends StatefulWidget {
-  const SafetyCenterScreen({Key? key}) : super(key: key);
+  const SafetyCenterScreen({super.key});
 
   @override
   State<SafetyCenterScreen> createState() => _SafetyCenterScreenState();
@@ -26,8 +26,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
   static final Color textLight = Colors.grey.shade600;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -54,25 +53,23 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
             // Header Section
             _buildHeaderSection(),
             const SizedBox(height: 24),
-            
+
             // Quick Actions
             _buildQuickActionsSection(),
             const SizedBox(height: 24),
-            
+
             // Safety Tips
             _buildSafetyTipsSection(),
             const SizedBox(height: 24),
-            
+
             // Report & Block Tools
             _buildReportToolsSection(),
           ],
         ),
       ),
     );
-  }
 
-  Widget _buildHeaderSection() {
-    return Container(
+  Widget _buildHeaderSection() => Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardColor,
@@ -94,7 +91,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
               color: primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.security,
               size: 40,
               color: primaryColor,
@@ -123,10 +120,8 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildQuickActionsSection() {
-    return Column(
+  Widget _buildQuickActionsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -163,7 +158,6 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ),
       ],
     );
-  }
 
   Widget _buildQuickActionCard({
     required IconData icon,
@@ -171,8 +165,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
     required String subtitle,
     required Color color,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -222,34 +215,38 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildSafetyTipsSection() {
     final safetyTips = [
       {
         'icon': Icons.location_on,
         'title': 'Meet in Public Places',
-        'description': 'Always meet your date in a public, well-lit location for the first few dates.',
+        'description':
+            'Always meet your date in a public, well-lit location for the first few dates.',
       },
       {
         'icon': Icons.people,
         'title': 'Tell Someone Your Plans',
-        'description': 'Let a friend or family member know where you\'re going and who you\'re meeting.',
+        'description':
+            'Let a friend or family member know where you\'re going and who you\'re meeting.',
       },
       {
         'icon': Icons.phone,
         'title': 'Keep Personal Info Private',
-        'description': 'Don\'t share your home address, workplace, or financial information too early.',
+        'description':
+            'Don\'t share your home address, workplace, or financial information too early.',
       },
       {
         'icon': Icons.warning,
         'title': 'Trust Your Instincts',
-        'description': 'If something feels wrong or uncomfortable, trust your gut and leave the situation.',
+        'description':
+            'If something feels wrong or uncomfortable, trust your gut and leave the situation.',
       },
       {
         'icon': Icons.no_drinks,
         'title': 'Watch Your Drink',
-        'description': 'Never leave your drink unattended and don\'t accept drinks from strangers.',
+        'description':
+            'Never leave your drink unattended and don\'t accept drinks from strangers.',
       },
     ];
 
@@ -265,13 +262,12 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ...safetyTips.map((tip) => _buildSafetyTipCard(tip)).toList(),
+        ...safetyTips.map(_buildSafetyTipCard),
       ],
     );
   }
 
-  Widget _buildSafetyTipCard(Map<String, dynamic> tip) {
-    return Container(
+  Widget _buildSafetyTipCard(Map<String, dynamic> tip) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -328,10 +324,8 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildReportToolsSection() {
-    return Column(
+  Widget _buildReportToolsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -367,15 +361,13 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ),
       ],
     );
-  }
 
   Widget _buildReportToolCard({
     required IconData icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -434,7 +426,6 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
         ),
       ),
     );
-  }
 
   void _showReportDialog() {
     showDialog(
@@ -453,7 +444,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
                 color: errorColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.report, color: errorColor, size: 30),
+              child: const Icon(Icons.report, color: errorColor, size: 30),
             ),
             const SizedBox(height: 16),
             Text(
@@ -522,7 +513,7 @@ class _SafetyCenterScreenState extends State<SafetyCenterScreen> {
                 color: warningColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.block, color: warningColor, size: 30),
+              child: const Icon(Icons.block, color: warningColor, size: 30),
             ),
             const SizedBox(height: 16),
             Text(

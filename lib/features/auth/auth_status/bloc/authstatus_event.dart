@@ -1,7 +1,7 @@
 part of 'authstatus_bloc.dart';
 
 abstract class AuthstatusEvent extends Equatable {
-  const AuthstatusEvent({List props = const []});
+  const AuthstatusEvent();
 
   @override
   List<Object> get props => [];

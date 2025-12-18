@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_3d_icons.dart';
-import '../../../../common/constants/app_colors.dart';
 import '../../../groups/screens/unified_groups_screen.dart';
 
 class CommunitiesHubScreen extends StatefulWidget {
-  const CommunitiesHubScreen({Key? key}) : super(key: key);
+  const CommunitiesHubScreen({super.key});
 
   @override
   State<CommunitiesHubScreen> createState() => _CommunitiesHubScreenState();
@@ -14,8 +15,7 @@ class CommunitiesHubScreen extends StatefulWidget {
 
 class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text(
@@ -37,17 +37,11 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
               size: 28,
             ),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Search functionality coming soon!',
-                    style: GoogleFonts.montserrat(),
-                  ),
-                  backgroundColor: AppColors.primaryGreen,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              // Navigate to UnifiedGroupsScreen which has full search functionality
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UnifiedGroupsScreen(),
                 ),
               );
             },
@@ -69,10 +63,8 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildWelcomeSection() {
-    return Column(
+  Widget _buildWelcomeSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -95,10 +87,8 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildQuickActions() {
-    return Column(
+  Widget _buildQuickActions() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -144,10 +134,9 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildActionCard(String title, String subtitle, Widget icon, Color color, VoidCallback? onTap) {
-    return Material(
+  Widget _buildActionCard(String title, String subtitle, Widget icon,
+      Color color, VoidCallback? onTap,) => Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -162,12 +151,10 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                 color: Colors.black.withOpacity(0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
-                spreadRadius: 0,
               ),
             ],
             border: Border.all(
               color: color.withOpacity(0.1),
-              width: 1,
             ),
           ),
           child: Column(
@@ -215,5 +202,4 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         ),
       ),
     );
-  }
 }

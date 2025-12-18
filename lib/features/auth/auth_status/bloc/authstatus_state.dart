@@ -12,13 +12,13 @@ class AuthIntialState extends AuthstatusState {}
 class AuthLoadingState extends AuthstatusState {}
 
 class AuthFailed extends AuthstatusState {
-  final String message;
   const AuthFailed({required this.message});
+  final String message;
 }
 
 class AuthenticatedState extends AuthstatusState {
-  final User user;
   const AuthenticatedState({required this.user});
+  final User user;
 }
 
 class UnauthenticatedState extends AuthstatusState {}

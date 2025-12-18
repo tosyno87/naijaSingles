@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/utils/custom_toast.dart';
 
 import '../constants/colors.dart';
+import 'custom_toast.dart';
 
 class NoInternetPage extends StatelessWidget {
   const NoInternetPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
         automaticallyImplyLeading: false,
-        title: const Text("No internet"),
+        title: const Text('No internet'),
         centerTitle: true,
         elevation: 0,
       ),
@@ -20,7 +19,7 @@ class NoInternetPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.signal_wifi_connected_no_internet_4,
               color: primaryColor,
               size: 80,
@@ -48,13 +47,13 @@ class NoInternetPage extends StatelessWidget {
               width: 100,
               child: ElevatedButton(
                 onPressed: () {
-                  CustomToast.showToast("No Internet, try again");
+                  CustomToast.showToast('No Internet, try again');
                 },
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(primaryColor),
                   shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
@@ -65,5 +64,4 @@ class NoInternetPage extends StatelessWidget {
         ),
       ),
     );
-  }
 }

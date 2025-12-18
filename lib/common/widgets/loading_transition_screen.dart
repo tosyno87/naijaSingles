@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/app_colors.dart';
 import 'animated_loading_indicator.dart';
 
 class LoadingTransitionScreen extends StatelessWidget {
-  final String message;
 
   const LoadingTransitionScreen({
-    Key? key,
-    this.message = "Setting up your profile...",
-  }) : super(key: key);
+    super.key,
+    this.message = 'Setting up your profile...',
+  });
+  final String message;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+  Widget build(BuildContext context) => Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -34,7 +34,7 @@ class LoadingTransitionScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              "This will only take a moment",
+              'This will only take a moment',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: Colors.grey.shade600,
@@ -45,5 +45,4 @@ class LoadingTransitionScreen extends StatelessWidget {
         ),
       ),
     );
-  }
 }

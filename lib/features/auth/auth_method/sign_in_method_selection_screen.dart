@@ -1,15 +1,18 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../common/widgets/afropeep_logo.dart';
+import '../../../common/widgets/afropeep_primary_button.dart';
 import '../../../common/widgets/custom_snackbar.dart';
-import '../phone/ui/screens/phone_number.dart';
 import '../google_login/google_login_bloc.dart';
 import '../google_login/google_login_events.dart';
 import '../google_login/google_login_states.dart';
-import '../email_password/ui/screens/email_login_screen.dart';
-import '../auth_method/auth_method_selection_screen.dart';
+import '../phone/ui/screens/phone_number.dart';
 
 class SignInMethodSelectionScreen extends StatelessWidget {
   const SignInMethodSelectionScreen({super.key});
@@ -19,16 +22,15 @@ class SignInMethodSelectionScreen extends StatelessWidget {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
-    // Define colors based on MVP styling
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
-    const Color primaryColor = Color(0xFF008037); // Green
-    const Color accentColor = Color(0xFFEF476F); // Pink/Coral
-    const Color googleBlue = Color(0xFF3B82F6); // Google blue
+    // Define colors for modern dating app style
+    const Color backgroundColor = Colors.white;
+    const Color primaryColor = AppColors.primaryGreen; // #008037
+    const Color googleBlue = Color(0xFF4285F4); // Google blue
     const Color appleBlack = Color(0xFF000000); // Apple black
-    const Color textColor = Color(0xFF3B3B3B); // Text dark gray
-    const Color textLightBrown = Color(0xFF8B6C59); // Light brown for subtitle
+    const Color textColor = AppColors.textPrimary;
+    const Color textSecondary = AppColors.textSecondary;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -54,167 +56,172 @@ class SignInMethodSelectionScreen extends StatelessWidget {
 
           // Main content
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 24),
-
-                  // Header text - Bold Montserrat
-                  Text(
-                    "Sign In or Create Account",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
+            child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Subtitle - Regular Montserrat, light brown
-                  Text(
-                    "Choose how you'd like to continue",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: textLightBrown,
-                    ),
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // Phone Number Button
-                  _buildAuthMethodButton(
-                    context: context,
-                    icon: Icons.phone_android,
-                    text: "Continue with Phone",
-                    color: primaryColor,
-                    onTap: () {
-                      // Navigate to phone login screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PhoneNumber(
-                              updatePhoneNumber: false, isSignIn: true),
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Email Button
-                  _buildAuthMethodButton(
-                    context: context,
-                    icon: Icons.email_outlined,
-                    text: "Continue with Email",
-                    color: accentColor,
-                    onTap: () {
-                      // Navigate to email login screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EmailLoginScreen(),
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Google Sign In Button
-                  BlocProvider(
-                    create: (context) => GoogleLoginBloc(),
-                    child: BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
-                      listener: (context, state) {
-                        if (state is GoogleLoginSuccess) {
-                          // Navigate to home screen on successful sign-in
-                          Navigator.pushReplacementNamed(
-                              context, '/main_navigation');
-                        } else if (state is GoogleLoginFailed) {
-                          CustomSnackbar.showSnackBarSimple(
-                            state.message,
-                            context,
-                          );
-                        }
-                      },
-                      builder: (context, state) {
-                        return _buildAuthMethodButton(
-                          context: context,
-                          icon: Icons.g_mobiledata_rounded,
-                          text: "Continue with Google",
-                          color: googleBlue,
-                          isLoading: state is GoogleLoginLoading,
-                          onTap: () {
-                            BlocProvider.of<GoogleLoginBloc>(context).add(
-                              const GoogleLoginRequested(),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-
-                  // Apple Sign In Button (iOS only)
-                  if (Platform.isIOS) ...[
-                    const SizedBox(height: 16),
-                    _buildAuthMethodButton(
-                      context: context,
-                      icon: Icons.apple,
-                      text: "Continue with Apple",
-                      color: appleBlack,
-                      onTap: () {
-                        // Implement Apple Sign In
-                        CustomSnackbar.showSnackBarSimple(
-                          "Apple Sign In will be implemented soon",
-                          context,
-                        );
-                      },
-                    ),
-                  ],
-
-                  const Spacer(),
-
-                  // Don't have an account? Create one
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account? ",
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          color: textColor,
-                        ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: 24,
+                        right: 24,
+                        bottom: MediaQuery.of(context).padding.bottom > 0
+                            ? MediaQuery.of(context).padding.bottom + 16
+                            : 24,
+                        top: 16,
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const AuthMethodSelectionScreen(),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 16),
+
+                          // Afropeep Logo - larger size for better visibility
+                          const AfropeepLogo(size: 100),
+
+                          const SizedBox(height: 32),
+
+                          // Header text - "Sign in"
+                          Text(
+                            'Sign in',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                              letterSpacing: -0.5,
                             ),
-                          );
-                        },
-                        child: Text(
-                          "Create one",
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: primaryColor,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
 
-                  const SizedBox(height: 24),
-                ],
-              ),
+                          const SizedBox(height: 8),
+
+                          // Subtitle
+                          Text(
+                            "Choose how you'd like to sign in",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: textSecondary,
+                            ),
+                          ),
+
+                          const SizedBox(height: 40),
+
+                          // Button order: Apple (iOS only) → Google → Phone (primary)
+                          // Apple Sign In Button (iOS only) - Secondary (first on iOS)
+                          if (Platform.isIOS) ...[
+                            AfropeepPrimaryButton(
+                              icon: Icons.apple,
+                              text: 'Continue with Apple',
+                              backgroundColor: appleBlack,
+                              textColor: Colors.white,
+                              variant: AuthButtonVariant.secondary,
+                              onPressed: () {
+                                CustomSnackbar.showSnackBarSimple(
+                                  'Apple Sign In will be implemented soon',
+                                  context,
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+
+                          // Google Sign In Button - Secondary (first on Android, second on iOS)
+                          BlocProvider(
+                            create: (context) => GoogleLoginBloc(),
+                            child: BlocConsumer<GoogleLoginBloc, GoogleLoginStates>(
+                              listener: (context, state) {
+                                if (state is GoogleLoginSuccess) {
+                                  Navigator.pushReplacementNamed(
+                                      context, '/main_navigation',);
+                                } else if (state is GoogleLoginFailed) {
+                                  CustomSnackbar.showSnackBarSimple(
+                                    state.message,
+                                    context,
+                                  );
+                                }
+                              },
+                              builder: (context, state) => AfropeepPrimaryButton(
+                                  icon: Icons.g_mobiledata_rounded,
+                                  text: 'Continue with Google',
+                                  backgroundColor: googleBlue,
+                                  textColor: Colors.white,
+                                  variant: AuthButtonVariant.secondary,
+                                  isLoading: state is GoogleLoginLoading,
+                                  onPressed: () {
+                                    BlocProvider.of<GoogleLoginBloc>(context)
+                                        .add(
+                                      const GoogleLoginRequested(),
+                                    );
+                                  },
+                                ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Phone Number Button - Primary (last, most prominent)
+                          AfropeepPrimaryButton(
+                            icon: Icons.phone_outlined,
+                            text: 'Continue with Phone',
+                            backgroundColor: primaryColor,
+                            textColor: Colors.white,
+                            onPressed: () {
+                              // Use pushReplacement to remove this screen from stack
+                              // This prevents both screens from being visible during transition
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PhoneNumber(
+                                      updatePhoneNumber: false, isSignIn: true,),
+                                ),
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          // Don't have an account? Create one
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Don't have an account? ",
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  color: textSecondary,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  // Use pushReplacement to remove this screen from stack
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PhoneNumber(
+                                        updatePhoneNumber: false,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Create one',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
             ),
           ),
         ],
@@ -222,66 +229,4 @@ class SignInMethodSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAuthMethodButton({
-    required BuildContext context,
-    required IconData icon,
-    required String text,
-    required Color color,
-    required VoidCallback onTap,
-    bool isLoading = false,
-  }) {
-    return Container(
-      width: double.infinity,
-      height: 56, // 56dp height as specified
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16), // 16dp radius as specified
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFFF6E5)
-                .withValues(alpha: 0.5), // Soft cream shadow
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, size: 24, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Text(
-                    text,
-                    style: GoogleFonts.montserrat(
-                      // Montserrat font as specified
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
 }

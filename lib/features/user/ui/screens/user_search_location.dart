@@ -4,13 +4,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:naijasingles/features/user/ui/screens/update_user_location.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/constants.dart';
@@ -19,10 +16,10 @@ import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/utils/welcome_dialog.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
-
 import '../../../../services/firestore_database.dart';
 import '../../../../services/location/bloc/userlocation_bloc.dart';
 import '../../../auth/auth_status/bloc/registration/bloc/registration_bloc.dart';
+import 'update_user_location.dart';
 
 class SearchLocation extends StatefulWidget {
   const SearchLocation({super.key});
@@ -78,29 +75,29 @@ class _SearchLocationState extends State<SearchLocation>
 
   @override
   Widget build(BuildContext context) {
-    var userData = (ModalRoute.of(context)!.settings.arguments
+    final userData = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['userData'];
-    var profilePic = (ModalRoute.of(context)!.settings.arguments
+    final profilePic = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['profilePic'] as File;
 
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserLocationReporistory>(
-            create: (context) => UserLocationReporistoryImpl()),
+            create: (context) => UserLocationReporistoryImpl(),),
         RepositoryProvider<PhoneAuthRepository>(
-            create: (context) => PhoneAuthRepository()),
+            create: (context) => PhoneAuthRepository(),),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<UserLocationBloc>(
             create: (context) => UserLocationBloc(
                 userLocationReporistory:
-                    RepositoryProvider.of<UserLocationReporistory>(context)),
+                    RepositoryProvider.of<UserLocationReporistory>(context),),
           ),
           BlocProvider<RegistrationBloc>(
             create: (context) => RegistrationBloc(
                 phoneAuthRepository:
-                    RepositoryProvider.of<PhoneAuthRepository>(context)),
+                    RepositoryProvider.of<PhoneAuthRepository>(context),),
           ),
         ],
         child: Scaffold(
@@ -145,7 +142,7 @@ class _SearchLocationState extends State<SearchLocation>
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -154,11 +151,11 @@ class _SearchLocationState extends State<SearchLocation>
                         // Title and subtitle with fade animation
                         FadeTransition(
                           opacity: _fadeAnimation!,
-                          child: Column(
+                          child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
-                                "Where are you located?",
+                                'Where are you located?',
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
@@ -167,7 +164,7 @@ class _SearchLocationState extends State<SearchLocation>
                               ),
                               SizedBox(height: 8),
                               Text(
-                                "This helps us find matches near you.",
+                                'This helps us find matches near you.',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF888888),
@@ -183,7 +180,7 @@ class _SearchLocationState extends State<SearchLocation>
                         // Location icon and input field with animation
                         FadeTransition(
                           opacity: _fadeAnimation!,
-                          child: Container(
+                          child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: const Color(0xFFF5F5F5),
                               borderRadius: BorderRadius.circular(16),
@@ -194,7 +191,7 @@ class _SearchLocationState extends State<SearchLocation>
                                             .withValues(alpha: 0.15),
                                         blurRadius: 12,
                                         offset: const Offset(0, 4),
-                                      )
+                                      ),
                                     ]
                                   : [],
                             ),
@@ -203,13 +200,13 @@ class _SearchLocationState extends State<SearchLocation>
                               focusNode: _focusNode,
                               controller: _city,
                               decoration: InputDecoration(
-                                hintText: "Enter your city or state",
+                                hintText: 'Enter your city or state',
                                 hintStyle: const TextStyle(
                                   color: Color(0xFF888888),
                                 ),
                                 prefixIcon: const Padding(
                                   padding:
-                                      EdgeInsets.only(left: 16.0, right: 8.0),
+                                      EdgeInsets.only(left: 16, right: 8),
                                   child: Icon(
                                     Icons.location_on_rounded,
                                     color: Color(0xFF27AE60),
@@ -235,7 +232,7 @@ class _SearchLocationState extends State<SearchLocation>
                                 ),
                               ),
                               onTap: () async {
-                                var result = await Navigator.push(
+                                final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => UpdateLocation(
@@ -243,11 +240,11 @@ class _SearchLocationState extends State<SearchLocation>
                                     ),
                                   ),
                                 );
-                                log("after pop address is ${result.toString()}");
+                                log('after pop address is ${result.toString()}');
                                 if (result != null) {
                                   selectedLocation = result;
-                                  log("after pop selected is ${selectedLocation.toString()}");
-                                  _city.text = result['address'] ?? "";
+                                  log('after pop selected is ${selectedLocation.toString()}');
+                                  _city.text = result['address'] ?? '';
                                   if (mounted) setState(() {});
                                 }
                               },
@@ -296,9 +293,9 @@ class _SearchLocationState extends State<SearchLocation>
                               RegistrationStates>(
                             listener: (context, registrationState) {
                               if (registrationState is RegistrationSuccess) {
-                                log("userregistrationsuccess");
+                                log('userregistrationsuccess');
                                 Provider.of<UserProvider>(context,
-                                        listen: false)
+                                        listen: false,)
                                     .currentUser = registrationState.user;
                                 showWelcomDialog(context);
                               }
@@ -345,28 +342,28 @@ class _SearchLocationState extends State<SearchLocation>
                                               },
                                               'maximum_distance': 20,
                                               'age_range': {
-                                                'min': "20",
-                                                'max': "50",
+                                                'min': '20',
+                                                'max': '50',
                                               },
                                               'lastvisited':
                                                   FieldValue.serverTimestamp(),
                                               'createdAt':
-                                                  FieldValue.serverTimestamp()
+                                                  FieldValue.serverTimestamp(),
                                             },
                                           );
                                           await FireStoreClass.uploadprofile(
                                               currentUserId:
                                                   auth.currentUser!.uid,
-                                              file: profilePic);
+                                              file: profilePic,);
                                           context.read<RegistrationBloc>().add(
                                                 RegistrationRequest(
-                                                    userdata: userData),
+                                                    userdata: userData,),
                                               );
-                                          log("added user finally \$userData.toString()");
+                                          log(r'added user finally $userData.toString()');
                                         }
                                       : () {
                                           CustomSnackbar.showSnackBarSimple(
-                                            "Please select location to continue"
+                                            'Please select location to continue'
                                                 .tr()
                                                 .toString(),
                                             context,
@@ -393,7 +390,7 @@ class _SearchLocationState extends State<SearchLocation>
                                     ),
                                     child: const Center(
                                       child: Text(
-                                        "Continue",
+                                        'Continue',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,

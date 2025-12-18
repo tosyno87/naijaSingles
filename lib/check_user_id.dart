@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+
+import 'common/utils/app_logger.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -13,11 +15,10 @@ void main() async {
 }
 
 class CheckUserIdApp extends StatelessWidget {
-  const CheckUserIdApp({Key? key}) : super(key: key);
+  const CheckUserIdApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Check User ID'),
@@ -67,8 +68,8 @@ class CheckUserIdApp extends StatelessWidget {
                     ),
                   ),
                   if (!matches && userId != null)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
+                    const Padding(
+                      padding: EdgeInsets.all(16),
                       child: Text(
                         'Your current user ID does not match any of the test users in the imported data.',
                         textAlign: TextAlign.center,
@@ -86,12 +87,11 @@ class CheckUserIdApp extends StatelessWidget {
         ),
       ),
     );
-  }
 
   Future<String?> _getCurrentUserId() async {
     // Print to console for debugging
     final currentUser = FirebaseAuth.instance.currentUser;
-    print('Current User ID: ${currentUser?.uid}');
+    AppLogger.info('Current User ID: ${currentUser?.uid}');
     return currentUser?.uid;
   }
 
@@ -99,7 +99,7 @@ class CheckUserIdApp extends StatelessWidget {
     try {
       await FirebaseAuth.instance.signInAnonymously();
     } catch (e) {
-      print('Error signing in: $e');
+      AppLogger.error('Error signing in', error: e);
     }
   }
 }

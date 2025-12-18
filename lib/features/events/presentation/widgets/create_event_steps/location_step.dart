@@ -51,14 +51,15 @@ class _LocationStepState extends State<LocationStep> {
   }
 
   void _updateLocation() {
+    // Update location immediately to ensure validation has latest data
     widget.eventData.location = EventLocation(
-      name: _venueNameController.text,
-      address: _addressController.text,
-      city: _cityController.text,
-      state: _stateController.text,
-      country: _countryController.text.isEmpty
+      name: _venueNameController.text.trim(),
+      address: _addressController.text.trim(),
+      city: _cityController.text.trim(),
+      state: _stateController.text.trim(),
+      country: _countryController.text.trim().isEmpty
           ? 'United States'
-          : _countryController.text, // Default to US, allow user input
+          : _countryController.text.trim(), // Default to US, allow user input
     );
     // Notify parent that location changed (triggers button state update)
     widget.onLocationChanged?.call();

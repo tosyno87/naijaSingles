@@ -303,7 +303,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void _handleNextStep() {
     // Prevent multiple rapid calls
-    if (_isSubmitting) return;
+    if (_isSubmitting) {
+      AppLogger.debug('⚠️ _handleNextStep: Already submitting, ignoring');
+      return;
+    }
+
+    // Validate before proceeding
+    if (!_isCurrentStepValid()) {
+      AppLogger.debug('⚠️ _handleNextStep: Current step is not valid');
+      // Show error message (validation already handles this)
+      _validateCurrentStep(showErrors: true);
+      return;
+    }
 
     if (_currentStep < _stepTitles.length - 1) {
       _nextStep();
@@ -313,13 +324,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void _nextStep() {
-    if (_validateCurrentStep()) {
-      setState(() => _currentStep++);
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+    // Double-check validation before advancing
+    if (!_validateCurrentStep(showErrors: true)) {
+      AppLogger.debug('⚠️ _nextStep: Validation failed, not advancing');
+      return;
     }
+
+    setState(() {
+      _currentStep++;
+    });
+    
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _previousStep() {

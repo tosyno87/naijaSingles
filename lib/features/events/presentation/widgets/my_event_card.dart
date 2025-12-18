@@ -95,14 +95,16 @@ class MyEventCard extends StatelessWidget {
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),
-                child: event.primaryImageUrl.startsWith('http')
-                    ?                       Image.network(
-                        event.primaryImageUrl,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                        isAntiAlias: true,
+                child: Container(
+                  color: Colors.grey.shade100, // Background for contained images
+                  child: event.primaryImageUrl.startsWith('http')
+                      ? Image.network(
+                          event.primaryImageUrl,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                          isAntiAlias: true,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(

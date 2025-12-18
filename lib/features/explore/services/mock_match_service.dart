@@ -1,4 +1,4 @@
-import 'package:naijasingles/features/explore/services/match_service.dart';
+import 'match_service.dart';
 
 /// A mock implementation of MatchService for testing purposes
 class MockMatchService extends MatchService {
@@ -12,9 +12,9 @@ class MockMatchService extends MatchService {
   // Override the createMessageThread method to return a mock thread ID
   @override
   Future<String> createMessageThread(
-      String currentUserId, String matchedUserId) async {
+      String currentUserId, String matchedUserId,) async {
     // For testing, just return a mock thread ID
-    return 'mock_thread_${currentUserId}_${matchedUserId}';
+    return 'mock_thread_${currentUserId}_$matchedUserId';
   }
 
   // Override the markAsMatched method to do nothing

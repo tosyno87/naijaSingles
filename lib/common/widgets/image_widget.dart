@@ -7,20 +7,19 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 
 class CustomCNImage extends StatelessWidget {
-  final String? imageUrl;
-  final double? height;
-  final double? width;
-  final bool main;
-  final BoxFit? fit;
 
   const CustomCNImage({
-    super.key,
-    required this.imageUrl,
+    required this.imageUrl, super.key,
     this.height,
     this.fit,
     this.width,
     this.main = false,
   });
+  final String? imageUrl;
+  final double? height;
+  final double? width;
+  final bool main;
+  final BoxFit? fit;
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +50,13 @@ class CustomCNImage extends StatelessWidget {
                   size: 20,
                 ),
                 Text(
-                  "Unable to load".tr().toString(),
+                  'Unable to load'.tr().toString(),
                   style: TextStyle(
                     fontSize: 12,
                     color:
                         themeProvider.isDarkMode ? Colors.white : Colors.black,
                   ),
-                )
+                ),
               ],
             ),
       height: height,

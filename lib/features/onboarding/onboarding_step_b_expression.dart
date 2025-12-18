@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../common/constants/app_colors.dart';
+
 import '../user/controllers/onboarding_controller.dart';
 import 'shared_styles.dart';
 
@@ -11,16 +13,14 @@ import 'shared_styles.dart';
 /// This screen collects information about the user's music preferences,
 /// fashion style, and weekend activities.
 class OnboardingStepBExpression extends StatefulWidget {
+
+  const OnboardingStepBExpression({
+    required this.onNext, required this.onBack, super.key,
+    this.backgroundColor = AppColors.backgroundColor,
+  });
   final VoidCallback onNext;
   final VoidCallback onBack;
   final Color backgroundColor;
-
-  OnboardingStepBExpression({
-    Key? key,
-    required this.onNext,
-    required this.onBack,
-    this.backgroundColor = OnboardingStyles.backgroundColor,
-  }) : super(key: key);
 
   @override
   State<OnboardingStepBExpression> createState() =>
@@ -57,7 +57,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
     'Reggae',
     'Dancehall',
     'Alte',
-    'Afro-fusion'
+    'Afro-fusion',
   ];
 
   @override
@@ -109,9 +109,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
             // Main content
             SingleChildScrollView(
               padding: EdgeInsets.only(
-                left: 24.0,
-                right: 24.0,
-                top: 24.0,
+                left: 24,
+                right: 24,
+                top: 24,
                 bottom: 100.0 + keyboardPadding, // Extra padding for labelLarge
               ),
               child: Column(
@@ -122,14 +122,14 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                            horizontal: 12, vertical: 6,),
                         decoration: BoxDecoration(
                           color: deepGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           'Step 2 of 3',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: deepGreen,
@@ -144,7 +144,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                   // Header
                   Text(
                     'Your Style & Expression',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.brown.shade800,
@@ -154,7 +154,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                   const SizedBox(height: 12),
                   Text(
                     'Tell us about your preferences and how you express yourself.',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 15,
                       color: Colors.brown.shade600,
                     ),
@@ -163,8 +163,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
 
                   // New section title
                   Text(
-                    "How do you express yourself?",
-                    style: GoogleFonts.poppins(
+                    'How do you express yourself?',
+                    style: GoogleFonts.montserrat(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.brown.shade800,
@@ -204,7 +204,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                         const SizedBox(height: 8),
                         Text(
                           'Select all that apply',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 14,
                             color: Colors.grey[700],
                           ),
@@ -224,7 +224,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                               return FilterChip(
                                 label: Text(
                                   genre,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     color: isSelected
                                         ? Colors.white
                                         : Colors.black87,
@@ -234,8 +234,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                 ),
                                 selected: isSelected,
                                 onSelected: (selected) {
-                                  List<String> updatedGenres = [
-                                    ...controller.genres
+                                  final List<String> updatedGenres = [
+                                    ...controller.genres,
                                   ];
                                   if (selected) {
                                     updatedGenres.add(genre);
@@ -302,7 +302,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                           key: _fashionKey,
                           controller: _fashionController,
                           textInputAction: TextInputAction.next,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             color: Colors.black87,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -310,11 +310,11 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                           decoration: InputDecoration(
                             labelText: 'Fashion Style',
                             hintText: 'e.g. Urban streetwear, Ankara, Casual',
-                            hintStyle: GoogleFonts.poppins(
+                            hintStyle: GoogleFonts.montserrat(
                               color: Colors.grey[600],
                               fontSize: 14,
                             ),
-                            labelStyle: GoogleFonts.poppins(
+                            labelStyle: GoogleFonts.montserrat(
                               color: deepGreen,
                               fontSize: 16,
                             ),
@@ -374,7 +374,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                             ),
                             const SizedBox(width: 8),
                             _buildSectionTitle(
-                                'What\'s your ideal weekend like?'),
+                                'What\'s your ideal weekend like?',),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -382,7 +382,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                           key: _weekendKey,
                           controller: _weekendController,
                           textInputAction: TextInputAction.done,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             color: Colors.black87,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -390,11 +390,11 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                           decoration: InputDecoration(
                             labelText: 'Weekend Vibe',
                             hintText: 'e.g. Chill at home, beach day, concert',
-                            hintStyle: GoogleFonts.poppins(
+                            hintStyle: GoogleFonts.montserrat(
                               color: Colors.grey[600],
                               fontSize: 14,
                             ),
-                            labelStyle: GoogleFonts.poppins(
+                            labelStyle: GoogleFonts.montserrat(
                               color: deepGreen,
                               fontSize: 16,
                             ),
@@ -464,7 +464,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                       icon: const Icon(Icons.arrow_back, size: 16),
                       label: Text(
                         'Back',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -472,7 +472,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.grey.shade700,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                            horizontal: 16, vertical: 12,),
                       ),
                     ),
 
@@ -499,7 +499,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                         ),
                         child: Text(
                           'Continue',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -517,23 +517,19 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
   }
 
   /// Builds a section title with consistent styling
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.montserrat(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
       ),
     );
-  }
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) {
-    return controller.genres.isNotEmpty &&
+  bool _isStepValid(OnboardingController controller) => controller.genres.isNotEmpty &&
         controller.fashionStyle != null &&
         controller.fashionStyle!.trim().isNotEmpty &&
         controller.weekendVibe != null &&
         controller.weekendVibe!.trim().isNotEmpty;
-  }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 import 'package:naijasingles/features/onboarding/screens/enhanced_photo_upload_screen.dart';
 import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   group('Enhanced Photo Upload Screen Tests', () {
@@ -13,7 +13,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => OnboardingController(),
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedPhotoUploadScreen(),
             ),
           ),
@@ -28,8 +28,10 @@ void main() {
       // Verify photo slots are present - handle multiple text widgets
       expect(find.text('Main Photo'), findsOneWidget);
       expect(find.text('Full Body'), findsOneWidget);
-      expect(find.text('Activity'), findsAtLeastNWidgets(1)); // At least one Activity text
-      expect(find.text('Social'), findsAtLeastNWidgets(1)); // At least one Social text
+      expect(find.text('Activity'),
+          findsAtLeastNWidgets(1),); // At least one Activity text
+      expect(find.text('Social'),
+          findsAtLeastNWidgets(1),); // At least one Social text
       expect(find.text('Lifestyle'), findsOneWidget);
     });
 
@@ -39,7 +41,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => OnboardingController(),
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedPhotoUploadScreen(),
             ),
           ),
@@ -48,11 +50,16 @@ void main() {
 
       // Verify the photo guide section is present
       expect(find.text('Quick Photo Guide'), findsOneWidget);
-      
+
       // Verify photo tips are visible in the guide
-      expect(find.text('Main Photo: Clear face shot with a genuine smile'), findsOneWidget);
-      expect(find.text('Full Body: Show your style in a natural setting'), findsOneWidget);
-      expect(find.text('Activity: Doing something you love or are passionate about'), findsOneWidget);
+      expect(find.text('Main Photo: Clear face shot with a genuine smile'),
+          findsOneWidget,);
+      expect(find.text('Full Body: Show your style in a natural setting'),
+          findsOneWidget,);
+      expect(
+          find.text(
+              'Activity: Doing something you love or are passionate about',),
+          findsOneWidget,);
     });
 
     testWidgets('Primary photo slot has special styling',
@@ -61,7 +68,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => OnboardingController(),
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedPhotoUploadScreen(),
             ),
           ),
@@ -79,15 +86,15 @@ void main() {
 
   group('Photo Type Guidance Tests', () {
     test('Photo type guidance provides correct information', () {
-      final guidance = PhotoTypeGuidance(
+      const guidance = PhotoTypeGuidance(
         type: PhotoType.closeUp,
-        title: "Main Photo",
-        description: "A clear, smiling face shot with good lighting",
+        title: 'Main Photo',
+        description: 'A clear, smiling face shot with good lighting',
         isPrimary: true,
       );
 
       expect(guidance.type, PhotoType.closeUp);
-      expect(guidance.title, "Main Photo");
+      expect(guidance.title, 'Main Photo');
       expect(guidance.isPrimary, true);
     });
 

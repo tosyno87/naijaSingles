@@ -4,8 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/features/home/ui/widgets/re_auth_dialog.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
@@ -35,154 +34,148 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return TextButtonWidget(
-      text: "Delete Account",
+  Widget build(BuildContext context) => TextButtonWidget(
+      text: 'Delete Account',
       onTap: () async {
         showDialog(
           context: context,
-          builder: (BuildContext context) {
-            return Theme(
+          builder: (BuildContext context) => Theme(
               data: Theme.of(context).copyWith(
-                dialogBackgroundColor: Colors.white,
                 colorScheme: Theme.of(context).colorScheme.copyWith(
-                  surface: Colors.white,
-                ),
+                      surface: Colors.white,
+                    ), dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
               ),
               child: AlertDialog(
                 backgroundColor: Colors.white,
                 title: Text('Delete Account'.tr().toString()),
                 content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Do you want to delete your account?'.tr().toString()),
-                  const SizedBox(
-                    height: 8,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Do you want to delete your account?'.tr().toString()),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                        "We're sorry to see you go, but we understand your decision. Deleting your account will permanently remove all your personal information and data associated with it."
+                            .tr()
+                            .toString(),),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('No'.tr().toString(),
+                        style: const TextStyle(color: primaryColor),),
                   ),
-                  Text(
-                      "We're sorry to see you go, but we understand your decision. Deleting your account will permanently remove all your personal information and data associated with it."
-                          .tr()
-                          .toString()),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      // Show final confirmation dialog with DELETE input
+                      _showFinalConfirmationDialog();
+                    },
+                    child: Text('Yes'.tr().toString(),
+                        style: const TextStyle(color: primaryColor),),
+                  ),
                 ],
               ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text('No'.tr().toString(),
-                      style: TextStyle(color: primaryColor)),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    // Show final confirmation dialog with DELETE input
-                    _showFinalConfirmationDialog();
-                  },
-                  child: Text('Yes'.tr().toString(),
-                      style: TextStyle(color: primaryColor)),
-                ),
-              ],
             ),
-          );
-        },
         );
       },
       icon: Icons.delete_forever_outlined,
     );
-  }
 
   void _showFinalConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Theme(
+      builder: (BuildContext context) => Theme(
           data: Theme.of(context).copyWith(
-            dialogBackgroundColor: Colors.white,
             colorScheme: Theme.of(context).colorScheme.copyWith(
-              surface: Colors.white,
-            ),
+                  surface: Colors.white,
+                ), dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
           ),
           child: AlertDialog(
             backgroundColor: Colors.white,
-            title: Text(
+            title: const Text(
               'Final Confirmation',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Type "DELETE" to confirm account deletion:',
-                style: TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _confirmationController,
-                decoration: InputDecoration(
-                  hintText: 'Type DELETE here',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Type "DELETE" to confirm account deletion:',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _confirmationController,
+                  decoration: InputDecoration(
+                    hintText: 'Type DELETE here',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.red, width: 2),
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.red, width: 2),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  '⚠️ This action cannot be undone. All your data will be permanently deleted.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onChanged: (value) {
-                  setState(() {});
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  _confirmationController.clear();
+                  Navigator.of(context).pop();
                 },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                '⚠️ This action cannot be undone. All your data will be permanently deleted.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.red,
-                  fontWeight: FontWeight.w500,
+              TextButton(
+                onPressed: _confirmationController.text.trim().toUpperCase() ==
+                        'DELETE'
+                    ? () {
+                        Navigator.of(context).pop();
+                        _confirmationController.clear();
+                        _performAccountDeletion();
+                      }
+                    : null,
+                child: Text(
+                  'Confirm Delete',
+                  style: TextStyle(
+                    color: _confirmationController.text.trim().toUpperCase() ==
+                            'DELETE'
+                        ? Colors.red
+                        : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _confirmationController.clear();
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            TextButton(
-              onPressed: _confirmationController.text.trim().toUpperCase() == 'DELETE'
-                  ? () {
-                      Navigator.of(context).pop();
-                      _confirmationController.clear();
-                      _performAccountDeletion();
-                    }
-                  : null,
-              child: Text(
-                'Confirm Delete',
-                style: TextStyle(
-                  color: _confirmationController.text.trim().toUpperCase() == 'DELETE'
-                      ? Colors.red
-                      : Colors.grey,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
         ),
-      );
-    },
     );
   }
 
@@ -193,9 +186,11 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
     try {
       // Check authentication method and handle accordingly
       final providerData = user.providerData;
-      bool isGoogleUser = providerData.any((info) => info.providerId == 'google.com');
-      bool isFacebookUser = providerData.any((info) => info.providerId == 'facebook.com');
-      bool isPhoneUser = providerData.any((info) => info.providerId == 'phone');
+      final bool isGoogleUser =
+          providerData.any((info) => info.providerId == 'google.com');
+      final bool isFacebookUser =
+          providerData.any((info) => info.providerId == 'facebook.com');
+      final bool isPhoneUser = providerData.any((info) => info.providerId == 'phone');
 
       if (isGoogleUser) {
         // For Google users, try direct deletion first
@@ -211,10 +206,10 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         await _deleteUserWithReauth(user);
       }
     } catch (e) {
-      log("Error in account deletion: ${e.toString()}");
+      log('Error in account deletion: ${e.toString()}');
       if (context.mounted) {
         CustomSnackbar.showSnackBarSimple(
-          "Failed to delete account. Please try again.".tr().toString(),
+          'Failed to delete account. Please try again.'.tr().toString(),
           context,
         );
       }
@@ -289,10 +284,14 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   Future<void> _showSuccessAndNavigate() async {
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(
-        "Account deleted successfully".tr().toString(),
+        'Account deleted successfully'.tr().toString(),
         context,
       );
-      Navigator.pushReplacementNamed(context, RouteName.loginScreen).then((value) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteName.welcomeScreen,
+        (route) => false,
+      ).then((value) {
         Provider.of<UserProvider>(context, listen: false).currentUser = null;
       });
     }
@@ -301,15 +300,15 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
   void _showGoogleReauthDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
           backgroundColor: Colors.white,
-          title: Text('Re-authentication Required'),
-          content: Text('Please sign in with Google again to confirm account deletion.'),
+          title: const Text('Re-authentication Required'),
+          content: const Text(
+              'Please sign in with Google again to confirm account deletion.',),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -317,36 +316,36 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                 // Implement Google re-auth here
                 // This would require Google Sign-In re-authentication
                 CustomSnackbar.showSnackBarSimple(
-                  "Google re-authentication not yet implemented",
+                  'Google re-authentication not yet implemented',
                   context,
                 );
               },
-              child: Text('Continue'),
+              child: const Text('Continue'),
             ),
           ],
-        );
-      },
+        ),
     );
   }
 
   void _showFacebookReauthDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
           backgroundColor: Colors.white,
-          title: Text('Re-authentication Required'),
-          content: Text('Please sign in with Facebook again to confirm account deletion.'),
+          title: const Text('Re-authentication Required'),
+          content: const Text(
+              'Please sign in with Facebook again to confirm account deletion.',),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.pop(context);
                 try {
-                  final User? fbUser = await FaceBookLoginRepositoryImpl().signInWithFacebook();
+                  final User? fbUser =
+                      await FaceBookLoginRepositoryImpl().signInWithFacebook();
                   if (fbUser != null) {
                     await fbUser.delete();
                     await _cleanupUserData(fbUser);
@@ -354,69 +353,65 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                   }
                 } catch (e) {
                   CustomSnackbar.showSnackBarSimple(
-                    "Facebook re-authentication failed",
+                    'Facebook re-authentication failed',
                     context,
                   );
                 }
               },
-              child: Text('Continue'),
+              child: const Text('Continue'),
             ),
           ],
-        );
-      },
+        ),
     );
   }
 
   void _showPhoneReauthDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
           backgroundColor: Colors.white,
-          title: Text('Re-authentication Required'),
-          content: Text('Please verify your phone number again to confirm account deletion.'),
+          title: const Text('Re-authentication Required'),
+          content: const Text(
+              'Please verify your phone number again to confirm account deletion.',),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.pop(context);
                 // Implement phone re-auth here
                 CustomSnackbar.showSnackBarSimple(
-                  "Phone re-authentication not yet implemented",
+                  'Phone re-authentication not yet implemented',
                   context,
                 );
               },
-              child: Text('Continue'),
+              child: const Text('Continue'),
             ),
           ],
-        );
-      },
+        ),
     );
   }
 
   void _showGenericReauthDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
           backgroundColor: Colors.white,
-          title: Text('Re-authentication Required'),
-          content: Text('Please sign in again to confirm account deletion.'),
+          title: const Text('Re-authentication Required'),
+          content: const Text('Please sign in again to confirm account deletion.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Continue'),
+              child: const Text('Continue'),
             ),
           ],
-        );
-      },
+        ),
     );
   }
 }

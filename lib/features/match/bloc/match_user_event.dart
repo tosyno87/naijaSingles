@@ -8,9 +8,9 @@ abstract class MatchUserEvent extends Equatable {
 }
 
 class LoadMatchUserEvent extends MatchUserEvent {
-  final UserModel currentUser;
 
   const LoadMatchUserEvent({required this.currentUser});
+  final UserModel currentUser;
 
   @override
   List<Object?> get props => [currentUser];

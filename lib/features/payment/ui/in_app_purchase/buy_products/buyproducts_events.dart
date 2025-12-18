@@ -7,6 +7,6 @@ abstract class BuyInAppProductsEvents extends Equatable {
 }
 
 class RequestBuyConsumableProducts extends BuyInAppProductsEvents {
-  final ProductDetails productDetails;
   RequestBuyConsumableProducts({required this.productDetails});
+  final ProductDetails productDetails;
 }

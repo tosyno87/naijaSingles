@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 import 'package:naijasingles/features/onboarding/screens/enhanced_additional_info_screen.dart';
 import 'package:naijasingles/features/user/controllers/onboarding_controller.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   group('Enhanced Additional Info Screen Tests', () {
@@ -12,7 +12,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => OnboardingController(),
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedAdditionalInfoScreen(),
             ),
           ),
@@ -22,7 +22,7 @@ void main() {
       // Verify the screen renders
       expect(find.text('Tell us more about you'), findsOneWidget);
       expect(
-          find.text('Help us create better matches for you'), findsOneWidget);
+          find.text('Help us create better matches for you'), findsOneWidget,);
 
       // Verify main sections are present
       expect(find.text('Height'), findsOneWidget);
@@ -39,7 +39,7 @@ void main() {
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => OnboardingController(),
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedAdditionalInfoScreen(),
             ),
           ),
@@ -50,21 +50,20 @@ void main() {
       expect(find.byType(Container), findsAtLeastNWidgets(1));
       expect(find.byType(Column), findsAtLeastNWidgets(1));
       expect(find.byType(Text), findsAtLeastNWidgets(1));
-      
+
       // Verify dropdowns are present
       expect(find.byType(DropdownButton<String>), findsAtLeastNWidgets(1));
-      
+
       // Verify the screen is scrollable (important for long forms)
       expect(find.byType(SingleChildScrollView), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('Progress indicator is present',
-        (WidgetTester tester) async {
+    testWidgets('Progress indicator is present', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => OnboardingController(),
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedAdditionalInfoScreen(),
             ),
           ),
@@ -74,16 +73,15 @@ void main() {
       // Verify progress indicator is present
       expect(find.textContaining('Profile completion:'), findsOneWidget);
       expect(
-          find.text('Complete profiles get 3x more matches!'), findsOneWidget);
+          find.text('Complete profiles get 3x more matches!'), findsOneWidget,);
     });
 
-    testWidgets('Info card is present',
-        (WidgetTester tester) async {
+    testWidgets('Info card is present', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => OnboardingController(),
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedAdditionalInfoScreen(),
             ),
           ),
@@ -99,12 +97,12 @@ void main() {
     testWidgets('Controller is properly initialized',
         (WidgetTester tester) async {
       final controller = OnboardingController();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(
             create: (_) => controller,
-            child: Scaffold(
+            child: const Scaffold(
               body: EnhancedAdditionalInfoScreen(),
             ),
           ),

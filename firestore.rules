@@ -690,6 +690,17 @@ service cloud.firestore {
                    request.auth.uid == resource.data.reporterId;
     }
 
+    // Account Deletions collection - for audit logging
+    match /accountDeletions/{deletionId} {
+      // Users can create their own deletion records
+      allow create: if request.auth != null && 
+                     request.auth.uid == request.resource.data.userId;
+      
+      // Users can read their own deletion records
+      allow read: if request.auth != null && 
+                   request.auth.uid == resource.data.userId;
+    }
+
     // Block any other access not explicitly allowed above
     match /{document=**} {
       allow read, write: if false;

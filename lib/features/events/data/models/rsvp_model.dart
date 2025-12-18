@@ -13,11 +13,11 @@ extension RSVPStatusExtension on RSVPStatus {
       case RSVPStatus.going:
         return "I'm Going";
       case RSVPStatus.interested:
-        return "Interested";
+        return 'Interested';
       case RSVPStatus.notGoing:
-        return "Not Going";
+        return 'Not Going';
       case RSVPStatus.none:
-        return "No Response";
+        return 'No Response';
     }
   }
 
@@ -49,13 +49,6 @@ extension RSVPStatusExtension on RSVPStatus {
 }
 
 class RSVPModel extends Equatable {
-  final String id;
-  final String userId;
-  final String eventId;
-  final RSVPStatus status;
-  final DateTime rsvpDate;
-  final Map<String, dynamic>? userProfile;
-  final String? notes;
 
   const RSVPModel({
     required this.id,
@@ -67,32 +60,37 @@ class RSVPModel extends Equatable {
     this.notes,
   });
 
-  factory RSVPModel.fromFirestoreJson(Map<String, dynamic> json, String docId) {
-    return RSVPModel(
+  factory RSVPModel.fromFirestoreJson(Map<String, dynamic> json, String docId) => RSVPModel(
       id: docId,
       userId: json['userId'] ?? '',
       eventId: json['eventId'] ?? '',
       status: RSVPStatusExtension.fromString(json['status'] ?? 'none'),
       rsvpDate: DateTime.fromMillisecondsSinceEpoch(
-        json['rsvpDate']?.millisecondsSinceEpoch ?? 
-        json['timestamp']?.millisecondsSinceEpoch ?? 0,
+        json['rsvpDate']?.millisecondsSinceEpoch ??
+            json['timestamp']?.millisecondsSinceEpoch ??
+            0,
       ),
       userProfile: json['userProfile'],
       notes: json['notes'],
     );
-  }
+  final String id;
+  final String userId;
+  final String eventId;
+  final RSVPStatus status;
+  final DateTime rsvpDate;
+  final Map<String, dynamic>? userProfile;
+  final String? notes;
 
-  Map<String, dynamic> toFirestoreJson() {
-    return {
+  Map<String, dynamic> toFirestoreJson() => {
       'userId': userId,
       'eventId': eventId,
       'status': status.value,
       'rsvpDate': rsvpDate,
-      'timestamp': rsvpDate, // Add timestamp field for Firestore rules compatibility
+      'timestamp':
+          rsvpDate, // Add timestamp field for Firestore rules compatibility
       'userProfile': userProfile,
       'notes': notes,
     };
-  }
 
   RSVPModel copyWith({
     String? id,
@@ -102,8 +100,7 @@ class RSVPModel extends Equatable {
     DateTime? rsvpDate,
     Map<String, dynamic>? userProfile,
     String? notes,
-  }) {
-    return RSVPModel(
+  }) => RSVPModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       eventId: eventId ?? this.eventId,
@@ -112,7 +109,6 @@ class RSVPModel extends Equatable {
       userProfile: userProfile ?? this.userProfile,
       notes: notes ?? this.notes,
     );
-  }
 
   @override
   List<Object?> get props => [
@@ -127,14 +123,6 @@ class RSVPModel extends Equatable {
 }
 
 class EventAttendeeModel extends Equatable {
-  final String userId;
-  final String eventId;
-  final RSVPStatus status;
-  final DateTime rsvpDate;
-  final String userName;
-  final String? userAvatar;
-  final int? userAge;
-  final String? userLocation;
 
   const EventAttendeeModel({
     required this.userId,
@@ -147,8 +135,7 @@ class EventAttendeeModel extends Equatable {
     this.userLocation,
   });
 
-  factory EventAttendeeModel.fromFirestoreJson(Map<String, dynamic> json) {
-    return EventAttendeeModel(
+  factory EventAttendeeModel.fromFirestoreJson(Map<String, dynamic> json) => EventAttendeeModel(
       userId: json['userId'] ?? '',
       eventId: json['eventId'] ?? '',
       status: RSVPStatusExtension.fromString(json['status'] ?? 'none'),
@@ -160,7 +147,14 @@ class EventAttendeeModel extends Equatable {
       userAge: json['userProfile']?['age'],
       userLocation: json['userProfile']?['location'],
     );
-  }
+  final String userId;
+  final String eventId;
+  final RSVPStatus status;
+  final DateTime rsvpDate;
+  final String userName;
+  final String? userAvatar;
+  final int? userAge;
+  final String? userLocation;
 
   @override
   List<Object?> get props => [

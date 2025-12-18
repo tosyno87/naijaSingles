@@ -10,7 +10,7 @@ import '../../../services/profile_verification_service.dart';
 import '../../../services/content_moderation_service.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -19,8 +19,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final ProfileVerificationService _verificationService = ProfileVerificationService();
-  final ContentModerationService _moderationService = ContentModerationService();
+  final ProfileVerificationService _verificationService =
+      ProfileVerificationService();
+  final ContentModerationService _moderationService =
+      ContentModerationService();
 
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
@@ -51,7 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Available fields: ${data?.keys.toList()}');
           print('   Name: ${data?['name']}');
           print('   Interests: ${data?['interests']}');
-          print('   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
+          print(
+              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}',);
           print('   Looking for: ${data?['lookingFor']}');
           print('   Bio length: ${(data?['bio'] ?? '').length} characters');
           print('   Photos field: ${data?['photos']}');
@@ -59,8 +62,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Profile photos: ${data?['profilePhotos']}');
 
           // Load verification status
-          final verificationStatus = await _verificationService.getUserVerificationStatus(user.uid);
-          
+          final verificationStatus =
+              await _verificationService.getUserVerificationStatus(user.uid);
+
           setState(() {
             _userData = data;
             _verificationStatus = verificationStatus;
@@ -81,15 +85,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
         title: Text(
           'Profile',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             color: textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -147,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Text(
                               'Privacy Settings',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: textPrimary,
@@ -155,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             Text(
                               'Control who can see your profile',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 color: textSecondary,
                               ),
@@ -195,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Text(
                               'Settings',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: textPrimary,
@@ -203,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             Text(
                               'App preferences and account',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 color: textSecondary,
                               ),
@@ -242,12 +245,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
     );
-  }
 
   Widget _buildPhotoSection() {
     // Try multiple possible photo field names
     List<dynamic> photos = [];
-    
+
     // Check different possible field names for photos
     if (_userData?['photos'] != null) {
       photos = List<dynamic>.from(_userData!['photos']);
@@ -262,7 +264,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     // Filter out null/empty photos
-    photos = photos.where((photo) => photo != null && photo.toString().isNotEmpty).toList();
+    photos = photos
+        .where((photo) => photo != null && photo.toString().isNotEmpty)
+        .toList();
 
     print('📸 Found ${photos.length} photos: $photos');
 
@@ -273,8 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return _buildInstagramStylePhotoGrid(photos);
   }
 
-  Widget _buildInstagramStylePhotoGrid(List<dynamic> photos) {
-    return Container(
+  Widget _buildInstagramStylePhotoGrid(List<dynamic> photos) => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,16 +287,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(
               'Photos (${photos.length})',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: textPrimary,
               ),
             ),
           ),
-          
+
           // Instagram-style grid
-          Container(
+          SizedBox(
             height: 300,
             child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -301,15 +304,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisCount: 3,
                 crossAxisSpacing: 4,
                 mainAxisSpacing: 4,
-                childAspectRatio: 1,
               ),
-              itemCount: photos.length > 6 ? 6 : photos.length, // Show max 6 photos
+              itemCount:
+                  photos.length > 6 ? 6 : photos.length, // Show max 6 photos
               itemBuilder: (context, index) {
                 if (index == 0 && photos.length > 1) {
                   // First photo takes up 2x2 space (spans 2 columns and 2 rows)
                   return GestureDetector(
                     onTap: () => _showFullScreenPhoto(photos, index),
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
@@ -328,8 +331,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Image.network(
                               photos[index],
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                              errorBuilder: (context, error, stackTrace) => ColoredBox(
                                   color: Colors.grey.shade200,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -342,15 +344,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         'Failed to load',
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.montserrat(
                                           color: Colors.grey.shade600,
                                           fontSize: 10,
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-                              },
+                                ),
                             ),
                             // Photo number indicator
                             Positioned(
@@ -367,7 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: Text(
                                   '${index + 1}',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     color: Colors.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
@@ -384,7 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Regular 1x1 photos
                   return GestureDetector(
                     onTap: () => _showFullScreenPhoto(photos, index),
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
@@ -403,8 +404,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Image.network(
                               photos[index],
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                              errorBuilder: (context, error, stackTrace) => ColoredBox(
                                   color: Colors.grey.shade200,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -417,15 +417,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       const SizedBox(height: 2),
                                       Text(
                                         'Failed',
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.montserrat(
                                           color: Colors.grey.shade600,
                                           fontSize: 8,
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-                              },
+                                ),
                             ),
                             // Photo number indicator
                             Positioned(
@@ -442,7 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: Text(
                                   '${index + 1}',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     color: Colors.white,
                                     fontSize: 8,
                                     fontWeight: FontWeight.w600,
@@ -459,7 +458,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
           ),
-          
+
           // Show more photos indicator
           if (photos.length > 6)
             Padding(
@@ -467,7 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Center(
                 child: Text(
                   '+${photos.length - 6} more photos',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: primaryColor,
                     fontWeight: FontWeight.w500,
@@ -478,7 +477,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
 
   // Full screen photo viewer
   void _showFullScreenPhoto(List<dynamic> photos, int initialIndex) {
@@ -492,8 +490,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildEmptyPhotoPlaceholder() {
-    return Container(
+  Widget _buildEmptyPhotoPlaceholder() => Container(
       height: 200,
       decoration: BoxDecoration(
         color: cardColor,
@@ -511,7 +508,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 8),
           Text(
             'Add Photos',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               color: textSecondary,
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -520,7 +517,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 4),
           Text(
             'Tap to add your photos',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               color: textSecondary.withOpacity(0.7),
               fontSize: 12,
             ),
@@ -528,10 +525,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildBasicInfoCard() {
-    return Card(
+  Widget _buildBasicInfoCard() => Card(
       color: cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -545,7 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: Text(
                     _userData?['name'] ?? 'No name',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: textPrimary,
@@ -561,16 +556,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (_userData?['age'] != null)
               Text(
                 '${_userData!['age']} years old',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   color: textSecondary,
                 ),
               ),
             const SizedBox(height: 4),
-            if (_userData?['heightDisplay'] != null || _userData?['height_ft_in'] != null)
+            if (_userData?['heightDisplay'] != null ||
+                _userData?['height_ft_in'] != null)
               Text(
                 _userData?['heightDisplay'] ?? _userData?['height_ft_in'] ?? '',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: textSecondary,
                 ),
@@ -579,7 +575,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildVerificationBadge(VerificationStatus status) {
     final badge = _verificationService.getVerificationBadge(status);
@@ -626,8 +621,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileActionButtons() {
-    return Column(
+  Widget _buildProfileActionButtons() => Column(
       children: [
         // Edit Profile Button
         SizedBox(
@@ -658,11 +652,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.edit_outlined, size: 20),
+                const Icon(Icons.edit_outlined, size: 20),
                 const SizedBox(width: 12),
                 Text(
                   'Edit Profile',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -682,15 +676,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: _showReportDialog,
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.red,
-              side: BorderSide(color: Colors.red),
+              side: const BorderSide(color: Colors.red),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            icon: Icon(Icons.flag_outlined, size: 18),
+            icon: const Icon(Icons.flag_outlined, size: 18),
             label: Text(
               'Report Profile',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -699,7 +693,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
-  }
 
   void _showReportDialog() {
     showDialog(
@@ -738,7 +731,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           reporterId: currentUserId,
           reason: 'Inappropriate profile content',
         );
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Profile reported successfully'),
@@ -756,8 +749,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Widget _buildVerificationSection() {
-    return Card(
+  Widget _buildVerificationSection() => Card(
       color: cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -768,11 +760,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.verified_user, color: primaryColor, size: 20),
+                const Icon(Icons.verified_user, color: primaryColor, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Profile Verification',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: textPrimary,
@@ -791,7 +783,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: Text(
                       'Current Status: ${_verificationService.getVerificationStatusText(_verificationStatus!)}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: textSecondary,
                       ),
@@ -805,7 +797,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Verification types
             Text(
               'Available Verifications:',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: textPrimary,
@@ -817,18 +809,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: VerificationType.values.map((type) {
-                return _buildVerificationButton(type);
-              }).toList(),
+              children: VerificationType.values.map(_buildVerificationButton).toList(),
             ),
           ],
         ),
       ),
     );
-  }
 
-  Widget _buildVerificationButton(VerificationType type) {
-    return ElevatedButton.icon(
+  Widget _buildVerificationButton(VerificationType type) => ElevatedButton.icon(
       onPressed: () => _requestVerification(type),
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor.withOpacity(0.1),
@@ -840,10 +828,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       icon: Icon(_getVerificationIcon(type), size: 16),
       label: Text(
         type.toString().split('.').last.toUpperCase(),
-        style: GoogleFonts.poppins(fontSize: 12),
+        style: GoogleFonts.montserrat(fontSize: 12),
       ),
     );
-  }
 
   IconData _getVerificationIcon(VerificationType type) {
     switch (type) {
@@ -873,7 +860,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (result) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${type.toString().split('.').last.toUpperCase()} verification requested'),
+              content: Text(
+                  '${type.toString().split('.').last.toUpperCase()} verification requested',),
               backgroundColor: Colors.green,
             ),
           );
@@ -904,16 +892,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case VerificationType.phone:
         return {'phone': _userData?['phone'] ?? ''};
       case VerificationType.photo:
-        return {'photos': ['photo1.jpg', 'photo2.jpg'], 'selfie': 'selfie.jpg'};
+        return {
+          'photos': ['photo1.jpg', 'photo2.jpg'],
+          'selfie': 'selfie.jpg',
+        };
       case VerificationType.identity:
-        return {'idType': 'passport', 'idNumber': 'A1234567', 'idPhoto': 'id.jpg'};
+        return {
+          'idType': 'passport',
+          'idNumber': 'A1234567',
+          'idPhoto': 'id.jpg',
+        };
       case VerificationType.employment:
-        return {'company': 'Tech Company', 'position': 'Developer', 'email': 'work@company.com'};
+        return {
+          'company': 'Tech Company',
+          'position': 'Developer',
+          'email': 'work@company.com',
+        };
     }
   }
 
-  Widget _buildAboutSection() {
-    return Card(
+  Widget _buildAboutSection() => Card(
       color: cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -924,7 +922,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               'About',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
@@ -933,7 +931,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 12),
             Text(
               _userData?['bio'] ?? 'No bio available',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
                 height: 1.5,
@@ -943,11 +941,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildInterestsSection() {
     final interests = _userData?['interests'] as List<dynamic>? ?? [];
-    
+
     if (interests.isEmpty) return const SizedBox.shrink();
 
     return Card(
@@ -961,7 +958,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               'Interests',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
@@ -971,9 +968,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: interests.map((interest) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              children: interests.map((interest) => Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: primaryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -981,14 +978,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Text(
                     interest.toString(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       color: primaryColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
             ),
           ],
         ),
@@ -998,7 +994,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildLookingForSection() {
     final lookingFor = _userData?['lookingFor'];
-    
+
     if (lookingFor == null) return const SizedBox.shrink();
 
     return Card(
@@ -1012,7 +1008,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               'Looking For',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
@@ -1021,7 +1017,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 12),
             Text(
               lookingFor.toString(),
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
                 height: 1.5,
@@ -1036,13 +1032,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 // Full-screen photo viewer widget
 class _FullScreenPhotoViewer extends StatefulWidget {
-  final List<dynamic> photos;
-  final int initialIndex;
 
   const _FullScreenPhotoViewer({
     required this.photos,
     required this.initialIndex,
   });
+  final List<dynamic> photos;
+  final int initialIndex;
 
   @override
   State<_FullScreenPhotoViewer> createState() => _FullScreenPhotoViewerState();
@@ -1066,8 +1062,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -1078,7 +1073,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
         ),
         title: Text(
           '${_currentIndex + 1} of ${widget.photos.length}',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -1096,14 +1091,12 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                 _currentIndex = index;
               });
             },
-            itemBuilder: (context, index) {
-              return Center(
+            itemBuilder: (context, index) => Center(
                 child: InteractiveViewer(
                   child: Image.network(
                     widget.photos[index],
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
+                    errorBuilder: (context, error, stackTrace) => ColoredBox(
                         color: Colors.grey.shade800,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1116,19 +1109,17 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                             const SizedBox(height: 16),
                             Text(
                               'Failed to load image',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 color: Colors.grey.shade400,
                                 fontSize: 16,
                               ),
                             ),
                           ],
                         ),
-                      );
-                    },
+                      ),
                   ),
                 ),
-              );
-            },
+              ),
           ),
 
           // Page indicators
@@ -1158,5 +1149,4 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
         ],
       ),
     );
-  }
 }

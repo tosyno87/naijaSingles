@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../common/constants/app_colors.dart';
+import '../../models/community_group_model.dart';
 import '../widgets/community_group_card.dart';
 import '../widgets/community_group_filter_bar.dart';
-import '../../models/community_group_model.dart';
 
 class CommunityGroupsScreen extends StatefulWidget {
-  const CommunityGroupsScreen({Key? key}) : super(key: key);
+  const CommunityGroupsScreen({super.key});
 
   @override
   State<CommunityGroupsScreen> createState() => _CommunityGroupsScreenState();
@@ -22,7 +24,8 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
     CommunityGroup(
       id: '1',
       name: 'Nigerian Tech Professionals',
-      description: 'Connect with Nigerian tech professionals worldwide. Share opportunities, mentorship, and industry insights.',
+      description:
+          'Connect with Nigerian tech professionals worldwide. Share opportunities, mentorship, and industry insights.',
       category: 'Professional',
       country: 'Nigeria',
       city: 'Lagos',
@@ -41,7 +44,8 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
     CommunityGroup(
       id: '2',
       name: 'Ghanaian Food Culture',
-      description: 'Share traditional Ghanaian recipes, cooking techniques, and food stories. Celebrate our culinary heritage.',
+      description:
+          'Share traditional Ghanaian recipes, cooking techniques, and food stories. Celebrate our culinary heritage.',
       category: 'Cultural',
       country: 'Ghana',
       city: 'Accra',
@@ -51,7 +55,10 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
       imageUrl: '',
       isPublic: true,
       isVerified: true,
-      rules: {'authentic': 'Share authentic recipes', 'respect': 'Respect traditions'},
+      rules: {
+        'authentic': 'Share authentic recipes',
+        'respect': 'Respect traditions',
+      },
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
       updatedAt: DateTime.now(),
       memberCount: 890,
@@ -60,7 +67,8 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
     CommunityGroup(
       id: '3',
       name: 'Kenyan Music & Arts',
-      description: 'Discover Kenyan music, art, and cultural expressions. Support local artists and celebrate creativity.',
+      description:
+          'Discover Kenyan music, art, and cultural expressions. Support local artists and celebrate creativity.',
       category: 'Interest',
       country: 'Kenya',
       city: 'Nairobi',
@@ -70,7 +78,10 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
       imageUrl: '',
       isPublic: true,
       isVerified: false,
-      rules: {'support': 'Support local artists', 'original': 'Share original content'},
+      rules: {
+        'support': 'Support local artists',
+        'original': 'Share original content',
+      },
       createdAt: DateTime.now().subtract(const Duration(days: 7)),
       updatedAt: DateTime.now(),
       memberCount: 456,
@@ -79,9 +90,8 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+  Widget build(BuildContext context) => Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -108,7 +118,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        heroTag: "community_groups_fab",
+        heroTag: 'community_groups_fab',
         onPressed: () {
           // TODO: Navigate to create group screen
           ScaffoldMessenger.of(context).showSnackBar(
@@ -130,10 +140,8 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildHeader() {
-    return Container(
+  Widget _buildHeader() => Container(
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
@@ -177,11 +185,10 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildSearchBar() {
     if (!_isSearching) return const SizedBox.shrink();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextField(
@@ -211,12 +218,18 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
   Widget _buildGroupsList() {
     final filteredGroups = _mockGroups.where((group) {
       final matchesSearch = _searchController.text.isEmpty ||
-          group.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-          group.description.toLowerCase().contains(_searchController.text.toLowerCase());
-      
-      final matchesCategory = _selectedCategory == 'All' || group.category == _selectedCategory;
-      final matchesCountry = _selectedCountry == 'All' || group.country == _selectedCountry;
-      
+          group.name
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase()) ||
+          group.description
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase());
+
+      final matchesCategory =
+          _selectedCategory == 'All' || group.category == _selectedCategory;
+      final matchesCountry =
+          _selectedCountry == 'All' || group.country == _selectedCountry;
+
       return matchesSearch && matchesCategory && matchesCountry;
     }).toList();
 
@@ -255,8 +268,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
     return ListView.builder(
       padding: const EdgeInsets.all(20),
       itemCount: filteredGroups.length,
-      itemBuilder: (context, index) {
-        return CommunityGroupCard(
+      itemBuilder: (context, index) => CommunityGroupCard(
           group: filteredGroups[index],
           onJoin: () {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -266,8 +278,7 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
               ),
             );
           },
-        );
-      },
+        ),
     );
   }
 }

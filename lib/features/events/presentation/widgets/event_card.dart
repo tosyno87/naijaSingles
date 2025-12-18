@@ -1,33 +1,29 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
 import '../../data/models/event_model.dart';
-import '../../data/models/rsvp_model.dart';
 import '../../data/services/location_service.dart';
-import '../bloc/rsvp_bloc.dart';
 import 'rsvp_button.dart';
 
 class EventCard extends StatelessWidget {
+
+  const EventCard({
+    required this.event, super.key,
+    this.onTap,
+    this.showRSVPButton = true,
+    this.isCompact = false,
+  });
   final EventModel event;
   final VoidCallback? onTap;
   final bool showRSVPButton;
   final bool isCompact;
 
-  const EventCard({
-    Key? key,
-    required this.event,
-    this.onTap,
-    this.showRSVPButton = true,
-    this.isCompact = false,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -64,10 +60,8 @@ class EventCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildEventImage() {
-    return ClipRRect(
+  Widget _buildEventImage() => ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       child: AspectRatio(
         aspectRatio: 16 / 9,
@@ -75,9 +69,9 @@ class EventCard extends StatelessWidget {
             ? CachedNetworkImage(
                 imageUrl: event.imageUrl!,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: const Color(0xFFF5F5F5),
-                  child: const Center(
+                placeholder: (context, url) => const ColoredBox(
+                  color: Color(0xFFF5F5F5),
+                  child: Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
                     ),
@@ -88,10 +82,8 @@ class EventCard extends StatelessWidget {
             : _buildPlaceholderImage(),
       ),
     );
-  }
 
-  Widget _buildPlaceholderImage() {
-    return Container(
+  Widget _buildPlaceholderImage() => ColoredBox(
       color: const Color(0xFFF5F5F5),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -113,10 +105,8 @@ class EventCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildEventHeader() {
-    return Row(
+  Widget _buildEventHeader() => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
@@ -151,10 +141,8 @@ class EventCard extends StatelessWidget {
         _buildPriceTag(),
       ],
     );
-  }
 
-  Widget _buildCategoryChip() {
-    return Container(
+  Widget _buildCategoryChip() => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFF008037).withOpacity(0.1),
@@ -169,10 +157,8 @@ class EventCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildDistanceChip() {
-    return Container(
+  Widget _buildDistanceChip() => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFF666666).withOpacity(0.1),
@@ -181,10 +167,10 @@ class EventCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.location_on,
             size: 12,
-            color: const Color(0xFF666666),
+            color: Color(0xFF666666),
           ),
           const SizedBox(width: 2),
           Text(
@@ -198,21 +184,17 @@ class EventCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildPriceTag() {
-    return Container(
+  Widget _buildPriceTag() => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: event.isFree 
+        color: event.isFree
             ? const Color(0xFF4CAF50).withOpacity(0.1)
             : const Color(0xFFFF9800).withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: event.isFree 
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFFF9800),
-          width: 1,
+          color:
+              event.isFree ? const Color(0xFF4CAF50) : const Color(0xFFFF9800),
         ),
       ),
       child: Text(
@@ -220,16 +202,13 @@ class EventCard extends StatelessWidget {
         style: GoogleFonts.montserrat(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: event.isFree 
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFFF9800),
+          color:
+              event.isFree ? const Color(0xFF4CAF50) : const Color(0xFFFF9800),
         ),
       ),
     );
-  }
 
-  Widget _buildEventDetails() {
-    return Column(
+  Widget _buildEventDetails() => Column(
       children: [
         _buildDetailRow(
           icon: Icons.calendar_today,
@@ -243,16 +222,14 @@ class EventCard extends StatelessWidget {
         const SizedBox(height: 8),
         _buildDetailRow(
           icon: Icons.location_on,
-          text: event.location.displayAddress.isNotEmpty 
+          text: event.location.displayAddress.isNotEmpty
               ? event.location.displayAddress
               : 'Location TBA',
         ),
       ],
     );
-  }
 
-  Widget _buildDetailRow({required IconData icon, required String text}) {
-    return Row(
+  Widget _buildDetailRow({required IconData icon, required String text}) => Row(
       children: [
         Icon(
           icon,
@@ -273,11 +250,10 @@ class EventCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildEventDescription() {
     if (event.description.isEmpty) return const SizedBox.shrink();
-    
+
     return Text(
       event.description,
       style: GoogleFonts.montserrat(
@@ -290,8 +266,7 @@ class EventCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEventFooter(BuildContext context) {
-    return Row(
+  Widget _buildEventFooter(BuildContext context) => Row(
       children: [
         _buildAttendeeCount(),
         const Spacer(),
@@ -302,15 +277,13 @@ class EventCard extends StatelessWidget {
           ),
       ],
     );
-  }
 
-  Widget _buildAttendeeCount() {
-    return Row(
+  Widget _buildAttendeeCount() => Row(
       children: [
-        Icon(
+        const Icon(
           Icons.people,
           size: 16,
-          color: const Color(0xFF008037),
+          color: Color(0xFF008037),
         ),
         const SizedBox(width: 4),
         Text(
@@ -323,7 +296,6 @@ class EventCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   IconData _getCategoryIcon() {
     switch (event.category.toLowerCase()) {
@@ -353,54 +325,52 @@ class EventCard extends StatelessWidget {
   String _formatEventDate() {
     final now = DateTime.now();
     final eventDate = event.startDate;
-    
+
     if (eventDate.year == now.year &&
         eventDate.month == now.month &&
         eventDate.day == now.day) {
       return 'Today';
     }
-    
+
     final tomorrow = now.add(const Duration(days: 1));
     if (eventDate.year == tomorrow.year &&
         eventDate.month == tomorrow.month &&
         eventDate.day == tomorrow.day) {
       return 'Tomorrow';
     }
-    
+
     final difference = eventDate.difference(now).inDays;
     if (difference < 7) {
       return DateFormat('EEEE, MMM d').format(eventDate);
     }
-    
+
     return DateFormat('MMM d, yyyy').format(eventDate);
   }
 
   String _formatEventTime() {
     final startTime = DateFormat('h:mm a').format(event.startDate);
-    
+
     if (event.startDate.day == event.endDate.day) {
       final endTime = DateFormat('h:mm a').format(event.endDate);
       return '$startTime - $endTime';
     }
-    
+
     return 'Starts at $startTime';
   }
 }
 
 // Compact version for lists
 class CompactEventCard extends StatelessWidget {
+
+  const CompactEventCard({
+    required this.event, super.key,
+    this.onTap,
+  });
   final EventModel event;
   final VoidCallback? onTap;
 
-  const CompactEventCard({
-    Key? key,
-    required this.event,
-    this.onTap,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -427,26 +397,26 @@ class CompactEventCard extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: event.imageUrl!,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: const Color(0xFFF5F5F5),
+                        placeholder: (context, url) => const ColoredBox(
+                          color: Color(0xFFF5F5F5),
                           child: Icon(
                             Icons.event,
-                            color: const Color(0xFF008037),
+                            color: Color(0xFF008037),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Container(
-                          color: const Color(0xFFF5F5F5),
+                        errorWidget: (context, url, error) => const ColoredBox(
+                          color: Color(0xFFF5F5F5),
                           child: Icon(
                             Icons.event,
-                            color: const Color(0xFF008037),
+                            color: Color(0xFF008037),
                           ),
                         ),
                       )
-                    : Container(
-                        color: const Color(0xFFF5F5F5),
+                    : const ColoredBox(
+                        color: Color(0xFFF5F5F5),
                         child: Icon(
                           Icons.event,
-                          color: const Color(0xFF008037),
+                          color: Color(0xFF008037),
                         ),
                       ),
               ),
@@ -476,7 +446,7 @@ class CompactEventCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    event.location.displayAddress.isNotEmpty 
+                    event.location.displayAddress.isNotEmpty
                         ? event.location.displayAddress
                         : 'Location TBA',
                     style: GoogleFonts.montserrat(
@@ -497,5 +467,4 @@ class CompactEventCard extends StatelessWidget {
         ),
       ),
     );
-  }
 }

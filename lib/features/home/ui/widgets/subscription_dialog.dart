@@ -1,31 +1,30 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/constants/colors.dart';
+import '../../../../common/constants/colors.dart';
 
 import '../../../../models/user_model.dart';
 import '../../../payment/ui/products.dart';
 
-void showSubscriptionDialog({
+Future<void> showSubscriptionDialog({
   required BuildContext context,
   required UserModel currentUser,
   required Map items,
 }) async {
   showDialog(
     context: context,
-    builder: (BuildContext context) {
-      return Dialog(
+    builder: (BuildContext context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 'Subscription Required'.tr().toString(),
-                style: TextStyle(fontSize: 18, color: primaryColor),
+                style: const TextStyle(fontSize: 18, color: primaryColor),
               ),
               const SizedBox(height: 10),
               Text(
@@ -44,7 +43,7 @@ void showSubscriptionDialog({
                     },
                     child: Text(
                       'No'.tr().toString(),
-                      style: TextStyle(color: primaryColor),
+                      style: const TextStyle(color: primaryColor),
                     ),
                   ),
                   TextButton(
@@ -61,7 +60,7 @@ void showSubscriptionDialog({
                     },
                     child: Text(
                       'Yes'.tr().toString(),
-                      style: TextStyle(color: primaryColor),
+                      style: const TextStyle(color: primaryColor),
                     ),
                   ),
                 ],
@@ -69,7 +68,6 @@ void showSubscriptionDialog({
             ],
           ),
         ),
-      );
-    },
+      ),
   );
 }

@@ -7,25 +7,12 @@ enum SwiperPosition { none, left, right }
 enum StackFrom { none, top, left, right, bottom }
 
 class SwiperItem {
-  Widget Function(SwiperPosition, double progress) builder;
 
   SwiperItem({required this.builder});
+  Widget Function(SwiperPosition, double progress) builder;
 }
 
 class SwipeStack extends StatefulWidget {
-  final List<SwiperItem> children;
-  final int maxAngle;
-  final int threshold;
-  final StackFrom stackFrom;
-  final int visibleCount;
-  final int translationInterval;
-  final double scaleInterval;
-  final Duration animationDuration;
-  final int historyCount;
-  final void Function(int, SwiperPosition)? onSwipe;
-  final void Function(int, SwiperPosition)? onRewind;
-  final void Function()? onEnd;
-  final EdgeInsetsGeometry padding;
 
   const SwipeStack(
       {required Key key,
@@ -41,7 +28,7 @@ class SwipeStack extends StatefulWidget {
       this.onEnd,
       this.onSwipe,
       this.onRewind,
-      this.padding = const EdgeInsets.symmetric(vertical: 20, horizontal: 25)})
+      this.padding = const EdgeInsets.symmetric(vertical: 20, horizontal: 25),})
       : assert(maxAngle >= 0 && maxAngle <= 360),
         assert(threshold >= 1 && threshold <= 100),
         assert(visibleCount >= 2),
@@ -49,6 +36,19 @@ class SwipeStack extends StatefulWidget {
         assert(scaleInterval >= 0),
         assert(historyCount >= 0),
         super(key: key);
+  final List<SwiperItem> children;
+  final int maxAngle;
+  final int threshold;
+  final StackFrom stackFrom;
+  final int visibleCount;
+  final int translationInterval;
+  final double scaleInterval;
+  final Duration animationDuration;
+  final int historyCount;
+  final void Function(int, SwiperPosition)? onSwipe;
+  final void Function(int, SwiperPosition)? onRewind;
+  final void Function()? onEnd;
+  final EdgeInsetsGeometry padding;
 
   @override
   SwipeStackState createState() => SwipeStackState();
@@ -75,7 +75,7 @@ class SwipeStackState extends State<SwipeStack>
     StackFrom.top: Alignment.topCenter,
     StackFrom.right: Alignment.centerRight,
     StackFrom.bottom: Alignment.bottomCenter,
-    StackFrom.none: Alignment.center
+    StackFrom.none: Alignment.center,
   };
 
   bool _isTop = false;
@@ -120,11 +120,11 @@ class SwipeStackState extends State<SwipeStack>
         if (_animationType != 3 && _animationType != 0) {
           if (widget.historyCount > 0) {
             _history.add({
-              "item": widget.children[widget.children.length - 1],
-              "position": _currentItemPosition,
-              "left": _left,
-              "top": _top,
-              "angle": _angle
+              'item': widget.children[widget.children.length - 1],
+              'position': _currentItemPosition,
+              'left': _left,
+              'top': _top,
+              'angle': _angle,
             });
 
             if (_history.length > widget.historyCount) _history.removeAt(0);
@@ -132,7 +132,7 @@ class SwipeStackState extends State<SwipeStack>
         } else if (_animationType == 3) {
           if (widget.onRewind != null) {
             widget.onRewind!(widget.children.length - 1,
-                _history[_history.length - 1]["position"]);
+                _history[_history.length - 1]['position'],);
           }
           _history.removeAt(_history.length - 1);
         }
@@ -163,8 +163,7 @@ class SwipeStackState extends State<SwipeStack>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       _baseContainerConstraints = constraints;
 
@@ -173,33 +172,28 @@ class SwipeStackState extends State<SwipeStack>
       return Container(
         padding: widget.padding,
         child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return Stack(
+          builder: (BuildContext context, BoxConstraints constraints) => Stack(
               clipBehavior: Clip.none,
               fit: StackFit.expand,
               children: widget.children
                   .asMap()
-                  .map((int index, _) {
-                    return MapEntry(index, _item(constraints, index));
-                  })
+                  .map((int index, _) => MapEntry(index, _item(constraints, index)))
                   .values
                   .toList(),
-            );
-          },
+            ),
         ),
       );
-    });
-  }
+    },);
 
   Widget _item(BoxConstraints constraints, int index) {
     if (index != widget.children.length - 1) {
       double scaleReduced =
-          (widget.scaleInterval * (widget.children.length - index));
+          widget.scaleInterval * (widget.children.length - index);
       scaleReduced -= ((widget.scaleInterval * 2) / 100) * _progress;
       final double scale = 1 - scaleReduced;
 
       double positionReduced =
-          ((widget.translationInterval * (widget.children.length - index - 1)))
+          (widget.translationInterval * (widget.children.length - index - 1))
               .toDouble();
       positionReduced -= (widget.translationInterval / 100) * _progress;
       final double position = positionReduced * -1;
@@ -217,7 +211,7 @@ class SwipeStackState extends State<SwipeStack>
                 child: Container(
                     constraints: constraints,
                     child: widget.children[index]
-                        .builder(SwiperPosition.none, 0)))),
+                        .builder(SwiperPosition.none, 0),),),),
       );
     }
 
@@ -237,13 +231,13 @@ class SwipeStackState extends State<SwipeStack>
       top: _top,
       child: GestureDetector(
           onPanStart: (DragStartDetails dragStartDetails) {
-            RenderBox getBox = context.findRenderObject() as RenderBox;
-            var local = getBox.globalToLocal(dragStartDetails.globalPosition);
+            final RenderBox getBox = context.findRenderObject() as RenderBox;
+            final local = getBox.globalToLocal(dragStartDetails.globalPosition);
 
             _isLeft = local.dx < getBox.size.width / 2;
             _isTop = local.dy < getBox.size.height / 2;
 
-            double halfHeight = getBox.size.height / 2;
+            final double halfHeight = getBox.size.height / 2;
             _centerSlow = ((halfHeight - local.dy) * (1 / halfHeight)).abs();
           },
           onPanUpdate: (DragUpdateDetails dragUpdateDetails) {
@@ -265,8 +259,8 @@ class SwipeStackState extends State<SwipeStack>
             child: Container(
                 constraints: constraints,
                 child: widget.children[index]
-                    .builder(_currentItemPosition, _progress)),
-          )),
+                    .builder(_currentItemPosition, _progress),),
+          ),),
     );
   }
 
@@ -278,7 +272,7 @@ class SwipeStackState extends State<SwipeStack>
       _animationType = 1;
       _animationX = Tween<double>(
               begin: _left,
-              end: _baseContainerConstraints.maxWidth * (_left < 0 ? -1 : 1))
+              end: _baseContainerConstraints.maxWidth * (_left < 0 ? -1 : 1),)
           .animate(_animationController);
       _animationY = Tween<double>(begin: _top, end: _top + _top)
           .animate(_animationController);
@@ -288,12 +282,12 @@ class SwipeStackState extends State<SwipeStack>
 
   void _goFirstPosition() {
     _animationX =
-        Tween<double>(begin: _left, end: 0.0).animate(_animationController);
+        Tween<double>(begin: _left, end: 0).animate(_animationController);
     _animationY =
-        Tween<double>(begin: _top, end: 0.0).animate(_animationController);
+        Tween<double>(begin: _top, end: 0).animate(_animationController);
     if (widget.maxAngle > 0) {
       _animationAngle =
-          Tween<double>(begin: _angle, end: 0.0).animate(_animationController);
+          Tween<double>(begin: _angle, end: 0).animate(_animationController);
     }
     _animationController.forward();
   }
@@ -306,7 +300,7 @@ class SwipeStackState extends State<SwipeStack>
           Tween<double>(begin: 0, end: _baseContainerConstraints.maxWidth * -1)
               .animate(_animationController);
       _animationY = Tween<double>(
-              begin: 0, end: (_baseContainerConstraints.maxHeight / 2) * -1)
+              begin: 0, end: (_baseContainerConstraints.maxHeight / 2) * -1,)
           .animate(_animationController);
       if (widget.maxAngle > 0) {
         _animationAngle = Tween<double>(begin: 0, end: _maxAngle * 0.7)
@@ -324,7 +318,7 @@ class SwipeStackState extends State<SwipeStack>
           Tween<double>(begin: 0, end: _baseContainerConstraints.maxWidth)
               .animate(_animationController);
       _animationY = Tween<double>(
-              begin: 0, end: (_baseContainerConstraints.maxHeight / 2) * -1)
+              begin: 0, end: (_baseContainerConstraints.maxHeight / 2) * -1,)
           .animate(_animationController);
       if (widget.maxAngle > 0) {
         _animationAngle = Tween<double>(begin: 0, end: (_maxAngle * 0.7) * -1)
@@ -341,13 +335,13 @@ class SwipeStackState extends State<SwipeStack>
 
       final lastHistory = _history[_history.length - 1];
 
-      widget.children.add(lastHistory["item"]);
-      _animationX = Tween<double>(begin: lastHistory["left"], end: 0)
+      widget.children.add(lastHistory['item']);
+      _animationX = Tween<double>(begin: lastHistory['left'], end: 0)
           .animate(_animationController);
-      _animationY = Tween<double>(begin: lastHistory["top"], end: 0)
+      _animationY = Tween<double>(begin: lastHistory['top'], end: 0)
           .animate(_animationController);
       if (widget.maxAngle > 0) {
-        _animationAngle = Tween<double>(begin: lastHistory["angle"], end: 0)
+        _animationAngle = Tween<double>(begin: lastHistory['angle'], end: 0)
             .animate(_animationController);
       }
 

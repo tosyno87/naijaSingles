@@ -11,9 +11,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// - Group moderation and reporting
 /// - Group events
 class GroupChatService {
-  static final GroupChatService _instance = GroupChatService._internal();
   factory GroupChatService() => _instance;
   GroupChatService._internal();
+  static final GroupChatService _instance = GroupChatService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -59,7 +59,8 @@ class GroupChatService {
         'lastMessageSenderId': currentUserId,
       };
 
-      final docRef = await _firestore.collection('unifiedGroups').add(groupData);
+      final docRef =
+          await _firestore.collection('unifiedGroups').add(groupData);
       final groupId = docRef.id;
 
       // Create initial message
@@ -144,7 +145,7 @@ class GroupChatService {
       // Remove user from group members
       log('🔍 Attempting to leave group: $groupId');
       log('🔍 Current user: $currentUserId');
-      
+
       await _firestore.collection('unifiedGroups').doc(groupId).update({
         'memberIds': FieldValue.arrayRemove([currentUserId]),
         'adminIds': FieldValue.arrayRemove([currentUserId]),
@@ -176,14 +177,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can invite users');
       }
@@ -225,14 +227,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can remove users');
       }
@@ -270,14 +273,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can promote users');
       }
@@ -320,18 +324,19 @@ class GroupChatService {
       }
 
       // Check if user is member of group
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final memberIds = List<String>.from(groupData['memberIds'] ?? []);
-      
+
       log('🔍 Group memberIds: $memberIds');
       log('🔍 Current user: $currentUserId');
       log('🔍 Is user member: ${memberIds.contains(currentUserId)}');
-      
+
       if (!memberIds.contains(currentUserId)) {
         throw Exception('You are not a member of this group');
       }
@@ -397,11 +402,7 @@ class GroupChatService {
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return GroupMessage.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+        .map((snapshot) => snapshot.docs.map((doc) => GroupMessage.fromMap(doc.id, doc.data())).toList(),);
   }
 
   /// Get user's groups
@@ -417,18 +418,15 @@ class GroupChatService {
         .where('isActive', isEqualTo: true)
         .orderBy('lastMessageAt', descending: true)
         .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return GroupChat.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+        .map((snapshot) => snapshot.docs.map((doc) => GroupChat.fromMap(doc.id, doc.data())).toList(),);
   }
 
   /// Get group details
   Future<GroupChat?> getGroupDetails(String groupId) async {
     try {
       log('🔍 GroupChatService: Looking for group in unifiedGroups collection: $groupId');
-      final doc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final doc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!doc.exists) {
         log('❌ GroupChatService: Group not found in unifiedGroups');
         return null;
@@ -470,14 +468,15 @@ class GroupChatService {
       }
 
       // Check if user is admin
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final adminIds = List<String>.from(groupData['adminIds'] ?? []);
-      
+
       if (!adminIds.contains(currentUserId)) {
         throw Exception('Only admins can update group settings');
       }
@@ -489,7 +488,10 @@ class GroupChatService {
       if (isActive != null) updateData['isActive'] = isActive;
 
       if (updateData.isNotEmpty) {
-        await _firestore.collection('unifiedGroups').doc(groupId).update(updateData);
+        await _firestore
+            .collection('unifiedGroups')
+            .doc(groupId)
+            .update(updateData);
       }
 
       log('✅ Group settings updated successfully: $groupId');
@@ -510,14 +512,15 @@ class GroupChatService {
       }
 
       // Check if user is creator
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) {
         throw Exception('Group not found');
       }
 
       final groupData = groupDoc.data()!;
       final creatorId = groupData['creatorId'] as String?;
-      
+
       if (creatorId != currentUserId) {
         throw Exception('Only the group creator can delete the group');
       }
@@ -569,9 +572,11 @@ class GroupChatService {
   }
 
   /// Notify group members (internal method)
-  Future<void> _notifyGroupMembers(String groupId, String message, {String? excludeUserId}) async {
+  Future<void> _notifyGroupMembers(String groupId, String message,
+      {String? excludeUserId,}) async {
     try {
-      final groupDoc = await _firestore.collection('unifiedGroups').doc(groupId).get();
+      final groupDoc =
+          await _firestore.collection('unifiedGroups').doc(groupId).get();
       if (!groupDoc.exists) return;
 
       final groupData = groupDoc.data()!;
@@ -619,6 +624,37 @@ enum MessageType {
 
 /// Group chat model
 class GroupChat {
+
+  const GroupChat({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.type,
+    required this.creatorId, required this.adminIds, required this.memberIds, required this.memberCount, required this.isActive, required this.createdAt, required this.lastMessageAt, required this.lastMessageText, required this.lastMessageSenderId, this.location,
+    this.eventId,
+  });
+
+  factory GroupChat.fromMap(String id, Map<String, dynamic> data) => GroupChat(
+      id: id,
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      type: GroupType.values.firstWhere(
+        (e) => e.name == data['type'],
+        orElse: () => GroupType.custom,
+      ),
+      location: data['location'],
+      eventId: data['eventId'],
+      creatorId: data['creatorId'] ?? '',
+      adminIds: List<String>.from(data['adminIds'] ?? []),
+      memberIds: List<String>.from(data['memberIds'] ?? []),
+      memberCount: data['memberCount'] ?? 0,
+      isActive: data['isActive'] ?? true,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastMessageAt:
+          (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastMessageText: data['lastMessageText'] ?? '',
+      lastMessageSenderId: data['lastMessageSenderId'] ?? '',
+    );
   final String id;
   final String name;
   final String description;
@@ -635,81 +671,21 @@ class GroupChat {
   final String lastMessageText;
   final String lastMessageSenderId;
 
-  const GroupChat({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.type,
-    this.location,
-    this.eventId,
-    required this.creatorId,
-    required this.adminIds,
-    required this.memberIds,
-    required this.memberCount,
-    required this.isActive,
-    required this.createdAt,
-    required this.lastMessageAt,
-    required this.lastMessageText,
-    required this.lastMessageSenderId,
-  });
-
-  factory GroupChat.fromMap(String id, Map<String, dynamic> data) {
-    return GroupChat(
-      id: id,
-      name: data['name'] ?? '',
-      description: data['description'] ?? '',
-      type: GroupType.values.firstWhere(
-        (e) => e.name == data['type'],
-        orElse: () => GroupType.custom,
-      ),
-      location: data['location'],
-      eventId: data['eventId'],
-      creatorId: data['creatorId'] ?? '',
-      adminIds: List<String>.from(data['adminIds'] ?? []),
-      memberIds: List<String>.from(data['memberIds'] ?? []),
-      memberCount: data['memberCount'] ?? 0,
-      isActive: data['isActive'] ?? true,
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastMessageAt: (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastMessageText: data['lastMessageText'] ?? '',
-      lastMessageSenderId: data['lastMessageSenderId'] ?? '',
-    );
-  }
-
   /// Check if user is admin
-  bool isAdmin(String userId) {
-    return adminIds.contains(userId);
-  }
+  bool isAdmin(String userId) => adminIds.contains(userId);
 
   /// Check if user is member
-  bool isMember(String userId) {
-    return memberIds.contains(userId);
-  }
+  bool isMember(String userId) => memberIds.contains(userId);
 
   /// Check if user is creator
-  bool isCreator(String userId) {
-    return creatorId == userId;
-  }
+  bool isCreator(String userId) => creatorId == userId;
 
   @override
-  String toString() {
-    return 'GroupChat($name: $memberCount members)';
-  }
+  String toString() => 'GroupChat($name: $memberCount members)';
 }
 
 /// Group message model
 class GroupMessage {
-  final String id;
-  final String groupId;
-  final String senderId;
-  final String text;
-  final MessageType messageType;
-  final String? mediaUrl;
-  final String? mediaType;
-  final String? replyToMessageId;
-  final DateTime timestamp;
-  final bool isRead;
-  final List<String> readBy;
 
   const GroupMessage({
     required this.id,
@@ -717,16 +693,12 @@ class GroupMessage {
     required this.senderId,
     required this.text,
     required this.messageType,
-    this.mediaUrl,
+    required this.timestamp, required this.isRead, required this.readBy, this.mediaUrl,
     this.mediaType,
     this.replyToMessageId,
-    required this.timestamp,
-    required this.isRead,
-    required this.readBy,
   });
 
-  factory GroupMessage.fromMap(String id, Map<String, dynamic> data) {
-    return GroupMessage(
+  factory GroupMessage.fromMap(String id, Map<String, dynamic> data) => GroupMessage(
       id: id,
       groupId: data['groupId'] ?? '',
       senderId: data['senderId'] ?? '',
@@ -742,15 +714,21 @@ class GroupMessage {
       isRead: data['isRead'] ?? false,
       readBy: List<String>.from(data['readBy'] ?? []),
     );
-  }
+  final String id;
+  final String groupId;
+  final String senderId;
+  final String text;
+  final MessageType messageType;
+  final String? mediaUrl;
+  final String? mediaType;
+  final String? replyToMessageId;
+  final DateTime timestamp;
+  final bool isRead;
+  final List<String> readBy;
 
   /// Check if message is read by user
-  bool isReadBy(String userId) {
-    return readBy.contains(userId);
-  }
+  bool isReadBy(String userId) => readBy.contains(userId);
 
   @override
-  String toString() {
-    return 'GroupMessage($text: ${messageType.name})';
-  }
+  String toString() => 'GroupMessage($text: ${messageType.name})';
 }

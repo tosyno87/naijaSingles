@@ -1,27 +1,25 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:naijasingles/features/events/presentation/bloc/events_bloc.dart';
 import 'package:naijasingles/features/events/data/models/event_model.dart';
+import 'package:naijasingles/features/events/presentation/bloc/events_bloc.dart';
 
 void main() {
   group('Event Discovery Features', () {
-    testWidgets('EventFilter should support advanced filtering options', (WidgetTester tester) async {
+    testWidgets('EventFilter should support advanced filtering options',
+        (WidgetTester tester) async {
       // Test enhanced EventFilter with new fields
       final filter = EventFilter(
         category: 'Music',
-        startDate: DateTime(2024, 1, 1),
+        startDate: DateTime(2024),
         endDate: DateTime(2024, 1, 31),
         location: 'Lagos',
         freeOnly: true,
-        maxPrice: 50.0,
-        minPrice: 10.0,
+        maxPrice: 50,
+        minPrice: 10,
         latitude: 6.5244,
         longitude: 3.3792,
-        radiusKm: 25.0,
-        tags: ['afrobeat', 'networking'],
+        radiusKm: 25,
+        tags: const ['afrobeat', 'networking'],
         sortBy: 'popularity',
-        trendingOnly: false,
         weekendOnly: true,
       );
 
@@ -42,8 +40,9 @@ void main() {
       expect(updatedFilter.maxPrice, equals(50.0)); // Should remain unchanged
     });
 
-    testWidgets('EventFilter should handle empty filters correctly', (WidgetTester tester) async {
-      final emptyFilter = const EventFilter();
+    testWidgets('EventFilter should handle empty filters correctly',
+        (WidgetTester tester) async {
+      const emptyFilter = EventFilter();
 
       expect(emptyFilter.hasActiveFilters, isFalse);
       expect(emptyFilter.hasLocationFilter, isFalse);
@@ -51,7 +50,8 @@ void main() {
       expect(emptyFilter.hasDateFilter, isFalse);
     });
 
-    testWidgets('EventModel should support new fields', (WidgetTester tester) async {
+    testWidgets('EventModel should support new fields',
+        (WidgetTester tester) async {
       final event = EventModel(
         id: 'test-event',
         name: 'Test Event',
@@ -68,9 +68,9 @@ void main() {
           longitude: 3.3792,
         ),
         isFree: false,
-        ticketPrice: 25.0,
+        ticketPrice: 25,
         category: 'Music',
-        tags: ['afrobeat', 'live music'],
+        tags: const ['afrobeat', 'live music'],
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         createdByUserId: 'test-user',
@@ -81,7 +81,8 @@ void main() {
       expect(event.isFree, isFalse);
     });
 
-    testWidgets('EventModel should handle free events correctly', (WidgetTester tester) async {
+    testWidgets('EventModel should handle free events correctly',
+        (WidgetTester tester) async {
       final freeEvent = EventModel(
         id: 'free-event',
         name: 'Free Event',
@@ -99,7 +100,7 @@ void main() {
         ),
         isFree: true,
         category: 'Community',
-        tags: ['networking', 'free'],
+        tags: const ['networking', 'free'],
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         createdByUserId: 'test-user',
@@ -110,9 +111,10 @@ void main() {
       expect(freeEvent.tags, equals(['networking', 'free']));
     });
 
-    testWidgets('EventFilter should apply weekend filter correctly', (WidgetTester tester) async {
-      final weekendFilter = const EventFilter(weekendOnly: true);
-      
+    testWidgets('EventFilter should apply weekend filter correctly',
+        (WidgetTester tester) async {
+      const weekendFilter = EventFilter(weekendOnly: true);
+
       // Create events for different days
       final fridayEvent = EventModel(
         id: 'friday-event',
@@ -128,7 +130,6 @@ void main() {
           country: 'Nigeria',
           latitude: 6.5244,
           longitude: 3.3792,
-
         ),
         isFree: true,
         category: 'Music',
@@ -141,8 +142,8 @@ void main() {
         id: 'monday-event',
         name: 'Monday Event',
         description: 'Monday Description',
-        startDate: DateTime(2024, 1, 1), // Monday
-        endDate: DateTime(2024, 1, 1),
+        startDate: DateTime(2024), // Monday
+        endDate: DateTime(2024),
         location: const EventLocation(
           name: 'Monday Venue',
           address: 'Monday Address',
@@ -151,7 +152,6 @@ void main() {
           country: 'Nigeria',
           latitude: 6.5244,
           longitude: 3.3792,
-
         ),
         isFree: true,
         category: 'Business',
@@ -165,10 +165,11 @@ void main() {
       expect(mondayEvent.startDate.weekday, equals(DateTime.monday));
     });
 
-    testWidgets('EventFilter should handle price range filtering', (WidgetTester tester) async {
-      final priceFilter = EventFilter(
-        minPrice: 20.0,
-        maxPrice: 100.0,
+    testWidgets('EventFilter should handle price range filtering',
+        (WidgetTester tester) async {
+      const priceFilter = EventFilter(
+        minPrice: 20,
+        maxPrice: 100,
       );
 
       expect(priceFilter.hasPriceFilter, isTrue);
@@ -190,10 +191,9 @@ void main() {
           country: 'Nigeria',
           latitude: 6.5244,
           longitude: 3.3792,
-
         ),
         isFree: false,
-        ticketPrice: 150.0, // Above max price
+        ticketPrice: 150, // Above max price
         category: 'Music',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -214,10 +214,9 @@ void main() {
           country: 'Nigeria',
           latitude: 6.5244,
           longitude: 3.3792,
-
         ),
         isFree: false,
-        ticketPrice: 50.0, // Within price range
+        ticketPrice: 50, // Within price range
         category: 'Music',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -230,8 +229,9 @@ void main() {
       expect(affordableEvent.ticketPrice! >= priceFilter.minPrice!, isTrue);
     });
 
-    testWidgets('EventFilter should handle tag filtering', (WidgetTester tester) async {
-      final tagFilter = EventFilter(
+    testWidgets('EventFilter should handle tag filtering',
+        (WidgetTester tester) async {
+      const tagFilter = EventFilter(
         tags: ['afrobeat', 'networking'],
       );
 
@@ -252,11 +252,10 @@ void main() {
           country: 'Nigeria',
           latitude: 6.5244,
           longitude: 3.3792,
-
         ),
         isFree: true,
         category: 'Music',
-        tags: ['afrobeat', 'live music', 'networking'],
+        tags: const ['afrobeat', 'live music', 'networking'],
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         createdByUserId: 'test-user',
@@ -276,25 +275,27 @@ void main() {
           country: 'Nigeria',
           latitude: 6.5244,
           longitude: 3.3792,
-
         ),
         isFree: true,
         category: 'Business',
-        tags: ['business', 'conference'],
+        tags: const ['business', 'conference'],
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         createdByUserId: 'test-user',
       );
 
       // Test tag filtering logic (this would be in the BLoC)
-      final eventTags = eventWithMatchingTags.tags.map((tag) => tag.toLowerCase()).toList();
-      final hasMatchingTag = tagFilter.tags!.any((filterTag) => 
-        eventTags.any((eventTag) => eventTag.contains(filterTag.toLowerCase())));
+      final eventTags =
+          eventWithMatchingTags.tags.map((tag) => tag.toLowerCase()).toList();
+      final hasMatchingTag = tagFilter.tags!.any((filterTag) => eventTags
+          .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),);
       expect(hasMatchingTag, isTrue);
 
-      final eventTags2 = eventWithoutMatchingTags.tags.map((tag) => tag.toLowerCase()).toList();
-      final hasMatchingTag2 = tagFilter.tags!.any((filterTag) => 
-        eventTags2.any((eventTag) => eventTag.contains(filterTag.toLowerCase())));
+      final eventTags2 = eventWithoutMatchingTags.tags
+          .map((tag) => tag.toLowerCase())
+          .toList();
+      final hasMatchingTag2 = tagFilter.tags!.any((filterTag) => eventTags2
+          .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),);
       expect(hasMatchingTag2, isFalse);
     });
   });

@@ -1,22 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CulturalStory {
-  final String id;
-  final String title;
-  final String content;
-  final String authorId;
-  final String authorName;
-  final String country;
-  final String category; // 'Traditions', 'Food', 'Music', 'Language', 'History'
-  final List<String> tags;
-  final String imageUrl;
-  final bool isVerified; // Community-verified stories
-  final int likesCount;
-  final int commentsCount;
-  final List<String> likedBy;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool isPublished;
 
   const CulturalStory({
     required this.id,
@@ -58,9 +42,24 @@ class CulturalStory {
       isPublished: data['isPublished'] ?? true,
     );
   }
+  final String id;
+  final String title;
+  final String content;
+  final String authorId;
+  final String authorName;
+  final String country;
+  final String category; // 'Traditions', 'Food', 'Music', 'Language', 'History'
+  final List<String> tags;
+  final String imageUrl;
+  final bool isVerified; // Community-verified stories
+  final int likesCount;
+  final int commentsCount;
+  final List<String> likedBy;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool isPublished;
 
-  Map<String, dynamic> toFirestore() {
-    return {
+  Map<String, dynamic> toFirestore() => {
       'title': title,
       'content': content,
       'authorId': authorId,
@@ -77,24 +76,9 @@ class CulturalStory {
       'updatedAt': Timestamp.fromDate(updatedAt),
       'isPublished': isPublished,
     };
-  }
 }
 
 class LanguageExchange {
-  final String id;
-  final String nativeLanguage;
-  final String learningLanguage;
-  final String userId;
-  final String userName;
-  final String proficiency; // 'Beginner', 'Intermediate', 'Advanced'
-  final String country;
-  final String city;
-  final bool isOnline;
-  final bool isInPerson;
-  final String description;
-  final List<String> interests;
-  final DateTime createdAt;
-  final bool isActive;
 
   const LanguageExchange({
     required this.id,
@@ -132,9 +116,22 @@ class LanguageExchange {
       isActive: data['isActive'] ?? true,
     );
   }
+  final String id;
+  final String nativeLanguage;
+  final String learningLanguage;
+  final String userId;
+  final String userName;
+  final String proficiency; // 'Beginner', 'Intermediate', 'Advanced'
+  final String country;
+  final String city;
+  final bool isOnline;
+  final bool isInPerson;
+  final String description;
+  final List<String> interests;
+  final DateTime createdAt;
+  final bool isActive;
 
-  Map<String, dynamic> toFirestore() {
-    return {
+  Map<String, dynamic> toFirestore() => {
       'nativeLanguage': nativeLanguage,
       'learningLanguage': learningLanguage,
       'userId': userId,
@@ -149,5 +146,4 @@ class LanguageExchange {
       'createdAt': Timestamp.fromDate(createdAt),
       'isActive': isActive,
     };
-  }
 }

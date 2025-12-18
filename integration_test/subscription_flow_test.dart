@@ -225,7 +225,7 @@ Future<void> _testPremiumPlanSelection(WidgetTester tester) async {
 
       // Verify plan details are shown
       expect(find.textContaining('month'), findsWidgets);
-      expect(find.textContaining('\$'), findsWidgets);
+      expect(find.textContaining(r'$'), findsWidgets);
       
       print('✓ Tested plan: $plan');
       break; // Test first available plan

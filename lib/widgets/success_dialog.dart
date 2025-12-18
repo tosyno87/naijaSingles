@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+import '../common/constants/app_colors.dart';
 
 /// Custom success dialog for group creation
 class SuccessDialog extends StatelessWidget {
+
+  const SuccessDialog({
+    required this.title, required this.message, super.key,
+    this.actionText,
+    this.onAction,
+    this.onClose,
+  });
   final String title;
   final String message;
   final String? actionText;
   final VoidCallback? onAction;
   final VoidCallback? onClose;
 
-  const SuccessDialog({
-    super.key,
-    required this.title,
-    required this.message,
-    this.actionText,
-    this.onAction,
-    this.onClose,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
+  Widget build(BuildContext context) => Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -38,7 +35,7 @@ class SuccessDialog extends StatelessWidget {
                 color: AppColors.primaryGreen.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.check_circle,
                 color: AppColors.primaryGreen,
                 size: 48,
@@ -126,7 +123,6 @@ class SuccessDialog extends StatelessWidget {
         ),
       ),
     );
-  }
 
   /// Show success dialog
   static Future<void> show({
@@ -136,8 +132,7 @@ class SuccessDialog extends StatelessWidget {
     String? actionText,
     VoidCallback? onAction,
     VoidCallback? onClose,
-  }) {
-    return showDialog(
+  }) => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => SuccessDialog(
@@ -148,21 +143,19 @@ class SuccessDialog extends StatelessWidget {
         onClose: onClose ?? () => Navigator.pop(context),
       ),
     );
-  }
 }
 
 /// Loading dialog for group creation
 class LoadingDialog extends StatelessWidget {
-  final String message;
 
   const LoadingDialog({
     super.key,
     this.message = 'Creating group...',
   });
+  final String message;
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
+  Widget build(BuildContext context) => Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -191,19 +184,16 @@ class LoadingDialog extends StatelessWidget {
         ),
       ),
     );
-  }
 
   /// Show loading dialog
   static Future<void> show({
     required BuildContext context,
     String message = 'Creating group...',
-  }) {
-    return showDialog(
+  }) => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => LoadingDialog(message: message),
     );
-  }
 
   /// Hide loading dialog
   static void hide(BuildContext context) {

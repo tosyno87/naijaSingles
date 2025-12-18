@@ -1,11 +1,13 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../common/widgets/custom_snackbar.dart';
-import '../phone/ui/screens/phone_number.dart';
 import '../google_sign_in/google_sign_in_bloc.dart';
+import '../phone/ui/screens/phone_number.dart';
 import 'sign_in_method_selection_screen.dart';
 
 class AuthMethodSelectionScreen extends StatelessWidget {
@@ -16,10 +18,10 @@ class AuthMethodSelectionScreen extends StatelessWidget {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     // Define colors based on Afrocentric design guidelines
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Green accent
     const Color accentColor = Color(0xFF008037); // Use green for consistency
     const Color googleBlue = Color(0xFF3B82F6); // Google blue
@@ -52,15 +54,14 @@ class AuthMethodSelectionScreen extends StatelessWidget {
           // Main content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 24),
 
                   // Header text - Bold Montserrat
                   Text(
-                    "Create Your Account",
+                    'Create Your Account',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
@@ -88,14 +89,14 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                   _buildAuthMethodButton(
                     context: context,
                     icon: Icons.phone_android,
-                    text: "Continue with Phone",
+                    text: 'Continue with Phone',
                     color: primaryColor,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => PhoneNumber(
-                              updatePhoneNumber: false, isSignIn: false),
+                              updatePhoneNumber: false,),
                         ),
                       );
                     },
@@ -107,7 +108,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                   _buildAuthMethodButton(
                     context: context,
                     icon: Icons.email_outlined,
-                    text: "Continue with Email",
+                    text: 'Continue with Email',
                     color: accentColor,
                     onTap: () {
                       Navigator.pushNamed(context, '/email_signup');
@@ -124,7 +125,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                         if (state is GoogleSignInSuccess) {
                           // Navigate to onboarding or home based on user status
                           Navigator.pushReplacementNamed(
-                              context, '/onboarding');
+                              context, '/onboarding',);
                         } else if (state is GoogleSignInFailure) {
                           CustomSnackbar.showSnackBarSimple(
                             state.error,
@@ -132,11 +133,10 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                           );
                         }
                       },
-                      builder: (context, state) {
-                        return _buildAuthMethodButton(
+                      builder: (context, state) => _buildAuthMethodButton(
                           context: context,
                           icon: Icons.g_mobiledata_rounded,
-                          text: "Continue with Google",
+                          text: 'Continue with Google',
                           color: googleBlue,
                           isLoading: state is GoogleSignInLoading,
                           onTap: () {
@@ -144,8 +144,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                               GoogleSignInRequested(),
                             );
                           },
-                        );
-                      },
+                        ),
                     ),
                   ),
 
@@ -155,12 +154,12 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     _buildAuthMethodButton(
                       context: context,
                       icon: Icons.apple,
-                      text: "Continue with Apple",
+                      text: 'Continue with Apple',
                       color: appleBlack,
                       onTap: () {
                         // Implement Apple Sign In
                         CustomSnackbar.showSnackBarSimple(
-                          "Apple Sign In will be implemented soon",
+                          'Apple Sign In will be implemented soon',
                           context,
                         );
                       },
@@ -174,7 +173,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Already have an account? ",
+                        'Already have an account? ',
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: textColor,
@@ -191,7 +190,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                           );
                         },
                         child: Text(
-                          "Sign in",
+                          'Sign in',
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -219,8 +218,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
     bool isLoading = false,
-  }) {
-    return Container(
+  }) => Container(
       width: double.infinity,
       height: 56, // 56dp height as specified
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -228,7 +226,7 @@ class AuthMethodSelectionScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16), // 16dp radius as specified
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFFF6E5)
+            color: Colors.white
                 .withValues(alpha: 0.5), // Soft cream shadow
             blurRadius: 8,
             offset: const Offset(0, 4),
@@ -273,5 +271,4 @@ class AuthMethodSelectionScreen extends StatelessWidget {
               ),
       ),
     );
-  }
 }

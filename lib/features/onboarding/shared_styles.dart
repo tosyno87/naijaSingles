@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../common/constants/app_colors.dart';
 
 /// Shared styling constants for the onboarding flow
 class OnboardingStyles {
-  // Colors
-  static const Color backgroundColor = Colors.white;
+  // Colors - using centralized AppColors
+  // Use AppColors.backgroundColor instead of local backgroundColor
   static const Color primaryColor = Color(0xFF27AE60);
   static const Color accentColor = Color(0xFFE57C23);
   static const Color textDarkColor = Color(0xFF3C2A21);
   static const Color textLightColor = Color(0xFF8B7E74);
 
   // Spacing
-  static const double standardPadding = 24.0;
-  static const double standardSpacing = 16.0;
-  static const double smallSpacing = 8.0;
-  static const double largeSpacing = 32.0;
+  static const double standardPadding = 24;
+  static const double standardSpacing = 16;
+  static const double smallSpacing = 8;
+  static const double largeSpacing = 32;
 
   // Text styles
   static TextStyle get headingStyle => GoogleFonts.montserrat(
@@ -43,8 +44,8 @@ class OnboardingStyles {
   // Decorations
   static BoxDecoration get inputDecoration => BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AppColors.border),
       );
 
   static BoxDecoration get selectedItemDecoration => BoxDecoration(
@@ -79,7 +80,7 @@ class OnboardingStyles {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: primaryColor),
+          borderSide: const BorderSide(color: primaryColor),
         ),
       );
 
@@ -87,8 +88,8 @@ class OnboardingStyles {
   static ButtonStyle get primaryButtonStyle => ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
         padding: const EdgeInsets.symmetric(
-          horizontal: 32.0,
-          vertical: 12.0,
+          horizontal: 32,
+          vertical: 12,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
@@ -106,8 +107,8 @@ class OnboardingStyles {
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(color: Colors.grey.shade300),
         ),
-        labelStyle: TextStyle(color: Colors.black87),
-        secondaryLabelStyle: TextStyle(color: primaryColor),
+        labelStyle: const TextStyle(color: Colors.black87),
+        secondaryLabelStyle: const TextStyle(color: primaryColor),
         brightness: Brightness.light,
       );
 }

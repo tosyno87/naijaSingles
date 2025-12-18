@@ -7,15 +7,12 @@ import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
 
 class DistanceWidget extends StatefulWidget {
+  const DistanceWidget({
+    required this.currentUser, required this.max, required this.changeValues, super.key,
+  });
   final UserModel currentUser;
   final Map<String, dynamic> changeValues;
   final double max;
-  const DistanceWidget({
-    super.key,
-    required this.currentUser,
-    required this.max,
-    required this.changeValues,
-  });
 
   @override
   State<DistanceWidget> createState() => _DistanceWidgetState();
@@ -27,23 +24,23 @@ class _DistanceWidgetState extends State<DistanceWidget> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(5.0),
+        padding: const EdgeInsets.all(5),
         child: ListTile(
           title: Text(
-            "Maximum distance".tr().toString(),
+            'Maximum distance'.tr().toString(),
             style: TextStyle(
                 fontSize: 18,
                 color: themeProvider.isDarkMode ? Colors.white : primaryColor,
-                fontWeight: FontWeight.w500),
+                fontWeight: FontWeight.w500,),
           ),
           trailing: Text(
-            "${(widget.currentUser.maxDistance! * 0.621371).round()} mi.",
+            '${(widget.currentUser.maxDistance! * 0.621371).round()} mi.',
             style: const TextStyle(fontSize: 16),
           ),
           subtitle: Slider(
               value: widget.currentUser.maxDistance!.toDouble(),
               inactiveColor: AppColors.secondaryColor,
-              min: 1.0,
+              min: 1,
               max: widget.max,
               activeColor:
                   themeProvider.isDarkMode ? Colors.white : primaryColor,
@@ -52,7 +49,7 @@ class _DistanceWidgetState extends State<DistanceWidget> {
                 setState(() {
                   widget.currentUser.maxDistance = val.round();
                 });
-              }),
+              },),
         ),
       ),
     );

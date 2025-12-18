@@ -3,38 +3,37 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share_plus/share_plus.dart';
-
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/text_button.dart';
-import 'package:naijasingles/features/home/ui/widgets/street_view_enable.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../../common/constants/colors.dart';
 import '../../../../../common/providers/street_view_provider.dart';
 import '../../../../../common/providers/theme_provider.dart';
+import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/change_language_widget.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
+import '../../../../../common/widgets/text_button.dart';
 import '../../../../../common/widgets/theme_change.dart';
+import '../../../../../models/user_model.dart';
 import '../../../bloc/searchuser_bloc.dart';
 import '../../widgets/age_range.dart';
 import '../../widgets/delete_account.dart';
 import '../../widgets/distance_widget.dart';
 import '../../widgets/logout_dialog.dart';
 import '../../widgets/show_me.dart';
+import '../../widgets/street_view_enable.dart';
 import '../../widgets/update_address.dart';
 import 'bloc/userfilter_bloc.dart';
 
 class SettingPage extends StatefulWidget {
-  final UserModel currentUser;
-  final bool isPurchased;
-  final Map items;
   const SettingPage(
       {required this.currentUser,
       required this.isPurchased,
       required this.items,
-      super.key});
+      super.key,});
+  final UserModel currentUser;
+  final bool isPurchased;
+  final Map items;
 
   @override
   SettingPageState createState() => SettingPageState();
@@ -46,7 +45,7 @@ class SettingPageState extends State<SettingPage> {
   Future<bool> _onWillPop(BuildContext context) async {
     final currentstate = BlocProvider.of<UserfilterBloc>(context).state;
     if (currentstate == UpdatingUserFilter()) {
-      log("coming under updating state");
+      log('coming under updating state');
       return false;
     }
 
@@ -55,22 +54,22 @@ class SettingPageState extends State<SettingPage> {
             barrierDismissible: false,
             context: context,
             builder: (context) => AlertDialog(
-              title: Text("Save Changes?".tr().toString()),
+              title: Text('Save Changes?'.tr().toString()),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true);
-                    log("change---$changeValues");
+                    log('change---$changeValues');
                   },
                   child: Text(
-                    "Close".tr().toString(),
-                    style: TextStyle(color: primaryColor),
+                    'Close'.tr().toString(),
+                    style: const TextStyle(color: primaryColor),
                   ),
                 ),
                 BlocBuilder<UserfilterBloc, UserfilterState>(
                   builder: (context, state) {
                     if (state is UpdatingUserFilter) {
-                      return CircularProgressIndicator(
+                      return const CircularProgressIndicator(
                         color: primaryColor,
                       );
                     }
@@ -78,14 +77,14 @@ class SettingPageState extends State<SettingPage> {
                       onPressed: () {
                         Navigator.of(context).pop(true);
 
-                        log("not empty changesvalue");
+                        log('not empty changesvalue');
                         BlocProvider.of<UserfilterBloc>(context)
                             .add(ChangefilterRequest(details: changeValues));
                         context.read<SearchUserBloc>().add(
-                            LoadUserEvent(currentUser: widget.currentUser));
+                            LoadUserEvent(currentUser: widget.currentUser),);
                       },
-                      child: Text("Save".tr().toString(),
-                          style: TextStyle(color: primaryColor)),
+                      child: Text('Save'.tr().toString(),
+                          style: const TextStyle(color: primaryColor),),
                     );
                   },
                 ),
@@ -105,10 +104,12 @@ class SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     freeR = widget.items['free_radius'] != null
-        ? (int.parse(widget.items['free_radius']) * 0.621371).round() // Convert km to miles
+        ? (int.parse(widget.items['free_radius']) * 0.621371)
+            .round() // Convert km to miles
         : 248; // 400km = 248 miles
     paidR = widget.items['paid_radius'] != null
-        ? (int.parse(widget.items['paid_radius']) * 0.621371).round() // Convert km to miles
+        ? (int.parse(widget.items['paid_radius']) * 0.621371)
+            .round() // Convert km to miles
         : 248; // 400km = 248 miles
     setState(() {
       if (!widget.isPurchased && widget.currentUser.maxDistance! > freeR) {
@@ -129,16 +130,16 @@ class SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     log(widget.currentUser.toString());
-    log("my phone number is ${widget.currentUser.phoneNumber.toString()}");
+    log('my phone number is ${widget.currentUser.phoneNumber.toString()}');
     return BlocListener<UserfilterBloc, UserfilterState>(
       listener: (context, state) {
         if (state is UserFilterUpdationFailed) {
           CustomSnackbar.showSnackBarSimple(
-              "Filter not applied..".tr().toString(), context);
+              'Filter not applied..'.tr().toString(), context,);
         } else if (state is UserFilterUpdated) {
           CustomSnackbar.showSnackBarSimple(
-              "Changes saved.".tr().toString(), context);
-          log("filter succesfully applied ....".tr().toString());
+              'Changes saved.'.tr().toString(), context,);
+          log('filter succesfully applied ....'.tr().toString());
 
           changeValues.clear();
         }
@@ -160,10 +161,9 @@ class SettingPageState extends State<SettingPage> {
           appBar: AppBar(
               centerTitle: false,
               title: Text(
-                "Settings".tr().toString(),
+                'Settings'.tr().toString(),
                 style: const TextStyle(color: Colors.white),
               ),
-              automaticallyImplyLeading: true,
               actions: [
                 IconButton(
                   icon: const Icon(Icons.logout_outlined),
@@ -173,57 +173,57 @@ class SettingPageState extends State<SettingPage> {
                 ),
               ],
               elevation: 0,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor),
-          body: Container(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,),
+          body: DecoratedBox(
             decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20)),
-                color: Theme.of(context).primaryColor),
+                    topRight: Radius.circular(20),),
+                color: Theme.of(context).primaryColor,),
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  topLeft: Radius.circular(20), topRight: Radius.circular(20),),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: const EdgeInsets.all(15),
                       child: Text(
-                        "Account settings".tr().toString(),
+                        'Account settings'.tr().toString(),
                         style: TextStyle(
                             color: themeProvider.isDarkMode
                                 ? Colors.white
                                 : primaryColor,
                             fontSize: 18,
-                            fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w500,),
                       ),
                     ),
 
                     ListTile(
                       title: Card(
                           child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.all(15),
                         child: InkWell(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text("Phone Number".tr().toString()),
+                              Text('Phone Number'.tr().toString()),
                               Padding(
                                 padding: const EdgeInsets.only(
                                   left: 20,
                                 ),
                                 child: Text(
                                   widget.currentUser.phoneNumber!.isNotEmpty
-                                      ? "${widget.currentUser.phoneNumber}"
-                                      : "Add phone Number".tr().toString(),
-                                  style: TextStyle(
+                                      ? '${widget.currentUser.phoneNumber}'
+                                      : 'Add phone Number'.tr().toString(),
+                                  style: const TextStyle(
                                       color: AppColors.secondaryColor,
-                                      fontWeight: FontWeight.w400),
+                                      fontWeight: FontWeight.w400,),
                                 ),
                               ),
-                              Icon(
+                              const Icon(
                                 Icons.arrow_forward_ios,
                                 color: primaryColor,
                                 size: 15,
@@ -233,25 +233,25 @@ class SettingPageState extends State<SettingPage> {
                           onTap: () {
                             Navigator.pushNamed(
                                 context, RouteName.updatePhoneScreen,
-                                arguments: widget.currentUser);
+                                arguments: widget.currentUser,);
                           },
                         ),
-                      )),
+                      ),),
                       subtitle: Text(
-                          "Verify a phone number to secure your account"
+                          'Verify a phone number to secure your account'
                               .tr()
-                              .toString()),
+                              .toString(),),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: const EdgeInsets.all(15),
                       child: Text(
-                        "Discovery settings".tr().toString(),
+                        'Discovery settings'.tr().toString(),
                         style: TextStyle(
                             color: themeProvider.isDarkMode
                                 ? Colors.white
                                 : primaryColor,
                             fontSize: 18,
-                            fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.w500,),
                       ),
                     ),
                     Padding(
@@ -260,57 +260,55 @@ class SettingPageState extends State<SettingPage> {
                           currentUser: widget.currentUser,
                           hasSubscription: widget.isPurchased,
                           items: widget.items,
-                        )),
+                        ),),
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 15,
                       ),
                       child: Text(
-                        "Change your location to see members in other city"
+                        'Change your location to see members in other city'
                             .tr()
                             .toString(),
                         style: TextStyle(
                             color: themeProvider.isDarkMode
                                 ? AppColors.secondaryColor
-                                : Colors.black54),
+                                : Colors.black54,),
                       ),
                     ),
                     Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.all(15),
                         child: ShowmeWidget(
                           currentUser: widget.currentUser,
                           changeValues: changeValues,
-                        )),
+                        ),),
                     Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.all(15),
                         child: DistanceWidget(
                           changeValues: changeValues,
                           currentUser: widget.currentUser,
                           max: widget.isPurchased
                               ? paidR.toDouble()
                               : freeR.toDouble(),
-                        )),
+                        ),),
                     Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.all(15),
                         child: AgeRangeWidget(
                           currentUser: widget.currentUser,
                           changeValues: changeValues,
-                        )),
+                        ),),
                     // remove notification should be used here already made notification widget
 
                     const LanguageWidget(),
 
                     // for streetview setting of users
                     ChangeNotifierProvider(
-                        create: (context) {
-                          return StreetViewProvider(widget.currentUser.id!);
-                        },
+                        create: (context) => StreetViewProvider(widget.currentUser.id!),
                         child: StreetViewButtonWigdet(
-                            currentUser: widget.currentUser)),
+                            currentUser: widget.currentUser,),),
                     // for theme change and set labelLarge
                     const ChangeThemeButtonWidget(),
                     TextButtonWidget(
-                      text: "Invite your friends",
+                      text: 'Invite your friends',
                       onTap: () async {
                         await Share.share(
                           'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
@@ -320,30 +318,30 @@ class SettingPageState extends State<SettingPage> {
                     ),
 
                     TextButtonWidget(
-                      text: "Logout",
+                      text: 'Logout',
                       onTap: () async {
                         showLogoutDialog(context);
                       },
                       icon: Icons.logout_outlined,
                     ),
                     Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.all(20),
                         child: Center(
                           child: SizedBox(
                               height: 50,
                               width: 100,
                               child: Image.asset(
-                                "asset/hookup4u-Logo-BP.png",
+                                'asset/hookup4u-Logo-BP.png',
                                 fit: BoxFit.contain,
                                 color: themeProvider.isDarkMode
                                     ? Colors.white
                                     : primaryColor,
-                              )),
-                        )),
+                              ),),
+                        ),),
                     const DeleteAccountWidget(),
                     const SizedBox(
                       height: 80,
-                    )
+                    ),
                   ],
                 ),
               ),

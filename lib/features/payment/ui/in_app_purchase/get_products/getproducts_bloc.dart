@@ -9,7 +9,6 @@ import 'getproducts_states.dart';
 
 class GetInAppProductsBloc
     extends Bloc<GetInAppProductsEvents, GetInAppProductsStates> {
-  final inAppPurchaseRepository = InAppPurchaseRepoImpl();
   GetInAppProductsBloc() : super(GetInAppProductsInitialState()) {
     on<RequestInAppProducts>((event, emit) async {
       emit(GetInAppProductsLoadingState());
@@ -24,4 +23,5 @@ class GetInAppProductsBloc
       }
     });
   }
+  final inAppPurchaseRepository = InAppPurchaseRepoImpl();
 }

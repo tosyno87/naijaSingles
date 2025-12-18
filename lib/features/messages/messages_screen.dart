@@ -1,19 +1,20 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer';
 
-import 'services/chat_service.dart';
-import 'message_model.dart';
-import 'chat_thread_screen.dart';
-import '../explore/explore_screen.dart'; // Import ExploreScreen directly
-import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
 import '../../models/user_model.dart'; // Import UserModel
+import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
+import '../explore/explore_screen.dart'; // Import ExploreScreen directly
+import 'chat_thread_screen.dart';
+import 'message_model.dart';
+import 'services/chat_service.dart';
 
 class MessagesScreen extends StatefulWidget {
-  const MessagesScreen({Key? key}) : super(key: key);
+  const MessagesScreen({super.key});
 
   @override
   State<MessagesScreen> createState() => _MessagesScreenState();
@@ -35,8 +36,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   static final Color textLight = Colors.grey.shade600;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -52,7 +52,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         ),
         centerTitle: true,
-
       ),
       body: StreamBuilder<List<MessageThreadInfo>>(
         stream: _getChatThreadsStreamWithUserData(),
@@ -76,7 +75,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         },
       ),
     );
-  }
 
   // Enhanced stream that includes user data (with fallback for missing index)
   Stream<List<MessageThreadInfo>> _getChatThreadsStreamWithUserData() {
@@ -92,7 +90,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         .where('userIds', arrayContains: currentUserId)
         .snapshots()
         .asyncMap((snapshot) async {
-      List<MessageThreadInfo> threads = [];
+      final List<MessageThreadInfo> threads = [];
 
       for (var doc in snapshot.docs) {
         try {
@@ -114,7 +112,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           String? avatarUrl;
 
           if (otherUserDoc.exists) {
-            final userData = otherUserDoc.data() as Map<String, dynamic>?;
+            final userData = otherUserDoc.data();
             otherUserName = userData?['name'] ?? 'User';
 
             // Get first photo as avatar
@@ -138,7 +136,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
             unread: unread,
             avatarUrl: avatarUrl,
-          ));
+          ),);
         } catch (e) {
           log('Error processing thread: $e');
           continue;
@@ -155,12 +153,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
     });
   }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             color: primaryColor,
             strokeWidth: 3,
           ),
@@ -175,12 +172,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildErrorState(String error) {
-    return Center(
+  Widget _buildErrorState(String error) => Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -233,12 +228,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -248,7 +241,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.chat_bubble_outline,
                 size: 64,
                 color: primaryColor,
@@ -306,10 +299,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildMessagesList(List<MessageThreadInfo> threads) {
-    return ListView.separated(
+  Widget _buildMessagesList(List<MessageThreadInfo> threads) => ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: threads.length,
       separatorBuilder: (context, index) => const SizedBox(height: 4),
@@ -318,10 +309,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         return _buildMessageThreadItem(thread);
       },
     );
-  }
 
-  Widget _buildMessageThreadItem(MessageThreadInfo thread) {
-    return Dismissible(
+  Widget _buildMessageThreadItem(MessageThreadInfo thread) => Dismissible(
       key: Key(thread.threadId),
       direction: DismissDirection.endToStart,
       background: Container(
@@ -338,9 +327,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           size: 24,
         ),
       ),
-      confirmDismiss: (direction) async {
-        return await _showDeleteConfirmation(thread);
-      },
+      confirmDismiss: (direction) async => _showDeleteConfirmation(thread),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
         decoration: BoxDecoration(
@@ -355,7 +342,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ],
           border: thread.unread
               ? Border.all(
-                  color: primaryColor.withValues(alpha: 0.3), width: 1.5)
+                  color: primaryColor.withValues(alpha: 0.3), width: 1.5,)
               : null,
         ),
         child: Material(
@@ -417,7 +404,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.visibility,
                             color: Colors.white,
                             size: 12,
@@ -515,7 +502,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-  }
 
   void _openChatThread(MessageThreadInfo thread) {
     // Mark as read when tapped
@@ -535,12 +521,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
     );
   }
 
-
-
   // Show delete confirmation dialog
   Future<bool?> _showDeleteConfirmation(MessageThreadInfo thread) async {
     if (!mounted) return false;
-    
+
     return showDialog<bool>(
       context: context,
       barrierDismissible: false, // Prevent dismissing by tapping outside
@@ -558,7 +542,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 color: errorColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.delete_outline,
                 color: errorColor,
                 size: 30,
@@ -596,12 +580,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: errorColor.withOpacity(0.2),
-                  width: 1,
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.warning_amber_rounded,
                     color: errorColor,
                     size: 20,
@@ -689,7 +672,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   // Delete chat thread with loading indicator
   Future<void> _deleteChatThread(MessageThreadInfo thread) async {
     if (!mounted) return;
-    
+
     // Show MVP compliant loading indicator
     showDialog(
       context: context,
@@ -709,7 +692,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 color: primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Center(
+              child: const Center(
                 child: SizedBox(
                   width: 40,
                   height: 40,
@@ -757,35 +740,35 @@ class _MessagesScreenState extends State<MessagesScreen> {
         // Show success message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Conversation deleted and users unmatched',
-              style: GoogleFonts.montserrat(color: Colors.white),
+            SnackBar(
+              content: Text(
+                'Conversation deleted and users unmatched',
+                style: GoogleFonts.montserrat(color: Colors.white),
+              ),
+              backgroundColor: successColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            backgroundColor: successColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+          );
         }
       } else {
         // Show error message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to delete conversation',
-              style: GoogleFonts.montserrat(color: Colors.white),
+            SnackBar(
+              content: Text(
+                'Failed to delete conversation',
+                style: GoogleFonts.montserrat(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+          );
         }
       }
     } catch (e) {
@@ -797,18 +780,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       // Show error message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Error deleting conversation',
-            style: GoogleFonts.montserrat(color: Colors.white),
+          SnackBar(
+            content: Text(
+              'Error deleting conversation',
+              style: GoogleFonts.montserrat(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      );
+        );
       }
     }
   }
@@ -816,7 +799,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   // Method to view user profile from messages
   Future<void> _viewUserProfile(String userId) async {
     if (!mounted) return;
-    
+
     try {
       // Show MVP compliant loading indicator
       showDialog(
@@ -824,7 +807,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         barrierDismissible: false,
         builder: (context) => AlertDialog(
           backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 8,
           contentPadding: const EdgeInsets.all(32),
           content: Column(
@@ -837,7 +821,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   color: primaryColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Center(
+                child: const Center(
                   child: SizedBox(
                     width: 40,
                     height: 40,
@@ -890,7 +874,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           name: userData['name'] ?? 'Unknown User',
           age: userData['age'] ?? 0,
           imageUrl: List<String>.from(
-              userData['photos'] ?? userData['imageUrl'] ?? []),
+              userData['photos'] ?? userData['imageUrl'] ?? [],),
           address: userData['locationName'] ?? userData['address'],
           distanceBW: userData['distanceBW'],
           editInfo: userData['editInfo'] ?? {},
@@ -909,7 +893,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           SnackBar(
             content: Text(
               'User profile not found',
-              style: GoogleFonts.poppins(color: Colors.white),
+              style: GoogleFonts.montserrat(color: Colors.white),
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
@@ -930,7 +914,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         SnackBar(
           content: Text(
             'Failed to load profile',
-            style: GoogleFonts.poppins(color: Colors.white),
+            style: GoogleFonts.montserrat(color: Colors.white),
           ),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,

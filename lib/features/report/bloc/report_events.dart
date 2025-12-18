@@ -8,10 +8,6 @@ abstract class ReportEvents extends Equatable {
 }
 
 class ReportUserRequest extends ReportEvents {
-  final String reported;
-  final String reportedBy;
-  final String reason;
-  final String? moreReason;
 
   const ReportUserRequest({
     required this.moreReason,
@@ -19,6 +15,10 @@ class ReportUserRequest extends ReportEvents {
     required this.reportedBy,
     required this.reason,
   });
+  final String reported;
+  final String reportedBy;
+  final String reason;
+  final String? moreReason;
 
   @override
   List<Object> get props =>

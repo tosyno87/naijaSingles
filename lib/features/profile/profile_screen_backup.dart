@@ -9,7 +9,7 @@ import 'privacy_settings_screen.dart';
 import 'settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -22,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
   int _currentPhotoIndex = 0; // Track current photo for indicators
-  PageController _photoPageController =
+  final PageController _photoPageController =
       PageController(); // Control photo swiping
 
   // Afrocentric color scheme
@@ -57,7 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Name: ${data?['name']}');
           print('   Interests: ${data?['interests']}');
           print(
-              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}');
+              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}',);
           print('   Looking for: ${data?['lookingFor']}');
           print('   Bio length: ${(data?['bio'] ?? '').length} characters');
 
@@ -80,8 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
@@ -89,7 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: false, // Hide back button on main screen
         title: Text(
           'Profile',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: textPrimary,
@@ -143,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: primaryColor.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.event,
                           color: primaryColor,
                           size: 20,
@@ -153,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Expanded(
                         child: Text(
                           'Events',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: textPrimary,
@@ -178,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: primaryColor.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.privacy_tip_outlined,
                           color: primaryColor,
                           size: 20,
@@ -192,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Text(
                               'Privacy Settings',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: textPrimary,
@@ -200,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             Text(
                               'Control who can see your profile',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 color: textSecondary,
                               ),
@@ -240,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Text(
                               'Settings & Account',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: textPrimary,
@@ -248,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             Text(
                               'Manage your account settings',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 color: textSecondary,
                               ),
@@ -268,7 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? const Center(child: CircularProgressIndicator(color: primaryColor))
           : SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     // Profile Photos Section
@@ -305,7 +304,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
     );
-  }
 
   Widget _buildPhotoSection() {
     final photos = _userData?['photos'] as List<dynamic>? ?? [];
@@ -317,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: [
         // Main photo viewer with swipe
-        Container(
+        SizedBox(
           height: 400, // Increased height for better photo display
           child: Stack(
             children: [
@@ -330,8 +328,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _currentPhotoIndex = index;
                   });
                 },
-                itemBuilder: (context, index) {
-                  return GestureDetector(
+                itemBuilder: (context, index) => GestureDetector(
                     onTap: () => _showFullScreenPhoto(photos, index),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -353,8 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Image.network(
                               photos[index],
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                              errorBuilder: (context, error, stackTrace) => ColoredBox(
                                   color: Colors.grey.shade200,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -367,19 +363,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       const SizedBox(height: 8),
                                       Text(
                                         'Photo unavailable',
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.montserrat(
                                           color: Colors.grey.shade600,
                                           fontSize: 14,
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-                              },
+                                ),
                               loadingBuilder:
                                   (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
-                                return Container(
+                                return ColoredBox(
                                   color: Colors.grey.shade100,
                                   child: Center(
                                     child: CircularProgressIndicator(
@@ -412,7 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     end: Alignment.topCenter,
                                     colors: [
                                       Colors.black.withOpacity(
-                                          0.8), // Increased opacity
+                                          0.8,), // Increased opacity
                                       Colors.black.withOpacity(0.4),
                                       Colors.transparent,
                                     ],
@@ -427,19 +422,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               right: 16,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 8),
+                                    horizontal: 12, vertical: 8,),
                                 decoration: BoxDecoration(
                                   color: Colors.black
                                       .withOpacity(0.8), // Increased opacity
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: Colors.white.withOpacity(0.2),
-                                    width: 1,
                                   ),
                                 ),
                                 child: Text(
                                   '${index + 1} of ${photos.length}',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.montserrat(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight:
@@ -468,7 +462,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: Colors.white.withOpacity(0.3),
-                                    width: 1,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
@@ -478,7 +471,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ],
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.fullscreen,
                                   color: Colors.white,
                                   size: 18,
@@ -489,8 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
               ),
 
               // Enhanced Left/Right navigation arrows with better visibility
@@ -516,7 +508,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -526,7 +517,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.chevron_left,
                           color: Colors.white,
                           size: 24,
@@ -556,7 +547,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white.withOpacity(0.3),
-                            width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -566,7 +556,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.chevron_right,
                           color: Colors.white,
                           size: 24,
@@ -606,7 +596,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         // Photo grid view (thumbnail strip)
         if (photos.length > 1)
-          Container(
+          SizedBox(
             height: 80,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -643,16 +633,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Image.network(
                         photos[index],
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
+                        errorBuilder: (context, error, stackTrace) => ColoredBox(
                             color: Colors.grey.shade300,
                             child: Icon(
                               Icons.broken_image,
                               color: Colors.grey.shade500,
                               size: 20,
                             ),
-                          );
-                        },
+                          ),
                       ),
                     ),
                   ),
@@ -676,8 +664,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildEmptyPhotoPlaceholder() {
-    return Container(
+  Widget _buildEmptyPhotoPlaceholder() => DecoratedBox(
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -694,7 +681,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 8),
           Text(
             'Add Photos',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               color: textSecondary,
               fontSize: 16,
             ),
@@ -702,7 +689,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildBasicInfoCard() {
     final name = _userData?['name'] ?? 'Your Name';
@@ -724,7 +710,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: Text(
                     name,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: textPrimary,
@@ -767,7 +753,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               'About Me',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: textPrimary,
@@ -776,7 +762,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 12),
             Text(
               bio.isEmpty ? 'Tell others about yourself...' : bio,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: bio.isEmpty ? textSecondary : textPrimary,
                 height: 1.5,
@@ -802,7 +788,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.favorite_outline,
                   color: primaryColor,
                   size: 24,
@@ -810,7 +796,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 12),
                 Text(
                   'Interests',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                     color: textPrimary,
@@ -822,7 +808,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (interests.isEmpty)
               Text(
                 'No interests added yet',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: textSecondary,
                   fontStyle: FontStyle.italic,
@@ -832,26 +818,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: interests.map((interest) {
-                  return Container(
+                children: interests.map((interest) => Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: primaryColor.withValues(alpha: 0.3)),
+                          color: primaryColor.withValues(alpha: 0.3),),
                     ),
                     child: Text(
                       interest.toString(),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: primaryColor,
                       ),
                     ),
-                  );
-                }).toList(),
+                  ),).toList(),
               ),
           ],
         ),
@@ -894,7 +878,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline,
                   color: primaryColor,
                   size: 24,
@@ -902,7 +886,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 12),
                 Text(
                   'Details',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                     color: textPrimary,
@@ -948,7 +932,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Dating preferences
             Text(
               'Dating Preferences',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: textPrimary,
@@ -963,7 +947,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (ageRange.length == 2) ...[
               const SizedBox(height: 12),
               _buildDetailRow(
-                  'Age preference', '${ageRange[0]} - ${ageRange[1]} years'),
+                  'Age preference', '${ageRange[0]} - ${ageRange[1]} years',),
             ],
           ],
         ),
@@ -971,15 +955,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Row(
+  Widget _buildDetailRow(String label, String value) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           width: 120,
           child: Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textSecondary,
               fontWeight: FontWeight.w500,
@@ -989,7 +972,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Expanded(
           child: Text(
             value,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textPrimary,
             ),
@@ -997,10 +980,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildInfoChip({required IconData icon, required String label}) {
-    return Container(
+  Widget _buildInfoChip({required IconData icon, required String label}) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: primaryColor.withValues(alpha: 0.1),
@@ -1017,7 +998,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(width: 6),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 12,
               color: primaryColor,
               fontWeight: FontWeight.w500,
@@ -1026,10 +1007,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildProfileActionButtons() {
-    return SizedBox(
+  Widget _buildProfileActionButtons() => SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
@@ -1057,11 +1036,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.edit_outlined, size: 20),
+            const Icon(Icons.edit_outlined, size: 20),
             const SizedBox(width: 12),
             Text(
               'Edit Profile',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -1070,7 +1049,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
 
   int? _calculateAge(String? dobString) {
     if (dobString == null) return null;
@@ -1092,13 +1070,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 // Full-screen photo viewer widget
 class _FullScreenPhotoViewer extends StatefulWidget {
-  final List<dynamic> photos;
-  final int initialIndex;
 
   const _FullScreenPhotoViewer({
     required this.photos,
     required this.initialIndex,
   });
+  final List<dynamic> photos;
+  final int initialIndex;
 
   @override
   State<_FullScreenPhotoViewer> createState() => _FullScreenPhotoViewerState();
@@ -1122,8 +1100,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -1131,7 +1108,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           '${_currentIndex + 1} of ${widget.photos.length}',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -1150,16 +1127,14 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                 _currentIndex = index;
               });
             },
-            itemBuilder: (context, index) {
-              return InteractiveViewer(
+            itemBuilder: (context, index) => InteractiveViewer(
                 minScale: 0.5,
-                maxScale: 3.0,
+                maxScale: 3,
                 child: Center(
                   child: Image.network(
                     widget.photos[index],
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
+                    errorBuilder: (context, error, stackTrace) => ColoredBox(
                         color: Colors.grey.shade800,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1172,15 +1147,14 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                             const SizedBox(height: 16),
                             Text(
                               'Photo unavailable',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 color: Colors.grey.shade400,
                                 fontSize: 16,
                               ),
                             ),
                           ],
                         ),
-                      );
-                    },
+                      ),
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Center(
@@ -1195,8 +1169,7 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                     },
                   ),
                 ),
-              );
-            },
+              ),
           ),
 
           // Photo indicators at bottom
@@ -1226,5 +1199,4 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
         ],
       ),
     );
-  }
 }

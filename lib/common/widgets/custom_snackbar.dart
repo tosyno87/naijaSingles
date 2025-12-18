@@ -23,7 +23,7 @@ class CustomSnackbar {
   //   ));
   // }
 
-  static showSnackBarSimple(String msg, BuildContext context) {
+  static void showSnackBarSimple(String msg, BuildContext context) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -33,10 +33,10 @@ class CustomSnackbar {
             behavior: SnackBarBehavior.floating,
             content: Text(
               msg,
-              style: const TextStyle(color: Colors.white, fontFamily: "Gellix"),
+              style: const TextStyle(color: Colors.white, fontFamily: 'Gellix'),
             ),
             action: SnackBarAction(
-              label: "DISMISS",
+              label: 'DISMISS',
               onPressed: () {
                 try {
                   ScaffoldMessenger.of(context).clearSnackBars();
@@ -44,7 +44,7 @@ class CustomSnackbar {
                   rethrow;
                 }
               },
-            )),
+            ),),
       );
   }
 

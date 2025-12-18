@@ -2,14 +2,12 @@ import 'notification_model.dart';
 
 /// Service class to handle notifications
 class NotificationService {
-  // Singleton instance
-  static final NotificationService _instance = NotificationService._internal();
 
-  factory NotificationService() {
-    return _instance;
-  }
+  factory NotificationService() => _instance;
 
   NotificationService._internal();
+  // Singleton instance
+  static final NotificationService _instance = NotificationService._internal();
 
   // In-memory storage for notifications
   final List<AppNotification> _notifications = [];
@@ -26,9 +24,7 @@ class NotificationService {
   }
 
   /// Get unread notifications count
-  int getUnreadCount() {
-    return _notifications.where((notification) => !notification.isRead).length;
-  }
+  int getUnreadCount() => _notifications.where((notification) => !notification.isRead).length;
 
   /// Mark a notification as read
   void markAsRead(String id) {

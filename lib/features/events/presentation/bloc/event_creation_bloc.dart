@@ -14,64 +14,64 @@ abstract class EventCreationEvent extends Equatable {
 }
 
 class CreateEventEvent extends EventCreationEvent {
-  final EventCreationData eventData;
 
   const CreateEventEvent(this.eventData);
+  final EventCreationData eventData;
 
   @override
   List<Object?> get props => [eventData];
 }
 
 class UpdateEventEvent extends EventCreationEvent {
-  final String eventId;
-  final EventCreationData eventData;
 
   const UpdateEventEvent(this.eventId, this.eventData);
+  final String eventId;
+  final EventCreationData eventData;
 
   @override
   List<Object?> get props => [eventId, eventData];
 }
 
 class SaveEventAsDraftEvent extends EventCreationEvent {
-  final EventCreationData eventData;
 
   const SaveEventAsDraftEvent(this.eventData);
+  final EventCreationData eventData;
 
   @override
   List<Object?> get props => [eventData];
 }
 
 class PublishDraftEventEvent extends EventCreationEvent {
-  final String eventId;
 
   const PublishDraftEventEvent(this.eventId);
+  final String eventId;
 
   @override
   List<Object?> get props => [eventId];
 }
 
 class DeleteEventEvent extends EventCreationEvent {
-  final String eventId;
 
   const DeleteEventEvent(this.eventId);
+  final String eventId;
 
   @override
   List<Object?> get props => [eventId];
 }
 
 class LoadUserEventsEvent extends EventCreationEvent {
-  final String userId;
 
   const LoadUserEventsEvent(this.userId);
+  final String userId;
 
   @override
   List<Object?> get props => [userId];
 }
 
 class ValidateEventDataEvent extends EventCreationEvent {
-  final EventCreationData eventData;
 
   const ValidateEventDataEvent(this.eventData);
+  final EventCreationData eventData;
 
   @override
   List<Object?> get props => [eventData];
@@ -90,40 +90,40 @@ class EventCreationInitial extends EventCreationState {}
 class EventCreationLoading extends EventCreationState {}
 
 class EventCreationSuccess extends EventCreationState {
-  final String eventId;
-  final String message;
 
   const EventCreationSuccess(this.eventId, this.message);
+  final String eventId;
+  final String message;
 
   @override
   List<Object?> get props => [eventId, message];
 }
 
 class EventCreationError extends EventCreationState {
-  final String message;
-  final String? errorCode;
 
   const EventCreationError(this.message, {this.errorCode});
+  final String message;
+  final String? errorCode;
 
   @override
   List<Object?> get props => [message, errorCode];
 }
 
 class EventValidationState extends EventCreationState {
-  final bool isValid;
-  final List<String> errors;
 
   const EventValidationState(this.isValid, this.errors);
+  final bool isValid;
+  final List<String> errors;
 
   @override
   List<Object?> get props => [isValid, errors];
 }
 
 class UserEventsLoaded extends EventCreationState {
-  final List<EnhancedEventModel> events;
-  final List<EnhancedEventModel> drafts;
 
   const UserEventsLoaded(this.events, this.drafts);
+  final List<EnhancedEventModel> events;
+  final List<EnhancedEventModel> drafts;
 
   @override
   List<Object?> get props => [events, drafts];
@@ -132,36 +132,36 @@ class UserEventsLoaded extends EventCreationState {
 class UserEventsLoading extends EventCreationState {}
 
 class UserEventsError extends EventCreationState {
-  final String message;
 
   const UserEventsError(this.message);
+  final String message;
 
   @override
   List<Object?> get props => [message];
 }
 
 class EventDraftSaved extends EventCreationState {
-  final String eventId;
 
   const EventDraftSaved(this.eventId);
+  final String eventId;
 
   @override
   List<Object?> get props => [eventId];
 }
 
 class EventPublished extends EventCreationState {
-  final String eventId;
 
   const EventPublished(this.eventId);
+  final String eventId;
 
   @override
   List<Object?> get props => [eventId];
 }
 
 class EventDeleted extends EventCreationState {
-  final String eventId;
 
   const EventDeleted(this.eventId);
+  final String eventId;
 
   @override
   List<Object?> get props => [eventId];
@@ -169,7 +169,6 @@ class EventDeleted extends EventCreationState {
 
 // BLoC
 class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
-  final UserEventService _userEventService;
 
   EventCreationBloc({
     required UserEventService userEventService,
@@ -183,6 +182,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
     on<LoadUserEventsEvent>(_onLoadUserEvents);
     on<ValidateEventDataEvent>(_onValidateEventData);
   }
+  final UserEventService _userEventService;
 
   Future<void> _onCreateEvent(
     CreateEventEvent event,
@@ -197,16 +197,16 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
         emit(EventCreationError(
           'Please fix the following errors:\n${validationErrors.join('\n')}',
           errorCode: 'VALIDATION_ERROR',
-        ));
+        ),);
         return;
       }
 
       final eventId = await _userEventService.createEvent(event.eventData);
-      
+
       emit(EventCreationSuccess(
         eventId,
         'Event created and published successfully! It\'s now live and visible to other users.',
-      ));
+      ),);
 
       log('Event created successfully: $eventId', name: 'EventCreationBloc');
     } catch (e) {
@@ -214,7 +214,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(EventCreationError(
         _getErrorMessage(e),
         errorCode: _getErrorCode(e),
-      ));
+      ),);
     }
   }
 
@@ -231,24 +231,25 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
         emit(EventCreationError(
           'Please fix the following errors:\n${validationErrors.join('\n')}',
           errorCode: 'VALIDATION_ERROR',
-        ));
+        ),);
         return;
       }
 
       await _userEventService.updateEvent(event.eventId, event.eventData);
-      
+
       emit(EventCreationSuccess(
         event.eventId,
         'Event updated successfully! It will be reviewed before changes are published.',
-      ));
+      ),);
 
-      log('Event updated successfully: ${event.eventId}', name: 'EventCreationBloc');
+      log('Event updated successfully: ${event.eventId}',
+          name: 'EventCreationBloc',);
     } catch (e) {
       log('Error updating event: $e', name: 'EventCreationBloc');
       emit(EventCreationError(
         _getErrorMessage(e),
         errorCode: _getErrorCode(e),
-      ));
+      ),);
     }
   }
 
@@ -260,7 +261,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
 
     try {
       final eventId = await _userEventService.saveEventAsDraft(event.eventData);
-      
+
       emit(EventDraftSaved(eventId));
 
       log('Event draft saved: $eventId', name: 'EventCreationBloc');
@@ -269,7 +270,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(EventCreationError(
         _getErrorMessage(e),
         errorCode: _getErrorCode(e),
-      ));
+      ),);
     }
   }
 
@@ -281,7 +282,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
 
     try {
       await _userEventService.publishDraftEvent(event.eventId);
-      
+
       emit(EventPublished(event.eventId));
 
       log('Draft event published: ${event.eventId}', name: 'EventCreationBloc');
@@ -290,7 +291,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(EventCreationError(
         _getErrorMessage(e),
         errorCode: _getErrorCode(e),
-      ));
+      ),);
     }
   }
 
@@ -302,7 +303,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
 
     try {
       await _userEventService.deleteEvent(event.eventId);
-      
+
       emit(EventDeleted(event.eventId));
 
       log('Event deleted: ${event.eventId}', name: 'EventCreationBloc');
@@ -311,7 +312,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       emit(EventCreationError(
         _getErrorMessage(e),
         errorCode: _getErrorCode(e),
-      ));
+      ),);
     }
   }
 
@@ -323,16 +324,18 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
 
     try {
       final events = await _userEventService.getUserEvents(event.userId);
-      
+
       // Separate published events from drafts
-      final publishedEvents = events.where((e) => 
-        e.status == EventStatus.published || 
-        e.status == EventStatus.underReview ||
-        e.status == EventStatus.completed
-      ).toList();
-      
-      final drafts = events.where((e) => e.status == EventStatus.draft).toList();
-      
+      final publishedEvents = events
+          .where((e) =>
+              e.status == EventStatus.published ||
+              e.status == EventStatus.underReview ||
+              e.status == EventStatus.completed,)
+          .toList();
+
+      final drafts =
+          events.where((e) => e.status == EventStatus.draft).toList();
+
       emit(UserEventsLoaded(publishedEvents, drafts));
 
       log('Loaded ${events.length} user events', name: 'EventCreationBloc');
@@ -373,16 +376,18 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
     // Date validation
     if (data.startDate == null) {
       errors.add('Start date is required');
-    } else if (data.startDate!.isBefore(DateTime.now().add(Duration(hours: 1)))) {
+    } else if (data.startDate!
+        .isBefore(DateTime.now().add(const Duration(hours: 1)))) {
       errors.add('Event must start at least 1 hour from now');
     }
 
     if (data.endDate == null) {
       errors.add('End date is required');
-    } else if (data.startDate != null && data.endDate!.isBefore(data.startDate!)) {
+    } else if (data.startDate != null &&
+        data.endDate!.isBefore(data.startDate!)) {
       errors.add('End date must be after start date');
-    } else if (data.startDate != null && 
-               data.endDate!.difference(data.startDate!).inHours > 168) {
+    } else if (data.startDate != null &&
+        data.endDate!.difference(data.startDate!).inHours > 168) {
       errors.add('Event duration cannot exceed 7 days');
     }
 
@@ -434,13 +439,13 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
     return errors;
   }
 
-  String _getErrorMessage(dynamic error) {
+  String _getErrorMessage(error) {
     if (error is UserEventException) {
       return error.message;
     }
-    
+
     final errorString = error.toString();
-    
+
     // Common Firebase errors
     if (errorString.contains('permission-denied')) {
       return 'You do not have permission to perform this action';
@@ -451,19 +456,19 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
     } else if (errorString.contains('unauthenticated')) {
       return 'Please sign in to create events';
     }
-    
+
     return 'An unexpected error occurred. Please try again';
   }
 
-  String? _getErrorCode(dynamic error) {
+  String? _getErrorCode(error) {
     if (error is EventValidationException) {
       return 'VALIDATION_ERROR';
     } else if (error is EventPermissionException) {
       return 'PERMISSION_ERROR';
     }
-    
+
     final errorString = error.toString();
-    
+
     if (errorString.contains('permission-denied')) {
       return 'PERMISSION_DENIED';
     } else if (errorString.contains('network-request-failed')) {
@@ -471,7 +476,7 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
     } else if (errorString.contains('unauthenticated')) {
       return 'AUTH_ERROR';
     }
-    
+
     return null;
   }
 }

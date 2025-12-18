@@ -8,13 +8,15 @@ import '../../common/providers/user_provider.dart';
 import '../../services/settings_service.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
-  const NotificationSettingsScreen({Key? key}) : super(key: key);
+  const NotificationSettingsScreen({super.key});
 
   @override
-  State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
+  State<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
 }
 
-class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
+class _NotificationSettingsScreenState
+    extends State<NotificationSettingsScreen> {
   NotificationSettings? _settings;
   bool _isLoading = true;
   bool _isSaving = false;
@@ -40,7 +42,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     setState(() => _isLoading = true);
 
     try {
-      final settings = await SettingsService.getNotificationSettings(_currentUserId!);
+      final settings =
+          await SettingsService.getNotificationSettings(_currentUserId!);
       if (mounted) {
         setState(() {
           _settings = settings;
@@ -61,11 +64,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     setState(() => _isSaving = true);
 
     try {
-      final success = await SettingsService.updateNotificationSettings(_currentUserId!, _settings!);
-      
+      final success = await SettingsService.updateNotificationSettings(
+          _currentUserId!, _settings!,);
+
       if (mounted) {
         setState(() => _isSaving = false);
-        
+
         if (success) {
           _showSnackBar('Notification settings saved', isError: false);
         } else {
@@ -90,26 +94,21 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   Future<void> _showTimePickerDialog(bool isStartTime) async {
     if (_settings == null) return;
 
-    final currentTime = isStartTime 
+    final currentTime = isStartTime
         ? _parseTime(_settings!.quietHoursStart)
         : _parseTime(_settings!.quietHoursEnd);
 
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: currentTime,
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: primaryColor,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
 
     if (picked != null) {
@@ -117,7 +116,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       final newSettings = isStartTime
           ? _settings!.copyWith(quietHoursStart: timeString)
           : _settings!.copyWith(quietHoursEnd: timeString);
-      
+
       _updateSetting(newSettings);
     }
   }
@@ -130,9 +129,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
 
-  String _formatTime(TimeOfDay time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatTime(TimeOfDay time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
   String _formatTimeDisplay(String timeString) {
     final time = _parseTime(timeString);
@@ -174,7 +171,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         ),
         title: Text(
           'Notification Settings',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: isDarkMode ? Colors.white : Colors.black,
@@ -190,8 +187,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
 
-  Widget _buildErrorState(bool isDarkMode) {
-    return Center(
+  Widget _buildErrorState(bool isDarkMode) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -203,7 +199,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           const SizedBox(height: 16),
           Text(
             'Failed to load settings',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               color: isDarkMode ? Colors.white : Colors.black,
             ),
@@ -217,16 +213,14 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             ),
             child: Text(
               'Retry',
-              style: GoogleFonts.poppins(),
+              style: GoogleFonts.montserrat(),
             ),
           ),
         ],
       ),
     );
-  }
 
-  Widget _buildSettingsContent(bool isDarkMode) {
-    return SingleChildScrollView(
+  Widget _buildSettingsContent(bool isDarkMode) => SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +235,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.notifications_active,
                   color: primaryColor,
                   size: 24,
@@ -249,8 +243,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Control when and how you receive notifications from NaijaSingles.',
-                    style: GoogleFonts.poppins(
+                    'Control when and how you receive notifications from Afropeep.',
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: primaryColor,
                     ),
@@ -271,7 +265,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             subtitle: 'Get notified when you have a new match',
             icon: Icons.favorite,
             value: _settings!.matchNotifications,
-            onChanged: (value) => _updateSetting(_settings!.copyWith(matchNotifications: value)),
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(matchNotifications: value)),
             isDarkMode: isDarkMode,
           ),
 
@@ -280,7 +275,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             subtitle: 'Get notified when someone sends you a message',
             icon: Icons.message,
             value: _settings!.messageNotifications,
-            onChanged: (value) => _updateSetting(_settings!.copyWith(messageNotifications: value)),
+            onChanged: (value) => _updateSetting(
+                _settings!.copyWith(messageNotifications: value),),
             isDarkMode: isDarkMode,
           ),
 
@@ -289,7 +285,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             subtitle: 'Get notified when someone likes your profile',
             icon: Icons.thumb_up,
             value: _settings!.likeNotifications,
-            onChanged: (value) => _updateSetting(_settings!.copyWith(likeNotifications: value)),
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(likeNotifications: value)),
             isDarkMode: isDarkMode,
           ),
 
@@ -298,7 +295,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             subtitle: 'Get notified when someone super likes you',
             icon: Icons.star,
             value: _settings!.superLikeNotifications,
-            onChanged: (value) => _updateSetting(_settings!.copyWith(superLikeNotifications: value)),
+            onChanged: (value) => _updateSetting(
+                _settings!.copyWith(superLikeNotifications: value),),
             isDarkMode: isDarkMode,
           ),
 
@@ -313,7 +311,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             subtitle: 'Play sound for notifications',
             icon: Icons.volume_up,
             value: _settings!.soundEnabled,
-            onChanged: (value) => _updateSetting(_settings!.copyWith(soundEnabled: value)),
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(soundEnabled: value)),
             isDarkMode: isDarkMode,
           ),
 
@@ -322,7 +321,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             subtitle: 'Vibrate for notifications',
             icon: Icons.vibration,
             value: _settings!.vibrationEnabled,
-            onChanged: (value) => _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
             isDarkMode: isDarkMode,
           ),
 
@@ -337,7 +337,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             subtitle: 'Pause notifications during specified hours',
             icon: Icons.bedtime,
             value: _settings!.quietHoursEnabled,
-            onChanged: (value) => _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
             isDarkMode: isDarkMode,
           ),
 
@@ -373,7 +374,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   const SizedBox(width: 12),
                   Text(
                     'Saving...',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       color: Colors.grey[600],
                     ),
                   ),
@@ -383,18 +384,15 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildSectionHeader(String title, bool isDarkMode) {
-    return Text(
+  Widget _buildSectionHeader(String title, bool isDarkMode) => Text(
       title,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.montserrat(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: isDarkMode ? Colors.white : Colors.black,
       ),
     );
-  }
 
   Widget _buildSettingTile({
     required String title,
@@ -403,8 +401,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     required bool value,
     required ValueChanged<bool> onChanged,
     required bool isDarkMode,
-  }) {
-    return Container(
+  }) => Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
@@ -413,7 +410,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       child: SwitchListTile(
         title: Text(
           title,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w500,
             color: isDarkMode ? Colors.white : Colors.black,
@@ -421,7 +418,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         ),
         subtitle: Text(
           subtitle,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             color: Colors.grey[600],
           ),
@@ -432,18 +429,16 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         ),
         value: value,
         onChanged: onChanged,
-        activeColor: primaryColor,
+        activeThumbColor: primaryColor,
       ),
     );
-  }
 
   Widget _buildTimeSetting({
     required String title,
     required String time,
     required VoidCallback onTap,
     required bool isDarkMode,
-  }) {
-    return Container(
+  }) => Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
@@ -452,7 +447,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       child: ListTile(
         title: Text(
           title,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w500,
             color: isDarkMode ? Colors.white : Colors.black,
@@ -463,7 +458,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           children: [
             Text(
               _formatTimeDisplay(time),
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: primaryColor,
                 fontWeight: FontWeight.w500,
@@ -479,5 +474,4 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         onTap: onTap,
       ),
     );
-  }
 }

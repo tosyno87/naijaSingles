@@ -46,13 +46,13 @@ class _BioScreenState extends State<BioScreen> {
     const Color textColor = Color(0xFF333333);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Tell us about yourself",
-            style: GoogleFonts.poppins(
+            'Tell us about yourself',
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: textColor,
@@ -63,7 +63,7 @@ class _BioScreenState extends State<BioScreen> {
 
           Text(
             "Share a bit about who you are, what you enjoy, and what you're looking for",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: Colors.black54,
             ),
@@ -72,7 +72,7 @@ class _BioScreenState extends State<BioScreen> {
           const SizedBox(height: 24),
 
           // Bio text field
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -86,15 +86,15 @@ class _BioScreenState extends State<BioScreen> {
             ),
             child: TextField(
               controller: _bioController,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: textColor,
               ),
               maxLines: 8,
               maxLength: _maxLength,
               decoration: InputDecoration(
-                hintText: "Write your bio here...",
-                hintStyle: GoogleFonts.poppins(
+                hintText: 'Write your bio here...',
+                hintStyle: GoogleFonts.montserrat(
                   color: Colors.grey.shade400,
                 ),
                 border: OutlineInputBorder(
@@ -106,7 +106,7 @@ class _BioScreenState extends State<BioScreen> {
                   borderSide: const BorderSide(color: primaryColor, width: 2),
                 ),
                 contentPadding: const EdgeInsets.all(16),
-                counterText: "",
+                counterText: '',
               ),
               onChanged: (value) {
                 setState(() {
@@ -127,8 +127,8 @@ class _BioScreenState extends State<BioScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                "$_currentLength/$_maxLength",
-                style: GoogleFonts.poppins(
+                '$_currentLength/$_maxLength',
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: _currentLength >= 20 ? primaryColor : Colors.grey,
                 ),
@@ -146,15 +146,14 @@ class _BioScreenState extends State<BioScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: Colors.amber.shade200,
-                width: 1,
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Tips for a great bio:",
-                  style: GoogleFonts.poppins(
+                  'Tips for a great bio:',
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.amber.shade800,
@@ -162,16 +161,16 @@ class _BioScreenState extends State<BioScreen> {
                 ),
                 const SizedBox(height: 8),
                 _buildTipItem(
-                  "Be authentic and show your personality",
+                  'Be authentic and show your personality',
                 ),
                 _buildTipItem(
-                  "Mention your interests and hobbies",
+                  'Mention your interests and hobbies',
                 ),
                 _buildTipItem(
                   "Share what you're looking for in a partner",
                 ),
                 _buildTipItem(
-                  "Add something unique about yourself",
+                  'Add something unique about yourself',
                 ),
               ],
             ),
@@ -181,8 +180,7 @@ class _BioScreenState extends State<BioScreen> {
     );
   }
 
-  Widget _buildTipItem(String text) {
-    return Padding(
+  Widget _buildTipItem(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +194,7 @@ class _BioScreenState extends State<BioScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: Colors.amber.shade900,
               ),
@@ -205,5 +203,4 @@ class _BioScreenState extends State<BioScreen> {
         ],
       ),
     );
-  }
 }

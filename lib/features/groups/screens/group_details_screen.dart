@@ -1,34 +1,33 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:naijasingles/services/unified_group_service.dart';
-import 'package:naijasingles/services/user_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
-import 'package:naijasingles/features/groups/widgets/message_bubble.dart';
-import 'package:naijasingles/features/groups/widgets/message_shimmer.dart';
-import 'package:naijasingles/models/group_join_exception.dart';
-import 'package:naijasingles/widgets/full_screen_image_viewer.dart';
-import 'package:naijasingles/widgets/group_info_modal.dart';
-import 'package:naijasingles/widgets/group_notification_toggle.dart';
-import 'package:naijasingles/widgets/group_report_modal.dart';
-import 'package:naijasingles/features/groups/screens/group_settings_screen.dart';
-import 'package:naijasingles/services/group_notification_service.dart';
-import 'package:naijasingles/services/group_unread_service.dart';
-import 'package:naijasingles/widgets/unread_badge.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../models/group_join_exception.dart';
+import '../../../services/group_notification_service.dart';
+import '../../../services/group_unread_service.dart';
+import '../../../services/unified_group_service.dart';
+import '../../../services/user_service.dart';
+import '../../../widgets/full_screen_image_viewer.dart';
+import '../../../widgets/group_info_modal.dart';
+import '../../../widgets/group_notification_toggle.dart';
+import '../../../widgets/group_report_modal.dart';
+import '../../group_chat/screens/group_chat_screen.dart';
+import '../widgets/message_bubble.dart';
+import '../widgets/message_shimmer.dart';
+import '../widgets/invite_members_modal.dart';
+import 'group_settings_screen.dart';
 
 /// Enhanced Group Details Screen for members
 /// Provides comprehensive group information and member-specific actions
 class GroupDetailsScreen extends StatefulWidget {
-  final UnifiedGroup group;
-  final bool isMember;
 
   const GroupDetailsScreen({
-    super.key,
-    required this.group,
-    required this.isMember,
+    required this.group, required this.isMember, super.key,
   });
+  final UnifiedGroup group;
+  final bool isMember;
 
   @override
   State<GroupDetailsScreen> createState() => _GroupDetailsScreenState();
@@ -37,7 +36,8 @@ class GroupDetailsScreen extends StatefulWidget {
 class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   final UnifiedGroupService _groupService = UnifiedGroupService();
   final UserService _userService = UserService();
-  final GroupNotificationService _notificationService = GroupNotificationService();
+  final GroupNotificationService _notificationService =
+      GroupNotificationService();
   final GroupUnreadService _unreadService = GroupUnreadService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
@@ -51,8 +51,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -80,10 +79,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           ? _buildChatInterface()
           : _buildGroupDetails(),
     );
-  }
 
-  Widget _buildChatInterface() {
-    return Column(
+  Widget _buildChatInterface() => Column(
       children: [
         // Group info header
         _buildChatHeader(),
@@ -95,10 +92,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         _buildMessageInput(),
       ],
     );
-  }
 
-  Widget _buildChatHeader() {
-    return Container(
+  Widget _buildChatHeader() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -121,14 +116,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     child: Image.network(
                       widget.group.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
+                      errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.group,
                         color: AppColors.primaryGreen,
                         size: 20,
                       ),
                     ),
                   )
-                : Icon(
+                : const Icon(
                     Icons.group,
                     color: AppColors.primaryGreen,
                     size: 20,
@@ -158,8 +153,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             ),
           ),
           IconButton(
-            onPressed: () => _showGroupInfoModal(),
-            icon: Icon(
+            onPressed: _showGroupInfoModal,
+            icon: const Icon(
               Icons.info_outline,
               color: AppColors.primaryGreen,
             ),
@@ -167,15 +162,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildMessagesList() {
-    return StreamBuilder<QuerySnapshot>(
+  Widget _buildMessagesList() => StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('unifiedGroups')
           .doc(widget.group.id)
           .collection('messages')
-          .orderBy('timestamp', descending: false) // Oldest first for proper display
+          .orderBy('timestamp',
+              descending: false,) // Oldest first for proper display
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -183,11 +177,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: 3, // Show 3 shimmer messages
-            itemBuilder: (context, index) {
-              return MessageShimmer(
-                isCurrentUser: index % 2 == 0, // Alternate between user and other
-              );
-            },
+            itemBuilder: (context, index) => MessageShimmer(
+                isCurrentUser:
+                    index % 2 == 0, // Alternate between user and other
+              ),
           );
         }
 
@@ -224,7 +217,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         }
 
         final messages = snapshot.data?.docs ?? [];
-        
+
         if (messages.isEmpty) {
           return Center(
             child: Column(
@@ -277,25 +270,24 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             final messageDoc = messages[index];
             final messageData = messageDoc.data() as Map<String, dynamic>;
             final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
-            
+
             return MessageBubble(
               messageId: messageDoc.id,
               text: messageData['text'] ?? '',
               senderId: messageData['senderId'] ?? '',
-              senderName: messageData['senderId'] == currentUserId 
+              senderName: messageData['senderId'] == currentUserId
                   ? (FirebaseAuth.instance.currentUser?.displayName ?? 'You')
                   : (messageData['senderName'] ?? 'Unknown'),
-              timestamp: (messageData['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+              timestamp: (messageData['timestamp'] as Timestamp?)?.toDate() ??
+                  DateTime.now(),
               isCurrentUser: messageData['senderId'] == currentUserId,
             );
           },
         );
       },
     );
-  }
 
-  Widget _buildMessageInput() {
-    return Container(
+  Widget _buildMessageInput() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -327,7 +319,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.primaryGreen),
+                  borderSide: const BorderSide(color: AppColors.primaryGreen),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -343,13 +335,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          Container(
+          DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.primaryGreen,
               borderRadius: BorderRadius.circular(24),
             ),
             child: IconButton(
-              onPressed: _messageController.text.trim().isEmpty ? null : _sendMessage,
+              onPressed:
+                  _messageController.text.trim().isEmpty ? null : _sendMessage,
               icon: const Icon(
                 Icons.send,
                 color: Colors.white,
@@ -359,7 +352,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
@@ -384,7 +376,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       });
 
       // Increment unread count for other members
-      await _unreadService.incrementUnreadCount(widget.group.id, excludeUserId: currentUser.uid);
+      await _unreadService.incrementUnreadCount(widget.group.id,
+          excludeUserId: currentUser.uid,);
 
       _messageController.clear();
       setState(() {}); // Update send button state
@@ -400,8 +393,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     }
   }
 
-  Widget _buildGroupDetails() {
-    return SingleChildScrollView(
+  Widget _buildGroupDetails() => SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -413,14 +405,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildGroupHeader() {
-    return Container(
+  Widget _buildGroupHeader() => Container(
       width: double.infinity,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: AppColors.primaryGradient,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
         ),
@@ -457,11 +447,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildGroupAvatar() {
-    return GestureDetector(
-      onTap: () => _showGroupImageOptions(),
+  Widget _buildGroupAvatar() => GestureDetector(
+      onTap: _showGroupImageOptions,
       child: Container(
         width: 100,
         height: 100,
@@ -479,24 +467,21 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 child: Image.network(
                   widget.group.imageUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildDefaultAvatar(),
                 ),
               )
             : _buildDefaultAvatar(),
       ),
     );
-  }
 
-  Widget _buildDefaultAvatar() {
-    return Icon(
+  Widget _buildDefaultAvatar() => Icon(
       Icons.group,
       size: 50,
       color: Colors.white.withOpacity(0.8),
     );
-  }
 
-  Widget _buildGroupStats() {
-    return Row(
+  Widget _buildGroupStats() => Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildStatItem(
@@ -516,14 +501,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ],
     );
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(
           icon,
@@ -548,10 +531,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildGroupInfo() {
-    return Container(
+  Widget _buildGroupInfo() => Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -605,14 +586,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildInfoRow({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(
           icon,
@@ -645,10 +624,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildMemberSection() {
-    return Container(
+  Widget _buildMemberSection() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -690,7 +667,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildMemberList() {
     // Show first 6 members with "View All" option
@@ -699,7 +675,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
     return Column(
       children: [
-        ...displayMembers.map((memberId) => _buildMemberTile(memberId)),
+        ...displayMembers.map(_buildMemberTile),
         if (hasMoreMembers) ...[
           const SizedBox(height: 8),
           TextButton(
@@ -719,15 +695,18 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   Widget _buildMemberTile(String memberId) {
-    final isCurrentUser = memberId == FirebaseAuth.instance.currentUser?.uid;
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final isCurrentUser = memberId == currentUserId;
     final isCreator = memberId == widget.group.creatorId;
     final isAdmin = widget.group.adminIds.contains(memberId);
+    final canRemoveMembers = _canEditGroup() && !isCreator && !isCurrentUser;
 
     return FutureBuilder<UserProfile?>(
       future: _userService.getUserProfile(memberId),
       builder: (context, snapshot) {
         final userProfile = snapshot.data;
-        final displayName = userProfile?.displayName ?? (isCurrentUser ? 'You' : 'Member');
+        final displayName =
+            userProfile?.displayName ?? (isCurrentUser ? 'You' : 'Member');
         final avatarUrl = userProfile?.avatarUrl;
         final initials = userProfile?.initials ?? (isCurrentUser ? 'Y' : 'M');
 
@@ -760,7 +739,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             children: [
               if (isCreator)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: AppColors.primaryGreen,
                     borderRadius: BorderRadius.circular(8),
@@ -777,7 +757,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               if (isAdmin && !isCreator) ...[
                 const SizedBox(width: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(8),
@@ -794,6 +775,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               ],
             ],
           ),
+          trailing: canRemoveMembers
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.remove_circle_outline,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                  onPressed: () => _showRemoveMemberConfirmation(memberId, displayName),
+                  tooltip: 'Remove member',
+                )
+              : null,
           onTap: () => _navigateToMemberProfile(memberId),
         );
       },
@@ -841,8 +833,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     );
   }
 
-  Widget _buildJoinButton() {
-    return Container(
+  Widget _buildJoinButton() => Container(
       margin: const EdgeInsets.all(16),
       child: _buildPrimaryButton(
         text: 'Join Group',
@@ -850,14 +841,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         onPressed: _joinGroup,
       ),
     );
-  }
 
   Widget _buildPrimaryButton({
     required String text,
     required IconData icon,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => Container(
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
@@ -896,14 +885,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildSecondaryButton({
     required String text,
     required IconData icon,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -935,14 +922,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
   Widget _buildDangerButton({
     required String text,
     required IconData icon,
     required VoidCallback onPressed,
-  }) {
-    return Container(
+  }) => DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -974,7 +959,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ),
       ),
     );
-  }
 
   // Action methods
   void _openGroupChat() {
@@ -987,13 +971,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   void _inviteMembers() {
-    // TODO: Implement invite members functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Invite members functionality coming soon!'),
-        backgroundColor: AppColors.primaryGreen,
-      ),
-    );
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => InviteMembersModal(group: widget.group),
+    ).then((refresh) {
+      // Refresh the screen if members were added
+      if (refresh == true && mounted) {
+        setState(() {});
+      }
+    });
   }
 
   Future<void> _leaveGroup() async {
@@ -1002,7 +990,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
     try {
       await _groupService.leaveGroup(widget.group.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1027,7 +1015,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   Future<void> _joinGroup() async {
     try {
       await _groupService.joinGroup(widget.group.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1035,7 +1023,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             backgroundColor: AppColors.success,
           ),
         );
-        Navigator.pop(context, true); // Return true to indicate group was joined
+        Navigator.pop(
+            context, true,); // Return true to indicate group was joined
       }
     } catch (e) {
       if (mounted) {
@@ -1052,7 +1041,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               message = 'Failed to join group. Please try again.';
           }
         } else {
-          message = 'Failed to join group. Please check your connection and try again.';
+          message =
+              'Failed to join group. Please check your connection and try again.';
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1065,28 +1055,28 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     }
   }
 
-  Future<bool> _showLeaveConfirmation() async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Leave Group'),
-        content: Text('Are you sure you want to leave "${widget.group.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'),
+  Future<bool> _showLeaveConfirmation() async => await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Leave Group'),
+            content:
+                Text('Are you sure you want to leave "${widget.group.name}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text(
+                  'Leave',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              'Leave',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    ) ?? false;
-  }
+        ) ??
+        false;
 
   void _showGroupOptions() {
     showModalBottomSheet(
@@ -1097,21 +1087,22 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Group Settings'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Group Settings'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GroupSettingsScreen(group: widget.group),
+                    builder: (context) =>
+                        GroupSettingsScreen(group: widget.group),
                   ),
                 );
               },
             ),
             ListTile(
-              leading: Icon(Icons.notifications),
-              title: Text('Notification Settings'),
+              leading: const Icon(Icons.notifications),
+              title: const Text('Notification Settings'),
               onTap: () {
                 Navigator.pop(context);
                 showModalBottomSheet(
@@ -1126,8 +1117,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.report),
-              title: Text('Report Group'),
+              leading: const Icon(Icons.report),
+              title: const Text('Report Group'),
               onTap: () {
                 Navigator.pop(context);
                 showModalBottomSheet(
@@ -1205,7 +1196,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.visibility,
                     color: AppColors.primaryGreen,
                     size: 24,
@@ -1236,14 +1227,16 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.edit,
                     color: AppColors.primaryGreen,
                     size: 24,
                   ),
                 ),
                 title: Text(
-                  widget.group.imageUrl != null ? 'Change Group Photo' : 'Add Group Photo',
+                  widget.group.imageUrl != null
+                      ? 'Change Group Photo'
+                      : 'Add Group Photo',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -1286,28 +1279,108 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   bool _canEditGroup() {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    return currentUserId == widget.group.creatorId || 
-           widget.group.adminIds.contains(currentUserId);
+    return currentUserId == widget.group.creatorId ||
+        widget.group.adminIds.contains(currentUserId);
   }
 
   void _editGroupPhoto() {
-    // TODO: Implement group photo editing
+    // Navigate to group settings where photo editing is available
+    Navigator.pop(context); // Close the image options modal
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GroupSettingsScreen(group: widget.group),
+      ),
+    ).then((_) {
+      // Refresh the screen after returning from settings
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _navigateToMemberProfile(String memberId) {
+    // Navigate to user profile screen
+    // For now, show a snackbar. This can be enhanced to navigate to a profile screen
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Group photo editing coming soon!'),
+        content: Text('Viewing ${memberId == FirebaseAuth.instance.currentUser?.uid ? "your" : "member"} profile'),
         backgroundColor: AppColors.primaryGreen,
       ),
     );
   }
 
-  void _navigateToMemberProfile(String memberId) {
-    // TODO: Implement member profile navigation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Member profile navigation coming soon!'),
-        backgroundColor: AppColors.primaryGreen,
+  Future<void> _showRemoveMemberConfirmation(String memberId, String memberName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Remove Member',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to remove $memberName from this group?',
+          style: GoogleFonts.montserrat(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              'Remove',
+              style: GoogleFonts.montserrat(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+
+    if (confirmed == true) {
+      await _removeMember(memberId, memberName);
+    }
+  }
+
+  Future<void> _removeMember(String memberId, String memberName) async {
+    try {
+      await _groupService.removeMemberFromGroup(
+        groupId: widget.group.id,
+        userId: memberId,
+        reason: 'Removed by admin',
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$memberName has been removed from the group'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        // Refresh the screen
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to remove member: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   String _formatDate(DateTime date) {

@@ -6,16 +6,16 @@ import 'notifications_screen.dart';
 
 /// A widget that displays a notification icon with a badge for unread notifications
 class NotificationBadge extends StatefulWidget {
-  final Color iconColor;
-  final double iconSize;
-  final Color badgeColor;
 
   const NotificationBadge({
-    Key? key,
+    super.key,
     this.iconColor = const Color(0xFF008037),
     this.iconSize = 24.0,
     this.badgeColor = Colors.red,
-  }) : super(key: key);
+  });
+  final Color iconColor;
+  final double iconSize;
+  final Color badgeColor;
 
   @override
   State<NotificationBadge> createState() => _NotificationBadgeState();
@@ -38,8 +38,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
+  Widget build(BuildContext context) => InkWell(
       onTap: () async {
         await Navigator.push(
           context,
@@ -54,7 +53,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
         clipBehavior: Clip.none,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Icon(
               Icons.notifications_outlined,
               color: widget.iconColor,
@@ -82,7 +81,7 @@ class _NotificationBadgeState extends State<NotificationBadge> {
                 child: Center(
                   child: Text(
                     _unreadCount > 9 ? '9+' : _unreadCount.toString(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -94,5 +93,4 @@ class _NotificationBadgeState extends State<NotificationBadge> {
         ],
       ),
     );
-  }
 }

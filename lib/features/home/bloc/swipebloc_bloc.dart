@@ -11,10 +11,6 @@ part 'swipebloc_event.dart';
 part 'swipebloc_state.dart';
 
 class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
-  final Future<void> Function(UserModel, UserModel) leftSwipe;
-  final Future<void> Function(UserModel, UserModel) rightSwipe;
-  final Future<List<UserModel>> Function(UserModel) getUserList;
-  final MatchService _matchService;
 
   SwipeBloc({
     Future<void> Function(UserModel, UserModel)? leftSwipe,
@@ -29,11 +25,11 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
     on<LeftSwipeEvent>((event, emit) async {
       try {
         await this.leftSwipe(event.currentUser, event.selectedUser);
-        List<UserModel> userList = await this.getUserList(event.currentUser);
+        final List<UserModel> userList = await this.getUserList(event.currentUser);
         emit(SwipeSucessState(userList));
 
-        log("afterlefteventuser${userList.toString()}");
-        log("cominguser from leftevent");
+        log('afterlefteventuser${userList.toString()}');
+        log('cominguser from leftevent');
       } catch (e) {
         emit(SwipeFailedState());
         log('Error while processing left swipe: $e');
@@ -52,7 +48,7 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
 
         await this.rightSwipe(event.currentUser, event.selectedUser);
 
-        List<UserModel> userList = await this.getUserList(event.currentUser);
+        final List<UserModel> userList = await this.getUserList(event.currentUser);
 
         // Check if a match was created by looking for mutual likes
         final usersWhoLikedMe = await _matchService.getUsersWhoLikedMe();
@@ -65,17 +61,21 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
           emit(SwipeMatchCreatedState(
             users: userList,
             matchedUser: event.selectedUser,
-          ));
+          ),);
         } else {
           emit(SwipeSucessState(userList));
         }
 
-        log("afterrighteventuser${userList.toString()}");
-        log("cominguser from rightevent");
+        log('afterrighteventuser${userList.toString()}');
+        log('cominguser from rightevent');
       } catch (e) {
         emit(SwipeFailedState());
         log('Error while processing right swipe: $e');
       }
     });
   }
+  final Future<void> Function(UserModel, UserModel) leftSwipe;
+  final Future<void> Function(UserModel, UserModel) rightSwipe;
+  final Future<List<UserModel>> Function(UserModel) getUserList;
+  final MatchService _matchService;
 }

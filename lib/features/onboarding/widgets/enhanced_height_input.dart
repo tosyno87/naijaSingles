@@ -3,19 +3,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'ios_height_picker.dart';
 
 /// Enhanced height input widget with iOS-style picker option
-class EnhancedHeightInput extends StatefulWidget {
+class EnhancedHeightInput extends StatefulWidget { // Toggle between iOS picker and text input
+
+  const EnhancedHeightInput({
+    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+    this.useIOSPicker = true, // Default to iOS picker
+  });
   final double initialHeight;
   final String initialUnit;
   final Function(double height, String unit) onChanged;
-  final bool useIOSPicker; // Toggle between iOS picker and text input
-
-  const EnhancedHeightInput({
-    Key? key,
-    required this.initialHeight,
-    required this.initialUnit,
-    required this.onChanged,
-    this.useIOSPicker = true, // Default to iOS picker
-  }) : super(key: key);
+  final bool useIOSPicker;
 
   @override
   State<EnhancedHeightInput> createState() => _EnhancedHeightInputState();
@@ -24,7 +21,7 @@ class EnhancedHeightInput extends StatefulWidget {
 class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
   late double _height;
   late String _heightUnit;
-  bool _showPicker = false;
+  final bool _showPicker = false;
 
   @override
   void initState() {
@@ -37,9 +34,9 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
     if (_heightUnit == 'cm') {
       return '${_height.round()} cm';
     } else {
-      double totalInches = _height / 2.54;
-      int feet = (totalInches / 12).floor();
-      int inches = (totalInches % 12).round();
+      final double totalInches = _height / 2.54;
+      final int feet = (totalInches / 12).floor();
+      final int inches = (totalInches % 12).round();
       return '$feet\'$inches"';
     }
   }
@@ -81,7 +78,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     onPressed: () => Navigator.pop(context),
                     child: Text(
                       'Cancel',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 16 : 14,
                         color: Colors.grey.shade600,
                       ),
@@ -89,7 +86,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   ),
                   Text(
                     'Select Height',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 20 : 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -102,7 +99,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     },
                     child: Text(
                       'Done',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 16 : 14,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF008037),
@@ -183,7 +180,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   children: [
                     Text(
                       'Height',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 14 : 12,
                         color: Colors.grey.shade600,
                       ),
@@ -191,7 +188,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                     const SizedBox(height: 4),
                     Text(
                       _getHeightDisplay(),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 18 : 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -203,7 +200,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   children: [
                     Text(
                       'Tap to change',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: isTablet ? 14 : 12,
                         color: const Color(0xFF008037),
                       ),
@@ -226,7 +223,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
         // Helper text
         Text(
           'Tap above to select your height with an easy-to-use picker',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 14 : 12,
             color: Colors.grey.shade600,
           ),
@@ -238,20 +235,20 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
   Widget _buildTextInput() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-    late TextEditingController _controller;
+    late TextEditingController controller;
 
-    void _updateController() {
+    void updateController() {
       if (_heightUnit == 'cm') {
-        _controller = TextEditingController(text: _height.round().toString());
+        controller = TextEditingController(text: _height.round().toString());
       } else {
-        double totalInches = _height / 2.54;
-        int feet = (totalInches / 12).floor();
-        int inches = (totalInches % 12).round();
-        _controller = TextEditingController(text: "$feet'$inches");
+        final double totalInches = _height / 2.54;
+        final int feet = (totalInches / 12).floor();
+        final int inches = (totalInches % 12).round();
+        controller = TextEditingController(text: "$feet'$inches");
       }
     }
 
-    _updateController();
+    updateController();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,7 +261,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                 onTap: () {
                   setState(() {
                     _heightUnit = 'cm';
-                    _updateController();
+                    updateController();
                   });
                   widget.onChanged(_height, _heightUnit);
                 },
@@ -282,7 +279,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   child: Text(
                     'cm',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
                       color:
@@ -297,7 +294,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                 onTap: () {
                   setState(() {
                     _heightUnit = 'ft';
-                    _updateController();
+                    updateController();
                   });
                   widget.onChanged(_height, _heightUnit);
                 },
@@ -315,7 +312,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
                   child: Text(
                     'ft/in',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
                       color:
@@ -332,7 +329,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
 
         // Height input
         TextFormField(
-          controller: _controller,
+          controller: controller,
           keyboardType: TextInputType.text,
           onChanged: (value) {
             if (_heightUnit == 'cm') {
@@ -356,7 +353,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
           },
           decoration: InputDecoration(
             hintText: _heightUnit == 'cm' ? 'e.g., 170' : "e.g., 5'10",
-            hintStyle: GoogleFonts.poppins(
+            hintStyle: GoogleFonts.montserrat(
               color: Colors.grey.shade500,
               fontSize: isTablet ? 16 : 14,
             ),
@@ -379,7 +376,7 @@ class _EnhancedHeightInputState extends State<EnhancedHeightInput> {
               vertical: isTablet ? 20 : 16,
             ),
           ),
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 16 : 14,
             color: Colors.black87,
           ),

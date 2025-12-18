@@ -3,17 +3,17 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/street_view_provider.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../models/user_model.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 
 class StreetViewButtonWigdet extends StatefulWidget {
+  const StreetViewButtonWigdet({required this.currentUser, super.key});
   final UserModel currentUser;
-  const StreetViewButtonWigdet({super.key, required this.currentUser});
 
   @override
   State<StreetViewButtonWigdet> createState() => _StreetViewButtonWigdetState();
@@ -46,17 +46,17 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
             matchedUsers = state.users;
             userIds = matchedUsers
                 .where(
-                    (user) => user.id != null) // Filter out users with null IDs
+                    (user) => user.id != null,) // Filter out users with null IDs
                 .map((user) => user.id!) // Extract non-null IDs
                 .toList();
           });
         }
       },
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8),
         child: Card(
           child: Padding(
-            padding: const EdgeInsets.all(18.0),
+            padding: const EdgeInsets.all(18),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -68,43 +68,39 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                               ? Colors.white
                               : primaryColor,
                           fontSize: 18,
-                          fontWeight: FontWeight.w500),
+                          fontWeight: FontWeight.w500,),
                     ),
                   ),
                   InkResponse(
                     child: selectedOption == 'None'
-                        ? Icon(
+                        ? const Icon(
                             Icons.location_off_outlined,
                             color: primaryColor,
                           )
-                        : Icon(
+                        : const Icon(
                             Icons.location_on_outlined,
                             color: primaryColor,
                           ),
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (BuildContext dialogContext) {
-                          return StatefulBuilder(builder:
-                              (BuildContext context, StateSetter setState1) {
-                            return AlertDialog(
+                        builder: (BuildContext dialogContext) => StatefulBuilder(builder:
+                              (BuildContext context, StateSetter setState1) => AlertDialog(
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                                 title: Text('Who can see my street view'
                                     .tr()
-                                    .toString()),
+                                    .toString(),),
                                 content: StatefulBuilder(
                                   builder: (BuildContext context,
-                                      StateSetter setState) {
+                                      StateSetter setState,) {
                                     if (showUserList) {
                                       return matchedUsers.isEmpty
                                           ? Column(
                                               mainAxisSize: MainAxisSize.min,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
                                               children: [
                                                 Text(
                                                   "You don't have any matches"
@@ -113,15 +109,15 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                                   style: const TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
-                                                          FontWeight.w600),
+                                                          FontWeight.w600,),
                                                 ),
                                                 const SizedBox(height: 10),
                                                 Text(
-                                                  "Swipe more to find matches!"
+                                                  'Swipe more to find matches!'
                                                       .tr()
                                                       .toString(),
                                                   style: const TextStyle(
-                                                      fontSize: 16),
+                                                      fontSize: 16,),
                                                 ),
                                               ],
                                             )
@@ -141,7 +137,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                                           backgroundImage:
                                                               NetworkImage(user
                                                                   .imageUrl
-                                                                  ?.first),
+                                                                  ?.first,),
                                                         ),
                                                         const SizedBox(
                                                           width: 5,
@@ -172,7 +168,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                         children: <Widget>[
                                           RadioListTile<String>(
                                             title: Text(
-                                                'Everyone'.tr().toString()),
+                                                'Everyone'.tr().toString(),),
                                             value: 'Everyone',
                                             activeColor: primaryColor,
                                             groupValue: selectedOption,
@@ -181,12 +177,12 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                                 selectedOption = value!;
                                               });
 
-                                              log("theme $value");
+                                              log('theme $value');
                                             },
                                           ),
                                           RadioListTile<String>(
                                             title: Text(
-                                                'My Matches'.tr().toString()),
+                                                'My Matches'.tr().toString(),),
                                             activeColor: primaryColor,
                                             value: 'My Matches',
                                             groupValue: selectedOption,
@@ -197,7 +193,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                                     .read<MatchUserBloc>()
                                                     .add(LoadMatchUserEvent(
                                                         currentUser: widget
-                                                            .currentUser));
+                                                            .currentUser,),);
                                               });
                                             },
                                           ),
@@ -205,7 +201,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                             title: Text(
                                                 'My Matches including...'
                                                     .tr()
-                                                    .toString()),
+                                                    .toString(),),
                                             activeColor: primaryColor,
                                             value: 'Only',
                                             groupValue: selectedOption,
@@ -237,8 +233,8 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                   TextButton(
                                     child: Text(
                                       'Cancel'.tr().toString(),
-                                      style: TextStyle(
-                                          color: AppColors.secondaryColor),
+                                      style: const TextStyle(
+                                          color: AppColors.secondaryColor,),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -265,14 +261,14 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
 
                                           case 'My Matches':
                                             provider.toggleView(
-                                                selectedOption, userIds);
+                                                selectedOption, userIds,);
                                             Navigator.of(dialogContext).pop();
                                             break;
                                         }
                                       },
                                       child: Text(
                                         'Apply'.tr().toString(),
-                                        style: TextStyle(color: primaryColor),
+                                        style: const TextStyle(color: primaryColor),
                                       ),
                                     )
                                   else if (selectedOption == 'Only' &&
@@ -281,7 +277,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                     TextButton(
                                       onPressed: () {
                                         provider.toggleView(
-                                            selectedOption, selectedUserIds);
+                                            selectedOption, selectedUserIds,);
                                         setState(() {
                                           showUserList = false;
                                         });
@@ -289,16 +285,14 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                       },
                                       child: Text(
                                         'Apply'.tr().toString(),
-                                        style: TextStyle(color: primaryColor),
+                                        style: const TextStyle(color: primaryColor),
                                       ),
                                     ),
-                                ]);
-                          });
-                        },
+                                ],),),
                       );
                     },
-                  )
-                ]),
+                  ),
+                ],),
           ),
         ),
       ),

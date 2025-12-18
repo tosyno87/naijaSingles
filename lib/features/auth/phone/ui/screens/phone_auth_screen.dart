@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
+import '../../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../bloc/phone_auth_bloc.dart';
+import 'otp_page.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
-  final bool isSignIn;
-  final bool updatePhoneNumber;
 
   const PhoneAuthScreen({
-    Key? key,
+    super.key,
     this.isSignIn = false,
     this.updatePhoneNumber = false,
-  }) : super(key: key);
+  });
+  final bool isSignIn;
+  final bool updatePhoneNumber;
 
   @override
   State<PhoneAuthScreen> createState() => _PhoneAuthScreenState();
@@ -24,7 +24,7 @@ class PhoneAuthScreen extends StatefulWidget {
 
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  String _selectedCountryCode = '+234'; // Default to Nigeria
+  String _selectedCountryCode = '+1'; // Default to US
   bool _isLoading = false;
   final TextEditingController _codeController = TextEditingController();
 
@@ -52,10 +52,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     // Set system UI overlay style for status bar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
-    ));
+    ),);
 
     // Define colors based on MVP styling
-    const Color backgroundColor = Color(0xFFFFF6E5); // Cream background
+    const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Green
     const Color textColor = Color(0xFF3E1F0D); // Deep brown
     const Color textLightBrown = Color(0xFF8B6C59); // Light brown for subtitle
@@ -69,30 +69,31 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ),
         child: BlocConsumer<PhoneAuthBloc, PhoneAuthState>(
           listener: (context, state) {
-            if (state is PhoneAuthVerified) {
-              log("phone auth success listener called");
-              // Navigate to appropriate screen based on sign in or sign up
-              if (widget.isSignIn) {
-                Navigator.pushReplacementNamed(
-                    context, RouteName.mainNavigation);
-              } else {
-                Navigator.pushReplacementNamed(context, RouteName.onboarding);
-              }
-            }
+            // Don't handle PhoneAuthVerified here - let OTP screen handle it
+            // This prevents premature navigation before registration check completes
+            // The OTP screen will handle navigation after checking registration status
 
             if (state is PhoneAuthCodeSentSuccess) {
-              log("phone auth code sent success listener called");
-              setState(() {
-                _isLoading = false;
-              });
+              log('phone auth code sent success listener called');
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
 
-              Navigator.pushNamed(context, RouteName.otpScreen, arguments: {
-                'phoneNumber': _selectedCountryCode + _phoneController.text,
-                'codeController': _codeController.text,
-                'verificationId': state.verificationId,
-                'updatenumber': widget.updatePhoneNumber,
-                'isLogin': widget.isSignIn,
-              });
+                // Use direct MaterialPageRoute instead of named route to avoid router issues
+                // This ensures smooth transition without any "Page Not Found" flash
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => OtpPage(
+                      phoneNumber: _selectedCountryCode + _phoneController.text,
+                      verificationId: state.verificationId,
+                      codeController: _codeController.text,
+                      updatePhoneNumber: widget.updatePhoneNumber,
+                      isLogin: widget.isSignIn,
+                    ),
+                  ),
+                );
+              }
             }
 
             if (state is PhoneAuthError) {
@@ -105,8 +106,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               );
             }
           },
-          builder: (context, state) {
-            return Scaffold(
+          builder: (context, state) => Scaffold(
               backgroundColor: backgroundColor,
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
@@ -116,7 +116,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   onPressed: () => Navigator.pop(context),
                 ),
                 title: Text(
-                  widget.isSignIn ? "Sign In with Phone" : "Sign Up with Phone",
+                  widget.isSignIn ? 'Sign In with Phone' : 'Sign Up with Phone',
                   style: GoogleFonts.montserrat(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -127,12 +127,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ),
               body: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Enter your phone number",
+                        'Enter your phone number',
                         style: GoogleFonts.montserrat(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
@@ -150,7 +150,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                       const SizedBox(height: 32),
 
                       // Phone number input with country code
-                      Container(
+                      DecoratedBox(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
@@ -172,14 +172,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                 border: Border(
                                   right: BorderSide(
                                     color: Colors.grey.withValues(alpha: 0.3),
-                                    width: 1,
                                   ),
                                 ),
                               ),
                               child: DropdownButton<String>(
                                 value: _selectedCountryCode,
                                 icon: const Icon(Icons.arrow_drop_down),
-                                iconSize: 24,
                                 elevation: 16,
                                 style: GoogleFonts.montserrat(
                                   fontSize: 16,
@@ -195,13 +193,11 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                 },
                                 items: _countryCodes
                                     .map<DropdownMenuItem<String>>(
-                                        (Map<String, String> value) {
-                                  return DropdownMenuItem<String>(
+                                        (Map<String, String> value) => DropdownMenuItem<String>(
                                     value: value['code'],
                                     child: Text(
-                                        "${value['code']} (${value['name']})"),
-                                  );
-                                }).toList(),
+                                        "${value['code']} (${value['name']})",),
+                                  ),).toList(),
                               ),
                             ),
 
@@ -215,7 +211,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                   color: textColor,
                                 ),
                                 decoration: InputDecoration(
-                                  hintText: "Phone number",
+                                  hintText: 'Phone number',
                                   hintStyle: GoogleFonts.montserrat(
                                     color: Colors.grey,
                                   ),
@@ -282,7 +278,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                   ),
                                 )
                               : Text(
-                                  "Continue",
+                                  'Continue',
                                   style: GoogleFonts.montserrat(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
@@ -300,7 +296,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           Text(
                             widget.isSignIn
                                 ? "Don't have an account? "
-                                : "Already have an account? ",
+                                : 'Already have an account? ',
                             style: GoogleFonts.montserrat(
                               fontSize: 14,
                               color: textColor,
@@ -310,14 +306,14 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                             onTap: () {
                               if (widget.isSignIn) {
                                 Navigator.pushReplacementNamed(
-                                    context, '/auth_method_selection');
+                                    context, '/auth_method_selection',);
                               } else {
                                 Navigator.pushReplacementNamed(
-                                    context, '/sign_in_method_selection');
+                                    context, '/sign_in_method_selection',);
                               }
                             },
                             child: Text(
-                              widget.isSignIn ? "Create one" : "Sign in",
+                              widget.isSignIn ? 'Create one' : 'Sign in',
                               style: GoogleFonts.montserrat(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -331,8 +327,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   ),
                 ),
               ),
-            );
-          },
+            ),
         ),
       ),
     );

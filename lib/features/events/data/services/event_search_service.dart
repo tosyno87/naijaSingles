@@ -1,13 +1,16 @@
 import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../../../common/utils/app_logger.dart';
 import '../models/event_model.dart';
 
 /// Helper class to store event with its recommendation score
 class ScoredEvent {
-  final EventModel event;
-  final double score;
 
   ScoredEvent({required this.event, required this.score});
+  final EventModel event;
+  final double score;
 }
 
 class EventSearchService {
@@ -44,10 +47,12 @@ class EventSearchService {
 
       // Date range filter
       if (startDate != null) {
-        eventsQuery = eventsQuery.where('startDate', isGreaterThanOrEqualTo: startDate);
+        eventsQuery =
+            eventsQuery.where('startDate', isGreaterThanOrEqualTo: startDate);
       }
       if (endDate != null) {
-        eventsQuery = eventsQuery.where('startDate', isLessThanOrEqualTo: endDate);
+        eventsQuery =
+            eventsQuery.where('startDate', isLessThanOrEqualTo: endDate);
       }
 
       // Order by start date
@@ -58,7 +63,8 @@ class EventSearchService {
 
       final querySnapshot = await eventsQuery.get();
       List<EventModel> events = querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(doc.data() as Map<String, dynamic>, doc.id))
+          .map((doc) => EventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>, doc.id,),)
           .toList();
 
       // Apply text search filter (client-side for better flexibility)
@@ -78,7 +84,7 @@ class EventSearchService {
 
       return events;
     } catch (e) {
-      print('Error searching events: $e');
+      AppLogger.error('Error searching events', error: e);
       return [];
     }
   }
@@ -96,10 +102,11 @@ class EventSearchService {
 
       final querySnapshot = await eventsQuery.get();
       return querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(doc.data() as Map<String, dynamic>, doc.id))
+          .map((doc) => EventModel.fromFirestoreJson(
+              doc.data(), doc.id,),)
           .toList();
     } catch (e) {
-      print('Error getting trending events: $e');
+      AppLogger.error('Error getting trending events', error: e);
       return [];
     }
   }
@@ -118,14 +125,11 @@ class EventSearchService {
   }
 
   /// Get free events
-  Future<List<EventModel>> getFreeEvents({int limit = 15}) async {
-    return searchEvents(isFree: true, limit: limit);
-  }
+  Future<List<EventModel>> getFreeEvents({int limit = 15}) async => searchEvents(isFree: true, limit: limit);
 
   /// Get events by category with recommendations
-  Future<List<EventModel>> getEventsByCategory(String category, {int limit = 20}) async {
-    return searchEvents(category: category, limit: limit);
-  }
+  Future<List<EventModel>> getEventsByCategory(String category,
+      {int limit = 20,}) async => searchEvents(category: category, limit: limit);
 
   /// Get recommended events based on user interests
   Future<List<EventModel>> getRecommendedEvents({
@@ -143,8 +147,9 @@ class EventSearchService {
           .limit(limit * 2); // Get more to filter
 
       final querySnapshot = await eventsQuery.get();
-      List<EventModel> events = querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(doc.data() as Map<String, dynamic>, doc.id))
+      final List<EventModel> events = querySnapshot.docs
+          .map((doc) => EventModel.fromFirestoreJson(
+              doc.data(), doc.id,),)
           .toList();
 
       // Score events based on user interests
@@ -155,50 +160,50 @@ class EventSearchService {
 
       return scoredEvents.take(limit).map((e) => e.event).toList();
     } catch (e) {
-      print('Error getting recommended events: $e');
+      AppLogger.error('Error getting recommended events', error: e);
       return [];
     }
   }
 
   /// Filter events by text search (name, description, tags)
-  List<EventModel> _filterByTextSearch(List<EventModel> events, String query) {
-    return events.where((event) {
-      final searchableText = '${event.name} ${event.description} ${event.category}'.toLowerCase();
+  List<EventModel> _filterByTextSearch(List<EventModel> events, String query) => events.where((event) {
+      final searchableText =
+          '${event.name} ${event.description} ${event.category}'.toLowerCase();
       return searchableText.contains(query);
     }).toList();
-  }
 
   /// Filter events by location using Haversine formula
-  List<EventModel> _filterByLocation(List<EventModel> events, double lat, double lng, double radiusKm) {
-    return events.where((event) {
+  List<EventModel> _filterByLocation(
+      List<EventModel> events, double lat, double lng, double radiusKm,) => events.where((event) {
       if (event.location.latitude == null || event.location.longitude == null) {
         return false;
       }
-      
+
       final distance = _calculateDistance(
-        lat, lng,
-        event.location.latitude!, event.location.longitude!,
+        lat,
+        lng,
+        event.location.latitude!,
+        event.location.longitude!,
       );
-      
+
       return distance <= radiusKm;
     }).toList();
-  }
 
   /// Filter events by tags
-  List<EventModel> _filterByTags(List<EventModel> events, List<String> tags) {
-    return events.where((event) {
+  List<EventModel> _filterByTags(List<EventModel> events, List<String> tags) => events.where((event) {
       // Check if event has any of the specified tags
-      return tags.any((tag) => event.category.toLowerCase().contains(tag.toLowerCase()));
+      return tags.any(
+          (tag) => event.category.toLowerCase().contains(tag.toLowerCase()),);
     }).toList();
-  }
 
   /// Score events based on user interests
-  List<ScoredEvent> _scoreEventsByInterests(List<EventModel> events, List<String> userInterests) {
-    List<ScoredEvent> scoredEvents = [];
-    
+  List<ScoredEvent> _scoreEventsByInterests(
+      List<EventModel> events, List<String> userInterests,) {
+    final List<ScoredEvent> scoredEvents = [];
+
     for (final event in events) {
-      double score = 0.0;
-      
+      double score = 0;
+
       // Score based on category match
       for (final interest in userInterests) {
         if (event.category.toLowerCase().contains(interest.toLowerCase())) {
@@ -211,42 +216,42 @@ class EventSearchService {
           score += 1.0;
         }
       }
-      
+
       // Boost score for events happening soon
       final daysUntilEvent = event.startDate.difference(DateTime.now()).inDays;
       if (daysUntilEvent <= 7) {
         score += 0.5;
       }
-      
+
       // Boost score for popular events
       if (event.rsvpCount > 10) {
         score += 0.3;
       }
-      
+
       scoredEvents.add(ScoredEvent(event: event, score: score));
     }
-    
+
     return scoredEvents;
   }
 
   /// Calculate distance between two points using Haversine formula
-  double _calculateDistance(double lat1, double lng1, double lat2, double lng2) {
+  double _calculateDistance(
+      double lat1, double lng1, double lat2, double lng2,) {
     const double earthRadius = 6371; // Earth's radius in kilometers
-    
+
     final double dLat = _degreesToRadians(lat2 - lat1);
     final double dLng = _degreesToRadians(lng2 - lng1);
-    
-    final double a = 
-        sin(dLat / 2) * sin(dLat / 2) +
-        cos(_degreesToRadians(lat1)) * cos(_degreesToRadians(lat2)) *
-        sin(dLng / 2) * sin(dLng / 2);
-    
+
+    final double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degreesToRadians(lat1)) *
+            cos(_degreesToRadians(lat2)) *
+            sin(dLng / 2) *
+            sin(dLng / 2);
+
     final double c = 2 * asin(sqrt(a));
-    
+
     return earthRadius * c;
   }
 
-  double _degreesToRadians(double degrees) {
-    return degrees * (pi / 180);
-  }
+  double _degreesToRadians(double degrees) => degrees * (pi / 180);
 }

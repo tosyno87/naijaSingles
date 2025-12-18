@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
+
+import '../../../common/utils/app_logger.dart';
 import '../../user/controllers/onboarding_controller.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -19,7 +21,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -55,7 +57,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
     try {
       // Check if location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         setState(() {
           _isLoadingLocation = false;
@@ -88,18 +90,18 @@ class _LocationScreenState extends State<LocationScreen> {
       }
 
       // Get current position
-      Position position = await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
       // Get address from coordinates
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
 
       if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
+        final Placemark place = placemarks[0];
         String location = '';
 
         // Format location based on country
@@ -121,17 +123,19 @@ class _LocationScreenState extends State<LocationScreen> {
         final controller =
             Provider.of<OnboardingController>(context, listen: false);
         controller.setLocationName(location);
-        controller.setLocationCoordinates(position.latitude, position.longitude);
+        controller.setLocationCoordinates(
+            position.latitude, position.longitude,);
 
-        print('🔍 LocationScreen: GPS location set to "$location"');
-        print('🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}');
+        AppLogger.info('🔍 LocationScreen: GPS location set to "$location"');
+        AppLogger.info(
+            '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}',);
       }
     } catch (e) {
       setState(() {
         _isLoadingLocation = false;
         _locationPermissionDenied = true;
       });
-      print('Error getting location: $e');
+      AppLogger.error('Error getting location', error: e);
     }
   }
 
@@ -139,20 +143,62 @@ class _LocationScreenState extends State<LocationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: Text(
           'Location Services Disabled',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
         ),
         content: Text(
-          'Please enable location services to use GPS location detection.',
-          style: GoogleFonts.poppins(),
+          'Location is required to find matches nearby. Please enable location services in your device settings.',
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: textDarkBrown,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'OK',
-              style: GoogleFonts.poppins(color: afropeepGreen),
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: textLightBrown,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final opened = await Geolocator.openLocationSettings();
+              if (!opened && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Please enable location services manually in your device settings',
+                      style: GoogleFonts.montserrat(),
+                    ),
+                    backgroundColor: afropeepGreen,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: afropeepGreen,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Open Settings',
+              style: GoogleFonts.montserrat(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -164,20 +210,62 @@ class _LocationScreenState extends State<LocationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: Text(
           'Location Permission Required',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
         ),
         content: Text(
-          'Please enable location permissions in your device settings to use GPS location detection.',
-          style: GoogleFonts.poppins(),
+          'Location is required to find matches nearby. Please enable location permissions in your device settings to continue.',
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: textDarkBrown,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'OK',
-              style: GoogleFonts.poppins(color: afropeepGreen),
+              'Cancel',
+              style: GoogleFonts.montserrat(
+                color: textLightBrown,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final opened = await Geolocator.openLocationSettings();
+              if (!opened && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Please enable location permissions manually in your device settings',
+                      style: GoogleFonts.montserrat(),
+                    ),
+                    backgroundColor: afropeepGreen,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: afropeepGreen,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Open Settings',
+              style: GoogleFonts.montserrat(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -186,16 +274,15 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+  Widget build(BuildContext context) => SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Text(
-            "Where are you located?",
-            style: GoogleFonts.poppins(
+            'Where are you located?',
+            style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: textDarkBrown,
@@ -205,8 +292,8 @@ class _LocationScreenState extends State<LocationScreen> {
           const SizedBox(height: 8),
 
           Text(
-            "This helps us connect you with people nearby",
-            style: GoogleFonts.poppins(
+            'This helps us connect you with people nearby',
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textLightBrown,
             ),
@@ -215,12 +302,12 @@ class _LocationScreenState extends State<LocationScreen> {
           const SizedBox(height: 32),
 
           // GPS Location Button
-          Container(
+          SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _isLoadingLocation ? null : _getCurrentLocation,
               icon: _isLoadingLocation
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -228,12 +315,12 @@ class _LocationScreenState extends State<LocationScreen> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : Icon(Icons.my_location, color: Colors.white),
+                  : const Icon(Icons.my_location, color: Colors.white),
               label: Text(
                 _isLoadingLocation
                     ? 'Getting Location...'
                     : 'Use My Current Location',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -263,7 +350,7 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.location_on,
                     color: afropeepGreen,
                     size: 20,
@@ -275,7 +362,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       children: [
                         Text(
                           'Your Location',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 12,
                             color: textLightBrown,
                             fontWeight: FontWeight.w500,
@@ -283,7 +370,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         ),
                         Text(
                           _currentLocation!,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             color: textDarkBrown,
                             fontWeight: FontWeight.w600,
@@ -292,7 +379,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       ],
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.check_circle,
                     color: afropeepGreen,
                     size: 20,
@@ -313,7 +400,7 @@ class _LocationScreenState extends State<LocationScreen> {
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline,
                   color: afropeepGreen,
                   size: 20,
@@ -321,8 +408,8 @@ class _LocationScreenState extends State<LocationScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    "Your location helps us show you people nearby. We only show your city, never your exact location.",
-                    style: GoogleFonts.poppins(
+                    'Your location helps us show you people nearby. We only show your city, never your exact location.',
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: textDarkBrown,
                     ),
@@ -334,5 +421,4 @@ class _LocationScreenState extends State<LocationScreen> {
         ],
       ),
     );
-  }
 }

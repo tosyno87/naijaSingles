@@ -4,33 +4,29 @@ import '../../../models/user_model.dart';
 
 /// Mode-specific profile sections that show different information based on relationship intent
 class ModeSpecificProfileSections extends StatelessWidget {
+
+  const ModeSpecificProfileSections({
+    required this.user, required this.selectedMode, super.key,
+  });
   final UserModel user;
   final String selectedMode;
 
-  const ModeSpecificProfileSections({
-    Key? key,
-    required this.user,
-    required this.selectedMode,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: [
         // Mode-specific header
         _buildModeHeader(),
-        
+
         const SizedBox(height: 16),
-        
+
         // Mode-specific content sections
         ..._buildModeSpecificSections(),
       ],
     );
-  }
 
   Widget _buildModeHeader() {
     final config = _getModeConfig();
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -86,8 +82,7 @@ class ModeSpecificProfileSections extends StatelessWidget {
     }
   }
 
-  List<Widget> _buildDatingSections() {
-    return [
+  List<Widget> _buildDatingSections() => [
       _buildSection(
         title: 'Relationship Goals',
         icon: Icons.favorite,
@@ -98,7 +93,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           _buildInfoRow('Lifestyle', _getLifestyle()),
         ],
       ),
-      
       if (_getDealbreakers().isNotEmpty) ...[
         const SizedBox(height: 16),
         _buildSection(
@@ -110,7 +104,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           ],
         ),
       ],
-      
       const SizedBox(height: 16),
       _buildSection(
         title: 'Personality',
@@ -123,10 +116,8 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ],
       ),
     ];
-  }
 
-  List<Widget> _buildFriendshipSections() {
-    return [
+  List<Widget> _buildFriendshipSections() => [
       _buildSection(
         title: 'Social Interests',
         icon: Icons.people,
@@ -137,7 +128,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           _buildInfoRow('Availability', _getAvailability()),
         ],
       ),
-      
       if (_getHobbies().isNotEmpty) ...[
         const SizedBox(height: 16),
         _buildSection(
@@ -149,7 +139,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           ],
         ),
       ],
-      
       const SizedBox(height: 16),
       _buildSection(
         title: 'Friendship Goals',
@@ -162,10 +151,8 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ],
       ),
     ];
-  }
 
-  List<Widget> _buildNetworkingSections() {
-    return [
+  List<Widget> _buildNetworkingSections() => [
       _buildSection(
         title: 'Professional Info',
         icon: Icons.business_center,
@@ -176,7 +163,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           _buildInfoRow('Company', _getCompany()),
         ],
       ),
-      
       if (_getSkills().isNotEmpty) ...[
         const SizedBox(height: 16),
         _buildSection(
@@ -188,7 +174,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
           ],
         ),
       ],
-      
       const SizedBox(height: 16),
       _buildSection(
         title: 'Networking Goals',
@@ -197,19 +182,18 @@ class ModeSpecificProfileSections extends StatelessWidget {
         children: [
           _buildInfoRow('Professional Focus', _getProfessionalFocus()),
           _buildInfoRow('Collaboration Style', _getCollaborationStyle()),
-          _buildInfoRow('Networking Availability', _getNetworkingAvailability()),
+          _buildInfoRow(
+              'Networking Availability', _getNetworkingAvailability(),),
         ],
       ),
     ];
-  }
 
   Widget _buildSection({
     required String title,
     required IconData icon,
     required Color color,
     required List<Widget> children,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -244,11 +228,10 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildInfoRow(String label, String value) {
     if (value.isEmpty) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -281,16 +264,15 @@ class ModeSpecificProfileSections extends StatelessWidget {
 
   Widget _buildTagsList(List<String> tags) {
     if (tags.isEmpty) return const SizedBox.shrink();
-    
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: tags.map((tag) => _buildTag(tag)).toList(),
+      children: tags.map(_buildTag).toList(),
     );
   }
 
-  Widget _buildTag(String tag) {
-    return Container(
+  Widget _buildTag(String tag) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFF008037).withOpacity(0.1),
@@ -306,7 +288,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
         ),
       ),
     );
-  }
 
   // Mode configuration
   _ModeConfig _getModeConfig() {
@@ -350,22 +331,28 @@ class ModeSpecificProfileSections extends StatelessWidget {
   String _getCommunicationStyle() => 'Direct'; // This would come from user data
   String _getSocialEnergy() => 'Balanced'; // This would come from user data
   String _getLoveLanguage() => 'Quality Time'; // This would come from user data
-  
-  String _getGroupActivities() => 'Sports, Movies, Dining'; // This would come from user data
+
+  String _getGroupActivities() =>
+      'Sports, Movies, Dining'; // This would come from user data
   String _getSocialStyle() => 'Outgoing'; // This would come from user data
   String _getAvailability() => 'Weekends'; // This would come from user data
   String _getHobbies() => ''; // This would come from user data
-  String _getFriendGroupSize() => 'Small groups (3-5)'; // This would come from user data
+  String _getFriendGroupSize() =>
+      'Small groups (3-5)'; // This would come from user data
   String _getActivityLevel() => 'Moderate'; // This would come from user data
-  String _getMeetingStyle() => 'Casual gatherings'; // This would come from user data
-  
+  String _getMeetingStyle() =>
+      'Casual gatherings'; // This would come from user data
+
   String _getIndustry() => user.job_title ?? 'Not specified';
   String _getCareerLevel() => 'Mid-level'; // This would come from user data
   String _getCompany() => user.company ?? 'Not specified';
   String _getSkills() => ''; // This would come from user data
-  String _getProfessionalFocus() => 'Technology'; // This would come from user data
-  String _getCollaborationStyle() => 'Team player'; // This would come from user data
-  String _getNetworkingAvailability() => 'Business hours'; // This would come from user data
+  String _getProfessionalFocus() =>
+      'Technology'; // This would come from user data
+  String _getCollaborationStyle() =>
+      'Team player'; // This would come from user data
+  String _getNetworkingAvailability() =>
+      'Business hours'; // This would come from user data
 
   List<String> _getDealbreakersList() {
     // This would return actual dealbreakers from user data
@@ -384,10 +371,6 @@ class ModeSpecificProfileSections extends StatelessWidget {
 }
 
 class _ModeConfig {
-  final IconData icon;
-  final Color color;
-  final String title;
-  final String subtitle;
 
   _ModeConfig({
     required this.icon,
@@ -395,4 +378,8 @@ class _ModeConfig {
     required this.title,
     required this.subtitle,
   });
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
 }

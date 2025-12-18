@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '../../../common/utils/app_logger.dart';
 import '../../../common/widgets/custom_snackbar.dart';
 import '../../user/controllers/onboarding_controller.dart';
 
@@ -23,12 +25,12 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     'Female',
     'Non-binary',
     'Prefer not to say',
-    'Other'
+    'Other',
   ];
 
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -67,7 +69,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   void _formatDateIntoController() {
     if (_selectedDate != null) {
       _dobController.text =
-          "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}";
+          '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}';
     }
   }
 
@@ -78,12 +80,10 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           DateTime.now().subtract(const Duration(days: 365 * 18)),
       firstDate: DateTime(1950),
       lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: afropeepGreen,
-              onPrimary: Colors.white,
               surface: cardBackground,
               onSurface: textDarkBrown,
             ),
@@ -94,8 +94,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
 
     if (picked != null && picked != _selectedDate) {
@@ -115,7 +114,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       // Check if user is at least 18
       if (age < 18) {
         CustomSnackbar.showSnackBarSimple(
-          "You must be at least 18 years old to use this app",
+          'You must be at least 18 years old to use this app',
           context,
         );
       } else {
@@ -134,23 +133,22 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     // Save to controller
     final controller =
         Provider.of<OnboardingController>(context, listen: false);
-    print('🔍 BasicInfoScreen: Setting gender to "$gender"');
-    print('🔍 Controller instance: ${controller.hashCode}');
+    AppLogger.debug('🔍 BasicInfoScreen: Setting gender to "$gender"');
+    AppLogger.debug('🔍 Controller instance: ${controller.hashCode}');
     controller.setGender(gender);
-    print('🔍 Controller gender after setting: "${controller.gender}"');
+    AppLogger.debug('🔍 Controller gender after setting: "${controller.gender}"');
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+  Widget build(BuildContext context) => SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Name section
           Text(
             "What's your name?",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -161,15 +159,15 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
           TextField(
             controller: _nameController,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textDarkBrown,
             ),
             decoration: InputDecoration(
               filled: true,
               fillColor: cardBackground,
-              hintText: "Enter your full name",
-              hintStyle: GoogleFonts.poppins(
+              hintText: 'Enter your full name',
+              hintStyle: GoogleFonts.montserrat(
                 color: textLightBrown,
               ),
               border: OutlineInputBorder(
@@ -178,7 +176,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: afropeepGreen, width: 2),
+                borderSide: const BorderSide(color: afropeepGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -188,11 +186,11 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
             onChanged: (value) {
               final controller =
                   Provider.of<OnboardingController>(context, listen: false);
-              print('🔍 BasicInfoScreen: Setting name to "$value"');
-              print('🔍 Controller instance: ${controller.hashCode}');
+              AppLogger.debug('🔍 BasicInfoScreen: Setting name to "$value"');
+              AppLogger.debug('🔍 Controller instance: ${controller.hashCode}');
               controller.setFullName(value);
-              print(
-                  '🔍 Controller name after setting: "${controller.fullName}"');
+              AppLogger.debug(
+                  '🔍 Controller name after setting: "${controller.fullName}"',);
             },
           ),
 
@@ -200,8 +198,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
           // Date of birth section
           Text(
-            "When were you born?",
-            style: GoogleFonts.poppins(
+            'When were you born?',
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -214,15 +212,15 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           TextField(
             controller: _dobController,
             readOnly: true, // Make it read-only
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               color: textDarkBrown,
             ),
             decoration: InputDecoration(
               filled: true,
               fillColor: cardBackground,
-              hintText: "Select your date of birth",
-              hintStyle: GoogleFonts.poppins(
+              hintText: 'Select your date of birth',
+              hintStyle: GoogleFonts.montserrat(
                 color: textLightBrown,
               ),
               border: OutlineInputBorder(
@@ -231,13 +229,13 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: afropeepGreen, width: 2),
+                borderSide: const BorderSide(color: afropeepGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 16,
               ),
-              suffixIcon: Icon(
+              suffixIcon: const Icon(
                 Icons.calendar_today,
                 color: afropeepGreen, // Ensure icon is visible
                 size: 24,
@@ -251,8 +249,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                "Age: ${Provider.of<OnboardingController>(context).age}",
-                style: GoogleFonts.poppins(
+                'Age: ${Provider.of<OnboardingController>(context).age}',
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: afropeepGreen,
@@ -266,7 +264,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           // Gender section
           Text(
             "What's your gender?",
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -277,7 +275,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
           // Gender dropdown with MVP styling
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: cardBackground,
               borderRadius: BorderRadius.circular(12),
@@ -286,32 +284,30 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
             child: DropdownButton<String>(
               value: _selectedGender.isEmpty ? null : _selectedGender,
               hint: Text(
-                "Select your gender",
-                style: GoogleFonts.poppins(
+                'Select your gender',
+                style: GoogleFonts.montserrat(
                   color: textLightBrown,
                   fontSize: 16,
                 ),
               ),
               isExpanded: true,
               underline: const SizedBox(),
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_drop_down,
                 color: afropeepGreen,
               ),
               dropdownColor: cardBackground,
-              items: _genderOptions.map((String gender) {
-                return DropdownMenuItem<String>(
+              items: _genderOptions.map((String gender) => DropdownMenuItem<String>(
                   value: gender,
                   child: Text(
                     gender,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: textDarkBrown,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              }).toList(),
+                ),).toList(),
               onChanged: (String? newValue) {
                 if (newValue != null) {
                   _selectGender(newValue);
@@ -322,5 +318,4 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         ],
       ),
     );
-  }
 }

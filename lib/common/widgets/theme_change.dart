@@ -15,10 +15,10 @@ class ChangeThemeButtonWidget extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     ThemeMode currentThemeMode = themeProvider.themeMode;
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(18.0),
+          padding: const EdgeInsets.all(18),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Center(
@@ -28,28 +28,26 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                     color:
                         themeProvider.isDarkMode ? Colors.white : primaryColor,
                     fontSize: 18,
-                    fontWeight: FontWeight.w500),
+                    fontWeight: FontWeight.w500,),
               ),
             ),
             InkResponse(
               child: !themeProvider.isDarkMode
-                  ? Icon(
+                  ? const Icon(
                       Icons.wb_sunny,
                       color: primaryColor,
                     )
-                  : Icon(
+                  : const Icon(
                       Icons.nightlight_round,
                       color: primaryColor,
                     ),
               onTap: () {
                 showDialog(
                   context: context,
-                  builder: (BuildContext dialogContext) {
-                    return AlertDialog(
+                  builder: (BuildContext dialogContext) => AlertDialog(
                       title: Text('Select Theme Mode'.tr().toString()),
                       content: StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return Column(
+                        builder: (BuildContext context, StateSetter setState) => Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               RadioListTile<ThemeMode>(
@@ -62,7 +60,7 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                                     currentThemeMode = value!;
                                   });
 
-                                  log("theme $value");
+                                  log('theme $value');
                                 },
                               ),
                               RadioListTile<ThemeMode>(
@@ -74,7 +72,7 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                                   setState(() {
                                     currentThemeMode = value!;
                                   });
-                                  log("theme $value");
+                                  log('theme $value');
                                 },
                               ),
                               RadioListTile<ThemeMode>(
@@ -86,18 +84,17 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                                   setState(() {
                                     currentThemeMode = value!;
                                   });
-                                  log("theme $value");
+                                  log('theme $value');
                                 },
                               ),
                             ],
-                          );
-                        },
+                          ),
                       ),
                       actions: <Widget>[
                         TextButton(
                           child: Text(
                             'Cancel'.tr().toString(),
-                            style: TextStyle(color: AppColors.secondaryColor),
+                            style: const TextStyle(color: AppColors.secondaryColor),
                           ),
                           onPressed: () {
                             Navigator.of(dialogContext).pop();
@@ -106,22 +103,21 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                         TextButton(
                           child: Text(
                             'Apply'.tr().toString(),
-                            style: TextStyle(color: primaryColor),
+                            style: const TextStyle(color: primaryColor),
                           ),
                           onPressed: () {
                             final provider = Provider.of<ThemeProvider>(context,
-                                listen: false);
+                                listen: false,);
                             provider.toggleTheme(currentThemeMode);
                             Navigator.of(dialogContext).pop();
                           },
                         ),
                       ],
-                    );
-                  },
+                    ),
                 );
               },
-            )
-          ]),
+            ),
+          ],),
         ),
       ),
     );

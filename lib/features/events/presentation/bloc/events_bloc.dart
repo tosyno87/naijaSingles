@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../data/models/event_model.dart';
 import '../../data/repositories/events_repository.dart';
 
@@ -15,10 +17,10 @@ abstract class EventsEvent extends Equatable {
 }
 
 class LoadEventsEvent extends EventsEvent {
-  final bool forceRefresh;
-  
+
   const LoadEventsEvent({this.forceRefresh = false});
-  
+  final bool forceRefresh;
+
   @override
   List<Object?> get props => [forceRefresh];
 }
@@ -28,19 +30,19 @@ class RefreshEventsEvent extends EventsEvent {}
 class LoadMoreEventsEvent extends EventsEvent {}
 
 class FilterEventsEvent extends EventsEvent {
-  final EventFilter filter;
-  
+
   const FilterEventsEvent(this.filter);
-  
+  final EventFilter filter;
+
   @override
   List<Object?> get props => [filter];
 }
 
 class SearchEventsEvent extends EventsEvent {
-  final String query;
-  
+
   const SearchEventsEvent(this.query);
-  
+  final String query;
+
   @override
   List<Object?> get props => [query];
 }
@@ -60,11 +62,6 @@ class EventsInitial extends EventsState {}
 class EventsLoading extends EventsState {}
 
 class EventsLoaded extends EventsState {
-  final List<EventModel> events;
-  final bool hasReachedMax;
-  final EventFilter? currentFilter;
-  final String? searchQuery;
-  final bool isLoadingMore;
 
   const EventsLoaded({
     required this.events,
@@ -73,6 +70,11 @@ class EventsLoaded extends EventsState {
     this.searchQuery,
     this.isLoadingMore = false,
   });
+  final List<EventModel> events;
+  final bool hasReachedMax;
+  final EventFilter? currentFilter;
+  final String? searchQuery;
+  final bool isLoadingMore;
 
   EventsLoaded copyWith({
     List<EventModel>? events,
@@ -80,15 +82,13 @@ class EventsLoaded extends EventsState {
     EventFilter? currentFilter,
     String? searchQuery,
     bool? isLoadingMore,
-  }) {
-    return EventsLoaded(
+  }) => EventsLoaded(
       events: events ?? this.events,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       currentFilter: currentFilter ?? this.currentFilter,
       searchQuery: searchQuery ?? this.searchQuery,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
-  }
 
   @override
   List<Object?> get props => [
@@ -101,44 +101,29 @@ class EventsLoaded extends EventsState {
 }
 
 class EventsError extends EventsState {
-  final String message;
-  final bool isNetworkError;
 
   const EventsError({
     required this.message,
     this.isNetworkError = false,
   });
+  final String message;
+  final bool isNetworkError;
 
   @override
   List<Object?> get props => [message, isNetworkError];
 }
 
 class EventsSearching extends EventsState {
-  final String query;
-  
+
   const EventsSearching(this.query);
-  
+  final String query;
+
   @override
   List<Object?> get props => [query];
 }
 
 // Event Filter Model
 class EventFilter extends Equatable {
-  final String? category;
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final String? location;
-  final bool freeOnly;
-  final bool? paidOnly;
-  final double? maxPrice;
-  final double? minPrice;
-  final double? latitude;
-  final double? longitude;
-  final double? radiusKm;
-  final List<String>? tags;
-  final String? sortBy; // 'date', 'popularity', 'distance', 'price'
-  final bool trendingOnly;
-  final bool weekendOnly;
 
   const EventFilter({
     this.category,
@@ -157,6 +142,21 @@ class EventFilter extends Equatable {
     this.trendingOnly = false,
     this.weekendOnly = false,
   });
+  final String? category;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? location;
+  final bool freeOnly;
+  final bool? paidOnly;
+  final double? maxPrice;
+  final double? minPrice;
+  final double? latitude;
+  final double? longitude;
+  final double? radiusKm;
+  final List<String>? tags;
+  final String? sortBy; // 'date', 'popularity', 'distance', 'price'
+  final bool trendingOnly;
+  final bool weekendOnly;
 
   EventFilter copyWith({
     String? category,
@@ -174,8 +174,7 @@ class EventFilter extends Equatable {
     String? sortBy,
     bool? trendingOnly,
     bool? weekendOnly,
-  }) {
-    return EventFilter(
+  }) => EventFilter(
       category: category ?? this.category,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
@@ -192,7 +191,6 @@ class EventFilter extends Equatable {
       trendingOnly: trendingOnly ?? this.trendingOnly,
       weekendOnly: weekendOnly ?? this.weekendOnly,
     );
-  }
 
   bool get hasActiveFilters =>
       category != null ||
@@ -210,31 +208,38 @@ class EventFilter extends Equatable {
       trendingOnly ||
       weekendOnly;
 
-  bool get hasLocationFilter => latitude != null && longitude != null && radiusKm != null;
+  bool get hasLocationFilter =>
+      latitude != null && longitude != null && radiusKm != null;
   bool get hasPriceFilter => maxPrice != null || minPrice != null;
   bool get hasDateFilter => startDate != null || endDate != null;
 
   @override
   List<Object?> get props => [
-        category, startDate, endDate, location, freeOnly, paidOnly,
-        maxPrice, minPrice, latitude, longitude, radiusKm,
-        tags, sortBy, trendingOnly, weekendOnly
+        category,
+        startDate,
+        endDate,
+        location,
+        freeOnly,
+        paidOnly,
+        maxPrice,
+        minPrice,
+        latitude,
+        longitude,
+        radiusKm,
+        tags,
+        sortBy,
+        trendingOnly,
+        weekendOnly,
       ];
 }
 
 // Events BLoC
 class EventsBloc extends Bloc<EventsEvent, EventsState> {
-  final EventsRepository _repository;
-  
-  static const int _eventsPerPage = 20;
-  int _currentPage = 1;
-  List<EventModel> _allEvents = [];
 
   EventsBloc({
     required EventsRepository repository,
   })  : _repository = repository,
         super(EventsInitial()) {
-    
     on<LoadEventsEvent>(_onLoadEvents);
     on<RefreshEventsEvent>(_onRefreshEvents);
     on<LoadMoreEventsEvent>(_onLoadMoreEvents);
@@ -242,8 +247,14 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     on<SearchEventsEvent>(_onSearchEvents);
     on<ClearSearchEvent>(_onClearSearch);
   }
+  final EventsRepository _repository;
 
-  Future<void> _onLoadEvents(LoadEventsEvent event, Emitter<EventsState> emit) async {
+  static const int _eventsPerPage = 20;
+  int _currentPage = 1;
+  List<EventModel> _allEvents = [];
+
+  Future<void> _onLoadEvents(
+      LoadEventsEvent event, Emitter<EventsState> emit,) async {
     try {
       if (state is! EventsLoaded || event.forceRefresh) {
         emit(EventsLoading());
@@ -251,34 +262,36 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
 
       // Use location-based loading to get events with distance information
       final events = await _repository.getEventsWithDistance(
-        page: 1,
-        limit: _eventsPerPage,
         forceRefresh: event.forceRefresh,
       );
 
       _allEvents = events;
       _currentPage = 1;
-      
+
       emit(EventsLoaded(
         events: _allEvents,
         hasReachedMax: events.length < _eventsPerPage,
-      ));
+      ),);
     } catch (e) {
       log('Error loading events: $e', name: 'EventsBloc');
       emit(EventsError(
         message: _getErrorMessage(e),
         isNetworkError: _isNetworkError(e),
-      ));
+      ),);
     }
   }
 
-  Future<void> _onRefreshEvents(RefreshEventsEvent event, Emitter<EventsState> emit) async {
+  Future<void> _onRefreshEvents(
+      RefreshEventsEvent event, Emitter<EventsState> emit,) async {
     add(const LoadEventsEvent(forceRefresh: true));
   }
 
-  Future<void> _onLoadMoreEvents(LoadMoreEventsEvent event, Emitter<EventsState> emit) async {
+  Future<void> _onLoadMoreEvents(
+      LoadMoreEventsEvent event, Emitter<EventsState> emit,) async {
     final currentState = state;
-    if (currentState is! EventsLoaded || currentState.hasReachedMax || currentState.isLoadingMore) {
+    if (currentState is! EventsLoaded ||
+        currentState.hasReachedMax ||
+        currentState.isLoadingMore) {
       return;
     }
 
@@ -287,24 +300,23 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     try {
       final moreEvents = await _repository.getEvents(
         page: _currentPage + 1,
-        limit: _eventsPerPage,
       );
 
       if (moreEvents.isNotEmpty) {
         _allEvents.addAll(moreEvents);
         _currentPage++;
-        
+
         emit(EventsLoaded(
           events: List.from(_allEvents),
           hasReachedMax: moreEvents.length < _eventsPerPage,
           currentFilter: currentState.currentFilter,
           searchQuery: currentState.searchQuery,
-        ));
+        ),);
       } else {
         emit(currentState.copyWith(
           hasReachedMax: true,
           isLoadingMore: false,
-        ));
+        ),);
       }
     } catch (e) {
       log('Error loading more events: $e', name: 'EventsBloc');
@@ -312,7 +324,8 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }
   }
 
-  Future<void> _onFilterEvents(FilterEventsEvent event, Emitter<EventsState> emit) async {
+  Future<void> _onFilterEvents(
+      FilterEventsEvent event, Emitter<EventsState> emit,) async {
     final currentState = state;
     if (currentState is! EventsLoaded) return;
 
@@ -320,16 +333,17 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
 
     try {
       List<EventModel> filteredEvents;
-      
+
       if (event.filter.hasActiveFilters) {
         if (event.filter.category != null) {
           // Get events by category
-          filteredEvents = await _repository.getEventsByCategory(event.filter.category!);
+          filteredEvents =
+              await _repository.getEventsByCategory(event.filter.category!);
         } else {
           // Apply other filters to cached events
           filteredEvents = _applyFilters(_allEvents, event.filter);
         }
-        
+
         // Apply additional filters if needed
         filteredEvents = _applyFilters(filteredEvents, event.filter);
       } else {
@@ -340,14 +354,15 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         events: filteredEvents,
         hasReachedMax: true,
         currentFilter: event.filter,
-      ));
+      ),);
     } catch (e) {
       log('Error filtering events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
     }
   }
 
-  Future<void> _onSearchEvents(SearchEventsEvent event, Emitter<EventsState> emit) async {
+  Future<void> _onSearchEvents(
+      SearchEventsEvent event, Emitter<EventsState> emit,) async {
     if (event.query.trim().isEmpty) {
       add(ClearSearchEvent());
       return;
@@ -362,125 +377,133 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         events: searchResults,
         hasReachedMax: true,
         searchQuery: event.query,
-      ));
+      ),);
     } catch (e) {
       log('Error searching events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
     }
   }
 
-  Future<void> _onClearSearch(ClearSearchEvent event, Emitter<EventsState> emit) async {
+  Future<void> _onClearSearch(
+      ClearSearchEvent event, Emitter<EventsState> emit,) async {
     emit(EventsLoaded(
       events: _allEvents,
       hasReachedMax: _allEvents.length < _eventsPerPage,
-    ));
+    ),);
   }
 
   List<EventModel> _applyFilters(List<EventModel> events, EventFilter filter) {
     var filteredEvents = events.where((event) {
       // Category filter
-      if (filter.category != null && 
-          !event.category.toLowerCase().contains(filter.category!.toLowerCase())) {
+      if (filter.category != null &&
+          !event.category
+              .toLowerCase()
+              .contains(filter.category!.toLowerCase())) {
         return false;
       }
-      
+
       // Free/Paid filter
       if (filter.freeOnly && !event.isFree) {
         return false;
       }
-      
-      if (filter.paidOnly == true && event.isFree) {
+
+      if (filter.paidOnly ?? false && event.isFree) {
         return false;
       }
-      
+
       // Date range filters
-      if (filter.startDate != null && event.startDate.isBefore(filter.startDate!)) {
+      if (filter.startDate != null &&
+          event.startDate.isBefore(filter.startDate!)) {
         return false;
       }
-      
+
       if (filter.endDate != null && event.startDate.isAfter(filter.endDate!)) {
         return false;
       }
-      
+
       // Location text filter
-      if (filter.location != null && 
-          !event.location.displayAddress.toLowerCase().contains(filter.location!.toLowerCase())) {
+      if (filter.location != null &&
+          !event.location.displayAddress
+              .toLowerCase()
+              .contains(filter.location!.toLowerCase())) {
         return false;
       }
-      
+
       // Price filters
-      if (filter.minPrice != null && (event.ticketPrice ?? 0) < filter.minPrice!) {
+      if (filter.minPrice != null &&
+          (event.ticketPrice ?? 0) < filter.minPrice!) {
         return false;
       }
-      
-      if (filter.maxPrice != null && (event.ticketPrice ?? 0) > filter.maxPrice!) {
+
+      if (filter.maxPrice != null &&
+          (event.ticketPrice ?? 0) > filter.maxPrice!) {
         return false;
       }
-      
+
       // Tags filter
       if (filter.tags != null && filter.tags!.isNotEmpty) {
         final eventTags = event.tags.map((tag) => tag.toLowerCase()).toList();
-        final hasMatchingTag = filter.tags!.any((filterTag) => 
-          eventTags.any((eventTag) => eventTag.contains(filterTag.toLowerCase())));
+        final hasMatchingTag = filter.tags!.any((filterTag) => eventTags
+            .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),);
         if (!hasMatchingTag) return false;
       }
-      
+
       // Weekend filter
       if (filter.weekendOnly) {
         final weekday = event.startDate.weekday;
-        if (weekday != DateTime.friday && weekday != DateTime.saturday && weekday != DateTime.sunday) {
+        if (weekday != DateTime.friday &&
+            weekday != DateTime.saturday &&
+            weekday != DateTime.sunday) {
           return false;
         }
       }
-      
+
       return true;
     }).toList();
-    
+
     // Apply location-based filtering (radius)
     if (filter.hasLocationFilter) {
-      filteredEvents = _filterByLocation(filteredEvents, filter.latitude!, filter.longitude!, filter.radiusKm!);
+      filteredEvents = _filterByLocation(filteredEvents, filter.latitude!,
+          filter.longitude!, filter.radiusKm!,);
     }
-    
+
     // Apply sorting
     if (filter.sortBy != null) {
       filteredEvents = _sortEvents(filteredEvents, filter.sortBy!);
     }
-    
+
     return filteredEvents;
   }
-  
-  List<EventModel> _filterByLocation(List<EventModel> events, double latitude, double longitude, double radiusKm) {
-    return events.where((event) {
+
+  List<EventModel> _filterByLocation(List<EventModel> events, double latitude,
+      double longitude, double radiusKm,) => events.where((event) {
       // Skip events without location data
       if (event.location.latitude == null || event.location.longitude == null) {
         return false;
       }
-      
+
       // Calculate distance between user location and event location
-      final distance = _calculateDistance(
-        latitude, longitude,
-        event.location.latitude!, event.location.longitude!
-      );
+      final distance = _calculateDistance(latitude, longitude,
+          event.location.latitude!, event.location.longitude!,);
       return distance <= radiusKm;
     }).toList();
-  }
-  
-  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+
+  double _calculateDistance(
+      double lat1, double lon1, double lat2, double lon2,) {
     const double earthRadius = 6371; // Earth's radius in kilometers
     final double dLat = _degreesToRadians(lat2 - lat1);
     final double dLon = _degreesToRadians(lon2 - lon1);
-    final double a = 
-        math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(_degreesToRadians(lat1)) * math.cos(_degreesToRadians(lat2)) *
-        math.sin(dLon / 2) * math.sin(dLon / 2);
+    final double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_degreesToRadians(lat1)) *
+            math.cos(_degreesToRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
     final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
     return earthRadius * c;
   }
-  
-  double _degreesToRadians(double degrees) {
-    return degrees * (math.pi / 180);
-  }
-  
+
+  double _degreesToRadians(double degrees) => degrees * (math.pi / 180);
+
   List<EventModel> _sortEvents(List<EventModel> events, String sortBy) {
     switch (sortBy) {
       case 'date':
@@ -490,7 +513,8 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         events.sort((a, b) => b.rsvpCount.compareTo(a.rsvpCount));
         break;
       case 'price':
-        events.sort((a, b) => (a.ticketPrice ?? 0).compareTo(b.ticketPrice ?? 0));
+        events
+            .sort((a, b) => (a.ticketPrice ?? 0).compareTo(b.ticketPrice ?? 0));
         break;
       case 'distance':
         // Distance sorting would require user location, handled separately
@@ -499,7 +523,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     return events;
   }
 
-  String _getErrorMessage(dynamic error) {
+  String _getErrorMessage(error) {
     if (error.toString().contains('FirestoreException')) {
       return 'Failed to save events. Please try again.';
     } else {
@@ -507,8 +531,6 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }
   }
 
-  bool _isNetworkError(dynamic error) {
-    return error.toString().contains('SocketException') ||
-           error.toString().contains('TimeoutException');
-  }
+  bool _isNetworkError(error) => error.toString().contains('SocketException') ||
+        error.toString().contains('TimeoutException');
 }

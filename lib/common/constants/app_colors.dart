@@ -25,9 +25,14 @@ class AppColors {
   static const Color overlayColor = Color(0xFFF8FAFC);
 
   // 📝 TEXT COLORS - Afrocentric Theme
-  static const Color textPrimary = Color(0xFF2D2D2D); // Dark text for white background
+  static const Color textPrimary =
+      Color(0xFF2D2D2D); // Dark text for white background
   static const Color textSecondary = Color(0xFF666666); // Medium grey
   static const Color textTertiary = Color(0xFF94A3B8);
+  
+  // ⚠️ DEPRECATED: Use textSecondary instead. Kept for backward compatibility.
+  @Deprecated('Use AppColors.textSecondary instead')
+  static const Color secondaryColor = Color(0xFF8D6E63); // Light brown (old secondary color)
   static const Color textOnPrimary = Colors.white; // White text on green
   static const Color textOnSurface = Color(0xFF2D2D2D); // Dark text on white
 
@@ -92,6 +97,9 @@ class AppColors {
   static const Color divider = Color(0xFFE2E8F0);
   static const Color shadow = Color(0x1A000000);
   static const Color disabled = Color(0xFF94A3B8);
+  
+  // 🎨 AUTH SCREEN COLORS
+  static const Color iconBackgroundColor = Color(0xFFDFF5E2); // Light green for icon background
 
   // 📱 NAVIGATION COLORS - Afrocentric Theme
   static const Color navSelected = Color(0xFF008037); // Green for active
@@ -119,90 +127,86 @@ class AppColors {
 
   // 🌟 SHADOW DEFINITIONS
   static List<BoxShadow> get cardShadow => [
-    BoxShadow(
-      color: shadow,
-      blurRadius: 20,
-      offset: const Offset(0, 8),
-      spreadRadius: 0,
-    ),
-  ];
+        const BoxShadow(
+          color: shadow,
+          blurRadius: 20,
+          offset: Offset(0, 8),
+        ),
+      ];
 
   static List<BoxShadow> get buttonShadow => [
-    BoxShadow(
-      color: primaryGreen.withOpacity(0.3),
-      blurRadius: 15,
-      offset: const Offset(0, 6),
-      spreadRadius: 0,
-    ),
-  ];
+        BoxShadow(
+          color: primaryGreen.withOpacity(0.3),
+          blurRadius: 15,
+          offset: const Offset(0, 6),
+        ),
+      ];
 
   static List<BoxShadow> get iconShadow => [
-    BoxShadow(
-      color: shadow,
-      blurRadius: 10,
-      offset: const Offset(0, 4),
-      spreadRadius: 0,
-    ),
-  ];
+        const BoxShadow(
+          color: shadow,
+          blurRadius: 10,
+          offset: Offset(0, 4),
+        ),
+      ];
 
   // 🎯 THEME DATA - Afrocentric Theme
   static ThemeData get lightTheme => ThemeData(
-    useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryGreen,
-      brightness: Brightness.light,
-      primary: primaryGreen,
-      secondary: accentGreen,
-      surface: surfaceColor,
-      background: backgroundColor,
-      error: error,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      foregroundColor: textPrimary,
-    ),
-    cardTheme: CardThemeData(
-      color: cardColor,
-      elevation: 0,
-      shadowColor: shadow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primaryGreen,
-        foregroundColor: textOnPrimary,
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryGreen,
+          primary: primaryGreen,
+          secondary: accentGreen,
+          surface: surfaceColor,
+          background: backgroundColor,
+          error: error,
         ),
-      ),
-    ),
-    textTheme: const TextTheme(
-      headlineLarge: TextStyle(
-        color: textPrimary,
-        fontWeight: FontWeight.bold,
-      ),
-      headlineMedium: TextStyle(
-        color: textPrimary,
-        fontWeight: FontWeight.bold,
-      ),
-      headlineSmall: TextStyle(
-        color: textPrimary,
-        fontWeight: FontWeight.bold,
-      ),
-      bodyLarge: TextStyle(
-        color: textPrimary,
-      ),
-      bodyMedium: TextStyle(
-        color: textPrimary,
-      ),
-      bodySmall: TextStyle(
-        color: textSecondary,
-      ),
-    ),
-  );
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: textPrimary,
+        ),
+        cardTheme: CardThemeData(
+          color: cardColor,
+          elevation: 0,
+          shadowColor: shadow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryGreen,
+            foregroundColor: textOnPrimary,
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+        textTheme: const TextTheme(
+          headlineLarge: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineMedium: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+          headlineSmall: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+          bodyLarge: TextStyle(
+            color: textPrimary,
+          ),
+          bodyMedium: TextStyle(
+            color: textPrimary,
+          ),
+          bodySmall: TextStyle(
+            color: textSecondary,
+          ),
+        ),
+      );
 }

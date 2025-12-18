@@ -1,15 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:io';
-import 'package:naijasingles/services/unified_group_service.dart';
-import 'package:naijasingles/services/image_upload_service.dart';
-import 'package:naijasingles/services/validation_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/features/group_chat/screens/group_chat_screen.dart';
-import 'package:naijasingles/features/groups/widgets/contact_picker_widget.dart';
-import 'package:naijasingles/widgets/tag_input_widget.dart';
-import 'package:naijasingles/widgets/group_avatar_picker.dart';
-import 'package:naijasingles/widgets/success_dialog.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/app_logger.dart';
+import '../../../services/image_upload_service.dart';
+import '../../../services/unified_group_service.dart';
+import '../../../services/validation_service.dart';
+import '../../../widgets/group_avatar_picker.dart';
+import '../../../widgets/success_dialog.dart';
+import '../../../widgets/tag_input_widget.dart';
+import '../../groups/widgets/contact_picker_widget.dart';
+import 'group_chat_screen.dart';
 
 /// Screen for creating new group chats
 class CreateGroupScreen extends StatefulWidget {
@@ -25,20 +28,40 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   GroupType _selectedType = GroupType.music;
   String? _selectedLocation;
-  List<String> _selectedMembers = [];
+  final List<String> _selectedMembers = [];
   List<String> _tags = [];
   File? _selectedImage;
   bool _isCreating = false;
 
   // Popular tag suggestions
   final List<String> _tagSuggestions = [
-    'music', 'nigerian', 'afrobeats', 'lagos', 'abuja', 'community',
-    'friends', 'networking', 'events', 'culture', 'food', 'travel',
-    'sports', 'fitness', 'gaming', 'art', 'fashion', 'tech',
-    'business', 'career', 'study', 'support', 'local', 'international',
+    'music',
+    'nigerian',
+    'afrobeats',
+    'lagos',
+    'abuja',
+    'community',
+    'friends',
+    'networking',
+    'events',
+    'culture',
+    'food',
+    'travel',
+    'sports',
+    'fitness',
+    'gaming',
+    'art',
+    'fashion',
+    'tech',
+    'business',
+    'career',
+    'study',
+    'support',
+    'local',
+    'international',
   ];
 
   @override
@@ -49,8 +72,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
@@ -101,10 +123,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildAvatarSection() {
-    return Column(
+  Widget _buildAvatarSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -129,10 +149,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildTagsSection() {
-    return Column(
+  Widget _buildTagsSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -159,15 +177,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               _tags = tags;
             });
           },
-          maxTags: 5,
           hintText: 'e.g., music, nigerian, afrobeats',
           suggestions: _tagSuggestions,
         ),
       ],
     );
-  }
-  Widget _buildGroupTypeSection() {
-    return Column(
+
+  Widget _buildGroupTypeSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -187,12 +203,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             return GestureDetector(
               onTap: () => setState(() => _selectedType = type),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.primaryGreen : Colors.grey[100],
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? AppColors.primaryGreen : Colors.grey[300]!,
+                    color:
+                        isSelected ? AppColors.primaryGreen : Colors.grey[300]!,
                   ),
                 ),
                 child: Row(
@@ -220,10 +238,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildGroupInfoSection() {
-    return Column(
+  Widget _buildGroupInfoSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -263,10 +279,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildMembersSection() {
-    return Column(
+  Widget _buildMembersSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -298,7 +312,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: AppColors.primaryGreen.withOpacity(0.3),
-                  style: BorderStyle.solid,
                 ),
               ),
               child: Column(
@@ -328,7 +341,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppColors.primaryGreen,
                       borderRadius: BorderRadius.circular(20),
@@ -349,13 +363,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _selectedMembers.map((memberId) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            children: _selectedMembers.map((memberId) => Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGreen.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primaryGreen.withOpacity(0.3)),
+                  border: Border.all(
+                      color: AppColors.primaryGreen.withOpacity(0.3),),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -384,7 +399,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () => _removeMember(memberId),
-                      child: Icon(
+                      child: const Icon(
                         Icons.close,
                         size: 16,
                         color: AppColors.primaryGreen,
@@ -392,12 +407,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     ),
                   ],
                 ),
-              );
-            }).toList(),
+              ),).toList(),
           ),
       ],
     );
-  }
 
   Widget _buildLocationSection() {
     if (_selectedType != GroupType.local) return const SizedBox.shrink();
@@ -423,14 +436,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ),
             prefixIcon: const Icon(Icons.location_on),
           ),
-          onChanged: (value) => _selectedLocation = value.trim().isEmpty ? null : value.trim(),
+          onChanged: (value) =>
+              _selectedLocation = value.trim().isEmpty ? null : value.trim(),
         ),
       ],
     );
   }
 
-  Widget _buildCreateButton() {
-    return SizedBox(
+  Widget _buildCreateButton() => SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
@@ -453,7 +466,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               ),
       ),
     );
-  }
 
   String _getGroupTypeLabel(GroupType type) {
     switch (type) {
@@ -468,7 +480,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return 'Food';
       case GroupType.art:
         return 'Art';
-      
+
       // Lifestyle & Career Groups
       case GroupType.career:
         return 'Career';
@@ -480,7 +492,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return 'Reading';
       case GroupType.movies:
         return 'Movies';
-      
+
       // Social & Community Groups
       case GroupType.events:
         return 'Events';
@@ -492,7 +504,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return 'Study';
       case GroupType.local:
         return 'Local';
-      
+
       // Special Interest Groups
       case GroupType.tech:
         return 'Technology';
@@ -520,7 +532,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return Icons.restaurant;
       case GroupType.art:
         return Icons.palette;
-      
+
       // Lifestyle & Career Groups
       case GroupType.career:
         return Icons.work;
@@ -532,7 +544,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return Icons.menu_book;
       case GroupType.movies:
         return Icons.movie;
-      
+
       // Social & Community Groups
       case GroupType.events:
         return Icons.event;
@@ -544,7 +556,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         return Icons.school;
       case GroupType.local:
         return Icons.location_on;
-      
+
       // Special Interest Groups
       case GroupType.tech:
         return Icons.computer;
@@ -564,8 +576,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => ContactPickerWidget(
-          groupName: _nameController.text.isNotEmpty 
-              ? _nameController.text 
+          groupName: _nameController.text.isNotEmpty
+              ? _nameController.text
               : 'New Group',
           groupId: '', // Will be set after group creation
           onInvitationsSent: (invitations) {
@@ -594,7 +606,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     // Show loading dialog
     LoadingDialog.show(
       context: context,
-      message: 'Creating group...',
     );
 
     setState(() {
@@ -610,13 +621,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           imageUrl = await _imageService.uploadCompressedImage(
             imageFile: _selectedImage!,
             path: 'group_avatars',
-            quality: 85,
-            maxWidth: 800,
-            maxHeight: 800,
           );
         } catch (e) {
           // Continue without image if upload fails
-          print('Image upload failed: $e');
+          AppLogger.error('Image upload failed', error: e);
         }
       }
 
@@ -639,7 +647,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         await SuccessDialog.show(
           context: context,
           title: 'Group Created!',
-          message: 'Your group "${_nameController.text.trim()}" has been created successfully!',
+          message:
+              'Your group "${_nameController.text.trim()}" has been created successfully!',
           actionText: 'Open Group',
           onAction: () {
             Navigator.pop(context); // Close dialog

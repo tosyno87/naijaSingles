@@ -1,14 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../providers/theme_provider.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image/image.dart' as i;
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as i;
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../constants/colors.dart';
 import '../constants/constants.dart';
+import '../providers/theme_provider.dart';
 
 class ImageProperties {
   static Future<File> compressImage(CroppedFile image) async {
@@ -23,17 +24,18 @@ class ImageProperties {
       final File croppedToFileImage = File(image.path);
       final tempdir = await getTemporaryDirectory();
       final path = tempdir.path;
-      
+
       final bytes = await croppedToFileImage.readAsBytes();
-      i.Image? imagefile = i.decodeImage(bytes);
-      
+      final i.Image? imagefile = i.decodeImage(bytes);
+
       if (imagefile == null) {
         throw Exception('Failed to decode image');
       }
-      
-      final compressedImagefile = File('$path/${DateTime.now().millisecondsSinceEpoch}.jpg')
-        ..writeAsBytesSync(i.encodeJpg(imagefile, quality: 80));
-      
+
+      final compressedImagefile =
+          File('$path/${DateTime.now().millisecondsSinceEpoch}.jpg')
+            ..writeAsBytesSync(i.encodeJpg(imagefile, quality: 80));
+
       return compressedImagefile;
     } catch (e) {
       log('Error compressing image: $e');
@@ -49,11 +51,10 @@ class ImageProperties {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return showDialog(
         context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
+        builder: (BuildContext context) => CupertinoAlertDialog(
               title: Text(isProfilePicture
                   ? 'Update profile picture'.tr()
-                  : 'Add pictures'.tr()),
+                  : 'Add pictures'.tr(),),
               content: Text('Select source'.tr()),
               actions: canUploadMoreImages(currentUser)
                   ? <Widget>[
@@ -61,15 +62,15 @@ class ImageProperties {
                         icon: Icons.photo_camera,
                         label: ' Camera'.tr(),
                         themeProvider: themeProvider,
-                        onTap: () => _handleImageSource(
-                          context, currentUser, isProfilePicture, ImageSource.camera),
+                        onTap: () => _handleImageSource(context, currentUser,
+                            isProfilePicture, ImageSource.camera,),
                       ),
                       _buildSourceOption(
                         icon: Icons.photo_library,
                         label: ' Gallery'.tr(),
                         themeProvider: themeProvider,
-                        onTap: () => _handleImageSource(
-                          context, currentUser, isProfilePicture, ImageSource.gallery),
+                        onTap: () => _handleImageSource(context, currentUser,
+                            isProfilePicture, ImageSource.gallery,),
                       ),
                     ]
                   : [
@@ -80,7 +81,8 @@ class ImageProperties {
                             children: <Widget>[
                               const Icon(Icons.error),
                               Text(
-                                "Can't upload more than $maxImagesAllowed pictures".tr(),
+                                "Can't upload more than $maxImagesAllowed pictures"
+                                    .tr(),
                                 style: TextStyle(
                                   fontSize: 15,
                                   color: themeProvider.isDarkMode
@@ -92,9 +94,8 @@ class ImageProperties {
                             ],
                           ),
                         ),
-                      )
-                    ]);
-        });
+                      ),
+                    ],),);
   }
 
   static Future<void> getImage(
@@ -124,7 +125,7 @@ class ImageProperties {
             lockAspectRatio: true,
           ),
           IOSUiSettings(
-            minimumAspectRatio: 1.0,
+            minimumAspectRatio: 1,
             title: 'Crop',
           ),
         ],
@@ -132,7 +133,7 @@ class ImageProperties {
 
       if (croppedFile != null) {
         await uploadFile(
-            await compressImage(croppedFile), currentUser, isProfilePicture);
+            await compressImage(croppedFile), currentUser, isProfilePicture,);
       }
 
       if (context.mounted) {
@@ -159,22 +160,22 @@ class ImageProperties {
       final Reference storageReference = FirebaseStorage.instance
           .ref()
           .child('users/${currentUser.id}/${image.hashCode}.jpg');
-      
+
       final UploadTask uploadTask = storageReference.putFile(image);
-      
+
       final snapshot = await uploadTask;
       final fileURL = await snapshot.ref.getDownloadURL();
-      
+
       final Map<String, dynamic> updateObject = {
         'Pictures': FieldValue.arrayUnion([fileURL]),
       };
-      
+
       if (isProfilePicture) {
-        if (currentUser.imageUrl?.isNotEmpty == true) {
+        if (currentUser.imageUrl?.isNotEmpty ?? false) {
           currentUser.imageUrl?.removeAt(0);
         }
         currentUser.imageUrl?.insert(0, fileURL);
-        
+
         await firebaseFireStoreInstance
             .collection('users')
             .doc(currentUser.id)
@@ -195,15 +196,15 @@ class ImageProperties {
   static Future<File> urlToFile(String imageUrl) async {
     try {
       final response = await http.get(Uri.parse(imageUrl));
-      
+
       if (response.statusCode != 200) {
         throw Exception('Failed to download image: ${response.statusCode}');
       }
-      
+
       final tempdir = await getTemporaryDirectory();
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       final file = File('${tempdir.path}/$fileName');
-      
+
       await file.writeAsBytes(response.bodyBytes);
       return file;
     } on Exception catch (e) {
@@ -215,14 +216,14 @@ class ImageProperties {
   static Future<File> downloadFile(String url) async {
     try {
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode != 200) {
         throw Exception('Failed to download file: ${response.statusCode}');
       }
 
       final documentDirectory = await getApplicationDocumentsDirectory();
       final file = File(
-          '${documentDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+          '${documentDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg',);
 
       await file.writeAsBytes(response.bodyBytes);
       return file;
@@ -238,9 +239,8 @@ class ImageProperties {
     required String label,
     required ThemeProvider themeProvider,
     required VoidCallback onTap,
-  }) {
-    return Padding(
-        padding: const EdgeInsets.all(20),
+  }) => Padding(
+      padding: const EdgeInsets.all(20),
       child: GestureDetector(
         onTap: onTap,
         child: Row(
@@ -259,7 +259,6 @@ class ImageProperties {
         ),
       ),
     );
-  }
 
   /// Helper method to handle image source selection
   static void _handleImageSource(

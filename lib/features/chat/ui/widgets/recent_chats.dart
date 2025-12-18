@@ -4,30 +4,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/data/repo/pagination_repo.dart';
-import 'package:naijasingles/features/chat/ui/widgets/single_chattile.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
+import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../../../../models/chat_model.dart';
+import '../../../../models/user_model.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 import '../../../match/ui/widget/matches_card.dart';
+import 'single_chattile.dart';
 
 class RecentChats extends StatefulWidget {
-  final UserModel currentUser;
-  final ScrollController scrollController;
 
   const RecentChats({
-    super.key,
-    required this.currentUser,
-    required this.scrollController,
+    required this.currentUser, required this.scrollController, super.key,
   });
+  final UserModel currentUser;
+  final ScrollController scrollController;
 
   @override
   State<RecentChats> createState() => _RecentChatsState();
@@ -54,7 +52,7 @@ class _RecentChatsState extends State<RecentChats> {
             widget.scrollController.position.maxScrollExtent * 0.90 &&
         !widget.scrollController.position.outOfRange) {
       if (_hasMoreMessages && !_isLoadingMore) {
-        log("load more called");
+        log('load more called');
         _loadMoreChats();
       }
     }
@@ -74,12 +72,12 @@ class _RecentChatsState extends State<RecentChats> {
     });
   }
 
-  void _loadMoreChats() async {
+  Future<void> _loadMoreChats() async {
     setState(() {
       _isLoadingMore = true;
     });
     final snapshot = await PaginationRepo.getMoreChats(
-        perPage, lastVisibleDocument, widget.currentUser);
+        perPage, lastVisibleDocument, widget.currentUser,);
     setState(() {
       chats.addAll(snapshot.docs);
       _hasMoreMessages = snapshot.docs.length == perPage;
@@ -95,45 +93,45 @@ class _RecentChatsState extends State<RecentChats> {
     return BlocBuilder<MatchUserBloc, MatchUserState>(
       builder: (context, state) {
         if (state is MatchUserLoadingState) {
-          log("i am in matchuserloading");
-          return Hookup4uBar();
+          log('i am in matchuserloading');
+          return const Hookup4uBar();
         }
         if (state is MatchUserFailedState) {
-          log("I AM IN LOADUSERSFailed");
+          log('I AM IN LOADUSERSFailed');
           return Center(
               child: Text(
-            "Error to load data.".tr().toString(),
+            'Error to load data.'.tr().toString(),
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: themeProvider.isDarkMode ? Colors.white : Colors.black54,
                 fontStyle: FontStyle.normal,
                 letterSpacing: 1,
                 decoration: TextDecoration.none,
-                fontSize: 18),
-          ));
+                fontSize: 18,),
+          ),);
         }
         if (state is MatchUserLoadedState) {
-          log("FROM RECENT CHATS SUCCESS");
+          log('FROM RECENT CHATS SUCCESS');
 
-          return Container(
-            decoration: BoxDecoration(
+          return DecoratedBox(
+            decoration: const BoxDecoration(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30.0),
-                topRight: Radius.circular(30.0),
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
               ),
             ),
             child: chats.isEmpty
                 ? Center(
                     child: Text(
-                      "No Recent chat found".tr().toString(),
-                      style: TextStyle(
-                          color: AppColors.secondaryColor, fontSize: 16),
+                      'No Recent chat found'.tr().toString(),
+                      style: const TextStyle(
+                          color: AppColors.secondaryColor, fontSize: 16,),
                     ),
                   )
                 : ListView.builder(
                     shrinkWrap: true,
                     controller: widget.scrollController,
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(0),
                     itemCount: chats.length + 1,
                     itemBuilder: (context, index) {
                       if (index == chats.length) {
@@ -141,11 +139,11 @@ class _RecentChatsState extends State<RecentChats> {
                         return Column(
                           children: [
                             if (_isLoadingMore)
-                              SizedBox(
+                              const SizedBox(
                                   height: 20,
                                   width: 20,
-                                  child: const Hookup4uBar()),
-                            SizedBox(
+                                  child: Hookup4uBar(),),
+                            const SizedBox(
                               height: 20,
                             ),
                             // Padding(
@@ -189,8 +187,8 @@ class _RecentChatsState extends State<RecentChats> {
                         );
                       } else {
                         final data = chats[index].data();
-                        log(" lastmessage data is ${data.toString()}");
-                        ChatModel chat = ChatModel?.from(data);
+                        log(' lastmessage data is ${data.toString()}');
+                        final ChatModel chat = ChatModel?.from(data);
 
                         return FutureBuilder(
                           future: UserMessagingRepo.getChatUserDetails(
@@ -201,9 +199,9 @@ class _RecentChatsState extends State<RecentChats> {
                           builder:
                               (context, AsyncSnapshot<UserModel> snapshot2) {
                             if (!snapshot2.hasData) {
-                              return SizedBox.shrink();
+                              return const SizedBox.shrink();
                             } else if (snapshot2.data != null) {
-                              log(" userdetails ${snapshot2.data!.toString()}");
+                              log(' userdetails ${snapshot2.data!.toString()}');
                               if (_isLoadingMore) const Hookup4uBar();
                               return SingleChatTile(
                                 tempUser: snapshot2.data!,
@@ -214,11 +212,11 @@ class _RecentChatsState extends State<RecentChats> {
                               );
                             }
                             return Padding(
-                              padding: const EdgeInsets.only(top: 80.0),
+                              padding: const EdgeInsets.only(top: 80),
                               child: Center(
                                 child: Text(
-                                  "No Recent chat found".tr().toString(),
-                                  style: TextStyle(
+                                  'No Recent chat found'.tr().toString(),
+                                  style: const TextStyle(
                                     color: AppColors.secondaryColor,
                                     fontSize: 16,
                                   ),
@@ -234,12 +232,12 @@ class _RecentChatsState extends State<RecentChats> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(0.0),
+          padding: const EdgeInsets.all(0),
           child: Center(
               child: Text(
-            "No recent chat found".tr().toString(),
-            style: TextStyle(color: AppColors.secondaryColor, fontSize: 16),
-          )),
+            'No recent chat found'.tr().toString(),
+            style: const TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+          ),),
         );
       },
     );

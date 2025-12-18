@@ -13,16 +13,16 @@ class FacebookLoginInitial extends FacebookLoginStates {}
 class FacebookLoginLoading extends FacebookLoginStates {}
 
 class FacebookLoginSuccess extends FacebookLoginStates {
-  final User? user;
   const FacebookLoginSuccess({required this.user});
+  final User? user;
 
   @override
   List<Object> get props => [user!];
 }
 
 class FacebookLoginFailed extends FacebookLoginStates {
-  final String message;
   const FacebookLoginFailed({required this.message});
+  final String message;
 
   @override
   List<Object> get props => [message];

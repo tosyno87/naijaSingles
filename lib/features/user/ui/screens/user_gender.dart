@@ -5,13 +5,13 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/custom_button.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 
 class Gender extends StatefulWidget {
   const Gender({super.key});
@@ -60,7 +60,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var userData =
+    final userData =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     log(userData.toString());
     final screenSize = MediaQuery.of(context).size;
@@ -82,7 +82,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -106,7 +106,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "I am a...",
+                    'I am a...',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -115,7 +115,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "This helps us find the right matches for you",
+                    'This helps us find the right matches for you',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -130,23 +130,23 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
               Column(
                 children: [
                   _buildGenderCard(
-                    "Man",
-                    selectedGender == "men",
-                    () => setState(() => selectedGender = "men"),
+                    'Man',
+                    selectedGender == 'men',
+                    () => setState(() => selectedGender = 'men'),
                     Icons.male_rounded,
                   ),
                   const SizedBox(height: 16),
                   _buildGenderCard(
-                    "Woman",
-                    selectedGender == "women",
-                    () => setState(() => selectedGender = "women"),
+                    'Woman',
+                    selectedGender == 'women',
+                    () => setState(() => selectedGender = 'women'),
                     Icons.female_rounded,
                   ),
                   const SizedBox(height: 16),
                   _buildGenderCard(
-                    "Non-binary",
-                    selectedGender == "other",
-                    () => setState(() => selectedGender = "other"),
+                    'Non-binary',
+                    selectedGender == 'other',
+                    () => setState(() => selectedGender = 'other'),
                     Icons.transgender_rounded,
                   ),
                 ],
@@ -156,12 +156,12 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
               // iOS-style toggle for "Show my gender on profile"
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "Show my gender on my profile",
+                      'Show my gender on my profile',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -184,7 +184,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
               // Continue labelLarge
               Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
+                padding: const EdgeInsets.only(bottom: 24),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -194,15 +194,15 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                             if (selectedGender != null) {
                               final userGender = {
                                 'userGender': selectedGender,
-                                'showOnProfile': showOnProfile
+                                'showOnProfile': showOnProfile,
                               };
                               userData.addAll(userGender);
                               Navigator.pushNamed(
                                   context, RouteName.nationalityScreen,
-                                  arguments: userData);
+                                  arguments: userData,);
                             } else {
                               CustomSnackbar.showSnackBarSimple(
-                                  "Please select your gender", context);
+                                  'Please select your gender', context,);
                             }
                           },
                     style: ElevatedButton.styleFrom(
@@ -217,11 +217,11 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     child: const Text(
-                      "CONTINUE",
+                      'CONTINUE',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
+                        letterSpacing: 1,
                       ),
                     ),
                   ),
@@ -236,8 +236,7 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
   // Card-style gender option with shadow and rounded corners
   Widget _buildGenderCard(
-      String title, bool isSelected, VoidCallback onTap, IconData icon) {
-    return GestureDetector(
+      String title, bool isSelected, VoidCallback onTap, IconData icon,) => GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
@@ -252,7 +251,6 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
-              spreadRadius: 0,
               offset: const Offset(0, 2),
             ),
           ],
@@ -298,5 +296,4 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
         ),
       ),
     );
-  }
 }

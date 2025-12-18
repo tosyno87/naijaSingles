@@ -1,27 +1,25 @@
 import 'dart:developer';
 
-import '../../../config/app_config.dart';
-import '../../../models/block_user_model.dart';
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/data/repo/user_messaging_repo.dart';
+import '../../../config/app_config.dart';
+import '../../../models/block_user_model.dart';
 import '../../../models/user_model.dart';
 
 part 'bloc_user_list_event.dart';
 part 'bloc_user_list_state.dart';
 
 class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
-  BlockUserModel? lastDocument;
 
   BlocUserListBloc() : super(BlocUserListInitial()) {
     on<LoadBlockUserEvent>((event, emit) async {
       emit(BlockUserLoadingState());
       try {
-        List<BlockUserModel> blockList =
+        final List<BlockUserModel> blockList =
             await UserMessagingRepo.getBlockUserList(
-                event.currentUser, perPageData);
+                event.currentUser, perPageData,);
         lastDocument = blockList.isNotEmpty ? blockList.last : null;
         emit(BlockUserLoadedState(blockList));
       } catch (e) {
@@ -33,9 +31,9 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
     on<LoadMoreBlockUserEvent>((event, emit) async {
       try {
         if (state is BlockUserLoadedState) {
-          BlockUserLoadedState currentState = state as BlockUserLoadedState;
-          List<BlockUserModel> currentList = currentState.users;
-          List<BlockUserModel> moreBlockList =
+          final BlockUserLoadedState currentState = state as BlockUserLoadedState;
+          final List<BlockUserModel> currentList = currentState.users;
+          final List<BlockUserModel> moreBlockList =
               await UserMessagingRepo.loadMoreBlockUsers(
             event.currentUser,
             perPageData,
@@ -46,7 +44,7 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
             lastDocument = moreBlockList.last;
           }
 
-          List<BlockUserModel> updatedList = [...currentList, ...moreBlockList];
+          final List<BlockUserModel> updatedList = [...currentList, ...moreBlockList];
 
           emit(BlockUserLoadedState(updatedList));
         }
@@ -56,4 +54,5 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
       }
     });
   }
+  BlockUserModel? lastDocument;
 }

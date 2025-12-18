@@ -1,11 +1,4 @@
 class MessageThread {
-  final String matchId;
-  final String name;
-  final String avatarUrl;
-  final String lastMessage;
-  final DateTime timestamp;
-  final bool isOnline;
-  final bool unread;
 
   MessageThread({
     required this.matchId,
@@ -16,6 +9,13 @@ class MessageThread {
     required this.isOnline,
     required this.unread,
   });
+  final String matchId;
+  final String name;
+  final String avatarUrl;
+  final String lastMessage;
+  final DateTime timestamp;
+  final bool isOnline;
+  final bool unread;
 
   // Helper method to format timestamp as relative time
   String getRelativeTime() {

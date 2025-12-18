@@ -5,24 +5,20 @@ import 'package:provider/provider.dart';
 /// Test helper class for common test utilities
 class TestHelpers {
   /// Create a test MaterialApp wrapper
-  static Widget createTestApp(Widget child) {
-    return MaterialApp(
+  static Widget createTestApp(Widget child) => MaterialApp(
       home: child,
     );
-  }
 
   /// Create a test MaterialApp with Provider wrapper
   static Widget createTestAppWithProvider<T extends ChangeNotifier>(
     T provider,
     Widget child,
-  ) {
-    return MaterialApp(
+  ) => MaterialApp(
       home: ChangeNotifierProvider<T>(
         create: (_) => provider,
         child: child,
       ),
     );
-  }
 
   /// Mock Firebase initialization for tests
   static void mockFirebaseForTests() {

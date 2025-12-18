@@ -3,19 +3,19 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../common/widgets/image_widget.dart';
+import '../../../../models/user_model.dart';
 import '../../../chat/ui/screens/chat_page.dart';
 import '../../bloc/match_user_bloc.dart';
 
 class Matches extends StatefulWidget {
+  const Matches({required this.currentUser, super.key});
   final UserModel currentUser;
-  const Matches({super.key, required this.currentUser});
 
   @override
   State<Matches> createState() => _MatchesState();
@@ -32,35 +32,35 @@ class _MatchesState extends State<Matches> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
                   'New Matches'.tr().toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: primaryColor,
-                    fontSize: 18.0,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
+                    letterSpacing: 1,
                   ),
                 ),
                 IconButton(
                   icon: const Icon(
                     Icons.refresh_outlined,
                   ),
-                  iconSize: 24.0,
+                  iconSize: 24,
                   color: Colors.red,
                   onPressed: () {
                     context.read<MatchUserBloc>().add(
-                        LoadMatchUserEvent(currentUser: widget.currentUser));
+                        LoadMatchUserEvent(currentUser: widget.currentUser),);
                   },
                 ),
               ],
@@ -69,14 +69,14 @@ class _MatchesState extends State<Matches> {
           BlocBuilder<MatchUserBloc, MatchUserState>(
             builder: (context, state) {
               if (state is MatchUserLoadingState) {
-                log("i am in matchuserloading");
+                log('i am in matchuserloading');
                 return const Hookup4uBar();
               }
               if (state is MatchUserFailedState) {
-                log("I AM IN LOADUSERSFailed");
+                log('I AM IN LOADUSERSFailed');
                 return Center(
                     child: Text(
-                  "Error to load data.".tr().toString(),
+                  'Error to load data.'.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: themeProvider.isDarkMode
@@ -85,35 +85,31 @@ class _MatchesState extends State<Matches> {
                       fontStyle: FontStyle.normal,
                       letterSpacing: 1,
                       decoration: TextDecoration.none,
-                      fontSize: 18),
-                ));
+                      fontSize: 18,),
+                ),);
               }
               if (state is MatchUserLoadedState) {
-                log("i am in matchusersuccess");
+                log('i am in matchusersuccess');
                 return SizedBox(
                     height: size.height * 0.18,
                     child: state.users.isNotEmpty
                         ? ListView.builder(
-                            padding: const EdgeInsets.only(left: 10.0),
+                            padding: const EdgeInsets.only(left: 10),
                             scrollDirection: Axis.horizontal,
                             itemCount: state.users.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return GestureDetector(
+                            itemBuilder: (BuildContext context, int index) => GestureDetector(
                                 onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (_) => ChatPage(
                                               chatId: chatId(widget.currentUser,
-                                                  state.users[index]),
+                                                  state.users[index],),
                                               sender: widget.currentUser,
                                               second: state.users[index],
-                                            ))),
+                                            ),),),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
+                                  padding: const EdgeInsets.all(10),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       Container(
                                         padding: const EdgeInsets.all(1.5),
@@ -123,9 +119,8 @@ class _MatchesState extends State<Matches> {
                                             borderRadius:
                                                 BorderRadius.circular(15),
                                             border: Border.all(
-                                                style: BorderStyle.solid,
                                                 width: 2,
-                                                color: primaryColor)),
+                                                color: primaryColor,),),
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(15),
@@ -137,40 +132,39 @@ class _MatchesState extends State<Matches> {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 6.0),
+                                      const SizedBox(height: 6),
                                       SizedBox(
                                         width: size.width * 0.19,
                                         child: Text(
                                           state.users[index].name!,
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               color: AppColors.secondaryColor,
-                                              fontSize: 16.0,
+                                              fontSize: 16,
                                               fontWeight: FontWeight.w600,
-                                              overflow: TextOverflow.ellipsis),
+                                              overflow: TextOverflow.ellipsis,),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              );
-                            },
+                              ),
                           )
                         : Center(
                             child: Text(
-                            "No match found".tr().toString(),
-                            style: TextStyle(
-                                color: AppColors.secondaryColor, fontSize: 16),
-                          )));
+                            'No match found'.tr().toString(),
+                            style: const TextStyle(
+                                color: AppColors.secondaryColor, fontSize: 16,),
+                          ),),);
               }
               return Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(20),
                 child: Center(
                     child: Text(
-                  "No match found".tr().toString(),
+                  'No match found'.tr().toString(),
                   style:
-                      TextStyle(color: AppColors.secondaryColor, fontSize: 16),
-                )),
+                      const TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+                ),),
               );
             },
           ),

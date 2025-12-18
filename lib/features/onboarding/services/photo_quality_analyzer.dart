@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:image/image.dart' as img;
+import '../../../common/utils/app_logger.dart';
 
 class PhotoQualityAnalyzer {
   /// Analyzes a photo and returns quality metrics
@@ -11,7 +11,7 @@ class PhotoQualityAnalyzer {
       final image = img.decodeImage(bytes);
 
       if (image == null) {
-        return PhotoQuality(
+        return const PhotoQuality(
           hasFace: false,
           isWellLit: false,
           isSharp: false,
@@ -42,9 +42,9 @@ class PhotoQualityAnalyzer {
         qualityScore: qualityScore,
       );
     } catch (e) {
-      print('Error analyzing photo quality: $e');
+      AppLogger.error('Error analyzing photo quality', error: e);
       // Return default quality for error cases
-      return PhotoQuality(
+      return const PhotoQuality(
         hasFace: true, // Assume true to avoid false negatives
         isWellLit: true,
         isSharp: true,
@@ -247,12 +247,7 @@ class PhotoQualityAnalyzer {
 }
 
 /// Data class to hold photo quality analysis results
-class PhotoQuality {
-  final bool hasFace;
-  final bool isWellLit;
-  final bool isSharp;
-  final bool isAppropriate;
-  final int qualityScore; // 0-100
+class PhotoQuality { // 0-100
 
   const PhotoQuality({
     required this.hasFace,
@@ -261,11 +256,14 @@ class PhotoQuality {
     required this.isAppropriate,
     required this.qualityScore,
   });
+  final bool hasFace;
+  final bool isWellLit;
+  final bool isSharp;
+  final bool isAppropriate;
+  final int qualityScore;
 
   @override
-  String toString() {
-    return 'PhotoQuality(hasFace: $hasFace, isWellLit: $isWellLit, '
+  String toString() => 'PhotoQuality(hasFace: $hasFace, isWellLit: $isWellLit, '
         'isSharp: $isSharp, isAppropriate: $isAppropriate, '
         'qualityScore: $qualityScore)';
-  }
 }

@@ -6,7 +6,7 @@ import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({Key? key}) : super(key: key);
+  const MainNavigation({super.key});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
@@ -27,8 +27,7 @@ class _MainNavigationState extends State<MainNavigation> {
   static const Color deepGreen = Color(0xFF008037);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       // The body will switch between screens based on the current index
       body: _screens[_currentIndex],
 
@@ -43,11 +42,11 @@ class _MainNavigationState extends State<MainNavigation> {
         selectedItemColor: deepGreen,
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: GoogleFonts.poppins(
+        selectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
-        unselectedLabelStyle: GoogleFonts.poppins(
+        unselectedLabelStyle: GoogleFonts.montserrat(
           fontSize: 12,
         ),
         items: const [
@@ -66,5 +65,4 @@ class _MainNavigationState extends State<MainNavigation> {
         ],
       ),
     );
-  }
 }

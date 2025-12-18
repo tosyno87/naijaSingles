@@ -3,20 +3,18 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// Full-screen image viewer widget
 class FullScreenImageViewer extends StatelessWidget {
+
+  const FullScreenImageViewer({
+    required this.imageUrl, super.key,
+    this.title,
+    this.showAppBar = true,
+  });
   final String imageUrl;
   final String? title;
   final bool showAppBar;
 
-  const FullScreenImageViewer({
-    super.key,
-    required this.imageUrl,
-    this.title,
-    this.showAppBar = true,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
       appBar: showAppBar
           ? AppBar(
@@ -42,12 +40,11 @@ class FullScreenImageViewer extends StatelessWidget {
       body: Center(
         child: InteractiveViewer(
           minScale: 0.5,
-          maxScale: 4.0,
+          maxScale: 4,
           child: Image.network(
             imageUrl,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) {
-              return Center(
+            errorBuilder: (context, error, stackTrace) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -66,8 +63,7 @@ class FullScreenImageViewer extends StatelessWidget {
                     ),
                   ],
                 ),
-              );
-            },
+              ),
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
               return Center(
@@ -84,7 +80,6 @@ class FullScreenImageViewer extends StatelessWidget {
         ),
       ),
     );
-  }
 
   /// Show full-screen image viewer
   static Future<void> show({
@@ -92,8 +87,7 @@ class FullScreenImageViewer extends StatelessWidget {
     required String imageUrl,
     String? title,
     bool showAppBar = true,
-  }) {
-    return Navigator.push(
+  }) => Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => FullScreenImageViewer(
@@ -104,5 +98,4 @@ class FullScreenImageViewer extends StatelessWidget {
         fullscreenDialog: true,
       ),
     );
-  }
 }

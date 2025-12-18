@@ -1,17 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/services/group_chat_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../../../services/group_chat_service.dart';
 
 /// Group chat screen for displaying and managing group conversations
 class GroupChatScreen extends StatefulWidget {
-  final String groupId;
 
   const GroupChatScreen({
-    super.key,
-    required this.groupId,
+    required this.groupId, super.key,
   });
+  final String groupId;
 
   @override
   State<GroupChatScreen> createState() => _GroupChatScreenState();
@@ -38,7 +38,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   Future<void> _loadGroupDetails() async {
     try {
       final group = await _groupChatService.getGroupDetails(widget.groupId);
-      
+
       if (mounted) {
         setState(() {
           _group = group;
@@ -207,7 +207,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   Widget _buildMessageBubble(GroupMessage message) {
     final isSystemMessage = message.messageType == MessageType.system;
-    final isCurrentUser = message.senderId == FirebaseAuth.instance.currentUser?.uid;
+    final isCurrentUser =
+        message.senderId == FirebaseAuth.instance.currentUser?.uid;
 
     if (isSystemMessage) {
       return Container(
@@ -235,7 +236,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isCurrentUser) ...[
             CircleAvatar(
@@ -256,7 +258,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isCurrentUser ? AppColors.primaryGreen : Colors.grey[200],
+                color:
+                    isCurrentUser ? AppColors.primaryGreen : Colors.grey[200],
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -264,7 +267,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 children: [
                   if (!isCurrentUser)
                     Text(
-                      message.senderId, // In real app, you'd get the user's name
+                      message
+                          .senderId, // In real app, you'd get the user's name
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -292,10 +296,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ),
           if (isCurrentUser) ...[
             const SizedBox(width: 8),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primaryGreen,
-              child: const Icon(
+              child: Icon(
                 Icons.person,
                 color: Colors.white,
                 size: 16,
@@ -307,8 +311,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
-  Widget _buildMessageInput() {
-    return Container(
+  Widget _buildMessageInput() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -323,7 +326,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(24),
@@ -366,7 +369,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ],
       ),
     );
-  }
 
   String _formatTime(DateTime timestamp) {
     final now = DateTime.now();
@@ -392,8 +394,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
-  Widget _buildGroupInfoSheet() {
-    return Container(
+  Widget _buildGroupInfoSheet() => Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -416,43 +417,45 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                Text(
-                  'Group Info',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                  Text(
+                    'Group Info',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                _buildInfoRow(Icons.group, 'Name', _group!.name),
-                _buildInfoRow(Icons.description, 'Description', _group!.description),
-                _buildInfoRow(Icons.people, 'Members', '${_group!.memberCount}'),
-                _buildInfoRow(Icons.category, 'Type', _group!.type.name),
-                if (_group!.location != null)
-                  _buildInfoRow(Icons.location_on, 'Location', _group!.location!),
-                const SizedBox(height: 20),
-                Text(
-                  'Members',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                  const SizedBox(height: 20),
+                  _buildInfoRow(Icons.group, 'Name', _group!.name),
+                  _buildInfoRow(
+                      Icons.description, 'Description', _group!.description,),
+                  _buildInfoRow(
+                      Icons.people, 'Members', '${_group!.memberCount}',),
+                  _buildInfoRow(Icons.category, 'Type', _group!.type.name),
+                  if (_group!.location != null)
+                    _buildInfoRow(
+                        Icons.location_on, 'Location', _group!.location!,),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Members',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                ..._group!.memberIds.map((memberId) => _buildMemberTile(memberId)),
-              ],
+                  const SizedBox(height: 10),
+                  ..._group!.memberIds
+                      .map(_buildMemberTile),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
-  }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
+  Widget _buildInfoRow(IconData icon, String label, String value) => Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
@@ -478,7 +481,6 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildMemberTile(String memberId) {
     final isAdmin = _group!.adminIds.contains(memberId);

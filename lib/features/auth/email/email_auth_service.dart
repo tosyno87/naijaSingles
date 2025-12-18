@@ -69,7 +69,7 @@ class EmailAuthService {
         'isBlocked': false,
         'isPremium': false,
         'Pictures': [],
-      }, SetOptions(merge: true));
+      }, SetOptions(merge: true),);
     } catch (e) {
       debugPrint('Error creating user document: $e');
       rethrow;

@@ -14,8 +14,8 @@ class UpdatingUser extends UserStates {}
 class UserUpdated extends UserStates {}
 
 class UserUpdationFailed extends UserStates {
-  final String message;
   const UserUpdationFailed({required this.message});
+  final String message;
 
   @override
   List<Object> get props => [message];
@@ -24,8 +24,8 @@ class UserUpdationFailed extends UserStates {
 class UpdatingUserProfilePicture extends UserStates {}
 
 class UserProfilePictureUploaded extends UserStates {
-  final String? url;
   const UserProfilePictureUploaded({required this.url});
+  final String? url;
 
   @override
   List<Object> get props => [url!];

@@ -8,18 +8,18 @@ abstract class BlocUserListEvent extends Equatable {
 }
 
 class LoadBlockUserEvent extends BlocUserListEvent {
-  final UserModel currentUser;
 
   const LoadBlockUserEvent({required this.currentUser});
+  final UserModel currentUser;
 
   @override
   List<Object> get props => [currentUser];
 }
 
 class LoadMoreBlockUserEvent extends BlocUserListEvent {
-  final UserModel currentUser;
 
   const LoadMoreBlockUserEvent({required this.currentUser});
+  final UserModel currentUser;
 
   @override
   List<Object> get props => [currentUser];

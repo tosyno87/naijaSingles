@@ -77,8 +77,8 @@ class _InterestsScreenState extends State<InterestsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                "You can select up to 10 interests",
-                style: GoogleFonts.poppins(),
+                'You can select up to 10 interests',
+                style: GoogleFonts.montserrat(),
               ),
               backgroundColor: Colors.red.shade400,
             ),
@@ -95,7 +95,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
 
     return _interests
         .where((interest) =>
-            interest.toLowerCase().contains(_searchQuery.toLowerCase()))
+            interest.toLowerCase().contains(_searchQuery.toLowerCase()),)
         .toList();
   }
 
@@ -110,13 +110,13 @@ class _InterestsScreenState extends State<InterestsScreen> {
       children: [
         // Header
         Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Select Your Interests",
-                style: GoogleFonts.poppins(
+                'Select Your Interests',
+                style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: textColor,
@@ -126,8 +126,8 @@ class _InterestsScreenState extends State<InterestsScreen> {
               const SizedBox(height: 8),
 
               Text(
-                "Choose up to 10 interests to help us match you with like-minded people",
-                style: GoogleFonts.poppins(
+                'Choose up to 10 interests to help us match you with like-minded people',
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: Colors.black54,
                 ),
@@ -138,15 +138,15 @@ class _InterestsScreenState extends State<InterestsScreen> {
               // Search box
               TextField(
                 controller: _searchController,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
                   color: textColor,
                 ),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
-                  hintText: "Search interests",
-                  hintStyle: GoogleFonts.poppins(
+                  hintText: 'Search interests',
+                  hintStyle: GoogleFonts.montserrat(
                     color: Colors.grey.shade400,
                   ),
                   prefixIcon: const Icon(
@@ -177,8 +177,8 @@ class _InterestsScreenState extends State<InterestsScreen> {
 
               // Selected count
               Text(
-                "${_selectedInterests.length}/10 selected",
-                style: GoogleFonts.poppins(
+                '${_selectedInterests.length}/10 selected',
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: _selectedInterests.length >= 3
@@ -195,15 +195,15 @@ class _InterestsScreenState extends State<InterestsScreen> {
           child: _filteredInterests.isEmpty
               ? Center(
                   child: Text(
-                    "No interests found",
-                    style: GoogleFonts.poppins(
+                    'No interests found',
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: Colors.grey,
                     ),
                   ),
                 )
               : GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     childAspectRatio: 1.2,
@@ -218,7 +218,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                     return InkWell(
                       onTap: () => _toggleInterest(interest),
                       borderRadius: BorderRadius.circular(12),
-                      child: Container(
+                      child: DecoratedBox(
                         decoration: BoxDecoration(
                           color: isSelected ? primaryColor : Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -226,7 +226,6 @@ class _InterestsScreenState extends State<InterestsScreen> {
                             color: isSelected
                                 ? primaryColor
                                 : Colors.grey.shade300,
-                            width: 1,
                           ),
                           boxShadow: isSelected
                               ? [
@@ -240,11 +239,11 @@ class _InterestsScreenState extends State<InterestsScreen> {
                         ),
                         child: Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8),
                             child: Text(
                               interest,
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: isSelected ? Colors.white : textColor,

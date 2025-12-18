@@ -1,9 +1,11 @@
 import 'dart:developer';
+
+import 'package:geolocator/geolocator.dart';
+
 import '../models/event_model.dart';
 import '../models/rsvp_model.dart';
 import '../services/events_firestore_service.dart';
 import '../services/location_service.dart';
-import 'package:geolocator/geolocator.dart';
 
 abstract class EventsRepository {
   Future<List<EventModel>> getEvents({
@@ -11,18 +13,18 @@ abstract class EventsRepository {
     int limit = 20,
     bool forceRefresh = false,
   });
-  
+
   Future<List<EventModel>> searchEvents(String query);
-  
+
   Future<List<EventModel>> getEventsByCategory(String category);
-  
+
   Future<List<EventModel>> getEventsNearLocation({
     double? latitude,
     double? longitude,
     double radiusKm = 50.0,
     int limit = 20,
   });
-  
+
   Future<List<EventModel>> getEventsWithDistance({
     int page = 1,
     int limit = 20,
@@ -30,36 +32,36 @@ abstract class EventsRepository {
     double? userLatitude,
     double? userLongitude,
   });
-  
+
   Future<EventModel?> getEventById(String eventId);
-  
+
   Future<void> rsvpToEvent({
     required String userId,
     required String eventId,
     required RSVPStatus status,
   });
-  
+
   Future<RSVPModel?> getUserRSVP(String userId, String eventId);
-  
+
   Future<List<RSVPModel>> getUserRSVPs(String userId);
-  
+
   Future<List<EventAttendeeModel>> getEventAttendees(String eventId);
 }
 
 class EventsRepositoryImpl implements EventsRepository {
-  final EventsFirestoreService _firestoreService;
-  final LocationService _locationService;
-  
-  // Cache management
-  final Map<String, List<EventModel>> _eventsCache = {};
-  final Map<String, DateTime> _cacheTimestamps = {};
-  static const Duration _cacheExpiry = Duration(minutes: 15);
 
   EventsRepositoryImpl({
     required EventsFirestoreService firestoreService,
     LocationService? locationService,
   })  : _firestoreService = firestoreService,
         _locationService = locationService ?? LocationService();
+  final EventsFirestoreService _firestoreService;
+  final LocationService _locationService;
+
+  // Cache management
+  final Map<String, List<EventModel>> _eventsCache = {};
+  final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheExpiry = Duration(minutes: 15);
 
   @override
   Future<List<EventModel>> getEvents({
@@ -68,7 +70,7 @@ class EventsRepositoryImpl implements EventsRepository {
     bool forceRefresh = false,
   }) async {
     final cacheKey = 'events_${page}_$limit';
-    
+
     // Check cache first (unless force refresh)
     if (!forceRefresh && _isCacheValid(cacheKey)) {
       log('Returning cached events for page $page', name: 'EventsRepository');
@@ -77,53 +79,60 @@ class EventsRepositoryImpl implements EventsRepository {
 
     try {
       List<EventModel> events = [];
-      
+
       // Try to get from Firestore first (faster)
       if (page == 1) {
         try {
-          final cachedEvents = await _firestoreService.fetchEvents(limit: limit);
+          final cachedEvents =
+              await _firestoreService.fetchEvents(limit: limit);
           if (cachedEvents.isNotEmpty && !forceRefresh) {
             events = cachedEvents;
-            log('Loaded ${events.length} events from Firestore cache', name: 'EventsRepository');
-            
+            log('Loaded ${events.length} events from Firestore cache',
+                name: 'EventsRepository',);
+
             // Update cache
             _updateCache(cacheKey, events);
-            
+
             // Fetch fresh data in background
             _fetchAndCacheInBackground(page, limit);
-            
+
             return events;
           }
         } catch (e) {
-          log('Failed to load from Firestore cache: $e', name: 'EventsRepository');
+          log('Failed to load from Firestore cache: $e',
+              name: 'EventsRepository',);
         }
       }
-      
+
       // Fetch from Firestore only (user-created events)
       events = await _firestoreService.fetchEvents(limit: limit);
-      
+
       if (events.isNotEmpty) {
         // Update memory cache
         _updateCache(cacheKey, events);
-        
-        log('Fetched ${events.length} events from Firestore', name: 'EventsRepository');
+
+        log('Fetched ${events.length} events from Firestore',
+            name: 'EventsRepository',);
       }
-      
+
       return events;
     } catch (e) {
       log('Error fetching events: $e', name: 'EventsRepository');
-      
+
       // Fallback to Firestore cache even if expired
       try {
-        final fallbackEvents = await _firestoreService.fetchEvents(limit: limit);
+        final fallbackEvents =
+            await _firestoreService.fetchEvents(limit: limit);
         if (fallbackEvents.isNotEmpty) {
-          log('Using fallback Firestore cache with ${fallbackEvents.length} events', name: 'EventsRepository');
+          log('Using fallback Firestore cache with ${fallbackEvents.length} events',
+              name: 'EventsRepository',);
           return fallbackEvents;
         }
       } catch (fallbackError) {
-        log('Fallback cache also failed: $fallbackError', name: 'EventsRepository');
+        log('Fallback cache also failed: $fallbackError',
+            name: 'EventsRepository',);
       }
-      
+
       rethrow;
     }
   }
@@ -131,9 +140,9 @@ class EventsRepositoryImpl implements EventsRepository {
   @override
   Future<List<EventModel>> searchEvents(String query) async {
     if (query.trim().isEmpty) return [];
-    
+
     final cacheKey = 'search_${query.toLowerCase()}';
-    
+
     // Check cache first
     if (_isCacheValid(cacheKey)) {
       return _eventsCache[cacheKey] ?? [];
@@ -142,14 +151,15 @@ class EventsRepositoryImpl implements EventsRepository {
     try {
       // Search in Firestore first (faster)
       final firestoreResults = await _firestoreService.searchEvents(query);
-      
+
       // Use only Firestore results for user-created events
       final searchResults = firestoreResults;
-      
+
       // Update search cache
       _updateCache(cacheKey, searchResults);
-      
-      log('Search for "$query" returned ${searchResults.length} results from Firestore', name: 'EventsRepository');
+
+      log('Search for "$query" returned ${searchResults.length} results from Firestore',
+          name: 'EventsRepository',);
       return searchResults;
     } catch (e) {
       log('Error searching events: $e', name: 'EventsRepository');
@@ -160,7 +170,7 @@ class EventsRepositoryImpl implements EventsRepository {
   @override
   Future<List<EventModel>> getEventsByCategory(String category) async {
     final cacheKey = 'category_${category.toLowerCase()}';
-    
+
     // Check cache first
     if (_isCacheValid(cacheKey)) {
       return _eventsCache[cacheKey] ?? [];
@@ -168,22 +178,23 @@ class EventsRepositoryImpl implements EventsRepository {
 
     try {
       // Get from Firestore first
-      final firestoreEvents = await _firestoreService.getEventsByCategory(category);
-      
+      final firestoreEvents =
+          await _firestoreService.getEventsByCategory(category);
+
       // If we have enough cached events, return them and fetch fresh data in background
       if (firestoreEvents.length >= 10) {
         _updateCache(cacheKey, firestoreEvents);
-        
+
         // Fetch fresh data in background
         _fetchCategoryInBackground(category);
-        
+
         return firestoreEvents;
       }
-      
+
       // Use only Firestore results for user-created events
       final categoryEvents = firestoreEvents;
       _updateCache(cacheKey, categoryEvents);
-      
+
       return categoryEvents;
     } catch (e) {
       log('Error fetching events by category: $e', name: 'EventsRepository');
@@ -195,19 +206,19 @@ class EventsRepositoryImpl implements EventsRepository {
   Future<EventModel?> getEventById(String eventId) async {
     try {
       // Try Firestore first
-      EventModel? event = await _firestoreService.getEventById(eventId);
-      
+      final EventModel? event = await _firestoreService.getEventById(eventId);
+
       if (event != null) {
         return event;
       }
-      
+
       // External API calls removed - only user-generated events supported
-      
+
       if (event != null) {
         // Cache the event
         await _firestoreService.saveEvents([event]);
       }
-      
+
       return event;
     } catch (e) {
       log('Error fetching event by ID: $e', name: 'EventsRepository');
@@ -224,7 +235,7 @@ class EventsRepositoryImpl implements EventsRepository {
     try {
       // Check if user already has an RSVP
       final existingRSVP = await _firestoreService.getUserRSVP(userId, eventId);
-      
+
       if (existingRSVP != null) {
         // Update existing RSVP
         await _firestoreService.updateRSVP(
@@ -242,8 +253,9 @@ class EventsRepositoryImpl implements EventsRepository {
           userProfile: await _getUserProfile(userId),
         );
       }
-      
-      log('RSVP updated for user $userId to event $eventId: ${status.value}', name: 'EventsRepository');
+
+      log('RSVP updated for user $userId to event $eventId: ${status.value}',
+          name: 'EventsRepository',);
     } catch (e) {
       log('Error updating RSVP: $e', name: 'EventsRepository');
       rethrow;
@@ -282,13 +294,14 @@ class EventsRepositoryImpl implements EventsRepository {
 
   // Private helper methods
   bool _isCacheValid(String cacheKey) {
-    if (!_eventsCache.containsKey(cacheKey) || !_cacheTimestamps.containsKey(cacheKey)) {
+    if (!_eventsCache.containsKey(cacheKey) ||
+        !_cacheTimestamps.containsKey(cacheKey)) {
       return false;
     }
-    
+
     final cacheTime = _cacheTimestamps[cacheKey]!;
     final now = DateTime.now();
-    
+
     return now.difference(cacheTime) < _cacheExpiry;
   }
 
@@ -309,10 +322,10 @@ class EventsRepositoryImpl implements EventsRepository {
     try {
       // Background category refresh removed - only user-generated events supported
     } catch (e) {
-      log('Background category cache update failed: $e', name: 'EventsRepository');
+      log('Background category cache update failed: $e',
+          name: 'EventsRepository',);
     }
   }
-
 
   Future<Map<String, dynamic>?> _getUserProfile(String userId) async {
     // TODO: Implement user profile fetching from your user service
@@ -329,32 +342,31 @@ class EventsRepositoryImpl implements EventsRepository {
   void clearExpiredCache() {
     final now = DateTime.now();
     final expiredKeys = <String>[];
-    
+
     for (final entry in _cacheTimestamps.entries) {
       if (now.difference(entry.value) > _cacheExpiry) {
         expiredKeys.add(entry.key);
       }
     }
-    
+
     for (final key in expiredKeys) {
       _eventsCache.remove(key);
       _cacheTimestamps.remove(key);
     }
-    
+
     if (expiredKeys.isNotEmpty) {
-      log('Cleared ${expiredKeys.length} expired cache entries', name: 'EventsRepository');
+      log('Cleared ${expiredKeys.length} expired cache entries',
+          name: 'EventsRepository',);
     }
   }
 
   // Get cache statistics
-  Map<String, dynamic> getCacheStats() {
-    return {
+  Map<String, dynamic> getCacheStats() => {
       'cached_queries': _eventsCache.length,
       'cache_size_mb': _calculateCacheSize(),
       'oldest_cache': _getOldestCacheTime(),
       'newest_cache': _getNewestCacheTime(),
     };
-  }
 
   double _calculateCacheSize() {
     // Rough estimation of cache size in MB
@@ -403,24 +415,27 @@ class EventsRepositoryImpl implements EventsRepository {
       }
 
       if (userLocation == null) {
-        log('❌ Unable to get user location for nearby events', name: 'EventsRepository');
+        log('❌ Unable to get user location for nearby events',
+            name: 'EventsRepository',);
         return [];
       }
 
       // Get all events and filter by distance
-      final allEvents = await _firestoreService.fetchEvents(limit: 100); // Get more events to filter
-      
+      final allEvents = await _firestoreService.fetchEvents(
+          limit: 100,); // Get more events to filter
+
       // Calculate distances and filter
       final nearbyEvents = <EventModel>[];
       for (final event in allEvents) {
-        if (event.location.latitude != null && event.location.longitude != null) {
+        if (event.location.latitude != null &&
+            event.location.longitude != null) {
           final distance = LocationService.calculateDistance(
             userLocation.latitude,
             userLocation.longitude,
             event.location.latitude!,
             event.location.longitude!,
           );
-          
+
           if (distance <= radiusKm) {
             nearbyEvents.add(event.copyWith(distanceFromUser: distance));
           }
@@ -428,11 +443,13 @@ class EventsRepositoryImpl implements EventsRepository {
       }
 
       // Sort by distance and limit results
-      nearbyEvents.sort((a, b) => (a.distanceFromUser ?? 0).compareTo(b.distanceFromUser ?? 0));
-      
+      nearbyEvents.sort((a, b) =>
+          (a.distanceFromUser ?? 0).compareTo(b.distanceFromUser ?? 0),);
+
       final result = nearbyEvents.take(limit).toList();
-      log('📍 Found ${result.length} events within ${radiusKm}km', name: 'EventsRepository');
-      
+      log('📍 Found ${result.length} events within ${radiusKm}km',
+          name: 'EventsRepository',);
+
       return result;
     } catch (e) {
       log('❌ Error getting events near location: $e', name: 'EventsRepository');
@@ -478,10 +495,11 @@ class EventsRepositoryImpl implements EventsRepository {
       // Add distance information if user location is available
       if (userLocation != null) {
         final eventsWithDistance = events.map((event) {
-          if (event.location.latitude != null && event.location.longitude != null) {
+          if (event.location.latitude != null &&
+              event.location.longitude != null) {
             final distance = LocationService.calculateDistance(
               userLocation!.latitude,
-              userLocation!.longitude,
+              userLocation.longitude,
               event.location.latitude!,
               event.location.longitude!,
             );
@@ -503,7 +521,8 @@ class EventsRepositoryImpl implements EventsRepository {
       return events;
     } catch (e) {
       log('❌ Error getting events with distance: $e', name: 'EventsRepository');
-      return await getEvents(page: page, limit: limit, forceRefresh: forceRefresh);
+      return getEvents(
+          page: page, limit: limit, forceRefresh: forceRefresh,);
     }
   }
 }

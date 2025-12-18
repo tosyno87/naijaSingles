@@ -8,9 +8,9 @@ abstract class SearchUserForMapEvent extends Equatable {
 }
 
 class LoadUserForMapEvent extends SearchUserForMapEvent {
-  final UserModel currentUser;
 
   const LoadUserForMapEvent({required this.currentUser});
+  final UserModel currentUser;
 
   @override
   List<Object> get props => [currentUser];

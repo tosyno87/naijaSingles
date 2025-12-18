@@ -9,13 +9,12 @@ import 'buyproducts_barrel.dart';
 
 class BuyConsumableInAppProductsBloc
     extends Bloc<BuyInAppProductsEvents, BuyConsumableStates> {
-  final inAppPurchaseRepository = InAppPurchaseRepoImpl();
   BuyConsumableInAppProductsBloc() : super(BuyConsumableInitialState()) {
     on<RequestBuyConsumableProducts>((event, emit) async {
       emit(BuyConsumableLoadingState());
       try {
         final result = await inAppPurchaseRepository.buyConsumable(
-            productDetails: event.productDetails);
+            productDetails: event.productDetails,);
         emit(BuyConsumableSuccessState(result: result));
       } on SocketException {
         emit(BuyConsumableFailedState(msg: 'No Internet Connection'));
@@ -25,15 +24,16 @@ class BuyConsumableInAppProductsBloc
       }
     });
   }
+  final inAppPurchaseRepository = InAppPurchaseRepoImpl();
 
   Stream<BuyConsumableStates> mapEventToState(
-      BuyInAppProductsEvents event) async* {
+      BuyInAppProductsEvents event,) async* {
     if (event is RequestBuyConsumableProducts) {
       yield BuyConsumableLoadingState();
 
       try {
         final result = await inAppPurchaseRepository.buyConsumable(
-            productDetails: event.productDetails);
+            productDetails: event.productDetails,);
         yield BuyConsumableSuccessState(result: result);
       } on SocketException {
         yield BuyConsumableFailedState(msg: 'No Internet Connection');

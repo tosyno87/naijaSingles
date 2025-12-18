@@ -5,22 +5,22 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/features/explore/bloc/explore_map_bloc.dart';
 // Removed no_user.dart import - file deleted
 // import 'package:naijasingles/features/explore/premium_map.dart';
 // Removed street view import - feature deleted
 import 'package:provider/provider.dart';
 
+import '../../common/constants/colors.dart';
 import '../../common/data/repo/user_location_repo.dart';
 import '../../common/providers/theme_provider.dart';
 import '../../models/user_model.dart';
+import 'bloc/explore_map_bloc.dart';
 
 class ExploreMapWidget extends StatefulWidget {
+  const ExploreMapWidget(
+      {required this.currentUser, required this.isPuchased, super.key,});
   final UserModel currentUser;
   final bool isPuchased;
-  const ExploreMapWidget(
-      {super.key, required this.currentUser, required this.isPuchased});
 
   @override
   State<ExploreMapWidget> createState() => _ExploreMapWidgetState();
@@ -42,18 +42,18 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
 
 // for getting current address
 
-  void getCurrentAdddressName() async {
+  Future<void> getCurrentAdddressName() async {
     currentCoordinates = LatLng(
         widget.currentUser.currentCoordinates?['latitude'],
-        widget.currentUser.currentCoordinates?['longitude']);
+        widget.currentUser.currentCoordinates?['longitude'],);
     currentAddressName = await getAddress(
-            currentCoordinates?.latitude, currentCoordinates?.longitude)
+            currentCoordinates?.latitude, currentCoordinates?.longitude,)
         .whenComplete(() {
       context.read<SearchUserForMapBloc>().add(LoadUserForMapEvent(
             currentUser: widget.currentUser,
-          ));
+          ),);
     });
-    log("name is $currentAddressName");
+    log('name is $currentAddressName');
     setState(() {});
   }
 
@@ -86,13 +86,13 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
               BlocBuilder<SearchUserForMapBloc, SearchUserForMapState>(
             builder: (context, state) {
               if (state is SearchUserLoadingForMapState) {
-                return Center(
+                return const Center(
                   child: SizedBox(
                     width: 150,
                     child: Card(
                       elevation: 10,
                       child: Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: EdgeInsets.all(10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -104,11 +104,11 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                                     AlwaysStoppedAnimation(primaryColor),
                               ),
                             ),
-                            const Text(
-                              "Searching...",
+                            Text(
+                              'Searching...',
                               style: TextStyle(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.bold,),
                             ),
                           ],
                         ),
@@ -121,7 +121,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
               if (state is SearchUserFailedForMapState) {
                 return Center(
                     child: Text(
-                  "Error to load data.".tr().toString(),
+                  'Error to load data.'.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: themeProvider.isDarkMode
@@ -130,14 +130,14 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                       fontStyle: FontStyle.normal,
                       letterSpacing: 1,
                       decoration: TextDecoration.none,
-                      fontSize: 18),
-                ));
+                      fontSize: 18,),
+                ),);
               }
 
               if (state is SearchUserLoadUserForMapState) {
-                log("users is ${state.users.length}");
+                log('users is ${state.users.length}');
                 return state.users.isEmpty
-                    ? Center(
+                    ? const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -146,7 +146,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                               size: 64,
                               color: primaryColor,
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             Text(
                               'No users found in this area',
                               style: TextStyle(
@@ -155,7 +155,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Text(
                               'Try expanding your search radius',
                               style: TextStyle(
@@ -176,7 +176,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                             widget.currentUser.latitude ?? 0.0,
                             widget.currentUser.longitude ?? 0.0,
                           ),
-                          zoom: 14.0,
+                          zoom: 14,
                         ),
                         markers: Set<Marker>.from(
                           state.users.map((user) => Marker(
@@ -189,13 +189,13 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                                   title: user.name,
                                   snippet: '${user.age} years old',
                                 ),
-                              )),
+                              ),),
                         ),
                       );
               }
               return Container();
             },
-          )
+          ),
 
           // : FreeUserMapScreen(
           //     currentUser: widget.currentUser,

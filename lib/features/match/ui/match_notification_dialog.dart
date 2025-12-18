@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/match_bloc.dart';
-import '../../../models/user_model.dart';
 import '../../../common/constants/colors.dart';
+import '../../../models/user_model.dart';
+import '../bloc/match_bloc.dart';
 
 class MatchNotificationDialog extends StatefulWidget {
+
+  const MatchNotificationDialog({
+    required this.matchId, required this.otherUserId, super.key,
+    this.chatThreadId,
+    this.otherUser,
+  });
   final String matchId;
   final String otherUserId;
   final String? chatThreadId;
   final UserModel? otherUser;
-
-  const MatchNotificationDialog({
-    Key? key,
-    required this.matchId,
-    required this.otherUserId,
-    this.chatThreadId,
-    this.otherUser,
-  }) : super(key: key);
 
   @override
   State<MatchNotificationDialog> createState() =>
@@ -46,20 +44,20 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
     );
 
     _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _scaleController,
       curve: Curves.elasticOut,
-    ));
+    ),);
 
     _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _fadeController,
       curve: Curves.easeIn,
-    ));
+    ),);
 
     // Start animations
     _fadeController.forward();
@@ -97,8 +95,7 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
+  Widget build(BuildContext context) => FadeTransition(
       opacity: _fadeAnimation,
       child: Dialog(
         backgroundColor: Colors.transparent,
@@ -176,7 +173,7 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                 const SizedBox(height: 24),
 
                 // User avatars (if available)
-                if (widget.otherUser?.imageUrl?.isNotEmpty == true)
+                if (widget.otherUser?.imageUrl?.isNotEmpty ?? false)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -278,7 +275,6 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
         ),
       ),
     );
-  }
 }
 
 // Helper function to show the match dialog

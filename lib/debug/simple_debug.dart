@@ -59,11 +59,11 @@ class SimpleDebug {
 
   /// Test like functionality
   static Future<void> testLikeCreation(
-      String fromUserId, String toUserId) async {
+      String fromUserId, String toUserId,) async {
     try {
       debugPrint('💝 Testing like creation: $fromUserId → $toUserId');
 
-      final likeDocId = '${fromUserId}_likes_${toUserId}';
+      final likeDocId = '${fromUserId}_likes_$toUserId';
 
       await _firestore.collection('likes').doc(likeDocId).set({
         'from': fromUserId,

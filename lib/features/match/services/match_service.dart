@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-import 'likes_service.dart';
 import '../models/match_model.dart';
+import 'likes_service.dart';
 
 class MatchService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -94,7 +94,7 @@ class MatchService {
       if (currentUserId == null) return [];
 
       final querySnapshot = await _matchesCollection
-          .where('users', arrayContains: currentUserId!)
+          .where('users', arrayContains: currentUserId)
           .orderBy('matchedAt', descending: true)
           .get();
 
@@ -102,7 +102,7 @@ class MatchService {
           .map((doc) => {
                 'id': doc.id,
                 ...doc.data() as Map<String, dynamic>,
-              })
+              },)
           .toList();
     } catch (e) {
       debugPrint('Error getting user matches: $e');

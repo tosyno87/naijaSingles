@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../services/user_privacy_service.dart';
 import '../../common/constants/app_colors.dart';
+import '../../services/user_privacy_service.dart';
 
 class PrivacySettingsScreen extends StatefulWidget {
-  const PrivacySettingsScreen({Key? key}) : super(key: key);
+  const PrivacySettingsScreen({super.key});
 
   @override
   State<PrivacySettingsScreen> createState() => _PrivacySettingsScreenState();
@@ -84,14 +84,13 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -105,7 +104,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         actions: [
           if (_isSaving)
             const Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16),
               child: SizedBox(
                 width: 20,
                 height: 20,
@@ -129,10 +128,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _buildContent(),
     );
-  }
 
-  Widget _buildContent() {
-    return SingleChildScrollView(
+  Widget _buildContent() => SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,10 +179,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildSectionHeader(String title, String subtitle) {
-    return Column(
+  Widget _buildSectionHeader(String title, String subtitle) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -206,10 +201,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ),
       ],
     );
-  }
 
-  Widget _buildProfileVisibilitySection() {
-    return Container(
+  Widget _buildProfileVisibilitySection() => DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -262,10 +255,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildLocationPrivacySection() {
-    return Container(
+  Widget _buildLocationPrivacySection() => DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -301,10 +292,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildCommunicationSection() {
-    return Container(
+  Widget _buildCommunicationSection() => DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -327,14 +316,11 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
             }),
           ),
           _buildDivider(),
-
         ],
       ),
     );
-  }
 
-  Widget _buildActivitySection() {
-    return Container(
+  Widget _buildActivitySection() => DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -368,7 +354,6 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       ),
     );
-  }
 
   Widget _buildToggleItem(
     String title,
@@ -376,8 +361,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     bool value,
     ValueChanged<bool> onChanged, {
     bool isDestructive = false,
-  }) {
-    return Padding(
+  }) => Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
@@ -411,36 +395,34 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: isDestructive ? Colors.red.shade600 : AppColors.primaryGreen,
+            activeThumbColor:
+                isDestructive ? Colors.red.shade600 : AppColors.primaryGreen,
           ),
         ],
       ),
     );
-  }
 
-  Widget _buildDivider() {
-    return Divider(
+  Widget _buildDivider() => Divider(
       height: 1,
       color: Colors.grey[200],
       indent: 16,
       endIndent: 16,
     );
-  }
 
-  Widget _buildPrivacySummary() {
-    return Container(
+  Widget _buildPrivacySummary() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+        border:
+            Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.privacy_tip, color: AppColors.primaryGreen, size: 20),
+              const Icon(Icons.privacy_tip, color: AppColors.primaryGreen, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Privacy Summary',
@@ -471,5 +453,4 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
         ],
       ),
     );
-  }
 }

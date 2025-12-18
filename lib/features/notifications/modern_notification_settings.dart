@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
-import 'package:naijasingles/services/industry_notification_service.dart';
+import '../../common/constants/app_colors.dart';
+import '../../services/industry_notification_service.dart';
 
 /// Modern notification settings screen with industry-standard features
 /// Features:
@@ -14,20 +14,22 @@ import 'package:naijasingles/services/industry_notification_service.dart';
 /// - Do not disturb mode
 /// - Notification frequency controls
 class ModernNotificationSettings extends StatefulWidget {
-  const ModernNotificationSettings({Key? key}) : super(key: key);
+  const ModernNotificationSettings({super.key});
 
   @override
-  State<ModernNotificationSettings> createState() => _ModernNotificationSettingsState();
+  State<ModernNotificationSettings> createState() =>
+      _ModernNotificationSettingsState();
 }
 
 class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService = IndustryNotificationService();
-  
+  final IndustryNotificationService _notificationService =
+      IndustryNotificationService();
+
   NotificationSettings? _settings;
   bool _isLoading = true;
   bool _isSaving = false;
-  
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -51,30 +53,30 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
 
   Future<void> _loadSettings() async {
     setState(() => _isLoading = true);
-    
+
     // Simulate loading settings
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     setState(() {
       _settings = NotificationSettings.defaultSettings();
       _isLoading = false;
     });
-    
+
     _animationController.forward();
   }
 
   Future<void> _updateSetting(NotificationSettings newSettings) async {
     setState(() => _isSaving = true);
-    
+
     try {
       await _notificationService.updateSettings(newSettings);
       setState(() {
         _settings = newSettings;
       });
-      
+
       // Haptic feedback
       HapticFeedback.lightImpact();
-      
+
       _showSnackBar('Settings updated', isError: false);
     } catch (e) {
       _showSnackBar('Failed to update settings', isError: true);
@@ -90,16 +92,13 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: _buildAppBar(),
       body: _isLoading ? _buildLoadingState() : _buildSettingsContent(),
     );
-  }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
+  PreferredSizeWidget _buildAppBar() => AppBar(
       backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       leading: IconButton(
@@ -118,22 +117,21 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       actions: [
         if (_isSaving)
           const Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16),
             child: SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
               ),
             ),
           ),
       ],
     );
-  }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -151,7 +149,6 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       ),
     );
-  }
 
   Widget _buildSettingsContent() {
     if (_settings == null) {
@@ -167,33 +164,23 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
           children: [
             _buildHeaderCard(),
             const SizedBox(height: 24),
-            
             _buildSectionTitle('Push Notifications'),
             const SizedBox(height: 16),
             _buildNotificationToggles(),
-            
             const SizedBox(height: 32),
-            
             _buildSectionTitle('Sound & Vibration'),
             const SizedBox(height: 16),
             _buildSoundVibrationToggles(),
-            
             const SizedBox(height: 32),
-            
             _buildSectionTitle('Quiet Hours'),
             const SizedBox(height: 16),
             _buildQuietHoursSection(),
-            
             const SizedBox(height: 32),
-            
             _buildSectionTitle('Notification Frequency'),
             const SizedBox(height: 16),
             _buildFrequencySection(),
-            
             const SizedBox(height: 32),
-            
             _buildTestNotificationSection(),
-            
             const SizedBox(height: 32),
           ],
         ),
@@ -201,8 +188,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     );
   }
 
-  Widget _buildHeaderCard() {
-    return Container(
+  Widget _buildHeaderCard() => Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -217,7 +203,6 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.primaryGreen.withOpacity(0.2),
-          width: 1,
         ),
       ),
       child: Row(
@@ -228,7 +213,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
               color: AppColors.primaryGreen.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.notifications_active,
               color: AppColors.primaryGreen,
               size: 24,
@@ -249,7 +234,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Control when and how you receive notifications from NaijaSingles',
+                  'Control when and how you receive notifications from Afropeep',
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -262,10 +247,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       ),
     );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
+  Widget _buildSectionTitle(String title) => Text(
       title,
       style: GoogleFonts.montserrat(
         fontSize: 18,
@@ -273,75 +256,75 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         color: AppColors.textPrimary,
       ),
     );
-  }
 
-  Widget _buildNotificationToggles() {
-    return Column(
+  Widget _buildNotificationToggles() => Column(
       children: [
         _buildSettingTile(
           title: 'New Matches',
           subtitle: 'Get notified when you have a new match',
           icon: Icons.favorite,
           value: _settings!.matchNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(matchNotifications: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(matchNotifications: value)),
         ),
         _buildSettingTile(
           title: 'New Messages',
           subtitle: 'Get notified when someone sends you a message',
           icon: Icons.chat_bubble_outline,
           value: _settings!.messageNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(messageNotifications: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(messageNotifications: value)),
         ),
         _buildSettingTile(
           title: 'Profile Likes',
           subtitle: 'Get notified when someone likes your profile',
           icon: Icons.thumb_up,
           value: _settings!.likeNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(likeNotifications: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(likeNotifications: value)),
         ),
         _buildSettingTile(
           title: 'Super Likes',
           subtitle: 'Get notified when someone super likes you',
           icon: Icons.star,
           value: _settings!.superLikeNotifications,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(superLikeNotifications: value)),
+          onChanged: (value) => _updateSetting(
+              _settings!.copyWith(superLikeNotifications: value),),
         ),
       ],
     );
-  }
 
-  Widget _buildSoundVibrationToggles() {
-    return Column(
+  Widget _buildSoundVibrationToggles() => Column(
       children: [
         _buildSettingTile(
           title: 'Sound',
           subtitle: 'Play sound for notifications',
           icon: Icons.volume_up,
           value: _settings!.soundEnabled,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(soundEnabled: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(soundEnabled: value)),
         ),
         _buildSettingTile(
           title: 'Vibration',
           subtitle: 'Vibrate for notifications',
           icon: Icons.vibration,
           value: _settings!.vibrationEnabled,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
         ),
       ],
     );
-  }
 
-  Widget _buildQuietHoursSection() {
-    return Column(
+  Widget _buildQuietHoursSection() => Column(
       children: [
         _buildSettingTile(
           title: 'Enable Quiet Hours',
           subtitle: 'Pause notifications during specified hours',
           icon: Icons.bedtime,
           value: _settings!.quietHoursEnabled,
-          onChanged: (value) => _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
+          onChanged: (value) =>
+              _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
         ),
-        
         if (_settings!.quietHoursEnabled) ...[
           const SizedBox(height: 16),
           _buildTimeSetting(
@@ -357,10 +340,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       ],
     );
-  }
 
-  Widget _buildFrequencySection() {
-    return Container(
+  Widget _buildFrequencySection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -371,7 +352,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.schedule,
                 color: AppColors.primaryGreen,
                 size: 20,
@@ -405,7 +386,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildFrequencyOption('Medium', 'Balanced notifications'),
+                child:
+                    _buildFrequencyOption('Medium', 'Balanced notifications'),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -416,10 +398,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       ),
     );
-  }
 
-  Widget _buildFrequencyOption(String title, String subtitle) {
-    return Container(
+  Widget _buildFrequencyOption(String title, String subtitle) => Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.primaryGreen.withOpacity(0.1),
@@ -450,10 +430,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       ),
     );
-  }
 
-  Widget _buildTestNotificationSection() {
-    return Container(
+  Widget _buildTestNotificationSection() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -464,7 +442,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.science,
                 color: AppColors.primaryGreen,
                 size: 20,
@@ -507,7 +485,6 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       ),
     );
-  }
 
   Widget _buildSettingTile({
     required String title,
@@ -515,8 +492,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     required IconData icon,
     required bool value,
     required ValueChanged<bool> onChanged,
-  }) {
-    return Container(
+  }) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -560,19 +536,17 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ),
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.primaryGreen,
+        activeThumbColor: AppColors.primaryGreen,
         inactiveThumbColor: Colors.grey.shade400,
         inactiveTrackColor: Colors.grey.shade200,
       ),
     );
-  }
 
   Widget _buildTimeSetting({
     required String title,
     required String time,
     required VoidCallback onTap,
-  }) {
-    return Container(
+  }) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -609,10 +583,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         onTap: onTap,
       ),
     );
-  }
 
-  Widget _buildErrorState() {
-    return Center(
+  Widget _buildErrorState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -645,27 +617,23 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
         ],
       ),
     );
-  }
 
   Future<void> _showTimePicker(bool isStartTime) async {
-    final currentTime = _parseTime(isStartTime ? _settings!.quietHoursStart : _settings!.quietHoursEnd);
+    final currentTime = _parseTime(
+        isStartTime ? _settings!.quietHoursStart : _settings!.quietHoursEnd,);
 
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: currentTime,
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primaryGreen,
-              onPrimary: Colors.white,
-              surface: Colors.white,
               onSurface: AppColors.textPrimary,
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
 
     if (picked != null) {
@@ -673,7 +641,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
       final newSettings = isStartTime
           ? _settings!.copyWith(quietHoursStart: timeString)
           : _settings!.copyWith(quietHoursEnd: timeString);
-      
+
       _updateSetting(newSettings);
     }
   }
@@ -686,9 +654,7 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     );
   }
 
-  String _formatTime(TimeOfDay time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatTime(TimeOfDay time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
   String _formatTimeDisplay(String timeString) {
     final time = _parseTime(timeString);

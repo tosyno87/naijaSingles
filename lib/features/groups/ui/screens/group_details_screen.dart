@@ -6,12 +6,11 @@ import '../../../../models/group_model.dart';
 import '../../../../services/group_service.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
-  final GroupModel group;
 
   const GroupDetailsScreen({
-    super.key,
-    required this.group,
+    required this.group, super.key,
   });
+  final GroupModel group;
 
   @override
   State<GroupDetailsScreen> createState() => _GroupDetailsScreenState();
@@ -21,7 +20,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     with TickerProviderStateMixin {
   final GroupService _groupService = GroupService();
   late TabController _tabController;
-  
+
   List<Map<String, dynamic>> _members = [];
   bool _isLoading = false;
   bool _isMember = false;
@@ -55,7 +54,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   Future<void> _loadMembers() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final members = await _groupService.getGroupMembers(widget.group.id!);
       setState(() {
@@ -77,7 +76,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   Future<void> _joinGroup() async {
     final success = await _groupService.joinGroup(widget.group.id!);
-    
+
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -89,8 +88,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       _loadMembers();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Failed to join group'),
+        const SnackBar(
+          content: Text('Failed to join group'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -99,7 +98,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   Future<void> _leaveGroup() async {
     final success = await _groupService.leaveGroup(widget.group.id!);
-    
+
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -110,8 +109,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       Navigator.pop(context);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Failed to leave group'),
+        const SnackBar(
+          content: Text('Failed to leave group'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -119,34 +118,31 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: CustomScrollView(
         slivers: [
           // App Bar
           _buildSliverAppBar(),
-          
+
           // Group Info
           _buildGroupInfo(),
-          
+
           // Tab Bar
           _buildTabBar(),
-          
+
           // Tab Content
           _buildTabContent(),
         ],
       ),
     );
-  }
 
-  Widget _buildSliverAppBar() {
-    return SliverAppBar(
+  Widget _buildSliverAppBar() => SliverAppBar(
       expandedHeight: 200,
       pinned: true,
       backgroundColor: AppColors.primaryGreen,
       flexibleSpace: FlexibleSpaceBar(
-        background: Container(
+        background: DecoratedBox(
           decoration: BoxDecoration(
             gradient: _getCategoryGradient(),
           ),
@@ -158,14 +154,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   child: Image.network(
                     widget.group.imageUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildDefaultBackground();
-                    },
+                    errorBuilder: (context, error, stackTrace) => _buildDefaultBackground(),
                   ),
                 )
               else
                 _buildDefaultBackground(),
-              
+
               // Overlay
               Positioned.fill(
                 child: Container(
@@ -181,7 +175,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   ),
                 ),
               ),
-              
+
               // Group Name
               Positioned(
                 bottom: 16,
@@ -189,7 +183,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 right: 16,
                 child: Text(
                   widget.group.name,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -253,10 +247,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           ),
       ],
     );
-  }
 
-  Widget _buildDefaultBackground() {
-    return Container(
+  Widget _buildDefaultBackground() => DecoratedBox(
       decoration: BoxDecoration(
         gradient: _getCategoryGradient(),
       ),
@@ -264,10 +256,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         child: Custom3DIcons.groups(size: 80, color: Colors.white),
       ),
     );
-  }
 
-  Widget _buildGroupInfo() {
-    return SliverToBoxAdapter(
+  Widget _buildGroupInfo() => SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(20),
@@ -283,7 +273,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             Row(
               children: [
                 _buildInfoChip(
-                  icon: GroupCategories.categoryIcons[widget.group.category] ?? '🌟',
+                  icon: GroupCategories.categoryIcons[widget.group.category] ??
+                      '🌟',
                   label: widget.group.categoryDisplay,
                   color: AppColors.primaryGreen,
                 ),
@@ -296,28 +287,29 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Description
             Text(
               widget.group.description,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: AppColors.textSecondary,
                 height: 1.5,
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Stats Row
             Row(
               children: [
                 _buildStatItem(
                   icon: Icons.people,
                   label: 'Members',
-                  value: '${widget.group.memberCount}/${widget.group.maxMembers}',
+                  value:
+                      '${widget.group.memberCount}/${widget.group.maxMembers}',
                 ),
                 const SizedBox(width: 24),
                 if (widget.group.location != null)
@@ -334,23 +326,21 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Action Buttons
             _buildActionButtons(),
           ],
         ),
       ),
     );
-  }
 
   Widget _buildInfoChip({
     required String icon,
     required String label,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -364,7 +354,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: color,
@@ -373,14 +363,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -389,7 +377,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
@@ -399,7 +387,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         const SizedBox(height: 2),
         Text(
           value,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -407,10 +395,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildActionButtons() {
-    return Row(
+  Widget _buildActionButtons() => Row(
       children: [
         if (!_isMember)
           Expanded(
@@ -435,7 +421,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
               label: const Text('Leave Group'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.error,
-                side: BorderSide(color: AppColors.error),
+                side: const BorderSide(color: AppColors.error),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -468,10 +454,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ],
     );
-  }
 
-  Widget _buildTabBar() {
-    return SliverToBoxAdapter(
+  Widget _buildTabBar() => SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
@@ -487,11 +471,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           ),
           labelColor: Colors.white,
           unselectedLabelColor: AppColors.textSecondary,
-          labelStyle: GoogleFonts.poppins(
+          labelStyle: GoogleFonts.montserrat(
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
-          unselectedLabelStyle: GoogleFonts.poppins(
+          unselectedLabelStyle: GoogleFonts.montserrat(
             fontWeight: FontWeight.w400,
             fontSize: 14,
           ),
@@ -503,10 +487,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildTabContent() {
-    return SliverFillRemaining(
+  Widget _buildTabContent() => SliverFillRemaining(
       child: TabBarView(
         controller: _tabController,
         children: [
@@ -516,7 +498,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
   Widget _buildMembersTab() {
     if (_isLoading) {
@@ -537,8 +518,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     );
   }
 
-  Widget _buildMemberCard(Map<String, dynamic> member) {
-    return Container(
+  Widget _buildMemberCard(Map<String, dynamic> member) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -555,12 +535,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 ? NetworkImage(member['imageUrl'])
                 : null,
             child: member['imageUrl'] == null
-                ? Custom3DIcons.profile(size: 24)
+                ? Custom3DIcons.profile()
                 : null,
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           // Member Info
           Expanded(
             child: Column(
@@ -570,7 +550,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   children: [
                     Text(
                       member['name'],
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -586,7 +566,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 const SizedBox(height: 4),
                 Text(
                   'Joined ${_formatDate(DateTime.parse(member['joinedAt']))}',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -594,9 +574,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
               ],
             ),
           ),
-          
+
           // Actions
-          if (_isAdmin && !member['isCreator'] && member['id'] != _groupService.currentUserId)
+          if (_isAdmin &&
+              !member['isCreator'] &&
+              member['id'] != _groupService.currentUserId)
             PopupMenuButton<String>(
               onSelected: (value) {
                 switch (value) {
@@ -640,7 +622,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                     children: [
                       Icon(Icons.person_remove, color: Colors.red),
                       SizedBox(width: 8),
-                      Text('Remove Member', style: TextStyle(color: Colors.red)),
+                      Text('Remove Member',
+                          style: TextStyle(color: Colors.red),),
                     ],
                   ),
                 ),
@@ -649,10 +632,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildRoleBadge(String role, Color color) {
-    return Container(
+  Widget _buildRoleBadge(String role, Color color) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -661,17 +642,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       ),
       child: Text(
         role,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.montserrat(
           fontSize: 10,
           fontWeight: FontWeight.w600,
           color: color,
         ),
       ),
     );
-  }
 
-  Widget _buildPostsTab() {
-    return const Center(
+  Widget _buildPostsTab() => const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -697,10 +676,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildEventsTab() {
-    return const Center(
+  Widget _buildEventsTab() => const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -726,9 +703,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         ],
       ),
     );
-  }
 
-  void _makeAdmin(String userId) async {
+  Future<void> _makeAdmin(String userId) async {
     final success = await _groupService.addAdmin(widget.group.id!, userId);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -741,7 +717,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     }
   }
 
-  void _removeAdmin(String userId) async {
+  Future<void> _removeAdmin(String userId) async {
     final success = await _groupService.removeAdmin(widget.group.id!, userId);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -769,7 +745,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Group'),
-        content: Text('Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.',),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -799,7 +776,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 365) {
       return '${(difference.inDays / 365).floor()} year${(difference.inDays / 365).floor() == 1 ? '' : 's'} ago';
     } else if (difference.inDays > 30) {
@@ -816,37 +793,37 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   LinearGradient _getCategoryGradient() {
     switch (widget.group.category.toLowerCase()) {
       case 'cultural':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.culture, AppColors.heritage],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'professional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.business, AppColors.success],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'social':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.community, AppColors.info],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'educational':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.primaryGreen, AppColors.primaryGreenLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'religious':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.warning, AppColors.error],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'regional':
-        return LinearGradient(
+        return const LinearGradient(
           colors: [AppColors.textPrimary, AppColors.textSecondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

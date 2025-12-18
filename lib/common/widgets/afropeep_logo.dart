@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AfropeepLogo extends StatelessWidget {
-  final double size;
-  final Color? color;
 
   const AfropeepLogo({
     super.key,
     this.size = 60,
     this.color,
   });
+  final double size;
+  final Color? color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => SizedBox(
       width: size,
       height: size,
       child: Image.asset(
@@ -48,5 +47,4 @@ class AfropeepLogo extends StatelessWidget {
         },
       ),
     );
-  }
 }

@@ -14,9 +14,9 @@ class UserfilterBloc extends Bloc<UserfilterEvent, UserfilterState> {
     on<ChangefilterRequest>((event, emit) async {
       emit(UpdatingUserFilter());
       try {
-        log("ankit i am in filterbloc");
+        log('ankit i am in filterbloc');
         await UserRepo.updatefilter(event.details);
-        log("ankit i am in filterbloc after update");
+        log('ankit i am in filterbloc after update');
         emit(UserFilterUpdated());
       } on SocketException {
         emit(const UserFilterUpdationFailed(message: 'No Internet Connection'));

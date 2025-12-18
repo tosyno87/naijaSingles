@@ -1,19 +1,22 @@
 import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
-import '../bloc/event_creation_bloc.dart';
-import '../widgets/my_event_card.dart';
+import '../../../../common/utils/app_logger.dart';
 import '../../data/models/enhanced_event_model.dart';
 import '../../data/services/user_event_service.dart';
-import 'create_event_screen.dart';
+import '../bloc/event_creation_bloc.dart';
+import '../widgets/my_event_card.dart';
 
 class MyEventsScreen extends StatefulWidget {
-  const MyEventsScreen({Key? key}) : super(key: key);
+  const MyEventsScreen({super.key});
 
   @override
   State<MyEventsScreen> createState() => _MyEventsScreenState();
@@ -31,7 +34,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    
+
     // Add listener for tab changes
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
@@ -64,10 +67,10 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           children: [
             BlocListener<EventCreationBloc, EventCreationState>(
               listener: (context, state) {
-                print('🔄 EventCreationBloc State: ${state.runtimeType}');
-                
+                AppLogger.debug('🔄 EventCreationBloc State: ${state.runtimeType}');
+
                 if (state is EventDeleted) {
-                  print('✅ Event deleted successfully: ${state.eventId}');
+                  AppLogger.info('✅ Event deleted successfully: ${state.eventId}');
                   // Only clear loading if this is the event we're deleting
                   if (_deletingEventId == state.eventId) {
                     setState(() {
@@ -91,108 +94,108 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                     Future.delayed(const Duration(milliseconds: 300), () {
                       if (mounted) {
                         context.read<EventCreationBloc>().add(
-                          LoadUserEventsEvent(_currentUserId!),
-                        );
+                              LoadUserEventsEvent(_currentUserId!),
+                            );
                       }
                     });
                   }
                 } else if (state is EventPublished) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Event published successfully! It will be reviewed before going live.',
-                    style: GoogleFonts.montserrat(color: Colors.white),
-                  ),
-                  backgroundColor: const Color(0xFF008037),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
-              // Refresh the events list
-              context.read<EventCreationBloc>().add(
-                LoadUserEventsEvent(_currentUserId!),
-              );
-            } else if (state is EventCreationError) {
-              // Clear delete loading state on error
-              if (_isDeleting) {
-                setState(() {
-                  _isDeleting = false;
-                  _deletingEventId = null;
-                });
-              }
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    state.message,
-                    style: GoogleFonts.montserrat(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
-            }
-          },
-          child: Column(
-            children: [
-              _buildTabBar(),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildPublishedEventsTab(),
-                      _buildDraftsTab(),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Loading overlay during delete operations
-        if (_isDeleting)
-          Container(
-            color: Colors.black.withOpacity(0.3),
-            child: const Center(
-              child: Card(
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Event published successfully! It will be reviewed before going live.',
+                        style: GoogleFonts.montserrat(color: Colors.white),
                       ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Deleting event...',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      backgroundColor: const Color(0xFF008037),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
+                    ),
+                  );
+                  // Refresh the events list
+                  context.read<EventCreationBloc>().add(
+                        LoadUserEventsEvent(_currentUserId!),
+                      );
+                } else if (state is EventCreationError) {
+                  // Clear delete loading state on error
+                  if (_isDeleting) {
+                    setState(() {
+                      _isDeleting = false;
+                      _deletingEventId = null;
+                    });
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        state.message,
+                        style: GoogleFonts.montserrat(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Column(
+                children: [
+                  _buildTabBar(),
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          _buildPublishedEventsTab(),
+                          _buildDraftsTab(),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-          ),
-        ],
+            // Loading overlay during delete operations
+            if (_isDeleting)
+              ColoredBox(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(
+                  child: Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation(Color(0xFF008037)),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Deleting event...',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        floatingActionButton: _buildCreateEventFAB(),
       ),
-      floatingActionButton: _buildCreateEventFAB(),
-    ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: const Color(0xFFFFF6E5),
+  PreferredSizeWidget _buildAppBar() => AppBar(
+      backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       iconTheme: const IconThemeData(
         color: Color(0xFF333333), // Dark color for back button
@@ -231,8 +234,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         IconButton(
           onPressed: () {
             context.read<EventCreationBloc>().add(
-              LoadUserEventsEvent(_currentUserId!),
-            );
+                  LoadUserEventsEvent(_currentUserId!),
+                );
           },
           icon: const Icon(
             Icons.refresh,
@@ -242,14 +245,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ],
       systemOverlayStyle: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFFFFF6E5),
+        statusBarColor: AppColors.backgroundColor,
         statusBarIconBrightness: Brightness.dark,
       ),
     );
-  }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildTabBar() => Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       height: 50,
       decoration: BoxDecoration(
@@ -282,7 +283,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           fontWeight: FontWeight.w500,
         ),
         dividerColor: Colors.transparent,
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
         tabs: [
           Tab(
             child: Container(
@@ -299,10 +300,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildPublishedEventsTab() {
-    return BlocBuilder<EventCreationBloc, EventCreationState>(
+  Widget _buildPublishedEventsTab() => BlocBuilder<EventCreationBloc, EventCreationState>(
       builder: (context, state) {
         if (state is UserEventsLoading) {
           return _buildLoadingState();
@@ -313,11 +312,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         }
 
         if (state is UserEventsLoaded) {
-          final publishedEvents = state.events.where((event) => 
-            event.status == EventStatus.published || 
-            event.status == EventStatus.underReview ||
-            event.status == EventStatus.completed
-          ).toList();
+          final publishedEvents = state.events
+              .where((event) =>
+                  event.status == EventStatus.published ||
+                  event.status == EventStatus.underReview ||
+                  event.status == EventStatus.completed,)
+              .toList();
 
           if (publishedEvents.isEmpty) {
             // Don't show empty state if we're in the middle of a delete operation
@@ -326,9 +326,10 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             }
             return _buildEmptyState(
               title: 'No Published Events',
-              message: 'You haven\'t published any events yet.\nCreate your first event to get started!',
+              message:
+                  'You haven\'t published any events yet.\nCreate your first event to get started!',
               icon: Icons.event_busy,
-              showCreateButton: true,
+              showCreateButton: false,
             );
           }
 
@@ -337,16 +338,15 @@ class _MyEventsScreenState extends State<MyEventsScreen>
 
         return _buildEmptyState(
           title: 'No Published Events',
-          message: 'You haven\'t published any events yet.\nCreate your first event to get started!',
+          message:
+              'You haven\'t published any events yet.\nCreate your first event to get started!',
           icon: Icons.event_busy,
-          showCreateButton: true,
+          showCreateButton: false,
         );
       },
     );
-  }
 
-  Widget _buildDraftsTab() {
-    return BlocBuilder<EventCreationBloc, EventCreationState>(
+  Widget _buildDraftsTab() => BlocBuilder<EventCreationBloc, EventCreationState>(
       builder: (context, state) {
         if (state is UserEventsLoading) {
           return _buildLoadingState();
@@ -357,9 +357,9 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         }
 
         if (state is UserEventsLoaded) {
-          final draftEvents = state.drafts.where((event) => 
-            event.status == EventStatus.draft
-          ).toList();
+          final draftEvents = state.drafts
+              .where((event) => event.status == EventStatus.draft)
+              .toList();
 
           if (draftEvents.isEmpty) {
             // Don't show empty state if we're in the middle of a delete operation
@@ -368,9 +368,10 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             }
             return _buildEmptyState(
               title: 'No Draft Events',
-              message: 'You don\'t have any draft events.\nSave an event as draft while creating it.',
+              message:
+                  'You don\'t have any draft events.\nSave an event as draft while creating it.',
               icon: Icons.drafts,
-              showCreateButton: true,
+              showCreateButton: false,
             );
           }
 
@@ -379,26 +380,27 @@ class _MyEventsScreenState extends State<MyEventsScreen>
 
         return _buildEmptyState(
           title: 'No Draft Events',
-          message: 'You don\'t have any draft events.\nSave an event as draft while creating it.',
+          message:
+              'You don\'t have any draft events.\nSave an event as draft while creating it.',
           icon: Icons.drafts,
-          showCreateButton: true,
+          showCreateButton: false,
         );
       },
     );
-  }
 
-  Widget _buildEventsList(List<EnhancedEventModel> events, {bool isDrafts = false}) {
+  Widget _buildEventsList(List<EnhancedEventModel> events,
+      {bool isDrafts = false,}) {
     // Only apply optimistic update if there are multiple events to prevent empty state flash
     final filteredEvents = events.length > 1 && _deletingEventId != null
         ? events.where((event) => event.id != _deletingEventId).toList()
         : events;
-    
+
     return RefreshIndicator(
       onRefresh: () async {
         if (_currentUserId != null) {
           context.read<EventCreationBloc>().add(
-            LoadUserEventsEvent(_currentUserId!),
-          );
+                LoadUserEventsEvent(_currentUserId!),
+              );
           // Add a small delay to show the refresh indicator
           await Future.delayed(const Duration(milliseconds: 500));
         }
@@ -413,7 +415,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         itemBuilder: (context, index) {
           final event = filteredEvents[index];
           final isBeingDeleted = event.id == _deletingEventId;
-          
+
           return AnimatedContainer(
             duration: Duration(milliseconds: 200 + (index * 50)),
             curve: Curves.easeOutCubic,
@@ -425,12 +427,19 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                 child: MyEventCard(
                   event: event,
                   isDraft: isDrafts,
-                  onTap: isBeingDeleted ? null : () => _navigateToEventDetails(event),
+                  onTap: isBeingDeleted
+                      ? null
+                      : () => _navigateToEventDetails(event),
                   onEdit: isBeingDeleted ? null : () => _editEvent(event),
-                  onDelete: isBeingDeleted ? null : () => _deleteEvent(context, event),
-                  onPublish: (isDrafts && !isBeingDeleted) ? () => _publishDraft(context, event) : null,
+                  onDelete: isBeingDeleted
+                      ? null
+                      : () => _deleteEvent(context, event),
+                  onPublish: (isDrafts && !isBeingDeleted)
+                      ? () => _publishDraft(context, event)
+                      : null,
                   onShare: isBeingDeleted ? null : () => _shareEvent(event),
-                  onAnalytics: isBeingDeleted ? null : () => _showAnalytics(event),
+                  onAnalytics:
+                      isBeingDeleted ? null : () => _showAnalytics(event),
                 ),
               ),
             ),
@@ -440,8 +449,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
     );
   }
 
-  Widget _buildLoadingState() {
-    return Center(
+  Widget _buildLoadingState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -471,19 +479,17 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildErrorState(String message) {
-    return Center(
+  Widget _buildErrorState(String message) => Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 80,
-              color: const Color(0xFF999999),
+              color: Color(0xFF999999),
             ),
             const SizedBox(height: 24),
             Text(
@@ -507,13 +513,14 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             ElevatedButton(
               onPressed: () {
                 context.read<EventCreationBloc>().add(
-                  LoadUserEventsEvent(_currentUserId!),
-                );
+                      LoadUserEventsEvent(_currentUserId!),
+                    );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008037),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -530,15 +537,13 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
   Widget _buildEmptyState({
     required String title,
     required String message,
     required IconData icon,
     bool showCreateButton = false,
-  }) {
-    return Center(
+  }) => Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -566,7 +571,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               ),
             ),
             const SizedBox(height: 32),
-            
+
             Text(
               title,
               style: GoogleFonts.montserrat(
@@ -577,7 +582,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            
+
             Text(
               message,
               style: GoogleFonts.montserrat(
@@ -587,10 +592,10 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            
+
             if (showCreateButton) ...[
               const SizedBox(height: 40),
-              
+
               // Feature highlights
               Container(
                 padding: const EdgeInsets.all(20),
@@ -620,15 +625,16 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               ElevatedButton.icon(
                 onPressed: _createNewEvent,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF008037),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -648,13 +654,11 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
   Widget _buildFeatureHighlight({
     required IconData icon,
     required String text,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(
           icon,
@@ -673,21 +677,19 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ],
     );
-  }
 
-  Widget _buildAuthRequiredScreen() {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF6E5),
+  Widget _buildAuthRequiredScreen() => Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.login,
                 size: 80,
-                color: const Color(0xFF999999),
+                color: Color(0xFF999999),
               ),
               const SizedBox(height: 24),
               Text(
@@ -712,11 +714,9 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
-  Widget _buildCreateEventFAB() {
-    return FloatingActionButton.extended(
-      heroTag: "my_events_screen_fab",
+  Widget _buildCreateEventFAB() => FloatingActionButton.extended(
+      heroTag: 'my_events_screen_fab',
       onPressed: _createNewEvent,
       backgroundColor: const Color(0xFF008037),
       foregroundColor: Colors.white,
@@ -729,30 +729,29 @@ class _MyEventsScreenState extends State<MyEventsScreen>
         ),
       ),
     );
-  }
 
   void _createNewEvent() {
     Navigator.pushNamed(context, RouteName.createEvent).then((_) {
       // Refresh events list when returning from create screen
       if (_currentUserId != null) {
         context.read<EventCreationBloc>().add(
-          LoadUserEventsEvent(_currentUserId!),
-        );
+              LoadUserEventsEvent(_currentUserId!),
+            );
       }
     });
   }
 
   void _editEvent(EnhancedEventModel event) {
     Navigator.pushNamed(
-      context, 
+      context,
       RouteName.createEvent,
       arguments: {'existingEvent': event},
     ).then((_) {
       // Refresh events list when returning from edit screen
       if (_currentUserId != null) {
         context.read<EventCreationBloc>().add(
-          LoadUserEventsEvent(_currentUserId!),
-        );
+              LoadUserEventsEvent(_currentUserId!),
+            );
       }
     });
   }
@@ -760,7 +759,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   void _deleteEvent(BuildContext screenContext, EnhancedEventModel event) {
     showDialog(
       context: screenContext,
-      barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -819,15 +817,15 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           ),
           ElevatedButton(
             onPressed: () {
-              print('🗑️ Delete button pressed for event: ${event.id}');
+              AppLogger.debug('🗑️ Delete button pressed for event: ${event.id}');
               Navigator.of(dialogContext).pop();
-              
+
               // Track which event is being deleted
               setState(() {
                 _isDeleting = true;
                 _deletingEventId = event.id;
               });
-              
+
               // Add timeout mechanism
               Timer(const Duration(seconds: 10), () {
                 if (_isDeleting && _deletingEventId == event.id) {
@@ -850,10 +848,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
                   );
                 }
               });
-              
+
               // Use the passed screen context that has access to EventCreationBloc
-              print('📤 Dispatching DeleteEventEvent for: ${event.id}');
-              screenContext.read<EventCreationBloc>().add(DeleteEventEvent(event.id));
+              AppLogger.debug('📤 Dispatching DeleteEventEvent for: ${event.id}');
+              screenContext
+                  .read<EventCreationBloc>()
+                  .add(DeleteEventEvent(event.id));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -879,7 +879,6 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   void _publishDraft(BuildContext screenContext, EnhancedEventModel event) {
     showDialog(
       context: screenContext,
-      barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -940,7 +939,9 @@ class _MyEventsScreenState extends State<MyEventsScreen>
             onPressed: () {
               Navigator.of(dialogContext).pop();
               // Use the passed screen context that has access to EventCreationBloc
-              screenContext.read<EventCreationBloc>().add(PublishDraftEventEvent(event.id));
+              screenContext
+                  .read<EventCreationBloc>()
+                  .add(PublishDraftEventEvent(event.id));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008037),
@@ -974,24 +975,25 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   void _shareEvent(EnhancedEventModel event) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     final timeFormat = DateFormat('hh:mm a');
-    
+
     final shareText = '''
 🎉 ${event.name}
 
 📅 ${dateFormat.format(event.startDate)} at ${timeFormat.format(event.startDate)}
 📍 ${event.location.shortAddress}
-${event.isFree ? '🆓 Free Event' : '💰 ₦${event.ticketPrice?.toStringAsFixed(0)}'}
+${event.isFree ? '🆓 Free Event' : '💰 ${event.currencySymbol}${event.ticketPrice?.toStringAsFixed(0)}'}
 
 ${event.description.length > 100 ? '${event.description.substring(0, 100)}...' : event.description}
 
 Join me at this amazing event! 🚀
 
 #NaijaSingles #Events #${event.category.replaceAll(' ', '')}
-    '''.trim();
+    '''
+        .trim();
 
     // For MVP, we'll use the clipboard and show a snackbar
     Clipboard.setData(ClipboardData(text: shareText));
-    
+
     // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1046,7 +1048,7 @@ Join me at this amazing event! 🚀
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            
+
             // Header
             Padding(
               padding: const EdgeInsets.all(20),
@@ -1092,7 +1094,7 @@ Join me at this amazing event! 🚀
                 ],
               ),
             ),
-            
+
             // Analytics content
             Expanded(
               child: SingleChildScrollView(
@@ -1121,9 +1123,9 @@ Join me at this amazing event! 🚀
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     Row(
                       children: [
                         Expanded(
@@ -1145,9 +1147,9 @@ Join me at this amazing event! 🚀
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Performance insights
                     Container(
                       width: double.infinity,
@@ -1189,7 +1191,7 @@ Join me at this amazing event! 🚀
                         ],
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -1206,8 +1208,7 @@ Join me at this amazing event! 🚀
     required String title,
     required String value,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -1236,14 +1237,12 @@ Join me at this amazing event! 🚀
         ],
       ),
     );
-  }
 
   Widget _buildInsightRow({
     required IconData icon,
     required String text,
     required Color color,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 8),
@@ -1258,5 +1257,4 @@ Join me at this amazing event! 🚀
         ),
       ],
     );
-  }
 }

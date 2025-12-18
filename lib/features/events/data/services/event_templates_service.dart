@@ -1,8 +1,7 @@
 import '../models/enhanced_event_model.dart';
 
 class EventTemplatesService {
-  static List<EventTemplate> getAfrocentricTemplates() {
-    return [
+  static List<EventTemplate> getAfrocentricTemplates() => [
       EventTemplate(
         id: 'afrobeats_party',
         name: 'Afrobeats Party',
@@ -13,15 +12,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 6),
         defaultData: _createEventData(
           name: 'Afrobeats Night',
-          description: 'Join us for an unforgettable night of Afrobeats music, dancing, and good vibes. DJ will be spinning the latest hits from Nigeria, Ghana, and across Africa.',
+          description:
+              'Join us for an unforgettable night of Afrobeats music, dancing, and good vibes. DJ will be spinning the latest hits from Nigeria, Ghana, and across Africa.',
           category: 'Music',
           tags: ['afrobeats', 'music', 'dance', 'nightlife', 'african'],
-          isFree: false,
-          ticketPrice: 25.0, // $25 for nightlife event
+          ticketPrice: 25, // $25 for nightlife event
           maxAttendees: 200,
         ),
       ),
-      
       EventTemplate(
         id: 'cultural_exhibition',
         name: 'Cultural Exhibition',
@@ -32,14 +30,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(days: 2),
         defaultData: _createEventData(
           name: 'African Heritage Exhibition',
-          description: 'Discover the rich cultural heritage of Africa through art, crafts, and interactive displays. Meet local artists and learn about traditional practices.',
+          description:
+              'Discover the rich cultural heritage of Africa through art, crafts, and interactive displays. Meet local artists and learn about traditional practices.',
           category: 'Arts & Crafts',
           tags: ['art', 'culture', 'heritage', 'exhibition', 'african'],
           isFree: true, // Cultural exhibitions often free
           maxAttendees: 150,
         ),
       ),
-      
       EventTemplate(
         id: 'food_festival',
         name: 'Food Festival',
@@ -50,15 +48,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 8),
         defaultData: _createEventData(
           name: 'African Food Festival',
-          description: 'Taste authentic African dishes from different regions. Experience the diverse flavors of jollof rice, suya, injera, and many more traditional delicacies.',
+          description:
+              'Taste authentic African dishes from different regions. Experience the diverse flavors of jollof rice, suya, injera, and many more traditional delicacies.',
           category: 'Food & Dining',
           tags: ['food', 'festival', 'cuisine', 'traditional', 'african'],
-          isFree: false,
-          ticketPrice: 15.0, // $15 for food festival
+          ticketPrice: 15, // $15 for food festival
           maxAttendees: 300,
         ),
       ),
-      
       EventTemplate(
         id: 'networking_event',
         name: 'Networking Event',
@@ -69,15 +66,20 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 3),
         defaultData: _createEventData(
           name: 'Diaspora Connect Event',
-          description: 'Network with fellow Africans and friends of Africa. Share experiences, build connections, and strengthen our community bonds.',
+          description:
+              'Network with fellow Africans and friends of Africa. Share experiences, build connections, and strengthen our community bonds.',
           category: 'Professional Networking',
-          tags: ['networking', 'diaspora', 'community', 'professional', 'event'],
-          isFree: false,
-          ticketPrice: 10.0, // $10 for networking event
+          tags: [
+            'networking',
+            'diaspora',
+            'community',
+            'professional',
+            'event',
+          ],
+          ticketPrice: 10, // $10 for networking event
           maxAttendees: 80,
         ),
       ),
-      
       EventTemplate(
         id: 'dance_workshop',
         name: 'Dance Workshop',
@@ -88,15 +90,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 2),
         defaultData: _createEventData(
           name: 'African Dance Workshop',
-          description: 'Learn energetic African dance moves in a fun, supportive environment. Suitable for all skill levels. Come ready to move and groove!',
+          description:
+              'Learn energetic African dance moves in a fun, supportive environment. Suitable for all skill levels. Come ready to move and groove!',
           category: 'Sports & Fitness',
           tags: ['dance', 'workshop', 'fitness', 'african', 'traditional'],
-          isFree: false,
-          ticketPrice: 20.0, // $20 for workshop
+          ticketPrice: 20, // $20 for workshop
           maxAttendees: 50,
         ),
       ),
-      
       EventTemplate(
         id: 'business_conference',
         name: 'Business Conference',
@@ -107,15 +108,20 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 8),
         defaultData: _createEventData(
           name: 'African Business Summit',
-          description: 'Join entrepreneurs, investors, and business leaders to discuss opportunities in African markets. Network and learn from industry experts.',
+          description:
+              'Join entrepreneurs, investors, and business leaders to discuss opportunities in African markets. Network and learn from industry experts.',
           category: 'Business',
-          tags: ['business', 'entrepreneurship', 'conference', 'networking', 'african'],
-          isFree: false,
-          ticketPrice: 50.0, // $50 for business conference
+          tags: [
+            'business',
+            'entrepreneurship',
+            'conference',
+            'networking',
+            'african',
+          ],
+          ticketPrice: 50, // $50 for business conference
           maxAttendees: 120,
         ),
       ),
-      
       EventTemplate(
         id: 'fashion_show',
         name: 'Fashion Show',
@@ -126,15 +132,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 4),
         defaultData: _createEventData(
           name: 'African Fashion Showcase',
-          description: 'Experience the beauty and creativity of African fashion. Featuring local designers, traditional wear, and contemporary African-inspired pieces.',
+          description:
+              'Experience the beauty and creativity of African fashion. Featuring local designers, traditional wear, and contemporary African-inspired pieces.',
           category: 'Entertainment',
           tags: ['fashion', 'design', 'showcase', 'african', 'style'],
-          isFree: false,
-          ticketPrice: 30.0, // $30 for fashion show
+          ticketPrice: 30, // $30 for fashion show
           maxAttendees: 150,
         ),
       ),
-      
       EventTemplate(
         id: 'book_club',
         name: 'Book Club',
@@ -145,14 +150,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 2),
         defaultData: _createEventData(
           name: 'African Literature Book Club',
-          description: 'Join our monthly book club focusing on African authors and stories. Engage in thoughtful discussions about literature that celebrates African experiences.',
+          description:
+              'Join our monthly book club focusing on African authors and stories. Engage in thoughtful discussions about literature that celebrates African experiences.',
           category: 'Education',
           tags: ['books', 'literature', 'discussion', 'education', 'african'],
           isFree: true, // Book clubs are typically free
           maxAttendees: 25,
         ),
       ),
-      
       EventTemplate(
         id: 'speed_dating',
         name: 'Speed Dating',
@@ -163,15 +168,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 3),
         defaultData: _createEventData(
           name: 'African Singles Speed Dating',
-          description: 'Meet amazing singles in a fun, structured environment. Enjoy quick conversations, great music, and the chance to make meaningful connections.',
+          description:
+              'Meet amazing singles in a fun, structured environment. Enjoy quick conversations, great music, and the chance to make meaningful connections.',
           category: 'Social Gatherings',
           tags: ['dating', 'singles', 'networking', 'social', 'african'],
-          isFree: false,
-          ticketPrice: 20.0, // $20 for speed dating
+          ticketPrice: 20, // $20 for speed dating
           maxAttendees: 40,
         ),
       ),
-      
       EventTemplate(
         id: 'cooking_class',
         name: 'Cooking Class',
@@ -182,15 +186,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 4),
         defaultData: _createEventData(
           name: 'African Cuisine Cooking Class',
-          description: 'Learn to cook authentic African dishes from expert chefs. Includes ingredients, recipes, and a delicious meal to enjoy together.',
+          description:
+              'Learn to cook authentic African dishes from expert chefs. Includes ingredients, recipes, and a delicious meal to enjoy together.',
           category: 'Food & Dining',
           tags: ['cooking', 'food', 'learning', 'african cuisine', 'hands-on'],
-          isFree: false,
-          ticketPrice: 35.0, // $35 for cooking class
+          ticketPrice: 35, // $35 for cooking class
           maxAttendees: 20,
         ),
       ),
-      
       EventTemplate(
         id: 'fitness_workout',
         name: 'Fitness Workout',
@@ -201,14 +204,14 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 2),
         defaultData: _createEventData(
           name: 'African Dance Fitness',
-          description: 'Get your heart pumping with energetic African dance moves! Perfect for all fitness levels. Bring water and wear comfortable clothes.',
+          description:
+              'Get your heart pumping with energetic African dance moves! Perfect for all fitness levels. Bring water and wear comfortable clothes.',
           category: 'Sports & Fitness',
           tags: ['fitness', 'dance', 'workout', 'african music', 'wellness'],
           isFree: true, // Fitness events often free
           maxAttendees: 30,
         ),
       ),
-      
       EventTemplate(
         id: 'movie_night',
         name: 'Movie Night',
@@ -219,19 +222,26 @@ class EventTemplatesService {
         suggestedDuration: const Duration(hours: 3),
         defaultData: _createEventData(
           name: 'African Cinema Night',
-          description: 'Join us for a screening of amazing African films followed by a discussion. Popcorn and refreshments provided!',
+          description:
+              'Join us for a screening of amazing African films followed by a discussion. Popcorn and refreshments provided!',
           category: 'Entertainment',
-          tags: ['movies', 'cinema', 'african films', 'discussion', 'entertainment'],
+          tags: [
+            'movies',
+            'cinema',
+            'african films',
+            'discussion',
+            'entertainment',
+          ],
           isFree: true, // Movie nights often free
           maxAttendees: 50,
         ),
       ),
     ];
-  }
-  
+
   static EventTemplate? getTemplateById(String id) {
     try {
-      return getAfrocentricTemplates().firstWhere((template) => template.id == id);
+      return getAfrocentricTemplates()
+          .firstWhere((template) => template.id == id);
     } catch (e) {
       return null;
     }
@@ -260,14 +270,6 @@ class EventTemplatesService {
 }
 
 class EventTemplate {
-  final String id;
-  final String name;
-  final String description;
-  final String category;
-  final String icon;
-  final int color;
-  final Duration suggestedDuration;
-  final EventCreationData defaultData;
 
   const EventTemplate({
     required this.id,
@@ -279,4 +281,12 @@ class EventTemplate {
     required this.suggestedDuration,
     required this.defaultData,
   });
+  final String id;
+  final String name;
+  final String description;
+  final String category;
+  final String icon;
+  final int color;
+  final Duration suggestedDuration;
+  final EventCreationData defaultData;
 }

@@ -3,16 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/event_model.dart';
 
 class TrendingEventsSection extends StatelessWidget {
+
+  const TrendingEventsSection({
+    required this.trendingEvents, required this.onEventTap, super.key,
+    this.onViewAllTap,
+  });
   final List<EventModel> trendingEvents;
   final Function(EventModel) onEventTap;
   final VoidCallback? onViewAllTap;
-
-  const TrendingEventsSection({
-    Key? key,
-    required this.trendingEvents,
-    required this.onEventTap,
-    this.onViewAllTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +31,16 @@ class TrendingEventsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader() {
-    return Padding(
+  Widget _buildSectionHeader() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.trending_up,
-                color: const Color(0xFF008037),
+                color: Color(0xFF008037),
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -72,10 +69,8 @@ class TrendingEventsSection extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildTrendingEventsList() {
-    return SizedBox(
+  Widget _buildTrendingEventsList() => SizedBox(
       height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -87,10 +82,8 @@ class TrendingEventsSection extends StatelessWidget {
         },
       ),
     );
-  }
 
-  Widget _buildTrendingEventCard(EventModel event) {
-    return Container(
+  Widget _buildTrendingEventCard(EventModel event) => Container(
       width: 280,
       margin: const EdgeInsets.only(right: 16),
       child: GestureDetector(
@@ -126,10 +119,8 @@ class TrendingEventsSection extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildEventImage(EventModel event) {
-    return Container(
+  Widget _buildEventImage(EventModel event) => Container(
       height: 100,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -152,10 +143,8 @@ class TrendingEventsSection extends StatelessWidget {
             )
           : null,
     );
-  }
 
-  Widget _buildEventTitle(EventModel event) {
-    return Text(
+  Widget _buildEventTitle(EventModel event) => Text(
       event.name,
       style: GoogleFonts.montserrat(
         fontSize: 14,
@@ -165,19 +154,19 @@ class TrendingEventsSection extends StatelessWidget {
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
-  }
 
   Widget _buildEventDate(EventModel event) {
     final date = event.startDate;
     final formattedDate = '${date.day}/${date.month}/${date.year}';
-    final formattedTime = '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    final formattedTime =
+        '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
 
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.calendar_today,
           size: 12,
-          color: const Color(0xFF666666),
+          color: Color(0xFF666666),
         ),
         const SizedBox(width: 4),
         Text(
@@ -191,13 +180,12 @@ class TrendingEventsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildEventLocation(EventModel event) {
-    return Row(
+  Widget _buildEventLocation(EventModel event) => Row(
       children: [
-        Icon(
+        const Icon(
           Icons.location_on,
           size: 12,
-          color: const Color(0xFF666666),
+          color: Color(0xFF666666),
         ),
         const SizedBox(width: 4),
         Expanded(
@@ -213,18 +201,16 @@ class TrendingEventsSection extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildEventStats(EventModel event) {
-    return Row(
+  Widget _buildEventStats(EventModel event) => Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.people,
               size: 12,
-              color: const Color(0xFF008037),
+              color: Color(0xFF008037),
             ),
             const SizedBox(width: 4),
             Text(
@@ -264,5 +250,4 @@ class TrendingEventsSection extends StatelessWidget {
           ),
       ],
     );
-  }
 }

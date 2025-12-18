@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Industry-standard notification service following Hinge/Bumble/Tinder best practices
-/// 
+///
 /// Features:
 /// - Real-time Firebase integration
 /// - Rich notifications with images and actions
@@ -18,29 +18,31 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 /// - Quiet hours and do-not-disturb
 /// - Notification preferences per type
 class IndustryNotificationService {
-  static final IndustryNotificationService _instance = IndustryNotificationService._internal();
   factory IndustryNotificationService() => _instance;
   IndustryNotificationService._internal();
+  static final IndustryNotificationService _instance =
+      IndustryNotificationService._internal();
 
   // Firebase instances
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  
+
   // Local notifications
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
-  
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
+
   // Stream controllers for real-time updates
-  final StreamController<List<AppNotification>> _notificationsController = 
+  final StreamController<List<AppNotification>> _notificationsController =
       StreamController<List<AppNotification>>.broadcast();
-  final StreamController<int> _unreadCountController = 
+  final StreamController<int> _unreadCountController =
       StreamController<int>.broadcast();
-  
+
   // Current user and settings
   String? _currentUserId;
   NotificationSettings? _settings;
   StreamSubscription<QuerySnapshot>? _notificationsSubscription;
-  
+
   // Notification channels
   static const String _matchChannelId = 'matches';
   static const String _messageChannelId = 'messages';
@@ -52,24 +54,24 @@ class IndustryNotificationService {
     try {
       // Initialize local notifications
       await _initializeLocalNotifications();
-      
+
       // Request notification permissions
       await _requestPermissions();
-      
+
       // Setup Firebase messaging
       await _setupFirebaseMessaging();
-      
+
       // Initialize current user
       _currentUserId = _auth.currentUser?.uid;
-      
+
       if (_currentUserId != null) {
         // Load user settings
         await _loadUserSettings();
-        
+
         // Start listening to notifications
         await _startNotificationListener();
       }
-      
+
       log('IndustryNotificationService initialized successfully');
     } catch (e) {
       log('Error initializing IndustryNotificationService: $e');
@@ -78,13 +80,13 @@ class IndustryNotificationService {
 
   /// Initialize local notifications with industry-standard channels
   Future<void> _initializeLocalNotifications() async {
-    const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings(
+      
     );
-    
+
     const InitializationSettings settings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
@@ -108,55 +110,50 @@ class IndustryNotificationService {
       'Matches',
       description: 'Notifications for new matches',
       importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-      showBadge: true,
     );
 
-    const AndroidNotificationChannel messageChannel = AndroidNotificationChannel(
+    const AndroidNotificationChannel messageChannel =
+        AndroidNotificationChannel(
       _messageChannelId,
       'Messages',
       description: 'Notifications for new messages',
       importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-      showBadge: true,
     );
 
     const AndroidNotificationChannel likeChannel = AndroidNotificationChannel(
       _likeChannelId,
       'Likes',
       description: 'Notifications for profile likes',
-      importance: Importance.defaultImportance,
-      playSound: true,
       enableVibration: false,
-      showBadge: true,
     );
 
-    const AndroidNotificationChannel generalChannel = AndroidNotificationChannel(
+    const AndroidNotificationChannel generalChannel =
+        AndroidNotificationChannel(
       _generalChannelId,
       'General',
       description: 'General app notifications',
-      importance: Importance.defaultImportance,
       playSound: false,
       enableVibration: false,
-      showBadge: true,
     );
 
     await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(matchChannel);
-    
+
     await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(messageChannel);
-    
+
     await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(likeChannel);
-    
+
     await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(generalChannel);
   }
 
@@ -164,25 +161,21 @@ class IndustryNotificationService {
   Future<bool> _requestPermissions() async {
     // Request FCM permissions
     final settings = await _messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
+      
     );
 
     // Request local notification permissions
     final bool? localPermission = await _localNotifications
-        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
           badge: true,
           sound: true,
         );
 
-    final bool fcmAuthorized = settings.authorizationStatus == AuthorizationStatus.authorized;
+    final bool fcmAuthorized =
+        settings.authorizationStatus == AuthorizationStatus.authorized;
     final bool localAuthorized = localPermission ?? false;
 
     return fcmAuthorized && localAuthorized;
@@ -255,11 +248,11 @@ class IndustryNotificationService {
         .snapshots()
         .listen((snapshot) {
       final notifications = snapshot.docs
-          .map((doc) => AppNotification.fromFirestore(doc))
+          .map(AppNotification.fromFirestore)
           .toList();
-      
+
       _notificationsController.add(notifications);
-      
+
       // Update unread count
       final unreadCount = notifications.where((n) => !n.isRead).length;
       _unreadCountController.add(unreadCount);
@@ -269,7 +262,7 @@ class IndustryNotificationService {
   /// Handle foreground messages
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     log('Received foreground message: ${message.messageId}');
-    
+
     // Check if notifications are enabled for this type
     if (!_shouldShowNotification(message.data['type'] ?? 'general')) {
       return;
@@ -282,12 +275,12 @@ class IndustryNotificationService {
   /// Handle notification tap
   Future<void> _handleNotificationTap(RemoteMessage message) async {
     log('Notification tapped: ${message.messageId}');
-    
+
     // Mark as read
     if (message.data['notificationId'] != null) {
       await markAsRead(message.data['notificationId']);
     }
-    
+
     // Navigate to appropriate screen
     _navigateFromNotification(message.data);
   }
@@ -295,12 +288,11 @@ class IndustryNotificationService {
   /// Handle local notification tap
   Future<void> _onNotificationTapped(NotificationResponse response) async {
     log('Local notification tapped: ${response.id}');
-    
+
     // Parse payload and navigate
     if (response.payload != null) {
-      final Map<String, dynamic> data = Map<String, dynamic>.from(
-        Uri.splitQueryString(response.payload!)
-      );
+      final Map<String, dynamic> data =
+          Map<String, dynamic>.from(Uri.splitQueryString(response.payload!));
       _navigateFromNotification(data);
     }
   }
@@ -309,7 +301,7 @@ class IndustryNotificationService {
   Future<void> _showLocalNotification(RemoteMessage message) async {
     final String channelId = _getChannelId(message.data['type'] ?? 'general');
     final String? imageUrl = message.data['imageUrl'];
-    
+
     // Download and cache image if provided
     String? imagePath;
     if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -322,16 +314,16 @@ class IndustryNotificationService {
       }
     }
 
-    final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    final AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
       channelId,
       _getChannelName(channelId),
       channelDescription: _getChannelDescription(channelId),
       importance: Importance.high,
       priority: Priority.high,
-      showWhen: true,
       when: DateTime.now().millisecondsSinceEpoch,
       largeIcon: imagePath != null ? FilePathAndroidBitmap(imagePath) : null,
-      styleInformation: imagePath != null 
+      styleInformation: imagePath != null
           ? BigPictureStyleInformation(
               FilePathAndroidBitmap(imagePath),
               contentTitle: message.notification?.title,
@@ -369,7 +361,7 @@ class IndustryNotificationService {
   /// Check if notification should be shown based on settings
   bool _shouldShowNotification(String type) {
     if (_settings == null) return true;
-    
+
     switch (type) {
       case 'match':
         return _settings!.matchNotifications;
@@ -475,15 +467,16 @@ class IndustryNotificationService {
     // This would integrate with your app's navigation system
     final String type = data['type'] ?? 'general';
     final String? actionId = data['actionId'];
-    
+
     log('Navigating from notification: type=$type, actionId=$actionId');
-    
+
     // Implementation would depend on your navigation setup
     // Example: Navigator.pushNamed(context, '/profile', arguments: actionId);
   }
 
   /// Stream of notifications
-  Stream<List<AppNotification>> get notificationsStream => _notificationsController.stream;
+  Stream<List<AppNotification>> get notificationsStream =>
+      _notificationsController.stream;
 
   /// Stream of unread count
   Stream<int> get unreadCountStream => _unreadCountController.stream;
@@ -525,10 +518,7 @@ class IndustryNotificationService {
   /// Delete notification
   Future<void> deleteNotification(String notificationId) async {
     try {
-      await _firestore
-          .collection('notifications')
-          .doc(notificationId)
-          .delete();
+      await _firestore.collection('notifications').doc(notificationId).delete();
     } catch (e) {
       log('Error deleting notification: $e');
     }
@@ -560,7 +550,6 @@ class IndustryNotificationService {
         type: type,
         avatarUrl: imageUrl,
         actionId: actionId,
-        isRead: false,
       );
 
       // Add to Firestore
@@ -597,7 +586,7 @@ class IndustryNotificationService {
       // Get user's FCM token
       final userDoc = await _firestore.collection('users').doc(userId).get();
       final fcmToken = userDoc.data()?['fcmToken'];
-      
+
       if (fcmToken == null) {
         log('No FCM token found for user: $userId');
         return;
@@ -628,17 +617,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 /// Enhanced notification model
-class AppNotification {
-  final String id;
-  final String title;
-  final String message;
-  final DateTime timestamp;
-  final String type;
-  final String? avatarUrl;
-  final String? actionId;
-  final bool isRead;
-  final Map<String, dynamic>? data;
-  final int priority; // 0-3 (low to high)
+class AppNotification { // 0-3 (low to high)
 
   AppNotification({
     required this.id,
@@ -668,9 +647,18 @@ class AppNotification {
       priority: data['priority'] ?? 1,
     );
   }
+  final String id;
+  final String title;
+  final String message;
+  final DateTime timestamp;
+  final String type;
+  final String? avatarUrl;
+  final String? actionId;
+  final bool isRead;
+  final Map<String, dynamic>? data;
+  final int priority;
 
-  Map<String, dynamic> toFirestore() {
-    return {
+  Map<String, dynamic> toFirestore() => {
       'title': title,
       'message': message,
       'timestamp': Timestamp.fromDate(timestamp),
@@ -681,7 +669,6 @@ class AppNotification {
       'data': data,
       'priority': priority,
     };
-  }
 
   IconData get typeIcon {
     switch (type) {
@@ -749,8 +736,7 @@ class AppNotification {
     bool? isRead,
     Map<String, dynamic>? data,
     int? priority,
-  }) {
-    return AppNotification(
+  }) => AppNotification(
       id: id ?? this.id,
       title: title ?? this.title,
       message: message ?? this.message,
@@ -762,20 +748,10 @@ class AppNotification {
       data: data ?? this.data,
       priority: priority ?? this.priority,
     );
-  }
 }
 
 /// Notification settings model
 class NotificationSettings {
-  final bool matchNotifications;
-  final bool messageNotifications;
-  final bool likeNotifications;
-  final bool superLikeNotifications;
-  final bool soundEnabled;
-  final bool vibrationEnabled;
-  final bool quietHoursEnabled;
-  final String quietHoursStart;
-  final String quietHoursEnd;
 
   NotificationSettings({
     required this.matchNotifications,
@@ -789,8 +765,7 @@ class NotificationSettings {
     required this.quietHoursEnd,
   });
 
-  factory NotificationSettings.defaultSettings() {
-    return NotificationSettings(
+  factory NotificationSettings.defaultSettings() => NotificationSettings(
       matchNotifications: true,
       messageNotifications: true,
       likeNotifications: true,
@@ -801,7 +776,6 @@ class NotificationSettings {
       quietHoursStart: '22:00',
       quietHoursEnd: '08:00',
     );
-  }
 
   factory NotificationSettings.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -817,9 +791,17 @@ class NotificationSettings {
       quietHoursEnd: data['quietHoursEnd'] ?? '08:00',
     );
   }
+  final bool matchNotifications;
+  final bool messageNotifications;
+  final bool likeNotifications;
+  final bool superLikeNotifications;
+  final bool soundEnabled;
+  final bool vibrationEnabled;
+  final bool quietHoursEnabled;
+  final String quietHoursStart;
+  final String quietHoursEnd;
 
-  Map<String, dynamic> toFirestore() {
-    return {
+  Map<String, dynamic> toFirestore() => {
       'matchNotifications': matchNotifications,
       'messageNotifications': messageNotifications,
       'likeNotifications': likeNotifications,
@@ -830,7 +812,6 @@ class NotificationSettings {
       'quietHoursStart': quietHoursStart,
       'quietHoursEnd': quietHoursEnd,
     };
-  }
 
   NotificationSettings copyWith({
     bool? matchNotifications,
@@ -842,17 +823,16 @@ class NotificationSettings {
     bool? quietHoursEnabled,
     String? quietHoursStart,
     String? quietHoursEnd,
-  }) {
-    return NotificationSettings(
+  }) => NotificationSettings(
       matchNotifications: matchNotifications ?? this.matchNotifications,
       messageNotifications: messageNotifications ?? this.messageNotifications,
       likeNotifications: likeNotifications ?? this.likeNotifications,
-      superLikeNotifications: superLikeNotifications ?? this.superLikeNotifications,
+      superLikeNotifications:
+          superLikeNotifications ?? this.superLikeNotifications,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
       quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
       quietHoursStart: quietHoursStart ?? this.quietHoursStart,
       quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
     );
-  }
 }

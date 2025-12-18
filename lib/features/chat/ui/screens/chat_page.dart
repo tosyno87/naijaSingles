@@ -6,10 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/utils/custom_toast.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/features/chat/ui/widgets/send_message_box.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
@@ -18,19 +14,20 @@ import '../../../../common/constants/constants.dart';
 // // Calling functionality removed
 import '../../../../common/data/repo/user_repo.dart';
 import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/utils/custom_toast.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
+import '../../../../models/user_model.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 import '../../../report/report_user.dart';
+import '../widgets/send_message_box.dart';
 
 class ChatPage extends StatefulWidget {
+  const ChatPage(
+      {required this.sender, required this.second, required this.chatId, super.key,});
   final UserModel sender;
   final String chatId;
   final UserModel second;
-  const ChatPage(
-      {super.key,
-      required this.sender,
-      required this.second,
-      required this.chatId});
   @override
   ChatPageState createState() => ChatPageState();
 }
@@ -49,7 +46,7 @@ class ChatPageState extends State<ChatPage> {
     super.initState();
 
     chatReference =
-        db.collection("chats").doc(widget.chatId).collection('messages');
+        db.collection('chats').doc(widget.chatId).collection('messages');
     checkBlock();
   }
 
@@ -60,7 +57,7 @@ class ChatPageState extends State<ChatPage> {
   }
 
   void debounce(VoidCallback callback,
-      {Duration duration = const Duration(seconds: 15)}) {
+      {Duration duration = const Duration(seconds: 15),}) {
     if (!isCalling) {
       // Check if a call is not in progress
       callback(); // Execute the callback immediately
@@ -77,7 +74,7 @@ class ChatPageState extends State<ChatPage> {
   }
 
   String? blockedBy;
-  checkBlock() {
+  void checkBlock() {
     chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
@@ -111,18 +108,16 @@ class ChatPageState extends State<ChatPage> {
               onPressed: () => Navigator.pop(context),
             ),
             actions: <Widget>[
-              PopupMenuButton(itemBuilder: (ct) {
-                return [
+              PopupMenuButton(itemBuilder: (ct) => [
                   PopupMenuItem(
                     value: 'value1',
                     child: InkWell(
                       onTap: () => showDialog(
-                          barrierDismissible: true,
                           context: context,
                           builder: (context) => ReportUser(
                                 reported: widget.second,
                                 reportedBy: widget.sender,
-                              )).then((value) => Navigator.pop(ct)),
+                              ),).then((value) => Navigator.pop(ct)),
                       child: SizedBox(
                           width: 100,
                           height: 30,
@@ -139,10 +134,10 @@ class ChatPageState extends State<ChatPage> {
                                 width: 5,
                               ),
                               Text(
-                                "Report".tr().toString(),
+                                'Report'.tr().toString(),
                               ),
                             ],
-                          )),
+                          ),),
                     ),
                   ),
                   PopupMenuItem(
@@ -162,32 +157,31 @@ class ChatPageState extends State<ChatPage> {
                             width: 5,
                           ),
                           Text(isBlocked
-                              ? "Unblock user".tr().toString()
-                              : "Block user".tr().toString()),
+                              ? 'Unblock user'.tr().toString()
+                              : 'Block user'.tr().toString(),),
                         ],
                       ),
                       onTap: () {
                         Navigator.pop(ct);
                         showDialog(
                           context: context,
-                          builder: (BuildContext ctx) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
+                          builder: (BuildContext ctx) => ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
                               child: AlertDialog(
                                 title: Text(isBlocked
                                     ? 'Unblock'.tr().toString()
-                                    : 'Block'.tr().toString()),
-                                content: Text("Do you want to".tr(args: [
+                                    : 'Block'.tr().toString(),),
+                                content: Text('Do you want to'.tr(args: [
                                   "${isBlocked ? 'Unblock'.tr().toString() : 'Block'.tr().toString()}",
-                                  "${widget.second.name}"
-                                ])),
+                                  '${widget.second.name}',
+                                ],),),
                                 actions: <Widget>[
                                   TextButton(
                                     onPressed: () =>
                                         Navigator.of(context).pop(false),
                                     child: Text(
                                       'No'.tr().toString(),
-                                      style: TextStyle(color: primaryColor),
+                                      style: const TextStyle(color: primaryColor),
                                     ),
                                   ),
                                   TextButton(
@@ -198,58 +192,57 @@ class ChatPageState extends State<ChatPage> {
                                         chatReference.doc('blocked').set({
                                           'isBlocked': !isBlocked,
                                           'blockedBy': widget.sender.id,
-                                        }, SetOptions(merge: true));
+                                        }, SetOptions(merge: true),);
                                         // For deleting from   blocklist
                                         await firebaseFireStoreInstance
-                                            .collection("users")
+                                            .collection('users')
                                             .doc(widget.sender.id)
-                                            .collection("blockedlist")
+                                            .collection('blockedlist')
                                             .doc(widget.second
-                                                .id) // Assuming widget.second.id represents the blocked user's ID
+                                                .id,) // Assuming widget.second.id represents the blocked user's ID
                                             .delete();
 
                                         CustomToast.showToast(
-                                            "User Unblocked Successfully"
+                                            'User Unblocked Successfully'
                                                 .tr()
-                                                .toString());
+                                                .toString(),);
                                       } else if (!isBlocked) {
                                         chatReference.doc('blocked').set({
                                           'isBlocked': !isBlocked,
                                           'blockedBy': widget.sender.id,
-                                        }, SetOptions(merge: true));
+                                        }, SetOptions(merge: true),);
                                         // For adding in   blocklist
                                         await firebaseFireStoreInstance
-                                            .collection("users")
+                                            .collection('users')
                                             .doc(widget.sender.id)
-                                            .collection("blockedlist")
+                                            .collection('blockedlist')
                                             .doc(widget.second
-                                                .id) // Generate a unique document ID for each blocked user
+                                                .id,) // Generate a unique document ID for each blocked user
                                             .set({
                                           'isBlocked': !isBlocked,
                                           'blockedID': widget.second.id,
                                           'timestamp':
-                                              FieldValue.serverTimestamp()
+                                              FieldValue.serverTimestamp(),
                                         });
 
                                         CustomToast.showToast(
-                                            "User blocked Successfully"
+                                            'User blocked Successfully'
                                                 .tr()
-                                                .toString());
+                                                .toString(),);
                                       } else {
                                         CustomSnackbar.showSnackBarSimple(
                                             "You can't unblock".tr().toString(),
-                                            context);
+                                            context,);
                                       }
                                     },
                                     child: Text(
                                       'Yes'.tr().toString(),
-                                      style: TextStyle(color: primaryColor),
+                                      style: const TextStyle(color: primaryColor),
                                     ),
                                   ),
                                 ],
                               ),
-                            );
-                          },
+                            ),
                         );
                       },
                     ),
@@ -259,45 +252,44 @@ class ChatPageState extends State<ChatPage> {
                     child: InkWell(
                       onTap: () => showDialog(
                         context: context,
-                        builder: (BuildContext ctx) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10.0),
+                        builder: (BuildContext ctx) => ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
                             child: AlertDialog(
                               title: Text(
                                 'Unmatch'.tr().toString(),
-                                style: TextStyle(
-                                    fontSize: 18, color: primaryColor),
+                                style: const TextStyle(
+                                    fontSize: 18, color: primaryColor,),
                               ),
                               content: Text(
-                                  "Do you want to unmatch with".tr(args: [
-                                    "${widget.second.name}".toString()
-                                  ]).toString(),
-                                  style: const TextStyle(fontSize: 16)),
+                                  'Do you want to unmatch with'.tr(args: [
+                                    '${widget.second.name}'.toString(),
+                                  ],).toString(),
+                                  style: const TextStyle(fontSize: 16),),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.of(context).pop(false),
                                   child: Text(
                                     'No'.tr().toString(),
-                                    style: TextStyle(color: primaryColor),
+                                    style: const TextStyle(color: primaryColor),
                                   ),
                                 ),
                                 TextButton(
                                   onPressed: () async {
                                     Navigator.pop(ctx);
                                     await UserRepo.unmatchUser(
-                                        widget.sender, widget.second.id!);
+                                        widget.sender, widget.second.id!,);
                                     context.read<SearchUserBloc>().add(
                                         LoadUserEvent(
-                                            currentUser: widget.sender));
+                                            currentUser: widget.sender,),);
                                     context.read<MatchUserBloc>().add(
                                         LoadMatchUserEvent(
-                                            currentUser: widget.sender));
+                                            currentUser: widget.sender,),);
                                     CustomSnackbar.showSnackBarSimple(
-                                        "unmatched".tr(args: [
-                                          "${widget.second.name}".toString()
-                                        ]).toString(),
-                                        context);
+                                        'unmatched'.tr(args: [
+                                          '${widget.second.name}'.toString(),
+                                        ],).toString(),
+                                        context,);
                                     Navigator.pop(context);
                                     // Navigator.pushReplacement(
                                     //     context,
@@ -306,13 +298,12 @@ class ChatPageState extends State<ChatPage> {
                                   },
                                   child: Text(
                                     'Yes'.tr().toString(),
-                                    style: TextStyle(color: primaryColor),
+                                    style: const TextStyle(color: primaryColor),
                                   ),
                                 ),
                               ],
                             ),
-                          );
-                        },
+                          ),
                       ).then((value) => Navigator.pop(ct)),
                       child: Row(
                         children: [
@@ -327,18 +318,17 @@ class ChatPageState extends State<ChatPage> {
                             width: 5,
                           ),
                           Text(
-                            "Unmatch".tr().toString(),
+                            'Unmatch'.tr().toString(),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ];
-              })
-            ]),
+                ],),
+            ],),
         body: MessageBox(
             sender: widget.sender,
             chatId: widget.chatId,
-            second: widget.second));
+            second: widget.second,),);
   }
 }

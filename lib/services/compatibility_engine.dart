@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/utils/distance.dart' as distance;
+
+import '../common/utils/distance.dart' as distance;
+import '../models/user_model.dart';
 
 /// Compatibility engine that calculates match scores between users
 /// Implements Priority 2: Enhanced Matching Algorithm
@@ -15,14 +16,14 @@ class CompatibilityEngine {
   // Scoring parameters
   static const int IDEAL_AGE_DIFFERENCE = 3; // Years
   static const int MAX_AGE_DIFFERENCE = 10; // Years
-  static const double MAX_DISTANCE_MILES = 31.0; // Miles (converted from 50km)
+  static const double MAX_DISTANCE_MILES = 31; // Miles (converted from 50km)
   static const int ACTIVITY_THRESHOLD_DAYS = 7; // Days
 
   /// Calculate overall compatibility score between two users
   /// Returns a score between 0.0 (no compatibility) and 1.0 (perfect match)
   static double calculateCompatibility(UserModel user1, UserModel user2) {
     try {
-      double totalScore = 0.0;
+      double totalScore = 0;
 
       // Age compatibility (25%)
       final ageScore = _calculateAgeCompatibility(user1, user2);
@@ -48,9 +49,9 @@ class CompatibilityEngine {
       totalScore = totalScore.clamp(0.0, 1.0);
 
       debugPrint(
-          '🎯 Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%');
+          '🎯 Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',);
       debugPrint(
-          '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Activity: ${(activityScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%');
+          '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Activity: ${(activityScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',);
 
       return totalScore;
     } catch (e) {
@@ -69,7 +70,7 @@ class CompatibilityEngine {
       final ageDifference = (age1 - age2).abs();
 
       if (ageDifference <= IDEAL_AGE_DIFFERENCE) {
-        return 1.0; // Perfect score for ideal age difference
+        return 1; // Perfect score for ideal age difference
       } else if (ageDifference <= MAX_AGE_DIFFERENCE) {
         // Linear decrease from 1.0 to 0.3 as age difference increases
         final score = 1.0 -
@@ -111,7 +112,7 @@ class CompatibilityEngine {
       final distanceKm = distance.calculateDistance(lat1, lng1, lat2, lng2);
 
       if (distanceKm <= 3.1) {
-        return 1.0; // Perfect score for very close users (within 3.1 miles)
+        return 1; // Perfect score for very close users (within 3.1 miles)
       } else if (distanceKm <= MAX_DISTANCE_MILES) {
         // Linear decrease from 1.0 to 0.2 as distance increases
         final score =
@@ -154,7 +155,7 @@ class CompatibilityEngine {
       final score = (jaccardSimilarity + boost).clamp(0.0, 1.0);
 
       debugPrint(
-          '🎨 Interest matching: ${intersection.length} shared interests out of ${union.length} total');
+          '🎨 Interest matching: ${intersection.length} shared interests out of ${union.length} total',);
 
       return score;
     } catch (e) {
@@ -236,7 +237,7 @@ class CompatibilityEngine {
 
   /// Calculate user activity level (0.0 = inactive, 1.0 = very active)
   static double _calculateUserActivity(UserModel user) {
-    double activityScore = 0.0;
+    double activityScore = 0;
 
     // Recent login activity
     if (user.lastSeen != null) {
@@ -295,7 +296,7 @@ class CompatibilityEngine {
 
   /// Calculate individual profile completeness (0.0 = empty, 1.0 = complete)
   static double _calculateProfileCompleteness(UserModel user) {
-    double completeness = 0.0;
+    double completeness = 0;
     int totalFields = 0;
     int completedFields = 0;
 
@@ -349,7 +350,7 @@ class CompatibilityEngine {
 
   /// Get detailed compatibility breakdown for debugging
   static CompatibilityBreakdown getCompatibilityBreakdown(
-      UserModel user1, UserModel user2) {
+      UserModel user1, UserModel user2,) {
     final ageScore = _calculateAgeCompatibility(user1, user2);
     final locationScore = _calculateLocationScore(user1, user2);
     final interestScore = _calculateInterestScore(user1, user2);
@@ -388,7 +389,7 @@ class CompatibilityEngine {
       results.add(UserCompatibility(
         user: targetUser,
         compatibilityScore: score,
-      ));
+      ),);
     }
 
     // Sort by compatibility score (highest first)
@@ -401,16 +402,6 @@ class CompatibilityEngine {
 
 /// Detailed compatibility breakdown for analysis
 class CompatibilityBreakdown {
-  final double totalScore;
-  final double ageScore;
-  final double locationScore;
-  final double interestScore;
-  final double activityScore;
-  final double completenessScore;
-  final double user1Completeness;
-  final double user2Completeness;
-  final double user1Activity;
-  final double user2Activity;
 
   const CompatibilityBreakdown({
     required this.totalScore,
@@ -424,10 +415,19 @@ class CompatibilityBreakdown {
     required this.user1Activity,
     required this.user2Activity,
   });
+  final double totalScore;
+  final double ageScore;
+  final double locationScore;
+  final double interestScore;
+  final double activityScore;
+  final double completenessScore;
+  final double user1Completeness;
+  final double user2Completeness;
+  final double user1Activity;
+  final double user2Activity;
 
   @override
-  String toString() {
-    return 'CompatibilityBreakdown(\n'
+  String toString() => 'CompatibilityBreakdown(\n'
         '  Total: ${(totalScore * 100).toStringAsFixed(1)}%\n'
         '  Age: ${(ageScore * 100).toStringAsFixed(1)}%\n'
         '  Location: ${(locationScore * 100).toStringAsFixed(1)}%\n'
@@ -435,18 +435,17 @@ class CompatibilityBreakdown {
         '  Activity: ${(activityScore * 100).toStringAsFixed(1)}%\n'
         '  Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%\n'
         ')';
-  }
 }
 
 /// User with compatibility score
 class UserCompatibility {
-  final UserModel user;
-  final double compatibilityScore;
 
   const UserCompatibility({
     required this.user,
     required this.compatibilityScore,
   });
+  final UserModel user;
+  final double compatibilityScore;
 
   /// Get compatibility percentage as string
   String get compatibilityPercentage =>
@@ -463,7 +462,5 @@ class UserCompatibility {
   bool get isLowCompatibility => compatibilityScore < 0.5;
 
   @override
-  String toString() {
-    return 'UserCompatibility(${user.name}: ${compatibilityPercentage})';
-  }
+  String toString() => 'UserCompatibility(${user.name}: $compatibilityPercentage)';
 }

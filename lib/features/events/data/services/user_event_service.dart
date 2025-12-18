@@ -398,18 +398,30 @@ class UserEventService {
         );
         
         log('📤 Uploading with putData...', name: 'UserEventService');
+        log('📤 Reference path: ${ref.fullPath}', name: 'UserEventService');
+        log('📤 Reference bucket: ${ref.bucket}', name: 'UserEventService');
+        
         final uploadTask = ref.putData(fileBytes, metadata);
         
         // Monitor upload progress
         uploadTask.snapshotEvents.listen((snapshot) {
-          final progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          log('📊 Upload progress for image ${i + 1}: ${progress.toStringAsFixed(1)}%', name: 'UserEventService');
+          if (snapshot.totalBytes > 0) {
+            final progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            log('📊 Upload progress for image ${i + 1}: ${progress.toStringAsFixed(1)}%', name: 'UserEventService');
+          } else {
+            log('📊 Upload progress: ${snapshot.bytesTransferred} bytes transferred (total unknown)', name: 'UserEventService');
+          }
         }, onError: (error) {
           log('❌ Upload progress error for image ${i + 1}: $error', name: 'UserEventService');
         });
         
         log('⏳ Waiting for upload to complete...', name: 'UserEventService');
-        final snapshot = await uploadTask;
+        final snapshot = await uploadTask.whenComplete(() {
+          log('✅ Upload task completed for image ${i + 1}', name: 'UserEventService');
+        }).catchError((error) {
+          log('❌ Upload task failed for image ${i + 1}: $error', name: 'UserEventService');
+          throw error;
+        });
         log('✅ Upload completed, getting download URL...', name: 'UserEventService');
         
         final downloadUrl = await snapshot.ref.getDownloadURL();

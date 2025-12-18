@@ -434,9 +434,7 @@ class _InviteMembersModalState extends State<InviteMembersModal> {
                   : null,
               child: user.avatarUrl == null
                   ? Text(
-                      user.displayName.isNotEmpty
-                          ? user.displayName[0].toUpperCase()
-                          : 'U',
+                      user.initials,
                       style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

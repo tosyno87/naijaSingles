@@ -171,6 +171,18 @@ class _TicketingStepState extends State<TicketingStep> {
                 ),
                 items: [
                   DropdownMenuItem(
+                    value: 'USD',
+                    child: Row(
+                      children: [
+                        Text(r'$',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold,),),
+                        const SizedBox(width: 8),
+                        const Text('US Dollar (USD)'),
+                      ],
+                    ),
+                  ),
+                  DropdownMenuItem(
                     value: 'NGN',
                     child: Row(
                       children: [

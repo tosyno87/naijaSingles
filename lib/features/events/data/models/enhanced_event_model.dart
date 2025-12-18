@@ -363,6 +363,26 @@ class EnhancedEventModel extends Equatable { // Extensible data
     return validUrls.isNotEmpty;
   }
   bool get isPaid => !isFree && ticketPrice != null && ticketPrice! > 0;
+  
+  // Currency helper
+  String get currency {
+    return metadata['currency']?.toString() ?? 'USD';
+  }
+  
+  String get currencySymbol {
+    switch (currency) {
+      case 'USD':
+        return r'$';
+      case 'NGN':
+        return '₦';
+      case 'GBP':
+        return '£';
+      case 'EUR':
+        return '€';
+      default:
+        return r'$'; // Default to USD
+    }
+  }
   // isActive is already defined above as isVisible
   bool get canEdit {
     // Don't allow editing if event is cancelled or completed

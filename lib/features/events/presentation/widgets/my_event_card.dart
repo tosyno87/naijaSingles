@@ -504,7 +504,7 @@ class MyEventCard extends StatelessWidget {
             Text(
               event.isFree
                   ? 'Free Event'
-                  : '₦${event.ticketPrice?.toStringAsFixed(0) ?? '0'}',
+                  : '${event.currencySymbol}${event.ticketPrice?.toStringAsFixed(0) ?? '0'}',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,

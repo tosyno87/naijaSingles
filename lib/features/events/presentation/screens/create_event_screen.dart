@@ -42,7 +42,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   final List<String> _stepTitles = [
     'Basic Info',
-    'Cultural Heritage',
+    'Event Details',
     'Date & Time',
     'Location',
     'Advanced Settings',
@@ -371,16 +371,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   bool _validateCulturalHeritage({bool showErrors = true}) {
-    if (_eventData.metadata['culturalHeritage'] == null ||
-        _eventData.metadata['culturalHeritage'].toString().trim().isEmpty) {
-      if (showErrors) _showError('Please select a cultural heritage');
-      return false;
-    }
-    if (_eventData.metadata['ageGroup'] == null ||
-        _eventData.metadata['ageGroup'].toString().trim().isEmpty) {
-      if (showErrors) _showError('Please select a target age group');
-      return false;
-    }
+    // Age group is now optional (like Facebook Events)
+    // No longer requiring cultural heritage or language requirements
     return true;
   }
 

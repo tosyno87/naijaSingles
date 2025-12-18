@@ -54,6 +54,8 @@ class EnhancedEventCard extends StatelessWidget {
   bool get isPromoted => event is EnhancedEventModel ? event.isPromoted : false;
 
   double? get ticketPrice => event is EnhancedEventModel ? event.ticketPrice : null;
+  
+  String get currencySymbol => event is EnhancedEventModel ? event.currencySymbol : r'$';
 
   @override
   Widget build(BuildContext context) => GestureDetector(
@@ -229,7 +231,7 @@ class EnhancedEventCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '₦${ticketPrice!.toStringAsFixed(0)}',
+                  '$currencySymbol${ticketPrice!.toStringAsFixed(0)}',
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

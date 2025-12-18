@@ -981,7 +981,7 @@ class _MyEventsScreenState extends State<MyEventsScreen>
 
 📅 ${dateFormat.format(event.startDate)} at ${timeFormat.format(event.startDate)}
 📍 ${event.location.shortAddress}
-${event.isFree ? '🆓 Free Event' : '💰 ₦${event.ticketPrice?.toStringAsFixed(0)}'}
+${event.isFree ? '🆓 Free Event' : '💰 ${event.currencySymbol}${event.ticketPrice?.toStringAsFixed(0)}'}
 
 ${event.description.length > 100 ? '${event.description.substring(0, 100)}...' : event.description}
 

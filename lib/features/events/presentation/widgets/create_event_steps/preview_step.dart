@@ -206,7 +206,7 @@ class PreviewStep extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  '₦${eventData.ticketPrice?.toStringAsFixed(0) ?? '0'}',
+                  '${eventData.currencySymbol}${eventData.ticketPrice?.toStringAsFixed(0) ?? '0'}',
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -409,7 +409,7 @@ class PreviewStep extends StatelessWidget {
                 Text(
                   eventData.isFree
                       ? 'No charge for attendees'
-                      : '₦${eventData.ticketPrice?.toStringAsFixed(2) ?? '0.00'} per ticket',
+                      : '${eventData.currencySymbol}${eventData.ticketPrice?.toStringAsFixed(2) ?? '0.00'} per ticket',
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: const Color(0xFF666666),

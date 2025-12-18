@@ -96,11 +96,11 @@ class MyEventCard extends StatelessWidget {
                   topRight: Radius.circular(16),
                 ),
                 child: event.primaryImageUrl.startsWith('http')
-                    ? Image.network(
+                    ?                       Image.network(
                         event.primaryImageUrl,
                         width: double.infinity,
                         height: double.infinity,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         filterQuality: FilterQuality.high,
                         isAntiAlias: true,
                         loadingBuilder: (context, child, loadingProgress) {
@@ -186,7 +186,7 @@ class MyEventCard extends StatelessWidget {
                         File(event.primaryImageUrl),
                         width: double.infinity,
                         height: double.infinity,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         filterQuality: FilterQuality.high,
                         errorBuilder: (context, error, stackTrace) {
                           AppLogger.error(

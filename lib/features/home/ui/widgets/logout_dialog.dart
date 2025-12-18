@@ -8,6 +8,7 @@ import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../services/secure_storage_service.dart';
 
 void showLogoutDialog(BuildContext context) {
   final FirebaseAuth auth = firebaseAuthInstance;
@@ -18,6 +19,16 @@ void showLogoutDialog(BuildContext context) {
         Provider.of<UserProvider>(context, listen: false);
     userProvider.currentUser = null; // Reset user data in provider
     userProvider.cancelCurrentUserSubscription(); // Cancel any subscriptions
+
+    // Clear secure storage (authentication tokens, user IDs, etc.)
+    try {
+      final secureStorage = SecureStorageService();
+      await secureStorage.clearAuthData();
+      debugPrint('✅ Secure storage cleared on logout');
+    } catch (e) {
+      debugPrint('⚠️ Error clearing secure storage: $e');
+      // Continue with logout even if secure storage clear fails
+    }
 
     // Clear Firebase Messaging token
     try {
@@ -31,37 +42,39 @@ void showLogoutDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) => AlertDialog(
-        title: Text('Logout'.tr().toString()),
-        content: Text('Do you want to logout your account?'.tr().toString()),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'.tr().toString(),
-                style: const TextStyle(color: primaryColor),),
+      title: Text('Logout'.tr().toString()),
+      content: Text('Do you want to logout your account?'.tr().toString()),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(
+            'No'.tr().toString(),
+            style: const TextStyle(color: primaryColor),
           ),
-          TextButton(
-            onPressed: () async {
-              // Cancel subscriptions and clear user data BEFORE sign out
-              await clearUserData();
-              // Sign out from Firebase Auth
-              await auth.signOut();
-              // Small delay to ensure subscriptions are fully canceled
-              await Future.delayed(const Duration(milliseconds: 100));
-              if (context.mounted) {
-                // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RouteName.welcomeScreen,
-                  (route) => false,
-                );
-              }
-            },
-            child: Text(
-              'Yes'.tr().toString(),
-              style: const TextStyle(color: primaryColor),
-            ),
+        ),
+        TextButton(
+          onPressed: () async {
+            // Cancel subscriptions and clear user data BEFORE sign out
+            await clearUserData();
+            // Sign out from Firebase Auth
+            await auth.signOut();
+            // Small delay to ensure subscriptions are fully canceled
+            await Future.delayed(const Duration(milliseconds: 100));
+            if (context.mounted) {
+              // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                RouteName.welcomeScreen,
+                (route) => false,
+              );
+            }
+          },
+          child: Text(
+            'Yes'.tr().toString(),
+            style: const TextStyle(color: primaryColor),
           ),
-        ],
-      ),
+        ),
+      ],
+    ),
   );
 }

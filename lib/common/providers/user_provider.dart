@@ -33,34 +33,37 @@ class UserProvider extends ChangeNotifier {
     // Cancel any existing subscription before starting a new one
     _userSubscription?.cancel();
     _userSubscription = null;
-    
+
     final user = _auth.currentUser;
     if (user != null) {
       try {
         // Listen to the specific document directly using the user's UID as the document ID
         _userSubscription = _userCollection.doc(user.uid).snapshots().listen(
-            (documentSnapshot) {
-          try {
-            if (documentSnapshot.exists) {
-              final userData = UserModel.fromDocument(documentSnapshot);
-              currentUser = userData;
-              notifyListeners();
-            } else {
-              AppLogger.warning('User document does not exist for UID: ${user.uid}');
-              currentUser = null;
-              notifyListeners();
+          (documentSnapshot) {
+            try {
+              if (documentSnapshot.exists) {
+                final userData = UserModel.fromDocument(documentSnapshot);
+                currentUser = userData;
+                notifyListeners();
+              } else {
+                AppLogger.warning(
+                    'User document does not exist for UID: ${user.uid}');
+                currentUser = null;
+                notifyListeners();
+              }
+            } catch (e) {
+              AppLogger.error('Error parsing user document', error: e);
+              // Don't set currentUser to null here, keep existing data
             }
-          } catch (e) {
-            AppLogger.error('Error parsing user document', error: e);
-            // Don't set currentUser to null here, keep existing data
-          }
-        }, onError: (error) {
-          // Only log errors if user is still authenticated
-          // Permission errors when user is logged out are expected
-          if (_auth.currentUser != null) {
-            AppLogger.error('Error listening to user details', error: error);
-          }
-        },);
+          },
+          onError: (error) {
+            // Only log errors if user is still authenticated
+            // Permission errors when user is logged out are expected
+            if (_auth.currentUser != null) {
+              AppLogger.error('Error listening to user details', error: error);
+            }
+          },
+        );
       } catch (e) {
         AppLogger.error('Exception in listenCurrentUserdetails', error: e);
       }

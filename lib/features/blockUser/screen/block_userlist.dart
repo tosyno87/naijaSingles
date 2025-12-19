@@ -18,7 +18,9 @@ import '../bloc/bloc_user_list_bloc.dart';
 
 class BlockedUser extends StatefulWidget {
   const BlockedUser({
-    required this.currentUser, required this.scrollController, super.key,
+    required this.currentUser,
+    required this.scrollController,
+    super.key,
   });
   final UserModel currentUser;
   final ScrollController scrollController;
@@ -95,7 +97,10 @@ class _BlockedUserState extends State<BlockedUser> {
                         return const Column(
                           children: [
                             SizedBox(
-                                height: 20, width: 20, child: Hookup4uBar(),),
+                              height: 20,
+                              width: 20,
+                              child: Hookup4uBar(),
+                            ),
                             SizedBox(
                               height: 20,
                             ),
@@ -105,9 +110,15 @@ class _BlockedUserState extends State<BlockedUser> {
                       final BlockUserModel blockUser = state.users[index];
                       return Container(
                         margin: const EdgeInsets.only(
-                            top: 5, bottom: 5, right: 20, left: 5,),
+                          top: 5,
+                          bottom: 5,
+                          right: 20,
+                          left: 5,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10,),
+                          horizontal: 15,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: themeProvider.isDarkMode
                               ? Theme.of(context)
@@ -127,11 +138,12 @@ class _BlockedUserState extends State<BlockedUser> {
                             backgroundColor: Colors.black54,
                             radius: 30,
                             child: ClipRRect(
-                                borderRadius: BorderRadius.circular(90),
-                                child: CustomCNImage(
-                                  imageUrl: blockUser.imageUrl,
-                                  fit: BoxFit.cover,
-                                ),),
+                              borderRadius: BorderRadius.circular(90),
+                              child: CustomCNImage(
+                                imageUrl: blockUser.imageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
                           title: Text(
                             blockUser.name,
@@ -169,59 +181,69 @@ class _BlockedUserState extends State<BlockedUser> {
                             showDialog(
                               context: context,
                               builder: (BuildContext ctx) => ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: AlertDialog(
-                                    title: Text('Unblock'.tr()),
-                                    content: Text('Do you want to Unblock'
-                                        .tr(args: [blockUser.name]),),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: Text(
-                                          'No'.tr().toString(),
-                                          style: const TextStyle(color: primaryColor),
-                                        ),
+                                borderRadius: BorderRadius.circular(10),
+                                child: AlertDialog(
+                                  title: Text('Unblock'.tr()),
+                                  content: Text(
+                                    'Do you want to Unblock'
+                                        .tr(args: [blockUser.name]),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: Text(
+                                        'No'.tr().toString(),
+                                        style: const TextStyle(
+                                            color: primaryColor),
                                       ),
-                                      TextButton(
-                                        onPressed: () async {
-                                          // Reload the block user list
-                                          context.read<BlocUserListBloc>().add(
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        // Reload the block user list
+                                        context.read<BlocUserListBloc>().add(
                                               LoadBlockUserEvent(
-                                                  currentUser:
-                                                      widget.currentUser,),);
-                                          Navigator.pop(ctx);
-                                          db
-                                              .collection('chats')
-                                              .doc(blockUser.chatID)
-                                              .collection('messages')
-                                              .doc('blocked')
-                                              .set({
+                                                currentUser: widget.currentUser,
+                                              ),
+                                            );
+                                        Navigator.pop(ctx);
+                                        db
+                                            .collection('chats')
+                                            .doc(blockUser.chatID)
+                                            .collection('messages')
+                                            .doc('blocked')
+                                            .set(
+                                          {
                                             'isBlocked': false,
                                             'blockedBy': widget.currentUser.id,
-                                          }, SetOptions(merge: true),);
-                                          // For deleting from   blocklist
-                                          await firebaseFireStoreInstance
-                                              .collection('users')
-                                              .doc(widget.currentUser.id)
-                                              .collection('blockedlist')
-                                              .doc(blockUser
-                                                  .id,) // Assuming widget.second.id represents the blocked user's ID
-                                              .delete();
+                                          },
+                                          SetOptions(merge: true),
+                                        );
+                                        // For deleting from   blocklist
+                                        await firebaseFireStoreInstance
+                                            .collection('users')
+                                            .doc(widget.currentUser.id)
+                                            .collection('blockedlist')
+                                            .doc(
+                                              blockUser.id,
+                                            ) // Assuming widget.second.id represents the blocked user's ID
+                                            .delete();
 
-                                          CustomToast.showToast(
-                                              'User Unblocked Successfully'
-                                                  .tr()
-                                                  .toString(),);
-                                        },
-                                        child: Text(
-                                          'Yes'.tr().toString(),
-                                          style: const TextStyle(color: primaryColor),
-                                        ),
+                                        CustomToast.showToast(
+                                          'User Unblocked Successfully'
+                                              .tr()
+                                              .toString(),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Yes'.tr().toString(),
+                                        style: const TextStyle(
+                                            color: primaryColor),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
+                              ),
                             );
                           },
                         ),
@@ -232,7 +254,9 @@ class _BlockedUserState extends State<BlockedUser> {
                     child: Text(
                       'No Block user found'.tr().toString(),
                       style: const TextStyle(
-                          color: AppColors.secondaryColor, fontSize: 16,),
+                        color: AppColors.secondaryColor,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
           );
@@ -243,7 +267,8 @@ class _BlockedUserState extends State<BlockedUser> {
           child: Center(
             child: Text(
               'No Block user found'.tr().toString(),
-              style: const TextStyle(color: AppColors.secondaryColor, fontSize: 16),
+              style: const TextStyle(
+                  color: AppColors.secondaryColor, fontSize: 16),
             ),
           ),
         );

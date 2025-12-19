@@ -15,8 +15,12 @@ import '../../bloc/searchuser_bloc.dart';
 import 'subscription_dialog.dart';
 
 class UpdateAddressWidget extends StatefulWidget {
-  const UpdateAddressWidget(
-      {required this.currentUser, required this.hasSubscription, required this.items, super.key,});
+  const UpdateAddressWidget({
+    required this.currentUser,
+    required this.hasSubscription,
+    required this.items,
+    super.key,
+  });
   final UserModel currentUser;
   final bool hasSubscription;
   final Map items;
@@ -45,77 +49,80 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
 
   @override
   Widget build(BuildContext context) => Card(
-      child: ExpansionTile(
-        iconColor: primaryColor,
-        textColor: primaryColor,
-        key: UniqueKey(),
-        leading: Text(
-          'Current location :'.tr().toString(),
-          style: const TextStyle(
-            fontSize: 14,
-          ),
-        ),
-        title: Text(
-          widget.currentUser.address ?? ''.tr().toString(),
-          style: const TextStyle(
-            color: AppColors.secondaryColor,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Icon(
-                  Icons.location_on,
-                  color: primaryColor,
-                  size: 20,
-                ),
-                InkWell(
-                  child: Text(
-                    'Change location'.tr().toString(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: primaryColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  onTap: () async {
-                    log('hasSubscription $widget.hasSubscription');
-                    if (widget.hasSubscription) {
-                      final address = await Navigator.pushNamed(
-                          context, RouteName.updateLocationScreen,
-                          arguments: selectedLocation,);
-                      if (!context.mounted) return;
-                      log('after pop address is ${address.toString()}');
-                      if (address != null) {
-                        _updateAddress(address as Map);
-
-                        context.read<SearchUserBloc>().add(
-                            LoadUserEvent(currentUser: widget.currentUser),);
-                      }
-                    } else {
-                      showSubscriptionDialog(
-                        context: context,
-                        currentUser: widget.currentUser,
-                        items: widget.items,
-                      );
-                    }
-                  },
-                ),
-              ],
+        child: ExpansionTile(
+          iconColor: primaryColor,
+          textColor: primaryColor,
+          key: UniqueKey(),
+          leading: Text(
+            'Current location :'.tr().toString(),
+            style: const TextStyle(
+              fontSize: 14,
             ),
           ),
-          const SizedBox(
-            height: 20,
+          title: Text(
+            widget.currentUser.address ?? ''.tr().toString(),
+            style: const TextStyle(
+              color: AppColors.secondaryColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ],
-      ),
-    );
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Icon(
+                    Icons.location_on,
+                    color: primaryColor,
+                    size: 20,
+                  ),
+                  InkWell(
+                    child: Text(
+                      'Change location'.tr().toString(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () async {
+                      log('hasSubscription $widget.hasSubscription');
+                      if (widget.hasSubscription) {
+                        final address = await Navigator.pushNamed(
+                          context,
+                          RouteName.updateLocationScreen,
+                          arguments: selectedLocation,
+                        );
+                        if (!context.mounted) return;
+                        log('after pop address is ${address.toString()}');
+                        if (address != null) {
+                          _updateAddress(address as Map);
+
+                          context.read<SearchUserBloc>().add(
+                                LoadUserEvent(currentUser: widget.currentUser),
+                              );
+                        }
+                      } else {
+                        showSubscriptionDialog(
+                          context: context,
+                          currentUser: widget.currentUser,
+                          items: widget.items,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
+      );
 
   void _updateAddress(Map<dynamic, dynamic> address) {
     showCupertinoModalPopup(
@@ -189,51 +196,52 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                           'address': address['address'],
                         },
                       })
-                      .whenComplete(() => showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) {
-                              Future.delayed(const Duration(seconds: 3), () {
-                                setState(() {
-                                  widget.currentUser.address =
-                                      address['address'];
-                                });
-
-                                Navigator.pop(context);
+                      .whenComplete(
+                        () => showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) {
+                            Future.delayed(const Duration(seconds: 3), () {
+                              setState(() {
+                                widget.currentUser.address = address['address'];
                               });
-                              return Center(
-                                child: Container(
-                                  width: 160,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Image.asset(
-                                        'asset/auth/verified.jpg',
-                                        height: 60,
-                                        color: primaryColor,
-                                        colorBlendMode: BlendMode.color,
-                                      ),
-                                      Text(
-                                        'location\nchanged'.tr().toString(),
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          decoration: TextDecoration.none,
-                                          color: themeProvider.isDarkMode
-                                              ? Colors.black
-                                              : Colors.black,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+
+                              Navigator.pop(context);
+                            });
+                            return Center(
+                              child: Container(
+                                width: 160,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                              );
-                            },
-                          ),)
+                                child: Column(
+                                  children: <Widget>[
+                                    Image.asset(
+                                      'asset/auth/verified.jpg',
+                                      height: 60,
+                                      color: primaryColor,
+                                      colorBlendMode: BlendMode.color,
+                                    ),
+                                    Text(
+                                      'location\nchanged'.tr().toString(),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        decoration: TextDecoration.none,
+                                        color: themeProvider.isDarkMode
+                                            ? Colors.black
+                                            : Colors.black,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
                       .catchError(log);
                 },
               ),

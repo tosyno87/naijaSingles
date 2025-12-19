@@ -13,9 +13,10 @@ import 'shared_styles.dart';
 /// This screen collects information about the user's music preferences,
 /// fashion style, and weekend activities.
 class OnboardingStepBExpression extends StatefulWidget {
-
   const OnboardingStepBExpression({
-    required this.onNext, required this.onBack, super.key,
+    required this.onNext,
+    required this.onBack,
+    super.key,
     this.backgroundColor = AppColors.backgroundColor,
   });
   final VoidCallback onNext;
@@ -122,7 +123,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6,),
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: deepGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
@@ -374,7 +377,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                             ),
                             const SizedBox(width: 8),
                             _buildSectionTitle(
-                                'What\'s your ideal weekend like?',),
+                              'What\'s your ideal weekend like?',
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -472,7 +476,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.grey.shade700,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12,),
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                     ),
 
@@ -518,18 +524,19 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-      ),
-    );
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) => controller.genres.isNotEmpty &&
-        controller.fashionStyle != null &&
-        controller.fashionStyle!.trim().isNotEmpty &&
-        controller.weekendVibe != null &&
-        controller.weekendVibe!.trim().isNotEmpty;
+  bool _isStepValid(OnboardingController controller) =>
+      controller.genres.isNotEmpty &&
+      controller.fashionStyle != null &&
+      controller.fashionStyle!.trim().isNotEmpty &&
+      controller.weekendVibe != null &&
+      controller.weekendVibe!.trim().isNotEmpty;
 }

@@ -239,7 +239,8 @@ class CachedUserService {
       }
 
       debugPrint(
-          '🧹 Cleared ${expiredKeys.length} expired user list caches and ${expiredProfileKeys.length} expired profile caches',);
+        '🧹 Cleared ${expiredKeys.length} expired user list caches and ${expiredProfileKeys.length} expired profile caches',
+      );
     } catch (e) {
       debugPrint('❌ Error clearing expired cache: $e');
     }
@@ -312,8 +313,12 @@ class CachedUserService {
       if (cachedData != null) {
         final List<dynamic> userListData = jsonDecode(cachedData);
         final users = userListData
-            .map((userData) => UserModel.fromMap(
-                userData as Map<String, dynamic>, userData['id'] ?? '',),)
+            .map(
+              (userData) => UserModel.fromMap(
+                userData as Map<String, dynamic>,
+                userData['id'] ?? '',
+              ),
+            )
             .toList();
 
         // Update in-memory cache
@@ -358,17 +363,17 @@ class CachedUserService {
 
   /// Get cache statistics for debugging
   Map<String, dynamic> getCacheStats() => {
-      'userListCacheSize': _userListCache.length,
-      'profileCacheSize': _profileCache.length,
-      'oldestUserListCache': _cacheTimestamps.values.isNotEmpty
-          ? _cacheTimestamps.values
-              .reduce((a, b) => a.isBefore(b) ? a : b)
-              .toString()
-          : 'None',
-      'oldestProfileCache': _profileTimestamps.values.isNotEmpty
-          ? _profileTimestamps.values
-              .reduce((a, b) => a.isBefore(b) ? a : b)
-              .toString()
-          : 'None',
-    };
+        'userListCacheSize': _userListCache.length,
+        'profileCacheSize': _profileCache.length,
+        'oldestUserListCache': _cacheTimestamps.values.isNotEmpty
+            ? _cacheTimestamps.values
+                .reduce((a, b) => a.isBefore(b) ? a : b)
+                .toString()
+            : 'None',
+        'oldestProfileCache': _profileTimestamps.values.isNotEmpty
+            ? _profileTimestamps.values
+                .reduce((a, b) => a.isBefore(b) ? a : b)
+                .toString()
+            : 'None',
+      };
 }

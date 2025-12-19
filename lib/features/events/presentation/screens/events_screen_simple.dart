@@ -12,65 +12,66 @@ class EventsScreenSimple extends StatefulWidget {
 class _EventsScreenSimpleState extends State<EventsScreenSimple> {
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor, // NaijaSingles cream background
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Discover Events',
-                style: GoogleFonts.montserrat(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Find amazing Afrocentric events near you',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF666666),
-                ),
-              ),
-              const SizedBox(height: 30),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.event,
-                        size: 80,
-                        color: Color(0xFF008037),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Events Coming Soon!',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF333333),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'We\'re working on bringing you amazing events.',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          color: const Color(0xFF666666),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+        backgroundColor:
+            AppColors.backgroundColor, // NaijaSingles cream background
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Discover Events',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF333333),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  'Find amazing Afrocentric events near you',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    color: const Color(0xFF666666),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.event,
+                          size: 80,
+                          color: Color(0xFF008037),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Events Coming Soon!',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF333333),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'We\'re working on bringing you amazing events.',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            color: const Color(0xFF666666),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 }

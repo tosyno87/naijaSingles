@@ -23,10 +23,13 @@ class SmartMatchingService {
 
   /// Calculate compatibility score between two users
   Future<MatchScore> calculateCompatibilityScore(
-      String userId1, String userId2,) async {
+    String userId1,
+    String userId2,
+  ) async {
     try {
       dev.log(
-          '💕 Calculating compatibility score between $userId1 and $userId2',);
+        '💕 Calculating compatibility score between $userId1 and $userId2',
+      );
 
       // Get both users' data
       final user1Doc = await _firestore.collection('users').doc(userId1).get();
@@ -87,7 +90,8 @@ class SmartMatchingService {
       );
 
       dev.log(
-          '✅ Compatibility score calculated: ${overallScore.toStringAsFixed(2)}',);
+        '✅ Compatibility score calculated: ${overallScore.toStringAsFixed(2)}',
+      );
       return matchScore;
     } catch (e) {
       dev.log('❌ Error calculating compatibility score: $e');
@@ -103,8 +107,10 @@ class SmartMatchingService {
   }
 
   /// Get smart matches for a user
-  Future<List<SmartMatch>> getSmartMatches(String userId,
-      {int limit = 20,}) async {
+  Future<List<SmartMatch>> getSmartMatches(
+    String userId, {
+    int limit = 20,
+  }) async {
     try {
       dev.log('🔍 Finding smart matches for user: $userId');
 
@@ -126,19 +132,23 @@ class SmartMatchingService {
 
         if (matchScore.overallScore > 0.3) {
           // Only include matches with decent compatibility
-          smartMatches.add(SmartMatch(
-            user: potentialMatch,
-            matchScore: matchScore,
-            distance: await _calculateDistance(user, potentialMatch),
-            commonInterests: _getCommonInterests(user, potentialMatch),
-            matchReasons: _getMatchReasons(matchScore),
-          ),);
+          smartMatches.add(
+            SmartMatch(
+              user: potentialMatch,
+              matchScore: matchScore,
+              distance: await _calculateDistance(user, potentialMatch),
+              commonInterests: _getCommonInterests(user, potentialMatch),
+              matchReasons: _getMatchReasons(matchScore),
+            ),
+          );
         }
       }
 
       // Sort by compatibility score (highest first)
-      smartMatches.sort((a, b) =>
-          b.matchScore.overallScore.compareTo(a.matchScore.overallScore),);
+      smartMatches.sort(
+        (a, b) =>
+            b.matchScore.overallScore.compareTo(a.matchScore.overallScore),
+      );
 
       // Return top matches
       final topMatches = smartMatches.take(limit).toList();
@@ -188,8 +198,10 @@ class SmartMatchingService {
 
       final snapshot = await query.get();
       return snapshot.docs
-          .map((doc) =>
-              UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),)
+          .map(
+            (doc) =>
+                UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),
+          )
           .toList();
     } catch (e) {
       dev.log('❌ Error getting potential matches: $e');
@@ -212,7 +224,9 @@ class SmartMatchingService {
 
   /// Calculate location compatibility score
   Future<double> _calculateLocationCompatibility(
-      UserModel user1, UserModel user2,) async {
+    UserModel user1,
+    UserModel user2,
+  ) async {
     try {
       // If both users have location data
       if (user1.latitude != null &&
@@ -254,8 +268,7 @@ class SmartMatchingService {
 
       if (interests1.isEmpty || interests2.isEmpty) return 0.5;
 
-      final commonInterests =
-          interests1.where(interests2.contains).length;
+      final commonInterests = interests1.where(interests2.contains).length;
       final totalInterests = (interests1.length + interests2.length) / 2;
 
       return (commonInterests / totalInterests).clamp(0.0, 1.0);
@@ -487,9 +500,7 @@ class SmartMatchingService {
       final interests1 = user1.editInfo?['interests'] as List<String>? ?? [];
       final interests2 = user2.editInfo?['interests'] as List<String>? ?? [];
 
-      return interests1
-          .where(interests2.contains)
-          .toList();
+      return interests1.where(interests2.contains).toList();
     } catch (e) {
       dev.log('❌ Error getting common interests: $e');
       return [];
@@ -559,7 +570,6 @@ enum MatchRecommendation {
 
 /// Match score model
 class MatchScore {
-
   const MatchScore({
     required this.userId1,
     required this.userId2,
@@ -576,12 +586,12 @@ class MatchScore {
   final DateTime calculatedAt;
 
   @override
-  String toString() => 'MatchScore($userId1-$userId2: ${overallScore.toStringAsFixed(2)}, ${recommendation.name})';
+  String toString() =>
+      'MatchScore($userId1-$userId2: ${overallScore.toStringAsFixed(2)}, ${recommendation.name})';
 }
 
 /// Smart match model
 class SmartMatch {
-
   const SmartMatch({
     required this.user,
     required this.matchScore,
@@ -596,5 +606,6 @@ class SmartMatch {
   final List<String> matchReasons;
 
   @override
-  String toString() => 'SmartMatch(${user.name}: ${matchScore.overallScore.toStringAsFixed(2)})';
+  String toString() =>
+      'SmartMatch(${user.name}: ${matchScore.overallScore.toStringAsFixed(2)})';
 }

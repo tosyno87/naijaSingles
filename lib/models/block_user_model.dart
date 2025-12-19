@@ -1,5 +1,4 @@
 class BlockUserModel {
-
   BlockUserModel({
     required this.id,
     required this.chatID,

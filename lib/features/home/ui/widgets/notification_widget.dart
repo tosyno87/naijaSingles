@@ -8,46 +8,50 @@ class NotificatioWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListTile(
-      title: Text(
-        'App settings'.tr().toString(),
-        style: const TextStyle(
-            color: primaryColor, fontSize: 18, fontWeight: FontWeight.w500,),
-      ),
-      subtitle: Card(
-        elevation: 1,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      'Notifications'.tr().toString(),
-                      style: const TextStyle(
-                          fontSize: 18,
-                          color: primaryColor,
-                          fontWeight: FontWeight.w500,),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text('Push notifications'.tr().toString()),
-                  ),
-                ],
-              ),
-              const Icon(
-                Icons.edit_notifications_outlined,
-                size: 20,
-                color: primaryColor,
-              ),
-            ],
+        title: Text(
+          'App settings'.tr().toString(),
+          style: const TextStyle(
+            color: primaryColor,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
           ),
         ),
-      ),
-    );
+        subtitle: Card(
+          elevation: 1,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        'Notifications'.tr().toString(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text('Push notifications'.tr().toString()),
+                    ),
+                  ],
+                ),
+                const Icon(
+                  Icons.edit_notifications_outlined,
+                  size: 20,
+                  color: primaryColor,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
 }

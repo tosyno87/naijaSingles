@@ -7,7 +7,6 @@ abstract class RegistrationEvents extends Equatable {
 }
 
 class RegistrationRequest extends RegistrationEvents {
-
   const RegistrationRequest({required this.userdata});
   final Map<String, dynamic> userdata;
 
@@ -16,7 +15,6 @@ class RegistrationRequest extends RegistrationEvents {
 }
 
 class CheckRegistration extends RegistrationEvents {
-
   const CheckRegistration({required this.token});
   final String token;
 

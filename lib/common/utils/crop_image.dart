@@ -7,9 +7,12 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CropMedia extends StatefulWidget {
-
-  const CropMedia(
-      {required this.title, required this.file, required this.checktype, super.key,});
+  const CropMedia({
+    required this.title,
+    required this.file,
+    required this.checktype,
+    super.key,
+  });
   final String title;
   final File file;
   final String checktype;
@@ -106,33 +109,35 @@ class CropMediaState extends State<CropMedia>
         ),
         centerTitle: true,
         actions: [
-          if (isFinished) IconButton(
-                  icon: const Icon(
-                    Icons.check,
-                    color: Color(0xFF27AE60),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      isFinished = false;
-                    });
-                    _finished().then((value) {
-                      setState(() {
-                        isFinished = true;
-                      });
-                    });
-                  },
-                ) else const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 18, 10, 18),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Color(0xFF27AE60)),
-                      strokeWidth: 2,
-                    ),
-                  ),
+          if (isFinished)
+            IconButton(
+              icon: const Icon(
+                Icons.check,
+                color: Color(0xFF27AE60),
+              ),
+              onPressed: () {
+                setState(() {
+                  isFinished = false;
+                });
+                _finished().then((value) {
+                  setState(() {
+                    isFinished = true;
+                  });
+                });
+              },
+            )
+          else
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 18, 10, 18),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF27AE60)),
+                  strokeWidth: 2,
                 ),
+              ),
+            ),
         ],
       ),
       body: _fadeAnimation != null
@@ -145,111 +150,112 @@ class CropMediaState extends State<CropMedia>
   }
 
   Widget _buildBodyContent(bool isDarkMode) => Column(
-      children: [
-        Expanded(
-          child: Hero(
-            tag: 'profileImage',
-            child: Container(
-              color: Colors.black,
-              alignment: Alignment.center,
-              child: CropImage(
-                controller: controller,
-                image: Image.file(widget.file),
-                gridColor: Colors.white,
-                gridThinWidth: 1,
-                gridThickWidth: 1,
-                alwaysShowThirdLines: true,
-                minimumImageSize: 150,
+        children: [
+          Expanded(
+            child: Hero(
+              tag: 'profileImage',
+              child: Container(
+                color: Colors.black,
+                alignment: Alignment.center,
+                child: CropImage(
+                  controller: controller,
+                  image: Image.file(widget.file),
+                  gridColor: Colors.white,
+                  gridThinWidth: 1,
+                  gridThickWidth: 1,
+                  alwaysShowThirdLines: true,
+                  minimumImageSize: 150,
+                ),
               ),
             ),
           ),
-        ),
 
-        // Instruction text
-        Container(
-          color: isDarkMode ? Colors.black : Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Text(
-            'Tip: Make sure your face is clearly visible.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontStyle: FontStyle.italic,
+          // Instruction text
+          Container(
+            color: isDarkMode ? Colors.black : Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Text(
+              'Tip: Make sure your face is clearly visible.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ),
-        ),
 
-        // Bottom toolbar
-        Container(
-          margin: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE8F5E9),
-            borderRadius: BorderRadius.circular(30),
+          // Bottom toolbar
+          Container(
+            margin: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F5E9),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildToolbarButton(
+                  Icons.rotate_90_degrees_ccw,
+                  'Rotate Left',
+                  () {
+                    controller.rotateLeft();
+                    _onCropChanged();
+                  },
+                ),
+                _buildToolbarButton(
+                  Icons.rotate_90_degrees_cw,
+                  'Rotate Right',
+                  () {
+                    controller.rotateRight();
+                    _onCropChanged();
+                  },
+                ),
+                _buildToolbarButton(
+                  Icons.refresh,
+                  'Reset',
+                  () {
+                    // Recreate controller to reset
+                    final aspectRatio = controller.aspectRatio;
+                    controller.dispose();
+                    setState(() {
+                      controller = CropController(aspectRatio: aspectRatio);
+                    });
+                    _onCropChanged();
+                  },
+                ),
+              ],
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        ],
+      );
+
+  Widget _buildToolbarButton(IconData icon, String label, VoidCallback onTap) =>
+      InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildToolbarButton(
-                Icons.rotate_90_degrees_ccw,
-                'Rotate Left',
-                () {
-                  controller.rotateLeft();
-                  _onCropChanged();
-                },
+              Icon(
+                icon,
+                color: const Color(0xFF27AE60),
+                size: 24,
               ),
-              _buildToolbarButton(
-                Icons.rotate_90_degrees_cw,
-                'Rotate Right',
-                () {
-                  controller.rotateRight();
-                  _onCropChanged();
-                },
-              ),
-              _buildToolbarButton(
-                Icons.refresh,
-                'Reset',
-                () {
-                  // Recreate controller to reset
-                  final aspectRatio = controller.aspectRatio;
-                  controller.dispose();
-                  setState(() {
-                    controller = CropController(aspectRatio: aspectRatio);
-                  });
-                  _onCropChanged();
-                },
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF27AE60),
+                ),
               ),
             ],
           ),
         ),
-      ],
-    );
-
-  Widget _buildToolbarButton(IconData icon, String label, VoidCallback onTap) => InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: const Color(0xFF27AE60),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF27AE60),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+      );
 
   Future<void> _finished() async {
     try {

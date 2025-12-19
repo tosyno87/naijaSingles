@@ -59,56 +59,66 @@ class ContentModerationService {
       // Check for inappropriate words
       final inappropriateWords = _checkInappropriateWords(text);
       if (inappropriateWords.isNotEmpty) {
-        issues.add(ModerationIssue(
-          type: ModerationIssueType.inappropriateContent,
-          severity: ModerationSeverity.high,
-          description:
-              'Contains inappropriate words: ${inappropriateWords.join(', ')}',
-          confidence: 0.9,
-        ),);
+        issues.add(
+          ModerationIssue(
+            type: ModerationIssueType.inappropriateContent,
+            severity: ModerationSeverity.high,
+            description:
+                'Contains inappropriate words: ${inappropriateWords.join(', ')}',
+            confidence: 0.9,
+          ),
+        );
       }
 
       // Check for spam patterns
       final spamPatterns = _checkSpamPatterns(text);
       if (spamPatterns.isNotEmpty) {
-        issues.add(ModerationIssue(
-          type: ModerationIssueType.spam,
-          severity: ModerationSeverity.medium,
-          description: 'Contains spam patterns: ${spamPatterns.join(', ')}',
-          confidence: 0.8,
-        ),);
+        issues.add(
+          ModerationIssue(
+            type: ModerationIssueType.spam,
+            severity: ModerationSeverity.medium,
+            description: 'Contains spam patterns: ${spamPatterns.join(', ')}',
+            confidence: 0.8,
+          ),
+        );
       }
 
       // Check for excessive repetition
       if (_checkExcessiveRepetition(text)) {
-        issues.add(const ModerationIssue(
-          type: ModerationIssueType.spam,
-          severity: ModerationSeverity.medium,
-          description: 'Contains excessive repetition',
-          confidence: 0.7,
-        ),);
+        issues.add(
+          const ModerationIssue(
+            type: ModerationIssueType.spam,
+            severity: ModerationSeverity.medium,
+            description: 'Contains excessive repetition',
+            confidence: 0.7,
+          ),
+        );
       }
 
       // Check for all caps (shouting)
       if (_checkAllCaps(text)) {
-        issues.add(const ModerationIssue(
-          type: ModerationIssueType.inappropriateContent,
-          severity: ModerationSeverity.low,
-          description: 'Contains excessive capitalization',
-          confidence: 0.6,
-        ),);
+        issues.add(
+          const ModerationIssue(
+            type: ModerationIssueType.inappropriateContent,
+            severity: ModerationSeverity.low,
+            description: 'Contains excessive capitalization',
+            confidence: 0.6,
+          ),
+        );
       }
 
       // Check for personal information
       final personalInfo = _checkPersonalInformation(text);
       if (personalInfo.isNotEmpty) {
-        issues.add(ModerationIssue(
-          type: ModerationIssueType.personalInformation,
-          severity: ModerationSeverity.high,
-          description:
-              'Contains personal information: ${personalInfo.join(', ')}',
-          confidence: 0.8,
-        ),);
+        issues.add(
+          ModerationIssue(
+            type: ModerationIssueType.personalInformation,
+            severity: ModerationSeverity.high,
+            description:
+                'Contains personal information: ${personalInfo.join(', ')}',
+            confidence: 0.8,
+          ),
+        );
       }
 
       // Determine overall result
@@ -142,20 +152,24 @@ class ContentModerationService {
 
       if (random < 5) {
         // 5% chance of inappropriate content
-        issues.add(const ModerationIssue(
-          type: ModerationIssueType.inappropriateContent,
-          severity: ModerationSeverity.high,
-          description: 'Image contains inappropriate content',
-          confidence: 0.9,
-        ),);
+        issues.add(
+          const ModerationIssue(
+            type: ModerationIssueType.inappropriateContent,
+            severity: ModerationSeverity.high,
+            description: 'Image contains inappropriate content',
+            confidence: 0.9,
+          ),
+        );
       } else if (random < 15) {
         // 10% chance of questionable content
-        issues.add(const ModerationIssue(
-          type: ModerationIssueType.inappropriateContent,
-          severity: ModerationSeverity.medium,
-          description: 'Image may contain questionable content',
-          confidence: 0.7,
-        ),);
+        issues.add(
+          const ModerationIssue(
+            type: ModerationIssueType.inappropriateContent,
+            severity: ModerationSeverity.medium,
+            description: 'Image may contain questionable content',
+            confidence: 0.7,
+          ),
+        );
       }
 
       // Determine overall result
@@ -218,12 +232,14 @@ class ContentModerationService {
 
       // Check for fake profiles
       if (_checkFakeProfile(userData)) {
-        issues.add(const ModerationIssue(
-          type: ModerationIssueType.fakeProfile,
-          severity: ModerationSeverity.high,
-          description: 'Profile appears to be fake',
-          confidence: 0.8,
-        ),);
+        issues.add(
+          const ModerationIssue(
+            type: ModerationIssueType.fakeProfile,
+            severity: ModerationSeverity.high,
+            description: 'Profile appears to be fake',
+            confidence: 0.8,
+          ),
+        );
       }
 
       // Determine overall result
@@ -320,9 +336,7 @@ class ContentModerationService {
   /// Check spam patterns
   List<String> _checkSpamPatterns(String text) {
     final lowerText = text.toLowerCase();
-    return _spamPatterns
-        .where(lowerText.contains)
-        .toList();
+    return _spamPatterns.where(lowerText.contains).toList();
   }
 
   /// Check for excessive repetition
@@ -447,8 +461,12 @@ class ContentModerationService {
   }
 
   /// Save moderation result
-  Future<void> _saveModerationResult(String userId, String contentType,
-      String contentId, ModerationResult result,) async {
+  Future<void> _saveModerationResult(
+    String userId,
+    String contentType,
+    String contentId,
+    ModerationResult result,
+  ) async {
     try {
       await _firestore.collection('moderation_history').add({
         'userId': userId,
@@ -492,7 +510,6 @@ enum ModerationAction {
 
 /// Moderation issue model
 class ModerationIssue {
-
   const ModerationIssue({
     required this.type,
     required this.severity,
@@ -501,36 +518,36 @@ class ModerationIssue {
   });
 
   factory ModerationIssue.fromMap(Map<String, dynamic> map) => ModerationIssue(
-      type: ModerationIssueType.values.firstWhere(
-        (e) => e.name == map['type'],
-        orElse: () => ModerationIssueType.inappropriateContent,
-      ),
-      severity: ModerationSeverity.values.firstWhere(
-        (e) => e.name == map['severity'],
-        orElse: () => ModerationSeverity.low,
-      ),
-      description: map['description'] ?? '',
-      confidence: map['confidence']?.toDouble() ?? 0.0,
-    );
+        type: ModerationIssueType.values.firstWhere(
+          (e) => e.name == map['type'],
+          orElse: () => ModerationIssueType.inappropriateContent,
+        ),
+        severity: ModerationSeverity.values.firstWhere(
+          (e) => e.name == map['severity'],
+          orElse: () => ModerationSeverity.low,
+        ),
+        description: map['description'] ?? '',
+        confidence: map['confidence']?.toDouble() ?? 0.0,
+      );
   final ModerationIssueType type;
   final ModerationSeverity severity;
   final String description;
   final double confidence;
 
   Map<String, dynamic> toMap() => {
-      'type': type.name,
-      'severity': severity.name,
-      'description': description,
-      'confidence': confidence,
-    };
+        'type': type.name,
+        'severity': severity.name,
+        'description': description,
+        'confidence': confidence,
+      };
 
   @override
-  String toString() => 'ModerationIssue(${type.name}: ${severity.name}, confidence: $confidence)';
+  String toString() =>
+      'ModerationIssue(${type.name}: ${severity.name}, confidence: $confidence)';
 }
 
 /// Moderation result model
 class ModerationResult {
-
   const ModerationResult({
     required this.action,
     required this.issues,
@@ -543,12 +560,12 @@ class ModerationResult {
   final DateTime moderatedAt;
 
   @override
-  String toString() => 'ModerationResult(${action.name}, confidence: $confidence, issues: ${issues.length})';
+  String toString() =>
+      'ModerationResult(${action.name}, confidence: $confidence, issues: ${issues.length})';
 }
 
 /// Moderation history model
 class ModerationHistory {
-
   const ModerationHistory({
     required this.id,
     required this.userId,
@@ -567,5 +584,6 @@ class ModerationHistory {
   final DateTime moderatedAt;
 
   @override
-  String toString() => 'ModerationHistory($userId: ${action.name}, $contentType)';
+  String toString() =>
+      'ModerationHistory($userId: ${action.name}, $contentType)';
 }

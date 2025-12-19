@@ -16,10 +16,11 @@ class AuthService {
   Future<UserCredential> signInWithEmail({
     required String email,
     required String password,
-  }) async => _auth.signInWithEmailAndPassword(
-      email: email.trim(),
-      password: password,
-    );
+  }) async =>
+      _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
 
   /// Start phone number verification for [phone].
   /// The provided callbacks are forwarded to [FirebaseAuth.verifyPhoneNumber].

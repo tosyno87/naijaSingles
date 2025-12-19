@@ -13,61 +13,61 @@ Future<void> showSubscriptionDialog({
   showDialog(
     context: context,
     builder: (BuildContext context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Subscription Required'.tr().toString(),
-                style: const TextStyle(fontSize: 18, color: primaryColor),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'This feature requires a subscription. Do you want to subscribe to our plan?'
-                    .tr()
-                    .toString(),
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'No'.tr().toString(),
-                      style: const TextStyle(color: primaryColor),
-                    ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Subscription Required'.tr().toString(),
+              style: const TextStyle(fontSize: 18, color: primaryColor),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'This feature requires a subscription. Do you want to subscribe to our plan?'
+                  .tr()
+                  .toString(),
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'No'.tr().toString(),
+                    style: const TextStyle(color: primaryColor),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      // Navigate to the subscription page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              Products(currentUser, null, items),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Yes'.tr().toString(),
-                      style: const TextStyle(color: primaryColor),
-                    ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to the subscription page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            Products(currentUser, null, items),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'Yes'.tr().toString(),
+                    style: const TextStyle(color: primaryColor),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
+    ),
   );
 }

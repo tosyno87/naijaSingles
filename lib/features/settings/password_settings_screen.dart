@@ -43,461 +43,467 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Change Password',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
+            onPressed: () => Navigator.pop(context),
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Section
-              _buildHeaderSection(),
-              const SizedBox(height: 24),
-
-              // Current Password
-              _buildCurrentPasswordSection(),
-              const SizedBox(height: 24),
-
-              // New Password
-              _buildNewPasswordSection(),
-              const SizedBox(height: 24),
-
-              // Confirm Password
-              _buildConfirmPasswordSection(),
-              const SizedBox(height: 24),
-
-              // Update Button
-              _buildUpdateButton(),
-              const SizedBox(height: 16),
-
-              // Password Requirements
-              _buildPasswordRequirementsSection(),
-            ],
-          ),
-        ),
-      ),
-    );
-
-  Widget _buildHeaderSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.lock,
-              size: 40,
-              color: primaryColor,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Change Your Password',
+          title: Text(
+            'Change Password',
             style: GoogleFonts.montserrat(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: textPrimary,
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Keep your account secure by updating your password regularly. Choose a strong password that you haven\'t used before.',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: textSecondary,
-              height: 1.5,
+          centerTitle: true,
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Section
+                _buildHeaderSection(),
+                const SizedBox(height: 24),
+
+                // Current Password
+                _buildCurrentPasswordSection(),
+                const SizedBox(height: 24),
+
+                // New Password
+                _buildNewPasswordSection(),
+                const SizedBox(height: 24),
+
+                // Confirm Password
+                _buildConfirmPasswordSection(),
+                const SizedBox(height: 24),
+
+                // Update Button
+                _buildUpdateButton(),
+                const SizedBox(height: 16),
+
+                // Password Requirements
+                _buildPasswordRequirementsSection(),
+              ],
             ),
-            textAlign: TextAlign.center,
           ),
-        ],
-      ),
-    );
+        ),
+      );
+
+  Widget _buildHeaderSection() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.lock,
+                size: 40,
+                color: primaryColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Change Your Password',
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Keep your account secure by updating your password regularly. Choose a strong password that you haven\'t used before.',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: textSecondary,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
 
   Widget _buildCurrentPasswordSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Current Password',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Enter your current password to confirm your identity',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textSecondary,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Current Password',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _currentPasswordController,
-            obscureText: !_currentPasswordVisible,
-            decoration: InputDecoration(
-              hintText: 'Enter your current password',
-              hintStyle: GoogleFonts.montserrat(color: textLight),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+            const SizedBox(height: 12),
+            Text(
+              'Enter your current password to confirm your identity',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: primaryColor, width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _currentPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: textLight,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _currentPasswordController,
+              obscureText: !_currentPasswordVisible,
+              decoration: InputDecoration(
+                hintText: 'Enter your current password',
+                hintStyle: GoogleFonts.montserrat(color: textLight),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                onPressed: () => setState(
-                    () => _currentPasswordVisible = !_currentPasswordVisible,),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: primaryColor, width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _currentPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: textLight,
+                  ),
+                  onPressed: () => setState(
+                    () => _currentPasswordVisible = !_currentPasswordVisible,
+                  ),
+                ),
               ),
+              style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your current password';
+                }
+                return null;
+              },
             ),
-            style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your current password';
-              }
-              return null;
-            },
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildNewPasswordSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'New Password',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Choose a strong password with at least 8 characters',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textSecondary,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'New Password',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _newPasswordController,
-            obscureText: !_newPasswordVisible,
-            decoration: InputDecoration(
-              hintText: 'Enter your new password',
-              hintStyle: GoogleFonts.montserrat(color: textLight),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+            const SizedBox(height: 12),
+            Text(
+              'Choose a strong password with at least 8 characters',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: primaryColor, width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              prefixIcon: const Icon(Icons.lock, color: primaryColor),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _newPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: textLight,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _newPasswordController,
+              obscureText: !_newPasswordVisible,
+              decoration: InputDecoration(
+                hintText: 'Enter your new password',
+                hintStyle: GoogleFonts.montserrat(color: textLight),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                onPressed: () =>
-                    setState(() => _newPasswordVisible = !_newPasswordVisible),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: primaryColor, width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                prefixIcon: const Icon(Icons.lock, color: primaryColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _newPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: textLight,
+                  ),
+                  onPressed: () => setState(
+                      () => _newPasswordVisible = !_newPasswordVisible),
+                ),
               ),
+              style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a new password';
+                }
+                if (value.length < 8) {
+                  return 'Password must be at least 8 characters long';
+                }
+                if (value == _currentPasswordController.text) {
+                  return 'New password must be different from current password';
+                }
+                // Check for at least one uppercase, one lowercase, and one number
+                if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
+                    .hasMatch(value)) {
+                  return 'Password must contain uppercase, lowercase, and number';
+                }
+                return null;
+              },
+              onChanged: (value) {
+                // Trigger validation for confirm password field
+                if (_confirmPasswordController.text.isNotEmpty) {
+                  _formKey.currentState?.validate();
+                }
+              },
             ),
-            style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a new password';
-              }
-              if (value.length < 8) {
-                return 'Password must be at least 8 characters long';
-              }
-              if (value == _currentPasswordController.text) {
-                return 'New password must be different from current password';
-              }
-              // Check for at least one uppercase, one lowercase, and one number
-              if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
-                return 'Password must contain uppercase, lowercase, and number';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              // Trigger validation for confirm password field
-              if (_confirmPasswordController.text.isNotEmpty) {
-                _formKey.currentState?.validate();
-              }
-            },
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildConfirmPasswordSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Confirm New Password',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Re-enter your new password to confirm',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textSecondary,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Confirm New Password',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _confirmPasswordController,
-            obscureText: !_confirmPasswordVisible,
-            decoration: InputDecoration(
-              hintText: 'Confirm your new password',
-              hintStyle: GoogleFonts.montserrat(color: textLight),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+            const SizedBox(height: 12),
+            Text(
+              'Re-enter your new password to confirm',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: primaryColor, width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _confirmPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: textLight,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _confirmPasswordController,
+              obscureText: !_confirmPasswordVisible,
+              decoration: InputDecoration(
+                hintText: 'Confirm your new password',
+                hintStyle: GoogleFonts.montserrat(color: textLight),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                onPressed: () => setState(
-                    () => _confirmPasswordVisible = !_confirmPasswordVisible,),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: primaryColor, width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _confirmPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: textLight,
+                  ),
+                  onPressed: () => setState(
+                    () => _confirmPasswordVisible = !_confirmPasswordVisible,
+                  ),
+                ),
               ),
+              style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please confirm your new password';
+                }
+                if (value != _newPasswordController.text) {
+                  return 'Passwords do not match';
+                }
+                return null;
+              },
             ),
-            style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please confirm your new password';
-              }
-              if (value != _newPasswordController.text) {
-                return 'Passwords do not match';
-              }
-              return null;
-            },
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildUpdateButton() => SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isUpdating ? null : _updatePassword,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: _isUpdating ? null : _updatePassword,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 0,
           ),
-          elevation: 0,
-        ),
-        child: _isUpdating
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
+          child: _isUpdating
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Updating Password...',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(width: 12),
+                    Text(
+                      'Updating Password...',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+                  ],
+                )
+              : Text(
+                  'Update Password',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
-                ],
-              )
-            : Text(
-                'Update Password',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
                 ),
-              ),
-      ),
-    );
+        ),
+      );
 
   Widget _buildPasswordRequirementsSection() => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.security, color: primaryColor, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Password Requirements',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildRequirementItem('🔢 At least 8 characters long'),
-          _buildRequirementItem('🔤 Contains uppercase letters (A-Z)'),
-          _buildRequirementItem('🔡 Contains lowercase letters (a-z)'),
-          _buildRequirementItem('🔢 Contains at least one number (0-9)'),
-          _buildRequirementItem('🔒 Different from your current password'),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: successColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: primaryColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: primaryColor.withOpacity(0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                const Icon(Icons.tips_and_updates, color: successColor, size: 16),
+                const Icon(Icons.security, color: primaryColor, size: 20),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Tip: Use a mix of words, numbers, and symbols for better security',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      color: successColor,
-                      fontWeight: FontWeight.w500,
-                    ),
+                Text(
+                  'Password Requirements',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 12),
+            _buildRequirementItem('🔢 At least 8 characters long'),
+            _buildRequirementItem('🔤 Contains uppercase letters (A-Z)'),
+            _buildRequirementItem('🔡 Contains lowercase letters (a-z)'),
+            _buildRequirementItem('🔢 Contains at least one number (0-9)'),
+            _buildRequirementItem('🔒 Different from your current password'),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: successColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.tips_and_updates,
+                      color: successColor, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Tip: Use a mix of words, numbers, and symbols for better security',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        color: successColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildRequirementItem(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        text,
-        style: GoogleFonts.montserrat(
-          fontSize: 14,
-          color: textSecondary,
-          height: 1.4,
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text(
+          text,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: textSecondary,
+            height: 1.4,
+          ),
         ),
-      ),
-    );
+      );
 
   Future<void> _updatePassword() async {
     if (!_formKey.currentState!.validate()) return;
@@ -541,8 +547,8 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                     color: successColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child:
-                      const Icon(Icons.check_circle, color: successColor, size: 30),
+                  child: const Icon(Icons.check_circle,
+                      color: successColor, size: 30),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -579,7 +585,8 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: primaryColor, size: 20),
+                      const Icon(Icons.info_outline,
+                          color: primaryColor, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(

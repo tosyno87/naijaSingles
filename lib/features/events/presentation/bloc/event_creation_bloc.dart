@@ -14,7 +14,6 @@ abstract class EventCreationEvent extends Equatable {
 }
 
 class CreateEventEvent extends EventCreationEvent {
-
   const CreateEventEvent(this.eventData);
   final EventCreationData eventData;
 
@@ -23,7 +22,6 @@ class CreateEventEvent extends EventCreationEvent {
 }
 
 class UpdateEventEvent extends EventCreationEvent {
-
   const UpdateEventEvent(this.eventId, this.eventData);
   final String eventId;
   final EventCreationData eventData;
@@ -33,7 +31,6 @@ class UpdateEventEvent extends EventCreationEvent {
 }
 
 class SaveEventAsDraftEvent extends EventCreationEvent {
-
   const SaveEventAsDraftEvent(this.eventData);
   final EventCreationData eventData;
 
@@ -42,7 +39,6 @@ class SaveEventAsDraftEvent extends EventCreationEvent {
 }
 
 class PublishDraftEventEvent extends EventCreationEvent {
-
   const PublishDraftEventEvent(this.eventId);
   final String eventId;
 
@@ -51,7 +47,6 @@ class PublishDraftEventEvent extends EventCreationEvent {
 }
 
 class DeleteEventEvent extends EventCreationEvent {
-
   const DeleteEventEvent(this.eventId);
   final String eventId;
 
@@ -60,7 +55,6 @@ class DeleteEventEvent extends EventCreationEvent {
 }
 
 class LoadUserEventsEvent extends EventCreationEvent {
-
   const LoadUserEventsEvent(this.userId);
   final String userId;
 
@@ -69,7 +63,6 @@ class LoadUserEventsEvent extends EventCreationEvent {
 }
 
 class ValidateEventDataEvent extends EventCreationEvent {
-
   const ValidateEventDataEvent(this.eventData);
   final EventCreationData eventData;
 
@@ -90,7 +83,6 @@ class EventCreationInitial extends EventCreationState {}
 class EventCreationLoading extends EventCreationState {}
 
 class EventCreationSuccess extends EventCreationState {
-
   const EventCreationSuccess(this.eventId, this.message);
   final String eventId;
   final String message;
@@ -100,7 +92,6 @@ class EventCreationSuccess extends EventCreationState {
 }
 
 class EventCreationError extends EventCreationState {
-
   const EventCreationError(this.message, {this.errorCode});
   final String message;
   final String? errorCode;
@@ -110,7 +101,6 @@ class EventCreationError extends EventCreationState {
 }
 
 class EventValidationState extends EventCreationState {
-
   const EventValidationState(this.isValid, this.errors);
   final bool isValid;
   final List<String> errors;
@@ -120,7 +110,6 @@ class EventValidationState extends EventCreationState {
 }
 
 class UserEventsLoaded extends EventCreationState {
-
   const UserEventsLoaded(this.events, this.drafts);
   final List<EnhancedEventModel> events;
   final List<EnhancedEventModel> drafts;
@@ -132,7 +121,6 @@ class UserEventsLoaded extends EventCreationState {
 class UserEventsLoading extends EventCreationState {}
 
 class UserEventsError extends EventCreationState {
-
   const UserEventsError(this.message);
   final String message;
 
@@ -141,7 +129,6 @@ class UserEventsError extends EventCreationState {
 }
 
 class EventDraftSaved extends EventCreationState {
-
   const EventDraftSaved(this.eventId);
   final String eventId;
 
@@ -150,7 +137,6 @@ class EventDraftSaved extends EventCreationState {
 }
 
 class EventPublished extends EventCreationState {
-
   const EventPublished(this.eventId);
   final String eventId;
 
@@ -159,7 +145,6 @@ class EventPublished extends EventCreationState {
 }
 
 class EventDeleted extends EventCreationState {
-
   const EventDeleted(this.eventId);
   final String eventId;
 
@@ -169,7 +154,6 @@ class EventDeleted extends EventCreationState {
 
 // BLoC
 class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
-
   EventCreationBloc({
     required UserEventService userEventService,
   })  : _userEventService = userEventService,
@@ -194,27 +178,33 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       // Validate event data first
       final validationErrors = _validateEventData(event.eventData);
       if (validationErrors.isNotEmpty) {
-        emit(EventCreationError(
-          'Please fix the following errors:\n${validationErrors.join('\n')}',
-          errorCode: 'VALIDATION_ERROR',
-        ),);
+        emit(
+          EventCreationError(
+            'Please fix the following errors:\n${validationErrors.join('\n')}',
+            errorCode: 'VALIDATION_ERROR',
+          ),
+        );
         return;
       }
 
       final eventId = await _userEventService.createEvent(event.eventData);
 
-      emit(EventCreationSuccess(
-        eventId,
-        'Event created and published successfully! It\'s now live and visible to other users.',
-      ),);
+      emit(
+        EventCreationSuccess(
+          eventId,
+          'Event created and published successfully! It\'s now live and visible to other users.',
+        ),
+      );
 
       log('Event created successfully: $eventId', name: 'EventCreationBloc');
     } catch (e) {
       log('Error creating event: $e', name: 'EventCreationBloc');
-      emit(EventCreationError(
-        _getErrorMessage(e),
-        errorCode: _getErrorCode(e),
-      ),);
+      emit(
+        EventCreationError(
+          _getErrorMessage(e),
+          errorCode: _getErrorCode(e),
+        ),
+      );
     }
   }
 
@@ -228,28 +218,36 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       // Validate event data first
       final validationErrors = _validateEventData(event.eventData);
       if (validationErrors.isNotEmpty) {
-        emit(EventCreationError(
-          'Please fix the following errors:\n${validationErrors.join('\n')}',
-          errorCode: 'VALIDATION_ERROR',
-        ),);
+        emit(
+          EventCreationError(
+            'Please fix the following errors:\n${validationErrors.join('\n')}',
+            errorCode: 'VALIDATION_ERROR',
+          ),
+        );
         return;
       }
 
       await _userEventService.updateEvent(event.eventId, event.eventData);
 
-      emit(EventCreationSuccess(
-        event.eventId,
-        'Event updated successfully! It will be reviewed before changes are published.',
-      ),);
+      emit(
+        EventCreationSuccess(
+          event.eventId,
+          'Event updated successfully! It will be reviewed before changes are published.',
+        ),
+      );
 
-      log('Event updated successfully: ${event.eventId}',
-          name: 'EventCreationBloc',);
+      log(
+        'Event updated successfully: ${event.eventId}',
+        name: 'EventCreationBloc',
+      );
     } catch (e) {
       log('Error updating event: $e', name: 'EventCreationBloc');
-      emit(EventCreationError(
-        _getErrorMessage(e),
-        errorCode: _getErrorCode(e),
-      ),);
+      emit(
+        EventCreationError(
+          _getErrorMessage(e),
+          errorCode: _getErrorCode(e),
+        ),
+      );
     }
   }
 
@@ -267,10 +265,12 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       log('Event draft saved: $eventId', name: 'EventCreationBloc');
     } catch (e) {
       log('Error saving event draft: $e', name: 'EventCreationBloc');
-      emit(EventCreationError(
-        _getErrorMessage(e),
-        errorCode: _getErrorCode(e),
-      ),);
+      emit(
+        EventCreationError(
+          _getErrorMessage(e),
+          errorCode: _getErrorCode(e),
+        ),
+      );
     }
   }
 
@@ -288,10 +288,12 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       log('Draft event published: ${event.eventId}', name: 'EventCreationBloc');
     } catch (e) {
       log('Error publishing draft event: $e', name: 'EventCreationBloc');
-      emit(EventCreationError(
-        _getErrorMessage(e),
-        errorCode: _getErrorCode(e),
-      ),);
+      emit(
+        EventCreationError(
+          _getErrorMessage(e),
+          errorCode: _getErrorCode(e),
+        ),
+      );
     }
   }
 
@@ -309,10 +311,12 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
       log('Event deleted: ${event.eventId}', name: 'EventCreationBloc');
     } catch (e) {
       log('Error deleting event: $e', name: 'EventCreationBloc');
-      emit(EventCreationError(
-        _getErrorMessage(e),
-        errorCode: _getErrorCode(e),
-      ),);
+      emit(
+        EventCreationError(
+          _getErrorMessage(e),
+          errorCode: _getErrorCode(e),
+        ),
+      );
     }
   }
 
@@ -327,10 +331,12 @@ class EventCreationBloc extends Bloc<EventCreationEvent, EventCreationState> {
 
       // Separate published events from drafts
       final publishedEvents = events
-          .where((e) =>
-              e.status == EventStatus.published ||
-              e.status == EventStatus.underReview ||
-              e.status == EventStatus.completed,)
+          .where(
+            (e) =>
+                e.status == EventStatus.published ||
+                e.status == EventStatus.underReview ||
+                e.status == EventStatus.completed,
+          )
           .toList();
 
       final drafts =

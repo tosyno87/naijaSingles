@@ -35,14 +35,22 @@ class LocationPrivacyService {
 
   /// Generate GeoHash based on precision level (public method)
   static String generateGeoHash(
-      double lat, double lng, LocationPrecision precision,) => _generateGeoHash(lat, lng, precision);
+    double lat,
+    double lng,
+    LocationPrecision precision,
+  ) =>
+      _generateGeoHash(lat, lng, precision);
 
   /// Decode GeoHash to approximate coordinates (public method)
-  static Map<String, double> decodeGeoHash(String geoHash) => _decodeGeoHash(geoHash);
+  static Map<String, double> decodeGeoHash(String geoHash) =>
+      _decodeGeoHash(geoHash);
 
   /// Generate GeoHash based on precision level
   static String _generateGeoHash(
-      double lat, double lng, LocationPrecision precision,) {
+    double lat,
+    double lng,
+    LocationPrecision precision,
+  ) {
     int precisionLevel;
     switch (precision) {
       case LocationPrecision.high:
@@ -115,7 +123,11 @@ class LocationPrivacyService {
     final coords2 = _decodeGeoHash(geoHash2);
 
     return _haversineDistanceInMiles(
-        coords1['lat']!, coords1['lng']!, coords2['lat']!, coords2['lng']!,);
+      coords1['lat']!,
+      coords1['lng']!,
+      coords2['lat']!,
+      coords2['lng']!,
+    );
   }
 
   /// Decode GeoHash to approximate coordinates
@@ -165,7 +177,11 @@ class LocationPrivacyService {
 
   /// Calculate distance using Haversine formula in miles
   static double _haversineDistanceInMiles(
-      double lat1, double lng1, double lat2, double lng2,) {
+    double lat1,
+    double lng1,
+    double lat2,
+    double lng2,
+  ) {
     const double earthRadiusMiles = 3959; // miles (vs 6371 km)
 
     final double dLat = _toRadians(lat2 - lat1);
@@ -222,7 +238,10 @@ class LocationPrivacyService {
 
   /// Format display location
   static String _formatDisplayLocation(
-      String city, String state, String country,) {
+    String city,
+    String state,
+    String country,
+  ) {
     if (city.isNotEmpty && state.isNotEmpty) {
       return '$city, $state';
     } else if (city.isNotEmpty) {
@@ -234,7 +253,9 @@ class LocationPrivacyService {
 
   /// Get users within radius using GeoHash (radius in miles)
   static List<String> getGeoHashesInRadius(
-      String centerGeoHash, double radiusMiles,) {
+    String centerGeoHash,
+    double radiusMiles,
+  ) {
     // Get neighboring GeoHashes for radius search
     final List<String> neighbors = [];
 

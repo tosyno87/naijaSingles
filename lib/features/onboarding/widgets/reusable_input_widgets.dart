@@ -3,9 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// Reusable selection option widget for onboarding screens
 class SelectionOption extends StatelessWidget {
-
   const SelectionOption({
-    required this.label, required this.value, required this.selectedValue, required this.onSelected, super.key,
+    required this.label,
+    required this.value,
+    required this.selectedValue,
+    required this.onSelected,
+    super.key,
     this.icon,
     this.isFullWidth = true,
   });
@@ -83,9 +86,9 @@ class SelectionOption extends StatelessWidget {
 
 /// Reusable section header widget
 class SectionHeader extends StatelessWidget {
-
   const SectionHeader({
-    required this.title, super.key,
+    required this.title,
+    super.key,
     this.subtitle,
   });
   final String title;
@@ -123,9 +126,11 @@ class SectionHeader extends StatelessWidget {
 
 /// Height input widget with unit toggle
 class HeightInput extends StatefulWidget {
-
   const HeightInput({
-    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+    required this.initialHeight,
+    required this.initialUnit,
+    required this.onChanged,
+    super.key,
   });
   final double initialHeight;
   final String initialUnit;
@@ -333,9 +338,9 @@ class _HeightInputState extends State<HeightInput> {
 
 /// Reusable continue labelLarge
 class ContinueButton extends StatelessWidget {
-
   const ContinueButton({
-    required this.onPressed, super.key,
+    required this.onPressed,
+    super.key,
     this.text = 'Continue',
     this.isEnabled = true,
   });

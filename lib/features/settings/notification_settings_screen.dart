@@ -65,7 +65,9 @@ class _NotificationSettingsScreenState
 
     try {
       final success = await SettingsService.updateNotificationSettings(
-          _currentUserId!, _settings!,);
+        _currentUserId!,
+        _settings!,
+      );
 
       if (mounted) {
         setState(() => _isSaving = false);
@@ -102,13 +104,13 @@ class _NotificationSettingsScreenState
       context: context,
       initialTime: currentTime,
       builder: (context, child) => Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: primaryColor,
-            ),
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: primaryColor,
           ),
-          child: child!,
         ),
+        child: child!,
+      ),
     );
 
     if (picked != null) {
@@ -129,7 +131,8 @@ class _NotificationSettingsScreenState
     );
   }
 
-  String _formatTime(TimeOfDay time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  String _formatTime(TimeOfDay time) =>
+      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
   String _formatTimeDisplay(String timeString) {
     final time = _parseTime(timeString);
@@ -188,211 +191,213 @@ class _NotificationSettingsScreenState
   }
 
   Widget _buildErrorState(bool isDarkMode) => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Failed to load settings',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              color: isDarkMode ? Colors.white : Colors.black,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.grey[400],
             ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadNotificationSettings,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
+            const SizedBox(height: 16),
+            Text(
+              'Failed to load settings',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
-            child: Text(
-              'Retry',
-              style: GoogleFonts.montserrat(),
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildSettingsContent(bool isDarkMode) => SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header info
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.notifications_active,
-                  color: primaryColor,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Control when and how you receive notifications from Afropeep.',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Push Notifications Section
-          _buildSectionHeader('Push Notifications', isDarkMode),
-          const SizedBox(height: 12),
-
-          _buildSettingTile(
-            title: 'New Matches',
-            subtitle: 'Get notified when you have a new match',
-            icon: Icons.favorite,
-            value: _settings!.matchNotifications,
-            onChanged: (value) =>
-                _updateSetting(_settings!.copyWith(matchNotifications: value)),
-            isDarkMode: isDarkMode,
-          ),
-
-          _buildSettingTile(
-            title: 'New Messages',
-            subtitle: 'Get notified when someone sends you a message',
-            icon: Icons.message,
-            value: _settings!.messageNotifications,
-            onChanged: (value) => _updateSetting(
-                _settings!.copyWith(messageNotifications: value),),
-            isDarkMode: isDarkMode,
-          ),
-
-          _buildSettingTile(
-            title: 'Likes',
-            subtitle: 'Get notified when someone likes your profile',
-            icon: Icons.thumb_up,
-            value: _settings!.likeNotifications,
-            onChanged: (value) =>
-                _updateSetting(_settings!.copyWith(likeNotifications: value)),
-            isDarkMode: isDarkMode,
-          ),
-
-          _buildSettingTile(
-            title: 'Super Likes',
-            subtitle: 'Get notified when someone super likes you',
-            icon: Icons.star,
-            value: _settings!.superLikeNotifications,
-            onChanged: (value) => _updateSetting(
-                _settings!.copyWith(superLikeNotifications: value),),
-            isDarkMode: isDarkMode,
-          ),
-
-          const SizedBox(height: 24),
-
-          // Sound & Vibration Section
-          _buildSectionHeader('Sound & Vibration', isDarkMode),
-          const SizedBox(height: 12),
-
-          _buildSettingTile(
-            title: 'Sound',
-            subtitle: 'Play sound for notifications',
-            icon: Icons.volume_up,
-            value: _settings!.soundEnabled,
-            onChanged: (value) =>
-                _updateSetting(_settings!.copyWith(soundEnabled: value)),
-            isDarkMode: isDarkMode,
-          ),
-
-          _buildSettingTile(
-            title: 'Vibration',
-            subtitle: 'Vibrate for notifications',
-            icon: Icons.vibration,
-            value: _settings!.vibrationEnabled,
-            onChanged: (value) =>
-                _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
-            isDarkMode: isDarkMode,
-          ),
-
-          const SizedBox(height: 24),
-
-          // Quiet Hours Section
-          _buildSectionHeader('Quiet Hours', isDarkMode),
-          const SizedBox(height: 12),
-
-          _buildSettingTile(
-            title: 'Enable Quiet Hours',
-            subtitle: 'Pause notifications during specified hours',
-            icon: Icons.bedtime,
-            value: _settings!.quietHoursEnabled,
-            onChanged: (value) =>
-                _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
-            isDarkMode: isDarkMode,
-          ),
-
-          if (_settings!.quietHoursEnabled) ...[
-            const SizedBox(height: 12),
-            _buildTimeSetting(
-              title: 'Start Time',
-              time: _settings!.quietHoursStart,
-              onTap: () => _showTimePickerDialog(true),
-              isDarkMode: isDarkMode,
-            ),
-            _buildTimeSetting(
-              title: 'End Time',
-              time: _settings!.quietHoursEnd,
-              onTap: () => _showTimePickerDialog(false),
-              isDarkMode: isDarkMode,
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadNotificationSettings,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                'Retry',
+                style: GoogleFonts.montserrat(),
+              ),
             ),
           ],
+        ),
+      );
 
-          const SizedBox(height: 32),
-
-          // Save indicator
-          if (_isSaving)
-            Center(
+  Widget _buildSettingsContent(bool isDarkMode) => SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header info
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                  const Icon(
+                    Icons.notifications_active,
+                    color: primaryColor,
+                    size: 24,
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    'Saving...',
-                    style: GoogleFonts.montserrat(
-                      color: Colors.grey[600],
+                  Expanded(
+                    child: Text(
+                      'Control when and how you receive notifications from Afropeep.',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: primaryColor,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-        ],
-      ),
-    );
+
+            const SizedBox(height: 24),
+
+            // Push Notifications Section
+            _buildSectionHeader('Push Notifications', isDarkMode),
+            const SizedBox(height: 12),
+
+            _buildSettingTile(
+              title: 'New Matches',
+              subtitle: 'Get notified when you have a new match',
+              icon: Icons.favorite,
+              value: _settings!.matchNotifications,
+              onChanged: (value) => _updateSetting(
+                  _settings!.copyWith(matchNotifications: value)),
+              isDarkMode: isDarkMode,
+            ),
+
+            _buildSettingTile(
+              title: 'New Messages',
+              subtitle: 'Get notified when someone sends you a message',
+              icon: Icons.message,
+              value: _settings!.messageNotifications,
+              onChanged: (value) => _updateSetting(
+                _settings!.copyWith(messageNotifications: value),
+              ),
+              isDarkMode: isDarkMode,
+            ),
+
+            _buildSettingTile(
+              title: 'Likes',
+              subtitle: 'Get notified when someone likes your profile',
+              icon: Icons.thumb_up,
+              value: _settings!.likeNotifications,
+              onChanged: (value) =>
+                  _updateSetting(_settings!.copyWith(likeNotifications: value)),
+              isDarkMode: isDarkMode,
+            ),
+
+            _buildSettingTile(
+              title: 'Super Likes',
+              subtitle: 'Get notified when someone super likes you',
+              icon: Icons.star,
+              value: _settings!.superLikeNotifications,
+              onChanged: (value) => _updateSetting(
+                _settings!.copyWith(superLikeNotifications: value),
+              ),
+              isDarkMode: isDarkMode,
+            ),
+
+            const SizedBox(height: 24),
+
+            // Sound & Vibration Section
+            _buildSectionHeader('Sound & Vibration', isDarkMode),
+            const SizedBox(height: 12),
+
+            _buildSettingTile(
+              title: 'Sound',
+              subtitle: 'Play sound for notifications',
+              icon: Icons.volume_up,
+              value: _settings!.soundEnabled,
+              onChanged: (value) =>
+                  _updateSetting(_settings!.copyWith(soundEnabled: value)),
+              isDarkMode: isDarkMode,
+            ),
+
+            _buildSettingTile(
+              title: 'Vibration',
+              subtitle: 'Vibrate for notifications',
+              icon: Icons.vibration,
+              value: _settings!.vibrationEnabled,
+              onChanged: (value) =>
+                  _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
+              isDarkMode: isDarkMode,
+            ),
+
+            const SizedBox(height: 24),
+
+            // Quiet Hours Section
+            _buildSectionHeader('Quiet Hours', isDarkMode),
+            const SizedBox(height: 12),
+
+            _buildSettingTile(
+              title: 'Enable Quiet Hours',
+              subtitle: 'Pause notifications during specified hours',
+              icon: Icons.bedtime,
+              value: _settings!.quietHoursEnabled,
+              onChanged: (value) =>
+                  _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
+              isDarkMode: isDarkMode,
+            ),
+
+            if (_settings!.quietHoursEnabled) ...[
+              const SizedBox(height: 12),
+              _buildTimeSetting(
+                title: 'Start Time',
+                time: _settings!.quietHoursStart,
+                onTap: () => _showTimePickerDialog(true),
+                isDarkMode: isDarkMode,
+              ),
+              _buildTimeSetting(
+                title: 'End Time',
+                time: _settings!.quietHoursEnd,
+                onTap: () => _showTimePickerDialog(false),
+                isDarkMode: isDarkMode,
+              ),
+            ],
+
+            const SizedBox(height: 32),
+
+            // Save indicator
+            if (_isSaving)
+              Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Saving...',
+                      style: GoogleFonts.montserrat(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      );
 
   Widget _buildSectionHeader(String title, bool isDarkMode) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: isDarkMode ? Colors.white : Colors.black,
-      ),
-    );
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+      );
 
   Widget _buildSettingTile({
     required String title,
@@ -401,77 +406,79 @@ class _NotificationSettingsScreenState
     required bool value,
     required ValueChanged<bool> onChanged,
     required bool isDarkMode,
-  }) => Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: SwitchListTile(
-        title: Text(
-          title,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: isDarkMode ? Colors.white : Colors.black,
+  }) =>
+      Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: SwitchListTile(
+          title: Text(
+            title,
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
           ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: Colors.grey[600],
+          subtitle: Text(
+            subtitle,
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
           ),
+          secondary: Icon(
+            icon,
+            color: primaryColor,
+          ),
+          value: value,
+          onChanged: onChanged,
+          activeThumbColor: primaryColor,
         ),
-        secondary: Icon(
-          icon,
-          color: primaryColor,
-        ),
-        value: value,
-        onChanged: onChanged,
-        activeThumbColor: primaryColor,
-      ),
-    );
+      );
 
   Widget _buildTimeSetting({
     required String title,
     required String time,
     required VoidCallback onTap,
     required bool isDarkMode,
-  }) => Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        title: Text(
-          title,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: isDarkMode ? Colors.white : Colors.black,
+  }) =>
+      Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          title: Text(
+            title,
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
           ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _formatTimeDisplay(time),
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: primaryColor,
-                fontWeight: FontWeight.w500,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _formatTimeDisplay(time),
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right,
-              color: Colors.grey[600],
-            ),
-          ],
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey[600],
+              ),
+            ],
+          ),
+          onTap: onTap,
         ),
-        onTap: onTap,
-      ),
-    );
+      );
 }

@@ -237,68 +237,70 @@ class CulturalDataValidationService {
     List<String>? languages,
     String? religion,
     String? occupation,
-  }) => {
-      'nationality': nationality?.trim() ?? '',
-      'tribe': tribe?.trim() ?? '',
-      'languages':
-          languages?.map((e) => e.trim()).where((e) => e.isNotEmpty).toList() ??
-              [],
-      'religion': religion?.trim() ?? '',
-      'occupation': occupation?.trim() ?? '',
-    };
+  }) =>
+      {
+        'nationality': nationality?.trim() ?? '',
+        'tribe': tribe?.trim() ?? '',
+        'languages': languages
+                ?.map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList() ??
+            [],
+        'religion': religion?.trim() ?? '',
+        'occupation': occupation?.trim() ?? '',
+      };
 
   /// Get common Nigerian tribes for validation
   static List<String> getCommonNigerianTribes() => [
-      'Yoruba',
-      'Igbo',
-      'Hausa',
-      'Fulani',
-      'Edo',
-      'Ijaw',
-      'Kanuri',
-      'Ibibio',
-      'Tiv',
-      'Efik',
-      'Nupe',
-      'Urhobo',
-      'Igala',
-      'Igbira',
-      'Edo',
-      'Etsako',
-      'Esan',
-      'Owan',
-      'Akoko-Edo',
-      'Other',
-    ];
+        'Yoruba',
+        'Igbo',
+        'Hausa',
+        'Fulani',
+        'Edo',
+        'Ijaw',
+        'Kanuri',
+        'Ibibio',
+        'Tiv',
+        'Efik',
+        'Nupe',
+        'Urhobo',
+        'Igala',
+        'Igbira',
+        'Edo',
+        'Etsako',
+        'Esan',
+        'Owan',
+        'Akoko-Edo',
+        'Other',
+      ];
 
   /// Get common languages for validation
   static List<String> getCommonLanguages() => [
-      'English',
-      'Yoruba',
-      'Igbo',
-      'Hausa',
-      'French',
-      'Portuguese',
-      'Spanish',
-      'Arabic',
-      'Pidgin',
-      'Other',
-    ];
+        'English',
+        'Yoruba',
+        'Igbo',
+        'Hausa',
+        'French',
+        'Portuguese',
+        'Spanish',
+        'Arabic',
+        'Pidgin',
+        'Other',
+      ];
 
   /// Get common religions for validation
   static List<String> getCommonReligions() => [
-      'Christianity',
-      'Islam',
-      'Traditional',
-      'Atheist',
-      'Agnostic',
-      'Other',
-    ];
+        'Christianity',
+        'Islam',
+        'Traditional',
+        'Atheist',
+        'Agnostic',
+        'Other',
+      ];
 }
 
 /// Result of a single field validation
 class ValidationResult {
-
   ValidationResult({
     required this.isValid,
     this.errorMessage,
@@ -309,7 +311,6 @@ class ValidationResult {
 
 /// Result of cultural fields validation
 class CulturalValidationResult {
-
   CulturalValidationResult({
     required this.isValid,
     required this.errors,

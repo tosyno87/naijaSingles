@@ -90,86 +90,86 @@ class _AdditionalPreferencesScreenState
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: isTablet ? 32 : 24,
-                vertical: 16,
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 32 : 24,
+              vertical: 16,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 32,
               ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 32,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header
-                    Text(
-                      'Tell us more about you',
-                      style: GoogleFonts.montserrat(
-                        fontSize: isTablet ? 32 : 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Text(
+                    'Tell us more about you',
+                    style: GoogleFonts.montserrat(
+                      fontSize: isTablet ? 32 : 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
-                    SizedBox(height: isTablet ? 12 : 8),
-                    Text(
-                      'Help us create better matches for you',
-                      style: GoogleFonts.montserrat(
-                        fontSize: isTablet ? 18 : 16,
-                        color: Colors.black54,
-                      ),
+                  ),
+                  SizedBox(height: isTablet ? 12 : 8),
+                  Text(
+                    'Help us create better matches for you',
+                    style: GoogleFonts.montserrat(
+                      fontSize: isTablet ? 18 : 16,
+                      color: Colors.black54,
                     ),
+                  ),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Height Section
-                    const SectionHeader(
-                      title: 'Height',
-                      subtitle: 'Your height helps with better matching',
-                    ),
-                    SizedBox(height: isTablet ? 20 : 16),
-                    HeightInput(
-                      initialHeight: _height,
-                      initialUnit: _heightUnit,
-                      onChanged: (height, unit) {
-                        setState(() {
-                          _height = height;
-                          _heightUnit = unit;
-                        });
-                      },
-                    ),
+                  // Height Section
+                  const SectionHeader(
+                    title: 'Height',
+                    subtitle: 'Your height helps with better matching',
+                  ),
+                  SizedBox(height: isTablet ? 20 : 16),
+                  HeightInput(
+                    initialHeight: _height,
+                    initialUnit: _heightUnit,
+                    onChanged: (height, unit) {
+                      setState(() {
+                        _height = height;
+                        _heightUnit = unit;
+                      });
+                    },
+                  ),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Looking For Section
-                    const SectionHeader(
-                      title: 'I\'m looking for',
-                      subtitle: 'What brings you to NaijaSingles?',
-                    ),
-                    SizedBox(height: isTablet ? 20 : 16),
-                    ..._buildLookingForOptions(),
+                  // Looking For Section
+                  const SectionHeader(
+                    title: 'I\'m looking for',
+                    subtitle: 'What brings you to NaijaSingles?',
+                  ),
+                  SizedBox(height: isTablet ? 20 : 16),
+                  ..._buildLookingForOptions(),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Relationship Intent Section
-                    const SectionHeader(
-                      title: 'Relationship goals',
-                      subtitle: 'What are you hoping to find?',
-                    ),
-                    SizedBox(height: isTablet ? 20 : 16),
-                    ..._buildRelationshipIntentOptions(),
+                  // Relationship Intent Section
+                  const SectionHeader(
+                    title: 'Relationship goals',
+                    subtitle: 'What are you hoping to find?',
+                  ),
+                  SizedBox(height: isTablet ? 20 : 16),
+                  ..._buildRelationshipIntentOptions(),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Continue Button
-                    ContinueButton(
-                      onPressed: _saveAndContinue,
-                    ),
+                  // Continue Button
+                  ContinueButton(
+                    onPressed: _saveAndContinue,
+                  ),
 
-                    SizedBox(height: isTablet ? 32 : 24),
-                  ],
-                ),
+                  SizedBox(height: isTablet ? 32 : 24),
+                ],
               ),
             ),
+          ),
         ),
       ),
     );
@@ -179,40 +179,48 @@ class _AdditionalPreferencesScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) => Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _lookingFor,
-          onSelected: (value) {
-            setState(() {
-              _lookingFor = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      ),).toList();
+    return _lookingForOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _lookingFor,
+              onSelected: (value) {
+                setState(() {
+                  _lookingFor = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) => Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _relationshipIntent,
-          onSelected: (value) {
-            setState(() {
-              _relationshipIntent = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      ),).toList();
+    return _relationshipIntentOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _relationshipIntent,
+              onSelected: (value) {
+                setState(() {
+                  _relationshipIntent = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   void _saveAndContinue() {

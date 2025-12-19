@@ -31,103 +31,104 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: afropeepGreen),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Profile Preview',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: afropeepGreen,
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: afropeepGreen),
+            onPressed: () => Navigator.pop(context),
           ),
-        ),
-        centerTitle: true,
-        actions: [
-          TextButton.icon(
-            onPressed: _showImprovementSuggestions,
-            icon: const Icon(Icons.tips_and_updates, color: afropeepGreen, size: 18),
-            label: Text(
-              'Tips',
-              style: GoogleFonts.montserrat(
-                color: afropeepGreen,
-                fontWeight: FontWeight.w500,
+          title: Text(
+            'Profile Preview',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: afropeepGreen,
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            TextButton.icon(
+              onPressed: _showImprovementSuggestions,
+              icon: const Icon(Icons.tips_and_updates,
+                  color: afropeepGreen, size: 18),
+              label: Text(
+                'Tips',
+                style: GoogleFonts.montserrat(
+                  color: afropeepGreen,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Consumer<OnboardingController>(
-        builder: (context, controller, _) {
-          final photos = controller.profilePhotos
-              .where((p) => p != null)
-              .cast<File>()
-              .toList();
+          ],
+        ),
+        body: Consumer<OnboardingController>(
+          builder: (context, controller, _) {
+            final photos = controller.profilePhotos
+                .where((p) => p != null)
+                .cast<File>()
+                .toList();
 
-          if (photos.isEmpty) {
-            return _buildNoPhotosState();
-          }
+            if (photos.isEmpty) {
+              return _buildNoPhotosState();
+            }
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                // Photo carousel section
-                _buildPhotoCarousel(photos),
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Photo carousel section
+                  _buildPhotoCarousel(photos),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // Profile card preview
-                _buildProfileCard(controller),
+                  // Profile card preview
+                  _buildProfileCard(controller),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // Match potential indicator
-                _buildMatchPotentialCard(controller),
+                  // Match potential indicator
+                  _buildMatchPotentialCard(controller),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // Improvement suggestions
-                _buildQuickImprovements(controller),
+                  // Improvement suggestions
+                  _buildQuickImprovements(controller),
 
-                const SizedBox(height: 20),
-              ],
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: _buildBottomActions(),
-    );
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          },
+        ),
+        bottomNavigationBar: _buildBottomActions(),
+      );
 
   Widget _buildPhotoCarousel(List<File> photos) => Container(
-      height: 500,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Photo PageView
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentPhotoIndex = index;
-              });
-            },
-            itemCount: photos.length,
-            itemBuilder: (context, index) => Container(
+        height: 500,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Photo PageView
+            PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPhotoIndex = index;
+                });
+              },
+              itemCount: photos.length,
+              itemBuilder: (context, index) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   image: DecorationImage(
@@ -136,229 +137,243 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                   ),
                 ),
               ),
-          ),
-
-          // Photo indicators
-          if (photos.length > 1)
-            Positioned(
-              top: 16,
-              left: 16,
-              right: 16,
-              child: Row(
-                children: photos.asMap().entries.map((entry) => Expanded(
-                    child: Container(
-                      height: 3,
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        color: entry.key == _currentPhotoIndex
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.4),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),).toList(),
-              ),
             ),
 
-          // Primary photo badge
-          if (_currentPhotoIndex == 0)
-            Positioned(
-              top: 16,
-              left: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: goldAccent,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.star, color: Colors.white, size: 12),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Main Photo',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          // Navigation arrows
-          if (photos.length > 1) ...[
-            if (_currentPhotoIndex > 0)
+            // Photo indicators
+            if (photos.length > 1)
               Positioned(
+                top: 16,
                 left: 16,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: GestureDetector(
-                    onTap: () => _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            if (_currentPhotoIndex < photos.length - 1)
-              Positioned(
                 right: 16,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: GestureDetector(
-                    onTap: () => _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
+                child: Row(
+                  children: photos
+                      .asMap()
+                      .entries
+                      .map(
+                        (entry) => Expanded(
+                          child: Container(
+                            height: 3,
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            decoration: BoxDecoration(
+                              color: entry.key == _currentPhotoIndex
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.4),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+
+            // Primary photo badge
+            if (_currentPhotoIndex == 0)
+              Positioned(
+                top: 16,
+                left: 16,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: goldAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star, color: Colors.white, size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Main Photo',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white,
-                        size: 16,
+                    ],
+                  ),
+                ),
+              ),
+
+            // Navigation arrows
+            if (photos.length > 1) ...[
+              if (_currentPhotoIndex > 0)
+                Positioned(
+                  left: 16,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () => _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              if (_currentPhotoIndex < photos.length - 1)
+                Positioned(
+                  right: 16,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () => _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ],
-        ],
-      ),
-    );
+        ),
+      );
 
   Widget _buildProfileCard(OnboardingController controller) => Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Name and age
-          Row(
-            children: [
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Name and age
+            Row(
+              children: [
+                Text(
+                  '${controller.fullName}, ${controller.age}',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: textDarkBrown,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: afropeepGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    controller.tribe,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: afropeepGreen,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Bio
+            if (controller.bio.isNotEmpty)
               Text(
-                '${controller.fullName}, ${controller.age}',
+                controller.bio,
                 style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  color: textLightBrown,
+                  height: 1.4,
+                ),
+              ),
+
+            const SizedBox(height: 16),
+
+            // Interests
+            if (controller.interests.isNotEmpty) ...[
+              Text(
+                'Interests',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: textDarkBrown,
                 ),
               ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: afropeepGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  controller.tribe,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: afropeepGreen,
-                  ),
-                ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: controller.interests
+                    .take(6)
+                    .map(
+                      (interest) => Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: cardBackground,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: afropeepGreen.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          interest,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            color: textDarkBrown,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Bio
-          if (controller.bio.isNotEmpty)
-            Text(
-              controller.bio,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textLightBrown,
-                height: 1.4,
-              ),
-            ),
-
-          const SizedBox(height: 16),
-
-          // Interests
-          if (controller.interests.isNotEmpty) ...[
-            Text(
-              'Interests',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: controller.interests.take(6).map((interest) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: cardBackground,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: afropeepGreen.withValues(alpha: 0.3),
-                    ),
-                  ),
+              if (controller.interests.length > 6)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    interest,
+                    '+${controller.interests.length - 6} more interests',
                     style: GoogleFonts.montserrat(
                       fontSize: 12,
-                      color: textDarkBrown,
-                      fontWeight: FontWeight.w500,
+                      color: textLightBrown,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
-                ),).toList(),
-            ),
-            if (controller.interests.length > 6)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  '+${controller.interests.length - 6} more interests',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: textLightBrown,
-                    fontStyle: FontStyle.italic,
-                  ),
                 ),
-              ),
+            ],
           ],
-        ],
-      ),
-    );
+        ),
+      );
 
   Widget _buildMatchPotentialCard(OnboardingController controller) {
     final photos = controller.profilePhotos.where((p) => p != null).length;
@@ -448,7 +463,11 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               _buildScoreItem('Photos', photos, 5, photos >= 3),
               _buildScoreItem('Bio', hasGoodBio ? 1 : 0, 1, hasGoodBio),
               _buildScoreItem(
-                  'Interests', hasInterests ? 1 : 0, 1, hasInterests,),
+                'Interests',
+                hasInterests ? 1 : 0,
+                1,
+                hasInterests,
+              ),
             ],
           ),
         ],
@@ -456,33 +475,34 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
     );
   }
 
-  Widget _buildScoreItem(String label, int current, int total, bool isGood) => Expanded(
-      child: Column(
-        children: [
-          Icon(
-            isGood ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isGood ? Colors.green : Colors.grey,
-            size: 16,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 10,
-              color: textLightBrown,
-            ),
-          ),
-          Text(
-            '$current/$total',
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+  Widget _buildScoreItem(String label, int current, int total, bool isGood) =>
+      Expanded(
+        child: Column(
+          children: [
+            Icon(
+              isGood ? Icons.check_circle : Icons.radio_button_unchecked,
               color: isGood ? Colors.green : Colors.grey,
+              size: 16,
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.montserrat(
+                fontSize: 10,
+                color: textLightBrown,
+              ),
+            ),
+            Text(
+              '$current/$total',
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isGood ? Colors.green : Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildQuickImprovements(OnboardingController controller) {
     final List<String> improvements = [];
@@ -550,118 +570,118 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          ...improvements
-              .map((improvement) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.arrow_right, color: Colors.blue, size: 16),
-                        const SizedBox(width: 4),
-                        Text(
-                          improvement,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            color: Colors.blue.shade700,
-                          ),
-                        ),
-                      ],
+          ...improvements.map(
+            (improvement) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  const Icon(Icons.arrow_right, color: Colors.blue, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    improvement,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: Colors.blue.shade700,
                     ),
-                  ),)
-              ,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildNoPhotosState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.photo_camera_outlined,
-            size: 80,
-            color: Colors.grey,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No Photos to Preview',
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: textDarkBrown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.photo_camera_outlined,
+              size: 80,
+              color: Colors.grey,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Add some photos to see how your profile will look',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textLightBrown,
+            const SizedBox(height: 16),
+            Text(
+              'No Photos to Preview',
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: textDarkBrown,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 8),
+            Text(
+              'Add some photos to see how your profile will look',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textLightBrown,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
 
   Widget _buildBottomActions() => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: afropeepGreen),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: afropeepGreen),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: Text(
-                'Back to Editing',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: afropeepGreen,
+                child: Text(
+                  'Back to Editing',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: afropeepGreen,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _shareProfile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: afropeepGreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _shareProfile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: afropeepGreen,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: Text(
-                'Share Preview',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                child: Text(
+                  'Share Preview',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   void _showImprovementSuggestions() {
     showModalBottomSheet(
@@ -716,46 +736,51 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
   }
 
   Widget _buildTipItem(
-      IconData icon, String title, String description, Color color,) => Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+    IconData icon,
+    String title,
+    String description,
+    Color color,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 20),
             ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: textDarkBrown,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: textDarkBrown,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: textLightBrown,
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: textLightBrown,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   void _shareProfile() {
     // Implement profile sharing functionality

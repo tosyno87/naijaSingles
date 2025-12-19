@@ -52,8 +52,10 @@ class UserEventService {
       // No moderation needed - events are immediately published
       // await _createModerationRecord(eventRef.id); // REMOVED
 
-      log('Created and published user event: ${eventRef.id}',
-          name: 'UserEventService',);
+      log(
+        'Created and published user event: ${eventRef.id}',
+        name: 'UserEventService',
+      );
       return eventRef.id;
     } catch (e) {
       log('Error creating event: $e', name: 'UserEventService');
@@ -179,10 +181,12 @@ class UserEventService {
 
       // Filter out cancelled/deleted events
       return querySnapshot.docs
-          .map((doc) => EnhancedEventModel.fromFirestoreJson(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ),)
+          .map(
+            (doc) => EnhancedEventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
           .where((event) => event.status != EventStatus.cancelled)
           .toList();
     } catch (e) {
@@ -204,16 +208,21 @@ class UserEventService {
           .get();
 
       final events = querySnapshot.docs
-          .map((doc) => EnhancedEventModel.fromFirestoreJson(
+          .map(
+            (doc) => EnhancedEventModel.fromFirestoreJson(
               doc.data() as Map<String, dynamic>,
               doc.id,
-            ),)
-          .where((event) =>
-              event.isVisible && event.status != EventStatus.cancelled,)
+            ),
+          )
+          .where(
+            (event) => event.isVisible && event.status != EventStatus.cancelled,
+          )
           .toList();
 
-      log('Fetched ${events.length} published user events',
-          name: 'UserEventService',);
+      log(
+        'Fetched ${events.length} published user events',
+        name: 'UserEventService',
+      );
       return events;
     } catch (e) {
       log('Error getting published events: $e', name: 'UserEventService');
@@ -247,10 +256,12 @@ class UserEventService {
             .get();
 
         events.addAll(
-          querySnapshot.docs.map((doc) => EnhancedEventModel.fromFirestoreJson(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ),),
+          querySnapshot.docs.map(
+            (doc) => EnhancedEventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          ),
         );
       }
 
@@ -338,8 +349,9 @@ class UserEventService {
 
   /// Upload event images to Firebase Storage
   Future<List<String>> _uploadEventImages(List<String> imagePaths) async {
-    log('🖼️ _uploadEventImages called with ${imagePaths.length} image(s)', name: 'UserEventService');
-    
+    log('🖼️ _uploadEventImages called with ${imagePaths.length} image(s)',
+        name: 'UserEventService');
+
     final uploadedUrls = <String>[];
 
     if (imagePaths.isEmpty) {
@@ -349,12 +361,14 @@ class UserEventService {
 
     for (int i = 0; i < imagePaths.length; i++) {
       final imagePath = imagePaths[i];
-      log('🖼️ Processing image ${i + 1}/${imagePaths.length}: $imagePath', name: 'UserEventService');
-      
+      log('🖼️ Processing image ${i + 1}/${imagePaths.length}: $imagePath',
+          name: 'UserEventService');
+
       try {
         // Skip if it's already a URL (existing image)
         if (imagePath.startsWith('http')) {
-          log('✅ Image ${i + 1} is already a URL, skipping upload', name: 'UserEventService');
+          log('✅ Image ${i + 1} is already a URL, skipping upload',
+              name: 'UserEventService');
           uploadedUrls.add(imagePath);
           continue;
         }
@@ -365,17 +379,22 @@ class UserEventService {
           continue;
         }
 
-        log('📤 Uploading image ${i + 1} to Firebase Storage...', name: 'UserEventService');
-        log('📦 Storage instance: ${_storage.app.name}', name: 'UserEventService');
-        log('📦 Storage bucket: ${_storage.app.options.storageBucket}', name: 'UserEventService');
-        
+        log('📤 Uploading image ${i + 1} to Firebase Storage...',
+            name: 'UserEventService');
+        log('📦 Storage instance: ${_storage.app.name}',
+            name: 'UserEventService');
+        log('📦 Storage bucket: ${_storage.app.options.storageBucket}',
+            name: 'UserEventService');
+
         // Verify user is authenticated
         final currentUser = _auth.currentUser;
         if (currentUser == null) {
-          log('❌ User is not authenticated - cannot upload', name: 'UserEventService');
+          log('❌ User is not authenticated - cannot upload',
+              name: 'UserEventService');
           throw Exception('User must be authenticated to upload images');
         }
-        log('✅ User authenticated: ${currentUser.uid}', name: 'UserEventService');
+        log('✅ User authenticated: ${currentUser.uid}',
+            name: 'UserEventService');
 
         // Create unique filename
         final fileName =
@@ -384,96 +403,122 @@ class UserEventService {
         final ref = _storage.ref().child(fileName);
 
         // Upload file
-        log('📤 Starting upload task for image ${i + 1}...', name: 'UserEventService');
-        log('📤 File size: ${await file.length()} bytes', name: 'UserEventService');
-        
+        log('📤 Starting upload task for image ${i + 1}...',
+            name: 'UserEventService');
+        log('📤 File size: ${await file.length()} bytes',
+            name: 'UserEventService');
+
         // Read file as bytes - sometimes putFile fails on iOS Simulator
         final fileBytes = await file.readAsBytes();
-        log('📤 File bytes read: ${fileBytes.length} bytes', name: 'UserEventService');
-        
+        log('📤 File bytes read: ${fileBytes.length} bytes',
+            name: 'UserEventService');
+
         // Try using putData instead of putFile (more reliable on iOS Simulator)
         final metadata = SettableMetadata(
           contentType: 'image/jpeg',
           cacheControl: 'public, max-age=31536000',
         );
-        
+
         log('📤 Uploading with putData...', name: 'UserEventService');
         log('📤 Reference path: ${ref.fullPath}', name: 'UserEventService');
         log('📤 Reference bucket: ${ref.bucket}', name: 'UserEventService');
-        
+
         final uploadTask = ref.putData(fileBytes, metadata);
-        
+
         // Monitor upload progress
         uploadTask.snapshotEvents.listen((snapshot) {
           if (snapshot.totalBytes > 0) {
-            final progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            log('📊 Upload progress for image ${i + 1}: ${progress.toStringAsFixed(1)}%', name: 'UserEventService');
+            final progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            log('📊 Upload progress for image ${i + 1}: ${progress.toStringAsFixed(1)}%',
+                name: 'UserEventService');
           } else {
-            log('📊 Upload progress: ${snapshot.bytesTransferred} bytes transferred (total unknown)', name: 'UserEventService');
+            log('📊 Upload progress: ${snapshot.bytesTransferred} bytes transferred (total unknown)',
+                name: 'UserEventService');
           }
         }, onError: (error) {
-          log('❌ Upload progress error for image ${i + 1}: $error', name: 'UserEventService');
+          log('❌ Upload progress error for image ${i + 1}: $error',
+              name: 'UserEventService');
         });
-        
+
         log('⏳ Waiting for upload to complete...', name: 'UserEventService');
         final snapshot = await uploadTask.whenComplete(() {
-          log('✅ Upload task completed for image ${i + 1}', name: 'UserEventService');
+          log('✅ Upload task completed for image ${i + 1}',
+              name: 'UserEventService');
         }).catchError((error) {
-          log('❌ Upload task failed for image ${i + 1}: $error', name: 'UserEventService');
+          log('❌ Upload task failed for image ${i + 1}: $error',
+              name: 'UserEventService');
           throw error;
         });
-        log('✅ Upload completed, getting download URL...', name: 'UserEventService');
-        
+        log('✅ Upload completed, getting download URL...',
+            name: 'UserEventService');
+
         final downloadUrl = await snapshot.ref.getDownloadURL();
-        
+
         uploadedUrls.add(downloadUrl);
-        log('✅ Successfully uploaded image ${i + 1}: $downloadUrl', name: 'UserEventService');
+        log('✅ Successfully uploaded image ${i + 1}: $downloadUrl',
+            name: 'UserEventService');
       } catch (e, stackTrace) {
-        log('❌ Error uploading image ${i + 1} ($imagePath)', name: 'UserEventService');
+        log('❌ Error uploading image ${i + 1} ($imagePath)',
+            name: 'UserEventService');
         log('❌ Error type: ${e.runtimeType}', name: 'UserEventService');
         log('❌ Error toString: ${e.toString()}', name: 'UserEventService');
-        
+
         // Handle FirebaseException specifically
         if (e is FirebaseException) {
-          log('❌ FirebaseException - Code: ${e.code}, Message: ${e.message}', name: 'UserEventService');
+          log('❌ FirebaseException - Code: ${e.code}, Message: ${e.message}',
+              name: 'UserEventService');
           log('❌ Plugin: ${e.plugin}', name: 'UserEventService');
-          
+
           if (e.code == 'permission-denied') {
-            log('❌ PERMISSION DENIED - Storage rules may be blocking upload', name: 'UserEventService');
+            log('❌ PERMISSION DENIED - Storage rules may be blocking upload',
+                name: 'UserEventService');
           } else if (e.code == 'unknown') {
-            log('❌ UNKNOWN ERROR - This could indicate:', name: 'UserEventService');
-            log('   - Storage bucket not configured correctly', name: 'UserEventService');
+            log('❌ UNKNOWN ERROR - This could indicate:',
+                name: 'UserEventService');
+            log('   - Storage bucket not configured correctly',
+                name: 'UserEventService');
             log('   - Network connectivity issue', name: 'UserEventService');
-            log('   - Firebase Storage not initialized properly', name: 'UserEventService');
-            log('   - Storage rules still propagating (wait a few minutes)', name: 'UserEventService');
+            log('   - Firebase Storage not initialized properly',
+                name: 'UserEventService');
+            log('   - Storage rules still propagating (wait a few minutes)',
+                name: 'UserEventService');
           } else if (e.code == 'unauthorized') {
-            log('❌ UNAUTHORIZED - User may not be authenticated', name: 'UserEventService');
+            log('❌ UNAUTHORIZED - User may not be authenticated',
+                name: 'UserEventService');
           }
         } else {
           log('❌ Non-Firebase exception: $e', name: 'UserEventService');
         }
-        
+
         log('❌ Stack trace: $stackTrace', name: 'UserEventService');
         // Continue with other images even if one fails
       }
     }
 
-    log('✅ _uploadEventImages completed: ${uploadedUrls.length}/${imagePaths.length} images uploaded', name: 'UserEventService');
+    log('✅ _uploadEventImages completed: ${uploadedUrls.length}/${imagePaths.length} images uploaded',
+        name: 'UserEventService');
     return uploadedUrls;
   }
 
   /// Add event to user's events collection
   Future<void> _addToUserEvents(
-      String userId, String eventId, String role,) async {
-    await _userEventsCollection.doc(userId).set({
-      'events': {
-        eventId: {
-          'role': role,
-          'joinedAt': Timestamp.fromDate(DateTime.now()),
-          'status': 'active',
+    String userId,
+    String eventId,
+    String role,
+  ) async {
+    await _userEventsCollection.doc(userId).set(
+      {
+        'events': {
+          eventId: {
+            'role': role,
+            'joinedAt': Timestamp.fromDate(DateTime.now()),
+            'status': 'active',
+          },
         },
       },
-    }, SetOptions(merge: true),);
+      SetOptions(merge: true),
+    );
   }
 
   /// Remove event from user's events collection
@@ -510,7 +555,8 @@ class UserEventService {
     }
 
     // Additional validations
-    if (data.startDate!.isBefore(DateTime.now().add(const Duration(hours: 1)))) {
+    if (data.startDate!
+        .isBefore(DateTime.now().add(const Duration(hours: 1)))) {
       throw Exception('Event must start at least 1 hour from now');
     }
 

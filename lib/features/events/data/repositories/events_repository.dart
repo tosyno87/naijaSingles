@@ -49,7 +49,6 @@ abstract class EventsRepository {
 }
 
 class EventsRepositoryImpl implements EventsRepository {
-
   EventsRepositoryImpl({
     required EventsFirestoreService firestoreService,
     LocationService? locationService,
@@ -87,8 +86,10 @@ class EventsRepositoryImpl implements EventsRepository {
               await _firestoreService.fetchEvents(limit: limit);
           if (cachedEvents.isNotEmpty && !forceRefresh) {
             events = cachedEvents;
-            log('Loaded ${events.length} events from Firestore cache',
-                name: 'EventsRepository',);
+            log(
+              'Loaded ${events.length} events from Firestore cache',
+              name: 'EventsRepository',
+            );
 
             // Update cache
             _updateCache(cacheKey, events);
@@ -99,8 +100,10 @@ class EventsRepositoryImpl implements EventsRepository {
             return events;
           }
         } catch (e) {
-          log('Failed to load from Firestore cache: $e',
-              name: 'EventsRepository',);
+          log(
+            'Failed to load from Firestore cache: $e',
+            name: 'EventsRepository',
+          );
         }
       }
 
@@ -111,8 +114,10 @@ class EventsRepositoryImpl implements EventsRepository {
         // Update memory cache
         _updateCache(cacheKey, events);
 
-        log('Fetched ${events.length} events from Firestore',
-            name: 'EventsRepository',);
+        log(
+          'Fetched ${events.length} events from Firestore',
+          name: 'EventsRepository',
+        );
       }
 
       return events;
@@ -124,13 +129,17 @@ class EventsRepositoryImpl implements EventsRepository {
         final fallbackEvents =
             await _firestoreService.fetchEvents(limit: limit);
         if (fallbackEvents.isNotEmpty) {
-          log('Using fallback Firestore cache with ${fallbackEvents.length} events',
-              name: 'EventsRepository',);
+          log(
+            'Using fallback Firestore cache with ${fallbackEvents.length} events',
+            name: 'EventsRepository',
+          );
           return fallbackEvents;
         }
       } catch (fallbackError) {
-        log('Fallback cache also failed: $fallbackError',
-            name: 'EventsRepository',);
+        log(
+          'Fallback cache also failed: $fallbackError',
+          name: 'EventsRepository',
+        );
       }
 
       rethrow;
@@ -158,8 +167,10 @@ class EventsRepositoryImpl implements EventsRepository {
       // Update search cache
       _updateCache(cacheKey, searchResults);
 
-      log('Search for "$query" returned ${searchResults.length} results from Firestore',
-          name: 'EventsRepository',);
+      log(
+        'Search for "$query" returned ${searchResults.length} results from Firestore',
+        name: 'EventsRepository',
+      );
       return searchResults;
     } catch (e) {
       log('Error searching events: $e', name: 'EventsRepository');
@@ -254,8 +265,10 @@ class EventsRepositoryImpl implements EventsRepository {
         );
       }
 
-      log('RSVP updated for user $userId to event $eventId: ${status.value}',
-          name: 'EventsRepository',);
+      log(
+        'RSVP updated for user $userId to event $eventId: ${status.value}',
+        name: 'EventsRepository',
+      );
     } catch (e) {
       log('Error updating RSVP: $e', name: 'EventsRepository');
       rethrow;
@@ -322,8 +335,10 @@ class EventsRepositoryImpl implements EventsRepository {
     try {
       // Background category refresh removed - only user-generated events supported
     } catch (e) {
-      log('Background category cache update failed: $e',
-          name: 'EventsRepository',);
+      log(
+        'Background category cache update failed: $e',
+        name: 'EventsRepository',
+      );
     }
   }
 
@@ -355,18 +370,20 @@ class EventsRepositoryImpl implements EventsRepository {
     }
 
     if (expiredKeys.isNotEmpty) {
-      log('Cleared ${expiredKeys.length} expired cache entries',
-          name: 'EventsRepository',);
+      log(
+        'Cleared ${expiredKeys.length} expired cache entries',
+        name: 'EventsRepository',
+      );
     }
   }
 
   // Get cache statistics
   Map<String, dynamic> getCacheStats() => {
-      'cached_queries': _eventsCache.length,
-      'cache_size_mb': _calculateCacheSize(),
-      'oldest_cache': _getOldestCacheTime(),
-      'newest_cache': _getNewestCacheTime(),
-    };
+        'cached_queries': _eventsCache.length,
+        'cache_size_mb': _calculateCacheSize(),
+        'oldest_cache': _getOldestCacheTime(),
+        'newest_cache': _getNewestCacheTime(),
+      };
 
   double _calculateCacheSize() {
     // Rough estimation of cache size in MB
@@ -415,14 +432,17 @@ class EventsRepositoryImpl implements EventsRepository {
       }
 
       if (userLocation == null) {
-        log('❌ Unable to get user location for nearby events',
-            name: 'EventsRepository',);
+        log(
+          '❌ Unable to get user location for nearby events',
+          name: 'EventsRepository',
+        );
         return [];
       }
 
       // Get all events and filter by distance
       final allEvents = await _firestoreService.fetchEvents(
-          limit: 100,); // Get more events to filter
+        limit: 100,
+      ); // Get more events to filter
 
       // Calculate distances and filter
       final nearbyEvents = <EventModel>[];
@@ -443,12 +463,15 @@ class EventsRepositoryImpl implements EventsRepository {
       }
 
       // Sort by distance and limit results
-      nearbyEvents.sort((a, b) =>
-          (a.distanceFromUser ?? 0).compareTo(b.distanceFromUser ?? 0),);
+      nearbyEvents.sort(
+        (a, b) => (a.distanceFromUser ?? 0).compareTo(b.distanceFromUser ?? 0),
+      );
 
       final result = nearbyEvents.take(limit).toList();
-      log('📍 Found ${result.length} events within ${radiusKm}km',
-          name: 'EventsRepository',);
+      log(
+        '📍 Found ${result.length} events within ${radiusKm}km',
+        name: 'EventsRepository',
+      );
 
       return result;
     } catch (e) {
@@ -522,7 +545,10 @@ class EventsRepositoryImpl implements EventsRepository {
     } catch (e) {
       log('❌ Error getting events with distance: $e', name: 'EventsRepository');
       return getEvents(
-          page: page, limit: limit, forceRefresh: forceRefresh,);
+        page: page,
+        limit: limit,
+        forceRefresh: forceRefresh,
+      );
     }
   }
 }

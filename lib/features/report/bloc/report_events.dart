@@ -8,7 +8,6 @@ abstract class ReportEvents extends Equatable {
 }
 
 class ReportUserRequest extends ReportEvents {
-
   const ReportUserRequest({
     required this.moreReason,
     required this.reported,

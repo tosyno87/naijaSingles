@@ -8,7 +8,6 @@ abstract class MatchEvent extends Equatable {
 }
 
 class LikeUserEvent extends MatchEvent {
-
   const LikeUserEvent({required this.toUserId});
   final String toUserId;
 
@@ -21,7 +20,6 @@ class LoadMatchesEvent extends MatchEvent {
 }
 
 class MatchCreatedEvent extends MatchEvent {
-
   const MatchCreatedEvent({
     required this.matchId,
     required this.otherUserId,
@@ -38,7 +36,6 @@ class DismissMatchNotificationEvent extends MatchEvent {
 }
 
 class UnlikeUserEvent extends MatchEvent {
-
   const UnlikeUserEvent({required this.toUserId});
   final String toUserId;
 
@@ -47,7 +44,6 @@ class UnlikeUserEvent extends MatchEvent {
 }
 
 class DeleteMatchEvent extends MatchEvent {
-
   const DeleteMatchEvent({required this.matchId});
   final String matchId;
 

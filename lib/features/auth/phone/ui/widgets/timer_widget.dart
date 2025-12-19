@@ -8,9 +8,12 @@ import '../../../../../common/constants/colors.dart';
 import '../../../../../common/providers/theme_provider.dart';
 
 class TimerWidget extends StatefulWidget {
-
   const TimerWidget({
-    required this.start, required this.phoneNumber, required this.resendText, required this.onResendOtp, super.key,
+    required this.start,
+    required this.phoneNumber,
+    required this.resendText,
+    required this.onResendOtp,
+    super.key,
   });
   final int start;
   final String phoneNumber;
@@ -76,9 +79,11 @@ class TimerWidgetState extends State<TimerWidget> {
               },
               child: Text(
                 _currentTimerValue > 0
-                    ? 'Resend OTP in'.tr(args: [
-                        "0:${_currentTimerValue.toString().padLeft(2, '0')} sec",
-                      ],).toString()
+                    ? 'Resend OTP in'.tr(
+                        args: [
+                          "0:${_currentTimerValue.toString().padLeft(2, '0')} sec",
+                        ],
+                      ).toString()
                     : 'Resend'.tr().toString(),
                 style: const TextStyle(
                   color: primaryColor,

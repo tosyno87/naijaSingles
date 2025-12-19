@@ -11,9 +11,12 @@ import '../../../../models/user_model.dart';
 import '../screens/chat_page.dart';
 
 class SingleChatTile extends StatelessWidget {
-
   const SingleChatTile({
-    required this.chat, required this.chatId, required this.tempUser, required this.currentUser, super.key,
+    required this.chat,
+    required this.chatId,
+    required this.tempUser,
+    required this.currentUser,
+    super.key,
   });
   final UserModel tempUser;
   final ChatModel chat;
@@ -27,8 +30,7 @@ class SingleChatTile extends StatelessWidget {
         db.collection('chats').doc(chatId).collection('messages');
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Container(
-      margin:
-          const EdgeInsets.only(top: 5, bottom: 5, right: 10, left: 10),
+      margin: const EdgeInsets.only(top: 5, bottom: 5, right: 10, left: 10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       decoration: BoxDecoration(
         color: chat.senderId != currentUser.id && !chat.isRead
@@ -135,34 +137,40 @@ class SingleChatTile extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        if (chat.senderId != currentUser.id && !chat.isRead) Container(
-                                width: 45,
-                                height: 18,
-                                decoration: BoxDecoration(
+                        if (chat.senderId != currentUser.id && !chat.isRead)
+                          Container(
+                            width: 45,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'NEW'.tr().toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        else
+                          const Text(''),
+                        if (chat.senderId == currentUser.id)
+                          !chat.isRead
+                              ? const Icon(
+                                  Icons.done,
+                                  color: AppColors.secondaryColor,
+                                  size: 15,
+                                )
+                              : const Icon(
+                                  Icons.done_all,
                                   color: primaryColor,
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'NEW'.tr().toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ) else const Text(''),
-                        if (chat.senderId == currentUser.id) !chat.isRead
-                                ? const Icon(
-                                    Icons.done,
-                                    color: AppColors.secondaryColor,
-                                    size: 15,
-                                  )
-                                : const Icon(
-                                    Icons.done_all,
-                                    color: primaryColor,
-                                    size: 15,
-                                  ) else const Text(''),
+                                  size: 15,
+                                )
+                        else
+                          const Text(''),
                       ],
                     )
                   : const SizedBox.shrink();

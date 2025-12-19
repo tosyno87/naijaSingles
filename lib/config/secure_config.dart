@@ -30,47 +30,58 @@ class SecureConfig {
   }
 
   /// Get Firebase Web API Key
-  static String get firebaseWebApiKey => dotenv.env['FIREBASE_WEB_API_KEY'] ??
-        (throw Exception('FIREBASE_WEB_API_KEY not found in environment'));
+  static String get firebaseWebApiKey =>
+      dotenv.env['FIREBASE_WEB_API_KEY'] ??
+      (throw Exception('FIREBASE_WEB_API_KEY not found in environment'));
 
   /// Get Firebase Android API Key
-  static String get firebaseAndroidApiKey => dotenv.env['FIREBASE_ANDROID_API_KEY'] ??
-        (throw Exception('FIREBASE_ANDROID_API_KEY not found in environment'));
+  static String get firebaseAndroidApiKey =>
+      dotenv.env['FIREBASE_ANDROID_API_KEY'] ??
+      (throw Exception('FIREBASE_ANDROID_API_KEY not found in environment'));
 
   /// Get Firebase iOS API Key
-  static String get firebaseIosApiKey => dotenv.env['FIREBASE_IOS_API_KEY'] ??
-        (throw Exception('FIREBASE_IOS_API_KEY not found in environment'));
+  static String get firebaseIosApiKey =>
+      dotenv.env['FIREBASE_IOS_API_KEY'] ??
+      (throw Exception('FIREBASE_IOS_API_KEY not found in environment'));
 
   /// Get Firebase Project ID
-  static String get firebaseProjectId => dotenv.env['FIREBASE_PROJECT_ID'] ??
-        (throw Exception('FIREBASE_PROJECT_ID not found in environment'));
+  static String get firebaseProjectId =>
+      dotenv.env['FIREBASE_PROJECT_ID'] ??
+      (throw Exception('FIREBASE_PROJECT_ID not found in environment'));
 
   /// Get Firebase Messaging Sender ID
-  static String get firebaseMessagingSenderId => dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ??
-        (throw Exception(
-            'FIREBASE_MESSAGING_SENDER_ID not found in environment',));
+  static String get firebaseMessagingSenderId =>
+      dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ??
+      (throw Exception(
+        'FIREBASE_MESSAGING_SENDER_ID not found in environment',
+      ));
 
   /// Get Firebase Storage Bucket
-  static String get firebaseStorageBucket => dotenv.env['FIREBASE_STORAGE_BUCKET'] ??
-        (throw Exception('FIREBASE_STORAGE_BUCKET not found in environment'));
+  static String get firebaseStorageBucket =>
+      dotenv.env['FIREBASE_STORAGE_BUCKET'] ??
+      (throw Exception('FIREBASE_STORAGE_BUCKET not found in environment'));
 
   /// Get Firebase Auth Domain
-  static String get firebaseAuthDomain => dotenv.env['FIREBASE_AUTH_DOMAIN'] ??
-        (throw Exception('FIREBASE_AUTH_DOMAIN not found in environment'));
+  static String get firebaseAuthDomain =>
+      dotenv.env['FIREBASE_AUTH_DOMAIN'] ??
+      (throw Exception('FIREBASE_AUTH_DOMAIN not found in environment'));
 
   /// Get Firebase iOS Client ID
-  static String get firebaseIosClientId => dotenv.env['FIREBASE_IOS_CLIENT_ID'] ??
-        (throw Exception('FIREBASE_IOS_CLIENT_ID not found in environment'));
+  static String get firebaseIosClientId =>
+      dotenv.env['FIREBASE_IOS_CLIENT_ID'] ??
+      (throw Exception('FIREBASE_IOS_CLIENT_ID not found in environment'));
 
   /// Get Firebase iOS Bundle ID
-  static String get firebaseIosBundleId => dotenv.env['FIREBASE_IOS_BUNDLE_ID'] ??
-        (throw Exception('FIREBASE_IOS_BUNDLE_ID not found in environment'));
+  static String get firebaseIosBundleId =>
+      dotenv.env['FIREBASE_IOS_BUNDLE_ID'] ??
+      (throw Exception('FIREBASE_IOS_BUNDLE_ID not found in environment'));
 
   /// Get Google Maps API Key
   static String? get googleMapsApiKey => dotenv.env['GOOGLE_MAPS_API_KEY'];
 
   /// Get current environment
-  static String get environment => dotenv.env['APP_ENVIRONMENT'] ?? 'development';
+  static String get environment =>
+      dotenv.env['APP_ENVIRONMENT'] ?? 'development';
 
   /// Check if running in production
   static bool get isProduction => environment == 'production';
@@ -105,7 +116,8 @@ class SecureConfig {
 
     if (missingKeys.isNotEmpty) {
       throw Exception(
-          'Missing required environment variables: ${missingKeys.join(', ')}',);
+        'Missing required environment variables: ${missingKeys.join(', ')}',
+      );
     }
 
     if (kDebugMode) {

@@ -4,7 +4,6 @@ import 'package:flutter/scheduler.dart';
 import '../data/theme_prefrences.dart';
 
 class ThemeProvider extends ChangeNotifier {
-
   ThemeProvider() {
     initializeTheme();
   }
@@ -13,7 +12,7 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> initializeTheme() async {
     final savedTheme = await _preferences.getTheme();
     themeMode = savedTheme;
-      notifyListeners();
+    notifyListeners();
   }
 
   bool get isDarkMode {

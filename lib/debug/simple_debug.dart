@@ -59,7 +59,9 @@ class SimpleDebug {
 
   /// Test like functionality
   static Future<void> testLikeCreation(
-      String fromUserId, String toUserId,) async {
+    String fromUserId,
+    String toUserId,
+  ) async {
     try {
       debugPrint('💝 Testing like creation: $fromUserId → $toUserId');
 

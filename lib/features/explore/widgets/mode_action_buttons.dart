@@ -4,9 +4,9 @@ import '../../../models/user_model.dart';
 
 /// Mode-specific action buttons for different relationship intents
 class ModeActionButtons extends StatelessWidget {
-
   const ModeActionButtons({
-    required this.selectedMode, super.key,
+    required this.selectedMode,
+    super.key,
     this.currentUser,
     this.onSuperLike,
     this.onPass,
@@ -22,28 +22,28 @@ class ModeActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        // Pass button (same for all modes)
-        _buildActionButton(
-          icon: Icons.close,
-          color: Colors.red,
-          onTap: onPass,
-          tooltip: 'Pass',
-        ),
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Pass button (same for all modes)
+          _buildActionButton(
+            icon: Icons.close,
+            color: Colors.red,
+            onTap: onPass,
+            tooltip: 'Pass',
+          ),
 
-        // Mode-specific primary action
-        _buildModeSpecificAction(),
+          // Mode-specific primary action
+          _buildModeSpecificAction(),
 
-        // Super like button (same for all modes)
-        _buildActionButton(
-          icon: Icons.star_rounded,
-          color: Colors.blue,
-          onTap: onSuperLike,
-          tooltip: 'Super Like',
-        ),
-      ],
-    );
+          // Super like button (same for all modes)
+          _buildActionButton(
+            icon: Icons.star_rounded,
+            color: Colors.blue,
+            onTap: onSuperLike,
+            tooltip: 'Super Like',
+          ),
+        ],
+      );
 
   Widget _buildModeSpecificAction() {
     switch (selectedMode) {
@@ -86,31 +86,32 @@ class ModeActionButtons extends StatelessWidget {
     required Color color,
     required VoidCallback? onTap,
     required String tooltip,
-  }) => Material(
-      elevation: 8,
-      shape: const CircleBorder(),
-      color: color,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: SizedBox(
-          width: 60,
-          height: 60,
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 30,
+  }) =>
+      Material(
+        elevation: 8,
+        shape: const CircleBorder(),
+        color: color,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: SizedBox(
+            width: 60,
+            height: 60,
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 30,
+            ),
           ),
         ),
-      ),
-    );
+      );
 }
 
 /// Mode-specific action button with enhanced styling
 class EnhancedModeActionButton extends StatelessWidget {
-
   const EnhancedModeActionButton({
-    required this.selectedMode, super.key,
+    required this.selectedMode,
+    super.key,
     this.onTap,
     this.isEnabled = true,
   });
@@ -190,7 +191,6 @@ class EnhancedModeActionButton extends StatelessWidget {
 }
 
 class _ModeConfig {
-
   _ModeConfig({
     required this.icon,
     required this.color,
@@ -203,9 +203,10 @@ class _ModeConfig {
 
 /// Mode-specific action sheet for additional options
 class ModeActionSheet extends StatelessWidget {
-
   const ModeActionSheet({
-    required this.selectedMode, required this.user, super.key,
+    required this.selectedMode,
+    required this.user,
+    super.key,
     this.onClose,
   });
   final String selectedMode;
@@ -214,45 +215,45 @@ class ModeActionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
 
-          // Mode-specific content
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Text(
-                  _getModeTitle(),
-                  style: GoogleFonts.montserrat(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF333333),
+            // Mode-specific content
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Text(
+                    _getModeTitle(),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF333333),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                ..._getModeSpecificActions(context),
-              ],
+                  const SizedBox(height: 20),
+                  ..._getModeSpecificActions(context),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   String _getModeTitle() {
     switch (selectedMode) {
@@ -345,25 +346,26 @@ class ModeActionSheet extends StatelessWidget {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) => ListTile(
-      leading: Icon(icon, color: const Color(0xFF008037)),
-      title: Text(
-        title,
-        style: GoogleFonts.montserrat(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: const Color(0xFF333333),
+  }) =>
+      ListTile(
+        leading: Icon(icon, color: const Color(0xFF008037)),
+        title: Text(
+          title,
+          style: GoogleFonts.montserrat(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF333333),
+          ),
         ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: GoogleFonts.montserrat(
-          fontSize: 14,
-          color: const Color(0xFF666666),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: const Color(0xFF666666),
+          ),
         ),
-      ),
-      onTap: onTap,
-    );
+        onTap: onTap,
+      );
 
   void _handleDatingAction(BuildContext context, String action) {
     Navigator.pop(context);

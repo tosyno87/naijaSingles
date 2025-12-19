@@ -8,7 +8,6 @@ abstract class SearchUserForMapEvent extends Equatable {
 }
 
 class LoadUserForMapEvent extends SearchUserForMapEvent {
-
   const LoadUserForMapEvent({required this.currentUser});
   final UserModel currentUser;
 

@@ -148,7 +148,9 @@ class _SexualOrientationState extends State<SexualOrientation> {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 16, horizontal: 20,),
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: selectedOrientations
@@ -210,7 +212,8 @@ class _SexualOrientationState extends State<SexualOrientation> {
                       ),
 
                       const SizedBox(
-                          height: 100,), // Space for the bottom labelLarge
+                        height: 100,
+                      ), // Space for the bottom labelLarge
                     ],
                   ),
                 ),
@@ -244,8 +247,10 @@ class _SexualOrientationState extends State<SexualOrientation> {
                           });
                           log(userData.toString());
                           Navigator.pushNamed(
-                              context, RouteName.showGenderScreen,
-                              arguments: userData,);
+                            context,
+                            RouteName.showGenderScreen,
+                            arguments: userData,
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),
@@ -276,60 +281,62 @@ class _SexualOrientationState extends State<SexualOrientation> {
   }
 
   Widget _buildOrientationGrid() => GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 2.5,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-      ),
-      itemCount: orientationList.length,
-      itemBuilder: (context, index) {
-        final orientation = orientationList[index];
-        final isSelected = orientation['selected'];
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 2.5,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+        ),
+        itemCount: orientationList.length,
+        itemBuilder: (context, index) {
+          final orientation = orientationList[index];
+          final isSelected = orientation['selected'];
 
-        return GestureDetector(
-          onTap: () {
-            // Don't allow selection if "Prefer not to say" is selected
-            if (selectedOrientations.contains('Prefer not to say')) {
-              setState(() {
-                selectedOrientations.clear();
-              });
-            }
+          return GestureDetector(
+            onTap: () {
+              // Don't allow selection if "Prefer not to say" is selected
+              if (selectedOrientations.contains('Prefer not to say')) {
+                setState(() {
+                  selectedOrientations.clear();
+                });
+              }
 
-            _toggleOrientation(index);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF27AE60) : Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                color: isSelected ? const Color(0xFF27AE60) : Colors.grey[300]!,
+              _toggleOrientation(index);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF27AE60) : Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color:
+                      isSelected ? const Color(0xFF27AE60) : Colors.grey[300]!,
+                ),
+                boxShadow: [
+                  if (isSelected)
+                    BoxShadow(
+                      color: const Color(0xFF27AE60).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 2),
+                    ),
+                ],
               ),
-              boxShadow: [
-                if (isSelected)
-                  BoxShadow(
-                    color: const Color(0xFF27AE60).withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 2),
+              child: Center(
+                child: Text(
+                  orientation['name'],
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected ? Colors.white : Colors.black87,
                   ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                orientation['name'],
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Colors.white : Colors.black87,
                 ),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
 }

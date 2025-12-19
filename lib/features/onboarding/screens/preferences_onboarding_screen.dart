@@ -147,9 +147,11 @@ class _PreferencesOnboardingScreenState
 
         // Debug logging
         AppLogger.debug(
-            '🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"',);
+          '🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"',
+        );
         AppLogger.debug(
-            '   Controller interestedIn after setting: "${controller.interestedIn}"',);
+          '   Controller interestedIn after setting: "${controller.interestedIn}"',
+        );
       },
       child: Container(
         width: double.infinity,
@@ -219,7 +221,7 @@ class _PreferencesOnboardingScreenState
             color: const Color(0xFF008037),
           ),
         ),
-          SizedBox(height: isTablet ? 16 : 12),
+        SizedBox(height: isTablet ? 16 : 12),
         RangeSlider(
           values: _ageRange,
           min: 18,
@@ -238,9 +240,11 @@ class _PreferencesOnboardingScreenState
 
             // Debug logging
             AppLogger.debug(
-                '🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}',);
+              '🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}',
+            );
             AppLogger.debug(
-                '   Controller ageRange after setting: ${controller.ageRange}',);
+              '   Controller ageRange after setting: ${controller.ageRange}',
+            );
           },
         ),
       ],
@@ -254,8 +258,8 @@ class _PreferencesOnboardingScreenState
     return Column(
       children: [
         Text(
-          _maxDistance.round() == 100 
-              ? '${_maxDistance.round()} miles (Anywhere)' 
+          _maxDistance.round() == 100
+              ? '${_maxDistance.round()} miles (Anywhere)'
               : 'Within ${_maxDistance.round()} miles',
           style: GoogleFonts.montserrat(
             fontSize: isTablet ? 18 : 16,
@@ -271,8 +275,8 @@ class _PreferencesOnboardingScreenState
           divisions: 99,
           activeColor: const Color(0xFF008037),
           inactiveColor: Colors.grey.shade300,
-          label: _maxDistance.round() == 100 
-              ? 'Anywhere' 
+          label: _maxDistance.round() == 100
+              ? 'Anywhere'
               : '${_maxDistance.round()} miles',
           onChanged: (double value) {
             setState(() {
@@ -285,7 +289,8 @@ class _PreferencesOnboardingScreenState
 
             // Debug logging
             AppLogger.debug(
-                '🔍 PreferencesOnboardingScreen: Max distance changed to: ${value.round()} miles',);
+              '🔍 PreferencesOnboardingScreen: Max distance changed to: ${value.round()} miles',
+            );
           },
         ),
         Padding(

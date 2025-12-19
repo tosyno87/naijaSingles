@@ -53,7 +53,9 @@ class RegionDetectionService {
 
   /// Format distance with appropriate unit based on region
   static String formatDistance(
-      double distanceKm, Map<String, dynamic>? locationData,) {
+    double distanceKm,
+    Map<String, dynamic>? locationData,
+  ) {
     try {
       final isMiles = isMilesCountry(locationData);
 
@@ -70,5 +72,6 @@ class RegionDetectionService {
   }
 
   /// Get distance unit label based on region
-  static String getDistanceUnit(Map<String, dynamic>? locationData) => isMilesCountry(locationData) ? 'miles' : 'km';
+  static String getDistanceUnit(Map<String, dynamic>? locationData) =>
+      isMilesCountry(locationData) ? 'miles' : 'km';
 }

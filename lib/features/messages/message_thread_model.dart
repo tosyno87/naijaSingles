@@ -1,5 +1,4 @@
 class MessageThread {
-
   MessageThread({
     required this.matchId,
     required this.name,

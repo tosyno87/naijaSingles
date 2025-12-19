@@ -8,7 +8,6 @@ part 'match_user_event.dart';
 part 'match_user_state.dart';
 
 class MatchUserBloc extends Bloc<MatchUserEvent, MatchUserState> {
-
   MatchUserBloc({
     required this.getMatches,
   }) : super(MatchUserInitial()) {

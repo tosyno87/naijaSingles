@@ -6,37 +6,42 @@ import '../routes/route_name.dart';
 
 Future showWelcomDialog(context) async {
   showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (ctx) {
-        Future.delayed(const Duration(seconds: 3), () {
-          Navigator.pop(ctx);
-          Navigator.pushNamed(context, RouteName.tabScreen);
-        });
-        return Center(
-            child: Container(
-                width: 150,
-                height: 100,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),),
-                child: Column(
-                  children: <Widget>[
-                    Image.asset(
-                      'asset/auth/verified.jpg',
-                      height: 60,
-                      color: primaryColor,
-                      colorBlendMode: BlendMode.color,
-                    ),
-                    Text(
-                      "You'r in".tr().toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          decoration: TextDecoration.none,
-                          color: Colors.black,
-                          fontSize: 20,),
-                    ),
-                  ],
-                ),),);
-      },);
+    barrierDismissible: false,
+    context: context,
+    builder: (ctx) {
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pop(ctx);
+        Navigator.pushNamed(context, RouteName.tabScreen);
+      });
+      return Center(
+        child: Container(
+          width: 150,
+          height: 100,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: <Widget>[
+              Image.asset(
+                'asset/auth/verified.jpg',
+                height: 60,
+                color: primaryColor,
+                colorBlendMode: BlendMode.color,
+              ),
+              Text(
+                "You'r in".tr().toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  decoration: TextDecoration.none,
+                  color: Colors.black,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

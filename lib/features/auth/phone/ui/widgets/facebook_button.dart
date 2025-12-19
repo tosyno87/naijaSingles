@@ -19,35 +19,44 @@ class FaceBookButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(6),
           child: InkWell(
-              onTap: onTap,
-              child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      gradient: !themeProvider.isDarkMode
-                          ? LinearGradient(
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                              colors: [
-                                  primaryColor.withValues(
-                                      alpha: (.5 * 255).toDouble(),),
-                                  primaryColor.withValues(
-                                      alpha: (.8 * 255).toDouble(),),
-                                  primaryColor,
-                                  primaryColor,
-                                ],)
-                          : const LinearGradient(
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                              colors: [primaryColor, primaryColor],),),
-                  height: MediaQuery.of(context).size.height * .065,
-                  width: MediaQuery.of(context).size.width * .8,
-                  child: Center(
-                      child: Text(
-                    'LOG IN WITH FACEBOOK'.tr().toString(),
-                    style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,),
-                  ),),),),
+            onTap: onTap,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                gradient: !themeProvider.isDarkMode
+                    ? LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          primaryColor.withValues(
+                            alpha: (.5 * 255).toDouble(),
+                          ),
+                          primaryColor.withValues(
+                            alpha: (.8 * 255).toDouble(),
+                          ),
+                          primaryColor,
+                          primaryColor,
+                        ],
+                      )
+                    : const LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [primaryColor, primaryColor],
+                      ),
+              ),
+              height: MediaQuery.of(context).size.height * .065,
+              width: MediaQuery.of(context).size.width * .8,
+              child: Center(
+                child: Text(
+                  'LOG IN WITH FACEBOOK'.tr().toString(),
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

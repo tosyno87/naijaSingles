@@ -9,7 +9,6 @@ part 'diary_event.dart';
 part 'diary_state.dart';
 
 class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
-
   DiaryBloc({required this.repository}) : super(DiaryInitial()) {
     on<LoadDiaryEntries>(_onLoad);
     on<AddDiaryEntryEvent>(_onAdd);
@@ -27,7 +26,9 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
   }
 
   Future<void> _onAdd(
-      AddDiaryEntryEvent event, Emitter<DiaryState> emit,) async {
+    AddDiaryEntryEvent event,
+    Emitter<DiaryState> emit,
+  ) async {
     try {
       await repository.addEntry(
         userId: event.userId,

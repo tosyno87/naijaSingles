@@ -5,9 +5,13 @@ import '../../../common/widgets/custom_3d_icons.dart';
 import '../../../models/user_model.dart';
 
 class TribeConnectCard extends StatelessWidget {
-
   const TribeConnectCard({
-    required this.user, required this.onConnect, required this.onMessage, required this.onSave, required this.onBlock, super.key,
+    required this.user,
+    required this.onConnect,
+    required this.onMessage,
+    required this.onSave,
+    required this.onBlock,
+    super.key,
   });
   final UserModel user;
   final VoidCallback onConnect;
@@ -17,313 +21,315 @@ class TribeConnectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Profile Image Section
-          _buildProfileImage(),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Profile Image Section
+            _buildProfileImage(),
 
-          // Profile Information
-          Padding(
-            padding: const EdgeInsets.all(16),
+            // Profile Information
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildBasicInfo(),
+                  const SizedBox(height: 12),
+                  _buildCulturalInfo(),
+                  const SizedBox(height: 12),
+                  _buildLocationAndLanguages(),
+                  const SizedBox(height: 12),
+                  _buildInterests(),
+                  const SizedBox(height: 12),
+                  _buildMutualInterests(),
+                  const SizedBox(height: 12),
+                  _buildBio(),
+                  const SizedBox(height: 16),
+                  _buildActionButtons(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildProfileImage() => Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          image: user.imageUrl?.isNotEmpty ?? false
+              ? DecorationImage(
+                  image: NetworkImage(user.imageUrl![0]),
+                  fit: BoxFit.cover,
+                )
+              : null,
+        ),
+        child: user.imageUrl?.isEmpty ?? false
+            ? DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Center(
+                  child: Custom3DIcons.profile(
+                    size: 60,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              )
+            : null,
+      );
+
+  Widget _buildBasicInfo() => Row(
+        children: [
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildBasicInfo(),
-                const SizedBox(height: 12),
-                _buildCulturalInfo(),
-                const SizedBox(height: 12),
-                _buildLocationAndLanguages(),
-                const SizedBox(height: 12),
-                _buildInterests(),
-                const SizedBox(height: 12),
-                _buildMutualInterests(),
-                const SizedBox(height: 12),
-                _buildBio(),
-                const SizedBox(height: 16),
-                _buildActionButtons(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildProfileImage() => Container(
-      height: 200,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-        image: user.imageUrl?.isNotEmpty ?? false
-            ? DecorationImage(
-                image: NetworkImage(user.imageUrl![0]),
-                fit: BoxFit.cover,
-              )
-            : null,
-      ),
-      child: user.imageUrl?.isEmpty ?? false
-          ? DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withOpacity(0.1),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Center(
-                child: Custom3DIcons.profile(
-                  size: 60,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-            )
-          : null,
-    );
-
-  Widget _buildBasicInfo() => Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                user.name ?? 'Unknown',
-                style: GoogleFonts.montserrat(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              if (user.age != null)
                 Text(
-                  '${user.age} years old',
+                  user.name ?? 'Unknown',
                   style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: AppColors.success,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
+                if (user.age != null)
                   Text(
-                    _getLastSeenText(),
+                    '${user.age} years old',
                     style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
                       color: AppColors.textSecondary,
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        // Nationality Badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            _getNationalityText(),
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildCulturalInfo() => Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.culture.withOpacity(0.1),
-            AppColors.heritage.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.culture.withOpacity(0.3),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.culture.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Custom3DIcons.culture(size: 16, color: Colors.white),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 4),
+                Row(
                   children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.success,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
                     Text(
-                      'Nationality & Tribe',
+                      _getLastSeenText(),
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.culture,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _getNationalityText(),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+                        color: AppColors.textSecondary,
                       ),
                     ),
-                    if (_getTribeText().isNotEmpty) ...[
-                      const SizedBox(height: 2),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Nationality Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              _getNationalityText(),
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      );
+
+  Widget _buildCulturalInfo() => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.culture.withOpacity(0.1),
+              AppColors.heritage.withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.culture.withOpacity(0.3),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.culture.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Custom3DIcons.culture(size: 16, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        _getTribeText(),
+                        'Nationality & Tribe',
                         style: GoogleFonts.montserrat(
                           fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondary,
-                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.culture,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _getNationalityText(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      if (_getTribeText().isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          _getTribeText(),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textSecondary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                // Cultural verification badge
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.success.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.verified,
+                        size: 12,
+                        color: AppColors.success,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Verified',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.success,
                         ),
                       ),
                     ],
-                  ],
-                ),
-              ),
-              // Cultural verification badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.success.withOpacity(0.3),
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.verified,
-                      size: 12,
-                      color: AppColors.success,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Verified',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.success,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+              ],
+            ),
+          ],
+        ),
+      );
 
   Widget _buildLocationAndLanguages() => Row(
-      children: [
-        Expanded(
-          child: _buildInfoChip(
-            icon: Custom3DIcons.location(size: 16),
-            text: user.living_in ?? 'Location not set',
-            color: AppColors.business,
+        children: [
+          Expanded(
+            child: _buildInfoChip(
+              icon: Custom3DIcons.location(size: 16),
+              text: user.living_in ?? 'Location not set',
+              color: AppColors.business,
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildInfoChip(
-            icon: Custom3DIcons.translate(size: 16),
-            text: _getLanguagesText(),
-            color: AppColors.community,
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildInfoChip(
+              icon: Custom3DIcons.translate(size: 16),
+              text: _getLanguagesText(),
+              color: AppColors.community,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
   Widget _buildInfoChip({
     required Widget icon,
     required String text,
     required Color color,
-  }) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: color.withOpacity(0.2),
           ),
-        ],
-      ),
-    );
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            icon,
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                text,
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildInterests() {
     final interests = _getInterests();
@@ -344,8 +350,7 @@ class TribeConnectCard extends StatelessWidget {
         Wrap(
           spacing: 6,
           runSpacing: 6,
-          children:
-              interests.map(_buildInterestTag).toList(),
+          children: interests.map(_buildInterestTag).toList(),
         ),
       ],
     );
@@ -396,9 +401,7 @@ class TribeConnectCard extends StatelessWidget {
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: mutualInterests
-                .map(_buildMutualInterestTag)
-                .toList(),
+            children: mutualInterests.map(_buildMutualInterestTag).toList(),
           ),
         ],
       ),
@@ -406,53 +409,53 @@ class TribeConnectCard extends StatelessWidget {
   }
 
   Widget _buildInterestTag(String interest) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.primaryGreen.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.3),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.primaryGreen.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.primaryGreen.withOpacity(0.3),
+          ),
         ),
-      ),
-      child: Text(
-        interest,
-        style: GoogleFonts.montserrat(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: AppColors.primaryGreen,
+        child: Text(
+          interest,
+          style: GoogleFonts.montserrat(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: AppColors.primaryGreen,
+          ),
         ),
-      ),
-    );
+      );
 
   Widget _buildMutualInterestTag(String interest) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.success.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.success.withOpacity(0.4),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.check_circle,
-            size: 12,
-            color: AppColors.success,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.success.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.success.withOpacity(0.4),
           ),
-          const SizedBox(width: 4),
-          Text(
-            interest,
-            style: GoogleFonts.montserrat(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.check_circle,
+              size: 12,
               color: AppColors.success,
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(width: 4),
+            Text(
+              interest,
+              style: GoogleFonts.montserrat(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.success,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildBio() {
     if (user.bio?.isEmpty ?? false) return const SizedBox.shrink();
@@ -507,46 +510,46 @@ class TribeConnectCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons() => Row(
-      children: [
-        Expanded(
-          child: _buildActionButton(
-            icon: Custom3DIcons.message(size: 20),
-            label: 'Message',
-            onPressed: onMessage,
-            color: AppColors.info,
+        children: [
+          Expanded(
+            child: _buildActionButton(
+              icon: Custom3DIcons.message(size: 20),
+              label: 'Message',
+              onPressed: onMessage,
+              color: AppColors.info,
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildActionButton(
-            icon: Custom3DIcons.connect(size: 20),
-            label: 'Connect',
-            onPressed: onConnect,
-            color: AppColors.primaryGreen,
-            isPrimary: true,
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildActionButton(
+              icon: Custom3DIcons.connect(size: 20),
+              label: 'Connect',
+              onPressed: onConnect,
+              color: AppColors.primaryGreen,
+              isPrimary: true,
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildActionButton(
-            icon: Custom3DIcons.save(size: 20),
-            label: 'Save',
-            onPressed: onSave,
-            color: AppColors.warning,
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildActionButton(
+              icon: Custom3DIcons.save(size: 20),
+              label: 'Save',
+              onPressed: onSave,
+              color: AppColors.warning,
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildActionButton(
-            icon: Custom3DIcons.block(size: 20),
-            label: 'Block',
-            onPressed: onBlock,
-            color: AppColors.error,
-            isDestructive: true,
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildActionButton(
+              icon: Custom3DIcons.block(size: 20),
+              label: 'Block',
+              onPressed: onBlock,
+              color: AppColors.error,
+              isDestructive: true,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
   Widget _buildActionButton({
     required Widget icon,
@@ -555,52 +558,54 @@ class TribeConnectCard extends StatelessWidget {
     required Color color,
     bool isPrimary = false,
     bool isDestructive = false,
-  }) => GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isPrimary
-              ? color
-              : isDestructive
-                  ? Colors.transparent
-                  : color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color:
-                isDestructive ? color.withOpacity(0.4) : color.withOpacity(0.3),
-            width: isDestructive ? 1 : 1.5,
-          ),
-          boxShadow: isPrimary
-              ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          children: [
-            icon,
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: GoogleFonts.montserrat(
-                fontSize: 11,
-                fontWeight: isPrimary ? FontWeight.w600 : FontWeight.w500,
-                color: isPrimary
-                    ? Colors.white
-                    : isDestructive
-                        ? color.withOpacity(0.8)
-                        : color,
-              ),
+  }) =>
+      GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isPrimary
+                ? color
+                : isDestructive
+                    ? Colors.transparent
+                    : color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDestructive
+                  ? color.withOpacity(0.4)
+                  : color.withOpacity(0.3),
+              width: isDestructive ? 1 : 1.5,
             ),
-          ],
+            boxShadow: isPrimary
+                ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Column(
+            children: [
+              icon,
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: GoogleFonts.montserrat(
+                  fontSize: 11,
+                  fontWeight: isPrimary ? FontWeight.w600 : FontWeight.w500,
+                  color: isPrimary
+                      ? Colors.white
+                      : isDestructive
+                          ? color.withOpacity(0.8)
+                          : color,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   String _getNationalityText() {
     // Extract nationality from user data - using available fields

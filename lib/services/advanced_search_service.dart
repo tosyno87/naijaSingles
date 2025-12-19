@@ -54,8 +54,10 @@ class AdvancedSearchService {
 
       // Convert to UserModel list
       final List<UserModel> users = snapshot.docs
-          .map((doc) =>
-              UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),)
+          .map(
+            (doc) =>
+                UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id),
+          )
           .toList();
 
       // Apply additional filtering (for complex criteria)
@@ -116,8 +118,10 @@ class AdvancedSearchService {
 
     // Height range filter
     if (criteria.heightRange != null) {
-      query = query.where('height',
-          isGreaterThanOrEqualTo: criteria.heightRange!.min,);
+      query = query.where(
+        'height',
+        isGreaterThanOrEqualTo: criteria.heightRange!.min,
+      );
       query =
           query.where('height', isLessThanOrEqualTo: criteria.heightRange!.max);
     }
@@ -125,8 +129,10 @@ class AdvancedSearchService {
     // Relationship intent filter
     if (criteria.relationshipIntent != null &&
         criteria.relationshipIntent!.isNotEmpty) {
-      query = query.where('relationshipIntent',
-          isEqualTo: criteria.relationshipIntent,);
+      query = query.where(
+        'relationshipIntent',
+        isEqualTo: criteria.relationshipIntent,
+      );
     }
 
     // Looking for filter
@@ -187,37 +193,40 @@ class AdvancedSearchService {
 
   /// Apply additional filters that can't be done in Firestore
   List<UserModel> _applyAdditionalFilters(
-      List<UserModel> users, SearchCriteria criteria,) => users.where((user) {
-      // Interest matching
-      if (criteria.interests != null && criteria.interests!.isNotEmpty) {
-        final userInterests =
-            user.editInfo?['interests'] as List<String>? ?? [];
-        final hasMatchingInterest = criteria.interests!.any(
-          userInterests.contains,
-        );
-        if (!hasMatchingInterest) return false;
-      }
+    List<UserModel> users,
+    SearchCriteria criteria,
+  ) =>
+      users.where((user) {
+        // Interest matching
+        if (criteria.interests != null && criteria.interests!.isNotEmpty) {
+          final userInterests =
+              user.editInfo?['interests'] as List<String>? ?? [];
+          final hasMatchingInterest = criteria.interests!.any(
+            userInterests.contains,
+          );
+          if (!hasMatchingInterest) return false;
+        }
 
-      // Language matching
-      if (criteria.languages != null && criteria.languages!.isNotEmpty) {
-        final userLanguages = user.languages ?? [];
-        final hasMatchingLanguage = criteria.languages!.any(
-          userLanguages.contains,
-        );
-        if (!hasMatchingLanguage) return false;
-      }
+        // Language matching
+        if (criteria.languages != null && criteria.languages!.isNotEmpty) {
+          final userLanguages = user.languages ?? [];
+          final hasMatchingLanguage = criteria.languages!.any(
+            userLanguages.contains,
+          );
+          if (!hasMatchingLanguage) return false;
+        }
 
-      // Bio keyword search
-      if (criteria.bioKeywords != null && criteria.bioKeywords!.isNotEmpty) {
-        final userBio = (user.bio ?? '').toLowerCase();
-        final hasMatchingKeyword = criteria.bioKeywords!.any(
-          (keyword) => userBio.contains(keyword.toLowerCase()),
-        );
-        if (!hasMatchingKeyword) return false;
-      }
+        // Bio keyword search
+        if (criteria.bioKeywords != null && criteria.bioKeywords!.isNotEmpty) {
+          final userBio = (user.bio ?? '').toLowerCase();
+          final hasMatchingKeyword = criteria.bioKeywords!.any(
+            (keyword) => userBio.contains(keyword.toLowerCase()),
+          );
+          if (!hasMatchingKeyword) return false;
+        }
 
-      return true;
-    }).toList();
+        return true;
+      }).toList();
 
   /// Search suggestions based on user input
   Future<List<String>> getSearchSuggestions(String query) async {
@@ -248,8 +257,9 @@ class AdvancedSearchService {
       for (final doc in interestQuery.docs) {
         final interests = List<String>.from(doc.data()['interests'] ?? []);
         suggestions.addAll(
-          interests.where((interest) =>
-              interest.toLowerCase().contains(query.toLowerCase()),),
+          interests.where(
+            (interest) => interest.toLowerCase().contains(query.toLowerCase()),
+          ),
         );
       }
 
@@ -408,7 +418,6 @@ class AdvancedSearchService {
 
 /// Search criteria model
 class SearchCriteria {
-
   const SearchCriteria({
     this.ageRange,
     this.gender,
@@ -429,31 +438,31 @@ class SearchCriteria {
   });
 
   factory SearchCriteria.fromMap(Map<String, dynamic> map) => SearchCriteria(
-      ageRange:
-          map['ageRange'] != null ? AgeRange.fromMap(map['ageRange']) : null,
-      gender: map['gender'],
-      interestedIn: map['interestedIn'],
-      tribe: map['tribe'],
-      nationality: map['nationality'],
-      religion: map['religion'],
-      education: map['education'],
-      occupation: map['occupation'],
-      heightRange: map['heightRange'] != null
-          ? HeightRange.fromMap(map['heightRange'])
-          : null,
-      relationshipIntent: map['relationshipIntent'],
-      lookingFor: map['lookingFor'],
-      interests: List<String>.from(map['interests'] ?? []),
-      languages: List<String>.from(map['languages'] ?? []),
-      bioKeywords: List<String>.from(map['bioKeywords'] ?? []),
-      location: map['location'] != null
-          ? LocationCriteria.fromMap(map['location'])
-          : null,
-      sortBy: SearchSortBy.values.firstWhere(
-        (e) => e.name == map['sortBy'],
-        orElse: () => SearchSortBy.lastActive,
-      ),
-    );
+        ageRange:
+            map['ageRange'] != null ? AgeRange.fromMap(map['ageRange']) : null,
+        gender: map['gender'],
+        interestedIn: map['interestedIn'],
+        tribe: map['tribe'],
+        nationality: map['nationality'],
+        religion: map['religion'],
+        education: map['education'],
+        occupation: map['occupation'],
+        heightRange: map['heightRange'] != null
+            ? HeightRange.fromMap(map['heightRange'])
+            : null,
+        relationshipIntent: map['relationshipIntent'],
+        lookingFor: map['lookingFor'],
+        interests: List<String>.from(map['interests'] ?? []),
+        languages: List<String>.from(map['languages'] ?? []),
+        bioKeywords: List<String>.from(map['bioKeywords'] ?? []),
+        location: map['location'] != null
+            ? LocationCriteria.fromMap(map['location'])
+            : null,
+        sortBy: SearchSortBy.values.firstWhere(
+          (e) => e.name == map['sortBy'],
+          orElse: () => SearchSortBy.lastActive,
+        ),
+      );
   final AgeRange? ageRange;
   final String? gender;
   final String? interestedIn;
@@ -472,31 +481,31 @@ class SearchCriteria {
   final SearchSortBy sortBy;
 
   Map<String, dynamic> toMap() => {
-      'ageRange': ageRange?.toMap(),
-      'gender': gender,
-      'interestedIn': interestedIn,
-      'tribe': tribe,
-      'nationality': nationality,
-      'religion': religion,
-      'education': education,
-      'occupation': occupation,
-      'heightRange': heightRange?.toMap(),
-      'relationshipIntent': relationshipIntent,
-      'lookingFor': lookingFor,
-      'interests': interests,
-      'languages': languages,
-      'bioKeywords': bioKeywords,
-      'location': location?.toMap(),
-      'sortBy': sortBy.name,
-    };
+        'ageRange': ageRange?.toMap(),
+        'gender': gender,
+        'interestedIn': interestedIn,
+        'tribe': tribe,
+        'nationality': nationality,
+        'religion': religion,
+        'education': education,
+        'occupation': occupation,
+        'heightRange': heightRange?.toMap(),
+        'relationshipIntent': relationshipIntent,
+        'lookingFor': lookingFor,
+        'interests': interests,
+        'languages': languages,
+        'bioKeywords': bioKeywords,
+        'location': location?.toMap(),
+        'sortBy': sortBy.name,
+      };
 
   @override
-  String toString() => 'SearchCriteria(ageRange: $ageRange, gender: $gender, tribe: $tribe, sortBy: $sortBy)';
+  String toString() =>
+      'SearchCriteria(ageRange: $ageRange, gender: $gender, tribe: $tribe, sortBy: $sortBy)';
 }
 
 /// Age range model
 class AgeRange {
-
   const AgeRange({required this.min, required this.max});
 
   factory AgeRange.fromMap(Map<String, dynamic> map) =>
@@ -512,7 +521,6 @@ class AgeRange {
 
 /// Height range model
 class HeightRange {
-
   const HeightRange({required this.min, required this.max});
 
   factory HeightRange.fromMap(Map<String, dynamic> map) =>
@@ -528,7 +536,6 @@ class HeightRange {
 
 /// Location criteria model
 class LocationCriteria {
-
   const LocationCriteria({
     this.city,
     this.country,
@@ -574,7 +581,6 @@ enum SearchSortBy {
 
 /// Saved search model
 class SavedSearch {
-
   const SavedSearch({
     required this.id,
     required this.name,
@@ -592,7 +598,6 @@ class SavedSearch {
 
 /// Search history model
 class SearchHistory {
-
   const SearchHistory({
     required this.id,
     required this.query,

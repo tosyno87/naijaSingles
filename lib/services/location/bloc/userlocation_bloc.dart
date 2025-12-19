@@ -29,20 +29,26 @@ class UserLocationBloc extends Bloc<UserLocationEvents, UserLocationStates> {
 
         if (currentLocation != null) {
           log('Location obtained: $currentLocation');
-          emit(UserLocationSuccess(
+          emit(
+            UserLocationSuccess(
               latitude: currentLocation['latitude'],
               longitude: currentLocation['longitude'],
-              formattedAddress: currentLocation['PlaceName'],),);
+              formattedAddress: currentLocation['PlaceName'],
+            ),
+          );
         } else {
           log('Failed to get location: returned null');
           // Use default location as fallback
           final defaultLocation =
               await userLocationReporistory.getDefaultLocation();
           log('Using default location: $defaultLocation');
-          emit(UserLocationSuccess(
+          emit(
+            UserLocationSuccess(
               latitude: defaultLocation['latitude'],
               longitude: defaultLocation['longitude'],
-              formattedAddress: defaultLocation['PlaceName'],),);
+              formattedAddress: defaultLocation['PlaceName'],
+            ),
+          );
         }
       } on SocketException catch (e) {
         log('Socket exception: ${e.toString()}');
@@ -51,14 +57,20 @@ class UserLocationBloc extends Bloc<UserLocationEvents, UserLocationStates> {
           final defaultLocation =
               await userLocationReporistory.getDefaultLocation();
           log('Using default location after socket exception: $defaultLocation');
-          emit(UserLocationSuccess(
+          emit(
+            UserLocationSuccess(
               latitude: defaultLocation['latitude'],
               longitude: defaultLocation['longitude'],
-              formattedAddress: defaultLocation['PlaceName'],),);
+              formattedAddress: defaultLocation['PlaceName'],
+            ),
+          );
         } catch (innerE) {
-          emit(const UserLocationFailed(
+          emit(
+            const UserLocationFailed(
               message:
-                  'No internet connection. Please check your network and try again.',),);
+                  'No internet connection. Please check your network and try again.',
+            ),
+          );
         }
       } catch (e) {
         log('General exception in location bloc: ${e.toString()}');
@@ -67,13 +79,19 @@ class UserLocationBloc extends Bloc<UserLocationEvents, UserLocationStates> {
           final defaultLocation =
               await userLocationReporistory.getDefaultLocation();
           log('Using default location after general exception: $defaultLocation');
-          emit(UserLocationSuccess(
+          emit(
+            UserLocationSuccess(
               latitude: defaultLocation['latitude'],
               longitude: defaultLocation['longitude'],
-              formattedAddress: defaultLocation['PlaceName'],),);
+              formattedAddress: defaultLocation['PlaceName'],
+            ),
+          );
         } catch (innerE) {
-          emit(UserLocationFailed(
-              message: 'Could not access your location: ${e.toString()}',),);
+          emit(
+            UserLocationFailed(
+              message: 'Could not access your location: ${e.toString()}',
+            ),
+          );
         }
       }
     });

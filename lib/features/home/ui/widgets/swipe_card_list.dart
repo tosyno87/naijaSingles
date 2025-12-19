@@ -14,9 +14,11 @@ import '../../bloc/swipebloc_bloc.dart';
 import '../screens/swipe_card.dart';
 
 class SwipeCardList extends StatefulWidget {
-
   const SwipeCardList({
-    required this.controller, required this.stackController, required this.onUserRemoved, super.key,
+    required this.controller,
+    required this.stackController,
+    required this.onUserRemoved,
+    super.key,
   });
   final HomeController controller;
   final SwipableStackController? stackController;
@@ -102,10 +104,12 @@ class _SwipeCardListState extends State<SwipeCardList> {
                     onswiped: (int index, SwipeDirection dir) {
                       final user = state.users[index];
                       if (dir == SwipeDirection.right) {
-                        context.read<SwipeBloc>().add(RightSwipeEvent(
-                              currentUser: widget.controller.currentUser,
-                              selectedUser: user,
-                            ),);
+                        context.read<SwipeBloc>().add(
+                              RightSwipeEvent(
+                                currentUser: widget.controller.currentUser,
+                                selectedUser: user,
+                              ),
+                            );
                         if (widget.controller.likedByList.contains(user.id) ||
                             (user.isBot ?? false)) {
                           showDialog(
@@ -121,10 +125,12 @@ class _SwipeCardListState extends State<SwipeCardList> {
                         }
                       }
                       if (dir == SwipeDirection.left) {
-                        context.read<SwipeBloc>().add(LeftSwipeEvent(
-                              currentUser: widget.controller.currentUser,
-                              selectedUser: user,
-                            ),);
+                        context.read<SwipeBloc>().add(
+                              LeftSwipeEvent(
+                                currentUser: widget.controller.currentUser,
+                                selectedUser: user,
+                              ),
+                            );
                         if (index < state.users.length) {
                           widget.onUserRemoved(user);
                         }

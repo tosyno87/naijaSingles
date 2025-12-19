@@ -12,7 +12,6 @@ import 'modern_notifications_screen.dart';
 /// - Haptic feedback
 /// - Badge pulsing animation for new notifications
 class ModernNotificationBadge extends StatefulWidget {
-
   const ModernNotificationBadge({
     super.key,
     this.iconColor = AppColors.textPrimary,
@@ -64,10 +63,12 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
     _pulseAnimation = Tween<double>(
       begin: 1,
       end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ),);
+    ).animate(
+      CurvedAnimation(
+        parent: _pulseController,
+        curve: Curves.easeInOut,
+      ),
+    );
 
     // Scale animation for tap feedback
     _scaleController = AnimationController(
@@ -78,10 +79,12 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
     _scaleAnimation = Tween<double>(
       begin: 1,
       end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.easeInOut,
-    ),);
+    ).animate(
+      CurvedAnimation(
+        parent: _scaleController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   void _startListening() {
@@ -118,19 +121,19 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-      onTapDown: (_) {
-        if (widget.enableHapticFeedback) {
-          // Haptic feedback for tap
-          // HapticFeedback.lightImpact();
-        }
-        _scaleController.forward();
-      },
-      onTapUp: (_) => _scaleController.reverse(),
-      onTapCancel: () => _scaleController.reverse(),
-      onTap: _handleTap,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_pulseAnimation, _scaleAnimation]),
-        builder: (context, child) => Transform.scale(
+        onTapDown: (_) {
+          if (widget.enableHapticFeedback) {
+            // Haptic feedback for tap
+            // HapticFeedback.lightImpact();
+          }
+          _scaleController.forward();
+        },
+        onTapUp: (_) => _scaleController.reverse(),
+        onTapCancel: () => _scaleController.reverse(),
+        onTap: _handleTap,
+        child: AnimatedBuilder(
+          animation: Listenable.merge([_pulseAnimation, _scaleAnimation]),
+          builder: (context, child) => Transform.scale(
             scale: _scaleAnimation.value,
             child: Stack(
               clipBehavior: Clip.none,
@@ -158,41 +161,41 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
               ],
             ),
           ),
-      ),
-    );
+        ),
+      );
 
   Widget _buildBadge() => Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: widget.badgeColor,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white,
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: widget.badgeColor.withOpacity(0.3),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      constraints: const BoxConstraints(
-        minWidth: 20,
-        minHeight: 20,
-      ),
-      child: Center(
-        child: Text(
-          _unreadCount > 99 ? '99+' : _unreadCount.toString(),
-          style: GoogleFonts.montserrat(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: widget.badgeColor,
+          shape: BoxShape.circle,
+          border: Border.all(
             color: Colors.white,
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: widget.badgeColor.withOpacity(0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        constraints: const BoxConstraints(
+          minWidth: 20,
+          minHeight: 20,
+        ),
+        child: Center(
+          child: Text(
+            _unreadCount > 99 ? '99+' : _unreadCount.toString(),
+            style: GoogleFonts.montserrat(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-    );
+      );
 
   void _handleTap() {
     if (widget.onTap != null) {
@@ -215,9 +218,9 @@ class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
 
 /// Floating notification badge for overlay use
 class FloatingNotificationBadge extends StatefulWidget {
-
   const FloatingNotificationBadge({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.badgeColor = Colors.red,
     this.showBadge = true,
     this.badgePosition,
@@ -251,53 +254,52 @@ class _FloatingNotificationBadgeState extends State<FloatingNotificationBadge> {
 
   @override
   Widget build(BuildContext context) => Stack(
-      clipBehavior: Clip.none,
-      children: [
-        widget.child,
-        if (widget.showBadge && _unreadCount > 0)
-          Positioned(
-            top: widget.badgePosition?.dy ?? 0,
-            right: widget.badgePosition?.dx ?? 0,
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: widget.badgeColor,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: widget.badgeColor.withOpacity(0.3),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              constraints: const BoxConstraints(
-                minWidth: 18,
-                minHeight: 18,
-              ),
-              child: Center(
-                child: Text(
-                  _unreadCount > 9 ? '9+' : _unreadCount.toString(),
-                  style: GoogleFonts.montserrat(
+        clipBehavior: Clip.none,
+        children: [
+          widget.child,
+          if (widget.showBadge && _unreadCount > 0)
+            Positioned(
+              top: widget.badgePosition?.dy ?? 0,
+              right: widget.badgePosition?.dx ?? 0,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: widget.badgeColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
                     color: Colors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.badgeColor.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 18,
+                  minHeight: 18,
+                ),
+                child: Center(
+                  child: Text(
+                    _unreadCount > 9 ? '9+' : _unreadCount.toString(),
+                    style: GoogleFonts.montserrat(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
-    );
+        ],
+      );
 }
 
 /// Notification badge for app bar
 class AppBarNotificationBadge extends StatelessWidget {
-
   const AppBarNotificationBadge({
     super.key,
     this.onTap,
@@ -310,15 +312,14 @@ class AppBarNotificationBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ModernNotificationBadge(
-      iconColor: iconColor,
-      iconSize: iconSize,
-      onTap: onTap,
-    );
+        iconColor: iconColor,
+        iconSize: iconSize,
+        onTap: onTap,
+      );
 }
 
 /// Notification badge for bottom navigation
 class BottomNavNotificationBadge extends StatelessWidget {
-
   const BottomNavNotificationBadge({
     super.key,
     this.onTap,
@@ -331,8 +332,8 @@ class BottomNavNotificationBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ModernNotificationBadge(
-      iconColor: iconColor,
-      iconSize: iconSize,
-      onTap: onTap,
-    );
+        iconColor: iconColor,
+        iconSize: iconSize,
+        onTap: onTap,
+      );
 }

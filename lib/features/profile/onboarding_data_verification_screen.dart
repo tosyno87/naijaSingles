@@ -113,74 +113,74 @@ class _OnboardingDataVerificationScreenState
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          'Onboarding Data Verification',
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: Text(
+            'Onboarding Data Verification',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
+          backgroundColor: const Color(0xFF008037),
+          elevation: 0,
         ),
-        backgroundColor: const Color(0xFF008037),
-        elevation: 0,
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Summary Card
-                  _buildSummaryCard(),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Summary Card
+                    _buildSummaryCard(),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Present Fields Card
-                  _buildPresentFieldsCard(),
+                    // Present Fields Card
+                    _buildPresentFieldsCard(),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Missing Fields Card
-                  _buildMissingFieldsCard(),
+                    // Missing Fields Card
+                    _buildMissingFieldsCard(),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Raw Data Card
-                  _buildRawDataCard(),
+                    // Raw Data Card
+                    _buildRawDataCard(),
 
-                  const SizedBox(height: 32),
+                    const SizedBox(height: 32),
 
-                  // Refresh Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() => _isLoading = true);
-                        _loadAndVerifyUserData();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF008037),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    // Refresh Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() => _isLoading = true);
+                          _loadAndVerifyUserData();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF008037),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'Refresh Data',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                        child: Text(
+                          'Refresh Data',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-    );
+      );
 
   Widget _buildSummaryCard() {
     final completionPercentage = _expectedFields.isEmpty
@@ -246,177 +246,191 @@ class _OnboardingDataVerificationScreenState
   }
 
   Widget _buildPresentFieldsCard() => Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  'Present Fields (${_presentFields.length})',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (_presentFields.isEmpty)
-              Text(
-                'No fields found',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                  fontStyle: FontStyle.italic,
-                ),
-              )
-            else
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: _presentFields.map((field) => Chip(
-                    label: Text(
-                      field,
-                      style: GoogleFonts.montserrat(fontSize: 12),
-                    ),
-                    backgroundColor: Colors.green.shade100,
-                    side: BorderSide(color: Colors.green.shade300),
-                  ),).toList(),
-              ),
-          ],
-        ),
-      ),
-    );
-
-  Widget _buildMissingFieldsCard() => Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.error, color: Colors.red, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  'Missing Fields (${_missingFields.length})',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (_missingFields.isEmpty)
-              Text(
-                'All expected fields are present! 🎉',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.green.shade600,
-                  fontWeight: FontWeight.w500,
-                ),
-              )
-            else
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: _missingFields.map((field) => Chip(
-                    label: Text(
-                      field,
-                      style: GoogleFonts.montserrat(fontSize: 12),
-                    ),
-                    backgroundColor: Colors.red.shade100,
-                    side: BorderSide(color: Colors.red.shade300),
-                  ),).toList(),
-              ),
-          ],
-        ),
-      ),
-    );
-
-  Widget _buildRawDataCard() => Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sample Data Values',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            if (_userData == null)
-              Text(
-                'No data available',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                  fontStyle: FontStyle.italic,
-                ),
-              )
-            else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  _buildDataRow('Name', _userData!['name']),
-                  _buildDataRow('Age', _userData!['age']),
-                  _buildDataRow('Gender', _userData!['gender']),
-                  _buildDataRow('Tribe', _userData!['tribe']),
-                  _buildDataRow('Bio Length',
-                      '${(_userData!['bio'] ?? '').length} chars',),
-                  _buildDataRow('Interests',
-                      '${(_userData!['interests'] as List?)?.length ?? 0} items',),
-                  _buildDataRow(
-                      'Height',
-                      _userData!['heightDisplay'] ??
-                          _userData!['height_ft_in'],),
-                  _buildDataRow('Looking For', _userData!['lookingFor']),
-                  _buildDataRow(
-                      'Relationship Intent', _userData!['relationshipIntent'],),
-                  _buildDataRow('Interested In', _userData!['interestedIn']),
+                  const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Present Fields (${_presentFields.length})',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.green,
+                    ),
+                  ),
                 ],
               ),
-          ],
+              const SizedBox(height: 12),
+              if (_presentFields.isEmpty)
+                Text(
+                  'No fields found',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    fontStyle: FontStyle.italic,
+                  ),
+                )
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: _presentFields
+                      .map(
+                        (field) => Chip(
+                          label: Text(
+                            field,
+                            style: GoogleFonts.montserrat(fontSize: 12),
+                          ),
+                          backgroundColor: Colors.green.shade100,
+                          side: BorderSide(color: Colors.green.shade300),
+                        ),
+                      )
+                      .toList(),
+                ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+
+  Widget _buildMissingFieldsCard() => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.red, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Missing Fields (${_missingFields.length})',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (_missingFields.isEmpty)
+                Text(
+                  'All expected fields are present! 🎉',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.green.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                )
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: _missingFields
+                      .map(
+                        (field) => Chip(
+                          label: Text(
+                            field,
+                            style: GoogleFonts.montserrat(fontSize: 12),
+                          ),
+                          backgroundColor: Colors.red.shade100,
+                          side: BorderSide(color: Colors.red.shade300),
+                        ),
+                      )
+                      .toList(),
+                ),
+            ],
+          ),
+        ),
+      );
+
+  Widget _buildRawDataCard() => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Sample Data Values',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (_userData == null)
+                Text(
+                  'No data available',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    fontStyle: FontStyle.italic,
+                  ),
+                )
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDataRow('Name', _userData!['name']),
+                    _buildDataRow('Age', _userData!['age']),
+                    _buildDataRow('Gender', _userData!['gender']),
+                    _buildDataRow('Tribe', _userData!['tribe']),
+                    _buildDataRow(
+                      'Bio Length',
+                      '${(_userData!['bio'] ?? '').length} chars',
+                    ),
+                    _buildDataRow(
+                      'Interests',
+                      '${(_userData!['interests'] as List?)?.length ?? 0} items',
+                    ),
+                    _buildDataRow(
+                      'Height',
+                      _userData!['heightDisplay'] ?? _userData!['height_ft_in'],
+                    ),
+                    _buildDataRow('Looking For', _userData!['lookingFor']),
+                    _buildDataRow(
+                      'Relationship Intent',
+                      _userData!['relationshipIntent'],
+                    ),
+                    _buildDataRow('Interested In', _userData!['interestedIn']),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      );
 
   Widget _buildDataRow(String label, value) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              '$label:',
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey.shade700,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 120,
+              child: Text(
+                '$label:',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade700,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              value?.toString() ?? 'null',
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                color: value != null ? Colors.black87 : Colors.red,
+            Expanded(
+              child: Text(
+                value?.toString() ?? 'null',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: value != null ? Colors.black87 : Colors.red,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 }

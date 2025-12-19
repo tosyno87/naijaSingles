@@ -13,7 +13,6 @@ class GoogleLoginInitial extends GoogleLoginStates {}
 class GoogleLoginLoading extends GoogleLoginStates {}
 
 class GoogleLoginSuccess extends GoogleLoginStates {
-
   const GoogleLoginSuccess({required this.user});
   final User? user;
 
@@ -22,7 +21,6 @@ class GoogleLoginSuccess extends GoogleLoginStates {
 }
 
 class GoogleLoginFailed extends GoogleLoginStates {
-
   const GoogleLoginFailed({required this.message});
   final String message;
 

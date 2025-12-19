@@ -66,7 +66,9 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
 
       try {
         final reverseGeocode = await getReverseGeocodingData(
-            lat: coordinates.latitude!, lng: coordinates.longitude!,);
+          lat: coordinates.latitude!,
+          lng: coordinates.longitude!,
+        );
         return reverseGeocode;
       } catch (e) {
         log('Geocoding error: ${e.toString()}');
@@ -98,8 +100,10 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
     };
   }
 
-  Future<ReverseGeocode> getReverseGeoding(
-      {required double lat, required double lng,}) async {
+  Future<ReverseGeocode> getReverseGeoding({
+    required double lat,
+    required double lng,
+  }) async {
     try {
       const geocodeURL = 'https://maps.googleapis.com/maps/api/geocode';
       final url =
@@ -135,8 +139,10 @@ class UserLocationReporistoryImpl implements UserLocationReporistory {
     }
   }
 
-  Future<Map<String, dynamic>> getReverseGeocodingData(
-      {required double lat, required double lng,}) async {
+  Future<Map<String, dynamic>> getReverseGeocodingData({
+    required double lat,
+    required double lng,
+  }) async {
     try {
       const geocodeURL = 'https://maps.googleapis.com/maps/api/geocode';
       final url =

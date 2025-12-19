@@ -35,7 +35,6 @@ class AlreadyRegistered extends RegistrationStates {
 }
 
 class NewRegistration extends RegistrationStates {
-
   const NewRegistration({
     required this.token,
     required this.user,

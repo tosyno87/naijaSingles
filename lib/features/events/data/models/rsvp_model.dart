@@ -49,7 +49,6 @@ extension RSVPStatusExtension on RSVPStatus {
 }
 
 class RSVPModel extends Equatable {
-
   const RSVPModel({
     required this.id,
     required this.userId,
@@ -60,19 +59,21 @@ class RSVPModel extends Equatable {
     this.notes,
   });
 
-  factory RSVPModel.fromFirestoreJson(Map<String, dynamic> json, String docId) => RSVPModel(
-      id: docId,
-      userId: json['userId'] ?? '',
-      eventId: json['eventId'] ?? '',
-      status: RSVPStatusExtension.fromString(json['status'] ?? 'none'),
-      rsvpDate: DateTime.fromMillisecondsSinceEpoch(
-        json['rsvpDate']?.millisecondsSinceEpoch ??
-            json['timestamp']?.millisecondsSinceEpoch ??
-            0,
-      ),
-      userProfile: json['userProfile'],
-      notes: json['notes'],
-    );
+  factory RSVPModel.fromFirestoreJson(
+          Map<String, dynamic> json, String docId) =>
+      RSVPModel(
+        id: docId,
+        userId: json['userId'] ?? '',
+        eventId: json['eventId'] ?? '',
+        status: RSVPStatusExtension.fromString(json['status'] ?? 'none'),
+        rsvpDate: DateTime.fromMillisecondsSinceEpoch(
+          json['rsvpDate']?.millisecondsSinceEpoch ??
+              json['timestamp']?.millisecondsSinceEpoch ??
+              0,
+        ),
+        userProfile: json['userProfile'],
+        notes: json['notes'],
+      );
   final String id;
   final String userId;
   final String eventId;
@@ -82,15 +83,15 @@ class RSVPModel extends Equatable {
   final String? notes;
 
   Map<String, dynamic> toFirestoreJson() => {
-      'userId': userId,
-      'eventId': eventId,
-      'status': status.value,
-      'rsvpDate': rsvpDate,
-      'timestamp':
-          rsvpDate, // Add timestamp field for Firestore rules compatibility
-      'userProfile': userProfile,
-      'notes': notes,
-    };
+        'userId': userId,
+        'eventId': eventId,
+        'status': status.value,
+        'rsvpDate': rsvpDate,
+        'timestamp':
+            rsvpDate, // Add timestamp field for Firestore rules compatibility
+        'userProfile': userProfile,
+        'notes': notes,
+      };
 
   RSVPModel copyWith({
     String? id,
@@ -100,15 +101,16 @@ class RSVPModel extends Equatable {
     DateTime? rsvpDate,
     Map<String, dynamic>? userProfile,
     String? notes,
-  }) => RSVPModel(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      eventId: eventId ?? this.eventId,
-      status: status ?? this.status,
-      rsvpDate: rsvpDate ?? this.rsvpDate,
-      userProfile: userProfile ?? this.userProfile,
-      notes: notes ?? this.notes,
-    );
+  }) =>
+      RSVPModel(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        eventId: eventId ?? this.eventId,
+        status: status ?? this.status,
+        rsvpDate: rsvpDate ?? this.rsvpDate,
+        userProfile: userProfile ?? this.userProfile,
+        notes: notes ?? this.notes,
+      );
 
   @override
   List<Object?> get props => [
@@ -123,7 +125,6 @@ class RSVPModel extends Equatable {
 }
 
 class EventAttendeeModel extends Equatable {
-
   const EventAttendeeModel({
     required this.userId,
     required this.eventId,
@@ -135,18 +136,19 @@ class EventAttendeeModel extends Equatable {
     this.userLocation,
   });
 
-  factory EventAttendeeModel.fromFirestoreJson(Map<String, dynamic> json) => EventAttendeeModel(
-      userId: json['userId'] ?? '',
-      eventId: json['eventId'] ?? '',
-      status: RSVPStatusExtension.fromString(json['status'] ?? 'none'),
-      rsvpDate: DateTime.fromMillisecondsSinceEpoch(
-        json['rsvpDate']?.millisecondsSinceEpoch ?? 0,
-      ),
-      userName: json['userProfile']?['name'] ?? 'Unknown User',
-      userAvatar: json['userProfile']?['avatar'],
-      userAge: json['userProfile']?['age'],
-      userLocation: json['userProfile']?['location'],
-    );
+  factory EventAttendeeModel.fromFirestoreJson(Map<String, dynamic> json) =>
+      EventAttendeeModel(
+        userId: json['userId'] ?? '',
+        eventId: json['eventId'] ?? '',
+        status: RSVPStatusExtension.fromString(json['status'] ?? 'none'),
+        rsvpDate: DateTime.fromMillisecondsSinceEpoch(
+          json['rsvpDate']?.millisecondsSinceEpoch ?? 0,
+        ),
+        userName: json['userProfile']?['name'] ?? 'Unknown User',
+        userAvatar: json['userProfile']?['avatar'],
+        userAge: json['userProfile']?['age'],
+        userLocation: json['userProfile']?['location'],
+      );
   final String userId;
   final String eventId;
   final RSVPStatus status;

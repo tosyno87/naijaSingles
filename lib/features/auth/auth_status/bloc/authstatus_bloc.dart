@@ -28,7 +28,7 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
   Future<void> _logout(LogoutEvent event, Emitter<AuthstatusState> emit) async {
     try {
       emit(AuthLoadingState());
-      
+
       // Clear secure storage before signing out
       try {
         final secureStorage = SecureStorageService();
@@ -38,7 +38,7 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
         log('⚠️ Error clearing secure storage: $e');
         // Continue with logout even if secure storage clear fails
       }
-      
+
       await phoneAuthRepository.signOut();
       log('user singout sucessfully');
       emit(UnauthenticatedState());
@@ -71,7 +71,7 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
             try {
               final token = await user.getIdToken(true);
               log('Token retrieved successfully: ${token != null}');
-              
+
               // Store authentication data securely
               if (token != null) {
                 try {
@@ -84,7 +84,7 @@ class AuthstatusBloc extends Bloc<AuthstatusEvent, AuthstatusState> {
                   // Continue even if secure storage fails
                 }
               }
-              
+
               emit(AuthenticatedState(user: user));
             } catch (tokenError) {
               log('Error retrieving token: $tokenError');

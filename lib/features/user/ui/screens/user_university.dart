@@ -154,7 +154,9 @@ class _UniversityPage extends State<UniversityPage> {
                                   : Colors.grey[400],
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20, horizontal: 16,),
+                              vertical: 20,
+                              horizontal: 16,
+                            ),
                             border: InputBorder.none,
                           ),
                         ),
@@ -178,31 +180,37 @@ class _UniversityPage extends State<UniversityPage> {
                           Wrap(
                             spacing: 8,
                             runSpacing: 12,
-                            children: _suggestions.map((suggestion) => GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    university = suggestion;
-                                    _universityController.text = suggestion;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 10,),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[50],
-                                    borderRadius: BorderRadius.circular(20),
-                                    border:
-                                        Border.all(color: Colors.grey[300]!),
-                                  ),
-                                  child: Text(
-                                    suggestion,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[800],
+                            children: _suggestions
+                                .map(
+                                  (suggestion) => GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        university = suggestion;
+                                        _universityController.text = suggestion;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                            color: Colors.grey[300]!),
+                                      ),
+                                      child: Text(
+                                        suggestion,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[800],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),).toList(),
+                                )
+                                .toList(),
                           ),
                         ],
                       ),
@@ -240,8 +248,10 @@ class _UniversityPage extends State<UniversityPage> {
 
                           log(userData.toString());
                           Navigator.pushNamed(
-                              context, RouteName.profilePicSetScreen,
-                              arguments: userData,);
+                            context,
+                            RouteName.profilePicSetScreen,
+                            arguments: userData,
+                          );
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

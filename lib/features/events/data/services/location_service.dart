@@ -19,8 +19,10 @@ class LocationService {
           _lastLocationUpdate != null &&
           DateTime.now().difference(_lastLocationUpdate!) <
               _locationCacheTimeout) {
-        log('📍 Using cached location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
-            name: 'LocationService',);
+        log(
+          '📍 Using cached location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
+          name: 'LocationService',
+        );
         return _currentPosition;
       }
 
@@ -40,8 +42,10 @@ class LocationService {
 
       _lastLocationUpdate = DateTime.now();
 
-      log('📍 Location obtained: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
-          name: 'LocationService',);
+      log(
+        '📍 Location obtained: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
+        name: 'LocationService',
+      );
       return _currentPosition;
     } catch (e) {
       log('❌ Error getting location: $e', name: 'LocationService');
@@ -71,8 +75,10 @@ class LocationService {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        log('❌ Location permission permanently denied',
-            name: 'LocationService',);
+        log(
+          '❌ Location permission permanently denied',
+          name: 'LocationService',
+        );
         return false;
       }
 
@@ -97,7 +103,10 @@ class LocationService {
 
   /// Calculate distance between user location and event location
   static double? calculateDistanceToEvent(
-      Position? userLocation, double? eventLat, double? eventLon,) {
+    Position? userLocation,
+    double? eventLat,
+    double? eventLon,
+  ) {
     if (userLocation == null || eventLat == null || eventLon == null) {
       return null;
     }

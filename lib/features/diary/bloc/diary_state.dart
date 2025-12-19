@@ -12,7 +12,6 @@ class DiaryInitial extends DiaryState {}
 class DiaryLoading extends DiaryState {}
 
 class DiaryLoaded extends DiaryState {
-
   const DiaryLoaded(this.entries);
   final List<DiaryEntry> entries;
 
@@ -21,7 +20,6 @@ class DiaryLoaded extends DiaryState {
 }
 
 class DiaryError extends DiaryState {
-
   const DiaryError(this.message);
   final String message;
 

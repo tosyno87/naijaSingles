@@ -24,7 +24,8 @@ class PhoneNumber extends StatefulWidget {
   final bool isSignIn;
 
   PhoneNumber({
-    required this.updatePhoneNumber, super.key,
+    required this.updatePhoneNumber,
+    super.key,
     this.isSignIn = false,
   });
 
@@ -59,18 +60,19 @@ class _PhoneNumberState extends State<PhoneNumber> {
 
   void _validatePhoneNumber() {
     if (mounted) {
-      final phoneDigits = phoneNumberController.text.trim().replaceAll(RegExp(r'[^\d]'), '');
-      
+      final phoneDigits =
+          phoneNumberController.text.trim().replaceAll(RegExp(r'[^\d]'), '');
+
       // Allow typing freely - just check minimum length for button enable
       // Full validation happens on submit to Firebase
       const minDigits = 6; // Minimum to enable button
-      
+
       final isValid = phoneDigits.length >= minDigits;
-      
+
       setState(() {
         isValidNumber = isValid;
       });
-      
+
       log('📞 Phone validation: "${phoneNumberController.text.trim()}" -> $phoneDigits digits -> button enabled: $isValid (min: $minDigits)');
     }
   }
@@ -78,9 +80,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
   @override
   Widget build(BuildContext context) {
     // Set system UI overlay style for status bar
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-    ),);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    );
 
     // Using centralized AppColors - no need for local color constants
 
@@ -88,20 +92,22 @@ class _PhoneNumberState extends State<PhoneNumber> {
       create: (context) => PhoneAuthRepository(),
       child: BlocProvider(
         create: (context) => PhoneAuthBloc(
-            phoneAuthRepository:
-                RepositoryProvider.of<PhoneAuthRepository>(context),),
+          phoneAuthRepository:
+              RepositoryProvider.of<PhoneAuthRepository>(context),
+        ),
         child: Scaffold(
           key: _scaffoldKey,
           backgroundColor: AppColors.backgroundColor,
           appBar: AfropeepAppBar(
-            title: widget.isSignIn ? 'Sign In with Phone' : 'Sign Up with Phone',
+            title:
+                widget.isSignIn ? 'Sign In with Phone' : 'Sign Up with Phone',
           ),
           body: BlocListener<PhoneAuthBloc, PhoneAuthState>(
             listener: (context, state) {
               // Don't handle PhoneAuthVerified here - let OTP screen handle it
               // This prevents premature navigation before registration check completes
               // The OTP screen will handle navigation after checking registration status
-              
+
               if (state is PhoneAuthCodeSentSuccess) {
                 log('phone auth code sent success listener called');
                 if (mounted) {
@@ -133,33 +139,42 @@ class _PhoneNumberState extends State<PhoneNumber> {
                 log('Error: ${state.error}');
                 log('═══════════════════════════════════════════════════════');
                 log('');
-                
+
                 if (mounted) {
                   setState(() {
                     _isLoading = false;
                   });
-                  
+
                   // Provide helpful error message for simulator users
                   final String errorMessage = state.error;
                   String debugHint = '';
-                  
+
                   if (state.error.contains('invalid-phone-number')) {
                     String countrySpecificHint = '';
                     if (countryCode == '+1') {
-                      countrySpecificHint = '\n\n⚠️ US/Canada numbers must be exactly 10 digits (not including country code +1)';
-                      countrySpecificHint += '\nExample: 2179044453 (10 digits), not 21790444533 (11 digits)';
+                      countrySpecificHint =
+                          '\n\n⚠️ US/Canada numbers must be exactly 10 digits (not including country code +1)';
+                      countrySpecificHint +=
+                          '\nExample: 2179044453 (10 digits), not 21790444533 (11 digits)';
                     }
-                    debugHint = '\n\n📋 Troubleshooting:$countrySpecificHint\n1. Check console logs for the EXACT number sent\n2. In Firebase Console, add test number WITHOUT spaces/dashes\n3. Format: +12179044453 (not +1 217 904 445 33)';
-                  } else if (state.error.contains('missing-verification-code')) {
-                    debugHint = '\n\n📋 Test number not found!\n1. Check console logs for exact number sent\n2. Add that EXACT number (no spaces) to Firebase Console\n3. Set a verification code (e.g., 123456)';
-                  } else if (state.error.contains('invalid-verification-code')) {
-                    debugHint = '\n\n📋 Wrong verification code!\nUse the code you set in Firebase Console test numbers';
+                    debugHint =
+                        '\n\n📋 Troubleshooting:$countrySpecificHint\n1. Check console logs for the EXACT number sent\n2. In Firebase Console, add test number WITHOUT spaces/dashes\n3. Format: +12179044453 (not +1 217 904 445 33)';
+                  } else if (state.error
+                      .contains('missing-verification-code')) {
+                    debugHint =
+                        '\n\n📋 Test number not found!\n1. Check console logs for exact number sent\n2. Add that EXACT number (no spaces) to Firebase Console\n3. Set a verification code (e.g., 123456)';
+                  } else if (state.error
+                      .contains('invalid-verification-code')) {
+                    debugHint =
+                        '\n\n📋 Wrong verification code!\nUse the code you set in Firebase Console test numbers';
                   } else if (state.error.contains('quota-exceeded')) {
-                    debugHint = '\n\n📋 Too many requests!\nWait a few minutes and try again';
+                    debugHint =
+                        '\n\n📋 Too many requests!\nWait a few minutes and try again';
                   } else {
-                    debugHint = '\n\n💡 For iOS Simulator: Use test phone numbers from Firebase Console.\nCheck console logs for exact number format needed.';
+                    debugHint =
+                        '\n\n💡 For iOS Simulator: Use test phone numbers from Firebase Console.\nCheck console logs for exact number format needed.';
                   }
-                  
+
                   CustomSnackbar.showSnackBarSimple(
                     '$errorMessage$debugHint',
                     context,
@@ -194,8 +209,11 @@ class _PhoneNumberState extends State<PhoneNumber> {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.info_outline,
-                                    color: Colors.blue.shade700, size: 20,),
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Colors.blue.shade700,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -287,8 +305,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                     color: Colors.black,
                                     fontSize: 16,
                                   ),
-                                  dialogBackgroundColor:
-                                      Colors.white,
+                                  dialogBackgroundColor: Colors.white,
                                   boxDecoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
@@ -296,8 +313,9 @@ class _PhoneNumberState extends State<PhoneNumber> {
                                   barrierColor: Colors.black54,
                                   backgroundColor: Colors.white,
                                   dialogSize: Size(
-                                      MediaQuery.of(context).size.width * 0.9,
-                                      MediaQuery.of(context).size.height * 0.7,),
+                                    MediaQuery.of(context).size.width * 0.9,
+                                    MediaQuery.of(context).size.height * 0.7,
+                                  ),
                                   headerTextStyle: GoogleFonts.montserrat(
                                     color: const Color(0xFF3E1F0D),
                                     fontSize: 18,
@@ -388,59 +406,62 @@ class _PhoneNumberState extends State<PhoneNumber> {
                         // Wrap in Builder to get context from within BlocProvider tree
                         Builder(
                           builder: (builderContext) => AfropeepPrimaryButton(
-                              text: 'Continue',
-                              isLoading: _isLoading,
-                              onPressed: isValidNumber && !_isLoading
-                                  ? () {
-                                      log('');
-                                      log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
-                                      log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
-                                      log('Phone input: "${phoneNumberController.text}"');
-                                      log('Country code: $countryCode');
-                                      log('');
-                                      
-                                      setState(() {
-                                        _isLoading = true;
-                                      });
+                            text: 'Continue',
+                            isLoading: _isLoading,
+                            onPressed: isValidNumber && !_isLoading
+                                ? () {
+                                    log('');
+                                    log('🚀🚀🚀 BUTTON CLICKED! 🚀🚀🚀');
+                                    log('Button state: isValidNumber=$isValidNumber, isLoading=$_isLoading');
+                                    log('Phone input: "${phoneNumberController.text}"');
+                                    log('Country code: $countryCode');
+                                    log('');
 
-                                      // Remove spaces, dashes, and other formatting from phone number
-                                      final cleanPhoneNumber = phoneNumberController.text
-                                          .replaceAll(' ', '')
-                                          .replaceAll('-', '')
-                                          .replaceAll('(', '')
-                                          .replaceAll(')', '')
-                                          .trim();
-                                      
-                                      final fullPhoneNumber = countryCode + cleanPhoneNumber;
-                                      
-                                      log('');
-                                      log('═══════════════════════════════════════════════════════');
-                                      log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
-                                      log('═══════════════════════════════════════════════════════');
-                                      log('Country Code: $countryCode');
-                                      log('User Input: "${phoneNumberController.text}"');
-                                      log('Cleaned Input: "$cleanPhoneNumber"');
-                                      log('Full Number (sent to Firebase): "$fullPhoneNumber"');
-                                      log('');
-                                      log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
-                                      log('   "$fullPhoneNumber"');
-                                      log('');
-                                      log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
-                                      log('═══════════════════════════════════════════════════════');
-                                      log('');
-                                      
-                                      // Use builderContext which is inside the BlocProvider tree
-                                      final bloc = BlocProvider.of<PhoneAuthBloc>(builderContext);
-                                      log('📤 Adding SendOtpToPhoneEvent to bloc...');
-                                      bloc.add(
-                                        SendOtpToPhoneEvent(
-                                          phoneNumber: fullPhoneNumber,
-                                        ),
-                                      );
-                                      log('✅ Event added to bloc');
-                                    }
-                                  : null,
-                            ),
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+
+                                    // Remove spaces, dashes, and other formatting from phone number
+                                    final cleanPhoneNumber =
+                                        phoneNumberController.text
+                                            .replaceAll(' ', '')
+                                            .replaceAll('-', '')
+                                            .replaceAll('(', '')
+                                            .replaceAll(')', '')
+                                            .trim();
+
+                                    final fullPhoneNumber =
+                                        countryCode + cleanPhoneNumber;
+
+                                    log('');
+                                    log('═══════════════════════════════════════════════════════');
+                                    log('📱 PHONE AUTH REQUEST - BUTTON CLICKED');
+                                    log('═══════════════════════════════════════════════════════');
+                                    log('Country Code: $countryCode');
+                                    log('User Input: "${phoneNumberController.text}"');
+                                    log('Cleaned Input: "$cleanPhoneNumber"');
+                                    log('Full Number (sent to Firebase): "$fullPhoneNumber"');
+                                    log('');
+                                    log('💡 COPY THIS EXACT NUMBER to Firebase Console test numbers:');
+                                    log('   "$fullPhoneNumber"');
+                                    log('');
+                                    log('🔍 Next: Watch for "🎯 EVENT RECEIVED IN BLOC!" log');
+                                    log('═══════════════════════════════════════════════════════');
+                                    log('');
+
+                                    // Use builderContext which is inside the BlocProvider tree
+                                    final bloc = BlocProvider.of<PhoneAuthBloc>(
+                                        builderContext);
+                                    log('📤 Adding SendOtpToPhoneEvent to bloc...');
+                                    bloc.add(
+                                      SendOtpToPhoneEvent(
+                                        phoneNumber: fullPhoneNumber,
+                                      ),
+                                    );
+                                    log('✅ Event added to bloc');
+                                  }
+                                : null,
+                          ),
                         ),
 
                         const SizedBox(height: 24),
@@ -474,10 +495,14 @@ class _PhoneNumberState extends State<PhoneNumber> {
                               onTap: () {
                                 if (widget.isSignIn) {
                                   Navigator.pushReplacementNamed(
-                                      context, '/auth_method_selection',);
+                                    context,
+                                    '/auth_method_selection',
+                                  );
                                 } else {
                                   Navigator.pushReplacementNamed(
-                                      context, '/sign_in_method_selection',);
+                                    context,
+                                    '/sign_in_method_selection',
+                                  );
                                 }
                               },
                               child: Text(

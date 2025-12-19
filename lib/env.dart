@@ -93,8 +93,7 @@ class Environment {
 
   static String get firebaseProjectId {
     // Allow override via environment variable first
-    const fromEnv =
-        String.fromEnvironment('FIREBASE_PROJECT_ID');
+    const fromEnv = String.fromEnvironment('FIREBASE_PROJECT_ID');
     if (fromEnv.isNotEmpty) return fromEnv;
 
     // Fall back to environment-specific defaults

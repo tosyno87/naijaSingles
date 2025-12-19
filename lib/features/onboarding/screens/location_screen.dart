@@ -124,11 +124,14 @@ class _LocationScreenState extends State<LocationScreen> {
             Provider.of<OnboardingController>(context, listen: false);
         controller.setLocationName(location);
         controller.setLocationCoordinates(
-            position.latitude, position.longitude,);
+          position.latitude,
+          position.longitude,
+        );
 
         AppLogger.info('🔍 LocationScreen: GPS location set to "$location"');
         AppLogger.info(
-            '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}',);
+          '🔍 LocationScreen: Coordinates set to ${position.latitude}, ${position.longitude}',
+        );
       }
     } catch (e) {
       setState(() {
@@ -275,73 +278,124 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Text(
-            'Where are you located?',
-            style: GoogleFonts.montserrat(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: textDarkBrown,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            'This helps us connect you with people nearby',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: textLightBrown,
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // GPS Location Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _isLoadingLocation ? null : _getCurrentLocation,
-              icon: _isLoadingLocation
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Icon(Icons.my_location, color: Colors.white),
-              label: Text(
-                _isLoadingLocation
-                    ? 'Getting Location...'
-                    : 'Use My Current Location',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: afropeepGreen,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Text(
+              'Where are you located?',
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: textDarkBrown,
               ),
             ),
-          ),
 
-          const SizedBox(height: 32),
+            const SizedBox(height: 8),
 
-          // Current location display
-          if (_currentLocation != null) ...[
-            Container(
+            Text(
+              'This helps us connect you with people nearby',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: textLightBrown,
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // GPS Location Button
+            SizedBox(
               width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isLoadingLocation ? null : _getCurrentLocation,
+                icon: _isLoadingLocation
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.my_location, color: Colors.white),
+                label: Text(
+                  _isLoadingLocation
+                      ? 'Getting Location...'
+                      : 'Use My Current Location',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: afropeepGreen,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // Current location display
+            if (_currentLocation != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: afropeepGreen.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      color: afropeepGreen,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Your Location',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              color: textLightBrown,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            _currentLocation!,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              color: textDarkBrown,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.check_circle,
+                      color: afropeepGreen,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+
+            // Privacy note
+            Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: afropeepGreen.withOpacity(0.1),
@@ -351,74 +405,24 @@ class _LocationScreenState extends State<LocationScreen> {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.location_on,
+                    Icons.info_outline,
                     color: afropeepGreen,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Your Location',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            color: textLightBrown,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          _currentLocation!,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            color: textDarkBrown,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'Your location helps us show you people nearby. We only show your city, never your exact location.',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: textDarkBrown,
+                      ),
                     ),
-                  ),
-                  const Icon(
-                    Icons.check_circle,
-                    color: afropeepGreen,
-                    size: 20,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
           ],
-
-          // Privacy note
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: afropeepGreen.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: afropeepGreen.withOpacity(0.3)),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.info_outline,
-                  color: afropeepGreen,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Your location helps us show you people nearby. We only show your city, never your exact location.',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      color: textDarkBrown,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      );
 }

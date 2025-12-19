@@ -27,7 +27,8 @@ class ExploreMap {
 // for getting user under specifice radius in map
 
   static Future<List<UserModel>> getUserListForMap(
-      UserModel currentUser,) async {
+    UserModel currentUser,
+  ) async {
     final querySnapshots = await query(currentUser);
 
     // Check if both query snapshots are empty
@@ -41,10 +42,11 @@ class ExploreMap {
     for (var doc in querySnapshots[0].docs) {
       final UserModel temp = UserModel.fromDocument(doc);
       final distance = calculateDistance(
-          currentUser.currentCoordinates?['latitude'],
-          currentUser.currentCoordinates?['longitude'],
-          temp.currentCoordinates?['latitude'],
-          temp.currentCoordinates?['longitude'],);
+        currentUser.currentCoordinates?['latitude'],
+        currentUser.currentCoordinates?['longitude'],
+        temp.currentCoordinates?['latitude'],
+        temp.currentCoordinates?['longitude'],
+      );
       temp.distanceBW = distance.round();
 
       if (distance <= 50.0 && temp.id != currentUser.id && !temp.isBlocked!) {
@@ -55,10 +57,11 @@ class ExploreMap {
     for (var doc in querySnapshots[1].docs) {
       final UserModel temp = UserModel.fromDocument(doc);
       final distance = calculateDistance(
-          currentUser.currentCoordinates?['latitude'],
-          currentUser.currentCoordinates?['longitude'],
-          temp.currentCoordinates?['latitude'],
-          temp.currentCoordinates?['longitude'],);
+        currentUser.currentCoordinates?['latitude'],
+        currentUser.currentCoordinates?['longitude'],
+        temp.currentCoordinates?['latitude'],
+        temp.currentCoordinates?['longitude'],
+      );
       temp.distanceBW = distance.round();
 
       if (distance <= 50.0 && temp.id != currentUser.id && !temp.isBlocked!) {

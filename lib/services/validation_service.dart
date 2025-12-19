@@ -148,9 +148,13 @@ class ValidationService {
     return text
         .trim()
         .replaceAll(
-            RegExp(r'\s+'), ' ',) // Replace multiple spaces with single space
-        .replaceAll(RegExp(r'[^\w\s\-]'),
-            '',); // Remove special characters except allowed ones
+          RegExp(r'\s+'),
+          ' ',
+        ) // Replace multiple spaces with single space
+        .replaceAll(
+          RegExp(r'[^\w\s\-]'),
+          '',
+        ); // Remove special characters except allowed ones
   }
 
   /// Check if group name is available (placeholder for future implementation)
@@ -158,7 +162,8 @@ class ValidationService {
     // TODO: Implement actual check against Firestore
     // For now, return true (available)
     await Future.delayed(
-        const Duration(milliseconds: 500),); // Simulate network delay
+      const Duration(milliseconds: 500),
+    ); // Simulate network delay
     return true;
   }
 

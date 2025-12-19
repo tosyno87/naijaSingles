@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MatchModel {
-
   MatchModel({
     required this.id,
     required this.users,
@@ -32,11 +31,11 @@ class MatchModel {
 
   // Convert MatchModel to a Map for Firestore
   Map<String, dynamic> toMap() => {
-      'users': users,
-      'matchedAt': FieldValue.serverTimestamp(),
-      'matchStatus': matchStatus,
-      if (chatThreadId != null) 'chatThreadId': chatThreadId,
-    };
+        'users': users,
+        'matchedAt': FieldValue.serverTimestamp(),
+        'matchStatus': matchStatus,
+        if (chatThreadId != null) 'chatThreadId': chatThreadId,
+      };
 
   // Create a copy of this MatchModel with updated fields
   MatchModel copyWith({
@@ -45,16 +44,18 @@ class MatchModel {
     DateTime? matchedAt,
     String? matchStatus,
     String? chatThreadId,
-  }) => MatchModel(
-      id: id ?? this.id,
-      users: users ?? this.users,
-      matchedAt: matchedAt ?? this.matchedAt,
-      matchStatus: matchStatus ?? this.matchStatus,
-      chatThreadId: chatThreadId ?? this.chatThreadId,
-    );
+  }) =>
+      MatchModel(
+        id: id ?? this.id,
+        users: users ?? this.users,
+        matchedAt: matchedAt ?? this.matchedAt,
+        matchStatus: matchStatus ?? this.matchStatus,
+        chatThreadId: chatThreadId ?? this.chatThreadId,
+      );
 
   @override
-  String toString() => 'MatchModel(id: $id, users: $users, matchedAt: $matchedAt, matchStatus: $matchStatus, chatThreadId: $chatThreadId)';
+  String toString() =>
+      'MatchModel(id: $id, users: $users, matchedAt: $matchedAt, matchStatus: $matchStatus, chatThreadId: $chatThreadId)';
 
   @override
   bool operator ==(Object other) {

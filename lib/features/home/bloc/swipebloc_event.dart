@@ -8,9 +8,10 @@ abstract class SwipeblocEvent extends Equatable {
 }
 
 class RightSwipeEvent extends SwipeblocEvent {
-
-  const RightSwipeEvent(
-      {required this.currentUser, required this.selectedUser,});
+  const RightSwipeEvent({
+    required this.currentUser,
+    required this.selectedUser,
+  });
   final UserModel currentUser;
   final UserModel selectedUser;
 
@@ -19,7 +20,6 @@ class RightSwipeEvent extends SwipeblocEvent {
 }
 
 class LeftSwipeEvent extends SwipeblocEvent {
-
   const LeftSwipeEvent({required this.currentUser, required this.selectedUser});
   final UserModel currentUser;
   final UserModel selectedUser;

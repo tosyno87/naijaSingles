@@ -1,5 +1,4 @@
 class Message {
-
   Message({
     required this.id,
     required this.senderId,
@@ -15,13 +14,14 @@ class Message {
 }
 
 class MessageThreadInfo {
-
   MessageThreadInfo({
     required this.threadId,
     required this.otherUserId,
     required this.otherUserName,
     required this.lastMessage,
-    required this.timestamp, required this.unread, this.lastMessageSenderId,
+    required this.timestamp,
+    required this.unread,
+    this.lastMessageSenderId,
     this.avatarUrl,
   });
   final String threadId;

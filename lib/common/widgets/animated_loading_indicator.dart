@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class AnimatedLoadingIndicator extends StatefulWidget {
-
   const AnimatedLoadingIndicator({
     super.key,
     this.color = const Color(0xFF008037),
@@ -38,16 +37,16 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
 
   @override
   Widget build(BuildContext context) => Container(
-      width: widget.size,
-      height: widget.size,
-      decoration: const BoxDecoration(
-        color: Color(0xFFDFF5E2),
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) => Transform.rotate(
+        width: widget.size,
+        height: widget.size,
+        decoration: const BoxDecoration(
+          color: Color(0xFFDFF5E2),
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) => Transform.rotate(
               angle: _controller.value * 2 * math.pi,
               child: Stack(
                 alignment: Alignment.center,
@@ -84,13 +83,12 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
                 ],
               ),
             ),
+          ),
         ),
-      ),
-    );
+      );
 }
 
 class _LoadingDotPainter extends CustomPainter {
-
   _LoadingDotPainter({
     required this.color,
     required this.progress,
@@ -117,5 +115,6 @@ class _LoadingDotPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_LoadingDotPainter oldDelegate) => oldDelegate.progress != progress;
+  bool shouldRepaint(_LoadingDotPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }

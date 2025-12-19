@@ -38,5 +38,6 @@ class GenderSign extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => _userGenderIcon(gender: gender, iconColor: iconColor);
+  Widget build(BuildContext context) =>
+      _userGenderIcon(gender: gender, iconColor: iconColor);
 }

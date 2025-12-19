@@ -83,21 +83,25 @@ class _SearchLocationState extends State<SearchLocation>
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserLocationReporistory>(
-            create: (context) => UserLocationReporistoryImpl(),),
+          create: (context) => UserLocationReporistoryImpl(),
+        ),
         RepositoryProvider<PhoneAuthRepository>(
-            create: (context) => PhoneAuthRepository(),),
+          create: (context) => PhoneAuthRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<UserLocationBloc>(
             create: (context) => UserLocationBloc(
-                userLocationReporistory:
-                    RepositoryProvider.of<UserLocationReporistory>(context),),
+              userLocationReporistory:
+                  RepositoryProvider.of<UserLocationReporistory>(context),
+            ),
           ),
           BlocProvider<RegistrationBloc>(
             create: (context) => RegistrationBloc(
-                phoneAuthRepository:
-                    RepositoryProvider.of<PhoneAuthRepository>(context),),
+              phoneAuthRepository:
+                  RepositoryProvider.of<PhoneAuthRepository>(context),
+            ),
           ),
         ],
         child: Scaffold(
@@ -205,8 +209,7 @@ class _SearchLocationState extends State<SearchLocation>
                                   color: Color(0xFF888888),
                                 ),
                                 prefixIcon: const Padding(
-                                  padding:
-                                      EdgeInsets.only(left: 16, right: 8),
+                                  padding: EdgeInsets.only(left: 16, right: 8),
                                   child: Icon(
                                     Icons.location_on_rounded,
                                     color: Color(0xFF27AE60),
@@ -294,9 +297,10 @@ class _SearchLocationState extends State<SearchLocation>
                             listener: (context, registrationState) {
                               if (registrationState is RegistrationSuccess) {
                                 log('userregistrationsuccess');
-                                Provider.of<UserProvider>(context,
-                                        listen: false,)
-                                    .currentUser = registrationState.user;
+                                Provider.of<UserProvider>(
+                                  context,
+                                  listen: false,
+                                ).currentUser = registrationState.user;
                                 showWelcomDialog(context);
                               }
                             },
@@ -352,12 +356,14 @@ class _SearchLocationState extends State<SearchLocation>
                                             },
                                           );
                                           await FireStoreClass.uploadprofile(
-                                              currentUserId:
-                                                  auth.currentUser!.uid,
-                                              file: profilePic,);
+                                            currentUserId:
+                                                auth.currentUser!.uid,
+                                            file: profilePic,
+                                          );
                                           context.read<RegistrationBloc>().add(
                                                 RegistrationRequest(
-                                                    userdata: userData,),
+                                                  userdata: userData,
+                                                ),
                                               );
                                           log(r'added user finally $userData.toString()');
                                         }

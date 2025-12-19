@@ -48,15 +48,17 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                   onPressed: () {
                     final text = _controller.text.trim();
                     if (text.isNotEmpty) {
-                      context.read<DiaryBloc>().add(AddDiaryEntryEvent(
-                            userId: user.id!,
-                            content: text,
-                            userName: user.name ?? '',
-                            userImage: user.imageUrl != null &&
-                                    user.imageUrl!.isNotEmpty
-                                ? user.imageUrl!.first
-                                : null,
-                          ),);
+                      context.read<DiaryBloc>().add(
+                            AddDiaryEntryEvent(
+                              userId: user.id!,
+                              content: text,
+                              userName: user.name ?? '',
+                              userImage: user.imageUrl != null &&
+                                      user.imageUrl!.isNotEmpty
+                                  ? user.imageUrl!.first
+                                  : null,
+                            ),
+                          );
                       _controller.clear();
                     }
                   },
@@ -85,8 +87,10 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                             : const CircleAvatar(child: Icon(Icons.person)),
                         title: Text(entry.userName),
                         subtitle: Text(entry.content),
-                        trailing: Text(DateFormat('MMM d, HH:mm')
-                            .format(entry.timestamp.toDate()),),
+                        trailing: Text(
+                          DateFormat('MMM d, HH:mm')
+                              .format(entry.timestamp.toDate()),
+                        ),
                       );
                     },
                   );
@@ -108,7 +112,7 @@ class DiaryFeedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-      create: (_) => DiaryBloc(repository: DiaryRepository()),
-      child: const DiaryFeedScreen(),
-    );
+        create: (_) => DiaryBloc(repository: DiaryRepository()),
+        child: const DiaryFeedScreen(),
+      );
 }

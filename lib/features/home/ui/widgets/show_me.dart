@@ -8,7 +8,9 @@ import '../../../../models/user_model.dart';
 
 class ShowmeWidget extends StatefulWidget {
   const ShowmeWidget({
-    required this.currentUser, required this.changeValues, super.key,
+    required this.currentUser,
+    required this.changeValues,
+    super.key,
   });
   final UserModel currentUser;
   final Map<String, dynamic> changeValues;
@@ -30,9 +32,10 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
             Text(
               'Show me'.tr().toString(),
               style: TextStyle(
-                  fontSize: 18,
-                  color: themeProvider.isDarkMode ? Colors.white : primaryColor,
-                  fontWeight: FontWeight.w500,),
+                fontSize: 18,
+                color: themeProvider.isDarkMode ? Colors.white : primaryColor,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             ListTile(
               title: DropdownButton(
@@ -53,21 +56,27 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
                     ),
                   ),
                   DropdownMenuItem(
-                      value: 'women',
-                      child: Text('Women'.tr().toString(),
-                          style: const TextStyle(
-                            color: AppColors.secondaryColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),),),
+                    value: 'women',
+                    child: Text(
+                      'Women'.tr().toString(),
+                      style: const TextStyle(
+                        color: AppColors.secondaryColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                   DropdownMenuItem(
-                      value: 'everyone',
-                      child: Text('Everyone'.tr().toString(),
-                          style: const TextStyle(
-                            color: AppColors.secondaryColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),),),
+                    value: 'everyone',
+                    child: Text(
+                      'Everyone'.tr().toString(),
+                      style: const TextStyle(
+                        color: AppColors.secondaryColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 ],
                 onChanged: (val) {
                   widget.changeValues.addAll({

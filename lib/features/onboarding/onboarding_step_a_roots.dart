@@ -13,7 +13,6 @@ import 'shared_styles.dart';
 /// This screen collects information about the user's tribe,
 /// languages spoken, and their intent for using the app.
 class OnboardingStepARoots extends StatefulWidget {
-
   const OnboardingStepARoots({
     required this.onNext,
     super.key,
@@ -136,12 +135,11 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
           });
         } else {
           // If not in the list, set to "Other" and enable custom entry
-        setState(() {
-          _selectedTribe = 'Other';
-          _isCustomTribe = true;
-        });
+          setState(() {
+            _selectedTribe = 'Other';
+            _isCustomTribe = true;
+          });
         }
-      
       }
     });
   }
@@ -260,17 +258,21 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           });
                         }
                       },
-                      items: _africanTribes.map((tribe) => DropdownMenuItem(
-                          value: tribe,
-                          child: Text(
-                            tribe,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                      items: _africanTribes
+                          .map(
+                            (tribe) => DropdownMenuItem(
+                              value: tribe,
+                              child: Text(
+                                tribe,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),).toList(),
+                          )
+                          .toList(),
                       decoration: InputDecoration(
                         labelText: 'Tribe or Ethnic Group',
                         labelStyle: GoogleFonts.montserrat(
@@ -372,27 +374,32 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: controller.languages.map((language) => Chip(
-                            label: Text(
-                              language,
-                              style: GoogleFonts.montserrat(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                        children: controller.languages
+                            .map(
+                              (language) => Chip(
+                                label: Text(
+                                  language,
+                                  style: GoogleFonts.montserrat(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                backgroundColor: deepGreen,
+                                deleteIconColor: Colors.white,
+                                onDeleted: () {
+                                  setState(() {
+                                    final List<String> updatedLanguages = [
+                                      ...controller.languages,
+                                    ];
+                                    updatedLanguages.remove(language);
+                                    controller
+                                        .updateLanguages(updatedLanguages);
+                                  });
+                                },
                               ),
-                            ),
-                            backgroundColor: deepGreen,
-                            deleteIconColor: Colors.white,
-                            onDeleted: () {
-                              setState(() {
-                                final List<String> updatedLanguages = [
-                                  ...controller.languages,
-                                ];
-                                updatedLanguages.remove(language);
-                                controller.updateLanguages(updatedLanguages);
-                              });
-                            },
-                          ),).toList(),
+                            )
+                            .toList(),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -433,17 +440,21 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           });
                         }
                       },
-                      items: _availableLanguages.map((language) => DropdownMenuItem(
-                          value: language,
-                          child: Text(
-                            language,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                      items: _availableLanguages
+                          .map(
+                            (language) => DropdownMenuItem(
+                              value: language,
+                              child: Text(
+                                language,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),).toList(),
+                          )
+                          .toList(),
                       decoration: InputDecoration(
                         labelText: 'Add Language',
                         labelStyle: GoogleFonts.montserrat(
@@ -514,7 +525,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                      color: deepGreen, width: 2,),
+                                    color: deepGreen,
+                                    width: 2,
+                                  ),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -597,12 +610,14 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   children: [
                     _buildSectionTitle('What are you looking for?'),
                     const SizedBox(height: 16),
-                    ..._intentOptions.map((option) => _buildIntentOption(
-                          option: option,
-                          isSelected: controller.intent == option['value'],
-                          onTap: () => controller.updateIntent(option['value']),
-                          deepGreen: deepGreen,
-                        ),),
+                    ..._intentOptions.map(
+                      (option) => _buildIntentOption(
+                        option: option,
+                        isSelected: controller.intent == option['value'],
+                        onTap: () => controller.updateIntent(option['value']),
+                        deepGreen: deepGreen,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -651,13 +666,13 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-      ),
-    );
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      );
 
   /// Builds an intent option card with icon, title and description
   Widget _buildIntentOption({
@@ -665,84 +680,86 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     required bool isSelected,
     required VoidCallback onTap,
     required Color deepGreen,
-  }) => Semantics(
-      button: true,
-      label: '${option['title']} option',
-      hint: option['description'],
-      selected: isSelected,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            onTap();
-            HapticFeedback.selectionClick();
-          },
-          borderRadius: BorderRadius.circular(12),
-          splashColor: deepGreen.withValues(alpha: 0.1),
-          highlightColor: deepGreen.withValues(alpha: 0.05),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 90),
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color:
-                  isSelected ? deepGreen.withValues(alpha: 0.1) : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected ? deepGreen : Colors.grey[300]!,
-                width: isSelected ? 2 : 1,
+  }) =>
+      Semantics(
+        button: true,
+        label: '${option['title']} option',
+        hint: option['description'],
+        selected: isSelected,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              onTap();
+              HapticFeedback.selectionClick();
+            },
+            borderRadius: BorderRadius.circular(12),
+            splashColor: deepGreen.withValues(alpha: 0.1),
+            highlightColor: deepGreen.withValues(alpha: 0.05),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 90),
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? deepGreen.withValues(alpha: 0.1)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? deepGreen : Colors.grey[300]!,
+                  width: isSelected ? 2 : 1,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isSelected ? deepGreen : Colors.grey.shade100,
-                    shape: BoxShape.circle,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? deepGreen : Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      option['icon'],
+                      color: isSelected ? Colors.white : Colors.grey.shade600,
+                      size: 24,
+                    ),
                   ),
-                  child: Icon(
-                    option['icon'],
-                    color: isSelected ? Colors.white : Colors.grey.shade600,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        option['title'],
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? deepGreen : Colors.black87,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          option['title'],
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected ? deepGreen : Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        option['description'],
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          color: Colors.grey.shade700,
+                        const SizedBox(height: 4),
+                        Text(
+                          option['description'],
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (isSelected)
-                  Icon(
-                    Icons.check_circle,
-                    color: deepGreen,
-                    size: 24,
-                  ),
-              ],
+                  if (isSelected)
+                    Icon(
+                      Icons.check_circle,
+                      color: deepGreen,
+                      size: 24,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
   /// Validates if all required fields are filled
   bool _isStepValid(OnboardingController controller) {

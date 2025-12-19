@@ -92,7 +92,7 @@ class BiometricAuthService {
     String? reason,
   }) async {
     log('⚠️ Biometric authentication temporarily disabled due to dependency conflict');
-    
+
     // When biometric auth is re-enabled, use secure storage for credentials
     // Example implementation (commented out until biometric auth is enabled):
     /*
@@ -119,7 +119,7 @@ class BiometricAuthService {
     String? reason,
   }) async {
     log('⚠️ Biometric authentication temporarily disabled due to dependency conflict');
-    
+
     // When biometric auth is re-enabled, retrieve from secure storage
     // Example implementation (commented out until biometric auth is enabled):
     /*
@@ -155,7 +155,7 @@ class BiometricAuthService {
         log('⚠️ Error clearing secure storage credentials: $e');
         // Continue to clear SharedPreferences
       }
-      
+
       // Clear SharedPreferences settings (non-sensitive)
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_biometricEnabledKey);

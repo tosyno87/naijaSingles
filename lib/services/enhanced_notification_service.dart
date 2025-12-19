@@ -52,9 +52,7 @@ class EnhancedNotificationService {
   static Future<void> _initializeLocalNotifications() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings(
-      
-    );
+    const iosSettings = DarwinInitializationSettings();
 
     const initSettings = InitializationSettings(
       android: androidSettings,
@@ -117,12 +115,11 @@ class EnhancedNotificationService {
 
   /// Request notification permissions
   static Future<void> _requestPermissions() async {
-    final settings = await _messaging.requestPermission(
-      
-    );
+    final settings = await _messaging.requestPermission();
 
     debugPrint(
-        '🔔 Notification permission status: ${settings.authorizationStatus}',);
+      '🔔 Notification permission status: ${settings.authorizationStatus}',
+    );
   }
 
   /// Setup FCM token management
@@ -148,14 +145,18 @@ class EnhancedNotificationService {
             if (_retryCount < _maxRetries) {
               _retryCount++;
               debugPrint(
-                  '⚠️ APNS token not available yet, retry $_retryCount/$_maxRetries',);
+                '⚠️ APNS token not available yet, retry $_retryCount/$_maxRetries',
+              );
               // Retry after a delay with exponential backoff
-              Future.delayed(Duration(seconds: 2 * _retryCount),
-                  () => _updateFCMToken(token),);
+              Future.delayed(
+                Duration(seconds: 2 * _retryCount),
+                () => _updateFCMToken(token),
+              );
               return;
             } else {
               debugPrint(
-                  '⚠️ APNS token not available after $_maxRetries retries, skipping (this is normal in simulator)',);
+                '⚠️ APNS token not available after $_maxRetries retries, skipping (this is normal in simulator)',
+              );
               _retryCount = 0; // Reset for future attempts
               // Continue without APNS token for now
             }
@@ -167,12 +168,15 @@ class EnhancedNotificationService {
           debugPrint('⚠️ Error getting APNS token: $e');
           if (_retryCount < _maxRetries) {
             _retryCount++;
-            Future.delayed(Duration(seconds: 2 * _retryCount),
-                () => _updateFCMToken(token),);
+            Future.delayed(
+              Duration(seconds: 2 * _retryCount),
+              () => _updateFCMToken(token),
+            );
             return;
           } else {
             debugPrint(
-                '⚠️ APNS token error after $_maxRetries retries, continuing without it',);
+              '⚠️ APNS token error after $_maxRetries retries, continuing without it',
+            );
             _retryCount = 0;
           }
         }
@@ -196,7 +200,8 @@ class EnhancedNotificationService {
           .update({'pushToken': token});
 
       debugPrint(
-          '🔑 FCM token updated successfully: ${token.substring(0, 20)}...',);
+        '🔑 FCM token updated successfully: ${token.substring(0, 20)}...',
+      );
       _retryCount = 0; // Reset on success
     } catch (e) {
       debugPrint('❌ Error updating FCM token: $e');
@@ -223,7 +228,8 @@ class EnhancedNotificationService {
   /// Handle foreground messages (show local notification)
   static Future<void> _handleForegroundMessage(RemoteMessage message) async {
     debugPrint(
-        '📱 Foreground message received: ${message.notification?.title}',);
+      '📱 Foreground message received: ${message.notification?.title}',
+    );
 
     final notification = message.notification;
     final data = message.data;
@@ -356,7 +362,8 @@ class EnhancedNotificationService {
   /// Navigate to profile screen
   static Future<void> _navigateToProfile(Map<String, dynamic> data) async {
     debugPrint(
-        '👤 Navigating to profile: ${data['likerName'] ?? data['senderName']}',);
+      '👤 Navigating to profile: ${data['likerName'] ?? data['senderName']}',
+    );
 
     final context = _navigatorKey?.currentContext;
     if (context != null) {
@@ -377,29 +384,33 @@ class EnhancedNotificationService {
   }
 
   /// Get user's notifications from Firestore (real-time)
-  static Stream<List<AppNotification>> getUserNotifications(String userId) => _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('notifications')
-        .orderBy('timestamp', descending: true)
-        .limit(50)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map(AppNotification.fromFirestore)
-            .toList(),);
+  static Stream<List<AppNotification>> getUserNotifications(String userId) =>
+      _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('notifications')
+          .orderBy('timestamp', descending: true)
+          .limit(50)
+          .snapshots()
+          .map(
+            (snapshot) =>
+                snapshot.docs.map(AppNotification.fromFirestore).toList(),
+          );
 
   /// Get unread notification count (real-time)
   static Stream<int> getUnreadCount(String userId) => _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('notifications')
-        .where('isRead', isEqualTo: false)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.length);
+      .collection('users')
+      .doc(userId)
+      .collection('notifications')
+      .where('isRead', isEqualTo: false)
+      .snapshots()
+      .map((snapshot) => snapshot.docs.length);
 
   /// Mark notification as read
   static Future<void> markNotificationAsRead(
-      String userId, String notificationId,) async {
+    String userId,
+    String notificationId,
+  ) async {
     try {
       await _firestore
           .collection('users')

@@ -8,9 +8,9 @@ import '../../data/services/location_service.dart';
 import 'rsvp_button.dart';
 
 class EventCard extends StatelessWidget {
-
   const EventCard({
-    required this.event, super.key,
+    required this.event,
+    super.key,
     this.onTap,
     this.showRSVPButton = true,
     this.isCompact = false,
@@ -22,234 +22,237 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-      onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildEventImage(),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildEventHeader(),
-                  const SizedBox(height: 12),
-                  _buildEventDetails(),
-                  if (!isCompact) ...[
-                    const SizedBox(height: 12),
-                    _buildEventDescription(),
-                  ],
-                  const SizedBox(height: 16),
-                  _buildEventFooter(context),
-                ],
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-
-  Widget _buildEventImage() => ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: event.imageUrl != null && event.imageUrl!.isNotEmpty
-            ? CachedNetworkImage(
-                imageUrl: event.imageUrl!,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const ColoredBox(
-                  color: Color(0xFFF5F5F5),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
-                    ),
-                  ),
-                ),
-                errorWidget: (context, url, error) => _buildPlaceholderImage(),
-              )
-            : _buildPlaceholderImage(),
-      ),
-    );
-
-  Widget _buildPlaceholderImage() => ColoredBox(
-      color: const Color(0xFFF5F5F5),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            _getCategoryIcon(),
-            size: 48,
-            color: const Color(0xFF008037),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            event.category,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF008037),
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildEventHeader() => Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                event.name,
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                  height: 1.3,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  _buildCategoryChip(),
-                  if (event.distanceFromUser != null) ...[
-                    const SizedBox(width: 8),
-                    _buildDistanceChip(),
+              _buildEventImage(),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildEventHeader(),
+                    const SizedBox(height: 12),
+                    _buildEventDetails(),
+                    if (!isCompact) ...[
+                      const SizedBox(height: 12),
+                      _buildEventDescription(),
+                    ],
+                    const SizedBox(height: 16),
+                    _buildEventFooter(context),
                   ],
-                ],
+                ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
-        _buildPriceTag(),
-      ],
-    );
+      );
+
+  Widget _buildEventImage() => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: event.imageUrl != null && event.imageUrl!.isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: event.imageUrl!,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const ColoredBox(
+                    color: Color(0xFFF5F5F5),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) =>
+                      _buildPlaceholderImage(),
+                )
+              : _buildPlaceholderImage(),
+        ),
+      );
+
+  Widget _buildPlaceholderImage() => ColoredBox(
+        color: const Color(0xFFF5F5F5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _getCategoryIcon(),
+              size: 48,
+              color: const Color(0xFF008037),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              event.category,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF008037),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildEventHeader() => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.name,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF333333),
+                    height: 1.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    _buildCategoryChip(),
+                    if (event.distanceFromUser != null) ...[
+                      const SizedBox(width: 8),
+                      _buildDistanceChip(),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          _buildPriceTag(),
+        ],
+      );
 
   Widget _buildCategoryChip() => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF008037).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        event.category,
-        style: GoogleFonts.montserrat(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: const Color(0xFF008037),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF008037).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
         ),
-      ),
-    );
+        child: Text(
+          event.category,
+          style: GoogleFonts.montserrat(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF008037),
+          ),
+        ),
+      );
 
   Widget _buildDistanceChip() => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF666666).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.location_on,
-            size: 12,
-            color: Color(0xFF666666),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF666666).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.location_on,
+              size: 12,
+              color: Color(0xFF666666),
+            ),
+            const SizedBox(width: 2),
+            Text(
+              LocationService.formatDistance(event.distanceFromUser!),
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF666666),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildPriceTag() => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: event.isFree
+              ? const Color(0xFF4CAF50).withOpacity(0.1)
+              : const Color(0xFFFF9800).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: event.isFree
+                ? const Color(0xFF4CAF50)
+                : const Color(0xFFFF9800),
           ),
-          const SizedBox(width: 2),
-          Text(
-            LocationService.formatDistance(event.distanceFromUser!),
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF666666),
+        ),
+        child: Text(
+          event.isFree ? 'FREE' : 'PAID',
+          style: GoogleFonts.montserrat(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: event.isFree
+                ? const Color(0xFF4CAF50)
+                : const Color(0xFFFF9800),
+          ),
+        ),
+      );
+
+  Widget _buildEventDetails() => Column(
+        children: [
+          _buildDetailRow(
+            icon: Icons.calendar_today,
+            text: _formatEventDate(),
+          ),
+          const SizedBox(height: 8),
+          _buildDetailRow(
+            icon: Icons.access_time,
+            text: _formatEventTime(),
+          ),
+          const SizedBox(height: 8),
+          _buildDetailRow(
+            icon: Icons.location_on,
+            text: event.location.displayAddress.isNotEmpty
+                ? event.location.displayAddress
+                : 'Location TBA',
+          ),
+        ],
+      );
+
+  Widget _buildDetailRow({required IconData icon, required String text}) => Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: const Color(0xFF666666),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: const Color(0xFF666666),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
-      ),
-    );
-
-  Widget _buildPriceTag() => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: event.isFree
-            ? const Color(0xFF4CAF50).withOpacity(0.1)
-            : const Color(0xFFFF9800).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color:
-              event.isFree ? const Color(0xFF4CAF50) : const Color(0xFFFF9800),
-        ),
-      ),
-      child: Text(
-        event.isFree ? 'FREE' : 'PAID',
-        style: GoogleFonts.montserrat(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color:
-              event.isFree ? const Color(0xFF4CAF50) : const Color(0xFFFF9800),
-        ),
-      ),
-    );
-
-  Widget _buildEventDetails() => Column(
-      children: [
-        _buildDetailRow(
-          icon: Icons.calendar_today,
-          text: _formatEventDate(),
-        ),
-        const SizedBox(height: 8),
-        _buildDetailRow(
-          icon: Icons.access_time,
-          text: _formatEventTime(),
-        ),
-        const SizedBox(height: 8),
-        _buildDetailRow(
-          icon: Icons.location_on,
-          text: event.location.displayAddress.isNotEmpty
-              ? event.location.displayAddress
-              : 'Location TBA',
-        ),
-      ],
-    );
-
-  Widget _buildDetailRow({required IconData icon, required String text}) => Row(
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: const Color(0xFF666666),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: const Color(0xFF666666),
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
+      );
 
   Widget _buildEventDescription() {
     if (event.description.isEmpty) return const SizedBox.shrink();
@@ -267,35 +270,35 @@ class EventCard extends StatelessWidget {
   }
 
   Widget _buildEventFooter(BuildContext context) => Row(
-      children: [
-        _buildAttendeeCount(),
-        const Spacer(),
-        if (showRSVPButton)
-          RSVPButton(
-            eventId: event.id,
-            compact: true,
-          ),
-      ],
-    );
+        children: [
+          _buildAttendeeCount(),
+          const Spacer(),
+          if (showRSVPButton)
+            RSVPButton(
+              eventId: event.id,
+              compact: true,
+            ),
+        ],
+      );
 
   Widget _buildAttendeeCount() => Row(
-      children: [
-        const Icon(
-          Icons.people,
-          size: 16,
-          color: Color(0xFF008037),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '${event.rsvpCount} going',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF008037),
+        children: [
+          const Icon(
+            Icons.people,
+            size: 16,
+            color: Color(0xFF008037),
           ),
-        ),
-      ],
-    );
+          const SizedBox(width: 4),
+          Text(
+            '${event.rsvpCount} going',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF008037),
+            ),
+          ),
+        ],
+      );
 
   IconData _getCategoryIcon() {
     switch (event.category.toLowerCase()) {
@@ -361,9 +364,9 @@ class EventCard extends StatelessWidget {
 
 // Compact version for lists
 class CompactEventCard extends StatelessWidget {
-
   const CompactEventCard({
-    required this.event, super.key,
+    required this.event,
+    super.key,
     this.onTap,
   });
   final EventModel event;
@@ -371,100 +374,101 @@ class CompactEventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox(
-                width: 60,
-                height: 60,
-                child: event.imageUrl != null && event.imageUrl!.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: event.imageUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => const ColoredBox(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: event.imageUrl != null && event.imageUrl!.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: event.imageUrl!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const ColoredBox(
+                            color: Color(0xFFF5F5F5),
+                            child: Icon(
+                              Icons.event,
+                              color: Color(0xFF008037),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              const ColoredBox(
+                            color: Color(0xFFF5F5F5),
+                            child: Icon(
+                              Icons.event,
+                              color: Color(0xFF008037),
+                            ),
+                          ),
+                        )
+                      : const ColoredBox(
                           color: Color(0xFFF5F5F5),
                           child: Icon(
                             Icons.event,
                             color: Color(0xFF008037),
                           ),
                         ),
-                        errorWidget: (context, url, error) => const ColoredBox(
-                          color: Color(0xFFF5F5F5),
-                          child: Icon(
-                            Icons.event,
-                            color: Color(0xFF008037),
-                          ),
-                        ),
-                      )
-                    : const ColoredBox(
-                        color: Color(0xFFF5F5F5),
-                        child: Icon(
-                          Icons.event,
-                          color: Color(0xFF008037),
-                        ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      event.name,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF333333),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      DateFormat('MMM d, h:mm a').format(event.startDate),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: const Color(0xFF666666),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      event.location.displayAddress.isNotEmpty
+                          ? event.location.displayAddress
+                          : 'Location TBA',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        color: const Color(0xFF999999),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    event.name,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF333333),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    DateFormat('MMM d, h:mm a').format(event.startDate),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      color: const Color(0xFF666666),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    event.location.displayAddress.isNotEmpty
-                        ? event.location.displayAddress
-                        : 'Location TBA',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      color: const Color(0xFF999999),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              RSVPButton(
+                eventId: event.id,
+                compact: true,
               ),
-            ),
-            RSVPButton(
-              eventId: event.id,
-              compact: true,
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
 }

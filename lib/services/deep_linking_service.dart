@@ -200,7 +200,6 @@ class DeepLinkingService {
 
 /// Deep link data model
 class DeepLinkData {
-
   const DeepLinkData({
     required this.type,
     required this.parameters,
@@ -208,14 +207,15 @@ class DeepLinkData {
   });
 
   factory DeepLinkData.fromUri(Uri uri) => DeepLinkData(
-      type: uri.pathSegments.isNotEmpty ? uri.pathSegments.first : 'unknown',
-      parameters: uri.queryParameters,
-      timestamp: DateTime.now(),
-    );
+        type: uri.pathSegments.isNotEmpty ? uri.pathSegments.first : 'unknown',
+        parameters: uri.queryParameters,
+        timestamp: DateTime.now(),
+      );
   final String type;
   final Map<String, String> parameters;
   final DateTime timestamp;
 
   @override
-  String toString() => 'DeepLinkData(type: $type, parameters: $parameters, timestamp: $timestamp)';
+  String toString() =>
+      'DeepLinkData(type: $type, parameters: $parameters, timestamp: $timestamp)';
 }

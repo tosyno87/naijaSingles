@@ -44,8 +44,8 @@ class OnboardingStyles {
   // Decorations
   static BoxDecoration get inputDecoration => BoxDecoration(
         color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
       );
 
   static BoxDecoration get selectedItemDecoration => BoxDecoration(

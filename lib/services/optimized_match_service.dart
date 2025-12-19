@@ -28,7 +28,9 @@ class OptimizedMatchService {
   /// Optimized like handling with minimal Firestore reads
   /// Target: 2-3 reads maximum per match operation
   Future<OptimizedMatchResult> handleLike(
-      String fromUserId, String toUserId,) async {
+    String fromUserId,
+    String toUserId,
+  ) async {
     try {
       if (fromUserId.isEmpty || toUserId.isEmpty) {
         return OptimizedMatchResult.error('Invalid user IDs provided');
@@ -72,7 +74,9 @@ class OptimizedMatchService {
   /// Check for mutual like with single optimized query
   /// Returns information about existing matches and mutual likes
   Future<MutualLikeCheckResult> _checkMutualLike(
-      String fromUserId, String toUserId,) async {
+    String fromUserId,
+    String toUserId,
+  ) async {
     try {
       // Use cached result if available and recent
       final cacheKey = '${fromUserId}_$toUserId';
@@ -212,12 +216,14 @@ class OptimizedMatchService {
       });
 
       // 3. Update legacy match collections for backward compatibility
-      final userAImageUrl = (userAData['imageUrl'] as List?)?.isNotEmpty ?? false
-          ? userAData['imageUrl'][0]
-          : '';
-      final userBImageUrl = (userBData['imageUrl'] as List?)?.isNotEmpty ?? false
-          ? userBData['imageUrl'][0]
-          : '';
+      final userAImageUrl =
+          (userAData['imageUrl'] as List?)?.isNotEmpty ?? false
+              ? userAData['imageUrl'][0]
+              : '';
+      final userBImageUrl =
+          (userBData['imageUrl'] as List?)?.isNotEmpty ?? false
+              ? userBData['imageUrl'][0]
+              : '';
 
       // User A's matches
       batch.set(
@@ -295,9 +301,7 @@ class OptimizedMatchService {
           .limit(50) // Limit for performance
           .get();
 
-      return querySnapshot.docs
-          .map(MatchModel.fromDocument)
-          .toList();
+      return querySnapshot.docs.map(MatchModel.fromDocument).toList();
     } catch (e) {
       debugPrint('❌ Error getting user matches: $e');
       return [];
@@ -331,13 +335,13 @@ class OptimizedMatchService {
 
   /// Get cache statistics
   Map<String, dynamic> getCacheStats() => {
-      'likeCheckCacheSize': _recentLikeChecks.length,
-      'oldestCacheEntry': _likeCheckTimestamps.values.isNotEmpty
-          ? _likeCheckTimestamps.values
-              .reduce((a, b) => a.isBefore(b) ? a : b)
-              .toString()
-          : 'None',
-    };
+        'likeCheckCacheSize': _recentLikeChecks.length,
+        'oldestCacheEntry': _likeCheckTimestamps.values.isNotEmpty
+            ? _likeCheckTimestamps.values
+                .reduce((a, b) => a.isBefore(b) ? a : b)
+                .toString()
+            : 'None',
+      };
 
   /// Clear all caches
   void clearCache() {
@@ -349,7 +353,6 @@ class OptimizedMatchService {
 
 /// Result class for optimized match operations
 class OptimizedMatchResult {
-
   const OptimizedMatchResult._({
     required this.isSuccess,
     required this.isMatch,
@@ -359,33 +362,35 @@ class OptimizedMatchResult {
     this.error,
   });
 
-  factory OptimizedMatchResult.newMatch(String matchId, String otherUserId) => OptimizedMatchResult._(
-      isSuccess: true,
-      isMatch: true,
-      isExistingMatch: false,
-      matchId: matchId,
-      otherUserId: otherUserId,
-    );
+  factory OptimizedMatchResult.newMatch(String matchId, String otherUserId) =>
+      OptimizedMatchResult._(
+        isSuccess: true,
+        isMatch: true,
+        isExistingMatch: false,
+        matchId: matchId,
+        otherUserId: otherUserId,
+      );
 
-  factory OptimizedMatchResult.existingMatch(String matchId) => OptimizedMatchResult._(
-      isSuccess: true,
-      isMatch: true,
-      isExistingMatch: true,
-      matchId: matchId,
-    );
+  factory OptimizedMatchResult.existingMatch(String matchId) =>
+      OptimizedMatchResult._(
+        isSuccess: true,
+        isMatch: true,
+        isExistingMatch: true,
+        matchId: matchId,
+      );
 
   factory OptimizedMatchResult.likeSaved() => const OptimizedMatchResult._(
-      isSuccess: true,
-      isMatch: false,
-      isExistingMatch: false,
-    );
+        isSuccess: true,
+        isMatch: false,
+        isExistingMatch: false,
+      );
 
   factory OptimizedMatchResult.error(String error) => OptimizedMatchResult._(
-      isSuccess: false,
-      isMatch: false,
-      isExistingMatch: false,
-      error: error,
-    );
+        isSuccess: false,
+        isMatch: false,
+        isExistingMatch: false,
+        error: error,
+      );
   final bool isSuccess;
   final bool isMatch;
   final bool isExistingMatch;
@@ -394,12 +399,12 @@ class OptimizedMatchResult {
   final String? error;
 
   @override
-  String toString() => 'OptimizedMatchResult(isSuccess: $isSuccess, isMatch: $isMatch, isExistingMatch: $isExistingMatch, matchId: $matchId, error: $error)';
+  String toString() =>
+      'OptimizedMatchResult(isSuccess: $isSuccess, isMatch: $isMatch, isExistingMatch: $isExistingMatch, matchId: $matchId, error: $error)';
 }
 
 /// Result class for mutual like checks
 class MutualLikeCheckResult {
-
   const MutualLikeCheckResult({
     required this.isMutualLike,
     required this.isExistingMatch,

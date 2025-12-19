@@ -668,31 +668,32 @@ class Custom3DIcons {
     required double size,
     required Color color,
     required LinearGradient gradient,
-  }) => Container(
-      width: size + 8,
-      height: size + 8,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: gradient,
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: Colors.white.withOpacity(0.1),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Icon(
-        iconData,
-        size: size,
-        color: Colors.white,
-      ),
-    );
+  }) =>
+      Container(
+        width: size + 8,
+        height: size + 8,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: gradient,
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.white.withOpacity(0.1),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Icon(
+          iconData,
+          size: size,
+          color: Colors.white,
+        ),
+      );
 
   // 🌍 CULTURAL & COMMUNITY ICONS
   static Widget culture({double size = 24, Color? color}) => _build3DIcon(

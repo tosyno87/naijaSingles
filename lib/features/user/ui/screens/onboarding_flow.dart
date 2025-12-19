@@ -61,8 +61,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           children: [
             // Progress indicator
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
                 children: List.generate(
                   3,
@@ -112,21 +111,24 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Back labelLarge (hidden on first page)
-                  if (_currentPage > 0) TextButton(
-                          onPressed: () {
-                            _pageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                          child: Text(
-                            'Back',
-                            style: TextStyle(
-                              color: Colors.grey.shade700,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ) else const SizedBox(width: 80),
+                  if (_currentPage > 0)
+                    TextButton(
+                      onPressed: () {
+                        _pageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      child: Text(
+                        'Back',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    )
+                  else
+                    const SizedBox(width: 80),
 
                   // Next/Finish labelLarge
                   ElevatedButton(
@@ -181,68 +183,70 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   /// Build the cultural identity screen (Page 1)
-  Widget _buildCulturalIdentityScreen(OnboardingController controller) => SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            'Your Cultural Identity',
-            style: GoogleFonts.montserrat(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.brown.shade800,
+  Widget _buildCulturalIdentityScreen(OnboardingController controller) =>
+      SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              'Your Cultural Identity',
+              style: GoogleFonts.montserrat(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown.shade800,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Tell us about your cultural background to help us connect you with like-minded people.',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: Colors.brown.shade600,
+            const SizedBox(height: 16),
+            Text(
+              'Tell us about your cultural background to help us connect you with like-minded people.',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: Colors.brown.shade600,
+              ),
             ),
-          ),
-          const SizedBox(height: 40),
+            const SizedBox(height: 40),
 
-          // Tribe selection
-          _buildInputLabel('Tribe or Ethnic Group'),
-          _buildDropdownField<String>(
-            value: controller.tribe,
-            items: const [
-              'Yoruba',
-              'Igbo',
-              'Hausa',
-              'Fulani',
-              'Ijaw',
-              'Kanuri',
-              'Ibibio',
-              'Tiv',
-              'Other',
-            ],
-            onChanged: (value) {
-              if (value != null) controller.updateTribe(value);
-            },
-            hint: 'Select your tribe',
-          ),
-          const SizedBox(height: 24),
+            // Tribe selection
+            _buildInputLabel('Tribe or Ethnic Group'),
+            _buildDropdownField<String>(
+              value: controller.tribe,
+              items: const [
+                'Yoruba',
+                'Igbo',
+                'Hausa',
+                'Fulani',
+                'Ijaw',
+                'Kanuri',
+                'Ibibio',
+                'Tiv',
+                'Other',
+              ],
+              onChanged: (value) {
+                if (value != null) controller.updateTribe(value);
+              },
+              hint: 'Select your tribe',
+            ),
+            const SizedBox(height: 24),
 
-          // Languages selection
-          _buildInputLabel('Languages Spoken'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              'English',
-              'Yoruba',
-              'Igbo',
-              'Hausa',
-              'Pidgin',
-              'French',
-              'Arabic',
-              'Other',
-            ]
-                .map((language) => _buildSelectionChip(
+            // Languages selection
+            _buildInputLabel('Languages Spoken'),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                'English',
+                'Yoruba',
+                'Igbo',
+                'Hausa',
+                'Pidgin',
+                'French',
+                'Arabic',
+                'Other',
+              ]
+                  .map(
+                    (language) => _buildSelectionChip(
                       label: language,
                       isSelected: controller.languages.contains(language),
                       onSelected: (selected) {
@@ -256,136 +260,142 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         }
                         controller.updateLanguages(updatedLanguages);
                       },
-                    ),)
-                .toList(),
-          ),
-          const SizedBox(height: 24),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 24),
 
-          // Nationality selection
-          _buildInputLabel('Nationality'),
-          _buildDropdownField<String>(
-            value: controller.nationality,
-            items: const [
-              'Nigerian',
-              'Nigerian Diaspora',
-              'Other African',
-              'Other',
-            ],
-            onChanged: (value) {
-              if (value != null) {
-                final bool isDiaspora = value == 'Nigerian Diaspora';
-                controller.updateNationality(value, isDiaspora);
-              }
-            },
-            hint: 'Select your nationality',
-          ),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
+            // Nationality selection
+            _buildInputLabel('Nationality'),
+            _buildDropdownField<String>(
+              value: controller.nationality,
+              items: const [
+                'Nigerian',
+                'Nigerian Diaspora',
+                'Other African',
+                'Other',
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  final bool isDiaspora = value == 'Nigerian Diaspora';
+                  controller.updateNationality(value, isDiaspora);
+                }
+              },
+              hint: 'Select your nationality',
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      );
 
   /// Build the relationship intent screen (Page 2)
-  Widget _buildRelationshipIntentScreen(OnboardingController controller) => SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            'What Are You Looking For?',
-            style: GoogleFonts.montserrat(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.brown.shade800,
+  Widget _buildRelationshipIntentScreen(OnboardingController controller) =>
+      SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              'What Are You Looking For?',
+              style: GoogleFonts.montserrat(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown.shade800,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Let us know what kind of connections you want to make.',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: Colors.brown.shade600,
+            const SizedBox(height: 16),
+            Text(
+              'Let us know what kind of connections you want to make.',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: Colors.brown.shade600,
+              ),
             ),
-          ),
-          const SizedBox(height: 40),
+            const SizedBox(height: 40),
 
-          // Intent selection cards
-          _buildIntentCard(
-            controller: controller,
-            title: 'Dating',
-            description: 'I want to find a romantic partner',
-            icon: Icons.favorite,
-            intentValue: 'Dating',
-          ),
-          const SizedBox(height: 16),
+            // Intent selection cards
+            _buildIntentCard(
+              controller: controller,
+              title: 'Dating',
+              description: 'I want to find a romantic partner',
+              icon: Icons.favorite,
+              intentValue: 'Dating',
+            ),
+            const SizedBox(height: 16),
 
-          _buildIntentCard(
-            controller: controller,
-            title: 'Friendship',
-            description: 'I want to make new friends',
-            icon: Icons.people,
-            intentValue: 'Friendship',
-          ),
-          const SizedBox(height: 16),
+            _buildIntentCard(
+              controller: controller,
+              title: 'Friendship',
+              description: 'I want to make new friends',
+              icon: Icons.people,
+              intentValue: 'Friendship',
+            ),
+            const SizedBox(height: 16),
 
-          _buildIntentCard(
-            controller: controller,
-            title: 'Community',
-            description: 'I want to connect with my cultural community',
-            icon: Icons.diversity_3,
-            intentValue: 'Community',
-          ),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
+            _buildIntentCard(
+              controller: controller,
+              title: 'Community',
+              description: 'I want to connect with my cultural community',
+              icon: Icons.diversity_3,
+              intentValue: 'Community',
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      );
 
   /// Build the lifestyle and values screen (Page 3)
-  Widget _buildLifestyleValuesScreen(OnboardingController controller) => SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            'Your Lifestyle & Values',
-            style: GoogleFonts.montserrat(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.brown.shade800,
+  Widget _buildLifestyleValuesScreen(OnboardingController controller) =>
+      SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              'Your Lifestyle & Values',
+              style: GoogleFonts.montserrat(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.brown.shade800,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Tell us about your preferences and what matters to you.',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: Colors.brown.shade600,
+            const SizedBox(height: 16),
+            Text(
+              'Tell us about your preferences and what matters to you.',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: Colors.brown.shade600,
+              ),
             ),
-          ),
-          const SizedBox(height: 40),
+            const SizedBox(height: 40),
 
-          // Music genres
-          _buildInputLabel('Favorite Music Genres'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              'Afrobeats',
-              'Highlife',
-              'Gospel',
-              'Hip Hop',
-              'R&B',
-              'Amapiano',
-              'Fuji',
-              'Juju',
-              'Traditional',
-            ]
-                .map((genre) => _buildSelectionChip(
+            // Music genres
+            _buildInputLabel('Favorite Music Genres'),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                'Afrobeats',
+                'Highlife',
+                'Gospel',
+                'Hip Hop',
+                'R&B',
+                'Amapiano',
+                'Fuji',
+                'Juju',
+                'Traditional',
+              ]
+                  .map(
+                    (genre) => _buildSelectionChip(
                       label: genre,
                       isSelected: controller.genres.contains(genre),
                       onSelected: (selected) {
-                        final List<String> updatedGenres = [...controller.genres];
+                        final List<String> updatedGenres = [
+                          ...controller.genres
+                        ];
                         if (selected) {
                           updatedGenres.add(genre);
                         } else {
@@ -393,71 +403,75 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         }
                         controller.updateGenres(updatedGenres);
                       },
-                    ),)
-                .toList(),
-          ),
-          const SizedBox(height: 24),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 24),
 
-          // Fashion style
-          _buildInputLabel('Your Fashion Style'),
-          _buildDropdownField<String>(
-            value: controller.fashionStyle,
-            items: const [
-              'Traditional',
-              'Modern African',
-              'Western',
-              'Afro-fusion',
-              'Minimalist',
-              'Vintage',
-              'Other',
-            ],
-            onChanged: (value) {
-              if (value != null) controller.updateFashionStyle(value);
-            },
-            hint: 'Select your style',
-          ),
-          const SizedBox(height: 24),
+            // Fashion style
+            _buildInputLabel('Your Fashion Style'),
+            _buildDropdownField<String>(
+              value: controller.fashionStyle,
+              items: const [
+                'Traditional',
+                'Modern African',
+                'Western',
+                'Afro-fusion',
+                'Minimalist',
+                'Vintage',
+                'Other',
+              ],
+              onChanged: (value) {
+                if (value != null) controller.updateFashionStyle(value);
+              },
+              hint: 'Select your style',
+            ),
+            const SizedBox(height: 24),
 
-          // Weekend vibe
-          _buildInputLabel('Your Ideal Weekend'),
-          _buildDropdownField<String>(
-            value: controller.weekendVibe,
-            items: const [
-              'Outdoor adventures',
-              'Cultural events',
-              'Quiet time at home',
-              'Nightlife & clubbing',
-              'Family gatherings',
-              'Religious activities',
-              'Sports & fitness',
-            ],
-            onChanged: (value) {
-              if (value != null) controller.updateWeekendVibe(value);
-            },
-            hint: 'Select your weekend vibe',
-          ),
-          const SizedBox(height: 24),
+            // Weekend vibe
+            _buildInputLabel('Your Ideal Weekend'),
+            _buildDropdownField<String>(
+              value: controller.weekendVibe,
+              items: const [
+                'Outdoor adventures',
+                'Cultural events',
+                'Quiet time at home',
+                'Nightlife & clubbing',
+                'Family gatherings',
+                'Religious activities',
+                'Sports & fitness',
+              ],
+              onChanged: (value) {
+                if (value != null) controller.updateWeekendVibe(value);
+              },
+              hint: 'Select your weekend vibe',
+            ),
+            const SizedBox(height: 24),
 
-          // Values
-          _buildInputLabel('Important Values to You'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              'Family',
-              'Tradition',
-              'Religion',
-              'Education',
-              'Career',
-              'Community',
-              'Independence',
-              'Creativity',
-            ]
-                .map((value) => _buildSelectionChip(
+            // Values
+            _buildInputLabel('Important Values to You'),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                'Family',
+                'Tradition',
+                'Religion',
+                'Education',
+                'Career',
+                'Community',
+                'Independence',
+                'Creativity',
+              ]
+                  .map(
+                    (value) => _buildSelectionChip(
                       label: value,
                       isSelected: controller.values.contains(value),
                       onSelected: (selected) {
-                        final List<String> updatedValues = [...controller.values];
+                        final List<String> updatedValues = [
+                          ...controller.values
+                        ];
                         if (selected) {
                           updatedValues.add(value);
                         } else {
@@ -465,26 +479,27 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                         }
                         controller.updateValues(updatedValues);
                       },
-                    ),)
-                .toList(),
-          ),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      );
 
   /// Build a label for input fields
   Widget _buildInputLabel(String label) => Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
         ),
-      ),
-    );
+      );
 
   /// Build a dropdown field
   Widget _buildDropdownField<T>({
@@ -492,48 +507,54 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     required List<T> items,
     required ValueChanged<T?> onChanged,
     required String hint,
-  }) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: DropdownButton<T>(
-        value: value,
-        hint: Text(hint),
-        isExpanded: true,
-        underline: const SizedBox(),
-        items: items.map((T item) => DropdownMenuItem<T>(
-            value: item,
-            child: Text(item.toString()),
-          ),).toList(),
-        onChanged: onChanged,
-      ),
-    );
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: DropdownButton<T>(
+          value: value,
+          hint: Text(hint),
+          isExpanded: true,
+          underline: const SizedBox(),
+          items: items
+              .map(
+                (T item) => DropdownMenuItem<T>(
+                  value: item,
+                  child: Text(item.toString()),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+        ),
+      );
 
   /// Build a selection chip for multi-select options
   Widget _buildSelectionChip({
     required String label,
     required bool isSelected,
     required ValueChanged<bool> onSelected,
-  }) => FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: onSelected,
-      backgroundColor: Colors.white,
-      selectedColor: primaryColor.withValues(alpha: 0.2),
-      checkmarkColor: primaryColor,
-      labelStyle: TextStyle(
-        color: isSelected ? primaryColor : Colors.black87,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: isSelected ? primaryColor : Colors.grey.shade300,
+  }) =>
+      FilterChip(
+        label: Text(label),
+        selected: isSelected,
+        onSelected: onSelected,
+        backgroundColor: Colors.white,
+        selectedColor: primaryColor.withValues(alpha: 0.2),
+        checkmarkColor: primaryColor,
+        labelStyle: TextStyle(
+          color: isSelected ? primaryColor : Colors.black87,
         ),
-      ),
-    );
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: isSelected ? primaryColor : Colors.grey.shade300,
+          ),
+        ),
+      );
 
   /// Build an intent selection card
   Widget _buildIntentCard({

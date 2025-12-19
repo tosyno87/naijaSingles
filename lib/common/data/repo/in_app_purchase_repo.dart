@@ -83,14 +83,22 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
 
   /// check if user has pruchased
   static PurchaseDetails hasPurchased(
-      String productId, List<PurchaseDetails> purchases,) => purchases.firstWhere(
-      (purchase) => purchase.productID == productId,
-      //orElse: () => null
-    );
+    String productId,
+    List<PurchaseDetails> purchases,
+  ) =>
+      purchases.firstWhere(
+        (purchase) => purchase.productID == productId,
+        //orElse: () => null
+      );
 
   ///verifying opurhcase of user
-  static Future<void> verifyPuchase(String id, List<PurchaseDetails> purchases,
-      UserModel currentUser, Map items, BuildContext context,) async {
+  static Future<void> verifyPuchase(
+    String id,
+    List<PurchaseDetails> purchases,
+    UserModel currentUser,
+    Map items,
+    BuildContext context,
+  ) async {
     final PurchaseDetails purchase = hasPurchased(id, purchases);
     if (purchase.status == PurchaseStatus.purchased ||
         purchase.status == PurchaseStatus.restored) {
@@ -102,17 +110,20 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
-          CupertinoPageRoute(builder: (context) => Tabbar(
+          CupertinoPageRoute(
+            builder: (context) => Tabbar(
               isPaymentSuccess: true,
               currentUserId: purchase.productID,
-            ),),
+            ),
+          ),
         );
       }
     } else if (purchase.status == PurchaseStatus.error) {
       Navigator.pushReplacement(
         context,
         CupertinoPageRoute(
-            builder: (context) => Products(currentUser, false, items),),
+          builder: (context) => Products(currentUser, false, items),
+        ),
       );
     }
     return;
@@ -133,8 +144,8 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
 
   String getIntervalAndroid(ProductDetails product) {
     product as GooglePlayProductDetails;
-    final String? durCode = product.productDetails.subscriptionOfferDetails?.first
-        .pricingPhases.first.billingPeriod;
+    final String? durCode = product.productDetails.subscriptionOfferDetails
+        ?.first.pricingPhases.first.billingPeriod;
     if (durCode == 'M' || durCode == 'm') {
       return 'Month(s)';
     } else if (durCode == 'Y' || durCode == 'y') {

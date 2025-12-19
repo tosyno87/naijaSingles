@@ -93,62 +93,62 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: _buildAppBar(),
-      body: _isLoading ? _buildLoadingState() : _buildSettingsContent(),
-    );
+        backgroundColor: AppColors.backgroundColor,
+        appBar: _buildAppBar(),
+        body: _isLoading ? _buildLoadingState() : _buildSettingsContent(),
+      );
 
   PreferredSizeWidget _buildAppBar() => AppBar(
-      backgroundColor: AppColors.backgroundColor,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: Text(
-        'Notification Settings',
-        style: GoogleFonts.montserrat(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textPrimary,
+        backgroundColor: AppColors.backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+          onPressed: () => Navigator.pop(context),
         ),
-      ),
-      centerTitle: true,
-      actions: [
-        if (_isSaving)
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+        title: Text(
+          'Notification Settings',
+          style: GoogleFonts.montserrat(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          if (_isSaving)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                ),
               ),
             ),
-          ),
-      ],
-    );
+        ],
+      );
 
   Widget _buildLoadingState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Loading settings...',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: AppColors.textSecondary,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            Text(
+              'Loading settings...',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildSettingsContent() {
     if (_settings == null) {
@@ -189,302 +189,304 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
   }
 
   Widget _buildHeaderCard() => Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primaryGreen.withOpacity(0.1),
-            AppColors.primaryGreen.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primaryGreen.withOpacity(0.1),
+              AppColors.primaryGreen.withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.primaryGreen.withOpacity(0.2),
+          ),
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.2),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.notifications_active,
+                color: AppColors.primaryGreen,
+                size: 24,
+              ),
             ),
-            child: const Icon(
-              Icons.notifications_active,
-              color: AppColors.primaryGreen,
-              size: 24,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Stay Connected',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Control when and how you receive notifications from Afropeep',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildSectionTitle(String title) => Text(
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textPrimary,
+        ),
+      );
+
+  Widget _buildNotificationToggles() => Column(
+        children: [
+          _buildSettingTile(
+            title: 'New Matches',
+            subtitle: 'Get notified when you have a new match',
+            icon: Icons.favorite,
+            value: _settings!.matchNotifications,
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(matchNotifications: value)),
+          ),
+          _buildSettingTile(
+            title: 'New Messages',
+            subtitle: 'Get notified when someone sends you a message',
+            icon: Icons.chat_bubble_outline,
+            value: _settings!.messageNotifications,
+            onChanged: (value) => _updateSetting(
+                _settings!.copyWith(messageNotifications: value)),
+          ),
+          _buildSettingTile(
+            title: 'Profile Likes',
+            subtitle: 'Get notified when someone likes your profile',
+            icon: Icons.thumb_up,
+            value: _settings!.likeNotifications,
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(likeNotifications: value)),
+          ),
+          _buildSettingTile(
+            title: 'Super Likes',
+            subtitle: 'Get notified when someone super likes you',
+            icon: Icons.star,
+            value: _settings!.superLikeNotifications,
+            onChanged: (value) => _updateSetting(
+              _settings!.copyWith(superLikeNotifications: value),
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      );
+
+  Widget _buildSoundVibrationToggles() => Column(
+        children: [
+          _buildSettingTile(
+            title: 'Sound',
+            subtitle: 'Play sound for notifications',
+            icon: Icons.volume_up,
+            value: _settings!.soundEnabled,
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(soundEnabled: value)),
+          ),
+          _buildSettingTile(
+            title: 'Vibration',
+            subtitle: 'Vibrate for notifications',
+            icon: Icons.vibration,
+            value: _settings!.vibrationEnabled,
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
+          ),
+        ],
+      );
+
+  Widget _buildQuietHoursSection() => Column(
+        children: [
+          _buildSettingTile(
+            title: 'Enable Quiet Hours',
+            subtitle: 'Pause notifications during specified hours',
+            icon: Icons.bedtime,
+            value: _settings!.quietHoursEnabled,
+            onChanged: (value) =>
+                _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
+          ),
+          if (_settings!.quietHoursEnabled) ...[
+            const SizedBox(height: 16),
+            _buildTimeSetting(
+              title: 'Start Time',
+              time: _settings!.quietHoursStart,
+              onTap: () => _showTimePicker(true),
+            ),
+            _buildTimeSetting(
+              title: 'End Time',
+              time: _settings!.quietHoursEnd,
+              onTap: () => _showTimePicker(false),
+            ),
+          ],
+        ],
+      );
+
+  Widget _buildFrequencySection() => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          children: [
+            Row(
               children: [
-                Text(
-                  'Stay Connected',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                const Icon(
+                  Icons.schedule,
+                  color: AppColors.primaryGreen,
+                  size: 20,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Control when and how you receive notifications from Afropeep',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                    height: 1.4,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Notification Frequency',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildSectionTitle(String title) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-      ),
-    );
-
-  Widget _buildNotificationToggles() => Column(
-      children: [
-        _buildSettingTile(
-          title: 'New Matches',
-          subtitle: 'Get notified when you have a new match',
-          icon: Icons.favorite,
-          value: _settings!.matchNotifications,
-          onChanged: (value) =>
-              _updateSetting(_settings!.copyWith(matchNotifications: value)),
-        ),
-        _buildSettingTile(
-          title: 'New Messages',
-          subtitle: 'Get notified when someone sends you a message',
-          icon: Icons.chat_bubble_outline,
-          value: _settings!.messageNotifications,
-          onChanged: (value) =>
-              _updateSetting(_settings!.copyWith(messageNotifications: value)),
-        ),
-        _buildSettingTile(
-          title: 'Profile Likes',
-          subtitle: 'Get notified when someone likes your profile',
-          icon: Icons.thumb_up,
-          value: _settings!.likeNotifications,
-          onChanged: (value) =>
-              _updateSetting(_settings!.copyWith(likeNotifications: value)),
-        ),
-        _buildSettingTile(
-          title: 'Super Likes',
-          subtitle: 'Get notified when someone super likes you',
-          icon: Icons.star,
-          value: _settings!.superLikeNotifications,
-          onChanged: (value) => _updateSetting(
-              _settings!.copyWith(superLikeNotifications: value),),
-        ),
-      ],
-    );
-
-  Widget _buildSoundVibrationToggles() => Column(
-      children: [
-        _buildSettingTile(
-          title: 'Sound',
-          subtitle: 'Play sound for notifications',
-          icon: Icons.volume_up,
-          value: _settings!.soundEnabled,
-          onChanged: (value) =>
-              _updateSetting(_settings!.copyWith(soundEnabled: value)),
-        ),
-        _buildSettingTile(
-          title: 'Vibration',
-          subtitle: 'Vibrate for notifications',
-          icon: Icons.vibration,
-          value: _settings!.vibrationEnabled,
-          onChanged: (value) =>
-              _updateSetting(_settings!.copyWith(vibrationEnabled: value)),
-        ),
-      ],
-    );
-
-  Widget _buildQuietHoursSection() => Column(
-      children: [
-        _buildSettingTile(
-          title: 'Enable Quiet Hours',
-          subtitle: 'Pause notifications during specified hours',
-          icon: Icons.bedtime,
-          value: _settings!.quietHoursEnabled,
-          onChanged: (value) =>
-              _updateSetting(_settings!.copyWith(quietHoursEnabled: value)),
-        ),
-        if (_settings!.quietHoursEnabled) ...[
-          const SizedBox(height: 16),
-          _buildTimeSetting(
-            title: 'Start Time',
-            time: _settings!.quietHoursStart,
-            onTap: () => _showTimePicker(true),
-          ),
-          _buildTimeSetting(
-            title: 'End Time',
-            time: _settings!.quietHoursEnd,
-            onTap: () => _showTimePicker(false),
-          ),
-        ],
-      ],
-    );
-
-  Widget _buildFrequencySection() => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.schedule,
-                color: AppColors.primaryGreen,
-                size: 20,
+            const SizedBox(height: 12),
+            Text(
+              'Reduce notification frequency to avoid overwhelming you with updates',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: AppColors.textSecondary,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Notification Frequency',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Reduce notification frequency to avoid overwhelming you with updates',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: AppColors.textSecondary,
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildFrequencyOption('Low', 'Fewer notifications'),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child:
-                    _buildFrequencyOption('Medium', 'Balanced notifications'),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildFrequencyOption('High', 'All notifications'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildFrequencyOption('Low', 'Fewer notifications'),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child:
+                      _buildFrequencyOption('Medium', 'Balanced notifications'),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildFrequencyOption('High', 'All notifications'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
 
   Widget _buildFrequencyOption(String title, String subtitle) => Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.primaryGreen.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.3),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.primaryGreen.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: AppColors.primaryGreen.withOpacity(0.3),
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primaryGreen,
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryGreen,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: AppColors.textSecondary,
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildTestNotificationSection() => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.science,
-                color: AppColors.primaryGreen,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Test Notifications',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.science,
+                  color: AppColors.primaryGreen,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Test Notifications',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Send a test notification to see how it will appear',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: AppColors.textSecondary,
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _sendTestNotification,
-            icon: const Icon(Icons.send),
-            label: const Text('Send Test Notification'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 12),
+            Text(
+              'Send a test notification to see how it will appear',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: AppColors.textSecondary,
               ),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _sendTestNotification,
+              icon: const Icon(Icons.send),
+              label: const Text('Send Test Notification'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildSettingTile({
     required String title,
@@ -492,148 +494,151 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     required IconData icon,
     required bool value,
     required ValueChanged<bool> onChanged,
-  }) => Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: SwitchListTile(
-        title: Text(
-          title,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
+  }) =>
+      Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
-        subtitle: Text(
-          subtitle,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: AppColors.textSecondary,
+        child: SwitchListTile(
+          title: Text(
+            title,
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
+          subtitle: Text(
+            subtitle,
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          secondary: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primaryGreen.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.primaryGreen,
+              size: 20,
+            ),
+          ),
+          value: value,
+          onChanged: onChanged,
+          activeThumbColor: AppColors.primaryGreen,
+          inactiveThumbColor: Colors.grey.shade400,
+          inactiveTrackColor: Colors.grey.shade200,
         ),
-        secondary: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppColors.primaryGreen.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: AppColors.primaryGreen,
-            size: 20,
-          ),
-        ),
-        value: value,
-        onChanged: onChanged,
-        activeThumbColor: AppColors.primaryGreen,
-        inactiveThumbColor: Colors.grey.shade400,
-        inactiveTrackColor: Colors.grey.shade200,
-      ),
-    );
+      );
 
   Widget _buildTimeSetting({
     required String title,
     required String time,
     required VoidCallback onTap,
-  }) => Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: ListTile(
-        title: Text(
-          title,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
+  }) =>
+      Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _formatTimeDisplay(time),
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: AppColors.primaryGreen,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right,
-              color: Colors.grey.shade600,
-            ),
-          ],
-        ),
-        onTap: onTap,
-      ),
-    );
-
-  Widget _buildErrorState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.grey.shade400,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Failed to load settings',
+        child: ListTile(
+          title: Text(
+            title,
             style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadSettings,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(
-              'Retry',
-              style: GoogleFonts.montserrat(),
-            ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _formatTimeDisplay(time),
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: AppColors.primaryGreen,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey.shade600,
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+          onTap: onTap,
+        ),
+      );
+
+  Widget _buildErrorState() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Failed to load settings',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadSettings,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                'Retry',
+                style: GoogleFonts.montserrat(),
+              ),
+            ),
+          ],
+        ),
+      );
 
   Future<void> _showTimePicker(bool isStartTime) async {
     final currentTime = _parseTime(
-        isStartTime ? _settings!.quietHoursStart : _settings!.quietHoursEnd,);
+      isStartTime ? _settings!.quietHoursStart : _settings!.quietHoursEnd,
+    );
 
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: currentTime,
       builder: (context, child) => Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primaryGreen,
-              onSurface: AppColors.textPrimary,
-            ),
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppColors.primaryGreen,
+            onSurface: AppColors.textPrimary,
           ),
-          child: child!,
         ),
+        child: child!,
+      ),
     );
 
     if (picked != null) {
@@ -654,7 +659,8 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     );
   }
 
-  String _formatTime(TimeOfDay time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  String _formatTime(TimeOfDay time) =>
+      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
   String _formatTimeDisplay(String timeString) {
     final time = _parseTime(timeString);

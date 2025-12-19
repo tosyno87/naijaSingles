@@ -8,7 +8,6 @@ import './google_login_events.dart';
 import './google_login_states.dart';
 
 class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
-
   GoogleLoginBloc({GoogleLoginRepository? repository})
       : _repository = repository ?? GoogleLoginRepositoryImpl(),
         super(GoogleLoginInitial()) {

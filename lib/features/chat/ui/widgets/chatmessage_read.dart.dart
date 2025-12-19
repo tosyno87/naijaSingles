@@ -13,7 +13,11 @@ import '../../../user/ui/widgets/user_info.dart';
 
 class ChatMessageRead {
   static List<Widget> messagesIsRead(
-      documentSnapshot, UserModel second, sender, BuildContext context,) {
+    documentSnapshot,
+    UserModel second,
+    sender,
+    BuildContext context,
+  ) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return <Widget>[
       Column(
@@ -29,14 +33,15 @@ class ChatMessageRead {
               ),
             ),
             onTap: () => showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (context) => Info(
-                    second,
-                    sender,
-                    false,
-                    fromChatPage: true,
-                  ),),
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => Info(
+                second,
+                sender,
+                false,
+                fromChatPage: true,
+              ),
+            ),
           ),
         ],
       ),
@@ -52,7 +57,10 @@ class ChatMessageRead {
                         children: <Widget>[
                           Container(
                             margin: const EdgeInsets.only(
-                                top: 2, bottom: 2, right: 15,),
+                              top: 2,
+                              bottom: 2,
+                              right: 15,
+                            ),
                             height: 150,
                             width: 150,
                             color: const Color.fromRGBO(0, 0, 0, 0.2),
@@ -67,78 +75,96 @@ class ChatMessageRead {
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: Text(
-                                documentSnapshot.data()!['time'] != null
-                                    ? DateFormat.yMMMd('en_US')
-                                        .add_jm()
-                                        .format(documentSnapshot
+                              documentSnapshot.data()!['time'] != null
+                                  ? DateFormat.yMMMd('en_US')
+                                      .add_jm()
+                                      .format(
+                                        documentSnapshot
                                             .data()!['time']
-                                            .toDate(),)
-                                        .toString()
-                                    : '',
-                                style: const TextStyle(
-                                  color: AppColors.secondaryColor,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),),
+                                            .toDate(),
+                                      )
+                                      .toString()
+                                  : '',
+                              style: const TextStyle(
+                                color: AppColors.secondaryColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       onTap: () {
-                        Navigator.pushNamed(context, RouteName.largeImageScreen,
-                            arguments: documentSnapshot.get('image_url'),);
+                        Navigator.pushNamed(
+                          context,
+                          RouteName.largeImageScreen,
+                          arguments: documentSnapshot.get('image_url'),
+                        );
                       },
                     )
                   : GestureDetector(
                       onLongPress: () {
-                        Clipboard.setData(ClipboardData(
-                            text: documentSnapshot.data()!['text'],),);
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: documentSnapshot.data()!['text'],
+                          ),
+                        );
                         CustomToast.showToast('Message Copied'.tr().toString());
                       },
                       child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10,),
-                          width: MediaQuery.of(context).size.width * 0.65,
-                          margin: const EdgeInsets.only(
-                              top: 8, bottom: 8, right: 10,),
-                          decoration: BoxDecoration(
-                              color: AppColors.secondaryColor
-                                  .withValues(alpha: (.3 * 255).toDouble()),
-                              borderRadius: BorderRadius.circular(15),),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                documentSnapshot.data()!['text'],
-                                style: TextStyle(
-                                  color: themeProvider.isDarkMode
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 10,
+                        ),
+                        width: MediaQuery.of(context).size.width * 0.65,
+                        margin: const EdgeInsets.only(
+                          top: 8,
+                          bottom: 8,
+                          right: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondaryColor
+                              .withValues(alpha: (.3 * 255).toDouble()),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              documentSnapshot.data()!['text'],
+                              style: TextStyle(
+                                color: themeProvider.isDarkMode
+                                    ? Colors.white
+                                    : Colors.black87,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Text(
-                                    documentSnapshot.data()!['time'] != null
-                                        ? DateFormat.MMMd('en_US')
-                                            .add_jm()
-                                            .format(documentSnapshot
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                Text(
+                                  documentSnapshot.data()!['time'] != null
+                                      ? DateFormat.MMMd('en_US')
+                                          .add_jm()
+                                          .format(
+                                            documentSnapshot
                                                 .data()!['time']
-                                                .toDate(),)
-                                            .toString()
-                                        : '',
-                                    style: const TextStyle(
-                                      color: AppColors.secondaryColor,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                                .toDate(),
+                                          )
+                                          .toString()
+                                      : '',
+                                  style: const TextStyle(
+                                    color: AppColors.secondaryColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
             ),
           ],

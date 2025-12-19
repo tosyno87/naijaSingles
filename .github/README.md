@@ -1,153 +1,188 @@
-# GitHub Actions for NaijaSingles
+# GitHub Actions for AfroPeep
 
-This directory contains automated workflows that run tests and checks for the NaijaSingles dating app.
+This directory contains automated workflows that run tests, quality checks, and deployments for the AfroPeep dating app.
 
 ## 🚀 Workflows
 
-### 1. Flutter Tests (`flutter_tests.yml`)
-**Triggers:** Every push and pull request to `main` or `develop`
+### 1. CI - Quality Gates & SonarQube (`ci.yml`) ⭐ **Main CI Workflow**
+**Triggers:** Push/PR to `main`, `develop`, `feature/*`
 
 **What it does:**
-- ✅ Runs unit tests
-- ✅ Performs code analysis
-- ✅ Builds iOS app (no signing)
-- ✅ Runs integration tests including bio screen single selection test
-- ✅ Uploads test results
+- ✅ Code quality analysis (static analysis, formatting)
+- ✅ **SonarQube analysis** (code quality, security, coverage)
+- ✅ Security analysis (secrets detection, vulnerability scanning)
+- ✅ Unit tests with coverage (70% threshold)
+- ✅ Build validation (Android APK)
+- ✅ Quality gate summary
 
-### 2. Code Quality (`code_quality.yml`)
-**Triggers:** Every push and pull request
+**SonarQube Integration:**
+- Runs on PRs and main/develop branches
+- Analyzes new code vs. main branch
+- Enforces quality gates
+- See `docs/SONARQUBE_SETUP.md` for setup
+
+### 2. Production Deployment (`production.yml`)
+**Triggers:** Push/PR to `main`, `release/*`
 
 **What it does:**
+- ✅ Runs tests with coverage
+- ✅ Builds iOS app with code signing
+- ✅ Auto-increments build number
+- ✅ Deploys to App Store Connect
+- ✅ Security scanning
+
+### 3. Staging Deployment (`staging.yml`)
+**Triggers:** Push/PR to `develop`
+
+**What it does:**
+- ✅ Runs tests and analysis
+- ✅ Builds staging web app
+- ✅ Deploys to Firebase hosting (staging)
+- ✅ Security audit
+
+### 4. Feature Development (`feature-development.yml`)
+**Triggers:** Push/PR to `develop`, `feature/*`, `fix/*`
+
+**What it does:**
+- ✅ Runs tests and analysis
 - ✅ Checks code formatting
-- ✅ Analyzes code for issues
-- ✅ Checks for unused dependencies
-- ✅ Generates coverage reports
-- ✅ Uploads coverage to Codecov
+- ✅ iOS build verification (PR only)
+- ✅ Coverage reporting
 
-### 3. Build and Deploy (`build_and_deploy.yml`)
-**Triggers:** Version tags (v1.0.0) or manual trigger
+## 📊 Quality Gates
 
-**What it does:**
-- ✅ Builds Android APK and App Bundle
-- ✅ Builds iOS app
-- ✅ Uploads build artifacts
-- ✅ Ready for app store deployment
+### Code Quality Standards
+- **Coverage Threshold:** 70% (warning, not blocking)
+- **Static Analysis:** Must pass (warnings allowed)
+- **Security:** No secrets in code (blocking)
+- **Build:** Must compile successfully (blocking)
+- **SonarQube:** Quality gate must pass (on PRs/main)
 
-### 4. Comprehensive Tests (`comprehensive_tests.yml`)
-**Triggers:** Push, PR, and daily at 2 AM
-
-**What it does:**
-- ✅ Unit tests with coverage
-- ✅ Integration tests on iOS simulator
-- ✅ Feature-specific tests (bio screen, onboarding)
-- ✅ Performance tests
-- ✅ Security vulnerability checks
-- ✅ Notifications on success/failure
-
-## 📊 Test Coverage
-
-The workflows specifically test:
-
-### Bio Screen Single Selection ✅
-- Verifies users can only select one prompt at a time
-- Tests prompt selection/deselection logic
-- Validates UI behavior
-
-### Onboarding Flow ✅
-- Complete user registration process
-- Profile setup validation
-- Navigation between screens
-
-### Performance Monitoring ✅
-- App startup time (target: <10 seconds)
-- Memory usage tracking
-- UI responsiveness
-
-### Security Checks ✅
-- Dependency vulnerability scanning
-- Permission analysis
-- Code security patterns
+### Test Coverage
+- Unit tests for all services and repositories
+- Widget tests for critical UI components
+- Integration tests for key user flows
+- Security tests for authentication and data protection
 
 ## 🔧 Setup Instructions
 
-1. **Commit workflows to your repository:**
-   ```bash
-   git add .github/
-   git commit -m "Add GitHub Actions workflows"
-   git push origin main
-   ```
+### 1. SonarQube Setup (Required for CI)
 
-2. **View workflows in GitHub:**
-   - Go to your repository on GitHub
-   - Click the "Actions" tab
-   - See workflows running automatically
+1. **Add GitHub Secrets:**
+   - Go to repository Settings > Secrets and variables > Actions
+   - Add `SONAR_TOKEN`: Your SonarQube/SonarCloud authentication token
+   - Add `SONAR_HOST_URL`: `https://sonarcloud.io` (or your SonarQube server)
 
-3. **Configure notifications:**
-   - Go to repository Settings > Notifications
-   - Enable email/Slack notifications for workflow results
+2. **Configure SonarQube:**
+   - Follow `docs/SONARQUBE_SETUP.md`
+   - Set "New Code Definition" to `Reference branch: main`
+   - Configure quality gates
 
-## 📈 Workflow Status
+3. **Project Configuration:**
+   - Project key: `afropeep`
+   - Configuration file: `sonar-project.properties` (already created)
 
-You can add these badges to your main README.md:
+### 2. Codecov Setup (Optional)
+
+1. **Add GitHub Secret:**
+   - Add `CODECOV_TOKEN`: Your Codecov token
+
+2. **View Coverage:**
+   - Coverage reports uploaded automatically
+   - View at codecov.io or in PR comments
+
+### 3. View Workflows
+
+1. **In GitHub:**
+   - Go to repository > Actions tab
+   - See all workflow runs and status
+
+2. **In SonarQube:**
+   - View code quality metrics
+   - Check quality gate status
+   - Review security vulnerabilities
+
+## 📈 Workflow Status Badges
+
+Add these to your main `README.md`:
 
 ```markdown
-![Flutter Tests](https://github.com/yourusername/naijaSingles/workflows/Flutter%20Tests/badge.svg)
-![Code Quality](https://github.com/yourusername/naijaSingles/workflows/Code%20Quality/badge.svg)
-![Build Status](https://github.com/yourusername/naijaSingles/workflows/Build%20and%20Deploy/badge.svg)
+![CI](https://github.com/yourusername/naijaSingles/workflows/CI%20-%20Quality%20Gates%20%26%20SonarQube/badge.svg)
+![Production](https://github.com/yourusername/naijaSingles/workflows/Production%20Deployment/badge.svg)
 ```
 
 ## 🎯 Benefits
 
 ### For Development:
-- **Instant feedback** on code changes
-- **Prevent bugs** from reaching production
-- **Maintain code quality** standards
-- **Automated testing** of critical features
+- **Instant feedback** on code changes via PR checks
+- **Prevent bugs** with automated quality gates
+- **Maintain code quality** with SonarQube analysis
+- **Security scanning** to catch vulnerabilities early
 
 ### For Team Collaboration:
 - **PR validation** before merging
-- **Consistent testing** across environments
-- **Deployment confidence**
-- **Quality gates** for releases
+- **Consistent testing** across all environments
+- **Quality metrics** visible in PRs
+- **Automated quality gates** prevent regressions
 
 ### For Production:
-- **Reliable releases** with automated testing
-- **Performance monitoring**
-- **Security vulnerability detection**
-- **Build artifacts** ready for app stores
+- **Reliable releases** with comprehensive testing
+- **Automated deployments** to App Store
+- **Build number management** automatic
+- **Security audits** before deployment
 
 ## 🚨 Troubleshooting
 
 ### Common Issues:
 
-1. **Tests failing on GitHub but passing locally:**
-   - Check Flutter version consistency
-   - Verify dependencies are locked in pubspec.lock
+1. **SonarQube not running:**
+   - Check `SONAR_TOKEN` and `SONAR_HOST_URL` secrets are set
+   - Verify workflow triggers (runs on PRs/main/develop only)
+   - Check SonarQube project exists and is configured
+
+2. **Tests failing on GitHub but passing locally:**
+   - Check Flutter version (should be 3.35.5)
+   - Verify dependencies in `pubspec.lock`
    - Review environment differences
 
-2. **iOS simulator issues:**
-   - Workflows use iPhone 15 Pro simulator
-   - Adjust device name in workflow if needed
+3. **Coverage below threshold:**
+   - This is a warning, not a failure
+   - Aim for 70%+ coverage
+   - Review coverage report in Codecov
 
-3. **Build failures:**
+4. **Build failures:**
    - Check Xcode version compatibility
-   - Verify signing certificates (for release builds)
+   - Verify signing certificates (for production)
+   - Review build logs for specific errors
 
 ### Getting Help:
 
 - Check workflow logs in GitHub Actions tab
-- Review test output for specific failures
+- Review SonarQube dashboard for quality issues
 - Compare with local test results
+- See `docs/GITHUB_ACTIONS_CONSOLIDATION.md` for workflow details
 
-## 📝 Customization
+## 📝 Workflow Customization
 
-You can modify workflows by:
+### Adding New Checks:
+1. Edit `.github/workflows/ci.yml`
+2. Add new job or step
+3. Test with a feature branch PR
 
-1. **Adding new test cases** to `integration_test/app_test.dart`
-2. **Changing trigger conditions** in workflow files
-3. **Adding deployment targets** (Firebase, App Store, Play Store)
-4. **Configuring notifications** (Slack, Discord, email)
+### Changing Triggers:
+1. Edit `on:` section in workflow file
+2. Adjust branch patterns as needed
+
+### Adding Notifications:
+1. Add notification step to workflow
+2. Configure Slack/Discord/email integration
+
+## 📚 Documentation
+
+- **Workflow Details:** `docs/GITHUB_ACTIONS_CONSOLIDATION.md`
+- **SonarQube Setup:** `docs/SONARQUBE_SETUP.md`
+- **Workflow Audit:** `docs/GITHUB_ACTIONS_AUDIT.md`
 
 ---
 
-**Your NaijaSingles app now has enterprise-level automated testing! 🎉**
+**Your AfroPeep app now has enterprise-level CI/CD with SonarQube integration! 🎉**

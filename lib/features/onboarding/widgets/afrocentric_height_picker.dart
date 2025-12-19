@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../common/constants/app_colors.dart';
 
 class AfrocentricHeightPicker extends StatefulWidget {
-
   const AfrocentricHeightPicker({
-    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+    required this.initialHeight,
+    required this.initialUnit,
+    required this.onChanged,
+    super.key,
   });
   final double initialHeight; // Height in cm
   final String initialUnit; // 'cm' or 'ft'
@@ -38,11 +40,11 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
   // MVP Colors
   static const Color backgroundColor =
       Color(0xFFF7E8DA); // Card background from MVP
-  static const Color primaryGreen =
-      Color(0xFF008037); // MVP green
+  static const Color primaryGreen = Color(0xFF008037); // MVP green
   static const Color textDarkBrown = Color(0xFF3A1D0F); // Dark text from MVP
   static const Color textLightBrown = Color(0xFF8B6C59); // Light text from MVP
-  static const Color creamBackground = AppColors.backgroundColor; // Main background
+  static const Color creamBackground =
+      AppColors.backgroundColor; // Main background
 
   @override
   void initState() {
@@ -300,141 +302,141 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
   }
 
   Widget _buildCmPicker(bool isTablet) => CupertinoPicker(
-      scrollController: _cmController,
-      itemExtent: isTablet ? 50 : 45,
-      onSelectedItemChanged: _onCmChanged,
-      selectionOverlay: Container(
-        decoration: BoxDecoration(
-          border: Border.symmetric(
-            horizontal: BorderSide(
-              color: primaryGreen.withValues(alpha: 0.4),
-              width: 2,
+        scrollController: _cmController,
+        itemExtent: isTablet ? 50 : 45,
+        onSelectedItemChanged: _onCmChanged,
+        selectionOverlay: Container(
+          decoration: BoxDecoration(
+            border: Border.symmetric(
+              horizontal: BorderSide(
+                color: primaryGreen.withValues(alpha: 0.4),
+                width: 2,
+              ),
             ),
           ),
         ),
-      ),
-      children: List.generate(
-        maxCm - minCm + 1,
-        (index) {
-          final int cm = minCm + index;
-          final double totalInches = cm / 2.54;
-          final int feet = (totalInches / 12).floor();
-          final int inches = (totalInches % 12).round();
+        children: List.generate(
+          maxCm - minCm + 1,
+          (index) {
+            final int cm = minCm + index;
+            final double totalInches = cm / 2.54;
+            final int feet = (totalInches / 12).floor();
+            final int inches = (totalInches % 12).round();
 
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '$cm',
-                  style: GoogleFonts.montserrat(
-                    fontSize: isTablet ? 24 : 20,
-                    fontWeight: FontWeight.bold,
-                    color: textDarkBrown,
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '$cm',
+                    style: GoogleFonts.montserrat(
+                      fontSize: isTablet ? 24 : 20,
+                      fontWeight: FontWeight.bold,
+                      color: textDarkBrown,
+                    ),
                   ),
-                ),
-                Text(
-                  'cm',
-                  style: GoogleFonts.montserrat(
-                    fontSize: isTablet ? 12 : 10,
-                    color: textLightBrown,
-                    fontWeight: FontWeight.w500,
+                  Text(
+                    'cm',
+                    style: GoogleFonts.montserrat(
+                      fontSize: isTablet ? 12 : 10,
+                      color: textLightBrown,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+                ],
+              ),
+            );
+          },
+        ),
+      );
 
   Widget _buildFeetInchesPicker(bool isTablet) => Row(
-      children: [
-        // Feet picker
-        Expanded(
-          child: CupertinoPicker(
-            scrollController: _feetController,
-            itemExtent: isTablet ? 50 : 45,
-            onSelectedItemChanged: (index) => _onFeetInchesChanged(),
-            selectionOverlay: Container(
-              decoration: BoxDecoration(
-                border: Border.symmetric(
-                  horizontal: BorderSide(
-                    color: primaryGreen.withValues(alpha: 0.4),
-                    width: 2,
+        children: [
+          // Feet picker
+          Expanded(
+            child: CupertinoPicker(
+              scrollController: _feetController,
+              itemExtent: isTablet ? 50 : 45,
+              onSelectedItemChanged: (index) => _onFeetInchesChanged(),
+              selectionOverlay: Container(
+                decoration: BoxDecoration(
+                  border: Border.symmetric(
+                    horizontal: BorderSide(
+                      color: primaryGreen.withValues(alpha: 0.4),
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
-            ),
-            children: List.generate(
-              maxFeet - minFeet + 1,
-              (index) {
-                final int feet = minFeet + index;
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '$feet',
-                        style: GoogleFonts.montserrat(
-                          fontSize: isTablet ? 24 : 20,
-                          fontWeight: FontWeight.bold,
-                          color: textDarkBrown,
+              children: List.generate(
+                maxFeet - minFeet + 1,
+                (index) {
+                  final int feet = minFeet + index;
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '$feet',
+                          style: GoogleFonts.montserrat(
+                            fontSize: isTablet ? 24 : 20,
+                            fontWeight: FontWeight.bold,
+                            color: textDarkBrown,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'feet',
-                        style: GoogleFonts.montserrat(
-                          fontSize: isTablet ? 10 : 8,
-                          color: textLightBrown,
-                          fontWeight: FontWeight.w500,
+                        Text(
+                          'feet',
+                          style: GoogleFonts.montserrat(
+                            fontSize: isTablet ? 10 : 8,
+                            color: textLightBrown,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-        ),
 
-        // Separator with African pattern inspiration
-        Container(
-          width: 2,
-          height: double.infinity,
-          margin: const EdgeInsets.symmetric(vertical: 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                primaryGreen.withValues(alpha: 0.1),
-                primaryGreen.withValues(alpha: 0.4),
-                primaryGreen.withValues(alpha: 0.1),
-              ],
+          // Separator with African pattern inspiration
+          Container(
+            width: 2,
+            height: double.infinity,
+            margin: const EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  primaryGreen.withValues(alpha: 0.1),
+                  primaryGreen.withValues(alpha: 0.4),
+                  primaryGreen.withValues(alpha: 0.1),
+                ],
+              ),
             ),
           ),
-        ),
 
-        // Inches picker
-        Expanded(
-          child: CupertinoPicker(
-            scrollController: _inchesController,
-            itemExtent: isTablet ? 50 : 45,
-            onSelectedItemChanged: (index) => _onFeetInchesChanged(),
-            selectionOverlay: Container(
-              decoration: BoxDecoration(
-                border: Border.symmetric(
-                  horizontal: BorderSide(
-                    color: primaryGreen.withValues(alpha: 0.4),
-                    width: 2,
+          // Inches picker
+          Expanded(
+            child: CupertinoPicker(
+              scrollController: _inchesController,
+              itemExtent: isTablet ? 50 : 45,
+              onSelectedItemChanged: (index) => _onFeetInchesChanged(),
+              selectionOverlay: Container(
+                decoration: BoxDecoration(
+                  border: Border.symmetric(
+                    horizontal: BorderSide(
+                      color: primaryGreen.withValues(alpha: 0.4),
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
-            ),
-            children: List.generate(
-              maxInches + 1,
-              (index) => Center(
+              children: List.generate(
+                maxInches + 1,
+                (index) => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -457,11 +459,11 @@ class _AfrocentricHeightPickerState extends State<AfrocentricHeightPicker> {
                     ],
                   ),
                 ),
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
   String _getFeetInchesEquivalent() {
     final double totalInches = _heightInCm / 2.54;

@@ -63,7 +63,9 @@ class CulturalFieldsMigrationService {
 
   /// Migrate a single user
   static Future<bool> _migrateUser(
-      String userId, Map<String, dynamic> userData,) async {
+    String userId,
+    Map<String, dynamic> userData,
+  ) async {
     try {
       // Check if user already has cultural fields
       if (_hasCulturalFields(userData)) {
@@ -86,15 +88,17 @@ class CulturalFieldsMigrationService {
   }
 
   /// Check if user already has cultural fields
-  static bool _hasCulturalFields(Map<String, dynamic> userData) => userData.containsKey('nationality') ||
-        userData.containsKey('tribe') ||
-        userData.containsKey('languages') ||
-        userData.containsKey('religion') ||
-        userData.containsKey('occupation');
+  static bool _hasCulturalFields(Map<String, dynamic> userData) =>
+      userData.containsKey('nationality') ||
+      userData.containsKey('tribe') ||
+      userData.containsKey('languages') ||
+      userData.containsKey('religion') ||
+      userData.containsKey('occupation');
 
   /// Extract cultural data from existing user data
   static Map<String, dynamic> _extractCulturalData(
-      Map<String, dynamic> userData,) {
+    Map<String, dynamic> userData,
+  ) {
     final culturalData = <String, dynamic>{};
 
     // Extract nationality from living_in or other location fields

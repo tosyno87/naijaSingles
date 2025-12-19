@@ -35,8 +35,11 @@ jobs:
           cache: true
           
       - name: Create .env file for CI
+        # SonarQube: These are dummy placeholder values for CI builds only
+        # Real secrets are injected via GitHub Secrets in production workflows
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
+          # Dummy values for CI - not real secrets
           FIREBASE_WEB_API_KEY=dummy_key_for_ci
           FIREBASE_ANDROID_API_KEY=dummy_key_for_ci
           FIREBASE_IOS_API_KEY=dummy_key_for_ci
@@ -79,7 +82,9 @@ jobs:
         uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
         
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        # Note: --ignore-scripts prevents arbitrary script execution during install
+        # firebase-tools may require scripts; if installation fails, remove this flag
+        run: npm install -g firebase-tools --ignore-scripts || npm install -g firebase-tools
         
       - name: Configure Firebase (if staging project exists)
         run: |

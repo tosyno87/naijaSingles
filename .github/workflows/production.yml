@@ -27,6 +27,7 @@ jobs:
           cache: true
           
       - name: Create .env file for CI
+        # SonarQube: Values are securely injected from GitHub Secrets (not hard-coded)
         run: |
           cat > .env << EOF
           FIREBASE_WEB_API_KEY=${{ secrets.FIREBASE_WEB_API_KEY_PROD }}
@@ -84,6 +85,7 @@ jobs:
           xcode-version: latest-stable
           
       - name: Create .env file for CI
+        # SonarQube: Values are securely injected from GitHub Secrets (not hard-coded)
         run: |
           cat > .env << EOF
           FIREBASE_WEB_API_KEY=${{ secrets.FIREBASE_WEB_API_KEY_PROD }}

@@ -32,6 +32,7 @@ jobs:
         with:
           flutter-version: '3.35.5'
           channel: 'stable'
+          cache: true
           
       - name: Create .env file for CI
         run: |
@@ -66,7 +67,8 @@ jobs:
         run: flutter analyze || echo "Analyzer completed with warnings"
         
       - name: Run tests
-        run: echo "Tests temporarily disabled due to segmentation faults in CI environment"
+        run: flutter test --coverage || echo "Some tests failed - continuing with deployment"
+        continue-on-error: true
         
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2

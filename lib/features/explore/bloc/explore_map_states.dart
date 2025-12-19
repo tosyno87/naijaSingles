@@ -12,7 +12,6 @@ class SearchuserForMapInitial extends SearchUserForMapState {}
 class SearchUserLoadingForMapState extends SearchUserForMapState {}
 
 class SearchUserLoadUserForMapState extends SearchUserForMapState {
-
   const SearchUserLoadUserForMapState(this.users);
   final List<UserModel> users;
 

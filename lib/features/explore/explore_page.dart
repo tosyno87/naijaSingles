@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'explore_screen.dart';
 
 class ExplorePage extends StatelessWidget {
-
   const ExplorePage({
     super.key,
     this.showBackButton = false, // Default to false (no back labelLarge)

@@ -11,95 +11,102 @@ import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 
 Future<Map<String, dynamic>?> showLocationDialog(
-    BuildContext context, double? latitude, double? longitude,) {
+  BuildContext context,
+  double? latitude,
+  double? longitude,
+) {
   final Map<String, dynamic> updatedLocation = {};
   final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
   return showDialog<Map<String, dynamic>?>(
     context: context,
     builder: (BuildContext context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Save changes!'.tr().toString(),
-                style: TextStyle(
-                    fontSize: 18,
-                    color: themeProvider.isDarkMode
-                        ? Colors.white
-                        : Colors.black87,),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Save changes!'.tr().toString(),
+              style: TextStyle(
+                fontSize: 18,
+                color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Do you want to continue with this location?'.tr().toString(),
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 5),
-              FutureBuilder(
-                future: getAddress(latitude, longitude),
-                builder: (BuildContext ctx, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: Hookup4uBar());
-                  }
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Do you want to continue with this location?'.tr().toString(),
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 5),
+            FutureBuilder(
+              future: getAddress(latitude, longitude),
+              builder: (BuildContext ctx, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: Hookup4uBar());
+                }
 
-                  return Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        child: Text(
-                            '${snapshot.data ?? 'loading...'.tr().toString()}',),
+                return Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        '${snapshot.data ?? 'loading...'.tr().toString()}',
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              'No'.tr().toString(),
-                              style: const TextStyle(color: primaryColor),
-                            ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'No'.tr().toString(),
+                            style: const TextStyle(color: primaryColor),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              updatedLocation.addAll({
-                                'position': {
-                                  'coordinates': <double>[
-                                    longitude ?? 0.0,
-                                    latitude ?? 0.0,
-                                  ],
-                                },
-                                'address': snapshot.data?.toString() ?? '',
-                              });
-                              log('new address is $updatedLocation');
-                              Navigator.pop(context, updatedLocation);
-                            },
-                            child: Text(
-                              'Yes'.tr().toString(),
-                              style: const TextStyle(color: primaryColor),
-                            ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            updatedLocation.addAll({
+                              'position': {
+                                'coordinates': <double>[
+                                  longitude ?? 0.0,
+                                  latitude ?? 0.0,
+                                ],
+                              },
+                              'address': snapshot.data?.toString() ?? '',
+                            });
+                            log('new address is $updatedLocation');
+                            Navigator.pop(context, updatedLocation);
+                          },
+                          child: Text(
+                            'Yes'.tr().toString(),
+                            style: const TextStyle(color: primaryColor),
                           ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
+    ),
   );
 }
 
 Future<void> showAddressDialog(
-    BuildContext context, double latitude, double longitude,) => showDialog(
-    barrierColor: Colors.transparent,
-    context: context,
-    builder: (BuildContext context) => FutureBuilder(
+  BuildContext context,
+  double latitude,
+  double longitude,
+) =>
+    showDialog(
+      barrierColor: Colors.transparent,
+      context: context,
+      builder: (BuildContext context) => FutureBuilder(
         future: getAddress(latitude, longitude),
         builder: (BuildContext ctx, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -122,7 +129,7 @@ Future<void> showAddressDialog(
           return Container();
         },
       ),
-  );
+    );
 
 Future getAddress(lat, lng) async {
   try {

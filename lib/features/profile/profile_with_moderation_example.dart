@@ -7,9 +7,9 @@ import '../../../services/profile_verification_service.dart';
 /// Example of how to integrate Content Moderation and Profile Verification
 /// into your existing profile screens
 class ProfileWithModerationExample extends StatefulWidget {
-
   const ProfileWithModerationExample({
-    required this.userId, super.key,
+    required this.userId,
+    super.key,
   });
   final String userId;
 
@@ -49,94 +49,94 @@ class _ProfileWithModerationExampleState
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile with Moderation'),
-        actions: [
-          // Report button
-          IconButton(
-            icon: const Icon(Icons.flag),
-            onPressed: _showReportDialog,
-            tooltip: 'Report Profile',
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Header with Verification Badge
-            _buildProfileHeader(),
-
-            const SizedBox(height: 24),
-
-            // Profile Content
-            _buildProfileContent(),
-
-            const SizedBox(height: 24),
-
-            // Verification Section
-            _buildVerificationSection(),
-
-            const SizedBox(height: 24),
-
-            // Action Buttons
-            _buildActionButtons(),
+        appBar: AppBar(
+          title: const Text('Profile with Moderation'),
+          actions: [
+            // Report button
+            IconButton(
+              icon: const Icon(Icons.flag),
+              onPressed: _showReportDialog,
+              tooltip: 'Report Profile',
+            ),
           ],
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Header with Verification Badge
+              _buildProfileHeader(),
+
+              const SizedBox(height: 24),
+
+              // Profile Content
+              _buildProfileContent(),
+
+              const SizedBox(height: 24),
+
+              // Verification Section
+              _buildVerificationSection(),
+
+              const SizedBox(height: 24),
+
+              // Action Buttons
+              _buildActionButtons(),
+            ],
+          ),
+        ),
+      );
 
   Widget _buildProfileHeader() => Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Profile Picture
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.grey[300],
-              child: const Icon(Icons.person, size: 40),
-            ),
-
-            const SizedBox(width: 16),
-
-            // Profile Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Text(
-                        'John Doe',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Verification Badge
-                      if (_verificationStatus != null)
-                        _buildVerificationBadge(_verificationStatus!),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    '25 years old',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                  const Text(
-                    'Lagos, Nigeria',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Profile Picture
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.grey[300],
+                child: const Icon(Icons.person, size: 40),
               ),
-            ),
-          ],
+
+              const SizedBox(width: 16),
+
+              // Profile Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'John Doe',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Verification Badge
+                        if (_verificationStatus != null)
+                          _buildVerificationBadge(_verificationStatus!),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      '25 years old',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const Text(
+                      'Lagos, Nigeria',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   Widget _buildVerificationBadge(VerificationStatus status) {
     final badge = _profileVerificationService.getVerificationBadge(status);
@@ -184,27 +184,27 @@ class _ProfileWithModerationExampleState
   }
 
   Widget _buildProfileContent() => const Card(
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'About Me',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'About Me',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'I love traveling, cooking, and meeting new people. Looking for someone to share adventures with!',
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
+              SizedBox(height: 8),
+              Text(
+                'I love traveling, cooking, and meeting new people. Looking for someone to share adventures with!',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   Widget _buildVerificationSection() {
     if (_isLoading) {
@@ -296,32 +296,32 @@ class _ProfileWithModerationExampleState
   }
 
   Widget _buildActionButtons() => Row(
-      children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _showReportDialog,
-            icon: const Icon(Icons.flag),
-            label: const Text('Report'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+        children: [
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: _showReportDialog,
+              icon: const Icon(Icons.flag),
+              label: const Text('Report'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _showVerificationDialog,
-            icon: const Icon(Icons.verified_user),
-            label: const Text('Verify'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: _showVerificationDialog,
+              icon: const Icon(Icons.verified_user),
+              label: const Text('Verify'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
   void _showReportDialog() {
     showDialog(
@@ -413,7 +413,8 @@ class _ProfileWithModerationExampleState
       if (!canRequest) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Cannot request this verification type'),),
+            content: Text('Cannot request this verification type'),
+          ),
         );
         return;
       }

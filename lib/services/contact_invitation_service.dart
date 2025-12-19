@@ -100,8 +100,9 @@ class ContactInvitationService {
   /// Format contact for display
   String formatContactDisplay(Contact contact) {
     final name = contact.displayName ?? 'Unknown';
-    final phone =
-        contact.phones?.isNotEmpty ?? false ? contact.phones!.first.value : null;
+    final phone = contact.phones?.isNotEmpty ?? false
+        ? contact.phones!.first.value
+        : null;
 
     if (phone != null) {
       return '$name ($phone)';

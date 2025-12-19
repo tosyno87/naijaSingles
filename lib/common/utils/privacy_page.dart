@@ -7,7 +7,6 @@ import '../constants/colors.dart';
 import '../providers/theme_provider.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
-
   const PrivacyPolicyPage({required this.url, required this.tittle, super.key});
   final String url;
   final String tittle;
@@ -27,31 +26,34 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(
-          themeProvider.isDarkMode ? Colors.white : const Color(0x00000000),)
-      ..setNavigationDelegate(NavigationDelegate(
-        onPageStarted: (url) {
-          setState(() {
-            loadingPercentage = 0;
-          });
-        },
-        onProgress: (progress) {
-          setState(() {
-            loadingPercentage = progress;
-          });
-        },
-        onPageFinished: (url) {
-          setState(() {
-            loadingPercentage = 100;
-          });
-        },
-        onWebResourceError: (WebResourceError error) {},
-        onNavigationRequest: (NavigationRequest request) {
-          if (request.url.startsWith('https://www.yt.com/')) {
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
-        },
-      ),)
+        themeProvider.isDarkMode ? Colors.white : const Color(0x00000000),
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (url) {
+            setState(() {
+              loadingPercentage = 0;
+            });
+          },
+          onProgress: (progress) {
+            setState(() {
+              loadingPercentage = progress;
+            });
+          },
+          onPageFinished: (url) {
+            setState(() {
+              loadingPercentage = 100;
+            });
+          },
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.yt.com/')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
       ..loadRequest(
         Uri.parse(widget.url),
       );
@@ -77,5 +79,6 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                 color: primaryColor,
               ),
           ],
-        ),);
+        ),
+      );
 }

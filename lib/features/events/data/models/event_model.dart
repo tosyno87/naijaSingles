@@ -11,7 +11,8 @@ enum EventStatus {
   underReview,
 }
 
-class EventModel extends Equatable { // Distance in kilometers from user's location
+class EventModel extends Equatable {
+  // Distance in kilometers from user's location
 
   const EventModel({
     required this.id,
@@ -38,19 +39,26 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
   });
 
   factory EventModel.fromFirestoreJson(
-      Map<String, dynamic> json, String docId,) {
+    Map<String, dynamic> json,
+    String docId,
+  ) {
     try {
       // Handle both imageUrl (singular) and imageUrls (plural) for backward compatibility
       String? imageUrl;
-      
+
       // Debug logging
       AppLogger.debug('🔍 EventModel.fromFirestoreJson - Event ID: $docId');
-      AppLogger.debug('🔍 EventModel.fromFirestoreJson - json keys: ${json.keys.toList()}');
-      AppLogger.debug('🔍 EventModel.fromFirestoreJson - imageUrl: ${json['imageUrl']}');
-      AppLogger.debug('🔍 EventModel.fromFirestoreJson - imageUrls: ${json['imageUrls']}');
-      AppLogger.debug('🔍 EventModel.fromFirestoreJson - imageUrls type: ${json['imageUrls']?.runtimeType}');
-      
-      if (json['imageUrl'] != null && json['imageUrl'].toString().trim().isNotEmpty) {
+      AppLogger.debug(
+          '🔍 EventModel.fromFirestoreJson - json keys: ${json.keys.toList()}');
+      AppLogger.debug(
+          '🔍 EventModel.fromFirestoreJson - imageUrl: ${json['imageUrl']}');
+      AppLogger.debug(
+          '🔍 EventModel.fromFirestoreJson - imageUrls: ${json['imageUrls']}');
+      AppLogger.debug(
+          '🔍 EventModel.fromFirestoreJson - imageUrls type: ${json['imageUrls']?.runtimeType}');
+
+      if (json['imageUrl'] != null &&
+          json['imageUrl'].toString().trim().isNotEmpty) {
         imageUrl = json['imageUrl'].toString();
         AppLogger.debug('✅ EventModel: Using imageUrl (singular): $imageUrl');
       } else if (json['imageUrls'] != null && json['imageUrls'] is List) {
@@ -60,12 +68,13 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
             .map((e) => e?.toString() ?? '')
             .where((url) => url.trim().isNotEmpty)
             .toList();
-        
+
         if (validUrls.isNotEmpty) {
           imageUrl = validUrls.first;
           AppLogger.debug('✅ EventModel: Using imageUrls[0]: $imageUrl');
         } else {
-          AppLogger.debug('❌ EventModel: imageUrls list is empty or contains only empty strings');
+          AppLogger.debug(
+              '❌ EventModel: imageUrls list is empty or contains only empty strings');
         }
       } else {
         AppLogger.debug('❌ EventModel: No valid imageUrl or imageUrls found');
@@ -95,7 +104,8 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
         distanceFromUser: json['distanceFromUser']?.toDouble(),
       );
     } catch (e, stackTrace) {
-      AppLogger.error('❌ Error parsing EventModel from Firestore', error: e, stackTrace: stackTrace);
+      AppLogger.error('❌ Error parsing EventModel from Firestore',
+          error: e, stackTrace: stackTrace);
       AppLogger.debug('📄 Raw data: $json');
       rethrow;
     }
@@ -125,7 +135,8 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
   // Helper method to safely parse EventStatus from Firestore
   static EventStatus _parseEventStatus(statusValue) {
     AppLogger.debug(
-        '🔄 Parsing EventStatus from: $statusValue (type: ${statusValue.runtimeType})',);
+      '🔄 Parsing EventStatus from: $statusValue (type: ${statusValue.runtimeType})',
+    );
 
     if (statusValue == null) return EventStatus.published;
 
@@ -145,7 +156,8 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
           return EventStatus.underReview;
         default:
           AppLogger.warning(
-              '⚠️ Unknown EventStatus string: $statusValue, defaulting to published',);
+            '⚠️ Unknown EventStatus string: $statusValue, defaulting to published',
+          );
           return EventStatus.published;
       }
     }
@@ -158,7 +170,8 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
     }
 
     AppLogger.warning(
-        '⚠️ Could not parse EventStatus: $statusValue, defaulting to published',);
+      '⚠️ Could not parse EventStatus: $statusValue, defaulting to published',
+    );
     return EventStatus.published;
   }
 
@@ -202,7 +215,8 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
     if (dateValue is Map && dateValue.containsKey('millisecondsSinceEpoch')) {
       try {
         return DateTime.fromMillisecondsSinceEpoch(
-            dateValue['millisecondsSinceEpoch'],);
+          dateValue['millisecondsSinceEpoch'],
+        );
       } catch (e) {
         return DateTime.now();
       }
@@ -212,26 +226,26 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
   }
 
   Map<String, dynamic> toFirestoreJson() => {
-      'externalId': externalId,
-      'name': name,
-      'description': description,
-      'startDate': startDate,
-      'endDate': endDate,
-      'imageUrl': imageUrl,
-      'location': location.toJson(),
-      'ticketUrl': ticketUrl,
-      'isFree': isFree,
-      'ticketPrice': ticketPrice,
-      'category': category,
-      'tags': tags,
-      'attendeeCount': attendeeCount,
-      'rsvpCount': rsvpCount,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
-      'status': status.toString().split('.').last,
-      'isPublic': isPublic,
-      'createdByUserId': createdByUserId,
-    };
+        'externalId': externalId,
+        'name': name,
+        'description': description,
+        'startDate': startDate,
+        'endDate': endDate,
+        'imageUrl': imageUrl,
+        'location': location.toJson(),
+        'ticketUrl': ticketUrl,
+        'isFree': isFree,
+        'ticketPrice': ticketPrice,
+        'category': category,
+        'tags': tags,
+        'attendeeCount': attendeeCount,
+        'rsvpCount': rsvpCount,
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
+        'status': status.toString().split('.').last,
+        'isPublic': isPublic,
+        'createdByUserId': createdByUserId,
+      };
 
   EventModel copyWith({
     String? id,
@@ -255,29 +269,30 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
     bool? isPublic,
     String? createdByUserId,
     double? distanceFromUser,
-  }) => EventModel(
-      id: id ?? this.id,
-      externalId: externalId ?? this.externalId,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      imageUrl: imageUrl ?? this.imageUrl,
-      location: location ?? this.location,
-      ticketUrl: ticketUrl ?? this.ticketUrl,
-      isFree: isFree ?? this.isFree,
-      ticketPrice: ticketPrice ?? this.ticketPrice,
-      category: category ?? this.category,
-      tags: tags ?? this.tags,
-      attendeeCount: attendeeCount ?? this.attendeeCount,
-      rsvpCount: rsvpCount ?? this.rsvpCount,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      status: status ?? this.status,
-      isPublic: isPublic ?? this.isPublic,
-      createdByUserId: createdByUserId ?? this.createdByUserId,
-      distanceFromUser: distanceFromUser ?? this.distanceFromUser,
-    );
+  }) =>
+      EventModel(
+        id: id ?? this.id,
+        externalId: externalId ?? this.externalId,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        startDate: startDate ?? this.startDate,
+        endDate: endDate ?? this.endDate,
+        imageUrl: imageUrl ?? this.imageUrl,
+        location: location ?? this.location,
+        ticketUrl: ticketUrl ?? this.ticketUrl,
+        isFree: isFree ?? this.isFree,
+        ticketPrice: ticketPrice ?? this.ticketPrice,
+        category: category ?? this.category,
+        tags: tags ?? this.tags,
+        attendeeCount: attendeeCount ?? this.attendeeCount,
+        rsvpCount: rsvpCount ?? this.rsvpCount,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        status: status ?? this.status,
+        isPublic: isPublic ?? this.isPublic,
+        createdByUserId: createdByUserId ?? this.createdByUserId,
+        distanceFromUser: distanceFromUser ?? this.distanceFromUser,
+      );
 
   @override
   List<Object?> get props => [
@@ -306,7 +321,6 @@ class EventModel extends Equatable { // Distance in kilometers from user's locat
 }
 
 class EventLocation extends Equatable {
-
   const EventLocation({
     this.name,
     this.address,
@@ -334,7 +348,8 @@ class EventLocation extends Equatable {
         longitude: json['longitude']?.toDouble(),
       );
     } catch (e, stackTrace) {
-      AppLogger.error('❌ Error parsing EventLocation', error: e, stackTrace: stackTrace);
+      AppLogger.error('❌ Error parsing EventLocation',
+          error: e, stackTrace: stackTrace);
       AppLogger.debug('📄 Raw location data: $json');
       rethrow;
     }
@@ -348,14 +363,14 @@ class EventLocation extends Equatable {
   final double? longitude;
 
   Map<String, dynamic> toJson() => {
-      'name': name,
-      'address': address,
-      'city': city,
-      'state': state,
-      'country': country,
-      'latitude': latitude,
-      'longitude': longitude,
-    };
+        'name': name,
+        'address': address,
+        'city': city,
+        'state': state,
+        'country': country,
+        'latitude': latitude,
+        'longitude': longitude,
+      };
 
   String get displayAddress {
     final parts = <String>[];

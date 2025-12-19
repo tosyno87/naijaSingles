@@ -11,7 +11,6 @@ part 'swipebloc_event.dart';
 part 'swipebloc_state.dart';
 
 class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
-
   SwipeBloc({
     Future<void> Function(UserModel, UserModel)? leftSwipe,
     Future<void> Function(UserModel, UserModel)? rightSwipe,
@@ -25,7 +24,8 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
     on<LeftSwipeEvent>((event, emit) async {
       try {
         await this.leftSwipe(event.currentUser, event.selectedUser);
-        final List<UserModel> userList = await this.getUserList(event.currentUser);
+        final List<UserModel> userList =
+            await this.getUserList(event.currentUser);
         emit(SwipeSucessState(userList));
 
         log('afterlefteventuser${userList.toString()}');
@@ -48,7 +48,8 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
 
         await this.rightSwipe(event.currentUser, event.selectedUser);
 
-        final List<UserModel> userList = await this.getUserList(event.currentUser);
+        final List<UserModel> userList =
+            await this.getUserList(event.currentUser);
 
         // Check if a match was created by looking for mutual likes
         final usersWhoLikedMe = await _matchService.getUsersWhoLikedMe();
@@ -58,10 +59,12 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
 
         if (isMatch) {
           // Emit match state
-          emit(SwipeMatchCreatedState(
-            users: userList,
-            matchedUser: event.selectedUser,
-          ),);
+          emit(
+            SwipeMatchCreatedState(
+              users: userList,
+              matchedUser: event.selectedUser,
+            ),
+          );
         } else {
           emit(SwipeSucessState(userList));
         }

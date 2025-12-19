@@ -16,32 +16,32 @@ class CardLabel extends StatelessWidget {
   });
 
   factory CardLabel.right() => CardLabel._(
-      color: primaryColor,
-      label: 'LIKE'.tr().toString(),
-      angle: -_labelAngle,
-      alignment: Alignment.topLeft,
-    );
+        color: primaryColor,
+        label: 'LIKE'.tr().toString(),
+        angle: -_labelAngle,
+        alignment: Alignment.topLeft,
+      );
 
   factory CardLabel.left() => CardLabel._(
-      color: Colors.black,
-      label: 'NOPE'.tr().toString(),
-      angle: _labelAngle,
-      alignment: Alignment.topRight,
-    );
+        color: Colors.black,
+        label: 'NOPE'.tr().toString(),
+        angle: _labelAngle,
+        alignment: Alignment.topRight,
+      );
 
   factory CardLabel.up() => CardLabel._(
-      color: primaryColor,
-      label: 'UP'.tr().toString(),
-      angle: _labelAngle,
-      alignment: const Alignment(0, 0.5),
-    );
+        color: primaryColor,
+        label: 'UP'.tr().toString(),
+        angle: _labelAngle,
+        alignment: const Alignment(0, 0.5),
+      );
 
   factory CardLabel.down() => CardLabel._(
-      color: primaryColor,
-      label: 'DOWN'.tr().toString(),
-      angle: -_labelAngle,
-      alignment: const Alignment(0, -0.75),
-    );
+        color: primaryColor,
+        label: 'DOWN'.tr().toString(),
+        angle: -_labelAngle,
+        alignment: const Alignment(0, -0.75),
+      );
 
   final Color color;
   final String label;
@@ -50,34 +50,34 @@ class CardLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-      alignment: alignment,
-      padding: const EdgeInsets.symmetric(
-        vertical: 36,
-        horizontal: 36,
-      ),
-      child: Transform.rotate(
-        angle: angle,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: color,
-              width: 4,
+        alignment: alignment,
+        padding: const EdgeInsets.symmetric(
+          vertical: 36,
+          horizontal: 36,
+        ),
+        child: Transform.rotate(
+          angle: angle,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: color,
+                width: 4,
+              ),
+              // color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
             ),
-            // color: Colors.white,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          padding: const EdgeInsets.all(6),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.4,
-              color: color,
-              height: 1,
+            padding: const EdgeInsets.all(6),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+                color: color,
+                height: 1,
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 }

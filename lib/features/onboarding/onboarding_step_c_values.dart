@@ -13,9 +13,10 @@ import 'shared_styles.dart';
 /// This screen collects information about what matters to the user
 /// in a partner and their dealbreakers.
 class OnboardingStepCValues extends StatefulWidget {
-
   const OnboardingStepCValues({
-    required this.onBack, required this.finishOnboarding, super.key,
+    required this.onBack,
+    required this.finishOnboarding,
+    super.key,
     this.backgroundColor = AppColors.backgroundColor,
   });
   final VoidCallback onBack;
@@ -277,7 +278,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     ? Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12,),
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -327,7 +330,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.grey.shade700,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12,),
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                   ),
 
@@ -342,7 +347,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                               HapticFeedback.mediumImpact();
                               // Navigate to Dating Homepage instead of calling finishOnboarding
                               Navigator.pushReplacementNamed(
-                                  context, '/dating',);
+                                context,
+                                '/dating',
+                              );
                             }
                           : () {
                               setState(() {
@@ -388,13 +395,13 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
 
   /// Builds a section title with consistent styling
   Widget _buildSectionTitle(String title) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-      ),
-    );
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      );
 
   /// Builds a custom checkbox for values selection
   Widget _buildValueCheckbox({
@@ -402,8 +409,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
     required bool isSelected,
     required ValueChanged<bool> onChanged,
     required Color deepGreen,
-  }) => LayoutBuilder(
-      builder: (context, constraints) => AnimatedScale(
+  }) =>
+      LayoutBuilder(
+        builder: (context, constraints) => AnimatedScale(
           scale: isSelected ? 1.02 : 1.0,
           duration: const Duration(milliseconds: 200),
           child: Material(
@@ -471,7 +479,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
             ),
           ),
         ),
-    );
+      );
 
   /// Validates if all required fields are filled
   bool _isStepValid(OnboardingController controller) {

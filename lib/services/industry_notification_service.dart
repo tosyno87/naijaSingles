@@ -83,9 +83,7 @@ class IndustryNotificationService {
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const DarwinInitializationSettings iosSettings =
-        DarwinInitializationSettings(
-      
-    );
+        DarwinInitializationSettings();
 
     const InitializationSettings settings = InitializationSettings(
       android: androidSettings,
@@ -160,9 +158,7 @@ class IndustryNotificationService {
   /// Request notification permissions with proper handling
   Future<bool> _requestPermissions() async {
     // Request FCM permissions
-    final settings = await _messaging.requestPermission(
-      
-    );
+    final settings = await _messaging.requestPermission();
 
     // Request local notification permissions
     final bool? localPermission = await _localNotifications
@@ -247,9 +243,8 @@ class IndustryNotificationService {
         .limit(50)
         .snapshots()
         .listen((snapshot) {
-      final notifications = snapshot.docs
-          .map(AppNotification.fromFirestore)
-          .toList();
+      final notifications =
+          snapshot.docs.map(AppNotification.fromFirestore).toList();
 
       _notificationsController.add(notifications);
 
@@ -617,7 +612,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 /// Enhanced notification model
-class AppNotification { // 0-3 (low to high)
+class AppNotification {
+  // 0-3 (low to high)
 
   AppNotification({
     required this.id,
@@ -659,16 +655,16 @@ class AppNotification { // 0-3 (low to high)
   final int priority;
 
   Map<String, dynamic> toFirestore() => {
-      'title': title,
-      'message': message,
-      'timestamp': Timestamp.fromDate(timestamp),
-      'type': type,
-      'avatarUrl': avatarUrl,
-      'actionId': actionId,
-      'isRead': isRead,
-      'data': data,
-      'priority': priority,
-    };
+        'title': title,
+        'message': message,
+        'timestamp': Timestamp.fromDate(timestamp),
+        'type': type,
+        'avatarUrl': avatarUrl,
+        'actionId': actionId,
+        'isRead': isRead,
+        'data': data,
+        'priority': priority,
+      };
 
   IconData get typeIcon {
     switch (type) {
@@ -736,23 +732,23 @@ class AppNotification { // 0-3 (low to high)
     bool? isRead,
     Map<String, dynamic>? data,
     int? priority,
-  }) => AppNotification(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      message: message ?? this.message,
-      timestamp: timestamp ?? this.timestamp,
-      type: type ?? this.type,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      actionId: actionId ?? this.actionId,
-      isRead: isRead ?? this.isRead,
-      data: data ?? this.data,
-      priority: priority ?? this.priority,
-    );
+  }) =>
+      AppNotification(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        message: message ?? this.message,
+        timestamp: timestamp ?? this.timestamp,
+        type: type ?? this.type,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
+        actionId: actionId ?? this.actionId,
+        isRead: isRead ?? this.isRead,
+        data: data ?? this.data,
+        priority: priority ?? this.priority,
+      );
 }
 
 /// Notification settings model
 class NotificationSettings {
-
   NotificationSettings({
     required this.matchNotifications,
     required this.messageNotifications,
@@ -766,16 +762,16 @@ class NotificationSettings {
   });
 
   factory NotificationSettings.defaultSettings() => NotificationSettings(
-      matchNotifications: true,
-      messageNotifications: true,
-      likeNotifications: true,
-      superLikeNotifications: true,
-      soundEnabled: true,
-      vibrationEnabled: true,
-      quietHoursEnabled: false,
-      quietHoursStart: '22:00',
-      quietHoursEnd: '08:00',
-    );
+        matchNotifications: true,
+        messageNotifications: true,
+        likeNotifications: true,
+        superLikeNotifications: true,
+        soundEnabled: true,
+        vibrationEnabled: true,
+        quietHoursEnabled: false,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+      );
 
   factory NotificationSettings.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -802,16 +798,16 @@ class NotificationSettings {
   final String quietHoursEnd;
 
   Map<String, dynamic> toFirestore() => {
-      'matchNotifications': matchNotifications,
-      'messageNotifications': messageNotifications,
-      'likeNotifications': likeNotifications,
-      'superLikeNotifications': superLikeNotifications,
-      'soundEnabled': soundEnabled,
-      'vibrationEnabled': vibrationEnabled,
-      'quietHoursEnabled': quietHoursEnabled,
-      'quietHoursStart': quietHoursStart,
-      'quietHoursEnd': quietHoursEnd,
-    };
+        'matchNotifications': matchNotifications,
+        'messageNotifications': messageNotifications,
+        'likeNotifications': likeNotifications,
+        'superLikeNotifications': superLikeNotifications,
+        'soundEnabled': soundEnabled,
+        'vibrationEnabled': vibrationEnabled,
+        'quietHoursEnabled': quietHoursEnabled,
+        'quietHoursStart': quietHoursStart,
+        'quietHoursEnd': quietHoursEnd,
+      };
 
   NotificationSettings copyWith({
     bool? matchNotifications,
@@ -823,16 +819,17 @@ class NotificationSettings {
     bool? quietHoursEnabled,
     String? quietHoursStart,
     String? quietHoursEnd,
-  }) => NotificationSettings(
-      matchNotifications: matchNotifications ?? this.matchNotifications,
-      messageNotifications: messageNotifications ?? this.messageNotifications,
-      likeNotifications: likeNotifications ?? this.likeNotifications,
-      superLikeNotifications:
-          superLikeNotifications ?? this.superLikeNotifications,
-      soundEnabled: soundEnabled ?? this.soundEnabled,
-      vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
-      quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
-      quietHoursStart: quietHoursStart ?? this.quietHoursStart,
-      quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
-    );
+  }) =>
+      NotificationSettings(
+        matchNotifications: matchNotifications ?? this.matchNotifications,
+        messageNotifications: messageNotifications ?? this.messageNotifications,
+        likeNotifications: likeNotifications ?? this.likeNotifications,
+        superLikeNotifications:
+            superLikeNotifications ?? this.superLikeNotifications,
+        soundEnabled: soundEnabled ?? this.soundEnabled,
+        vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+        quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
+        quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+        quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+      );
 }

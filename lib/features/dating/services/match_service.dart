@@ -290,7 +290,8 @@ class MatchService {
   }
 
   /// Get all available match categories
-  static List<String> getAvailableCategories() => ['nearby', 'same_tribe', 'shared_interests'];
+  static List<String> getAvailableCategories() =>
+      ['nearby', 'same_tribe', 'shared_interests'];
 
   /// Calculate match compatibility score between two users
   static double calculateMatchScore(

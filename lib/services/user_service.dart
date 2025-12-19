@@ -121,24 +121,26 @@ class UserService {
 
 /// User profile model
 class UserProfile {
-
   UserProfile({
     required this.id,
     required this.displayName,
-    required this.createdAt, required this.updatedAt, this.email,
+    required this.createdAt,
+    required this.updatedAt,
+    this.email,
     this.avatarUrl,
     this.preferences,
   });
 
-  factory UserProfile.fromMap(Map<String, dynamic> map, String id) => UserProfile(
-      id: id,
-      displayName: map['displayName'] ?? 'Unknown User',
-      email: map['email'],
-      avatarUrl: map['avatarUrl'],
-      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt: (map['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      preferences: map['preferences'] as Map<String, dynamic>?,
-    );
+  factory UserProfile.fromMap(Map<String, dynamic> map, String id) =>
+      UserProfile(
+        id: id,
+        displayName: map['displayName'] ?? 'Unknown User',
+        email: map['email'],
+        avatarUrl: map['avatarUrl'],
+        createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        updatedAt: (map['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        preferences: map['preferences'] as Map<String, dynamic>?,
+      );
   final String id;
   final String displayName;
   final String? email;
@@ -148,13 +150,13 @@ class UserProfile {
   final Map<String, dynamic>? preferences;
 
   Map<String, dynamic> toMap() => {
-      'displayName': displayName,
-      'email': email,
-      'avatarUrl': avatarUrl,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'preferences': preferences,
-    };
+        'displayName': displayName,
+        'email': email,
+        'avatarUrl': avatarUrl,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+        'preferences': preferences,
+      };
 
   /// Get user's initials for avatar
   String get initials {
@@ -180,16 +182,18 @@ class UserProfile {
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? preferences,
-  }) => UserProfile(
-      id: id ?? this.id,
-      displayName: displayName ?? this.displayName,
-      email: email ?? this.email,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      preferences: preferences ?? this.preferences,
-    );
+  }) =>
+      UserProfile(
+        id: id ?? this.id,
+        displayName: displayName ?? this.displayName,
+        email: email ?? this.email,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        preferences: preferences ?? this.preferences,
+      );
 
   @override
-  String toString() => 'UserProfile(id: $id, displayName: $displayName, email: $email, avatarUrl: $avatarUrl)';
+  String toString() =>
+      'UserProfile(id: $id, displayName: $displayName, email: $email, avatarUrl: $avatarUrl)';
 }

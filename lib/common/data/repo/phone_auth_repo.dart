@@ -128,7 +128,7 @@ class PhoneAuthRepository {
       }
 
       final token = await user.getIdToken(true); // Force refresh the token
-      
+
       // Store token securely for offline use
       if (token != null) {
         try {
@@ -141,14 +141,14 @@ class PhoneAuthRepository {
           // Continue even if secure storage fails
         }
       }
-      
+
       return token;
     } catch (e) {
       log('Error getting token: $e');
       return null;
     }
   }
-  
+
   /// Get cached token from secure storage (for offline use)
   /// Returns null if no cached token exists
   Future<String?> getCachedToken() async {

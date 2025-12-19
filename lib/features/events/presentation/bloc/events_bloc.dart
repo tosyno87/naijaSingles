@@ -17,7 +17,6 @@ abstract class EventsEvent extends Equatable {
 }
 
 class LoadEventsEvent extends EventsEvent {
-
   const LoadEventsEvent({this.forceRefresh = false});
   final bool forceRefresh;
 
@@ -30,7 +29,6 @@ class RefreshEventsEvent extends EventsEvent {}
 class LoadMoreEventsEvent extends EventsEvent {}
 
 class FilterEventsEvent extends EventsEvent {
-
   const FilterEventsEvent(this.filter);
   final EventFilter filter;
 
@@ -39,7 +37,6 @@ class FilterEventsEvent extends EventsEvent {
 }
 
 class SearchEventsEvent extends EventsEvent {
-
   const SearchEventsEvent(this.query);
   final String query;
 
@@ -62,7 +59,6 @@ class EventsInitial extends EventsState {}
 class EventsLoading extends EventsState {}
 
 class EventsLoaded extends EventsState {
-
   const EventsLoaded({
     required this.events,
     this.hasReachedMax = false,
@@ -82,13 +78,14 @@ class EventsLoaded extends EventsState {
     EventFilter? currentFilter,
     String? searchQuery,
     bool? isLoadingMore,
-  }) => EventsLoaded(
-      events: events ?? this.events,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-      currentFilter: currentFilter ?? this.currentFilter,
-      searchQuery: searchQuery ?? this.searchQuery,
-      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-    );
+  }) =>
+      EventsLoaded(
+        events: events ?? this.events,
+        hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+        currentFilter: currentFilter ?? this.currentFilter,
+        searchQuery: searchQuery ?? this.searchQuery,
+        isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      );
 
   @override
   List<Object?> get props => [
@@ -101,7 +98,6 @@ class EventsLoaded extends EventsState {
 }
 
 class EventsError extends EventsState {
-
   const EventsError({
     required this.message,
     this.isNetworkError = false,
@@ -114,7 +110,6 @@ class EventsError extends EventsState {
 }
 
 class EventsSearching extends EventsState {
-
   const EventsSearching(this.query);
   final String query;
 
@@ -124,7 +119,6 @@ class EventsSearching extends EventsState {
 
 // Event Filter Model
 class EventFilter extends Equatable {
-
   const EventFilter({
     this.category,
     this.startDate,
@@ -174,23 +168,24 @@ class EventFilter extends Equatable {
     String? sortBy,
     bool? trendingOnly,
     bool? weekendOnly,
-  }) => EventFilter(
-      category: category ?? this.category,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      location: location ?? this.location,
-      freeOnly: freeOnly ?? this.freeOnly,
-      paidOnly: paidOnly ?? this.paidOnly,
-      maxPrice: maxPrice ?? this.maxPrice,
-      minPrice: minPrice ?? this.minPrice,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      radiusKm: radiusKm ?? this.radiusKm,
-      tags: tags ?? this.tags,
-      sortBy: sortBy ?? this.sortBy,
-      trendingOnly: trendingOnly ?? this.trendingOnly,
-      weekendOnly: weekendOnly ?? this.weekendOnly,
-    );
+  }) =>
+      EventFilter(
+        category: category ?? this.category,
+        startDate: startDate ?? this.startDate,
+        endDate: endDate ?? this.endDate,
+        location: location ?? this.location,
+        freeOnly: freeOnly ?? this.freeOnly,
+        paidOnly: paidOnly ?? this.paidOnly,
+        maxPrice: maxPrice ?? this.maxPrice,
+        minPrice: minPrice ?? this.minPrice,
+        latitude: latitude ?? this.latitude,
+        longitude: longitude ?? this.longitude,
+        radiusKm: radiusKm ?? this.radiusKm,
+        tags: tags ?? this.tags,
+        sortBy: sortBy ?? this.sortBy,
+        trendingOnly: trendingOnly ?? this.trendingOnly,
+        weekendOnly: weekendOnly ?? this.weekendOnly,
+      );
 
   bool get hasActiveFilters =>
       category != null ||
@@ -235,7 +230,6 @@ class EventFilter extends Equatable {
 
 // Events BLoC
 class EventsBloc extends Bloc<EventsEvent, EventsState> {
-
   EventsBloc({
     required EventsRepository repository,
   })  : _repository = repository,
@@ -254,7 +248,9 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   List<EventModel> _allEvents = [];
 
   Future<void> _onLoadEvents(
-      LoadEventsEvent event, Emitter<EventsState> emit,) async {
+    LoadEventsEvent event,
+    Emitter<EventsState> emit,
+  ) async {
     try {
       if (state is! EventsLoaded || event.forceRefresh) {
         emit(EventsLoading());
@@ -268,26 +264,34 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
       _allEvents = events;
       _currentPage = 1;
 
-      emit(EventsLoaded(
-        events: _allEvents,
-        hasReachedMax: events.length < _eventsPerPage,
-      ),);
+      emit(
+        EventsLoaded(
+          events: _allEvents,
+          hasReachedMax: events.length < _eventsPerPage,
+        ),
+      );
     } catch (e) {
       log('Error loading events: $e', name: 'EventsBloc');
-      emit(EventsError(
-        message: _getErrorMessage(e),
-        isNetworkError: _isNetworkError(e),
-      ),);
+      emit(
+        EventsError(
+          message: _getErrorMessage(e),
+          isNetworkError: _isNetworkError(e),
+        ),
+      );
     }
   }
 
   Future<void> _onRefreshEvents(
-      RefreshEventsEvent event, Emitter<EventsState> emit,) async {
+    RefreshEventsEvent event,
+    Emitter<EventsState> emit,
+  ) async {
     add(const LoadEventsEvent(forceRefresh: true));
   }
 
   Future<void> _onLoadMoreEvents(
-      LoadMoreEventsEvent event, Emitter<EventsState> emit,) async {
+    LoadMoreEventsEvent event,
+    Emitter<EventsState> emit,
+  ) async {
     final currentState = state;
     if (currentState is! EventsLoaded ||
         currentState.hasReachedMax ||
@@ -306,17 +310,21 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         _allEvents.addAll(moreEvents);
         _currentPage++;
 
-        emit(EventsLoaded(
-          events: List.from(_allEvents),
-          hasReachedMax: moreEvents.length < _eventsPerPage,
-          currentFilter: currentState.currentFilter,
-          searchQuery: currentState.searchQuery,
-        ),);
+        emit(
+          EventsLoaded(
+            events: List.from(_allEvents),
+            hasReachedMax: moreEvents.length < _eventsPerPage,
+            currentFilter: currentState.currentFilter,
+            searchQuery: currentState.searchQuery,
+          ),
+        );
       } else {
-        emit(currentState.copyWith(
-          hasReachedMax: true,
-          isLoadingMore: false,
-        ),);
+        emit(
+          currentState.copyWith(
+            hasReachedMax: true,
+            isLoadingMore: false,
+          ),
+        );
       }
     } catch (e) {
       log('Error loading more events: $e', name: 'EventsBloc');
@@ -325,7 +333,9 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   Future<void> _onFilterEvents(
-      FilterEventsEvent event, Emitter<EventsState> emit,) async {
+    FilterEventsEvent event,
+    Emitter<EventsState> emit,
+  ) async {
     final currentState = state;
     if (currentState is! EventsLoaded) return;
 
@@ -350,11 +360,13 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         filteredEvents = _allEvents;
       }
 
-      emit(EventsLoaded(
-        events: filteredEvents,
-        hasReachedMax: true,
-        currentFilter: event.filter,
-      ),);
+      emit(
+        EventsLoaded(
+          events: filteredEvents,
+          hasReachedMax: true,
+          currentFilter: event.filter,
+        ),
+      );
     } catch (e) {
       log('Error filtering events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
@@ -362,7 +374,9 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   Future<void> _onSearchEvents(
-      SearchEventsEvent event, Emitter<EventsState> emit,) async {
+    SearchEventsEvent event,
+    Emitter<EventsState> emit,
+  ) async {
     if (event.query.trim().isEmpty) {
       add(ClearSearchEvent());
       return;
@@ -373,11 +387,13 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     try {
       final searchResults = await _repository.searchEvents(event.query);
 
-      emit(EventsLoaded(
-        events: searchResults,
-        hasReachedMax: true,
-        searchQuery: event.query,
-      ),);
+      emit(
+        EventsLoaded(
+          events: searchResults,
+          hasReachedMax: true,
+          searchQuery: event.query,
+        ),
+      );
     } catch (e) {
       log('Error searching events: $e', name: 'EventsBloc');
       emit(EventsError(message: _getErrorMessage(e)));
@@ -385,11 +401,15 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   Future<void> _onClearSearch(
-      ClearSearchEvent event, Emitter<EventsState> emit,) async {
-    emit(EventsLoaded(
-      events: _allEvents,
-      hasReachedMax: _allEvents.length < _eventsPerPage,
-    ),);
+    ClearSearchEvent event,
+    Emitter<EventsState> emit,
+  ) async {
+    emit(
+      EventsLoaded(
+        events: _allEvents,
+        hasReachedMax: _allEvents.length < _eventsPerPage,
+      ),
+    );
   }
 
   List<EventModel> _applyFilters(List<EventModel> events, EventFilter filter) {
@@ -443,8 +463,10 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
       // Tags filter
       if (filter.tags != null && filter.tags!.isNotEmpty) {
         final eventTags = event.tags.map((tag) => tag.toLowerCase()).toList();
-        final hasMatchingTag = filter.tags!.any((filterTag) => eventTags
-            .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),);
+        final hasMatchingTag = filter.tags!.any(
+          (filterTag) => eventTags
+              .any((eventTag) => eventTag.contains(filterTag.toLowerCase())),
+        );
         if (!hasMatchingTag) return false;
       }
 
@@ -463,8 +485,12 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
 
     // Apply location-based filtering (radius)
     if (filter.hasLocationFilter) {
-      filteredEvents = _filterByLocation(filteredEvents, filter.latitude!,
-          filter.longitude!, filter.radiusKm!,);
+      filteredEvents = _filterByLocation(
+        filteredEvents,
+        filter.latitude!,
+        filter.longitude!,
+        filter.radiusKm!,
+      );
     }
 
     // Apply sorting
@@ -475,21 +501,35 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     return filteredEvents;
   }
 
-  List<EventModel> _filterByLocation(List<EventModel> events, double latitude,
-      double longitude, double radiusKm,) => events.where((event) {
-      // Skip events without location data
-      if (event.location.latitude == null || event.location.longitude == null) {
-        return false;
-      }
+  List<EventModel> _filterByLocation(
+    List<EventModel> events,
+    double latitude,
+    double longitude,
+    double radiusKm,
+  ) =>
+      events.where((event) {
+        // Skip events without location data
+        if (event.location.latitude == null ||
+            event.location.longitude == null) {
+          return false;
+        }
 
-      // Calculate distance between user location and event location
-      final distance = _calculateDistance(latitude, longitude,
-          event.location.latitude!, event.location.longitude!,);
-      return distance <= radiusKm;
-    }).toList();
+        // Calculate distance between user location and event location
+        final distance = _calculateDistance(
+          latitude,
+          longitude,
+          event.location.latitude!,
+          event.location.longitude!,
+        );
+        return distance <= radiusKm;
+      }).toList();
 
   double _calculateDistance(
-      double lat1, double lon1, double lat2, double lon2,) {
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     const double earthRadius = 6371; // Earth's radius in kilometers
     final double dLat = _degreesToRadians(lat2 - lat1);
     final double dLon = _degreesToRadians(lon2 - lon1);
@@ -531,6 +571,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }
   }
 
-  bool _isNetworkError(error) => error.toString().contains('SocketException') ||
-        error.toString().contains('TimeoutException');
+  bool _isNetworkError(error) =>
+      error.toString().contains('SocketException') ||
+      error.toString().contains('TimeoutException');
 }

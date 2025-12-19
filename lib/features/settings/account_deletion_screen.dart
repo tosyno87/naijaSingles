@@ -70,7 +70,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       final providerData = user.providerData;
       final isPhone = providerData.any((info) => info.providerId == 'phone');
       log('📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone');
-      
+
       if (_isPhoneUser != isPhone) {
         setState(() {
           _isPhoneUser = isPhone;
@@ -86,250 +86,251 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Delete Account',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+            onPressed: () => Navigator.pop(context),
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Warning Header
-            _buildWarningHeader(),
-            const SizedBox(height: 24),
-
-            // What Gets Deleted
-            _buildWhatGetsDeletedSection(),
-            const SizedBox(height: 24),
-
-            // Deletion Reason
-            _buildDeletionReasonSection(),
-            const SizedBox(height: 24),
-
-            // Password/Phone Confirmation (based on auth provider)
-            if (_isPhoneUser) _buildPhoneConfirmationSection() else _buildPasswordConfirmationSection(),
-            const SizedBox(height: 24),
-
-            // Confirmation Checkboxes
-            _buildConfirmationSection(),
-            const SizedBox(height: 24),
-
-            // Delete Button
-            _buildDeleteButton(),
-            const SizedBox(height: 16),
-
-            // Alternative Options
-            _buildAlternativeOptionsSection(),
-          ],
-        ),
-      ),
-    );
-
-  Widget _buildWarningHeader() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: errorColor.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: errorColor.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: errorColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.warning,
-              size: 40,
-              color: errorColor,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Delete Your Account?',
+          title: Text(
+            'Delete Account',
             style: GoogleFonts.montserrat(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: textPrimary,
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
-          Text(
-            'This action cannot be undone. Once you delete your account, all your data will be permanently removed from our servers.',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: textSecondary,
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildWhatGetsDeletedSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          centerTitle: true,
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.delete_forever, color: errorColor, size: 24),
-              const SizedBox(width: 12),
-              Text(
-                'What Gets Deleted',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimary,
-                ),
-              ),
+              // Warning Header
+              _buildWarningHeader(),
+              const SizedBox(height: 24),
+
+              // What Gets Deleted
+              _buildWhatGetsDeletedSection(),
+              const SizedBox(height: 24),
+
+              // Deletion Reason
+              _buildDeletionReasonSection(),
+              const SizedBox(height: 24),
+
+              // Password/Phone Confirmation (based on auth provider)
+              if (_isPhoneUser)
+                _buildPhoneConfirmationSection()
+              else
+                _buildPasswordConfirmationSection(),
+              const SizedBox(height: 24),
+
+              // Confirmation Checkboxes
+              _buildConfirmationSection(),
+              const SizedBox(height: 24),
+
+              // Delete Button
+              _buildDeleteButton(),
+              const SizedBox(height: 16),
+
+              // Alternative Options
+              _buildAlternativeOptionsSection(),
             ],
           ),
-          const SizedBox(height: 16),
-          _buildDeletionItem('👤 Your profile and photos'),
-          _buildDeletionItem('💬 All your messages and conversations'),
-          _buildDeletionItem('❤️ Your matches and likes'),
-          _buildDeletionItem('📍 Location and preference data'),
-          _buildDeletionItem('📊 Activity history and analytics'),
-          _buildDeletionItem('💳 Subscription and payment history'),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: warningColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+        ),
+      );
+
+  Widget _buildWarningHeader() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: errorColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: errorColor.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: errorColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.warning,
+                size: 40,
+                color: errorColor,
+              ),
             ),
-            child: Row(
+            const SizedBox(height: 16),
+            Text(
+              'Delete Your Account?',
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'This action cannot be undone. Once you delete your account, all your data will be permanently removed from our servers.',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: textSecondary,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildWhatGetsDeletedSection() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                const Icon(Icons.info, color: warningColor, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'This process may take up to 30 days to complete as we ensure all data is properly removed from our systems.',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 13,
-                      color: textPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                const Icon(Icons.delete_forever, color: errorColor, size: 24),
+                const SizedBox(width: 12),
+                Text(
+                  'What Gets Deleted',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            _buildDeletionItem('👤 Your profile and photos'),
+            _buildDeletionItem('💬 All your messages and conversations'),
+            _buildDeletionItem('❤️ Your matches and likes'),
+            _buildDeletionItem('📍 Location and preference data'),
+            _buildDeletionItem('📊 Activity history and analytics'),
+            _buildDeletionItem('💳 Subscription and payment history'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: warningColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info, color: warningColor, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This process may take up to 30 days to complete as we ensure all data is properly removed from our systems.',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 13,
+                        color: textPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildDeletionItem(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          const Icon(Icons.check_circle, color: errorColor, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          children: [
+            const Icon(Icons.check_circle, color: errorColor, size: 16),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildDeletionReasonSection() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Why are you leaving?',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Help us improve by telling us why you\'re deleting your account (optional)',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildDeletionReasonSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Why are you leaving?',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Help us improve by telling us why you\'re deleting your account (optional)',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textSecondary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ..._deletionReasons
-              .map(_buildReasonTile)
-              ,
-          if (_selectedReason == 'Other') ...[
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _reasonController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Please tell us more...',
-                hintStyle: GoogleFonts.montserrat(color: textLight),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+            ..._deletionReasons.map(_buildReasonTile),
+            if (_selectedReason == 'Other') ...[
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _reasonController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Please tell us more...',
+                  hintStyle: GoogleFonts.montserrat(color: textLight),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: primaryColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.all(16),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: primaryColor, width: 2),
-                ),
-                contentPadding: const EdgeInsets.all(16),
+                style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
               ),
-              style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
-            ),
+            ],
           ],
-        ],
-      ),
-    );
+        ),
+      );
 
   Widget _buildReasonTile(String reason) {
     final isSelected = _selectedReason == reason;
@@ -383,163 +384,163 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   }
 
   Widget _buildPasswordConfirmationSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Confirm Your Password',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Enter your password to confirm account deletion',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textSecondary,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Confirm Your Password',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _passwordController,
-            obscureText: !_passwordVisible,
-            decoration: InputDecoration(
-              hintText: 'Enter your password',
-              hintStyle: GoogleFonts.montserrat(color: textLight),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+            const SizedBox(height: 8),
+            Text(
+              'Enter your password to confirm account deletion',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: primaryColor, width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              prefixIcon: const Icon(Icons.lock, color: primaryColor),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: textLight,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _passwordController,
+              obscureText: !_passwordVisible,
+              decoration: InputDecoration(
+                hintText: 'Enter your password',
+                hintStyle: GoogleFonts.montserrat(color: textLight),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                onPressed: () =>
-                    setState(() => _passwordVisible = !_passwordVisible),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: primaryColor, width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                prefixIcon: const Icon(Icons.lock, color: primaryColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: textLight,
+                  ),
+                  onPressed: () =>
+                      setState(() => _passwordVisible = !_passwordVisible),
+                ),
               ),
+              style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
             ),
-            style: GoogleFonts.montserrat(fontSize: 16, color: textPrimary),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildConfirmationSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Final Confirmation',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 16),
-          _buildCheckboxTile(
-            value: _understandConsequences,
-            onChanged: (value) =>
-                setState(() => _understandConsequences = value ?? false),
-            title: 'I understand that this action cannot be undone',
-            subtitle: 'All my data will be permanently deleted',
-          ),
-          const SizedBox(height: 12),
-          _buildCheckboxTile(
-            value: _confirmDeletion,
-            onChanged: (value) =>
-                setState(() => _confirmDeletion = value ?? false),
-            title: 'I want to permanently delete my account',
-            subtitle: 'I confirm that I want to proceed with deletion',
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Final Confirmation',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildCheckboxTile(
+              value: _understandConsequences,
+              onChanged: (value) =>
+                  setState(() => _understandConsequences = value ?? false),
+              title: 'I understand that this action cannot be undone',
+              subtitle: 'All my data will be permanently deleted',
+            ),
+            const SizedBox(height: 12),
+            _buildCheckboxTile(
+              value: _confirmDeletion,
+              onChanged: (value) =>
+                  setState(() => _confirmDeletion = value ?? false),
+              title: 'I want to permanently delete my account',
+              subtitle: 'I confirm that I want to proceed with deletion',
+            ),
+          ],
+        ),
+      );
 
   Widget _buildCheckboxTile({
     required bool value,
     required ValueChanged<bool?> onChanged,
     required String title,
     required String subtitle,
-  }) => Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Checkbox(
-          value: value,
-          onChanged: onChanged,
-          activeColor: errorColor,
-          checkColor: Colors.white,
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimary,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: textSecondary,
-                ),
-              ),
-            ],
+  }) =>
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Checkbox(
+            value: value,
+            onChanged: onChanged,
+            activeColor: errorColor,
+            checkColor: Colors.white,
           ),
-        ),
-      ],
-    );
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
 
   Widget _buildDeleteButton() {
     // For phone users, don't require password
     // For email users, require password
     final passwordValid = _isPhoneUser || _passwordController.text.isNotEmpty;
-    
-        final canDelete = passwordValid &&
-        _understandConsequences &&
-        _confirmDeletion;
-        
+
+    final canDelete =
+        passwordValid && _understandConsequences && _confirmDeletion;
+
     log('🔘 Delete button state check:');
     log('   - isPhoneUser: $_isPhoneUser');
     log('   - passwordValid: $passwordValid (phoneUser=$_isPhoneUser || passwordNotEmpty=${_passwordController.text.isNotEmpty})');
@@ -554,7 +555,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       child: ElevatedButton(
         onPressed: canDelete && !_isDeleting ? _deleteAccount : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: canDelete && !_isDeleting ? errorColor : Colors.grey.shade400,
+          backgroundColor:
+              canDelete && !_isDeleting ? errorColor : Colors.grey.shade400,
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey.shade400,
           disabledForegroundColor: Colors.white,
@@ -598,50 +600,51 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   }
 
   Widget _buildAlternativeOptionsSection() => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.lightbulb, color: primaryColor, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Consider These Alternatives',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimary,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: primaryColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: primaryColor.withOpacity(0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.lightbulb, color: primaryColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Consider These Alternatives',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildAlternativeItem(
-              '📴 Temporarily deactivate your account instead',),
-          _buildAlternativeItem('🔒 Update your privacy settings'),
-          _buildAlternativeItem('⚙️ Adjust your matching preferences'),
-          _buildAlternativeItem('💬 Contact support for help with issues'),
-        ],
-      ),
-    );
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildAlternativeItem(
+              '📴 Temporarily deactivate your account instead',
+            ),
+            _buildAlternativeItem('🔒 Update your privacy settings'),
+            _buildAlternativeItem('⚙️ Adjust your matching preferences'),
+            _buildAlternativeItem('💬 Contact support for help with issues'),
+          ],
+        ),
+      );
 
   Widget _buildAlternativeItem(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        text,
-        style: GoogleFonts.montserrat(
-          fontSize: 14,
-          color: textSecondary,
-          height: 1.4,
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text(
+          text,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: textSecondary,
+            height: 1.4,
+          ),
         ),
-      ),
-    );
+      );
 
   Future<void> _deleteAccount() async {
     setState(() => _isDeleting = true);
@@ -654,8 +657,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
       // Check auth provider and re-authenticate accordingly
       final providerData = user.providerData;
-      final isPhoneUser = providerData.any((info) => info.providerId == 'phone');
-      final isEmailUser = providerData.any((info) => info.providerId == 'password') || user.email != null;
+      final isPhoneUser =
+          providerData.any((info) => info.providerId == 'phone');
+      final isEmailUser =
+          providerData.any((info) => info.providerId == 'password') ||
+              user.email != null;
 
       log('📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser');
 
@@ -671,7 +677,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         } catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
             log('⚠️ Requires recent login - need phone reauth');
-            throw Exception('Please sign out and sign back in to delete your account, or contact support.');
+            throw Exception(
+                'Please sign out and sign back in to delete your account, or contact support.');
           }
           rethrow;
         }
@@ -691,7 +698,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           await user.delete();
         } catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
-            throw Exception('Please sign out and sign back in to delete your account.');
+            throw Exception(
+                'Please sign out and sign back in to delete your account.');
           }
           rethrow;
         }
@@ -714,7 +722,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           'userId': user.uid,
           'email': user.email,
           'phoneNumber': user.phoneNumber,
-          'authProvider': isPhoneUser ? 'phone' : (isEmailUser ? 'email' : 'other'),
+          'authProvider':
+              isPhoneUser ? 'phone' : (isEmailUser ? 'email' : 'other'),
           'reason': _selectedReason,
           'customReason':
               _selectedReason == 'Other' ? _reasonController.text : null,
@@ -750,8 +759,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                     color: errorColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child:
-                      const Icon(Icons.delete_forever, color: errorColor, size: 40),
+                  child: const Icon(Icons.delete_forever,
+                      color: errorColor, size: 40),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -788,7 +797,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.warning_amber_rounded, color: errorColor, size: 20),
+                      const Icon(Icons.warning_amber_rounded,
+                          color: errorColor, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -851,7 +861,8 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         String errorMessage = 'Failed to delete account.';
         if (e is FirebaseAuthException) {
           if (e.code == 'requires-recent-login') {
-            errorMessage = 'For security, please sign out and sign back in, then try again.';
+            errorMessage =
+                'For security, please sign out and sign back in, then try again.';
           } else if (e.code == 'wrong-password') {
             errorMessage = 'Incorrect password. Please try again.';
           } else {
@@ -860,7 +871,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         } else {
           errorMessage = e.toString();
         }
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -882,11 +893,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   Future<void> _cleanupUserData(User user) async {
     try {
       log('🧹 Starting user data cleanup for: ${user.uid}');
-      
+
       // Use PhoneAuthRepository's deleteUser method which handles cleanup
       final repo = PhoneAuthRepository();
       await repo.deleteUser(user);
-      
+
       log('✅ User data cleanup completed');
     } catch (e) {
       log('⚠️ Error during user data cleanup: $e');
@@ -897,62 +908,62 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   }
 
   Widget _buildPhoneConfirmationSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Confirm Account Deletion',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Since you signed up with phone, your account will be deleted immediately after confirmation.',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textSecondary,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Confirm Account Deletion',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: warningColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: warningColor.withOpacity(0.3)),
+            const SizedBox(height: 8),
+            Text(
+              'Since you signed up with phone, your account will be deleted immediately after confirmation.',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
+              ),
             ),
-            child: Row(
-              children: [
-                const Icon(Icons.info_outline, color: warningColor, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Note: For security, you may need to sign out and sign back in before deleting if you haven\'t signed in recently.',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      color: textSecondary,
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: warningColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: warningColor.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: warningColor, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Note: For security, you may need to sign out and sign back in before deleting if you haven\'t signed in recently.',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        color: textSecondary,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 }

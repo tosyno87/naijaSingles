@@ -30,7 +30,9 @@ class OtpPage extends StatefulWidget {
   final bool isLogin; // Added to distinguish between login and registration
 
   OtpPage({
-    required this.phoneNumber, required this.verificationId, super.key,
+    required this.phoneNumber,
+    required this.verificationId,
+    super.key,
     this.codeController = '',
     this.updatePhoneNumber = false,
     this.isLogin = false,
@@ -46,10 +48,10 @@ class _OtpPageState extends State<OtpPage> {
 
   OTPTextEditController? controller;
   OTPInteractor? _otpInteractor;
-  
+
   // Local state to track OTP code length for button enable/disable
   String _currentOtpCode = '';
-  
+
   // Flag to prevent multiple navigation attempts
   bool _hasNavigated = false;
 
@@ -73,7 +75,10 @@ class _OtpPageState extends State<OtpPage> {
   void _initializeOtpInteractor() {
     try {
       _otpInteractor = OTPInteractor();
-      _otpInteractor!.getAppSignature().then((value) => log('signature - $value')).catchError((error) {
+      _otpInteractor!
+          .getAppSignature()
+          .then((value) => log('signature - $value'))
+          .catchError((error) {
         log('⚠️ Error getting app signature: $error');
       });
 
@@ -89,9 +94,9 @@ class _OtpPageState extends State<OtpPage> {
             return exp.stringMatch(code ?? '') ?? '';
           },
           strategies: [
-          // SampleStrategy(),
-        ],
-      );
+            // SampleStrategy(),
+          ],
+        );
     } catch (e) {
       log('⚠️ Error initializing OTP interactor: $e');
       // On error, controller will be null and app will use regular TextField
@@ -101,16 +106,19 @@ class _OtpPageState extends State<OtpPage> {
   @override
   Widget build(BuildContext context) {
     // Set system UI overlay style for status bar
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-    ),);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    );
 
     // MVP Color Scheme
     const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Deep green MVP color
     const Color textColor = Color(0xFF2D2D2D); // Dark text
     const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
-    const Color iconBackgroundColor = Color(0xFFDFF5E2); // Light green for icon background
+    const Color iconBackgroundColor =
+        Color(0xFFDFF5E2); // Light green for icon background
 
     return PopScope(
       child: RepositoryProvider(
@@ -119,13 +127,15 @@ class _OtpPageState extends State<OtpPage> {
           providers: [
             BlocProvider(
               create: (context) => PhoneAuthBloc(
-                  phoneAuthRepository:
-                      RepositoryProvider.of<PhoneAuthRepository>(context),),
+                phoneAuthRepository:
+                    RepositoryProvider.of<PhoneAuthRepository>(context),
+              ),
             ),
             BlocProvider(
               create: (context) => RegistrationBloc(
-                  phoneAuthRepository:
-                      RepositoryProvider.of<PhoneAuthRepository>(context),),
+                phoneAuthRepository:
+                    RepositoryProvider.of<PhoneAuthRepository>(context),
+              ),
             ),
           ],
           child: Scaffold(
@@ -154,7 +164,7 @@ class _OtpPageState extends State<OtpPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(height: 40),
-                    
+
                     // Verification icon with MVP styling
                     Container(
                       width: 100,
@@ -189,9 +199,9 @@ class _OtpPageState extends State<OtpPage> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // Subtitle with phone number
                     RichText(
                       textAlign: TextAlign.center,
@@ -262,23 +272,22 @@ class _OtpPageState extends State<OtpPage> {
                         if (state is PhoneAuthLoading) {}
                       },
                       builder: (context, state) => TimerWidget(
-                          start: start,
-                          resendText:
-                              "Didn't receive the code? ".tr().toString(),
-                          phoneNumber: widget.phoneNumber,
-                          onResendOtp: () {
-                            context.read<PhoneAuthBloc>().add(
-                                  SendOtpToPhoneEvent(
-                                    phoneNumber: widget.phoneNumber,
-                                  ),
-                                );
-                            if (Platform.isAndroid) {
-                              _initializeOtpInteractor();
-                            }
-                          },
-                        ),
+                        start: start,
+                        resendText: "Didn't receive the code? ".tr().toString(),
+                        phoneNumber: widget.phoneNumber,
+                        onResendOtp: () {
+                          context.read<PhoneAuthBloc>().add(
+                                SendOtpToPhoneEvent(
+                                  phoneNumber: widget.phoneNumber,
+                                ),
+                              );
+                          if (Platform.isAndroid) {
+                            _initializeOtpInteractor();
+                          }
+                        },
+                      ),
                     ),
-                    
+
                     const SizedBox(height: 24),
                     BlocConsumer<RegistrationBloc, RegistrationStates>(
                       builder: (context, state) {
@@ -293,7 +302,7 @@ class _OtpPageState extends State<OtpPage> {
                           log('⚠️ Navigation already happened or widget unmounted, ignoring state: ${state.runtimeType}');
                           return;
                         }
-                        
+
                         if (state is AlreadyRegistered) {
                           log('');
                           log('═══════════════════════════════════════════════════════');
@@ -305,7 +314,7 @@ class _OtpPageState extends State<OtpPage> {
                           log('Is Sign-In: ${widget.isLogin}');
                           log('═══════════════════════════════════════════════════════');
                           log('');
-                          
+
                           // CRITICAL: If this is a sign-up flow (not login), ALWAYS send to onboarding
                           // Even if user exists, they should complete onboarding during sign-up
                           if (!widget.isLogin) {
@@ -316,16 +325,18 @@ class _OtpPageState extends State<OtpPage> {
                               Future.microtask(() {
                                 if (mounted) {
                                   Navigator.of(context).pushNamedAndRemoveUntil(
-                                      RouteName.onboarding,
-                                      (route) => false,);
+                                    RouteName.onboarding,
+                                    (route) => false,
+                                  );
                                 }
                               });
                             }
                             return;
                           }
-                          
+
                           // Double-check that user actually has a name (fully registered)
-                          if (state.user.name == null || state.user.name!.isEmpty) {
+                          if (state.user.name == null ||
+                              state.user.name!.isEmpty) {
                             log('⚠️ User marked as registered but has no name - treating as new registration');
                             if (!_hasNavigated && mounted) {
                               _hasNavigated = true;
@@ -333,14 +344,15 @@ class _OtpPageState extends State<OtpPage> {
                               Future.microtask(() {
                                 if (mounted) {
                                   Navigator.of(context).pushNamedAndRemoveUntil(
-                                      RouteName.onboarding,
-                                      (route) => false,);
+                                    RouteName.onboarding,
+                                    (route) => false,
+                                  );
                                 }
                               });
                             }
                             return;
                           }
-                          
+
                           // Only proceed to main navigation if this is a LOGIN flow AND user has complete profile
                           _hasNavigated = true;
                           Provider.of<UserProvider>(context, listen: false)
@@ -349,12 +361,13 @@ class _OtpPageState extends State<OtpPage> {
                           // Small delay to ensure all state is properly set
                           Future.microtask(() {
                             if (!mounted) return;
-                            
+
                             // This should only be reached for LOGIN flows with complete profiles
                             log('✅ Navigating to main navigation for existing user login');
                             Navigator.of(context).pushNamedAndRemoveUntil(
-                                RouteName.mainNavigation,
-                                (route) => false,);
+                              RouteName.mainNavigation,
+                              (route) => false,
+                            );
                           });
                         } else if (state is NewRegistration) {
                           log('');
@@ -364,7 +377,7 @@ class _OtpPageState extends State<OtpPage> {
                           log('Is Login Flow: ${widget.isLogin}');
                           log('═══════════════════════════════════════════════════════');
                           log('');
-                          
+
                           if (widget.isLogin) {
                             // If trying to login with a number that doesn't have an account
                             if (!_hasNavigated && mounted) {
@@ -387,15 +400,17 @@ class _OtpPageState extends State<OtpPage> {
                               Future.microtask(() {
                                 if (mounted) {
                                   Navigator.of(context).pushNamedAndRemoveUntil(
-                                      RouteName.onboarding,
-                                      (route) => false,);
+                                    RouteName.onboarding,
+                                    (route) => false,
+                                  );
                                 }
                               });
                             }
                           }
                         } else if (state is RegistrationFailed) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(state.message)),);
+                            SnackBar(content: Text(state.message)),
+                          );
                         }
                       },
                     ),
@@ -406,12 +421,12 @@ class _OtpPageState extends State<OtpPage> {
                         } else if (state is PhoneAuthVerified) {
                           return const SizedBox.shrink();
                         }
-                        
+
                         // Use local state to track OTP length for reactive button state
                         final isValidCode = _currentOtpCode.trim().length == 6;
-                        
+
                         log('🔘 Button state check: codeLength=${_currentOtpCode.length}, isValidCode=$isValidCode');
-                        
+
                         return SizedBox(
                           width: double.infinity,
                           height: 56,
@@ -428,7 +443,9 @@ class _OtpPageState extends State<OtpPage> {
                                       );
                                     } else {
                                       CustomSnackbar.showSnackBarSimple(
-                                        'Please enter all 6 digits'.tr().toString(),
+                                        'Please enter all 6 digits'
+                                            .tr()
+                                            .toString(),
                                         context,
                                       );
                                     }
@@ -460,13 +477,15 @@ class _OtpPageState extends State<OtpPage> {
                       listener: (context, state) {
                         // Prevent navigation if already navigated
                         if (_hasNavigated || !mounted) return;
-                        
+
                         if (state is PhoneAuthVerified) {
                           try {
                             if (state.user != null) {
                               log('✅ Phone verified, checking registration status...');
                               state.user!.getIdToken().then((value) async {
-                                if (value != null && mounted && !_hasNavigated) {
+                                if (value != null &&
+                                    mounted &&
+                                    !_hasNavigated) {
                                   log('Got token after phone verification, dispatching CheckRegistration');
                                   BlocProvider.of<RegistrationBloc>(context)
                                       .add(CheckRegistration(token: value));
@@ -474,41 +493,51 @@ class _OtpPageState extends State<OtpPage> {
                                   log('Error: Token is null after phone verification');
                                   if (mounted) {
                                     CustomSnackbar.showSnackBarSimple(
-                                        'Authentication error: Token is null',
-                                        context,);
+                                      'Authentication error: Token is null',
+                                      context,
+                                    );
                                   }
                                 }
                               }).catchError((error) {
                                 log('Error getting token after phone verification: $error');
                                 if (mounted && !_hasNavigated) {
                                   CustomSnackbar.showSnackBarSimple(
-                                      'Authentication error: $error', context,);
+                                    'Authentication error: $error',
+                                    context,
+                                  );
                                 }
                               });
                             } else {
                               log('Error: User is null after phone verification');
                               if (mounted && !_hasNavigated) {
                                 CustomSnackbar.showSnackBarSimple(
-                                    'Authentication error: User is null',
-                                    context,);
+                                  'Authentication error: User is null',
+                                  context,
+                                );
                               }
                             }
                           } catch (e) {
                             log('Exception during token retrieval after phone verification: $e');
                             if (mounted && !_hasNavigated) {
                               CustomSnackbar.showSnackBarSimple(
-                                  'Authentication error: $e', context,);
+                                'Authentication error: $e',
+                                context,
+                              );
                             }
                           }
                         } else if (state is PhoneupdateSuccess) {
                           if (!_hasNavigated && mounted) {
                             _hasNavigated = true;
                             Navigator.pushReplacementNamed(
-                                context, RouteName.tabScreen,);
+                              context,
+                              RouteName.tabScreen,
+                            );
                           }
                         } else if (state is PhoneAuthError) {
                           CustomSnackbar.showSnackBarSimple(
-                              state.error, context,);
+                            state.error,
+                            context,
+                          );
                         }
                       },
                     ),
@@ -527,15 +556,21 @@ class _OtpPageState extends State<OtpPage> {
 
   void _verifyOtp({required BuildContext context}) {
     if (widget.updatePhoneNumber) {
-      context.read<PhoneAuthBloc>().add(OnPhoneNumberupdateEvent(
-          phoneNumber: widget.phoneNumber,
-          verificationId: widget.verificationId,
-          token: widget.codeController,),);
+      context.read<PhoneAuthBloc>().add(
+            OnPhoneNumberupdateEvent(
+              phoneNumber: widget.phoneNumber,
+              verificationId: widget.verificationId,
+              token: widget.codeController,
+            ),
+          );
       log('coming under update number');
     } else {
-      context.read<PhoneAuthBloc>().add(VerifySentOtpEvent(
-          otpCode: widget.codeController,
-          verificationId: widget.verificationId,),);
+      context.read<PhoneAuthBloc>().add(
+            VerifySentOtpEvent(
+              otpCode: widget.codeController,
+              verificationId: widget.verificationId,
+            ),
+          );
     }
   }
 }

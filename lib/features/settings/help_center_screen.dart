@@ -25,80 +25,80 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Help Center',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: textPrimary),
+            onPressed: () => Navigator.pop(context),
           ),
+          title: Text(
+            'Help Center',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          // Tab Bar
-          _buildTabBar(),
+        body: Column(
+          children: [
+            // Tab Bar
+            _buildTabBar(),
 
-          // Tab Content
-          Expanded(
-            child: _buildTabContent(),
-          ),
-        ],
-      ),
-    );
+            // Tab Content
+            Expanded(
+              child: _buildTabContent(),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildTabBar() => Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: _tabs.asMap().entries.map((entry) {
-          final index = entry.key;
-          final tab = entry.value;
-          final isSelected = index == _selectedTabIndex;
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: _tabs.asMap().entries.map((entry) {
+            final index = entry.key;
+            final tab = entry.value;
+            final isSelected = index == _selectedTabIndex;
 
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _selectedTabIndex = index),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected ? primaryColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  tab,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.white : textSecondary,
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedTabIndex = index),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected ? primaryColor : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  textAlign: TextAlign.center,
+                  child: Text(
+                    tab,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? Colors.white : textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
+            );
+          }).toList(),
+        ),
+      );
 
   Widget _buildTabContent() {
     switch (_selectedTabIndex) {
@@ -175,175 +175,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   Widget _buildFAQItem(Map<String, String> faq) => Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ExpansionTile(
-        title: Text(
-          faq['question']!,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: textPrimary,
-          ),
-        ),
-        iconColor: primaryColor,
-        collapsedIconColor: textSecondary,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Text(
-              faq['answer']!,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: textSecondary,
-                height: 1.5,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildContactTab() => SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.support_agent,
-                    size: 40,
-                    color: primaryColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Get in Touch',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'We\'re here to help! Send us an email and we\'ll get back to you as soon as possible.',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    color: textSecondary,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Email Support Option
-          _buildContactOption(
-            icon: Icons.email,
-            title: 'Email Support',
-            subtitle: 'Get help via email',
-            description: 'support@afropeep.com',
-            onTap: () => _sendEmail('support@afropeep.com'),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Send Feedback Option
-          _buildContactOption(
-            icon: Icons.feedback,
-            title: 'Send Feedback',
-            subtitle: 'Share your thoughts',
-            description: 'Help us improve the app',
-            onTap: () => Navigator.pushNamed(context, '/feedback'),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Support Info
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: primaryColor.withOpacity(0.2)),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.schedule, color: primaryColor, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Response Time',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'We typically respond to emails within 24-48 hours during business days (Monday to Friday, 9 AM - 6 PM WAT).',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: textSecondary,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildContactOption({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String description,
-    required VoidCallback onTap,
-  }) => GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(12),
@@ -355,59 +187,228 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: primaryColor, size: 28),
+        child: ExpansionTile(
+          title: Text(
+            faq['question']!,
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
             ),
-            const SizedBox(width: 16),
-            Expanded(
+          ),
+          iconColor: primaryColor,
+          collapsedIconColor: textSecondary,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Text(
+                faq['answer']!,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: textSecondary,
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildContactTab() => SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.support_agent,
+                      size: 40,
+                      color: primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
-                    title,
+                    'Get in Touch',
                     style: GoogleFonts.montserrat(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                       color: textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Text(
-                    subtitle,
+                    'We\'re here to help! Send us an email and we\'ll get back to you as soon as possible.',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      color: textSecondary,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Email Support Option
+            _buildContactOption(
+              icon: Icons.email,
+              title: 'Email Support',
+              subtitle: 'Get help via email',
+              description: 'support@afropeep.com',
+              onTap: () => _sendEmail('support@afropeep.com'),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Send Feedback Option
+            _buildContactOption(
+              icon: Icons.feedback,
+              title: 'Send Feedback',
+              subtitle: 'Share your thoughts',
+              description: 'Help us improve the app',
+              onTap: () => Navigator.pushNamed(context, '/feedback'),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Support Info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: primaryColor.withOpacity(0.2)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.schedule, color: primaryColor, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Response Time',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'We typically respond to emails within 24-48 hours during business days (Monday to Friday, 9 AM - 6 PM WAT).',
                     style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 13,
-                      color: primaryColor,
-                      fontWeight: FontWeight.w500,
+                      height: 1.4,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: textLight,
-              size: 16,
-            ),
           ],
         ),
-      ),
-    );
+      );
+
+  Widget _buildContactOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String description,
+    required VoidCallback onTap,
+  }) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: primaryColor, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 13,
+                        color: primaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: textLight,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      );
 
   Widget _buildGuidesTab() {
     final guides = [
@@ -469,97 +470,99 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   Widget _buildGuideItem(Map<String, dynamic> guide) => Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ExpansionTile(
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(guide['icon'], color: primaryColor, size: 24),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        title: Text(
-          guide['title'],
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: textPrimary,
+        child: ExpansionTile(
+          leading: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(guide['icon'], color: primaryColor, size: 24),
           ),
-        ),
-        subtitle: Text(
-          guide['description'],
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: textSecondary,
+          title: Text(
+            guide['title'],
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: textPrimary,
+            ),
           ),
-        ),
-        iconColor: primaryColor,
-        collapsedIconColor: textSecondary,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:
-                  (guide['steps'] as List<String>).asMap().entries.map((entry) {
-                final index = entry.key + 1;
-                final step = entry.value;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: const BoxDecoration(
-                          color: primaryColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$index',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+          subtitle: Text(
+            guide['description'],
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: textSecondary,
+            ),
+          ),
+          iconColor: primaryColor,
+          collapsedIconColor: textSecondary,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: (guide['steps'] as List<String>)
+                    .asMap()
+                    .entries
+                    .map((entry) {
+                  final index = entry.key + 1;
+                  final step = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: const BoxDecoration(
+                            color: primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '$index',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          step,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            color: textSecondary,
-                            height: 1.4,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            step,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: textSecondary,
+                              height: 1.4,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Future<void> _sendEmail(String email) async {
     final Uri emailUri = Uri(

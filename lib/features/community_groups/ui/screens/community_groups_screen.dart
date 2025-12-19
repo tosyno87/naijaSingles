@@ -91,100 +91,100 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildSearchBar(),
-            CommunityGroupFilterBar(
-              selectedCategory: _selectedCategory,
-              selectedCountry: _selectedCountry,
-              onCategoryChanged: (category) {
-                setState(() {
-                  _selectedCategory = category;
-                });
-              },
-              onCountryChanged: (country) {
-                setState(() {
-                  _selectedCountry = country;
-                });
-              },
+        backgroundColor: AppColors.backgroundColor,
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildSearchBar(),
+              CommunityGroupFilterBar(
+                selectedCategory: _selectedCategory,
+                selectedCountry: _selectedCountry,
+                onCategoryChanged: (category) {
+                  setState(() {
+                    _selectedCategory = category;
+                  });
+                },
+                onCountryChanged: (country) {
+                  setState(() {
+                    _selectedCountry = country;
+                  });
+                },
+              ),
+              Expanded(
+                child: _buildGroupsList(),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          heroTag: 'community_groups_fab',
+          onPressed: () {
+            // TODO: Navigate to create group screen
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Create Group feature coming soon!'),
+                backgroundColor: Color(0xFF008037),
+              ),
+            );
+          },
+          backgroundColor: const Color(0xFF008037),
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.group_add),
+          label: Text(
+            'Create Group',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
+          ),
+        ),
+      );
+
+  Widget _buildHeader() => Container(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
             Expanded(
-              child: _buildGroupsList(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Community Groups',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF333333),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Join cultural, professional, and interest-based communities',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      color: const Color(0xFF666666),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _isSearching = !_isSearching;
+                  if (!_isSearching) {
+                    _searchController.clear();
+                  }
+                });
+              },
+              icon: Icon(
+                _isSearching ? Icons.close : Icons.search,
+                color: const Color(0xFF008037),
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'community_groups_fab',
-        onPressed: () {
-          // TODO: Navigate to create group screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Create Group feature coming soon!'),
-              backgroundColor: Color(0xFF008037),
-            ),
-          );
-        },
-        backgroundColor: const Color(0xFF008037),
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.group_add),
-        label: Text(
-          'Create Group',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-
-  Widget _buildHeader() => Container(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Community Groups',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF333333),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Join cultural, professional, and interest-based communities',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    color: const Color(0xFF666666),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = !_isSearching;
-                if (!_isSearching) {
-                  _searchController.clear();
-                }
-              });
-            },
-            icon: Icon(
-              _isSearching ? Icons.close : Icons.search,
-              color: const Color(0xFF008037),
-            ),
-          ),
-        ],
-      ),
-    );
+      );
 
   Widget _buildSearchBar() {
     if (!_isSearching) return const SizedBox.shrink();
@@ -269,16 +269,16 @@ class _CommunityGroupsScreenState extends State<CommunityGroupsScreen> {
       padding: const EdgeInsets.all(20),
       itemCount: filteredGroups.length,
       itemBuilder: (context, index) => CommunityGroupCard(
-          group: filteredGroups[index],
-          onJoin: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Joined ${filteredGroups[index].name}!'),
-                backgroundColor: const Color(0xFF008037),
-              ),
-            );
-          },
-        ),
+        group: filteredGroups[index],
+        onJoin: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Joined ${filteredGroups[index].name}!'),
+              backgroundColor: const Color(0xFF008037),
+            ),
+          );
+        },
+      ),
     );
   }
 }

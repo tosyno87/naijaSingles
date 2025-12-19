@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class IOSHeightPicker extends StatefulWidget {
-
   const IOSHeightPicker({
-    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+    required this.initialHeight,
+    required this.initialUnit,
+    required this.onChanged,
+    super.key,
   });
   final double initialHeight; // Height in cm
   final String initialUnit; // 'cm' or 'ft'
@@ -373,27 +375,27 @@ class _IOSHeightPickerState extends State<IOSHeightPicker> {
             children: List.generate(
               maxInches + 1,
               (index) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '$index',
-                        style: GoogleFonts.montserrat(
-                          fontSize: isTablet ? 24 : 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$index',
+                      style: GoogleFonts.montserrat(
+                        fontSize: isTablet ? 24 : 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                      Text(
-                        'inches',
-                        style: GoogleFonts.montserrat(
-                          fontSize: isTablet ? 12 : 10,
-                          color: Colors.grey.shade600,
-                        ),
+                    ),
+                    Text(
+                      'inches',
+                      style: GoogleFonts.montserrat(
+                        fontSize: isTablet ? 12 : 10,
+                        color: Colors.grey.shade600,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
             ),
           ),
         ),

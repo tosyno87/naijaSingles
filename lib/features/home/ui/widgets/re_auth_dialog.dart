@@ -14,9 +14,10 @@ import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 
 class ReAuthDialog extends StatefulWidget {
-
   const ReAuthDialog({
-    required this.verificationId, required this.auth, super.key,
+    required this.verificationId,
+    required this.auth,
+    super.key,
   });
   final String verificationId;
   final FirebaseAuth auth;
@@ -35,21 +36,25 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
       titlePadding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
       title: RichText(
         text: TextSpan(
-            text: 'Enter the code sent to '.tr().toString(),
-            children: [
-              TextSpan(
-                  text: widget.auth.currentUser?.phoneNumber,
-                  style: const TextStyle(
-                      color: primaryColor,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.bold,
-                      textBaseline: TextBaseline.alphabetic,
-                      fontSize: 15,),),
-            ],
-            style: TextStyle(
-                fontFamily: 'Gellix',
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
-                fontSize: 18,),),
+          text: 'Enter the code sent to '.tr().toString(),
+          children: [
+            TextSpan(
+              text: widget.auth.currentUser?.phoneNumber,
+              style: const TextStyle(
+                color: primaryColor,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+                textBaseline: TextBaseline.alphabetic,
+                fontSize: 15,
+              ),
+            ),
+          ],
+          style: TextStyle(
+            fontFamily: 'Gellix',
+            color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
+            fontSize: 18,
+          ),
+        ),
         textAlign: TextAlign.center,
       ),
       content: PinCodeTextField(
@@ -58,16 +63,17 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
         length: 6,
         animationType: AnimationType.fade,
         pinTheme: PinTheme(
-            shape: PinCodeFieldShape.box,
-            borderRadius: BorderRadius.circular(10),
-            fieldHeight: 50,
-            fieldWidth: 35,
-            inactiveFillColor: Colors.white,
-            inactiveColor: primaryColor,
-            selectedColor: Colors.green,
-            selectedFillColor: Colors.white,
-            activeFillColor: Colors.white,
-            activeColor: Colors.green,),
+          shape: PinCodeFieldShape.box,
+          borderRadius: BorderRadius.circular(10),
+          fieldHeight: 50,
+          fieldWidth: 35,
+          inactiveFillColor: Colors.white,
+          inactiveColor: primaryColor,
+          selectedColor: Colors.green,
+          selectedFillColor: Colors.white,
+          activeFillColor: Colors.white,
+          activeColor: Colors.green,
+        ),
         //shape: PinCodeFieldShape.underline,
         animationDuration: const Duration(milliseconds: 300),
         //fieldHeight: 50,
@@ -95,10 +101,11 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
               // For demonstration purpose, I'm just printing the OTP
               log('Submitted OTP: $otp');
               await reauthenticateWithPhone(
-                  context: context,
-                  auth: widget.auth,
-                  verificationId: widget.verificationId,
-                  verificationCode: otp,);
+                context: context,
+                auth: widget.auth,
+                verificationId: widget.verificationId,
+                verificationCode: otp,
+              );
             } else {
               CustomSnackbar.showSnackBarSimple(
                 'otp can not empty'.tr().toString(),

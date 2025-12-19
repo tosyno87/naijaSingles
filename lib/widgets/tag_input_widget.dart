@@ -5,9 +5,10 @@ import '../services/validation_service.dart';
 
 /// Widget for inputting and managing tags
 class TagInputWidget extends StatefulWidget {
-
   const TagInputWidget({
-    required this.tags, required this.onTagsChanged, super.key,
+    required this.tags,
+    required this.onTagsChanged,
+    super.key,
     this.maxTags = 5,
     this.hintText = 'Add tags...',
     this.suggestions = const [],
@@ -42,136 +43,137 @@ class _TagInputWidgetState extends State<TagInputWidget> {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Tags display
-        if (widget.tags.isNotEmpty) ...[
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: widget.tags.map(_buildTagChip).toList(),
-          ),
-          const SizedBox(height: 12),
-        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Tags display
+          if (widget.tags.isNotEmpty) ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: widget.tags.map(_buildTagChip).toList(),
+            ),
+            const SizedBox(height: 12),
+          ],
 
-        // Tag input field
-        TextField(
-          controller: _controller,
-          focusNode: _focusNode,
-          decoration: InputDecoration(
-            hintText: widget.hintText,
-            hintStyle: GoogleFonts.montserrat(
-              color: Colors.grey[500],
+          // Tag input field
+          TextField(
+            controller: _controller,
+            focusNode: _focusNode,
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              hintStyle: GoogleFonts.montserrat(
+                color: Colors.grey[500],
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.primaryGreen),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              suffixIcon: IconButton(
+                onPressed: _addTag,
+                icon: const Icon(
+                  Icons.add,
+                  color: AppColors.primaryGreen,
+                ),
+              ),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+            style: GoogleFonts.montserrat(),
+            onChanged: _onTextChanged,
+            onSubmitted: (_) => _addTag(),
+          ),
+
+          // Suggestions
+          if (_filteredSuggestions.isNotEmpty &&
+              _controller.text.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Container(
+              constraints: const BoxConstraints(maxHeight: 150),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[300]!),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _filteredSuggestions.length,
+                itemBuilder: (context, index) {
+                  final suggestion = _filteredSuggestions[index];
+                  return ListTile(
+                    title: Text(
+                      suggestion,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                      ),
+                    ),
+                    onTap: () => _selectSuggestion(suggestion),
+                  );
+                },
+              ),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+          ],
+
+          // Tag limit indicator
+          if (widget.tags.length >= widget.maxTags) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Maximum ${widget.maxTags} tags allowed',
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                color: Colors.orange[600],
+              ),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primaryGreen),
+          ],
+        ],
+      );
+
+  Widget _buildTagChip(String tag) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.primaryGreen.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.primaryGreen.withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              tag,
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                color: AppColors.primaryGreen,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-            suffixIcon: IconButton(
-              onPressed: _addTag,
-              icon: const Icon(
-                Icons.add,
+            const SizedBox(width: 4),
+            GestureDetector(
+              onTap: () => _removeTag(tag),
+              child: const Icon(
+                Icons.close,
+                size: 16,
                 color: AppColors.primaryGreen,
               ),
             ),
-          ),
-          style: GoogleFonts.montserrat(),
-          onChanged: _onTextChanged,
-          onSubmitted: (_) => _addTag(),
+          ],
         ),
-
-        // Suggestions
-        if (_filteredSuggestions.isNotEmpty && _controller.text.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Container(
-            constraints: const BoxConstraints(maxHeight: 150),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[300]!),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: _filteredSuggestions.length,
-              itemBuilder: (context, index) {
-                final suggestion = _filteredSuggestions[index];
-                return ListTile(
-                  title: Text(
-                    suggestion,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                    ),
-                  ),
-                  onTap: () => _selectSuggestion(suggestion),
-                );
-              },
-            ),
-          ),
-        ],
-
-        // Tag limit indicator
-        if (widget.tags.length >= widget.maxTags) ...[
-          const SizedBox(height: 8),
-          Text(
-            'Maximum ${widget.maxTags} tags allowed',
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: Colors.orange[600],
-            ),
-          ),
-        ],
-      ],
-    );
-
-  Widget _buildTagChip(String tag) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.primaryGreen.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryGreen.withOpacity(0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            tag,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: AppColors.primaryGreen,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            onTap: () => _removeTag(tag),
-            child: const Icon(
-              Icons.close,
-              size: 16,
-              color: AppColors.primaryGreen,
-            ),
-          ),
-        ],
-      ),
-    );
+      );
 
   void _onTextChanged(String value) {
     setState(() {
@@ -179,9 +181,11 @@ class _TagInputWidgetState extends State<TagInputWidget> {
         _filteredSuggestions = widget.suggestions;
       } else {
         _filteredSuggestions = widget.suggestions
-            .where((suggestion) =>
-                suggestion.toLowerCase().contains(value.toLowerCase()) &&
-                !widget.tags.contains(suggestion),)
+            .where(
+              (suggestion) =>
+                  suggestion.toLowerCase().contains(value.toLowerCase()) &&
+                  !widget.tags.contains(suggestion),
+            )
             .toList();
       }
     });

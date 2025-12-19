@@ -12,7 +12,6 @@ abstract class UserEvents extends Equatable {
 }
 
 class UpdateUserRequest extends UserEvents {
-
   const UpdateUserRequest({
     required this.details,
   });

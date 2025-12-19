@@ -8,9 +8,9 @@ import '../../../services/unified_group_service.dart';
 /// Comprehensive Member Management Screen
 /// Provides full control over group members with modern UI
 class MemberManagementScreen extends StatefulWidget {
-
   const MemberManagementScreen({
-    required this.group, super.key,
+    required this.group,
+    super.key,
   });
   final UnifiedGroup group;
 
@@ -47,83 +47,83 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Manage Members',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            'Manage Members',
+            style: GoogleFonts.montserrat(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.person_add, color: AppColors.primaryGreen),
+              onPressed: _showInviteDialog,
+            ),
+          ],
+          bottom: TabBar(
+            controller: _tabController,
+            labelColor: AppColors.primaryGreen,
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: AppColors.primaryGreen,
+            labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+            tabs: const [
+              Tab(text: 'Members'),
+              Tab(text: 'Admins'),
+              Tab(text: 'Invite'),
+            ],
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person_add, color: AppColors.primaryGreen),
-            onPressed: _showInviteDialog,
-          ),
-        ],
-        bottom: TabBar(
+        body: TabBarView(
           controller: _tabController,
-          labelColor: AppColors.primaryGreen,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: AppColors.primaryGreen,
-          labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-          tabs: const [
-            Tab(text: 'Members'),
-            Tab(text: 'Admins'),
-            Tab(text: 'Invite'),
+          children: [
+            _buildMembersTab(),
+            _buildAdminsTab(),
+            _buildInviteTab(),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildMembersTab(),
-          _buildAdminsTab(),
-          _buildInviteTab(),
-        ],
-      ),
-    );
+      );
 
   Widget _buildMembersTab() => Column(
-      children: [
-        _buildSearchBar(),
-        Expanded(
-          child: _buildMembersList(),
-        ),
-      ],
-    );
+        children: [
+          _buildSearchBar(),
+          Expanded(
+            child: _buildMembersList(),
+          ),
+        ],
+      );
 
   Widget _buildAdminsTab() => _buildAdminsList();
 
   Widget _buildInviteTab() => _buildInviteSection();
 
   Widget _buildSearchBar() => Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-          hintText: 'Search members...',
-          hintStyle: GoogleFonts.montserrat(color: Colors.grey[600]),
-          prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
-          border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
         ),
-        onChanged: _onSearchChanged,
-      ),
-    );
+        child: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: 'Search members...',
+            hintStyle: GoogleFonts.montserrat(color: Colors.grey[600]),
+            prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
+            border: InputBorder.none,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+          onChanged: _onSearchChanged,
+        ),
+      );
 
   Widget _buildMembersList() {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
@@ -133,7 +133,9 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
 
     if (members.isEmpty) {
       return _buildEmptyState(
-          'No members yet', 'Invite people to join your group',);
+        'No members yet',
+        'Invite people to join your group',
+      );
     }
 
     return ListView.builder(
@@ -185,47 +187,49 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
   }
 
   Widget _buildInviteSection() => Column(
-      children: [
-        Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.primaryGreen.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Invite New Members',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryGreen,
+        children: [
+          Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.primaryGreen.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Invite New Members',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryGreen,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Search for users by name, email, or username to invite them to your group.',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+                const SizedBox(height: 8),
+                Text(
+                  'Search for users by name, email, or username to invite them to your group.',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        _buildSearchBar(),
-        Expanded(
-          child: _isSearching
-              ? const Center(child: CircularProgressIndicator())
-              : _searchResults.isEmpty
-                  ? _buildEmptyState(
-                      'No search results', 'Try searching for users to invite',)
-                  : _buildSearchResults(),
-        ),
-      ],
-    );
+          _buildSearchBar(),
+          Expanded(
+            child: _isSearching
+                ? const Center(child: CircularProgressIndicator())
+                : _searchResults.isEmpty
+                    ? _buildEmptyState(
+                        'No search results',
+                        'Try searching for users to invite',
+                      )
+                    : _buildSearchResults(),
+          ),
+        ],
+      );
 
   Widget _buildMemberCard({
     required String memberId,
@@ -233,252 +237,259 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     required bool isCreator,
     required bool isCurrentUser,
     required bool canManage,
-  }) => Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Profile Picture
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: AppColors.primaryGreen,
-            child: Text(
-              memberId.substring(0, 1).toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+  }) =>
+      Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Profile Picture
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: AppColors.primaryGreen,
+              child: Text(
+                memberId.substring(0, 1).toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          // Member Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      _getUserDisplayName(memberId),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    if (isCreator)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2,),
-                        decoration: BoxDecoration(
-                          color: Colors.amber,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'CREATOR',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      )
-                    else if (isAdmin)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2,),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGreen,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'ADMIN',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  isCurrentUser ? 'You' : 'Member',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Action Buttons
-          if (canManage && !isCurrentUser)
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.grey),
-              onSelected: (value) => _handleMemberAction(value, memberId),
-              itemBuilder: (context) => [
-                if (!isAdmin && !isCreator)
-                  const PopupMenuItem(
-                    value: 'promote',
-                    child: Row(
-                      children: [
-                        Icon(Icons.admin_panel_settings,
-                            color: AppColors.primaryGreen,),
-                        SizedBox(width: 8),
-                        Text('Promote to Admin'),
-                      ],
-                    ),
-                  ),
-                if (isAdmin && !isCreator)
-                  const PopupMenuItem(
-                    value: 'demote',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person, color: Colors.orange),
-                        SizedBox(width: 8),
-                        Text('Demote to Member'),
-                      ],
-                    ),
-                  ),
-                const PopupMenuItem(
-                  value: 'remove',
-                  child: Row(
+            const SizedBox(width: 12),
+            // Member Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Icon(Icons.person_remove, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Remove from Group'),
+                      Text(
+                        _getUserDisplayName(memberId),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (isCreator)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.amber,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'CREATOR',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      else if (isAdmin)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGreen,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'ADMIN',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isCurrentUser ? 'You' : 'Member',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Action Buttons
+            if (canManage && !isCurrentUser)
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: Colors.grey),
+                onSelected: (value) => _handleMemberAction(value, memberId),
+                itemBuilder: (context) => [
+                  if (!isAdmin && !isCreator)
+                    const PopupMenuItem(
+                      value: 'promote',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.admin_panel_settings,
+                            color: AppColors.primaryGreen,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Promote to Admin'),
+                        ],
+                      ),
+                    ),
+                  if (isAdmin && !isCreator)
+                    const PopupMenuItem(
+                      value: 'demote',
+                      child: Row(
+                        children: [
+                          Icon(Icons.person, color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text('Demote to Member'),
+                        ],
+                      ),
+                    ),
+                  const PopupMenuItem(
+                    value: 'remove',
+                    child: Row(
+                      children: [
+                        Icon(Icons.person_remove, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Remove from Group'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      );
+
+  Widget _buildSearchResults() => ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _searchResults.length,
+        itemBuilder: (context, index) {
+          final user = _searchResults[index];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppColors.primaryGreen,
+                  backgroundImage:
+                      user['photoUrl'] != null && user['photoUrl'].isNotEmpty
+                          ? NetworkImage(user['photoUrl'])
+                          : null,
+                  child: user['photoUrl'] == null || user['photoUrl'].isEmpty
+                      ? Text(
+                          user['displayName'].substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user['displayName'],
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        user['email'],
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
-        ],
-      ),
-    );
-
-  Widget _buildSearchResults() => ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _searchResults.length,
-      itemBuilder: (context, index) {
-        final user = _searchResults[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[200]!),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.primaryGreen,
-                backgroundImage:
-                    user['photoUrl'] != null && user['photoUrl'].isNotEmpty
-                        ? NetworkImage(user['photoUrl'])
-                        : null,
-                child: user['photoUrl'] == null || user['photoUrl'].isEmpty
-                    ? Text(
-                        user['displayName'].substring(0, 1).toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user['displayName'],
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
+                ElevatedButton(
+                  onPressed: () => _inviteUser(user['id']),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryGreen,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    Text(
-                      user['email'],
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => _inviteUser(user['id']),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Invite',
+                    style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
                   ),
                 ),
-                child: Text(
-                  'Invite',
-                  style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+              ],
+            ),
+          );
+        },
+      );
 
   Widget _buildEmptyState(String title, String subtitle) => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.people_outline,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.people_outline,
+              size: 64,
+              color: Colors.grey[400],
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: Colors.grey[500],
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
 
   void _onSearchChanged(String query) {
     if (query.isEmpty) {
@@ -596,8 +607,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remove Member'),
-        content:
-            const Text('Are you sure you want to remove this member from the group?'),
+        content: const Text(
+            'Are you sure you want to remove this member from the group?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

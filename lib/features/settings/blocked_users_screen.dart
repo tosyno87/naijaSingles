@@ -97,43 +97,44 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
     }
   }
 
-  Future<bool> _showUnblockConfirmation(String userName) async => await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-              'Unblock User',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryGreen,
-              ),
+  Future<bool> _showUnblockConfirmation(String userName) async =>
+      await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Unblock User',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryGreen,
             ),
-            content: Text(
-              'Are you sure you want to unblock $userName? They will be able to see your profile and message you again.',
-              style: GoogleFonts.montserrat(),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'Cancel',
-                  style: GoogleFonts.montserrat(color: Colors.grey[600]),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text(
-                  'Unblock',
-                  style: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
           ),
-        ) ??
-        false;
+          content: Text(
+            'Are you sure you want to unblock $userName? They will be able to see your profile and message you again.',
+            style: GoogleFonts.montserrat(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.montserrat(color: Colors.grey[600]),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                'Unblock',
+                style: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+      ) ??
+      false;
 
   @override
   Widget build(BuildContext context) {
@@ -171,130 +172,130 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
   }
 
   Widget _buildEmptyState(bool isDarkMode) => Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.block,
-              size: 80,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No Blocked Users',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.white : Colors.black,
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.block,
+                size: 80,
+                color: Colors.grey[400],
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'You haven\'t blocked anyone yet. Blocked users won\'t be able to see your profile or message you.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: Colors.grey[600],
-                height: 1.5,
+              const SizedBox(height: 24),
+              Text(
+                'No Blocked Users',
+                style: GoogleFonts.montserrat(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
-            ),
-            const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 12),
+              Text(
+                'You haven\'t blocked anyone yet. Blocked users won\'t be able to see your profile or message you.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
               ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: AppColors.primaryGreen,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'To block someone, go to their profile and tap the block button.',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: AppColors.primaryGreen,
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.info_outline,
+                      color: AppColors.primaryGreen,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'To block someone, go to their profile and tap the block button.',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          color: AppColors.primaryGreen,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
-  Widget _buildBlockedUsersList(bool isDarkMode) => Column(
-      children: [
-        // Header info
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.info_outline,
-                color: AppColors.primaryGreen,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Blocked users can\'t see your profile or message you. You can unblock them anytime.',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
-                  ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
+      );
 
-        // Blocked users count
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '${_blockedUsers.length} blocked user${_blockedUsers.length == 1 ? '' : 's'}',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isDarkMode ? Colors.white : Colors.black,
+  Widget _buildBlockedUsersList(bool isDarkMode) => Column(
+        children: [
+          // Header info
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.info_outline,
+                  color: AppColors.primaryGreen,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Blocked users can\'t see your profile or message you. You can unblock them anytime.',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Blocked users count
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '${_blockedUsers.length} blocked user${_blockedUsers.length == 1 ? '' : 's'}',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
             ),
           ),
-        ),
 
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Blocked users list
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _blockedUsers.length,
-            itemBuilder: (context, index) {
-              final user = _blockedUsers[index];
-              return _buildBlockedUserCard(user, isDarkMode);
-            },
+          // Blocked users list
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _blockedUsers.length,
+              itemBuilder: (context, index) {
+                final user = _blockedUsers[index];
+                return _buildBlockedUserCard(user, isDarkMode);
+              },
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
   Widget _buildBlockedUserCard(BlockedUser user, bool isDarkMode) {
     final timeAgo = _getTimeAgo(user.blockedAt);

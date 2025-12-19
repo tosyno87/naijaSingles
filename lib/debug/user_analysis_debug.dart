@@ -20,18 +20,22 @@ class UserAnalysisDebug {
     debugPrint('📈 Demographics Summary:');
     debugPrint('   Total Users: ${analytics.totalUsers}');
     debugPrint(
-        '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
+      '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',
+    );
     debugPrint(
-        '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
+      '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',
+    );
     debugPrint(
-        '   Other/Unknown: ${analytics.otherGenderCount + analytics.unknownGenderCount}',);
+      '   Other/Unknown: ${analytics.otherGenderCount + analytics.unknownGenderCount}',
+    );
     debugPrint('');
 
     debugPrint('📋 Profile Completeness:');
     debugPrint('   Complete Profiles: ${analytics.completeProfiles}');
     debugPrint('   Incomplete Profiles: ${analytics.incompleteProfiles}');
     debugPrint(
-        '   Very Incomplete Profiles: ${analytics.veryIncompleteProfiles}',);
+      '   Very Incomplete Profiles: ${analytics.veryIncompleteProfiles}',
+    );
     debugPrint('');
 
     debugPrint('🎂 Age Distribution:');
@@ -47,7 +51,8 @@ class UserAnalysisDebug {
     debugPrint('🎯 Algorithm Status: ${algorithmStatus.status}');
     debugPrint('   Ready: ${algorithmStatus.isReady ? "✅" : "❌"}');
     debugPrint(
-        '   Gender Balance: ${(algorithmStatus.genderBalance * 100).toStringAsFixed(1)}% male',);
+      '   Gender Balance: ${(algorithmStatus.genderBalance * 100).toStringAsFixed(1)}% male',
+    );
     debugPrint('');
 
     if (algorithmStatus.recommendations.isNotEmpty) {
@@ -61,7 +66,8 @@ class UserAnalysisDebug {
     // 3. Show incomplete profiles
     if (analytics.incompleteUserIds.isNotEmpty) {
       debugPrint(
-          '⚠️ Incomplete Profiles (${analytics.incompleteUserIds.length}):',);
+        '⚠️ Incomplete Profiles (${analytics.incompleteUserIds.length}):',
+      );
       for (final userId in analytics.incompleteUserIds) {
         debugPrint('   - $userId');
       }
@@ -70,7 +76,8 @@ class UserAnalysisDebug {
 
     if (analytics.veryIncompleteUserIds.isNotEmpty) {
       debugPrint(
-          '🚨 Very Incomplete Profiles (${analytics.veryIncompleteUserIds.length}):',);
+        '🚨 Very Incomplete Profiles (${analytics.veryIncompleteUserIds.length}):',
+      );
       for (final userId in analytics.veryIncompleteUserIds) {
         debugPrint('   - $userId');
       }
@@ -81,11 +88,14 @@ class UserAnalysisDebug {
     if (analytics.veryIncompleteUserIds.isNotEmpty) {
       debugPrint('🧹 Step 3: Cleanup Options');
       debugPrint(
-          '   Found ${analytics.veryIncompleteUserIds.length} very incomplete profiles',);
+        '   Found ${analytics.veryIncompleteUserIds.length} very incomplete profiles',
+      );
       debugPrint(
-          '   These profiles have < 40% completeness and can be safely deleted',);
+        '   These profiles have < 40% completeness and can be safely deleted',
+      );
       debugPrint(
-          '   Run UserAnalysisDebug.cleanupIncompleteProfiles() to delete them',);
+        '   Run UserAnalysisDebug.cleanupIncompleteProfiles() to delete them',
+      );
       debugPrint('');
     }
 
@@ -120,9 +130,11 @@ class UserAnalysisDebug {
     final algorithmStatus = await UserAnalyticsService.getAlgorithmStatus();
 
     debugPrint(
-        '👥 Users: ${analytics.totalUsers} (M: ${analytics.maleCount}, F: ${analytics.femaleCount})',);
+      '👥 Users: ${analytics.totalUsers} (M: ${analytics.maleCount}, F: ${analytics.femaleCount})',
+    );
     debugPrint(
-        '📋 Complete: ${analytics.completeProfiles}/${analytics.totalUsers}',);
+      '📋 Complete: ${analytics.completeProfiles}/${analytics.totalUsers}',
+    );
     debugPrint('🎯 Algorithm: ${algorithmStatus.status}');
     debugPrint('🧹 Incomplete: ${analytics.veryIncompleteProfiles}');
 

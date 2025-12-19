@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventAnalytics {
-
   const EventAnalytics({
     required this.eventId,
     required this.totalViews,
@@ -18,18 +17,18 @@ class EventAnalytics {
   });
 
   factory EventAnalytics.fromJson(Map<String, dynamic> json) => EventAnalytics(
-      eventId: json['eventId'] ?? '',
-      totalViews: json['totalViews'] ?? 0,
-      totalRSVPs: json['totalRSVPs'] ?? 0,
-      totalShares: json['totalShares'] ?? 0,
-      totalClicks: json['totalClicks'] ?? 0,
-      viewsByDay: Map<String, int>.from(json['viewsByDay'] ?? {}),
-      rsvpsByDay: Map<String, int>.from(json['rsvpsByDay'] ?? {}),
-      topLocations: List<String>.from(json['topLocations'] ?? []),
-      topAgeGroups: List<String>.from(json['topAgeGroups'] ?? []),
-      conversionRate: (json['conversionRate'] ?? 0.0).toDouble(),
-      lastUpdated: (json['lastUpdated'] as Timestamp).toDate(),
-    );
+        eventId: json['eventId'] ?? '',
+        totalViews: json['totalViews'] ?? 0,
+        totalRSVPs: json['totalRSVPs'] ?? 0,
+        totalShares: json['totalShares'] ?? 0,
+        totalClicks: json['totalClicks'] ?? 0,
+        viewsByDay: Map<String, int>.from(json['viewsByDay'] ?? {}),
+        rsvpsByDay: Map<String, int>.from(json['rsvpsByDay'] ?? {}),
+        topLocations: List<String>.from(json['topLocations'] ?? []),
+        topAgeGroups: List<String>.from(json['topAgeGroups'] ?? []),
+        conversionRate: (json['conversionRate'] ?? 0.0).toDouble(),
+        lastUpdated: (json['lastUpdated'] as Timestamp).toDate(),
+      );
   final String eventId;
   final int totalViews;
   final int totalRSVPs;
@@ -43,18 +42,18 @@ class EventAnalytics {
   final DateTime lastUpdated;
 
   Map<String, dynamic> toJson() => {
-      'eventId': eventId,
-      'totalViews': totalViews,
-      'totalRSVPs': totalRSVPs,
-      'totalShares': totalShares,
-      'totalClicks': totalClicks,
-      'viewsByDay': viewsByDay,
-      'rsvpsByDay': rsvpsByDay,
-      'topLocations': topLocations,
-      'topAgeGroups': topAgeGroups,
-      'conversionRate': conversionRate,
-      'lastUpdated': lastUpdated,
-    };
+        'eventId': eventId,
+        'totalViews': totalViews,
+        'totalRSVPs': totalRSVPs,
+        'totalShares': totalShares,
+        'totalClicks': totalClicks,
+        'viewsByDay': viewsByDay,
+        'rsvpsByDay': rsvpsByDay,
+        'topLocations': topLocations,
+        'topAgeGroups': topAgeGroups,
+        'conversionRate': conversionRate,
+        'lastUpdated': lastUpdated,
+      };
 }
 
 class EventAnalyticsService {
@@ -65,12 +64,15 @@ class EventAnalyticsService {
     try {
       final today = DateTime.now().toIso8601String().split('T')[0];
 
-      await _firestore.collection('eventAnalytics').doc(eventId).set({
-        'eventId': eventId,
-        'lastUpdated': FieldValue.serverTimestamp(),
-        'totalViews': FieldValue.increment(1),
-        'viewsByDay.$today': FieldValue.increment(1),
-      }, SetOptions(merge: true),);
+      await _firestore.collection('eventAnalytics').doc(eventId).set(
+        {
+          'eventId': eventId,
+          'lastUpdated': FieldValue.serverTimestamp(),
+          'totalViews': FieldValue.increment(1),
+          'viewsByDay.$today': FieldValue.increment(1),
+        },
+        SetOptions(merge: true),
+      );
 
       // Track user-specific view
       await _firestore
@@ -78,14 +80,19 @@ class EventAnalyticsService {
           .doc(eventId)
           .collection('userViews')
           .doc(userId)
-          .set({
-        'userId': userId,
-        'viewedAt': FieldValue.serverTimestamp(),
-        'date': today,
-      }, SetOptions(merge: true),);
+          .set(
+        {
+          'userId': userId,
+          'viewedAt': FieldValue.serverTimestamp(),
+          'date': today,
+        },
+        SetOptions(merge: true),
+      );
 
-      log('Event view tracked for event: $eventId, user: $userId',
-          name: 'EventAnalyticsService',);
+      log(
+        'Event view tracked for event: $eventId, user: $userId',
+        name: 'EventAnalyticsService',
+      );
     } catch (e) {
       log('Error tracking event view: $e', name: 'EventAnalyticsService');
     }
@@ -96,12 +103,15 @@ class EventAnalyticsService {
     try {
       final today = DateTime.now().toIso8601String().split('T')[0];
 
-      await _firestore.collection('eventAnalytics').doc(eventId).set({
-        'eventId': eventId,
-        'lastUpdated': FieldValue.serverTimestamp(),
-        'totalRSVPs': FieldValue.increment(1),
-        'rsvpsByDay.$today': FieldValue.increment(1),
-      }, SetOptions(merge: true),);
+      await _firestore.collection('eventAnalytics').doc(eventId).set(
+        {
+          'eventId': eventId,
+          'lastUpdated': FieldValue.serverTimestamp(),
+          'totalRSVPs': FieldValue.increment(1),
+          'rsvpsByDay.$today': FieldValue.increment(1),
+        },
+        SetOptions(merge: true),
+      );
 
       // Track user-specific RSVP
       await _firestore
@@ -109,14 +119,19 @@ class EventAnalyticsService {
           .doc(eventId)
           .collection('userRSVPs')
           .doc(userId)
-          .set({
-        'userId': userId,
-        'rsvpedAt': FieldValue.serverTimestamp(),
-        'date': today,
-      }, SetOptions(merge: true),);
+          .set(
+        {
+          'userId': userId,
+          'rsvpedAt': FieldValue.serverTimestamp(),
+          'date': today,
+        },
+        SetOptions(merge: true),
+      );
 
-      log('Event RSVP tracked for event: $eventId, user: $userId',
-          name: 'EventAnalyticsService',);
+      log(
+        'Event RSVP tracked for event: $eventId, user: $userId',
+        name: 'EventAnalyticsService',
+      );
     } catch (e) {
       log('Error tracking event RSVP: $e', name: 'EventAnalyticsService');
     }
@@ -124,13 +139,19 @@ class EventAnalyticsService {
 
   /// Track event share
   Future<void> trackEventShare(
-      String eventId, String userId, String shareMethod,) async {
+    String eventId,
+    String userId,
+    String shareMethod,
+  ) async {
     try {
-      await _firestore.collection('eventAnalytics').doc(eventId).set({
-        'eventId': eventId,
-        'lastUpdated': FieldValue.serverTimestamp(),
-        'totalShares': FieldValue.increment(1),
-      }, SetOptions(merge: true),);
+      await _firestore.collection('eventAnalytics').doc(eventId).set(
+        {
+          'eventId': eventId,
+          'lastUpdated': FieldValue.serverTimestamp(),
+          'totalShares': FieldValue.increment(1),
+        },
+        SetOptions(merge: true),
+      );
 
       // Track user-specific share
       await _firestore
@@ -144,8 +165,10 @@ class EventAnalyticsService {
         'shareMethod': shareMethod, // 'whatsapp', 'instagram', 'twitter', etc.
       });
 
-      log('Event share tracked for event: $eventId, user: $userId, method: $shareMethod',
-          name: 'EventAnalyticsService',);
+      log(
+        'Event share tracked for event: $eventId, user: $userId, method: $shareMethod',
+        name: 'EventAnalyticsService',
+      );
     } catch (e) {
       log('Error tracking event share: $e', name: 'EventAnalyticsService');
     }
@@ -153,13 +176,19 @@ class EventAnalyticsService {
 
   /// Track event click (e.g., on ticket link)
   Future<void> trackEventClick(
-      String eventId, String userId, String clickType,) async {
+    String eventId,
+    String userId,
+    String clickType,
+  ) async {
     try {
-      await _firestore.collection('eventAnalytics').doc(eventId).set({
-        'eventId': eventId,
-        'lastUpdated': FieldValue.serverTimestamp(),
-        'totalClicks': FieldValue.increment(1),
-      }, SetOptions(merge: true),);
+      await _firestore.collection('eventAnalytics').doc(eventId).set(
+        {
+          'eventId': eventId,
+          'lastUpdated': FieldValue.serverTimestamp(),
+          'totalClicks': FieldValue.increment(1),
+        },
+        SetOptions(merge: true),
+      );
 
       // Track user-specific click
       await _firestore
@@ -173,8 +202,10 @@ class EventAnalyticsService {
         'clickType': clickType, // 'ticket_link', 'location', 'organizer', etc.
       });
 
-      log('Event click tracked for event: $eventId, user: $userId, type: $clickType',
-          name: 'EventAnalyticsService',);
+      log(
+        'Event click tracked for event: $eventId, user: $userId, type: $clickType',
+        name: 'EventAnalyticsService',
+      );
     } catch (e) {
       log('Error tracking event click: $e', name: 'EventAnalyticsService');
     }
@@ -246,8 +277,10 @@ class EventAnalyticsService {
 
       return analyticsList;
     } catch (e) {
-      log('Error getting user event analytics: $e',
-          name: 'EventAnalyticsService',);
+      log(
+        'Error getting user event analytics: $e',
+        name: 'EventAnalyticsService',
+      );
       return [];
     }
   }
@@ -263,8 +296,10 @@ class EventAnalyticsService {
 
       return query.docs.map((doc) => doc.id).toList();
     } catch (e) {
-      log('Error getting trending event IDs: $e',
-          name: 'EventAnalyticsService',);
+      log(
+        'Error getting trending event IDs: $e',
+        name: 'EventAnalyticsService',
+      );
       return [];
     }
   }
@@ -290,9 +325,13 @@ class EventAnalyticsService {
       final totalRSVPs =
           userAnalytics.fold(0, (sum, analytics) => sum + analytics.totalRSVPs);
       final totalShares = userAnalytics.fold(
-          0, (sum, analytics) => sum + analytics.totalShares,);
+        0,
+        (sum, analytics) => sum + analytics.totalShares,
+      );
       final averageConversionRate = userAnalytics.fold(
-              0.0, (sum, analytics) => sum + analytics.conversionRate,) /
+            0.0,
+            (sum, analytics) => sum + analytics.conversionRate,
+          ) /
           userAnalytics.length;
       final topPerformingEvent =
           userAnalytics.isNotEmpty ? userAnalytics.first : null;
@@ -343,11 +382,15 @@ class EventAnalyticsService {
           .doc(eventId)
           .update(updates);
 
-      log('User demographics updated for event: $eventId, user: $userId',
-          name: 'EventAnalyticsService',);
+      log(
+        'User demographics updated for event: $eventId, user: $userId',
+        name: 'EventAnalyticsService',
+      );
     } catch (e) {
-      log('Error updating user demographics: $e',
-          name: 'EventAnalyticsService',);
+      log(
+        'Error updating user demographics: $e',
+        name: 'EventAnalyticsService',
+      );
     }
   }
 }

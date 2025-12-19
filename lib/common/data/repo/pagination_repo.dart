@@ -7,7 +7,9 @@ class PaginationRepo {
   static final db = firebaseFireStoreInstance;
 
   static void updateNotification(
-      UserModel currentUser, QueryDocumentSnapshot<Object?> doc,) {
+    UserModel currentUser,
+    QueryDocumentSnapshot<Object?> doc,
+  ) {
     db
         .collection('users/${currentUser.id}/Matches')
         .doc('${doc.get("Matches")}')
@@ -15,21 +17,28 @@ class PaginationRepo {
   }
 
   static Stream<QuerySnapshot> listenForNotifications(
-      int perPage, CollectionReference notificationReference,) => notificationReference
-        .orderBy('timestamp', descending: true)
-        .limit(perPage)
-        .snapshots();
+    int perPage,
+    CollectionReference notificationReference,
+  ) =>
+      notificationReference
+          .orderBy('timestamp', descending: true)
+          .limit(perPage)
+          .snapshots();
 
   static Stream<QuerySnapshot> listenForMessages(
-      int perPage, CollectionReference chatReference,) => chatReference
-        .orderBy('time', descending: true)
-        .limit(perPage)
-        .snapshots();
+    int perPage,
+    CollectionReference chatReference,
+  ) =>
+      chatReference
+          .orderBy('time', descending: true)
+          .limit(perPage)
+          .snapshots();
 
   static Future<QuerySnapshot> getMoreNotifications(
-      int perPage,
-      DocumentSnapshot? lastVisibleDocument,
-      CollectionReference notificationReference,) async {
+    int perPage,
+    DocumentSnapshot? lastVisibleDocument,
+    CollectionReference notificationReference,
+  ) async {
     final QuerySnapshot snapshot = await notificationReference
         .orderBy('timestamp', descending: true)
         .startAfterDocument(lastVisibleDocument!)
@@ -40,9 +49,10 @@ class PaginationRepo {
   }
 
   static Future<QuerySnapshot> getMoreMessages(
-      int perPage,
-      DocumentSnapshot? lastVisibleDocument,
-      CollectionReference chatReference,) async {
+    int perPage,
+    DocumentSnapshot? lastVisibleDocument,
+    CollectionReference chatReference,
+  ) async {
     final QuerySnapshot snapshot = await chatReference
         .orderBy('time', descending: true)
         .startAfterDocument(lastVisibleDocument!)
@@ -52,8 +62,11 @@ class PaginationRepo {
     return snapshot;
   }
 
-  static Future<QuerySnapshot> getMoreChats(int perPage,
-      DocumentSnapshot? lastVisibleDocument, UserModel currentUser,) async {
+  static Future<QuerySnapshot> getMoreChats(
+    int perPage,
+    DocumentSnapshot? lastVisibleDocument,
+    UserModel currentUser,
+  ) async {
     final QuerySnapshot snapshot = await db
         .collection('chats')
         .where('users', arrayContains: currentUser.id)

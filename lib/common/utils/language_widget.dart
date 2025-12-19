@@ -107,7 +107,11 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
             try {
               return Padding(
                 padding: const EdgeInsets.only(
-                    left: 15, right: 15, top: 5, bottom: 5,),
+                  left: 15,
+                  right: 15,
+                  top: 5,
+                  bottom: 5,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -177,28 +181,34 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                             break;
                         }
                       },
-                      items: languages.map((language) => DropdownMenuItem<String>(
-                          value: language,
-                          child: Text(
-                            language.tr().toString(),
-                            style: TextStyle(
-                                color: themeProvider.isDarkMode
-                                    ? Colors.white70
-                                    : Colors.pink,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,),
-                          ),
-                        ),).toList(),
+                      items: languages
+                          .map(
+                            (language) => DropdownMenuItem<String>(
+                              value: language,
+                              child: Text(
+                                language.tr().toString(),
+                                style: TextStyle(
+                                  color: themeProvider.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.pink,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
                   ],
                 ),
               );
             } catch (e) {
               return Center(
-                  child: Text(
-                'Unable to load'.tr().toString(),
-                style: const TextStyle(color: primaryColor),
-              ),);
+                child: Text(
+                  'Unable to load'.tr().toString(),
+                  style: const TextStyle(color: primaryColor),
+                ),
+              );
             }
           },
         ),

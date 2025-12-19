@@ -8,7 +8,6 @@ abstract class SearchUserEvent extends Equatable {
 }
 
 class LoadUserEvent extends SearchUserEvent {
-
   const LoadUserEvent({required this.currentUser});
   final UserModel currentUser;
 
@@ -17,7 +16,6 @@ class LoadUserEvent extends SearchUserEvent {
 }
 
 class LoadNearbyUsersEvent extends SearchUserEvent {
-
   const LoadNearbyUsersEvent({
     required this.currentUser,
     required this.radiusMiles,
@@ -30,7 +28,6 @@ class LoadNearbyUsersEvent extends SearchUserEvent {
 }
 
 class CheckMigrationStatusEvent extends SearchUserEvent {
-
   const CheckMigrationStatusEvent({required this.userId});
   final String userId;
 

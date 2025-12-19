@@ -7,9 +7,9 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 
 class CustomCNImage extends StatelessWidget {
-
   const CustomCNImage({
-    required this.imageUrl, super.key,
+    required this.imageUrl,
+    super.key,
     this.height,
     this.fit,
     this.width,

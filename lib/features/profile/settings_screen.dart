@@ -34,271 +34,273 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
-          onPressed: () => Navigator.pop(context),
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            'Settings',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
+          ),
+          centerTitle: true,
         ),
-        title: Text(
-          'Settings',
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Account Section
+              _buildSectionHeader('Account'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.person_outline,
+                  title: 'Edit Profile',
+                  subtitle: 'Update your photos and info',
+                  onTap: () {
+                    Navigator.pushNamed(context, RouteName.editProfileScreen);
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.lock_outline,
+                  title: 'Change Password',
+                  subtitle: 'Update your password',
+                  onTap: _showChangePasswordDialog,
+                ),
+              ]),
+
+              const SizedBox(height: 32),
+
+              // Privacy & Safety Section
+              _buildSectionHeader('Privacy & Safety'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.privacy_tip_outlined,
+                  title: 'Privacy Settings',
+                  subtitle: 'Control who can see your profile',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacySettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.block_outlined,
+                  title: 'Blocked Users',
+                  subtitle: 'Manage blocked accounts',
+                  onTap: () =>
+                      Navigator.pushNamed(context, RouteName.blockedUsers),
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.report_outlined,
+                  title: 'Safety Center',
+                  subtitle: 'Report issues and get help',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SafetyCenterScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ]),
+
+              const SizedBox(height: 32),
+
+              // App Settings Section
+              _buildSectionHeader('App Settings'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.notifications_outlined,
+                  title: 'Notifications',
+                  subtitle: 'Manage your notification preferences',
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    RouteName.notificationSettings,
+                  ),
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.location_on_outlined,
+                  title: 'Location',
+                  subtitle: 'Update your location settings',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LocationSettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.language_outlined,
+                  title: 'Language',
+                  subtitle: 'English (US)',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LanguageSettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ]),
+
+              const SizedBox(height: 32),
+
+              // Support Section
+              _buildSectionHeader('Support'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.help_outline,
+                  title: 'Help Center',
+                  subtitle: 'Get help and support',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HelpCenterScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.feedback_outlined,
+                  title: 'Send Feedback',
+                  subtitle: 'Share your thoughts with us',
+                  onTap: _showFeedbackDialog,
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.info_outline,
+                  title: 'About',
+                  subtitle: 'App version and info',
+                  onTap: _showAboutDialog,
+                ),
+              ]),
+
+              const SizedBox(height: 40),
+
+              // Sign Out Button - Robust solution with proper width constraints
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _showSignOutDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.red.shade700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(color: Colors.red.shade300, width: 2),
+                      ),
+                      elevation: 2,
+                      shadowColor: Colors.black.withOpacity(0.1),
+                    ),
+                    child: Text(
+                      'Sign Out',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red.shade700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Delete Account Button - Robust solution with proper width constraints
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _showDeleteAccountDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.red.shade700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(color: Colors.red.shade300, width: 2),
+                      ),
+                      elevation: 2,
+                      shadowColor: Colors.black.withOpacity(0.1),
+                    ),
+                    child: Text(
+                      'Delete Account',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red.shade700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+            ],
           ),
         ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Account Section
-            _buildSectionHeader('Account'),
-            const SizedBox(height: 16),
-
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.person_outline,
-                title: 'Edit Profile',
-                subtitle: 'Update your photos and info',
-                onTap: () {
-                  Navigator.pushNamed(context, RouteName.editProfileScreen);
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.lock_outline,
-                title: 'Change Password',
-                subtitle: 'Update your password',
-                onTap: _showChangePasswordDialog,
-              ),
-            ]),
-
-            const SizedBox(height: 32),
-
-            // Privacy & Safety Section
-            _buildSectionHeader('Privacy & Safety'),
-            const SizedBox(height: 16),
-
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.privacy_tip_outlined,
-                title: 'Privacy Settings',
-                subtitle: 'Control who can see your profile',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PrivacySettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.block_outlined,
-                title: 'Blocked Users',
-                subtitle: 'Manage blocked accounts',
-                onTap: () =>
-                    Navigator.pushNamed(context, RouteName.blockedUsers),
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.report_outlined,
-                title: 'Safety Center',
-                subtitle: 'Report issues and get help',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SafetyCenterScreen(),
-                    ),
-                  );
-                },
-              ),
-            ]),
-
-            const SizedBox(height: 32),
-
-            // App Settings Section
-            _buildSectionHeader('App Settings'),
-            const SizedBox(height: 16),
-
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: 'Manage your notification preferences',
-                onTap: () => Navigator.pushNamed(
-                    context, RouteName.notificationSettings,),
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.location_on_outlined,
-                title: 'Location',
-                subtitle: 'Update your location settings',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LocationSettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.language_outlined,
-                title: 'Language',
-                subtitle: 'English (US)',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LanguageSettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-            ]),
-
-            const SizedBox(height: 32),
-
-            // Support Section
-            _buildSectionHeader('Support'),
-            const SizedBox(height: 16),
-
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.help_outline,
-                title: 'Help Center',
-                subtitle: 'Get help and support',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const HelpCenterScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.feedback_outlined,
-                title: 'Send Feedback',
-                subtitle: 'Share your thoughts with us',
-                onTap: _showFeedbackDialog,
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.info_outline,
-                title: 'About',
-                subtitle: 'App version and info',
-                onTap: _showAboutDialog,
-              ),
-            ]),
-
-            const SizedBox(height: 40),
-
-            // Sign Out Button - Robust solution with proper width constraints
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _showSignOutDialog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.red.shade700,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: Colors.red.shade300, width: 2),
-                    ),
-                    elevation: 2,
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: Text(
-                    'Sign Out',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red.shade700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Delete Account Button - Robust solution with proper width constraints
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _showDeleteAccountDialog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.red.shade700,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: Colors.red.shade300, width: 2),
-                    ),
-                    elevation: 2,
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: Text(
-                    'Delete Account',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red.shade700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
+      );
 
   Widget _buildSectionHeader(String title) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: textPrimary,
-      ),
-    );
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: textPrimary,
+        ),
+      );
 
   Widget _buildSettingsCard(List<Widget> children) => DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: primaryColor.withOpacity(0.1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: primaryColor.withOpacity(0.1),
           ),
-        ],
-      ),
-      child: Column(children: children),
-    );
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(children: children),
+      );
 
   Widget _buildSettingsItem({
     required IconData icon,
@@ -306,68 +308,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String subtitle,
     required VoidCallback onTap,
     Color? iconColor,
-  }) => Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: (iconColor ?? primaryColor).withOpacity(0.1),
-                  shape: BoxShape.circle,
+  }) =>
+      Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: (iconColor ?? primaryColor).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: iconColor ?? primaryColor,
+                    size: 20,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor ?? primaryColor,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          color: textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: textSecondary,
                   size: 20,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.chevron_right,
-                color: textSecondary,
-                size: 20,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
   Widget _buildDivider() => Divider(
-      height: 1,
-      color: Colors.grey.shade200,
-      indent: 72,
-    );
+        height: 1,
+        color: Colors.grey.shade200,
+        indent: 72,
+      );
 
   void _showSignOutDialog() {
     showDialog(
@@ -448,7 +451,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 elevation: 2,
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 12,), // Proper padding
+                  horizontal: 20,
+                  vertical: 12,
+                ), // Proper padding
                 minimumSize:
                     const Size(100, 44), // Minimum size to prevent cramping
               ),

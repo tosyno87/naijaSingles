@@ -83,10 +83,10 @@ class SecureStorageService {
   }
 
   /// Write secure data
-  /// 
+  ///
   /// [key] - The key to store the data under
   /// [value] - The value to store (must be a String)
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> write(String key, String value) async {
     try {
@@ -102,9 +102,9 @@ class SecureStorageService {
   }
 
   /// Read secure data
-  /// 
+  ///
   /// [key] - The key to read the data from
-  /// 
+  ///
   /// Returns the stored value or null if not found
   Future<String?> read(String key) async {
     try {
@@ -120,9 +120,9 @@ class SecureStorageService {
   }
 
   /// Delete secure data
-  /// 
+  ///
   /// [key] - The key to delete
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> delete(String key) async {
     try {
@@ -138,7 +138,7 @@ class SecureStorageService {
   }
 
   /// Read all secure data
-  /// 
+  ///
   /// Returns a map of all stored key-value pairs
   Future<Map<String, String>> readAll() async {
     try {
@@ -154,9 +154,9 @@ class SecureStorageService {
   }
 
   /// Delete all secure data
-  /// 
+  ///
   /// WARNING: This will delete all stored secure data
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> deleteAll() async {
     try {
@@ -172,9 +172,9 @@ class SecureStorageService {
   }
 
   /// Check if a key exists
-  /// 
+  ///
   /// [key] - The key to check
-  /// 
+  ///
   /// Returns true if the key exists, false otherwise
   Future<bool> containsKey(String key) async {
     try {
@@ -281,4 +281,3 @@ class SecureStorageService {
     }
   }
 }
-

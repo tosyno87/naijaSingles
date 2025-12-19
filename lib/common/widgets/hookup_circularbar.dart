@@ -7,8 +7,8 @@ class Hookup4uBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Center(
-      child: CircularProgressIndicator(
-        color: primaryColor,
-      ),
-    );
+        child: CircularProgressIndicator(
+          color: primaryColor,
+        ),
+      );
 }

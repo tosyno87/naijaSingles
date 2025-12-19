@@ -57,7 +57,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           print('   Name: ${data?['name']}');
           print('   Interests: ${data?['interests']}');
           print(
-              '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}',);
+            '   Height: ${data?['heightDisplay'] ?? data?['height_ft_in']}',
+          );
           print('   Looking for: ${data?['lookingFor']}');
           print('   Bio length: ${(data?['bio'] ?? '').length} characters');
 
@@ -81,229 +82,230 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        automaticallyImplyLeading: false, // Hide back button on main screen
-        title: Text(
-          'Profile',
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          // Settings menu with MVP styling
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: textPrimary),
-            color: cardColor, // Use MVP card color for background
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          automaticallyImplyLeading: false, // Hide back button on main screen
+          title: Text(
+            'Profile',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
             ),
-            onSelected: (value) {
-              switch (value) {
-                case 'events':
-                  Navigator.pushNamed(context, RouteName.eventsScreen);
-                  break;
-                case 'privacy':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PrivacySettingsScreen(),
-                    ),
-                  );
-                  break;
-                case 'settings':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SettingsScreen(),
-                    ),
-                  );
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'events',
-                height: 56,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.event,
-                          color: primaryColor,
-                          size: 20,
-                        ),
+          ),
+          centerTitle: true,
+          actions: [
+            // Settings menu with MVP styling
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, color: textPrimary),
+              color: cardColor, // Use MVP card color for background
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              onSelected: (value) {
+                switch (value) {
+                  case 'events':
+                    Navigator.pushNamed(context, RouteName.eventsScreen);
+                    break;
+                  case 'privacy':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacySettingsScreen(),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          'Events',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: textPrimary,
+                    );
+                    break;
+                  case 'settings':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsScreen(),
+                      ),
+                    );
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'events',
+                  height: 56,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.event,
+                            color: primaryColor,
+                            size: 20,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Events',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              PopupMenuItem(
-                value: 'privacy',
-                height: 56,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.1),
-                          shape: BoxShape.circle,
+                PopupMenuItem(
+                  value: 'privacy',
+                  height: 56,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.privacy_tip_outlined,
+                            color: primaryColor,
+                            size: 20,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.privacy_tip_outlined,
-                          color: primaryColor,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Privacy Settings',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: textPrimary,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Privacy Settings',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: textPrimary,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Control who can see your profile',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: textSecondary,
+                              Text(
+                                'Control who can see your profile',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  color: textSecondary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              PopupMenuItem(
-                value: 'settings',
-                height: 56,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: textPrimary.withOpacity(0.1),
-                          shape: BoxShape.circle,
+                PopupMenuItem(
+                  value: 'settings',
+                  height: 56,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: textPrimary.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.settings_outlined,
+                            color: textPrimary,
+                            size: 20,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.settings_outlined,
-                          color: textPrimary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Settings & Account',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: textPrimary,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Settings & Account',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: textPrimary,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Manage your account settings',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: textSecondary,
+                              Text(
+                                'Manage your account settings',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  color: textSecondary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: primaryColor))
-          : SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // Profile Photos Section
-                    _buildPhotoSection(),
-
-                    const SizedBox(height: 24),
-
-                    // Basic Info Card
-                    _buildBasicInfoCard(),
-
-                    const SizedBox(height: 16),
-
-                    // About Me Card
-                    _buildAboutMeCard(),
-
-                    const SizedBox(height: 16),
-
-                    // Interests Card
-                    _buildInterestsCard(),
-
-                    const SizedBox(height: 16),
-
-                    // Details Card
-                    _buildDetailsCard(),
-
-                    const SizedBox(height: 32),
-
-                    // Profile Action Buttons
-                    _buildProfileActionButtons(),
-
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
+              ],
             ),
-    );
+          ],
+        ),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: primaryColor))
+            : SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      // Profile Photos Section
+                      _buildPhotoSection(),
+
+                      const SizedBox(height: 24),
+
+                      // Basic Info Card
+                      _buildBasicInfoCard(),
+
+                      const SizedBox(height: 16),
+
+                      // About Me Card
+                      _buildAboutMeCard(),
+
+                      const SizedBox(height: 16),
+
+                      // Interests Card
+                      _buildInterestsCard(),
+
+                      const SizedBox(height: 16),
+
+                      // Details Card
+                      _buildDetailsCard(),
+
+                      const SizedBox(height: 32),
+
+                      // Profile Action Buttons
+                      _buildProfileActionButtons(),
+
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
+              ),
+      );
 
   Widget _buildPhotoSection() {
     final photos = _userData?['photos'] as List<dynamic>? ?? [];
@@ -329,160 +331,161 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   });
                 },
                 itemBuilder: (context, index) => GestureDetector(
-                    onTap: () => _showFullScreenPhoto(photos, index),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image.network(
-                              photos[index],
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => ColoredBox(
-                                  color: Colors.grey.shade200,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.broken_image_outlined,
-                                        size: 60,
-                                        color: Colors.grey.shade400,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Photo unavailable',
-                                        style: GoogleFonts.montserrat(
-                                          color: Colors.grey.shade600,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
+                  onTap: () => _showFullScreenPhoto(photos, index),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.network(
+                            photos[index],
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                ColoredBox(
+                              color: Colors.grey.shade200,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.broken_image_outlined,
+                                    size: 60,
+                                    color: Colors.grey.shade400,
                                   ),
-                                ),
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return ColoredBox(
-                                  color: Colors.grey.shade100,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: primaryColor,
-                                      value:
-                                          loadingProgress.expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Photo unavailable',
+                                    style: GoogleFonts.montserrat(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 14,
                                     ),
                                   ),
-                                );
-                              },
+                                ],
+                              ),
                             ),
-
-                            // Enhanced gradient overlay for better text visibility
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                height:
-                                    100, // Increased height for better coverage
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [
-                                      Colors.black.withOpacity(
-                                          0.8,), // Increased opacity
-                                      Colors.black.withOpacity(0.4),
-                                      Colors.transparent,
-                                    ],
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return ColoredBox(
+                                color: Colors.grey.shade100,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: primaryColor,
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
                                   ),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // Enhanced gradient overlay for better text visibility
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              height:
+                                  100, // Increased height for better coverage
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: [
+                                    Colors.black.withOpacity(
+                                      0.8,
+                                    ), // Increased opacity
+                                    Colors.black.withOpacity(0.4),
+                                    Colors.transparent,
+                                  ],
                                 ),
                               ),
                             ),
+                          ),
 
-                            // Enhanced photo counter with better contrast
-                            Positioned(
-                              top: 16,
-                              right: 16,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 8,),
-                                decoration: BoxDecoration(
-                                  color: Colors.black
-                                      .withOpacity(0.8), // Increased opacity
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.2),
-                                  ),
-                                ),
-                                child: Text(
-                                  '${index + 1} of ${photos.length}',
-                                  style: GoogleFonts.montserrat(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight:
-                                        FontWeight.w600, // Increased weight
-                                    shadows: [
-                                      Shadow(
-                                        offset: const Offset(0, 1),
-                                        blurRadius: 2,
-                                        color: Colors.black.withOpacity(0.8),
-                                      ),
-                                    ],
-                                  ),
+                          // Enhanced photo counter with better contrast
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black
+                                    .withOpacity(0.8), // Increased opacity
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
                                 ),
                               ),
-                            ),
-
-                            // Enhanced tap indicator with better visibility
-                            Positioned(
-                              bottom: 16,
-                              right: 16,
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.black
-                                      .withOpacity(0.8), // Increased opacity
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
+                              child: Text(
+                                '${index + 1} of ${photos.length}',
+                                style: GoogleFonts.montserrat(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight:
+                                      FontWeight.w600, // Increased weight
+                                  shadows: [
+                                    Shadow(
+                                      offset: const Offset(0, 1),
+                                      blurRadius: 2,
+                                      color: Colors.black.withOpacity(0.8),
                                     ),
                                   ],
                                 ),
-                                child: const Icon(
-                                  Icons.fullscreen,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+
+                          // Enhanced tap indicator with better visibility
+                          Positioned(
+                            bottom: 16,
+                            right: 16,
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.black
+                                    .withOpacity(0.8), // Increased opacity
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.fullscreen,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                ),
               ),
 
               // Enhanced Left/Right navigation arrows with better visibility
@@ -633,14 +636,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Image.network(
                         photos[index],
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => ColoredBox(
-                            color: Colors.grey.shade300,
-                            child: Icon(
-                              Icons.broken_image,
-                              color: Colors.grey.shade500,
-                              size: 20,
-                            ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            ColoredBox(
+                          color: Colors.grey.shade300,
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey.shade500,
+                            size: 20,
                           ),
+                        ),
                       ),
                     ),
                   ),
@@ -665,30 +669,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildEmptyPhotoPlaceholder() => DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.add_a_photo_outlined,
-            size: 48,
-            color: primaryColor.withValues(alpha: 0.6),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Add Photos',
-            style: GoogleFonts.montserrat(
-              color: textSecondary,
-              fontSize: 16,
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add_a_photo_outlined,
+              size: 48,
+              color: primaryColor.withValues(alpha: 0.6),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 8),
+            Text(
+              'Add Photos',
+              style: GoogleFonts.montserrat(
+                color: textSecondary,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildBasicInfoCard() {
     final name = _userData?['name'] ?? 'Your Name';
@@ -818,24 +822,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: interests.map((interest) => Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                          color: primaryColor.withValues(alpha: 0.3),),
-                    ),
-                    child: Text(
-                      interest.toString(),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: primaryColor,
+                children: interests
+                    .map(
+                      (interest) => Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: primaryColor.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          interest.toString(),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),).toList(),
+                    )
+                    .toList(),
               ),
           ],
         ),
@@ -947,7 +956,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (ageRange.length == 2) ...[
               const SizedBox(height: 12),
               _buildDetailRow(
-                  'Age preference', '${ageRange[0]} - ${ageRange[1]} years',),
+                'Age preference',
+                '${ageRange[0]} - ${ageRange[1]} years',
+              ),
             ],
           ],
         ),
@@ -956,99 +967,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildDetailRow(String label, String value) => Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textPrimary,
-            ),
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildInfoChip({required IconData icon, required String label}) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: primaryColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: primaryColor,
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: primaryColor,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textPrimary,
+              ),
             ),
           ),
         ],
-      ),
-    );
+      );
 
-  Widget _buildProfileActionButtons() => SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const EditProfileScreen(),
-            ),
-          );
-
-          // Reload data if profile was updated
-          if (result == true) {
-            _loadUserData();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 3,
+  Widget _buildInfoChip({required IconData icon, required String label}) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: primaryColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.edit_outlined, size: 20),
-            const SizedBox(width: 12),
+            Icon(
+              icon,
+              size: 16,
+              color: primaryColor,
+            ),
+            const SizedBox(width: 6),
             Text(
-              'Edit Profile',
+              label,
               style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: primaryColor,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
+
+  Widget _buildProfileActionButtons() => SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: ElevatedButton(
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const EditProfileScreen(),
+              ),
+            );
+
+            // Reload data if profile was updated
+            if (result == true) {
+              _loadUserData();
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 3,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.edit_outlined, size: 20),
+              const SizedBox(width: 12),
+              Text(
+                'Edit Profile',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 
   int? _calculateAge(String? dobString) {
     if (dobString == null) return null;
@@ -1070,7 +1082,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 // Full-screen photo viewer widget
 class _FullScreenPhotoViewer extends StatefulWidget {
-
   const _FullScreenPhotoViewer({
     required this.photos,
     required this.initialIndex,
@@ -1101,33 +1112,33 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          '${_currentIndex + 1} of ${widget.photos.length}',
-          style: GoogleFonts.montserrat(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: Text(
+            '${_currentIndex + 1} of ${widget.photos.length}',
+            style: GoogleFonts.montserrat(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          // Full screen photo viewer
-          PageView.builder(
-            controller: _pageController,
-            itemCount: widget.photos.length,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            itemBuilder: (context, index) => InteractiveViewer(
+        body: Stack(
+          children: [
+            // Full screen photo viewer
+            PageView.builder(
+              controller: _pageController,
+              itemCount: widget.photos.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemBuilder: (context, index) => InteractiveViewer(
                 minScale: 0.5,
                 maxScale: 3,
                 child: Center(
@@ -1135,26 +1146,26 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                     widget.photos[index],
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) => ColoredBox(
-                        color: Colors.grey.shade800,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.broken_image_outlined,
-                              size: 80,
+                      color: Colors.grey.shade800,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.broken_image_outlined,
+                            size: 80,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Photo unavailable',
+                            style: GoogleFonts.montserrat(
                               color: Colors.grey.shade400,
+                              fontSize: 16,
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Photo unavailable',
-                              style: GoogleFonts.montserrat(
-                                color: Colors.grey.shade400,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                    ),
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Center(
@@ -1170,33 +1181,33 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                   ),
                 ),
               ),
-          ),
+            ),
 
-          // Photo indicators at bottom
-          if (widget.photos.length > 1)
-            Positioned(
-              bottom: 50,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  widget.photos.length,
-                  (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: index == _currentIndex ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: index == _currentIndex
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(4),
+            // Photo indicators at bottom
+            if (widget.photos.length > 1)
+              Positioned(
+                bottom: 50,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    widget.photos.length,
+                    (index) => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: index == _currentIndex ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: index == _currentIndex
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 }

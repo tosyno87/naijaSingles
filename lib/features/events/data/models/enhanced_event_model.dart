@@ -7,11 +7,21 @@ enum EventType { userGenerated, external, promoted }
 
 enum EventStatus { draft, published, cancelled, completed, underReview }
 
-class EnhancedEventModel extends Equatable { // Extensible data
+class EnhancedEventModel extends Equatable {
+  // Extensible data
 
   const EnhancedEventModel({
     required this.id,
-    required this.name, required this.description, required this.startDate, required this.endDate, required this.location, required this.isFree, required this.category, required this.createdAt, required this.updatedAt, this.externalId,
+    required this.name,
+    required this.description,
+    required this.startDate,
+    required this.endDate,
+    required this.location,
+    required this.isFree,
+    required this.category,
+    required this.createdAt,
+    required this.updatedAt,
+    this.externalId,
     this.imageUrls = const [],
     this.ticketUrl,
     this.ticketPrice,
@@ -72,57 +82,60 @@ class EnhancedEventModel extends Equatable { // Extensible data
 
   // Factory from existing EventModel (for backward compatibility)
   factory EnhancedEventModel.fromEventModel(eventModel) => EnhancedEventModel(
-      id: eventModel.id,
-      externalId: eventModel.externalId,
-      name: eventModel.name,
-      description: eventModel.description,
-      startDate: eventModel.startDate,
-      endDate: eventModel.endDate,
-      imageUrls: eventModel.imageUrl != null ? [eventModel.imageUrl!] : [],
-      location: eventModel.location,
-      ticketUrl: eventModel.ticketUrl,
-      isFree: eventModel.isFree,
-      category: eventModel.category,
-      attendeeCount: eventModel.attendeeCount,
-      rsvpCount: eventModel.rsvpCount,
-      createdAt: eventModel.createdAt,
-      updatedAt: eventModel.updatedAt,
-    );
+        id: eventModel.id,
+        externalId: eventModel.externalId,
+        name: eventModel.name,
+        description: eventModel.description,
+        startDate: eventModel.startDate,
+        endDate: eventModel.endDate,
+        imageUrls: eventModel.imageUrl != null ? [eventModel.imageUrl!] : [],
+        location: eventModel.location,
+        ticketUrl: eventModel.ticketUrl,
+        isFree: eventModel.isFree,
+        category: eventModel.category,
+        attendeeCount: eventModel.attendeeCount,
+        rsvpCount: eventModel.rsvpCount,
+        createdAt: eventModel.createdAt,
+        updatedAt: eventModel.updatedAt,
+      );
 
   factory EnhancedEventModel.fromFirestoreJson(
-      Map<String, dynamic> json, String docId,) => EnhancedEventModel(
-      id: docId,
-      externalId: json['externalId'],
-      name: json['name'] ?? '',
-      description: json['description'] ?? '',
-      startDate: (json['startDate'] as Timestamp).toDate(),
-      endDate: (json['endDate'] as Timestamp).toDate(),
-      imageUrls: (json['imageUrls'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .where((url) => url.isNotEmpty)
-              .toList() ??
-          [],
-      location: EventLocation.fromJson(json['location'] ?? {}),
-      ticketUrl: json['ticketUrl'],
-      isFree: json['isFree'] ?? true,
-      ticketPrice: json['ticketPrice']?.toDouble(),
-      category: json['category'] ?? 'General',
-      tags: List<String>.from(json['tags'] ?? []),
-      attendeeCount: json['attendeeCount'] ?? 0,
-      rsvpCount: json['rsvpCount'] ?? 0,
-      maxAttendees: json['maxAttendees'] ?? 100,
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
-      updatedAt: (json['updatedAt'] as Timestamp).toDate(),
-      createdByUserId: json['createdByUserId'],
-      isUserGenerated: json['isUserGenerated'] ?? false,
-      eventType: _parseEventType(json['eventType']),
-      status: _parseEventStatus(json['status']),
-      isPromoted: json['isPromoted'] ?? false,
-      promotionExpiry: json['promotionExpiry'] != null
-          ? (json['promotionExpiry'] as Timestamp).toDate()
-          : null,
-      metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
-    );
+    Map<String, dynamic> json,
+    String docId,
+  ) =>
+      EnhancedEventModel(
+        id: docId,
+        externalId: json['externalId'],
+        name: json['name'] ?? '',
+        description: json['description'] ?? '',
+        startDate: (json['startDate'] as Timestamp).toDate(),
+        endDate: (json['endDate'] as Timestamp).toDate(),
+        imageUrls: (json['imageUrls'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .where((url) => url.isNotEmpty)
+                .toList() ??
+            [],
+        location: EventLocation.fromJson(json['location'] ?? {}),
+        ticketUrl: json['ticketUrl'],
+        isFree: json['isFree'] ?? true,
+        ticketPrice: json['ticketPrice']?.toDouble(),
+        category: json['category'] ?? 'General',
+        tags: List<String>.from(json['tags'] ?? []),
+        attendeeCount: json['attendeeCount'] ?? 0,
+        rsvpCount: json['rsvpCount'] ?? 0,
+        maxAttendees: json['maxAttendees'] ?? 100,
+        createdAt: (json['createdAt'] as Timestamp).toDate(),
+        updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+        createdByUserId: json['createdByUserId'],
+        isUserGenerated: json['isUserGenerated'] ?? false,
+        eventType: _parseEventType(json['eventType']),
+        status: _parseEventStatus(json['status']),
+        isPromoted: json['isPromoted'] ?? false,
+        promotionExpiry: json['promotionExpiry'] != null
+            ? (json['promotionExpiry'] as Timestamp).toDate()
+            : null,
+        metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
+      );
   final String id;
   final String? externalId; // Optional for external event sources
   final String name;
@@ -175,30 +188,32 @@ class EnhancedEventModel extends Equatable { // Extensible data
     // Use primaryImageUrl getter which filters empty strings
     final url = primaryImageUrl.isNotEmpty ? primaryImageUrl : null;
     return event_model.EventModel(
-        id: id,
-        externalId: externalId ?? id, // Use id if no externalId
-        name: name,
-        description: description,
-        startDate: startDate,
-        endDate: endDate,
-        imageUrl: url,
-        location: event_model.EventLocation.fromJson(
-            location.toJson(),), // Convert location
-        ticketUrl: ticketUrl,
-        isFree: isFree,
-        category: category,
-        attendeeCount: attendeeCount,
-        rsvpCount: rsvpCount,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        status: _convertToEventModelStatus(status),
-        createdByUserId: createdByUserId ?? 'unknown',
-      );
+      id: id,
+      externalId: externalId ?? id, // Use id if no externalId
+      name: name,
+      description: description,
+      startDate: startDate,
+      endDate: endDate,
+      imageUrl: url,
+      location: event_model.EventLocation.fromJson(
+        location.toJson(),
+      ), // Convert location
+      ticketUrl: ticketUrl,
+      isFree: isFree,
+      category: category,
+      attendeeCount: attendeeCount,
+      rsvpCount: rsvpCount,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      status: _convertToEventModelStatus(status),
+      createdByUserId: createdByUserId ?? 'unknown',
+    );
   }
 
   // Convert EnhancedEventModel status to EventModel status
   event_model.EventStatus _convertToEventModelStatus(
-      EventStatus enhancedStatus,) {
+    EventStatus enhancedStatus,
+  ) {
     switch (enhancedStatus) {
       case EventStatus.draft:
         return event_model.EventStatus.draft;
@@ -271,32 +286,33 @@ class EnhancedEventModel extends Equatable { // Extensible data
   }
 
   Map<String, dynamic> toFirestoreJson() => {
-      'externalId': externalId,
-      'name': name,
-      'description': description,
-      'startDate': Timestamp.fromDate(startDate),
-      'endDate': Timestamp.fromDate(endDate),
-      'imageUrls': imageUrls,
-      'location': location.toJson(),
-      'ticketUrl': ticketUrl,
-      'isFree': isFree,
-      'ticketPrice': ticketPrice,
-      'category': category,
-      'tags': tags,
-      'attendeeCount': attendeeCount,
-      'rsvpCount': rsvpCount,
-      'maxAttendees': maxAttendees,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'createdByUserId': createdByUserId,
-      'isUserGenerated': isUserGenerated,
-      'eventType': eventType.toString().split('.').last,
-      'status': status.toString().split('.').last,
-      'isPromoted': isPromoted,
-      'promotionExpiry':
-          promotionExpiry != null ? Timestamp.fromDate(promotionExpiry!) : null,
-      'metadata': metadata,
-    };
+        'externalId': externalId,
+        'name': name,
+        'description': description,
+        'startDate': Timestamp.fromDate(startDate),
+        'endDate': Timestamp.fromDate(endDate),
+        'imageUrls': imageUrls,
+        'location': location.toJson(),
+        'ticketUrl': ticketUrl,
+        'isFree': isFree,
+        'ticketPrice': ticketPrice,
+        'category': category,
+        'tags': tags,
+        'attendeeCount': attendeeCount,
+        'rsvpCount': rsvpCount,
+        'maxAttendees': maxAttendees,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+        'createdByUserId': createdByUserId,
+        'isUserGenerated': isUserGenerated,
+        'eventType': eventType.toString().split('.').last,
+        'status': status.toString().split('.').last,
+        'isPromoted': isPromoted,
+        'promotionExpiry': promotionExpiry != null
+            ? Timestamp.fromDate(promotionExpiry!)
+            : null,
+        'metadata': metadata,
+      };
 
   EnhancedEventModel copyWith({
     String? id,
@@ -324,51 +340,57 @@ class EnhancedEventModel extends Equatable { // Extensible data
     bool? isPromoted,
     DateTime? promotionExpiry,
     Map<String, dynamic>? metadata,
-  }) => EnhancedEventModel(
-      id: id ?? this.id,
-      externalId: externalId ?? this.externalId,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      imageUrls: imageUrls ?? this.imageUrls,
-      location: location ?? this.location,
-      ticketUrl: ticketUrl ?? this.ticketUrl,
-      isFree: isFree ?? this.isFree,
-      ticketPrice: ticketPrice ?? this.ticketPrice,
-      category: category ?? this.category,
-      tags: tags ?? this.tags,
-      attendeeCount: attendeeCount ?? this.attendeeCount,
-      rsvpCount: rsvpCount ?? this.rsvpCount,
-      maxAttendees: maxAttendees ?? this.maxAttendees,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      createdByUserId: createdByUserId ?? this.createdByUserId,
-      isUserGenerated: isUserGenerated ?? this.isUserGenerated,
-      eventType: eventType ?? this.eventType,
-      status: status ?? this.status,
-      isPromoted: isPromoted ?? this.isPromoted,
-      promotionExpiry: promotionExpiry ?? this.promotionExpiry,
-      metadata: metadata ?? this.metadata,
-    );
+  }) =>
+      EnhancedEventModel(
+        id: id ?? this.id,
+        externalId: externalId ?? this.externalId,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        startDate: startDate ?? this.startDate,
+        endDate: endDate ?? this.endDate,
+        imageUrls: imageUrls ?? this.imageUrls,
+        location: location ?? this.location,
+        ticketUrl: ticketUrl ?? this.ticketUrl,
+        isFree: isFree ?? this.isFree,
+        ticketPrice: ticketPrice ?? this.ticketPrice,
+        category: category ?? this.category,
+        tags: tags ?? this.tags,
+        attendeeCount: attendeeCount ?? this.attendeeCount,
+        rsvpCount: rsvpCount ?? this.rsvpCount,
+        maxAttendees: maxAttendees ?? this.maxAttendees,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        createdByUserId: createdByUserId ?? this.createdByUserId,
+        isUserGenerated: isUserGenerated ?? this.isUserGenerated,
+        eventType: eventType ?? this.eventType,
+        status: status ?? this.status,
+        isPromoted: isPromoted ?? this.isPromoted,
+        promotionExpiry: promotionExpiry ?? this.promotionExpiry,
+        metadata: metadata ?? this.metadata,
+      );
 
   // Helper getters
   String get primaryImageUrl {
-    final validUrls = imageUrls.where((url) => url.isNotEmpty && url.trim().isNotEmpty).toList();
+    final validUrls = imageUrls
+        .where((url) => url.isNotEmpty && url.trim().isNotEmpty)
+        .toList();
     return validUrls.isNotEmpty ? validUrls.first : '';
   }
-  
+
   bool get hasImages {
-    final validUrls = imageUrls.where((url) => url.isNotEmpty && url.trim().isNotEmpty).toList();
+    final validUrls = imageUrls
+        .where((url) => url.isNotEmpty && url.trim().isNotEmpty)
+        .toList();
     return validUrls.isNotEmpty;
   }
+
   bool get isPaid => !isFree && ticketPrice != null && ticketPrice! > 0;
-  
+
   // Currency helper
   String get currency {
     return metadata['currency']?.toString() ?? 'USD';
   }
-  
+
   String get currencySymbol {
     switch (currency) {
       case 'USD':
@@ -383,6 +405,7 @@ class EnhancedEventModel extends Equatable { // Extensible data
         return r'$'; // Default to USD
     }
   }
+
   // isActive is already defined above as isVisible
   bool get canEdit {
     // Don't allow editing if event is cancelled or completed
@@ -437,7 +460,6 @@ class EnhancedEventModel extends Equatable { // Extensible data
 
 // Enhanced EventLocation with additional fields
 class EventLocation extends Equatable {
-
   const EventLocation({
     this.name,
     this.address,
@@ -451,18 +473,18 @@ class EventLocation extends Equatable {
   });
 
   factory EventLocation.fromJson(Map<String, dynamic> json) => EventLocation(
-      name: json['name'],
-      address: json['address'],
-      city: json['city'],
-      state: json['state'],
-      country: json['country'],
-      latitude: json['latitude']?.toDouble(),
-      longitude: json['longitude']?.toDouble(),
-      placeId: json['placeId'],
-      additionalInfo: json['additionalInfo'] != null
-          ? Map<String, dynamic>.from(json['additionalInfo'])
-          : null,
-    );
+        name: json['name'],
+        address: json['address'],
+        city: json['city'],
+        state: json['state'],
+        country: json['country'],
+        latitude: json['latitude']?.toDouble(),
+        longitude: json['longitude']?.toDouble(),
+        placeId: json['placeId'],
+        additionalInfo: json['additionalInfo'] != null
+            ? Map<String, dynamic>.from(json['additionalInfo'])
+            : null,
+      );
   final String? name;
   final String? address;
   final String? city;
@@ -474,16 +496,16 @@ class EventLocation extends Equatable {
   final Map<String, dynamic>? additionalInfo;
 
   Map<String, dynamic> toJson() => {
-      'name': name,
-      'address': address,
-      'city': city,
-      'state': state,
-      'country': country,
-      'latitude': latitude,
-      'longitude': longitude,
-      'placeId': placeId,
-      'additionalInfo': additionalInfo,
-    };
+        'name': name,
+        'address': address,
+        'city': city,
+        'state': state,
+        'country': country,
+        'latitude': latitude,
+        'longitude': longitude,
+        'placeId': placeId,
+        'additionalInfo': additionalInfo,
+      };
 
   String get displayAddress {
     final parts = <String>[];
@@ -562,32 +584,34 @@ class EventCreationData {
     }
   }
 
-  bool get isValid => name.isNotEmpty &&
-        description.isNotEmpty &&
-        category.isNotEmpty &&
-        startDate != null &&
-        endDate != null &&
-        location != null &&
-        startDate!.isBefore(endDate!) &&
-        startDate!.isAfter(DateTime.now());
+  bool get isValid =>
+      name.isNotEmpty &&
+      description.isNotEmpty &&
+      category.isNotEmpty &&
+      startDate != null &&
+      endDate != null &&
+      location != null &&
+      startDate!.isBefore(endDate!) &&
+      startDate!.isAfter(DateTime.now());
 
-  EnhancedEventModel toEventModel(String id, String createdByUserId) => EnhancedEventModel.userGenerated(
-      id: id,
-      name: name,
-      description: description,
-      startDate: startDate!,
-      endDate: endDate!,
-      location: location!,
-      createdByUserId: createdByUserId,
-      imageUrls: imageUrls,
-      isFree: isFree,
-      ticketPrice: ticketPrice,
-      category: category,
-      tags: tags,
-      maxAttendees: maxAttendees,
-      metadata: {
-        ...metadata,
-        'currency': currency,
-      },
-    );
+  EnhancedEventModel toEventModel(String id, String createdByUserId) =>
+      EnhancedEventModel.userGenerated(
+        id: id,
+        name: name,
+        description: description,
+        startDate: startDate!,
+        endDate: endDate!,
+        location: location!,
+        createdByUserId: createdByUserId,
+        imageUrls: imageUrls,
+        isFree: isFree,
+        ticketPrice: ticketPrice,
+        category: category,
+        tags: tags,
+        maxAttendees: maxAttendees,
+        metadata: {
+          ...metadata,
+          'currency': currency,
+        },
+      );
 }

@@ -48,16 +48,16 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               // Continue even if secure storage fails
             }
           }
-          
+
           log('🔍 Checking registration for user: ${user.uid}');
           final isRegistered = await phoneAuthRepository.userDetails(user.uid);
           log('📋 Registration check result: $isRegistered');
-          
+
           if (isRegistered) {
             try {
               final usr = await phoneAuthRepository.getRegisterUser();
               log('👤 Retrieved user data: ${usr.name ?? "no name"}');
-              
+
               // Only consider user registered if they have a name (completed onboarding)
               if (usr.name != null && usr.name!.isNotEmpty) {
                 log('✅ User already registered with complete profile: ${usr.name}');
@@ -72,7 +72,7 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
             } catch (getUserError) {
               log('❌ Error getting user data: $getUserError');
               log('❌ Error type: ${getUserError.runtimeType}');
-              
+
               // If userDetails returned true but we can't get user data,
               // there might be a data inconsistency
               // In this case, treat as new registration to allow onboarding
@@ -84,12 +84,14 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
             if (user.displayName != null || user.phoneNumber != null) {
               emit(NewRegistration(token: event.token, user: user));
             } else {
-              emit(const RegistrationFailed(message: 'Error: No user identifier found'));
+              emit(const RegistrationFailed(
+                  message: 'Error: No user identifier found'));
             }
           }
         } else {
           log('❌ User has no displayName or phoneNumber');
-          emit(const RegistrationFailed(message: 'Error: No user identifier found'));
+          emit(const RegistrationFailed(
+              message: 'Error: No user identifier found'));
         }
       } on SocketException {
         log('❌ Network error during registration check');

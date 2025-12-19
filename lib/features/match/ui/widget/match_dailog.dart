@@ -50,16 +50,19 @@ class MAtchState extends State<MatchedPage> {
                 "It's a match\n With ${widget.name} ".tr().toString(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                    color: primaryColor,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.none,),
+                  color: primaryColor,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.none,
+                ),
               ),
             ),
             Center(
-                child: Image.asset(
-              image!.assetName,
-            ),),
+              child: Image.asset(
+                image!.assetName,
+              ),
+            ),
           ],
-        ),);
+        ),
+      );
 }

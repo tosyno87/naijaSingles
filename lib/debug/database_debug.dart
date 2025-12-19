@@ -49,18 +49,23 @@ class DatabaseDebug {
 
         // Log user details
         debugPrint(
-            '👤 User ${doc.id}: age=${data['age']}, gender=${data['gender']}, lat=${data['latitude']}, lng=${data['longitude']}',);
+          '👤 User ${doc.id}: age=${data['age']}, gender=${data['gender']}, lat=${data['latitude']}, lng=${data['longitude']}',
+        );
       }
 
       debugPrint('📈 Database Analysis:');
       debugPrint(
-          '   Users with age: $usersWithAge/${allUsersQuery.docs.length}',);
+        '   Users with age: $usersWithAge/${allUsersQuery.docs.length}',
+      );
       debugPrint(
-          '   Users with gender: $usersWithGender/${allUsersQuery.docs.length}',);
+        '   Users with gender: $usersWithGender/${allUsersQuery.docs.length}',
+      );
       debugPrint(
-          '   Users with location: $usersWithLocation/${allUsersQuery.docs.length}',);
+        '   Users with location: $usersWithLocation/${allUsersQuery.docs.length}',
+      );
       debugPrint(
-          '   Users in age range 18-35: $usersInAgeRange/${allUsersQuery.docs.length}',);
+        '   Users in age range 18-35: $usersInAgeRange/${allUsersQuery.docs.length}',
+      );
     } catch (e) {
       debugPrint('❌ Error checking database: $e');
     }
@@ -134,7 +139,8 @@ class DatabaseDebug {
       for (final doc in querySnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
         debugPrint(
-            '👤 Found user: ${doc.id} (age: ${data['age']}, gender: ${data['gender']})',);
+          '👤 Found user: ${doc.id} (age: ${data['age']}, gender: ${data['gender']})',
+        );
       }
     } catch (e) {
       debugPrint('❌ Error testing query: $e');

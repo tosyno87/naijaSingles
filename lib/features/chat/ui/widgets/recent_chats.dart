@@ -20,9 +20,10 @@ import '../../../match/ui/widget/matches_card.dart';
 import 'single_chattile.dart';
 
 class RecentChats extends StatefulWidget {
-
   const RecentChats({
-    required this.currentUser, required this.scrollController, super.key,
+    required this.currentUser,
+    required this.scrollController,
+    super.key,
   });
   final UserModel currentUser;
   final ScrollController scrollController;
@@ -77,7 +78,10 @@ class _RecentChatsState extends State<RecentChats> {
       _isLoadingMore = true;
     });
     final snapshot = await PaginationRepo.getMoreChats(
-        perPage, lastVisibleDocument, widget.currentUser,);
+      perPage,
+      lastVisibleDocument,
+      widget.currentUser,
+    );
     setState(() {
       chats.addAll(snapshot.docs);
       _hasMoreMessages = snapshot.docs.length == perPage;
@@ -99,16 +103,18 @@ class _RecentChatsState extends State<RecentChats> {
         if (state is MatchUserFailedState) {
           log('I AM IN LOADUSERSFailed');
           return Center(
-              child: Text(
-            'Error to load data.'.tr().toString(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
+            child: Text(
+              'Error to load data.'.tr().toString(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
                 color: themeProvider.isDarkMode ? Colors.white : Colors.black54,
                 fontStyle: FontStyle.normal,
                 letterSpacing: 1,
                 decoration: TextDecoration.none,
-                fontSize: 18,),
-          ),);
+                fontSize: 18,
+              ),
+            ),
+          );
         }
         if (state is MatchUserLoadedState) {
           log('FROM RECENT CHATS SUCCESS');
@@ -125,7 +131,9 @@ class _RecentChatsState extends State<RecentChats> {
                     child: Text(
                       'No Recent chat found'.tr().toString(),
                       style: const TextStyle(
-                          color: AppColors.secondaryColor, fontSize: 16,),
+                        color: AppColors.secondaryColor,
+                        fontSize: 16,
+                      ),
                     ),
                   )
                 : ListView.builder(
@@ -140,9 +148,10 @@ class _RecentChatsState extends State<RecentChats> {
                           children: [
                             if (_isLoadingMore)
                               const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: Hookup4uBar(),),
+                                height: 20,
+                                width: 20,
+                                child: Hookup4uBar(),
+                              ),
                             const SizedBox(
                               height: 20,
                             ),
@@ -234,10 +243,12 @@ class _RecentChatsState extends State<RecentChats> {
         return Padding(
           padding: const EdgeInsets.all(0),
           child: Center(
-              child: Text(
-            'No recent chat found'.tr().toString(),
-            style: const TextStyle(color: AppColors.secondaryColor, fontSize: 16),
-          ),),
+            child: Text(
+              'No recent chat found'.tr().toString(),
+              style: const TextStyle(
+                  color: AppColors.secondaryColor, fontSize: 16),
+            ),
+          ),
         );
       },
     );

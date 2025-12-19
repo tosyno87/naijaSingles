@@ -106,121 +106,122 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Profile',
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Text(
+            'Profile',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
           ),
+          centerTitle: true,
+          actions: [
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, color: textPrimary),
+              color: cardColor,
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              onSelected: (value) {
+                switch (value) {
+                  case 'events':
+                    Navigator.pushNamed(context, RouteName.eventsScreen);
+                    break;
+                  case 'privacy':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacySettingsScreen(),
+                      ),
+                    );
+                    break;
+                  case 'settings':
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsScreen(),
+                      ),
+                    );
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'events',
+                  child: Row(
+                    children: [
+                      Icon(Icons.event, color: primaryColor),
+                      SizedBox(width: 12),
+                      Text('Events'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'privacy',
+                  child: Row(
+                    children: [
+                      Icon(Icons.privacy_tip_outlined, color: primaryColor),
+                      SizedBox(width: 12),
+                      Text('Privacy Settings'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'settings',
+                  child: Row(
+                    children: [
+                      Icon(Icons.settings_outlined, color: primaryColor),
+                      SizedBox(width: 12),
+                      Text('Settings'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-        centerTitle: true,
-        actions: [
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: textPrimary),
-            color: cardColor,
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            onSelected: (value) {
-              switch (value) {
-                case 'events':
-                  Navigator.pushNamed(context, RouteName.eventsScreen);
-                  break;
-                case 'privacy':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PrivacySettingsScreen(),
-                    ),
-                  );
-                  break;
-                case 'settings':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SettingsScreen(),
-                    ),
-                  );
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'events',
-                child: Row(
-                  children: [
-                    Icon(Icons.event, color: primaryColor),
-                    SizedBox(width: 12),
-                    Text('Events'),
-                  ],
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: primaryColor))
+            : SafeArea(
+                child: SingleChildScrollView(
+                  // Remove padding for seamless Hinge-style layout
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Hinge-style large photo section (full width, no padding)
+                      _buildHingePhotoSection(),
+
+                      // Profile header (name, age, location) - integrated with photos
+                      _buildHingeProfileHeader(),
+
+                      // About section - seamless
+                      _buildHingeAboutSection(),
+
+                      // Details section - seamless
+                      _buildHingeDetailsSection(),
+
+                      // Interests section - seamless
+                      _buildHingeInterestsSection(),
+
+                      // Edit button with padding
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: _buildEditButton(),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
               ),
-              const PopupMenuItem(
-                value: 'privacy',
-                child: Row(
-                  children: [
-                    Icon(Icons.privacy_tip_outlined, color: primaryColor),
-                    SizedBox(width: 12),
-                    Text('Privacy Settings'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings_outlined, color: primaryColor),
-                    SizedBox(width: 12),
-                    Text('Settings'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: primaryColor))
-          : SafeArea(
-              child: SingleChildScrollView(
-                // Remove padding for seamless Hinge-style layout
-                padding: EdgeInsets.zero,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Hinge-style large photo section (full width, no padding)
-                    _buildHingePhotoSection(),
-                    
-                    // Profile header (name, age, location) - integrated with photos
-                    _buildHingeProfileHeader(),
-                    
-                    // About section - seamless
-                    _buildHingeAboutSection(),
-                    
-                    // Details section - seamless
-                    _buildHingeDetailsSection(),
-                    
-                    // Interests section - seamless
-                    _buildHingeInterestsSection(),
-                    
-                    // Edit button with padding
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: _buildEditButton(),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
-    );
+      );
 
   Widget _buildSimplifiedPhotoSection() {
     // Try multiple field names for compatibility
@@ -272,37 +273,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
               });
             },
             itemBuilder: (context, index) => GestureDetector(
-                onTap: () => _showFullScreenPhoto(photos, index),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.grey.shade100, // Background for images that don't fill container
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+              onTap: () => _showFullScreenPhoto(photos, index),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.grey
+                      .shade100, // Background for images that don't fill container
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    photos[index],
+                    fit: BoxFit.contain, // Show full image without cropping
+                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+                      color: Colors.grey.shade200,
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        size: 60,
+                        color: Colors.grey.shade400,
                       ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      photos[index],
-                      fit: BoxFit.contain, // Show full image without cropping
-                      errorBuilder: (context, error, stackTrace) => ColoredBox(
-                          color: Colors.grey.shade200,
-                          child: Icon(
-                            Icons.broken_image_outlined,
-                            size: 60,
-                            color: Colors.grey.shade400,
-                          ),
-                        ),
                     ),
                   ),
                 ),
               ),
+            ),
           ),
 
           // Photo counter
@@ -515,23 +517,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: interests.take(6).map((interest) => Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: primaryColor.withOpacity(0.3)),
-                    ),
-                    child: Text(
-                      interest.toString(),
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: primaryColor,
+                children: interests
+                    .take(6)
+                    .map(
+                      (interest) => Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border:
+                              Border.all(color: primaryColor.withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          interest.toString(),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),).toList(),
+                    )
+                    .toList(),
               ),
             if (interests.length > 6)
               Padding(
@@ -617,92 +625,93 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildLocationRow(IconData icon, String label, String value) => Row(
-      children: [
-        Icon(
-          icon,
-          color: textSecondary,
-          size: 20,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            '$label: $value',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: textPrimary,
-            ),
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildInfoChip({required IconData icon, required String label}) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             icon,
-            size: 16,
-            color: primaryColor,
+            color: textSecondary,
+            size: 20,
           ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: primaryColor,
-              fontWeight: FontWeight.w500,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              '$label: $value',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textPrimary,
+              ),
             ),
           ),
         ],
-      ),
-    );
+      );
 
-  Widget _buildEditButton() => SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const EditProfileScreen(),
-            ),
-          );
-
-          if (result == true) {
-            _loadUserData();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 3,
+  Widget _buildInfoChip({required IconData icon, required String label}) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.edit_outlined, size: 20),
-            const SizedBox(width: 12),
+            Icon(
+              icon,
+              size: 16,
+              color: primaryColor,
+            ),
+            const SizedBox(width: 6),
             Text(
-              'Edit Profile',
+              label,
               style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: primaryColor,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
+
+  Widget _buildEditButton() => SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: ElevatedButton(
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const EditProfileScreen(),
+              ),
+            );
+
+            if (result == true) {
+              _loadUserData();
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 3,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.edit_outlined, size: 20),
+              const SizedBox(width: 12),
+              Text(
+                'Edit Profile',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 
   int? _calculateAge(String? dobString) {
     if (dobString == null) return null;
@@ -814,7 +823,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final name = _userData?['name'] ?? 'Your Name';
     final age = _userData?['age'] ?? _calculateAge(_userData?['dateOfBirth']);
     final nationality = _userData?['nationality']?.toString() ?? '';
-    
+
     String location = '';
     if (_userData?['location'] != null) {
       if (_userData!['location'] is String) {
@@ -848,7 +857,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 if (nationality.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -874,7 +884,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 if (location.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -885,7 +896,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.location_on, size: 16, color: primaryColor),
+                        const Icon(Icons.location_on,
+                            size: 16, color: primaryColor),
                         const SizedBox(width: 6),
                         Text(
                           location,
@@ -964,11 +976,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     // Work/Job - briefcase icon (like Hinge)
-    final workTitle = getValue('job_title') ?? 
-                     getValue('profession') ?? 
-                     getValue('occupation');
+    final workTitle = getValue('job_title') ??
+        getValue('profession') ??
+        getValue('occupation');
     if (workTitle != null) {
-      details.add({'icon': Icons.business_center, 'label': '', 'value': workTitle});
+      details.add(
+          {'icon': Icons.business_center, 'label': '', 'value': workTitle});
     }
 
     // Religion - book icon (like Hinge)
@@ -979,9 +992,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // Relationship Intent (Relationship goals) - search icon (like Hinge)
     final relationshipIntent = getValue('relationshipIntent') ??
-                              _userData?['preferences']?['relationshipIntent']?.toString();
+        _userData?['preferences']?['relationshipIntent']?.toString();
     if (relationshipIntent != null && relationshipIntent.isNotEmpty) {
-      details.add({'icon': Icons.search, 'label': '', 'value': relationshipIntent});
+      details.add(
+          {'icon': Icons.search, 'label': '', 'value': relationshipIntent});
     }
 
     // Tribe - group icon
@@ -1058,24 +1072,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: interests.map((interest) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: primaryColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Text(
-                    interest.toString(),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: primaryColor,
-                    ),
-                  ),
-                )).toList(),
+            children: interests
+                .map((interest) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: primaryColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        interest.toString(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ))
+                .toList(),
           ),
           const SizedBox(height: 24),
         ],
@@ -1098,7 +1115,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 // Simplified full-screen photo viewer
 class _FullScreenPhotoViewer extends StatefulWidget {
-
   const _FullScreenPhotoViewer({
     required this.photos,
     required this.initialIndex,
@@ -1129,30 +1145,30 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          '${_currentIndex + 1} of ${widget.photos.length}',
-          style: GoogleFonts.montserrat(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: Text(
+            '${_currentIndex + 1} of ${widget.photos.length}',
+            style: GoogleFonts.montserrat(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: PageView.builder(
-        controller: _pageController,
-        itemCount: widget.photos.length,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        itemBuilder: (context, index) => InteractiveViewer(
+        body: PageView.builder(
+          controller: _pageController,
+          itemCount: widget.photos.length,
+          onPageChanged: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          itemBuilder: (context, index) => InteractiveViewer(
             minScale: 0.5,
             maxScale: 3,
             child: Center(
@@ -1160,29 +1176,29 @@ class _FullScreenPhotoViewerState extends State<_FullScreenPhotoViewer> {
                 widget.photos[index],
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => ColoredBox(
-                    color: Colors.grey.shade800,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.broken_image_outlined,
-                          size: 80,
+                  color: Colors.grey.shade800,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.broken_image_outlined,
+                        size: 80,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Photo unavailable',
+                        style: GoogleFonts.montserrat(
                           color: Colors.grey.shade400,
+                          fontSize: 16,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Photo unavailable',
-                          style: GoogleFonts.montserrat(
-                            color: Colors.grey.shade400,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
               ),
             ),
           ),
-      ),
-    );
+        ),
+      );
 }

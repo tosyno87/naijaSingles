@@ -142,8 +142,8 @@ class ImageUploadService {
 
   /// Show image picker dialog
   Future<File?> showImagePickerDialog() async => showDialog<File>(
-      context: navigatorKey.currentContext!,
-      builder: (BuildContext context) => AlertDialog(
+        context: navigatorKey.currentContext!,
+        builder: (BuildContext context) => AlertDialog(
           title: const Text('Select Image'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -153,15 +153,15 @@ class ImageUploadService {
                 title: const Text('Gallery'),
                 onTap: () async {
                   Navigator.pop(context);
-                  final File? image =
-                      await pickImage();
+                  final File? image = await pickImage();
                   if (image != null && validateImage(image)) {
                     Navigator.pop(context, image);
                   } else if (image != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                            'Invalid image. Please select a valid image file.',),
+                          'Invalid image. Please select a valid image file.',
+                        ),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -181,7 +181,8 @@ class ImageUploadService {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                            'Invalid image. Please select a valid image file.',),
+                          'Invalid image. Please select a valid image file.',
+                        ),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -191,7 +192,7 @@ class ImageUploadService {
             ],
           ),
         ),
-    );
+      );
 }
 
 // Global navigator key for accessing context

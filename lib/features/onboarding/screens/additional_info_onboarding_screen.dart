@@ -108,7 +108,9 @@ class _AdditionalInfoOnboardingScreenState
 
           // Height Section
           _buildSectionHeader(
-              'Height', 'Your height helps with better matching',),
+            'Height',
+            'Your height helps with better matching',
+          ),
           SizedBox(height: isTablet ? 20 : 16),
           AfropeepHeightDropdown(
             initialHeightFtIn: _heightFtIn,
@@ -129,7 +131,9 @@ class _AdditionalInfoOnboardingScreenState
 
           // Looking For Section
           _buildSectionHeader(
-              'I\'m looking for', 'What brings you to NaijaSingles?',),
+            'I\'m looking for',
+            'What brings you to NaijaSingles?',
+          ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildLookingForOptions(),
 
@@ -137,7 +141,9 @@ class _AdditionalInfoOnboardingScreenState
 
           // Relationship Intent Section
           _buildSectionHeader(
-              'Relationship goals', 'What are you hoping to find?',),
+            'Relationship goals',
+            'What are you hoping to find?',
+          ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildRelationshipIntentOptions(),
 
@@ -178,48 +184,56 @@ class _AdditionalInfoOnboardingScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) => Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: _buildSelectionOption(
-          option['label'],
-          option['value'],
-          _lookingFor,
-          (value) {
-            setState(() {
-              _lookingFor = value;
-            });
-            // Save to controller
-            final controller =
-                Provider.of<OnboardingController>(context, listen: false);
-            controller.setLookingFor(value);
-          },
-          option['icon'],
-        ),
-      ),).toList();
+    return _lookingForOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: _buildSelectionOption(
+              option['label'],
+              option['value'],
+              _lookingFor,
+              (value) {
+                setState(() {
+                  _lookingFor = value;
+                });
+                // Save to controller
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
+                controller.setLookingFor(value);
+              },
+              option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) => Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: _buildSelectionOption(
-          option['label'],
-          option['value'],
-          _relationshipIntent,
-          (value) {
-            setState(() {
-              _relationshipIntent = value;
-            });
-            // Save to controller
-            final controller =
-                Provider.of<OnboardingController>(context, listen: false);
-            controller.setRelationshipIntent(value);
-          },
-          option['icon'],
-        ),
-      ),).toList();
+    return _relationshipIntentOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: _buildSelectionOption(
+              option['label'],
+              option['value'],
+              _relationshipIntent,
+              (value) {
+                setState(() {
+                  _relationshipIntent = value;
+                });
+                // Save to controller
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
+                controller.setRelationshipIntent(value);
+              },
+              option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   Widget _buildSelectionOption(

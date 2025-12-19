@@ -14,24 +14,31 @@ import '../providers/theme_provider.dart';
 import 'crop_image.dart';
 
 abstract class UploadMedia {
-  static Future<File?> getImage(
-      {required BuildContext context, required String checktype,}) async {
+  static Future<File?> getImage({
+    required BuildContext context,
+    required String checktype,
+  }) async {
     final result = await _showDialogHandler(
-        isImage: true, context: context, checktype: checktype,);
+      isImage: true,
+      context: context,
+      checktype: checktype,
+    );
     return result;
   }
 
-  static Future<File> _showDialogHandler(
-      {required bool isImage,
-      required String checktype,
-      required BuildContext context,}) async {
+  static Future<File> _showDialogHandler({
+    required bool isImage,
+    required String checktype,
+    required BuildContext context,
+  }) async {
     final result = await showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) => _SelectMedia(
-            isImage: isImage,
-            checktype: checktype,
-          ),);
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => _SelectMedia(
+        isImage: isImage,
+        checktype: checktype,
+      ),
+    );
     return result;
   }
 }
@@ -43,13 +50,17 @@ class _SelectMedia extends StatelessWidget {
   final imagePicker = ImagePicker();
   //final cropKey = GlobalKey<CropState>();
 
-  Future<File?> getContentHandler(
-      {required ImageSource source, required BuildContext context,}) async {
+  Future<File?> getContentHandler({
+    required ImageSource source,
+    required BuildContext context,
+  }) async {
     try {
       final xFile = isImage
           ? await imagePicker.pickImage(source: source)
           : await imagePicker.pickVideo(
-              source: source, maxDuration: const Duration(seconds: 119),);
+              source: source,
+              maxDuration: const Duration(seconds: 119),
+            );
 
       if (xFile != null) {
         final file = File(xFile.path);
@@ -84,7 +95,8 @@ class _SelectMedia extends StatelessWidget {
     return null;
   }
 
-  Future<void> getContentFromSource(BuildContext context, ImageSource source) async {
+  Future<void> getContentFromSource(
+      BuildContext context, ImageSource source) async {
     final result = await getContentHandler(source: source, context: context);
     if (!context.mounted) return;
     if (result != null) {
@@ -175,22 +187,24 @@ class _SelectMedia extends StatelessWidget {
               overflowAlignment: OverflowBarAlignment.center,
               children: [
                 TextButton.icon(
-                    onPressed: () {
-                      getContentFromSource(context, ImageSource.camera);
-                    },
-                    icon: const Icon(
-                      FontAwesomeIcons.cameraRetro,
-                      color: primaryColor,
+                  onPressed: () {
+                    getContentFromSource(context, ImageSource.camera);
+                  },
+                  icon: const Icon(
+                    FontAwesomeIcons.cameraRetro,
+                    color: primaryColor,
+                  ),
+                  label: Text(
+                    'Camera'.tr().toString(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: themeProvider.isDarkMode
+                          ? Colors.white
+                          : Colors.black87,
                     ),
-                    label: Text(
-                      'Camera'.tr().toString(),
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: themeProvider.isDarkMode
-                              ? Colors.white
-                              : Colors.black87,),
-                    ),),
+                  ),
+                ),
                 TextButton.icon(
                   onPressed: () =>
                       getContentFromSource(context, ImageSource.gallery),
@@ -201,11 +215,12 @@ class _SelectMedia extends StatelessWidget {
                   label: Text(
                     'Gallery'.tr().toString(),
                     style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode
-                            ? Colors.white
-                            : Colors.black87,),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: themeProvider.isDarkMode
+                          ? Colors.white
+                          : Colors.black87,
+                    ),
                   ),
                 ),
               ],

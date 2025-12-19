@@ -10,7 +10,6 @@ abstract class DiaryEvent extends Equatable {
 class LoadDiaryEntries extends DiaryEvent {}
 
 class AddDiaryEntryEvent extends DiaryEvent {
-
   const AddDiaryEntryEvent({
     required this.userId,
     required this.content,

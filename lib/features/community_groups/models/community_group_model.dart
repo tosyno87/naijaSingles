@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CommunityGroup { // ['Technology', 'Music', 'Food', 'Language']
+class CommunityGroup {
+  // ['Technology', 'Music', 'Food', 'Language']
 
   const CommunityGroup({
     required this.id,
@@ -63,23 +64,23 @@ class CommunityGroup { // ['Technology', 'Music', 'Food', 'Language']
   final List<String> tags;
 
   Map<String, dynamic> toFirestore() => {
-      'name': name,
-      'description': description,
-      'category': category,
-      'country': country,
-      'city': city,
-      'creatorId': creatorId,
-      'memberIds': memberIds,
-      'adminIds': adminIds,
-      'imageUrl': imageUrl,
-      'isPublic': isPublic,
-      'isVerified': isVerified,
-      'rules': rules,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'memberCount': memberCount,
-      'tags': tags,
-    };
+        'name': name,
+        'description': description,
+        'category': category,
+        'country': country,
+        'city': city,
+        'creatorId': creatorId,
+        'memberIds': memberIds,
+        'adminIds': adminIds,
+        'imageUrl': imageUrl,
+        'isPublic': isPublic,
+        'isVerified': isVerified,
+        'rules': rules,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+        'memberCount': memberCount,
+        'tags': tags,
+      };
 
   CommunityGroup copyWith({
     String? id,
@@ -99,23 +100,24 @@ class CommunityGroup { // ['Technology', 'Music', 'Food', 'Language']
     DateTime? updatedAt,
     int? memberCount,
     List<String>? tags,
-  }) => CommunityGroup(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      category: category ?? this.category,
-      country: country ?? this.country,
-      city: city ?? this.city,
-      creatorId: creatorId ?? this.creatorId,
-      memberIds: memberIds ?? this.memberIds,
-      adminIds: adminIds ?? this.adminIds,
-      imageUrl: imageUrl ?? this.imageUrl,
-      isPublic: isPublic ?? this.isPublic,
-      isVerified: isVerified ?? this.isVerified,
-      rules: rules ?? this.rules,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      memberCount: memberCount ?? this.memberCount,
-      tags: tags ?? this.tags,
-    );
+  }) =>
+      CommunityGroup(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        category: category ?? this.category,
+        country: country ?? this.country,
+        city: city ?? this.city,
+        creatorId: creatorId ?? this.creatorId,
+        memberIds: memberIds ?? this.memberIds,
+        adminIds: adminIds ?? this.adminIds,
+        imageUrl: imageUrl ?? this.imageUrl,
+        isPublic: isPublic ?? this.isPublic,
+        isVerified: isVerified ?? this.isVerified,
+        rules: rules ?? this.rules,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        memberCount: memberCount ?? this.memberCount,
+        tags: tags ?? this.tags,
+      );
 }

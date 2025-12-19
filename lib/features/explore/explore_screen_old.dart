@@ -19,7 +19,6 @@ const Color kBorderColor = Color(0xFFDADADA); // Light gray border
 const Color kRedColor = Color(0xFFFF5A5F); // Red for dislike
 
 class ExploreScreen extends StatefulWidget {
-
   const ExploreScreen({
     super.key,
     this.showBackButton = false, // Default to false (no back labelLarge)
@@ -173,18 +172,22 @@ class _ExploreScreenState extends State<ExploreScreen>
   void _loadSwipeItems() {
     if (_users.isEmpty) return;
 
-    _swipeItems = _users.map((user) => SwipeItem(
-        content: user,
-        likeAction: () {
-          handleLike(user);
-        },
-        nopeAction: () {
-          handlePass(user);
-        },
-        superlikeAction: () {
-          handleSave(user);
-        },
-      ),).toList();
+    _swipeItems = _users
+        .map(
+          (user) => SwipeItem(
+            content: user,
+            likeAction: () {
+              handleLike(user);
+            },
+            nopeAction: () {
+              handlePass(user);
+            },
+            superlikeAction: () {
+              handleSave(user);
+            },
+          ),
+        )
+        .toList();
 
     _matchEngine = MatchEngine(swipeItems: _swipeItems);
   }
@@ -494,11 +497,11 @@ class _ExploreScreenState extends State<ExploreScreen>
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.6),
       builder: (BuildContext context) => MatchConfirmationModal(
-          currentUserImageUrl: currentUserImageUrl,
-          matchedUserImageUrl: matchedUserImageUrl,
-          matchedUserName: matchedUserName,
-          matchedUserId: matchedUserId ?? '',
-        ),
+        currentUserImageUrl: currentUserImageUrl,
+        matchedUserImageUrl: matchedUserImageUrl,
+        matchedUserName: matchedUserName,
+        matchedUserId: matchedUserId ?? '',
+      ),
     );
 
     // Also show a snackbar notification when the modal is dismissed
@@ -532,23 +535,26 @@ class _ExploreScreenState extends State<ExploreScreen>
           children: [
             // Clean header with undo and filter
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Undo button (always show if user is loaded)
-                      if (_currentUser != null) IconButton(
-                              icon: Icon(Icons.undo,
-                                  color: _canUndo ? Colors.purple : Colors.grey,
-                                  size: 24,),
-                              onPressed: _canUndo ? handleUndo : null,
-                              tooltip: _canUndo
-                                  ? 'Undo last pass'
-                                  : 'No pass to undo',
-                            ) else const SizedBox(width: 48),
+                      if (_currentUser != null)
+                        IconButton(
+                          icon: Icon(
+                            Icons.undo,
+                            color: _canUndo ? Colors.purple : Colors.grey,
+                            size: 24,
+                          ),
+                          onPressed: _canUndo ? handleUndo : null,
+                          tooltip:
+                              _canUndo ? 'Undo last pass' : 'No pass to undo',
+                        )
+                      else
+                        const SizedBox(width: 48),
 
                       // Title
                       Text(
@@ -593,7 +599,9 @@ class _ExploreScreenState extends State<ExploreScreen>
                       padding: const EdgeInsets.only(top: 8),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6,),
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: kPrimaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
@@ -832,9 +840,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
 // Profile Card Widget with fade-in animation
 class ProfileCard extends StatefulWidget {
-
   const ProfileCard({
-    required this.user, super.key,
+    required this.user,
+    super.key,
     this.selectedMode,
   });
   final UserModel user;
@@ -921,7 +929,8 @@ class _ProfileCardState extends State<ProfileCard>
                     children: [
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20),),
+                          top: Radius.circular(20),
+                        ),
                         child: AspectRatio(
                           aspectRatio: 4 / 3,
                           child: photos.isNotEmpty
@@ -957,7 +966,9 @@ class _ProfileCardState extends State<ProfileCard>
                           right: 12,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4,),
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.7),
                               borderRadius: BorderRadius.circular(12),
@@ -1082,7 +1093,9 @@ class _ProfileCardState extends State<ProfileCard>
                         if (widget.user.distanceBW != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 8,),
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),

@@ -101,7 +101,10 @@ class ProfileAnalyticsService {
 
   /// Track message sent
   Future<void> trackMessageSent(
-      String threadId, String senderId, String receiverId,) async {
+    String threadId,
+    String senderId,
+    String receiverId,
+  ) async {
     try {
       log('💬 Tracking message sent: $threadId');
 
@@ -264,12 +267,14 @@ class ProfileAnalyticsService {
             .where('date', isEqualTo: dateString)
             .get();
 
-        last30Days.add(DailyAnalytics(
-          date: date,
-          views: viewsSnapshot.docs.length,
-          likes: likesSnapshot.docs.length,
-          passes: passesSnapshot.docs.length,
-        ),);
+        last30Days.add(
+          DailyAnalytics(
+            date: date,
+            views: viewsSnapshot.docs.length,
+            likes: likesSnapshot.docs.length,
+            passes: passesSnapshot.docs.length,
+          ),
+        );
       }
 
       return last30Days;
@@ -469,14 +474,16 @@ class ProfileAnalyticsService {
       if (userData['bio'] != null && userData['bio'].toString().isNotEmpty) {
         completedFields++;
       }
-      if (userData['photos'] != null && (userData['photos'] as List).isNotEmpty) {
+      if (userData['photos'] != null &&
+          (userData['photos'] as List).isNotEmpty) {
         completedFields++;
       }
       if (userData['nationality'] != null &&
           userData['nationality'].toString().isNotEmpty) {
         completedFields++;
       }
-      if (userData['tribe'] != null && userData['tribe'].toString().isNotEmpty) {
+      if (userData['tribe'] != null &&
+          userData['tribe'].toString().isNotEmpty) {
         completedFields++;
       }
       if (userData['occupation'] != null &&
@@ -520,7 +527,6 @@ class ProfileAnalyticsService {
 
 /// Profile analytics model
 class ProfileAnalytics {
-
   const ProfileAnalytics({
     required this.userId,
     required this.totalViews,
@@ -545,12 +551,12 @@ class ProfileAnalytics {
   final DateTime lastUpdated;
 
   @override
-  String toString() => 'ProfileAnalytics($userId: $totalViews views, $totalLikes likes, ${likeRate.toStringAsFixed(1)}% like rate)';
+  String toString() =>
+      'ProfileAnalytics($userId: $totalViews views, $totalLikes likes, ${likeRate.toStringAsFixed(1)}% like rate)';
 }
 
 /// Daily analytics model
 class DailyAnalytics {
-
   const DailyAnalytics({
     required this.date,
     required this.views,
@@ -563,12 +569,12 @@ class DailyAnalytics {
   final int passes;
 
   @override
-  String toString() => 'DailyAnalytics(${date.toIso8601String().split('T')[0]}: $views views, $likes likes)';
+  String toString() =>
+      'DailyAnalytics(${date.toIso8601String().split('T')[0]}: $views views, $likes likes)';
 }
 
 /// Demographic analytics model
 class DemographicAnalytics {
-
   const DemographicAnalytics({
     required this.ageGroups,
     required this.genderGroups,
@@ -576,21 +582,21 @@ class DemographicAnalytics {
   });
 
   factory DemographicAnalytics.empty() => const DemographicAnalytics(
-      ageGroups: {},
-      genderGroups: {},
-      locationGroups: {},
-    );
+        ageGroups: {},
+        genderGroups: {},
+        locationGroups: {},
+      );
   final Map<String, int> ageGroups;
   final Map<String, int> genderGroups;
   final Map<String, int> locationGroups;
 
   @override
-  String toString() => 'DemographicAnalytics(age: ${ageGroups.length}, gender: ${genderGroups.length}, location: ${locationGroups.length})';
+  String toString() =>
+      'DemographicAnalytics(age: ${ageGroups.length}, gender: ${genderGroups.length}, location: ${locationGroups.length})';
 }
 
 /// App analytics model
 class AppAnalytics {
-
   const AppAnalytics({
     required this.totalUsers,
     required this.totalMatches,
@@ -605,5 +611,6 @@ class AppAnalytics {
   final DateTime lastUpdated;
 
   @override
-  String toString() => 'AppAnalytics($totalUsers users, $totalMatches matches, $dailyActiveUsers DAU)';
+  String toString() =>
+      'AppAnalytics($totalUsers users, $totalMatches matches, $dailyActiveUsers DAU)';
 }

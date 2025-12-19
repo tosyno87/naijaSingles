@@ -9,8 +9,10 @@ import '../models/user_model.dart';
 
 class FireStoreClass {
   // Method for uploading profile during registration
-  static Future<UploadTask?> uploadprofile(
-      {required String currentUserId, required File file,}) async {
+  static Future<UploadTask?> uploadprofile({
+    required String currentUserId,
+    required File file,
+  }) async {
     try {
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
 
@@ -37,9 +39,12 @@ class FireStoreClass {
               await firebaseFireStoreInstance
                   .collection('users')
                   .doc(currentUserId)
-                  .set({
-                'Pictures': [fileURL],
-              }, SetOptions(merge: true),);
+                  .set(
+                {
+                  'Pictures': [fileURL],
+                },
+                SetOptions(merge: true),
+              );
             } catch (e) {
               log('Error updating Firestore with image URL: $e');
             }
@@ -56,8 +61,10 @@ class FireStoreClass {
   }
 
   // Method for uploading verification images
-  static Future<String?> uploadVerification(
-      {required String userId, required File file,}) async {
+  static Future<String?> uploadVerification({
+    required String userId,
+    required File file,
+  }) async {
     try {
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
 
@@ -81,13 +88,16 @@ class FireStoreClass {
         final String downloadUrl = await snapshot.ref.getDownloadURL();
 
         // Update user document with verification status
-        await firebaseFireStoreInstance.collection('users').doc(userId).set({
-          'verification': {
-            'status': 'pending',
-            'imageUrl': downloadUrl,
-            'submittedAt': FieldValue.serverTimestamp(),
+        await firebaseFireStoreInstance.collection('users').doc(userId).set(
+          {
+            'verification': {
+              'status': 'pending',
+              'imageUrl': downloadUrl,
+              'submittedAt': FieldValue.serverTimestamp(),
+            },
           },
-        }, SetOptions(merge: true),);
+          SetOptions(merge: true),
+        );
 
         log('Verification image uploaded: $downloadUrl');
         return downloadUrl;
@@ -101,10 +111,11 @@ class FireStoreClass {
     }
   }
 
-  static Future<UploadTask?> uploadFile(
-      {required String checktype,
-      required UserModel currentUser,
-      required File file,}) async {
+  static Future<UploadTask?> uploadFile({
+    required String checktype,
+    required UserModel currentUser,
+    required File file,
+  }) async {
     try {
       final int timestamp = DateTime.now().millisecondsSinceEpoch;
 

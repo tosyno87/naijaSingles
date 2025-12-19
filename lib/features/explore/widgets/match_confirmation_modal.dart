@@ -7,9 +7,12 @@ import '../../messages/chat_thread_screen.dart';
 import '../../messages/services/chat_service.dart';
 
 class MatchConfirmationModal extends StatefulWidget {
-
   const MatchConfirmationModal({
-    required this.currentUserImageUrl, required this.matchedUserImageUrl, required this.matchedUserName, required this.matchedUserId, super.key,
+    required this.currentUserImageUrl,
+    required this.matchedUserImageUrl,
+    required this.matchedUserName,
+    required this.matchedUserId,
+    super.key,
   });
   final String currentUserImageUrl;
   final String matchedUserImageUrl;
@@ -236,7 +239,10 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                 const SizedBox(height: 40),
 
                 // Action labelLarges
-                if (isWideScreen) _buildHorizontalButtons() else _buildVerticalButtons(),
+                if (isWideScreen)
+                  _buildHorizontalButtons()
+                else
+                  _buildVerticalButtons(),
               ],
             ),
           ),
@@ -246,71 +252,107 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
   }
 
   Widget _buildProfileAvatar(String imageUrl) => Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF008037).withValues(alpha: 0.4),
-            blurRadius: 12,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(50),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Container(
-            color: Colors.grey[300],
-            child: const Icon(
-              Icons.person,
-              size: 50,
-              color: Colors.grey,
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF008037).withValues(alpha: 0.4),
+              blurRadius: 12,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: Colors.grey[300],
+              child: const Icon(
+                Icons.person,
+                size: 50,
+                color: Colors.grey,
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
   Widget _buildHorizontalButtons() => Row(
-      children: [
-        // Keep Exploring labelLarge
-        Expanded(
-          child: OutlinedButton(
-            onPressed: _isProcessing
-                ? null
-                : () {
-                    Navigator.pop(context);
-                  },
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
-                width: 2,
+        children: [
+          // Keep Exploring labelLarge
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _isProcessing
+                  ? null
+                  : () {
+                      Navigator.pop(context);
+                    },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+                  width: 2,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: Text(
-              'Keep Exploring',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+              child: Text(
+                'Keep Exploring',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+                ),
               ),
             ),
           ),
-        ),
 
-        const SizedBox(width: 16),
+          const SizedBox(width: 16),
 
-        // Send Message labelLarge
-        Expanded(
-          child: ElevatedButton(
+          // Send Message labelLarge
+          Expanded(
+            child: ElevatedButton(
+              onPressed: _isProcessing ? null : _handleSendMessage,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF008037),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                disabledBackgroundColor: Colors.grey,
+              ),
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      'Send Message',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      );
+
+  Widget _buildVerticalButtons() => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Send Message labelLarge
+          ElevatedButton(
             onPressed: _isProcessing ? null : _handleSendMessage,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008037),
@@ -338,71 +380,35 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                     ),
                   ),
           ),
-        ),
-      ],
-    );
 
-  Widget _buildVerticalButtons() => Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Send Message labelLarge
-        ElevatedButton(
-          onPressed: _isProcessing ? null : _handleSendMessage,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF008037),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+          const SizedBox(height: 12),
+
+          // Keep Exploring labelLarge
+          OutlinedButton(
+            onPressed: _isProcessing
+                ? null
+                : () {
+                    Navigator.pop(context);
+                  },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(
+                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+                width: 2,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
-            disabledBackgroundColor: Colors.grey,
-          ),
-          child: _isProcessing
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                )
-              : Text(
-                  'Send Message',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Keep Exploring labelLarge
-        OutlinedButton(
-          onPressed: _isProcessing
-              ? null
-              : () {
-                  Navigator.pop(context);
-                },
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: _isProcessing ? Colors.grey : const Color(0xFF008037),
-              width: 2,
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+            child: Text(
+              'Keep Exploring',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+              ),
             ),
           ),
-          child: Text(
-            'Keep Exploring',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: _isProcessing ? Colors.grey : const Color(0xFF008037),
-            ),
-          ),
-        ),
-      ],
-    );
+        ],
+      );
 }

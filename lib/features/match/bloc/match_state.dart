@@ -16,7 +16,6 @@ class MatchLoading extends MatchState {
 }
 
 class MatchesLoaded extends MatchState {
-
   const MatchesLoaded({required this.matches});
   final List<MatchModel> matches;
 
@@ -25,7 +24,6 @@ class MatchesLoaded extends MatchState {
 }
 
 class LikeProcessing extends MatchState {
-
   const LikeProcessing({required this.toUserId});
   final String toUserId;
 
@@ -34,7 +32,6 @@ class LikeProcessing extends MatchState {
 }
 
 class LikeSuccess extends MatchState {
-
   const LikeSuccess({
     required this.toUserId,
     required this.isMatch,
@@ -49,7 +46,6 @@ class LikeSuccess extends MatchState {
 }
 
 class MatchCreated extends MatchState {
-
   const MatchCreated({
     required this.matchId,
     required this.otherUserId,
@@ -64,7 +60,6 @@ class MatchCreated extends MatchState {
 }
 
 class MatchError extends MatchState {
-
   const MatchError({required this.message});
   final String message;
 
@@ -73,7 +68,6 @@ class MatchError extends MatchState {
 }
 
 class UnlikeSuccess extends MatchState {
-
   const UnlikeSuccess({required this.toUserId});
   final String toUserId;
 
@@ -82,7 +76,6 @@ class UnlikeSuccess extends MatchState {
 }
 
 class MatchDeleted extends MatchState {
-
   const MatchDeleted({required this.matchId});
   final String matchId;
 

@@ -59,22 +59,30 @@ class UserSearchRepo {
   }
 
   static Future<void> leftSwipe(
-      UserModel currentUser, UserModel selectedUser,) async {
+    UserModel currentUser,
+    UserModel selectedUser,
+  ) async {
     await docRef
         .doc(currentUser.id)
         .collection('CheckedUser')
         .doc(selectedUser.id)
-        .set({
-      'DislikedUser': selectedUser.id,
-      'timestamp': DateTime.now(),
-    }, SetOptions(merge: true),);
+        .set(
+      {
+        'DislikedUser': selectedUser.id,
+        'timestamp': DateTime.now(),
+      },
+      SetOptions(merge: true),
+    );
   }
 
   static Future<String?> rightSwipe(
-      UserModel currentUser, UserModel selectedUser,) async {
+    UserModel currentUser,
+    UserModel selectedUser,
+  ) async {
     try {
       debugPrint(
-          '🚀 Optimized right swipe: ${currentUser.name} → ${selectedUser.name}',);
+        '🚀 Optimized right swipe: ${currentUser.name} → ${selectedUser.name}',
+      );
 
       // Use optimized match service (2-3 Firestore reads max)
       final currentUserId = currentUser.id;
@@ -82,7 +90,9 @@ class UserSearchRepo {
 
       if (currentUserId != null && selectedUserId != null) {
         final result = await _optimizedMatchService.handleLike(
-            currentUserId, selectedUserId,);
+          currentUserId,
+          selectedUserId,
+        );
 
         if (result.isSuccess) {
           if (result.isMatch) {
@@ -103,10 +113,13 @@ class UserSearchRepo {
           .doc(currentUser.id)
           .collection('CheckedUser')
           .doc(selectedUser.id)
-          .set({
-        'LikedUser': selectedUser.id,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true),);
+          .set(
+        {
+          'LikedUser': selectedUser.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       return null; // No match created
     } catch (e) {
@@ -118,7 +131,9 @@ class UserSearchRepo {
 
   /// Legacy right swipe implementation as fallback
   static Future<String?> _legacyRightSwipe(
-      UserModel currentUser, UserModel selectedUser,) async {
+    UserModel currentUser,
+    UserModel selectedUser,
+  ) async {
     try {
       likedByList = await getLikedByList(currentUser);
       if (likedByList.contains(selectedUser.id) ||
@@ -128,28 +143,34 @@ class UserSearchRepo {
             .doc(currentUser.id)
             .collection('Matches')
             .doc(selectedUser.id)
-            .set({
-          'Matches': selectedUser.id,
-          'isRead': false,
-          'userName': selectedUser.name ?? 'Unknown',
-          'pictureUrl': selectedUser.imageUrl?.isNotEmpty ?? false
-              ? selectedUser.imageUrl![0]
-              : '',
-          'timestamp': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true),);
+            .set(
+          {
+            'Matches': selectedUser.id,
+            'isRead': false,
+            'userName': selectedUser.name ?? 'Unknown',
+            'pictureUrl': selectedUser.imageUrl?.isNotEmpty ?? false
+                ? selectedUser.imageUrl![0]
+                : '',
+            'timestamp': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
         await docRef
             .doc(selectedUser.id)
             .collection('Matches')
             .doc(currentUser.id)
-            .set({
-          'Matches': currentUser.id,
-          'userName': currentUser.name ?? 'Unknown',
-          'pictureUrl': currentUser.imageUrl?.isNotEmpty ?? false
-              ? currentUser.imageUrl![0]
-              : '',
-          'isRead': false,
-          'timestamp': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true),);
+            .set(
+          {
+            'Matches': currentUser.id,
+            'userName': currentUser.name ?? 'Unknown',
+            'pictureUrl': currentUser.imageUrl?.isNotEmpty ?? false
+                ? currentUser.imageUrl![0]
+                : '',
+            'isRead': false,
+            'timestamp': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
 
         // Return a legacy match indicator
         return 'legacy_match';
@@ -160,20 +181,26 @@ class UserSearchRepo {
           .doc(currentUser.id)
           .collection('CheckedUser')
           .doc(selectedUser.id)
-          .set({
-        'LikedUser': selectedUser.id,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true),);
+          .set(
+        {
+          'LikedUser': selectedUser.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       // Update legacy LikedBy collection
       await docRef
           .doc(selectedUser.id)
           .collection('LikedBy')
           .doc(currentUser.id)
-          .set({
-        'LikedBy': currentUser.id,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true),);
+          .set(
+        {
+          'LikedBy': currentUser.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       return null; // No match created
     } catch (e) {
@@ -303,8 +330,12 @@ class UserSearchRepo {
           final UserModel temp = UserModel.fromDocument(doc);
           debugPrint('Created UserModel for: ${temp.name}');
 
-          final distance = calculateDistance(currentUser.latitude,
-              currentUser.longitude, temp.latitude, temp.longitude,);
+          final distance = calculateDistance(
+            currentUser.latitude,
+            currentUser.longitude,
+            temp.latitude,
+            temp.longitude,
+          );
           temp.distanceBW = distance.round();
 
           if (checkedUserIds.contains(temp.id)) {
@@ -317,7 +348,8 @@ class UserSearchRepo {
             final userIntent = temp.lookingFor ?? 'Dating';
             if (userIntent != intentFilter) {
               debugPrint(
-                  'Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)',);
+                'Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)',
+              );
               continue;
             }
           }
@@ -326,11 +358,13 @@ class UserSearchRepo {
               temp.id != currentUser.id &&
               !temp.isBlocked!) {
             debugPrint(
-                'Adding user: ${temp.name} (intent: ${temp.lookingFor})',);
+              'Adding user: ${temp.name} (intent: ${temp.lookingFor})',
+            );
             userList.add(temp);
           } else {
             debugPrint(
-                'Filtered out user: ${temp.name} (distance: $distance, maxDistance: ${currentUser.maxDistance}, blocked: ${temp.isBlocked})',);
+              'Filtered out user: ${temp.name} (distance: $distance, maxDistance: ${currentUser.maxDistance}, blocked: ${temp.isBlocked})',
+            );
           }
         } catch (e) {
           debugPrint('Error processing document ${doc.id}: $e');
@@ -358,5 +392,6 @@ class UserSearchRepo {
     return likedByList;
   }
 
-  static double calculateDistance(lat1, lon1, lat2, lon2) => distance.calculateDistance(lat1, lon1, lat2, lon2);
+  static double calculateDistance(lat1, lon1, lat2, lon2) =>
+      distance.calculateDistance(lat1, lon1, lat2, lon2);
 }

@@ -5,7 +5,6 @@ import '../../user/controllers/onboarding_controller.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingPreferencesScreen extends StatefulWidget {
-
   const OnboardingPreferencesScreen({super.key, this.onNext});
   final VoidCallback? onNext;
 

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LikedUser {
-
   LikedUser({
     required this.currentUserId,
     required this.likedUserId,
@@ -23,8 +22,8 @@ class LikedUser {
 
   // Convert to Map for Firestore
   Map<String, dynamic> toMap() => {
-      'currentUserId': currentUserId,
-      'likedUserId': likedUserId,
-      'timestamp': timestamp,
-    };
+        'currentUserId': currentUserId,
+        'likedUserId': likedUserId,
+        'timestamp': timestamp,
+      };
 }

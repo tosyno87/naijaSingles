@@ -8,7 +8,6 @@ abstract class UserfilterEvent extends Equatable {
 }
 
 class ChangefilterRequest extends UserfilterEvent {
-
   const ChangefilterRequest({
     required this.details,
   });
@@ -21,7 +20,6 @@ class ChangefilterRequest extends UserfilterEvent {
 // for location change in filter.currently not in used
 
 class ChangelocationRequest extends UserfilterEvent {
-
   const ChangelocationRequest({
     required this.details,
   });

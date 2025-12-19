@@ -543,14 +543,17 @@ class _EnhancedAdditionalInfoScreenState
     return total;
   }
 
-  bool _isDatingUser() => _platformPurpose == 'Dating & Romance' ||
-        _platformPurpose == 'All of the Above';
+  bool _isDatingUser() =>
+      _platformPurpose == 'Dating & Romance' ||
+      _platformPurpose == 'All of the Above';
 
-  bool _isNetworkingUser() => _platformPurpose == 'Professional Networking' ||
-        _platformPurpose == 'All of the Above';
+  bool _isNetworkingUser() =>
+      _platformPurpose == 'Professional Networking' ||
+      _platformPurpose == 'All of the Above';
 
-  bool _isFriendshipUser() => _platformPurpose == 'Friendship & Social' ||
-        _platformPurpose == 'All of the Above';
+  bool _isFriendshipUser() =>
+      _platformPurpose == 'Friendship & Social' ||
+      _platformPurpose == 'All of the Above';
 
   String _getEducationSubtitle() {
     if (_isNetworkingUser()) {
@@ -673,8 +676,10 @@ class _EnhancedAdditionalInfoScreenState
           SizedBox(height: isTablet ? 32 : 24),
 
           // Platform Purpose Section - What brings you to Afropeep?
-          _buildSectionHeader('What brings you to Afropeep?',
-              'Help us understand how to serve you better',),
+          _buildSectionHeader(
+            'What brings you to Afropeep?',
+            'Help us understand how to serve you better',
+          ),
           SizedBox(height: isTablet ? 16 : 12),
           _buildPlatformPurposeDropdown(),
 
@@ -683,8 +688,10 @@ class _EnhancedAdditionalInfoScreenState
             SizedBox(height: isTablet ? 32 : 24),
 
             // Relationship Intent Section
-            _buildSectionHeader('Relationship goals',
-                'What are you hoping to find romantically?',),
+            _buildSectionHeader(
+              'Relationship goals',
+              'What are you hoping to find romantically?',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _relationshipIntent,
@@ -706,8 +713,10 @@ class _EnhancedAdditionalInfoScreenState
             SizedBox(height: isTablet ? 32 : 24),
 
             // Professional Focus Section
-            _buildSectionHeader('Professional Focus',
-                'What type of professional connections are you seeking?',),
+            _buildSectionHeader(
+              'Professional Focus',
+              'What type of professional connections are you seeking?',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _professionalFocus,
@@ -727,8 +736,10 @@ class _EnhancedAdditionalInfoScreenState
             SizedBox(height: isTablet ? 32 : 24),
 
             // Social Interests Section
-            _buildSectionHeader('Social Interests',
-                'What kind of friendships are you looking for?',),
+            _buildSectionHeader(
+              'Social Interests',
+              'What kind of friendships are you looking for?',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _socialInterests,
@@ -766,8 +777,10 @@ class _EnhancedAdditionalInfoScreenState
 
           // Religion Section - Show mainly for dating users, optional for others
           if (_isDatingUser() || _platformPurpose == 'All of the Above') ...[
-            _buildSectionHeader('Faith & Religion',
-                'Important for many Nigerian relationships',),
+            _buildSectionHeader(
+              'Faith & Religion',
+              'Important for many Nigerian relationships',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _religion,
@@ -787,7 +800,9 @@ class _EnhancedAdditionalInfoScreenState
 
           // Languages Section - Show for all users
           _buildSectionHeader(
-              'Languages', 'Primary language you speak fluently',),
+            'Languages',
+            'Primary language you speak fluently',
+          ),
           Text(
             _getLanguageSubtitle(),
             style: GoogleFonts.montserrat(
@@ -884,7 +899,9 @@ class _EnhancedAdditionalInfoScreenState
           // Lifestyle Preferences - Show mainly for dating users
           if (_isDatingUser()) ...[
             _buildSectionHeader(
-                'Lifestyle', 'Optional but helps with compatibility',),
+              'Lifestyle',
+              'Optional but helps with compatibility',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
 
             // Drinking
@@ -974,115 +991,116 @@ class _EnhancedAdditionalInfoScreenState
   }
 
   Widget _buildHeader(bool isTablet, int completed, int total) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Tell us more about you',
-          style: GoogleFonts.montserrat(
-            fontSize: isTablet ? 32 : 28,
-            fontWeight: FontWeight.bold,
-            color: textDarkBrown,
-          ),
-        ),
-        SizedBox(height: isTablet ? 8 : 6),
-        Text(
-          'Help us create better matches for you',
-          style: GoogleFonts.montserrat(
-            fontSize: isTablet ? 18 : 16,
-            color: textLightBrown,
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Progress indicator
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: afropeepGreen.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: afropeepGreen.withValues(alpha: 0.3),
-            ),
-          ),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  value: completed / total,
-                  backgroundColor: afropeepGreen.withValues(alpha: 0.2),
-                  valueColor: const AlwaysStoppedAnimation(afropeepGreen),
-                  strokeWidth: 3,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Profile completion: $completed of $total sections',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: afropeepGreen,
-                      ),
-                    ),
-                    Text(
-                      'Complete profiles get 3x more matches!',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: afropeepGreen,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildInfoCard(String title, String description, IconData icon) => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade200),
-      ),
-      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.blue.shade700, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Text(
+            'Tell us more about you',
+            style: GoogleFonts.montserrat(
+              fontSize: isTablet ? 32 : 28,
+              fontWeight: FontWeight.bold,
+              color: textDarkBrown,
+            ),
+          ),
+          SizedBox(height: isTablet ? 8 : 6),
+          Text(
+            'Help us create better matches for you',
+            style: GoogleFonts.montserrat(
+              fontSize: isTablet ? 18 : 16,
+              color: textLightBrown,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Progress indicator
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: afropeepGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: afropeepGreen.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue.shade800,
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    value: completed / total,
+                    backgroundColor: afropeepGreen.withValues(alpha: 0.2),
+                    valueColor: const AlwaysStoppedAnimation(afropeepGreen),
+                    strokeWidth: 3,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: Colors.blue.shade700,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Profile completion: $completed of $total sections',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: afropeepGreen,
+                        ),
+                      ),
+                      Text(
+                        'Complete profiles get 3x more matches!',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          color: afropeepGreen,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
+      );
+
+  Widget _buildInfoCard(String title, String description, IconData icon) =>
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.blue.shade200),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: Colors.blue.shade700, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue.shade800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: Colors.blue.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
 
   List<Widget> _buildEnhancedOptions(
     List<Map<String, dynamic>> options,
@@ -1232,47 +1250,51 @@ class _EnhancedAdditionalInfoScreenState
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(12),
           menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
-          items: options.map((option) => DropdownMenuItem<String>(
-              value: option['value'],
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: isTablet ? 6 : 4,
-                ),
-                child: Row(
-                  children: [
-                    if (option['icon'] != null) ...[
-                      Container(
-                        padding: EdgeInsets.all(isTablet ? 6 : 4),
-                        decoration: BoxDecoration(
-                          color: (option['color'] ?? Colors.grey)
-                              .withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Icon(
-                          option['icon'],
-                          color: option['color'] ?? Colors.grey,
-                          size: isTablet ? 18 : 16,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    Expanded(
-                      child: Text(
-                        option['label'],
-                        style: GoogleFonts.montserrat(
-                          fontSize: isTablet ? 16 : 14,
-                          fontWeight: FontWeight.w600,
-                          color: textDarkBrown,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+          items: options
+              .map(
+                (option) => DropdownMenuItem<String>(
+                  value: option['value'],
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: isTablet ? 6 : 4,
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        if (option['icon'] != null) ...[
+                          Container(
+                            padding: EdgeInsets.all(isTablet ? 6 : 4),
+                            decoration: BoxDecoration(
+                              color: (option['color'] ?? Colors.grey)
+                                  .withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Icon(
+                              option['icon'],
+                              color: option['color'] ?? Colors.grey,
+                              size: isTablet ? 18 : 16,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Expanded(
+                          child: Text(
+                            option['label'],
+                            style: GoogleFonts.montserrat(
+                              fontSize: isTablet ? 16 : 14,
+                              fontWeight: FontWeight.w600,
+                              color: textDarkBrown,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),).toList(),
+              )
+              .toList(),
           onChanged: (String? newValue) {
             if (newValue != null) {
               onChanged(newValue);
@@ -1347,45 +1369,49 @@ class _EnhancedAdditionalInfoScreenState
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(12),
           menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
-          items: _platformPurposeOptions.map((option) => DropdownMenuItem<String>(
-              value: option['value'],
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: isTablet ? 6 : 4,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(isTablet ? 6 : 4),
-                      decoration: BoxDecoration(
-                        color:
-                            (option['color'] as Color).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Icon(
-                        option['icon'],
-                        color: option['color'],
-                        size: isTablet ? 18 : 16,
-                      ),
+          items: _platformPurposeOptions
+              .map(
+                (option) => DropdownMenuItem<String>(
+                  value: option['value'],
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: isTablet ? 6 : 4,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        option['label'],
-                        style: GoogleFonts.montserrat(
-                          fontSize: isTablet ? 16 : 14,
-                          fontWeight: FontWeight.w600,
-                          color: textDarkBrown,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(isTablet ? 6 : 4),
+                          decoration: BoxDecoration(
+                            color: (option['color'] as Color)
+                                .withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            option['icon'],
+                            color: option['color'],
+                            size: isTablet ? 18 : 16,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            option['label'],
+                            style: GoogleFonts.montserrat(
+                              fontSize: isTablet ? 16 : 14,
+                              fontWeight: FontWeight.w600,
+                              color: textDarkBrown,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),).toList(),
+              )
+              .toList(),
           onChanged: (String? value) {
             if (value != null) {
               setState(() {
@@ -1487,50 +1513,52 @@ class _EnhancedAdditionalInfoScreenState
     List<Map<String, dynamic>> options,
     String selectedValue,
     Function(String) onSelected,
-  ) => [
-      Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: options.map((option) {
-          final isSelected = selectedValue == option['value'];
+  ) =>
+      [
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: options.map((option) {
+            final isSelected = selectedValue == option['value'];
 
-          return GestureDetector(
-            onTap: () => onSelected(option['value']),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? afropeepGreen.withValues(alpha: 0.1)
-                    : cardBackground,
-                border: Border.all(
-                  color: isSelected ? afropeepGreen : Colors.grey.shade300,
-                  width: 1.5,
+            return GestureDetector(
+              onTap: () => onSelected(option['value']),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? afropeepGreen.withValues(alpha: 0.1)
+                      : cardBackground,
+                  border: Border.all(
+                    color: isSelected ? afropeepGreen : Colors.grey.shade300,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    option['icon'],
-                    size: 16,
-                    color: isSelected ? afropeepGreen : Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    option['label'],
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
-                      color: isSelected ? afropeepGreen : textDarkBrown,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      option['icon'],
+                      size: 16,
+                      color: isSelected ? afropeepGreen : Colors.grey.shade600,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      option['label'],
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected ? afropeepGreen : textDarkBrown,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }).toList(),
-      ),
-    ];
+            );
+          }).toList(),
+        ),
+      ];
 }

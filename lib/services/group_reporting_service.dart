@@ -100,10 +100,12 @@ class GroupReportingService {
           .get();
 
       return querySnapshot.docs
-          .map((doc) => {
-                'id': doc.id,
-                ...doc.data(),
-              },)
+          .map(
+            (doc) => {
+              'id': doc.id,
+              ...doc.data(),
+            },
+          )
           .toList();
     } catch (e) {
       log('Error getting group reports: $e');
@@ -124,10 +126,12 @@ class GroupReportingService {
           .get();
 
       return querySnapshot.docs
-          .map((doc) => {
-                'id': doc.id,
-                ...doc.data(),
-              },)
+          .map(
+            (doc) => {
+              'id': doc.id,
+              ...doc.data(),
+            },
+          )
           .toList();
     } catch (e) {
       log('Error getting user reports: $e');

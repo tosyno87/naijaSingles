@@ -14,9 +14,9 @@ import '../../data/models/rsvp_model.dart';
 import '../../data/services/events_firestore_service.dart';
 
 class EventDetailsScreen extends StatefulWidget {
-
   const EventDetailsScreen({
-    required this.event, super.key,
+    required this.event,
+    super.key,
   });
   final EventModel event;
 
@@ -42,188 +42,203 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-      create: (context) => RSVPBloc(
-        firestoreService: EventsFirestoreService(),
-        currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
-      ),
-      child: BlocBuilder<RSVPBloc, RSVPState>(
-        builder: (context, state) {
-          // Load event RSVP status and attendees when the bloc is first created
-          if (state is RSVPInitial) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-              context.read<RSVPBloc>().add(LoadEventRSVPStatusEvent(
-                    userId: userId,
-                    eventId: widget.event.id,
-                  ),);
-              context.read<RSVPBloc>().add(LoadEventAttendeesEvent(
-                    eventId: widget.event.id,
-                  ),);
-            });
-          }
-
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                _buildSliverAppBar(),
-                SliverToBoxAdapter(
-                  child: _buildEventDetails(),
-                ),
-              ],
-            ),
-            bottomNavigationBar: _buildBottomActionBar(),
-          );
-        },
-      ),
-    );
-
-  Widget _buildSliverAppBar() => SliverAppBar(
-      expandedHeight: 350,
-      pinned: true,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: Container(
-        margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(20),
+        create: (context) => RSVPBloc(
+          firestoreService: EventsFirestoreService(),
+          currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
         ),
-        child: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      actions: [
-        Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: IconButton(
-            icon:
-                const Icon(Icons.share_outlined, color: Colors.white, size: 20),
-            onPressed: _shareEvent,
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.favorite_border,
-                color: Colors.white, size: 20,),
-            onPressed: _toggleFavorite,
-          ),
-        ),
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            _buildEventHeaderImage(),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.8),
-                  ],
-                ),
-              ),
-            ),
-            // Event title and chips overlaid on image
-            Positioned(
-              bottom: 20,
-              left: 20,
-              right: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.event.name,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      // Category chip
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6,),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF008037),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          widget.event.category,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+        child: BlocBuilder<RSVPBloc, RSVPState>(
+          builder: (context, state) {
+            // Load event RSVP status and attendees when the bloc is first created
+            if (state is RSVPInitial) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+                context.read<RSVPBloc>().add(
+                      LoadEventRSVPStatusEvent(
+                        userId: userId,
+                        eventId: widget.event.id,
                       ),
-                      const SizedBox(width: 8),
-                      // Paid/Free chip
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6,),
-                        decoration: BoxDecoration(
-                          color: widget.event.isFree
-                              ? Colors.grey.withOpacity(0.8)
-                              : const Color(0xFFEF476F).withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          widget.event.isFree ? 'FREE' : 'PAID',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                    );
+                context.read<RSVPBloc>().add(
+                      LoadEventAttendeesEvent(
+                        eventId: widget.event.id,
                       ),
-                    ],
+                    );
+              });
+            }
+
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  _buildSliverAppBar(),
+                  SliverToBoxAdapter(
+                    child: _buildEventDetails(),
                   ),
                 ],
               ),
-            ),
-          ],
+              bottomNavigationBar: _buildBottomActionBar(),
+            );
+          },
         ),
-      ),
-    );
+      );
+
+  Widget _buildSliverAppBar() => SliverAppBar(
+        expandedHeight: 350,
+        pinned: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.share_outlined,
+                  color: Colors.white, size: 20),
+              onPressed: _shareEvent,
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.favorite_border,
+                color: Colors.white,
+                size: 20,
+              ),
+              onPressed: _toggleFavorite,
+            ),
+          ),
+        ],
+        flexibleSpace: FlexibleSpaceBar(
+          background: Stack(
+            fit: StackFit.expand,
+            children: [
+              _buildEventHeaderImage(),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.8),
+                    ],
+                  ),
+                ),
+              ),
+              // Event title and chips overlaid on image
+              Positioned(
+                bottom: 20,
+                left: 20,
+                right: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.event.name,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        // Category chip
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF008037),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            widget.event.category,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Paid/Free chip
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: widget.event.isFree
+                                ? Colors.grey.withOpacity(0.8)
+                                : const Color(0xFFEF476F).withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            widget.event.isFree ? 'FREE' : 'PAID',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 
   String? _getEventImageUrl() {
     // Check if imageUrl exists and is not empty
     final imageUrl = widget.event.imageUrl;
-    AppLogger.debug('🔍 EventDetails._getEventImageUrl - Event ID: ${widget.event.id}');
-    AppLogger.debug('🔍 EventDetails._getEventImageUrl - imageUrl type: ${imageUrl.runtimeType}');
-    AppLogger.debug('🔍 EventDetails._getEventImageUrl - imageUrl value: $imageUrl');
-    
+    AppLogger.debug(
+        '🔍 EventDetails._getEventImageUrl - Event ID: ${widget.event.id}');
+    AppLogger.debug(
+        '🔍 EventDetails._getEventImageUrl - imageUrl type: ${imageUrl.runtimeType}');
+    AppLogger.debug(
+        '🔍 EventDetails._getEventImageUrl - imageUrl value: $imageUrl');
+
     if (imageUrl != null && imageUrl.trim().isNotEmpty) {
       AppLogger.debug('✅ EventDetails: Using imageUrl: $imageUrl');
       return imageUrl;
     }
-    AppLogger.debug('❌ EventDetails: imageUrl is null or empty. Event ID: ${widget.event.id}');
+    AppLogger.debug(
+        '❌ EventDetails: imageUrl is null or empty. Event ID: ${widget.event.id}');
     return null;
   }
 
   Widget _buildEventHeaderImage() {
     final imageUrl = _getEventImageUrl();
-    
+
     if (imageUrl != null && imageUrl.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: imageUrl,
@@ -239,241 +254,242 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         errorWidget: (context, url, error) => _buildPlaceholderImage(),
       );
     }
-    
+
     return _buildPlaceholderImage();
   }
 
   Widget _buildPlaceholderImage() => ColoredBox(
-      color: const Color(0xFF008037),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            _getCategoryIcon(),
-            size: 80,
-            color: Colors.white.withOpacity(0.8),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            widget.event.category,
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+        color: const Color(0xFF008037),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _getCategoryIcon(),
+              size: 80,
               color: Colors.white.withOpacity(0.8),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            Text(
+              widget.event.category,
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white.withOpacity(0.8),
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildEventDetails() => DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 24),
-          _buildStatsRow(),
-          const SizedBox(height: 24),
-          _buildDateTimeCard(),
-          const SizedBox(height: 16),
-          _buildLocationCard(),
-          const SizedBox(height: 24),
-          _buildEventDescription(),
-          const SizedBox(height: 24),
-          _buildEventAttendees(),
-          const SizedBox(height: 24),
-          _buildSimilarEvents(),
-          const SizedBox(height: 100), // Space for bottom bar
-        ],
-      ),
-    );
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            _buildStatsRow(),
+            const SizedBox(height: 24),
+            _buildDateTimeCard(),
+            const SizedBox(height: 16),
+            _buildLocationCard(),
+            const SizedBox(height: 24),
+            _buildEventDescription(),
+            const SizedBox(height: 24),
+            _buildEventAttendees(),
+            const SizedBox(height: 24),
+            _buildSimilarEvents(),
+            const SizedBox(height: 100), // Space for bottom bar
+          ],
+        ),
+      );
 
   Widget _buildStatsRow() => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildStatItem(
-            icon: Icons.people,
-            value: '${widget.event.rsvpCount}',
-            label: 'Going',
-          ),
-          _buildStatItem(
-            icon: Icons.visibility,
-            value: '${widget.event.attendeeCount + 50}', // Mock view count
-            label: 'Views',
-          ),
-          _buildStatItem(
-            icon: Icons.share,
-            value:
-                '${(widget.event.rsvpCount * 0.3).round()}', // Mock share count
-            label: 'Shares',
-          ),
-        ],
-      ),
-    );
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildStatItem(
+              icon: Icons.people,
+              value: '${widget.event.rsvpCount}',
+              label: 'Going',
+            ),
+            _buildStatItem(
+              icon: Icons.visibility,
+              value: '${widget.event.attendeeCount + 50}', // Mock view count
+              label: 'Views',
+            ),
+            _buildStatItem(
+              icon: Icons.share,
+              value:
+                  '${(widget.event.rsvpCount * 0.3).round()}', // Mock share count
+              label: 'Shares',
+            ),
+          ],
+        ),
+      );
 
   Widget _buildStatItem({
     required IconData icon,
     required String value,
     required String label,
-  }) => Column(
-      children: [
-        Icon(
-          icon,
-          size: 20,
-          color: const Color(0xFF666666),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF3E1F0D),
-          ),
-        ),
-        Text(
-          label,
-          style: GoogleFonts.montserrat(
-            fontSize: 12,
+  }) =>
+      Column(
+        children: [
+          Icon(
+            icon,
+            size: 20,
             color: const Color(0xFF666666),
           ),
-        ),
-      ],
-    );
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF3E1F0D),
+            ),
+          ),
+          Text(
+            label,
+            style: GoogleFonts.montserrat(
+              fontSize: 12,
+              color: const Color(0xFF666666),
+            ),
+          ),
+        ],
+      );
 
   Widget _buildDateTimeCard() => Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF008037).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-            child: const Icon(
-              Icons.calendar_today,
-              color: Color(0xFF008037),
-              size: 24,
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF008037).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.calendar_today,
+                color: Color(0xFF008037),
+                size: 24,
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Date & Time',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF3E1F0D),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Date & Time',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF3E1F0D),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _formatEventDateTime(),
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: const Color(0xFF666666),
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatEventDateTime(),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: const Color(0xFF666666),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildLocationCard() => Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.event.location.latitude != null ? _openMaps : null,
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008037).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.event.location.latitude != null ? _openMaps : null,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF008037).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.location_on,
+                      color: Color(0xFF008037),
+                      size: 24,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.location_on,
-                    color: Color(0xFF008037),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Location',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF3E1F0D),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Location',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF3E1F0D),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.event.location.displayAddress.isNotEmpty
-                            ? widget.event.location.displayAddress
-                            : 'Location TBA',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          color: const Color(0xFF666666),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.event.location.displayAddress.isNotEmpty
+                              ? widget.event.location.displayAddress
+                              : 'Location TBA',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            color: const Color(0xFF666666),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (widget.event.location.latitude != null)
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: Color(0xFF999999),
-                  ),
-              ],
+                  if (widget.event.location.latitude != null)
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Color(0xFF999999),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
   Widget _buildEventDescription() {
     if (widget.event.description.isEmpty) return const SizedBox.shrink();
@@ -552,63 +568,63 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   Widget _buildEventAttendees() => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'Who\'s Going',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF333333),
-                ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: _showAllAttendees,
-                child: Text(
-                  'See All',
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Who\'s Going',
                   style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF333333),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          EventAttendeesList(
-            eventId: widget.event.id,
-            maxVisible: 6,
-          ),
-        ],
-      ),
-    );
+                const Spacer(),
+                TextButton(
+                  onPressed: _showAllAttendees,
+                  child: Text(
+                    'See All',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF008037),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            EventAttendeesList(
+              eventId: widget.event.id,
+              maxVisible: 6,
+            ),
+          ],
+        ),
+      );
 
   Widget _buildSimilarEvents() => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Similar Events',
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF333333),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Similar Events',
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF333333),
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 120,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: 5, // Mock similar events
-              itemBuilder: (context, index) => Container(
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 5, // Mock similar events
+                itemBuilder: (context, index) => Container(
                   width: 200,
                   margin: EdgeInsets.only(right: index == 4 ? 0 : 16),
                   decoration: BoxDecoration(
@@ -658,89 +674,91 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     ),
                   ),
                 ),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildBottomActionBar() => BlocBuilder<RSVPBloc, RSVPState>(
-      builder: (context, state) {
-        bool isGoing = false;
-        if (state is EventRSVPStatusLoaded) {
-          isGoing = state.status == RSVPStatus.going;
-        }
+        builder: (context, state) {
+          bool isGoing = false;
+          if (state is EventRSVPStatusLoaded) {
+            isGoing = state.status == RSVPStatus.going;
+          }
 
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF008037),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+          return Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
                 ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      // Trigger RSVP action
-                      context.read<RSVPBloc>().add(RSVPToEventEvent(
-                            eventId: widget.event.id,
-                            status: isGoing
-                                ? RSVPStatus.notGoing
-                                : RSVPStatus.going,
-                          ),);
-                    },
+              ],
+            ),
+            child: SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF008037),
                     borderRadius: BorderRadius.circular(20),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isGoing ? Icons.check : Icons.add,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            isGoing ? 'Going' : 'I\'m Going',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        // Trigger RSVP action
+                        context.read<RSVPBloc>().add(
+                              RSVPToEventEvent(
+                                eventId: widget.event.id,
+                                status: isGoing
+                                    ? RSVPStatus.notGoing
+                                    : RSVPStatus.going,
+                              ),
+                            );
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isGoing ? Icons.check : Icons.add,
                               color: Colors.white,
+                              size: 20,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Text(
+                              isGoing ? 'Going' : 'I\'m Going',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
 
   IconData _getCategoryIcon() {
     switch (widget.event.category.toLowerCase()) {
@@ -846,43 +864,43 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
         maxChildSize: 0.9,
         minChildSize: 0.5,
         builder: (context, scrollController) => DecoratedBox(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Event Attendees',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF333333),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: EventAttendeesList(
-                    eventId: widget.event.id,
-                    scrollController: scrollController,
-                    showAll: true,
-                  ),
-                ),
-              ],
-            ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Event Attendees',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF333333),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: EventAttendeesList(
+                  eventId: widget.event.id,
+                  scrollController: scrollController,
+                  showAll: true,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

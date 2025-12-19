@@ -49,9 +49,11 @@ class CompatibilityEngine {
       totalScore = totalScore.clamp(0.0, 1.0);
 
       debugPrint(
-          '🎯 Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',);
+        '🎯 Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',
+      );
       debugPrint(
-          '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Activity: ${(activityScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',);
+        '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Activity: ${(activityScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',
+      );
 
       return totalScore;
     } catch (e) {
@@ -155,7 +157,8 @@ class CompatibilityEngine {
       final score = (jaccardSimilarity + boost).clamp(0.0, 1.0);
 
       debugPrint(
-          '🎨 Interest matching: ${intersection.length} shared interests out of ${union.length} total',);
+        '🎨 Interest matching: ${intersection.length} shared interests out of ${union.length} total',
+      );
 
       return score;
     } catch (e) {
@@ -350,7 +353,9 @@ class CompatibilityEngine {
 
   /// Get detailed compatibility breakdown for debugging
   static CompatibilityBreakdown getCompatibilityBreakdown(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     final ageScore = _calculateAgeCompatibility(user1, user2);
     final locationScore = _calculateLocationScore(user1, user2);
     final interestScore = _calculateInterestScore(user1, user2);
@@ -386,10 +391,12 @@ class CompatibilityEngine {
 
     for (final targetUser in targetUsers) {
       final score = calculateCompatibility(currentUser, targetUser);
-      results.add(UserCompatibility(
-        user: targetUser,
-        compatibilityScore: score,
-      ),);
+      results.add(
+        UserCompatibility(
+          user: targetUser,
+          compatibilityScore: score,
+        ),
+      );
     }
 
     // Sort by compatibility score (highest first)
@@ -402,7 +409,6 @@ class CompatibilityEngine {
 
 /// Detailed compatibility breakdown for analysis
 class CompatibilityBreakdown {
-
   const CompatibilityBreakdown({
     required this.totalScore,
     required this.ageScore,
@@ -428,18 +434,17 @@ class CompatibilityBreakdown {
 
   @override
   String toString() => 'CompatibilityBreakdown(\n'
-        '  Total: ${(totalScore * 100).toStringAsFixed(1)}%\n'
-        '  Age: ${(ageScore * 100).toStringAsFixed(1)}%\n'
-        '  Location: ${(locationScore * 100).toStringAsFixed(1)}%\n'
-        '  Interest: ${(interestScore * 100).toStringAsFixed(1)}%\n'
-        '  Activity: ${(activityScore * 100).toStringAsFixed(1)}%\n'
-        '  Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%\n'
-        ')';
+      '  Total: ${(totalScore * 100).toStringAsFixed(1)}%\n'
+      '  Age: ${(ageScore * 100).toStringAsFixed(1)}%\n'
+      '  Location: ${(locationScore * 100).toStringAsFixed(1)}%\n'
+      '  Interest: ${(interestScore * 100).toStringAsFixed(1)}%\n'
+      '  Activity: ${(activityScore * 100).toStringAsFixed(1)}%\n'
+      '  Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%\n'
+      ')';
 }
 
 /// User with compatibility score
 class UserCompatibility {
-
   const UserCompatibility({
     required this.user,
     required this.compatibilityScore,
@@ -462,5 +467,6 @@ class UserCompatibility {
   bool get isLowCompatibility => compatibilityScore < 0.5;
 
   @override
-  String toString() => 'UserCompatibility(${user.name}: $compatibilityPercentage)';
+  String toString() =>
+      'UserCompatibility(${user.name}: $compatibilityPercentage)';
 }

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LikeModel {
-
   LikeModel({
     required this.from,
     required this.to,
@@ -24,21 +23,22 @@ class LikeModel {
 
   // Convert LikeModel to a Map for Firestore
   Map<String, dynamic> toMap() => {
-      'from': from,
-      'to': to,
-      'timestamp': FieldValue.serverTimestamp(),
-    };
+        'from': from,
+        'to': to,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
 
   // Create a copy of this LikeModel with updated fields
   LikeModel copyWith({
     String? from,
     String? to,
     DateTime? timestamp,
-  }) => LikeModel(
-      from: from ?? this.from,
-      to: to ?? this.to,
-      timestamp: timestamp ?? this.timestamp,
-    );
+  }) =>
+      LikeModel(
+        from: from ?? this.from,
+        to: to ?? this.to,
+        timestamp: timestamp ?? this.timestamp,
+      );
 
   @override
   String toString() => 'LikeModel(from: $from, to: $to, timestamp: $timestamp)';

@@ -8,9 +8,9 @@ import '../../bloc/phone_auth_bloc.dart';
 import 'otp_verification_screen.dart';
 
 class PhoneVerificationScreen extends StatefulWidget {
-
   const PhoneVerificationScreen({
-    required this.updatePhoneNumber, super.key,
+    required this.updatePhoneNumber,
+    super.key,
   });
   final bool updatePhoneNumber;
 
@@ -235,45 +235,45 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       }
                     },
                     builder: (context, state) => SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: isValidNumber
-                              ? () {
-                                  _sendOtp(
-                                    phoneNumber: phoneNumberController.text,
-                                    context: context,
-                                  );
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor:
-                                primaryColor.withValues(alpha: 0.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 2,
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: isValidNumber
+                            ? () {
+                                _sendOtp(
+                                  phoneNumber: phoneNumberController.text,
+                                  context: context,
+                                );
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor:
+                              primaryColor.withValues(alpha: 0.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          child: state is PhoneAuthLoading
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  'Continue',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                          elevation: 2,
                         ),
+                        child: state is PhoneAuthLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'Continue',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
+                    ),
                   ),
 
                   SizedBox(height: screenSize.height * 0.08),

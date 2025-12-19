@@ -14,9 +14,10 @@ import 'message_model.dart';
 import 'services/chat_service.dart';
 
 class ChatThreadScreen extends StatefulWidget {
-
   const ChatThreadScreen({
-    required this.threadId, required this.userName, super.key,
+    required this.threadId,
+    required this.userName,
+    super.key,
     this.avatarUrl,
     this.otherUserId,
   });
@@ -84,7 +85,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     // Validate message length locally
     if (text.length > 1000) {
       _showErrorSnackBar(
-          'Message is too long. Please keep messages under 1000 characters.',);
+        'Message is too long. Please keep messages under 1000 characters.',
+      );
       return;
     }
 
@@ -109,8 +111,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         elevation: 1,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios,
-              color: primaryColor,), // Use MVP primary color
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: primaryColor,
+          ), // Use MVP primary color
           onPressed: () => Navigator.pop(context),
         ),
         title: GestureDetector(
@@ -124,8 +128,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   backgroundImage: widget.avatarUrl != null
                       ? NetworkImage(widget.avatarUrl!)
                       : const AssetImage(
-                              'assets/images/placeholder_profile.jpg',)
-                          as ImageProvider,
+                          'assets/images/placeholder_profile.jpg',
+                        ) as ImageProvider,
                   onBackgroundImageError: (_, __) {},
                 ),
               ),
@@ -283,8 +287,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
                     // Group messages by date
                     final showDateSeparator = index == 0 ||
-                        !_isSameDay(messages[index].timestamp,
-                            messages[index - 1].timestamp,);
+                        !_isSameDay(
+                          messages[index].timestamp,
+                          messages[index - 1].timestamp,
+                        );
 
                     return Column(
                       children: [
@@ -317,8 +323,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 children: [
                   // Emoji button
                   IconButton(
-                    icon: const Icon(Icons.emoji_emotions_outlined,
-                        color: Colors.grey,),
+                    icon: const Icon(
+                      Icons.emoji_emotions_outlined,
+                      color: Colors.grey,
+                    ),
                     onPressed: _showEmojiPicker,
                   ),
                   Expanded(
@@ -386,122 +394,123 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
 
   // Date separator
   Widget _buildDateSeparator(DateTime timestamp) => Container(
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Divider(color: Colors.grey[300]),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              _formatDate(timestamp),
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                color: Colors.grey[600],
+        margin: const EdgeInsets.symmetric(vertical: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Divider(color: Colors.grey[300]),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                _formatDate(timestamp),
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Divider(color: Colors.grey[300]),
-          ),
-        ],
-      ),
-    );
+            Expanded(
+              child: Divider(color: Colors.grey[300]),
+            ),
+          ],
+        ),
+      );
 
   // Message bubble
   Widget _buildMessageBubble(Message message, bool isMe) => Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (!isMe) ...[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: widget.avatarUrl != null
-                  ? NetworkImage(widget.avatarUrl!)
-                  : null,
-              onBackgroundImageError:
-                  widget.avatarUrl != null ? (_, __) {} : null,
-              child: widget.avatarUrl == null
-                  ? Icon(
-                      Icons.person,
-                      size: 16,
-                      color: Colors.grey[600],
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 8),
-          ],
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isMe ? primaryColor : Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(20),
-                  topRight: const Radius.circular(20),
-                  bottomLeft: isMe
-                      ? const Radius.circular(20)
-                      : const Radius.circular(4),
-                  bottomRight: isMe
-                      ? const Radius.circular(4)
-                      : const Radius.circular(20),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Row(
+          mainAxisAlignment:
+              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (!isMe) ...[
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: widget.avatarUrl != null
+                    ? NetworkImage(widget.avatarUrl!)
+                    : null,
+                onBackgroundImageError:
+                    widget.avatarUrl != null ? (_, __) {} : null,
+                child: widget.avatarUrl == null
+                    ? Icon(
+                        Icons.person,
+                        size: 16,
+                        color: Colors.grey[600],
+                      )
+                    : null,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    message.text,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 15,
-                      color: isMe ? Colors.white : Colors.black87,
-                      height: 1.4,
+              const SizedBox(width: 8),
+            ],
+            Flexible(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isMe ? primaryColor : Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(20),
+                    topRight: const Radius.circular(20),
+                    bottomLeft: isMe
+                        ? const Radius.circular(20)
+                        : const Radius.circular(4),
+                    bottomRight: isMe
+                        ? const Radius.circular(4)
+                        : const Radius.circular(20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _formatTime(message.timestamp),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 11,
-                          color: isMe
-                              ? Colors.white.withValues(alpha: 0.8)
-                              : Colors.grey[500],
-                        ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      message.text,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        color: isMe ? Colors.white : Colors.black87,
+                        height: 1.4,
                       ),
-                      if (isMe) ...[
-                        const SizedBox(width: 4),
-                        Icon(
-                          message.isRead ? Icons.done_all : Icons.done,
-                          size: 14,
-                          color: message.isRead
-                              ? Colors.blue[300]
-                              : Colors.white.withValues(alpha: 0.8),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _formatTime(message.timestamp),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 11,
+                            color: isMe
+                                ? Colors.white.withValues(alpha: 0.8)
+                                : Colors.grey[500],
+                          ),
                         ),
+                        if (isMe) ...[
+                          const SizedBox(width: 4),
+                          Icon(
+                            message.isRead ? Icons.done_all : Icons.done,
+                            size: 14,
+                            color: message.isRead
+                                ? Colors.blue[300]
+                                : Colors.white.withValues(alpha: 0.8),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   // Format time for message bubbles
   String _formatTime(DateTime timestamp) {
@@ -549,9 +558,10 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   }
 
   // Check if two dates are the same day
-  bool _isSameDay(DateTime date1, DateTime date2) => date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
+  bool _isSameDay(DateTime date1, DateTime date2) =>
+      date1.year == date2.year &&
+      date1.month == date2.month &&
+      date1.day == date2.day;
 
   // Show emoji picker for enhanced messaging
   void _showEmojiPicker() {
@@ -597,22 +607,26 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                   '✨',
                   '🌟',
                 ]
-                    .map((emoji) => GestureDetector(
-                          onTap: () {
-                            _messageController.text += emoji;
-                            Navigator.pop(context);
-                          },
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.grey[100],
-                            ),
-                            child: Center(
-                              child: Text(emoji,
-                                  style: const TextStyle(fontSize: 24),),
+                    .map(
+                      (emoji) => GestureDetector(
+                        onTap: () {
+                          _messageController.text += emoji;
+                          Navigator.pop(context);
+                        },
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.grey[100],
+                          ),
+                          child: Center(
+                            child: Text(
+                              emoji,
+                              style: const TextStyle(fontSize: 24),
                             ),
                           ),
-                        ),)
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ),
@@ -685,7 +699,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           name: userData['name'] ?? widget.userName,
           age: userData['age'] ?? 0,
           imageUrl: List<String>.from(
-              userData['photos'] ?? userData['imageUrl'] ?? [],),
+            userData['photos'] ?? userData['imageUrl'] ?? [],
+          ),
           address: userData['locationName'] ?? userData['address'],
           distanceBW: userData['distanceBW'],
           editInfo: userData['editInfo'] ?? {},
@@ -738,35 +753,36 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     required String label,
     required VoidCallback onTap,
     Color? color,
-  }) => GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: (color ?? primaryColor).withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+  }) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: (color ?? primaryColor).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: color ?? primaryColor,
+                size: 28,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: color ?? primaryColor,
-              size: 28,
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                color: color ?? primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: color ?? primaryColor,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   // Show block user dialog
   // Show MVP-styled block user dialog

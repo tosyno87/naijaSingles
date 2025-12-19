@@ -5,9 +5,11 @@ import 'afrocentric_height_picker.dart';
 
 /// Afrocentric height input widget with inline scroll picker
 class AfrocentricHeightInput extends StatefulWidget {
-
   const AfrocentricHeightInput({
-    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+    required this.initialHeight,
+    required this.initialUnit,
+    required this.onChanged,
+    super.key,
   });
   final double initialHeight;
   final String initialUnit;
@@ -25,11 +27,11 @@ class _AfrocentricHeightInputState extends State<AfrocentricHeightInput> {
   // MVP Colors
   static const Color backgroundColor =
       Color(0xFFF7E8DA); // Card background from MVP
-  static const Color primaryGreen =
-      Color(0xFF008037); // MVP green
+  static const Color primaryGreen = Color(0xFF008037); // MVP green
   static const Color textDarkBrown = Color(0xFF3A1D0F); // Dark text from MVP
   static const Color textLightBrown = Color(0xFF8B6C59); // Light text from MVP
-  static const Color creamBackground = AppColors.backgroundColor; // Main background
+  static const Color creamBackground =
+      AppColors.backgroundColor; // Main background
 
   @override
   void initState() {

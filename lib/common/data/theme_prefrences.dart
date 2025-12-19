@@ -7,12 +7,14 @@ class ThemePreferences {
   static const themekey = 'pref_key';
 
   Future<void> setTheme(ThemeMode value) async {
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
     sharedPreferences.setString(themekey, value.name);
   }
 
   Future<ThemeMode> getTheme() async {
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
     final savedTheme = sharedPreferences.getString(themekey);
     log('savedtheme $savedTheme');
     if (savedTheme != null) {

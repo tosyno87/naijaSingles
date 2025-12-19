@@ -81,7 +81,8 @@ class UndoService {
       _setUndoTimer(userId, swipeAction);
 
       debugPrint(
-          '📝 Recorded swipe: $userId → $targetUserId (${direction.name})',);
+        '📝 Recorded swipe: $userId → $targetUserId (${direction.name})',
+      );
     } catch (e) {
       debugPrint('❌ Error recording swipe action: $e');
     }
@@ -101,7 +102,8 @@ class UndoService {
       // This follows proper dating app logic - likes should be permanent
       if (lastSwipe.direction != SwipeDirection.left) {
         debugPrint(
-            '⚠️ Cannot undo ${lastSwipe.direction.name} swipe - only passes can be undone',);
+          '⚠️ Cannot undo ${lastSwipe.direction.name} swipe - only passes can be undone',
+        );
         return false;
       }
 
@@ -109,7 +111,8 @@ class UndoService {
       final timeSinceSwipe = DateTime.now().difference(lastSwipe.timestamp);
       if (timeSinceSwipe > UNDO_WINDOW) {
         debugPrint(
-            '⚠️ Undo window expired for user $userId (${timeSinceSwipe.inSeconds}s > ${UNDO_WINDOW.inSeconds}s)',);
+          '⚠️ Undo window expired for user $userId (${timeSinceSwipe.inSeconds}s > ${UNDO_WINDOW.inSeconds}s)',
+        );
         return false;
       }
 
@@ -127,12 +130,14 @@ class UndoService {
       if (undoCount >= limit) {
         final limitText = isPremiun ? 'premium limit' : 'daily limit';
         debugPrint(
-            '⚠️ User $userId has reached $limitText ($undoCount/$limit undos used)',);
+          '⚠️ User $userId has reached $limitText ($undoCount/$limit undos used)',
+        );
         return false;
       }
 
       debugPrint(
-          '✅ User $userId can undo last pass (${timeSinceSwipe.inSeconds}s ago)',);
+        '✅ User $userId can undo last pass (${timeSinceSwipe.inSeconds}s ago)',
+      );
       return true;
     } catch (e) {
       debugPrint('❌ Error checking undo availability: $e');
@@ -169,62 +174,68 @@ class UndoService {
   }
 
   /// Undo the last swipe action
-  Future<UndoResult> undoLastSwipe(String userId) async => PerformanceMonitor.measure('undo_last_swipe', () async {
-      try {
-        debugPrint('↩️ Attempting to undo last swipe for user $userId');
+  Future<UndoResult> undoLastSwipe(String userId) async =>
+      PerformanceMonitor.measure('undo_last_swipe', () async {
+        try {
+          debugPrint('↩️ Attempting to undo last swipe for user $userId');
 
-        // Check if undo is possible
-        if (!await canUndoLastSwipe(userId)) {
-          final undoCount = await getDailyUndoCount(userId);
-          final isPremiun = await _isPremiuUser(userId);
-          final limit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
+          // Check if undo is possible
+          if (!await canUndoLastSwipe(userId)) {
+            final undoCount = await getDailyUndoCount(userId);
+            final isPremiun = await _isPremiuUser(userId);
+            final limit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
 
-          if (undoCount >= limit) {
-            final limitText = isPremiun ? 'premium daily limit' : 'daily limit';
+            if (undoCount >= limit) {
+              final limitText =
+                  isPremiun ? 'premium daily limit' : 'daily limit';
+              return UndoResult.failed(
+                'You\'ve used your $limitText ($undoCount/$limit undos). Try again tomorrow!',
+              );
+            }
+
             return UndoResult.failed(
-                'You\'ve used your $limitText ($undoCount/$limit undos). Try again tomorrow!',);
+              'Cannot undo: only passes can be undone within ${UNDO_WINDOW.inSeconds} seconds',
+            );
           }
 
-          return UndoResult.failed(
-              'Cannot undo: only passes can be undone within ${UNDO_WINDOW.inSeconds} seconds',);
+          final lastSwipe = await getLastSwipeAction(userId);
+          if (lastSwipe == null) {
+            return UndoResult.failed('No recent pass found to undo');
+          }
+
+          // Double-check it's a left swipe (pass)
+          if (lastSwipe.direction != SwipeDirection.left) {
+            return UndoResult.failed(
+              'Can only undo passes, not likes or super likes',
+            );
+          }
+
+          // Perform the undo operation
+          final success = await _performUndo(lastSwipe);
+
+          if (success) {
+            // Mark as undone in cache
+            _markSwipeAsUndone(userId, lastSwipe);
+
+            // Record undo usage
+            await _recordUndoUsage(userId);
+
+            debugPrint(
+              '✅ Successfully undid pass: ${lastSwipe.userId} → ${lastSwipe.targetUserId}',
+            );
+
+            return UndoResult.success(
+              targetUserId: lastSwipe.targetUserId,
+              originalDirection: lastSwipe.direction,
+            );
+          } else {
+            return UndoResult.failed('Failed to reverse pass action');
+          }
+        } catch (e) {
+          debugPrint('❌ Error undoing last swipe: $e');
+          return UndoResult.failed('Error: ${e.toString()}');
         }
-
-        final lastSwipe = await getLastSwipeAction(userId);
-        if (lastSwipe == null) {
-          return UndoResult.failed('No recent pass found to undo');
-        }
-
-        // Double-check it's a left swipe (pass)
-        if (lastSwipe.direction != SwipeDirection.left) {
-          return UndoResult.failed(
-              'Can only undo passes, not likes or super likes',);
-        }
-
-        // Perform the undo operation
-        final success = await _performUndo(lastSwipe);
-
-        if (success) {
-          // Mark as undone in cache
-          _markSwipeAsUndone(userId, lastSwipe);
-
-          // Record undo usage
-          await _recordUndoUsage(userId);
-
-          debugPrint(
-              '✅ Successfully undid pass: ${lastSwipe.userId} → ${lastSwipe.targetUserId}',);
-
-          return UndoResult.success(
-            targetUserId: lastSwipe.targetUserId,
-            originalDirection: lastSwipe.direction,
-          );
-        } else {
-          return UndoResult.failed('Failed to reverse pass action');
-        }
-      } catch (e) {
-        debugPrint('❌ Error undoing last swipe: $e');
-        return UndoResult.failed('Error: ${e.toString()}');
-      }
-    });
+      });
 
   /// Perform the actual undo operation
   Future<bool> _performUndo(SwipeAction swipeAction) async {
@@ -237,7 +248,8 @@ class UndoService {
       } else {
         // This should never happen due to our checks above
         debugPrint(
-            '❌ Attempted to undo non-pass swipe: ${swipeAction.direction}',);
+          '❌ Attempted to undo non-pass swipe: ${swipeAction.direction}',
+        );
         return false;
       }
 
@@ -245,8 +257,10 @@ class UndoService {
       final historyQuery = await _swipeHistoryCollection
           .where('userId', isEqualTo: swipeAction.userId)
           .where('targetUserId', isEqualTo: swipeAction.targetUserId)
-          .where('timestamp',
-              isEqualTo: Timestamp.fromDate(swipeAction.timestamp),)
+          .where(
+            'timestamp',
+            isEqualTo: Timestamp.fromDate(swipeAction.timestamp),
+          )
           .limit(1)
           .get();
 
@@ -272,10 +286,9 @@ class UndoService {
     final targetUserId = swipeAction.targetUserId;
 
     // Remove from checked users so they can see each other again
-    batch.delete(_usersCollection
-        .doc(userId)
-        .collection('CheckedUser')
-        .doc(targetUserId),);
+    batch.delete(
+      _usersCollection.doc(userId).collection('CheckedUser').doc(targetUserId),
+    );
 
     debugPrint('👈 Undoing left swipe (pass): $userId → $targetUserId');
     debugPrint('✅ User will see $targetUserId again in their discovery queue');
@@ -297,9 +310,11 @@ class UndoService {
   void _markSwipeAsUndone(String userId, SwipeAction swipeAction) {
     final userSwipes = _recentSwipes[userId];
     if (userSwipes != null) {
-      final index = userSwipes.indexWhere((s) =>
-          s.targetUserId == swipeAction.targetUserId &&
-          s.timestamp == swipeAction.timestamp,);
+      final index = userSwipes.indexWhere(
+        (s) =>
+            s.targetUserId == swipeAction.targetUserId &&
+            s.timestamp == swipeAction.timestamp,
+      );
 
       if (index != -1) {
         userSwipes[index] = userSwipes[index].copyWith(canUndo: false);
@@ -316,8 +331,10 @@ class UndoService {
       final querySnapshot = await _swipeHistoryCollection
           .where('userId', isEqualTo: userId)
           .where('undone', isEqualTo: true)
-          .where('undoneAt',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),)
+          .where(
+            'undoneAt',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+          )
           .get();
 
       return querySnapshot.docs.length;
@@ -377,9 +394,8 @@ class UndoService {
           .limit(10)
           .get();
 
-      final recentSwipes = recentSwipesQuery.docs
-          .map(SwipeAction.fromDocument)
-          .toList();
+      final recentSwipes =
+          recentSwipesQuery.docs.map(SwipeAction.fromDocument).toList();
 
       final isPremiun = await _isPremiuUser(userId);
       final dailyLimit = isPremiun ? PREMIUM_UNDO_LIMIT : DAILY_UNDO_LIMIT;
@@ -416,7 +432,8 @@ class UndoService {
       if (expiredQuery.docs.isNotEmpty) {
         await batch.commit();
         debugPrint(
-            '🗑️ Cleared ${expiredQuery.docs.length} expired swipe history entries',);
+          '🗑️ Cleared ${expiredQuery.docs.length} expired swipe history entries',
+        );
       }
     } catch (e) {
       debugPrint('❌ Error clearing expired history: $e');
@@ -436,13 +453,13 @@ class UndoService {
 
 /// Represents a swipe action that can be undone
 class SwipeAction {
-
   const SwipeAction({
     required this.userId,
     required this.targetUserId,
     required this.direction,
     required this.timestamp,
-    required this.canUndo, this.matchId,
+    required this.canUndo,
+    this.matchId,
   });
 
   factory SwipeAction.fromDocument(DocumentSnapshot doc) {
@@ -473,17 +490,19 @@ class SwipeAction {
     DateTime? timestamp,
     String? matchId,
     bool? canUndo,
-  }) => SwipeAction(
-      userId: userId ?? this.userId,
-      targetUserId: targetUserId ?? this.targetUserId,
-      direction: direction ?? this.direction,
-      timestamp: timestamp ?? this.timestamp,
-      matchId: matchId ?? this.matchId,
-      canUndo: canUndo ?? this.canUndo,
-    );
+  }) =>
+      SwipeAction(
+        userId: userId ?? this.userId,
+        targetUserId: targetUserId ?? this.targetUserId,
+        direction: direction ?? this.direction,
+        timestamp: timestamp ?? this.timestamp,
+        matchId: matchId ?? this.matchId,
+        canUndo: canUndo ?? this.canUndo,
+      );
 
   @override
-  String toString() => 'SwipeAction(${direction.name}: $userId → $targetUserId, canUndo: $canUndo)';
+  String toString() =>
+      'SwipeAction(${direction.name}: $userId → $targetUserId, canUndo: $canUndo)';
 }
 
 /// Swipe direction enum
@@ -494,7 +513,6 @@ enum SwipeDirection {
 
 /// Result of an undo operation
 class UndoResult {
-
   const UndoResult._({
     required this.isSuccess,
     this.targetUserId,
@@ -507,17 +525,18 @@ class UndoResult {
     required String targetUserId,
     required SwipeDirection originalDirection,
     bool wasMatch = false,
-  }) => UndoResult._(
-      isSuccess: true,
-      targetUserId: targetUserId,
-      originalDirection: originalDirection,
-      wasMatch: wasMatch,
-    );
+  }) =>
+      UndoResult._(
+        isSuccess: true,
+        targetUserId: targetUserId,
+        originalDirection: originalDirection,
+        wasMatch: wasMatch,
+      );
 
   factory UndoResult.failed(String error) => UndoResult._(
-      isSuccess: false,
-      error: error,
-    );
+        isSuccess: false,
+        error: error,
+      );
   final bool isSuccess;
   final String? targetUserId;
   final SwipeDirection? originalDirection;
@@ -530,7 +549,6 @@ class UndoResult {
 
 /// Statistics about undo usage
 class UndoStats {
-
   const UndoStats({
     required this.dailyUndoCount,
     required this.dailyUndoLimit,
@@ -541,13 +559,13 @@ class UndoStats {
   });
 
   factory UndoStats.empty() => const UndoStats(
-      dailyUndoCount: 0,
-      dailyUndoLimit: 3,
-      totalUndoCount: 0,
-      recentSwipes: [],
-      canUndoMore: true,
-      isPremium: false,
-    );
+        dailyUndoCount: 0,
+        dailyUndoLimit: 3,
+        totalUndoCount: 0,
+        recentSwipes: [],
+        canUndoMore: true,
+        isPremium: false,
+      );
   final int dailyUndoCount;
   final int dailyUndoLimit;
   final int totalUndoCount;
@@ -562,10 +580,10 @@ class UndoStats {
 
   @override
   String toString() => 'UndoStats(\n'
-        '  Daily: $dailyUndoCount/$dailyUndoLimit\n'
-        '  Total: $totalUndoCount\n'
-        '  Can Undo More: $canUndoMore\n'
-        '  Premium: $isPremium\n'
-        '  Recent Swipes: ${recentSwipes.length}\n'
-        ')';
+      '  Daily: $dailyUndoCount/$dailyUndoLimit\n'
+      '  Total: $totalUndoCount\n'
+      '  Can Undo More: $canUndoMore\n'
+      '  Premium: $isPremium\n'
+      '  Recent Swipes: ${recentSwipes.length}\n'
+      ')';
 }

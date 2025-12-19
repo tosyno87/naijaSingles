@@ -94,8 +94,10 @@ class _InterestsScreenState extends State<InterestsScreen> {
     }
 
     return _interests
-        .where((interest) =>
-            interest.toLowerCase().contains(_searchQuery.toLowerCase()),)
+        .where(
+          (interest) =>
+              interest.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
         .toList();
   }
 

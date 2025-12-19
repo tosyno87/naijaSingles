@@ -37,25 +37,25 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: const AfropeepAppBar(
-        title: 'Create Account',
-      ),
-      body: BlocProvider(
-        create: (context) => EmailAuthBloc(),
-        child: BlocConsumer<EmailAuthBloc, EmailAuthState>(
-          listener: (context, state) {
-            if (state is EmailAuthSuccess) {
-              // Navigate to onboarding or home based on user status
-              Navigator.pushReplacementNamed(context, '/onboarding');
-            } else if (state is EmailAuthError) {
-              CustomSnackbar.showSnackBarSimple(
-                state.error,
-                context,
-              );
-            }
-          },
-          builder: (context, state) => SafeArea(
+        backgroundColor: AppColors.backgroundColor,
+        appBar: const AfropeepAppBar(
+          title: 'Create Account',
+        ),
+        body: BlocProvider(
+          create: (context) => EmailAuthBloc(),
+          child: BlocConsumer<EmailAuthBloc, EmailAuthState>(
+            listener: (context, state) {
+              if (state is EmailAuthSuccess) {
+                // Navigate to onboarding or home based on user status
+                Navigator.pushReplacementNamed(context, '/onboarding');
+              } else if (state is EmailAuthError) {
+                CustomSnackbar.showSnackBarSimple(
+                  state.error,
+                  context,
+                );
+              }
+            },
+            builder: (context, state) => SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Center(
@@ -100,8 +100,9 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                             prefixIcon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
                             onChanged: () => setState(() {}),
-                            validationChecker: (text) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(text),
+                            validationChecker: (text) =>
+                                RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    .hasMatch(text),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
@@ -156,7 +157,8 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                             obscureText: _obscureConfirmPassword,
                             onChanged: () => setState(() {}),
                             validationChecker: (text) =>
-                                text == _passwordController.text && text.isNotEmpty,
+                                text == _passwordController.text &&
+                                text.isNotEmpty,
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureConfirmPassword
@@ -166,7 +168,8 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                               ),
                               onPressed: () {
                                 setState(() {
-                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  _obscureConfirmPassword =
+                                      !_obscureConfirmPassword;
                                 });
                               },
                             ),
@@ -214,7 +217,9 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                               GestureDetector(
                                 onTap: () {
                                   Navigator.pushReplacementNamed(
-                                      context, '/email_login',);
+                                    context,
+                                    '/email_login',
+                                  );
                                 },
                                 child: Text(
                                   'Log In',
@@ -234,7 +239,7 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
                 ),
               ),
             ),
+          ),
         ),
-      ),
-    );
+      );
 }

@@ -12,7 +12,6 @@ class SearchuserInitial extends SearchUserState {}
 class SearchUserLoadingState extends SearchUserState {}
 
 class SearchUserLoadUserState extends SearchUserState {
-
   const SearchUserLoadUserState(this.users);
   final List<UserModel> users;
 
@@ -23,7 +22,6 @@ class SearchUserLoadUserState extends SearchUserState {
 class SearchUserFailedState extends SearchUserState {}
 
 class MigrationStatusState extends SearchUserState {
-
   const MigrationStatusState({required this.shouldPromptForMigration});
   final bool shouldPromptForMigration;
 

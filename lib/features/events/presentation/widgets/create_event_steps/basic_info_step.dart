@@ -4,9 +4,9 @@ import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class BasicInfoStep extends StatefulWidget {
-
   const BasicInfoStep({
-    required this.eventData, super.key,
+    required this.eventData,
+    super.key,
   });
   final EventCreationData eventData;
 
@@ -109,32 +109,32 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Event Details'),
-          const SizedBox(height: 20),
-          _buildEventNameField(),
-          const SizedBox(height: 20),
-          _buildDescriptionField(),
-          const SizedBox(height: 20),
-          _buildCategorySelector(),
-          const SizedBox(height: 20),
-          _buildTagsSection(),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Event Details'),
+            const SizedBox(height: 20),
+            _buildEventNameField(),
+            const SizedBox(height: 20),
+            _buildDescriptionField(),
+            const SizedBox(height: 20),
+            _buildCategorySelector(),
+            const SizedBox(height: 20),
+            _buildTagsSection(),
+            const SizedBox(height: 40),
+          ],
+        ),
+      );
 
   Widget _buildSectionTitle(String title) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: const Color(0xFF333333),
-      ),
-    );
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF333333),
+        ),
+      );
 
   Widget _buildEventNameField() {
     final currentLength = _nameController.text.length;
@@ -349,231 +349,239 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   }
 
   Widget _buildCategorySelector() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Event Category *',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.backgroundColor, // NaijaSingles cream background
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFF008037)
-                  .withOpacity(0.3), // NaijaSingles green border
-              width: 1.5,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Event Category *',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
             ),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: widget.eventData.category.isEmpty
-                  ? null
-                  : widget.eventData.category,
-              hint: Text(
-                'Select a category',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF008037)
-                      .withOpacity(0.7), // NaijaSingles green hint
-                  fontWeight: FontWeight.w500,
-                ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundColor, // NaijaSingles cream background
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFF008037)
+                    .withOpacity(0.3), // NaijaSingles green border
+                width: 1.5,
               ),
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: const Color(0xFF333333),
-                fontWeight: FontWeight.w600,
-              ),
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Color(0xFF008037), // NaijaSingles green icon
-                size: 24,
-              ),
-              isExpanded: true,
-              dropdownColor:
-                  AppColors.backgroundColor, // NaijaSingles cream dropdown
-              items: _categories.map((category) => DropdownMenuItem<String>(
-                  value: category,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      category,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        color: const Color(0xFF333333),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),).toList(),
-              onChanged: (value) {
-                setState(() {
-                  widget.eventData.category = value ?? '';
-                });
-              },
             ),
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildTagsSection() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Tags (Optional)',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Add tags to help people discover your event',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: const Color(0xFF666666),
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Tag input field
-        Row(
-          children: [
-            Flexible(
-              flex: 3,
-              child: TextFormField(
-                controller: _tagController,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  color: const Color(0xFF333333),
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Enter a tag',
-                  hintStyle: GoogleFonts.montserrat(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: widget.eventData.category.isEmpty
+                    ? null
+                    : widget.eventData.category,
+                hint: Text(
+                  'Select a category',
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     color: const Color(0xFF008037)
                         .withOpacity(0.7), // NaijaSingles green hint
+                    fontWeight: FontWeight.w500,
                   ),
-                  filled: true,
-                  fillColor:
-                      AppColors.backgroundColor, // NaijaSingles cream background
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: const Color(0xFF008037)
-                          .withOpacity(0.3), // NaijaSingles green border
-                      width: 1.5,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: const Color(0xFF008037)
-                          .withOpacity(0.3), // NaijaSingles green border
-                      width: 1.5,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        const BorderSide(color: Color(0xFF008037), width: 2),
-                  ),
-                  contentPadding: const EdgeInsets.all(16),
                 ),
-                onFieldSubmitted: _addTag,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: const Color(0xFF333333),
+                  fontWeight: FontWeight.w600,
+                ),
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Color(0xFF008037), // NaijaSingles green icon
+                  size: 24,
+                ),
+                isExpanded: true,
+                dropdownColor:
+                    AppColors.backgroundColor, // NaijaSingles cream dropdown
+                items: _categories
+                    .map(
+                      (category) => DropdownMenuItem<String>(
+                        value: category,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            category,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              color: const Color(0xFF333333),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    widget.eventData.category = value ?? '';
+                  });
+                },
               ),
             ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: ElevatedButton(
-                onPressed: () => _addTag(_tagController.text),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  minimumSize: const Size(50, 48), // Smaller minimum size
-                ),
-                child: Text(
-                  'Add',
+          ),
+        ],
+      );
+
+  Widget _buildTagsSection() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Tags (Optional)',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Add tags to help people discover your event',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: const Color(0xFF666666),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Tag input field
+          Row(
+            children: [
+              Flexible(
+                flex: 3,
+                child: TextFormField(
+                  controller: _tagController,
                   style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: const Color(0xFF333333),
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Enter a tag',
+                    hintStyle: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      color: const Color(0xFF008037)
+                          .withOpacity(0.7), // NaijaSingles green hint
+                    ),
+                    filled: true,
+                    fillColor: AppColors
+                        .backgroundColor, // NaijaSingles cream background
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: const Color(0xFF008037)
+                            .withOpacity(0.3), // NaijaSingles green border
+                        width: 1.5,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: const Color(0xFF008037)
+                            .withOpacity(0.3), // NaijaSingles green border
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: Color(0xFF008037), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                  onFieldSubmitted: _addTag,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () => _addTag(_tagController.text),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF008037),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    minimumSize: const Size(50, 48), // Smaller minimum size
+                  ),
+                  child: Text(
+                    'Add',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 16),
-
-        // Display tags
-        if (widget.eventData.tags.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: widget.eventData.tags.map((tag) => Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFF008037).withOpacity(0.3),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      tag,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: const Color(0xFF008037),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () => _removeTag(tag),
-                      child: const Icon(
-                        Icons.close,
-                        size: 16,
-                        color: Color(0xFF008037),
-                      ),
-                    ),
-                  ],
-                ),
-              ),).toList(),
+            ],
           ),
 
-        if (widget.eventData.tags.length >= 10)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Maximum 10 tags allowed',
-              style: GoogleFonts.montserrat(
-                fontSize: 12,
-                color: Colors.orange,
-                fontWeight: FontWeight.w500,
+          const SizedBox(height: 16),
+
+          // Display tags
+          if (widget.eventData.tags.isNotEmpty)
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: widget.eventData.tags
+                  .map(
+                    (tag) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF008037).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFF008037).withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            tag,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: const Color(0xFF008037),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          GestureDetector(
+                            onTap: () => _removeTag(tag),
+                            child: const Icon(
+                              Icons.close,
+                              size: 16,
+                              color: Color(0xFF008037),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+
+          if (widget.eventData.tags.length >= 10)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'Maximum 10 tags allowed',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.orange,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-      ],
-    );
+        ],
+      );
 
   void _addTag(String tag) {
     final trimmedTag = tag.trim();

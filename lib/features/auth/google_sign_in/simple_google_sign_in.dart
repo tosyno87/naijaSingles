@@ -67,9 +67,9 @@ class SimpleGoogleSignIn {
 
 // A simple labelLarge widget that uses the SimpleGoogleSignIn class
 class SimpleGoogleSignInButton extends StatefulWidget {
-
   const SimpleGoogleSignInButton({
-    required this.onSignInComplete, super.key,
+    required this.onSignInComplete,
+    super.key,
   });
   final Function(User?) onSignInComplete;
 
@@ -83,36 +83,39 @@ class _SimpleGoogleSignInButtonState extends State<SimpleGoogleSignInButton> {
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: Colors.grey.shade300),
-        ),
-      ),
-      onPressed: _isLoading ? null : _handleSignIn,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            'asset/auth/google_logo.png',
-            height: 24,
-            width: 24,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(color: Colors.grey.shade300),
           ),
-          const SizedBox(width: 12),
-          if (_isLoading) const SizedBox(
-                  height: 16,
-                  width: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ) else const Text(
-                  'Sign in with Google',
-                  style: TextStyle(fontSize: 16),
-                ),
-        ],
-      ),
-    );
+        ),
+        onPressed: _isLoading ? null : _handleSignIn,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'asset/auth/google_logo.png',
+              height: 24,
+              width: 24,
+            ),
+            const SizedBox(width: 12),
+            if (_isLoading)
+              const SizedBox(
+                height: 16,
+                width: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            else
+              const Text(
+                'Sign in with Google',
+                style: TextStyle(fontSize: 16),
+              ),
+          ],
+        ),
+      );
 
   Future<void> _handleSignIn() async {
     setState(() {

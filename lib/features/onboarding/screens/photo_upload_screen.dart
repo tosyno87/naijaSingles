@@ -85,53 +85,54 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) => InkWell(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: afropeepGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+  }) =>
+      InkWell(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: afropeepGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: afropeepGreen,
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: textDarkBrown,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: textLightBrown,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
               color: afropeepGreen,
-              size: 24,
+              size: 16,
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: textDarkBrown,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: textLightBrown,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.arrow_forward_ios,
-            color: afropeepGreen,
-            size: 16,
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildPhotoItem(int index) {
     final controller = Provider.of<OnboardingController>(context);
@@ -346,26 +347,26 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   Widget _buildTipItem(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.check_circle,
-            size: 16,
-            color: Colors.blue.shade800,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: Colors.blue.shade900,
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.check_circle,
+              size: 16,
+              color: Colors.blue.shade800,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Colors.blue.shade900,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 }

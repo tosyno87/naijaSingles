@@ -28,23 +28,24 @@ class CustomSnackbar {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-            duration: const Duration(seconds: 5),
-            backgroundColor: Colors.black,
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              msg,
-              style: const TextStyle(color: Colors.white, fontFamily: 'Gellix'),
-            ),
-            action: SnackBarAction(
-              label: 'DISMISS',
-              onPressed: () {
-                try {
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                } catch (e) {
-                  rethrow;
-                }
-              },
-            ),),
+          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.black,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            msg,
+            style: const TextStyle(color: Colors.white, fontFamily: 'Gellix'),
+          ),
+          action: SnackBarAction(
+            label: 'DISMISS',
+            onPressed: () {
+              try {
+                ScaffoldMessenger.of(context).clearSnackBars();
+              } catch (e) {
+                rethrow;
+              }
+            },
+          ),
+        ),
       );
   }
 

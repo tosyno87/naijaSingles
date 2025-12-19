@@ -217,198 +217,198 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Communities',
-          style: GoogleFonts.montserrat(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
         backgroundColor: AppColors.backgroundColor,
-        elevation: 0,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            child: Material(
-              color: AppColors.primaryGreen,
-              borderRadius: BorderRadius.circular(20),
-              elevation: 2,
-              child: InkWell(
-                onTap: _navigateToCreateGroup,
+        appBar: AppBar(
+          title: Text(
+            'Communities',
+            style: GoogleFonts.montserrat(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          backgroundColor: AppColors.backgroundColor,
+          elevation: 0,
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 16),
+              child: Material(
+                color: AppColors.primaryGreen,
                 borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: AppColors.buttonShadow,
-                  ),
-                  child: const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 20,
+                elevation: 2,
+                child: InkWell(
+                  onTap: _navigateToCreateGroup,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: AppColors.buttonShadow,
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Search Bar
-          _buildSearchBar(),
+          ],
+        ),
+        body: Column(
+          children: [
+            // Search Bar
+            _buildSearchBar(),
 
-          // Type Filter
-          _buildTypeFilter(),
+            // Type Filter
+            _buildTypeFilter(),
 
-          // Tab Bar
-          _buildTabBar(),
+            // Tab Bar
+            _buildTabBar(),
 
-          // Tab Content
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildDiscoverTab(),
-                _buildMyGroupsTab(),
-                _buildCreatedTab(),
-              ],
+            // Tab Content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildDiscoverTab(),
+                  _buildMyGroupsTab(),
+                  _buildCreatedTab(),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildSearchBar() => Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: AppColors.cardShadow,
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (value) {
-          if (value.isEmpty) {
-            _loadGroups();
-          }
-        },
-        onSubmitted: (_) => _searchGroups(),
-        decoration: InputDecoration(
-          hintText: 'Search communities...',
-          hintStyle: GoogleFonts.montserrat(
-            color: AppColors.textSecondary,
-            fontSize: 14,
-          ),
-          prefixIcon: const Icon(
-            Icons.search,
-            color: AppColors.primaryGreen,
-            size: 20,
-          ),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  onPressed: () {
-                    _searchController.clear();
-                    _loadGroups();
-                  },
-                  icon: const Icon(
-                    Icons.clear,
-                    color: AppColors.textSecondary,
-                    size: 18,
-                  ),
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: AppColors.cardShadow,
+        ),
+        child: TextField(
+          controller: _searchController,
+          onChanged: (value) {
+            if (value.isEmpty) {
+              _loadGroups();
+            }
+          },
+          onSubmitted: (_) => _searchGroups(),
+          decoration: InputDecoration(
+            hintText: 'Search communities...',
+            hintStyle: GoogleFonts.montserrat(
+              color: AppColors.textSecondary,
+              fontSize: 14,
+            ),
+            prefixIcon: const Icon(
+              Icons.search,
+              color: AppColors.primaryGreen,
+              size: 20,
+            ),
+            suffixIcon: _searchController.text.isNotEmpty
+                ? IconButton(
+                    onPressed: () {
+                      _searchController.clear();
+                      _loadGroups();
+                    },
+                    icon: const Icon(
+                      Icons.clear,
+                      color: AppColors.textSecondary,
+                      size: 18,
+                    ),
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
         ),
-      ),
-    );
+      );
 
   Widget _buildTypeFilter() => Container(
-      height: 50,
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: GroupType.values.length + 1,
-        itemBuilder: (context, index) {
-          final type = index == 0 ? null : GroupType.values[index - 1];
-          final isSelected = _selectedType == type;
-          final label = type == null ? 'All' : _getTypeLabel(type);
+        height: 50,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: GroupType.values.length + 1,
+          itemBuilder: (context, index) {
+            final type = index == 0 ? null : GroupType.values[index - 1];
+            final isSelected = _selectedType == type;
+            final label = type == null ? 'All' : _getTypeLabel(type);
 
-          return Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(
-                label,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? Colors.white : AppColors.textPrimary,
+            return Container(
+              margin: const EdgeInsets.only(right: 8),
+              child: ChoiceChip(
+                label: Text(
+                  label,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                  ),
                 ),
+                selected: isSelected,
+                onSelected: (selected) {
+                  setState(() => _selectedType = type);
+                  _loadGroups();
+                },
+                backgroundColor: Colors.white,
+                selectedColor: AppColors.primaryGreen,
+                side: BorderSide(
+                  color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                labelPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               ),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() => _selectedType = type);
-                _loadGroups();
-              },
-              backgroundColor: Colors.white,
-              selectedColor: AppColors.primaryGreen,
-              side: BorderSide(
-                color: isSelected ? AppColors.primaryGreen : AppColors.border,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              labelPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            ),
-          );
-        },
-      ),
-    );
+            );
+          },
+        ),
+      );
 
   Widget _buildTabBar() => Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: AppColors.cardShadow,
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: const UnderlineTabIndicator(
-          borderSide: BorderSide(
-            color: AppColors.primaryGreen,
-            width: 3,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: AppColors.cardShadow,
+        ),
+        child: TabBar(
+          controller: _tabController,
+          indicator: const UnderlineTabIndicator(
+            borderSide: BorderSide(
+              color: AppColors.primaryGreen,
+              width: 3,
+            ),
+            insets: EdgeInsets.symmetric(horizontal: 16),
           ),
-          insets: EdgeInsets.symmetric(horizontal: 16),
+          indicatorSize: TabBarIndicatorSize.label,
+          labelColor: AppColors.primaryGreen,
+          unselectedLabelColor: AppColors.textSecondary,
+          labelStyle: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+          unselectedLabelStyle: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
+          tabs: const [
+            Tab(text: 'Discover'),
+            Tab(text: 'My Groups'),
+            Tab(text: 'Created'),
+          ],
         ),
-        indicatorSize: TabBarIndicatorSize.label,
-        labelColor: AppColors.primaryGreen,
-        unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: GoogleFonts.montserrat(
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-        unselectedLabelStyle: GoogleFonts.montserrat(
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-        ),
-        tabs: const [
-          Tab(text: 'Discover'),
-          Tab(text: 'My Groups'),
-          Tab(text: 'Created'),
-        ],
-      ),
-    );
+      );
 
   Widget _buildDiscoverTab() {
     if (_isLoading) {
@@ -517,7 +517,10 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
     }
 
     // Filter groups created by current user
-    final createdGroups = _userGroups.where((group) => group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? '')).toList();
+    final createdGroups = _userGroups
+        .where((group) =>
+            group.isCreator(FirebaseAuth.instance.currentUser?.uid ?? ''))
+        .toList();
 
     if (createdGroups.isEmpty) {
       return _buildEmptyState(
@@ -541,297 +544,316 @@ class _UnifiedGroupsScreenState extends State<UnifiedGroupsScreen>
         itemCount: createdGroups.length,
         itemBuilder: (context, index) {
           final group = createdGroups[index];
-          return _buildGroupCard(group,
-              showJoinButton: false, showAdminBadge: true,);
+          return _buildGroupCard(
+            group,
+            showJoinButton: false,
+            showAdminBadge: true,
+          );
         },
       ),
     );
   }
 
-  Widget _buildGroupCard(UnifiedGroup group,
-      {bool showJoinButton = true, bool showAdminBadge = false,}) => Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: _buildGroupAvatar(group),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                group.name,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
+  Widget _buildGroupCard(
+    UnifiedGroup group, {
+    bool showJoinButton = true,
+    bool showAdminBadge = false,
+  }) =>
+      Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-            if (showAdminBadge)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'ADMIN',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
           ],
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              group.description,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _buildTypeChip(group.type),
-                const SizedBox(width: 8),
-                Text(
-                  '${group.memberCount}/${group.maxMembers}',
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(16),
+          leading: _buildGroupAvatar(group),
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  group.name,
                   style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: Colors.grey[500],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
                   ),
                 ),
-                if (group.enableChat) ...[
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.chat_bubble_outline,
-                    size: 14,
-                    color: Colors.grey[500],
+              ),
+              if (showAdminBadge)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
-                const Spacer(),
-                if (group.lastMessageAt != null)
+                  child: Text(
+                    'ADMIN',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 4),
+              Text(
+                group.description,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _buildTypeChip(group.type),
+                  const SizedBox(width: 8),
                   Text(
-                    _formatLastActivityTime(group.lastActivityAt),
+                    '${group.memberCount}/${group.maxMembers}',
                     style: GoogleFonts.montserrat(
                       fontSize: 12,
                       color: Colors.grey[500],
                     ),
                   ),
-              ],
-            ),
-          ],
+                  if (group.enableChat) ...[
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      size: 14,
+                      color: Colors.grey[500],
+                    ),
+                  ],
+                  const Spacer(),
+                  if (group.lastMessageAt != null)
+                    Text(
+                      _formatLastActivityTime(group.lastActivityAt),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+          trailing: showJoinButton ? _buildActionButton(group) : null,
+          onTap: () => _navigateToGroupDetails(group),
         ),
-        trailing: showJoinButton ? _buildActionButton(group) : null,
-        onTap: () => _navigateToGroupDetails(group),
-      ),
-    );
+      );
 
   Widget _buildGroupAvatar(UnifiedGroup group) => Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: _getTypeColor(group.type),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Icon(
-        _getTypeIcon(group.type),
-        color: Colors.white,
-        size: 24,
-      ),
-    );
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          color: _getTypeColor(group.type),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Icon(
+          _getTypeIcon(group.type),
+          color: Colors.white,
+          size: 24,
+        ),
+      );
 
   Widget _buildTypeChip(GroupType type) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: _getTypeColor(type).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        _getTypeLabel(type).toUpperCase(),
-        style: GoogleFonts.montserrat(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: _getTypeColor(type),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: _getTypeColor(type).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
         ),
-      ),
-    );
+        child: Text(
+          _getTypeLabel(type).toUpperCase(),
+          style: GoogleFonts.montserrat(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: _getTypeColor(type),
+          ),
+        ),
+      );
 
   Widget _buildCreateButton() => SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: _navigateToCreateGroup,
-        icon: const Icon(Icons.add, size: 18),
-        label: Text(
-          'Create Community',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: _navigateToCreateGroup,
+          icon: const Icon(Icons.add, size: 18),
+          label: Text(
+            'Create Community',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryGreen,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-    );
+      );
 
   Widget _buildEmptyState({
     required Widget icon,
     required String title,
     required String subtitle,
     Widget? actionButton,
-  }) => Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
+  }) =>
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(child: icon),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                title,
+                style: GoogleFonts.montserrat(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                subtitle,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                  height: 1.3,
+                  letterSpacing: 0.2,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (actionButton != null) ...[
+                const SizedBox(height: 32),
+                actionButton,
+              ],
+            ],
+          ),
+        ),
+      );
+
+  Widget _buildGroupInfoSheet(UnifiedGroup group) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 120,
-              height: 120,
+              margin: const EdgeInsets.only(top: 8),
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[50],
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Community Info',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInfoRow(Icons.group, 'Name', group.name),
+                  _buildInfoRow(
+                    Icons.description,
+                    'Description',
+                    group.description,
+                  ),
+                  _buildInfoRow(Icons.category, 'Type', group.typeDisplayName),
+                  _buildInfoRow(
+                    Icons.people,
+                    'Members',
+                    '${group.memberCount}/${group.maxMembers}',
+                  ),
+                  if (group.location != null)
+                    _buildInfoRow(
+                        Icons.location_on, 'Location', group.location!),
+                  if (group.tags.isNotEmpty)
+                    _buildInfoRow(Icons.tag, 'Tags', group.tags.join(', ')),
+                  _buildInfoRow(
+                    Icons.chat,
+                    'Chat',
+                    group.enableChat ? 'Enabled' : 'Disabled',
                   ),
                 ],
               ),
-              child: Center(child: icon),
             ),
-            const SizedBox(height: 32),
-            Text(
-              title,
-              style: GoogleFonts.montserrat(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              subtitle,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
-                height: 1.3,
-                letterSpacing: 0.2,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (actionButton != null) ...[
-              const SizedBox(height: 32),
-              actionButton,
-            ],
           ],
         ),
-      ),
-    );
-
-  Widget _buildGroupInfoSheet(UnifiedGroup group) => Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Community Info',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _buildInfoRow(Icons.group, 'Name', group.name),
-                _buildInfoRow(
-                    Icons.description, 'Description', group.description,),
-                _buildInfoRow(Icons.category, 'Type', group.typeDisplayName),
-                _buildInfoRow(Icons.people, 'Members',
-                    '${group.memberCount}/${group.maxMembers}',),
-                if (group.location != null)
-                  _buildInfoRow(Icons.location_on, 'Location', group.location!),
-                if (group.tags.isNotEmpty)
-                  _buildInfoRow(Icons.tag, 'Tags', group.tags.join(', ')),
-                _buildInfoRow(Icons.chat, 'Chat',
-                    group.enableChat ? 'Enabled' : 'Disabled',),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+      );
 
   Widget _buildInfoRow(IconData icon, String label, String value) => Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.primaryGreen, size: 20),
-          const SizedBox(width: 12),
-          Text(
-            '$label: ',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.primaryGreen, size: 20),
+            const SizedBox(width: 12),
+            Text(
+              '$label: ',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
-                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
               ),
             ),
-          ),
-        ],
-      ),
-    );
+            Expanded(
+              child: Text(
+                value,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 
   String _getTypeLabel(GroupType type) {
     switch (type) {

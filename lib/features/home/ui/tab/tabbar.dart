@@ -32,7 +32,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class Tabbar extends StatefulWidget {
-
   const Tabbar({super.key, this.isPaymentSuccess, this.currentUserId});
   final bool? isPaymentSuccess;
   final String? currentUserId;
@@ -73,39 +72,39 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
         showDialog(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-              backgroundColor: themeProvider.isDarkMode
-                  ? const Color(0xFF2C2C2E)
-                  : Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+            backgroundColor: themeProvider.isDarkMode
+                ? const Color(0xFF2C2C2E)
+                : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Icon(
+              Icons.check_circle,
+              color: Colors.green,
+              size: 60,
+            ),
+            content: Text(
+              'Payment Successful!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: themeProvider.isDarkMode ? Colors.white : Colors.black,
               ),
-              title: const Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 60,
-              ),
-              content: Text(
-                'Payment Successful!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                    ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
         );
       });
     }
@@ -154,7 +153,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
         // Handle other notification types (messages, matches, etc.)
         debugPrint('Received notification: ${message.data}');
       }
-        });
+    });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       final String notificationId = message.data['notificationId'] ?? '';
@@ -168,11 +167,17 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
       if (message.data['type'] != 'Call') {
         // Navigate to appropriate screen based on notification type
         if (message.data['type'] == 'message') {
-          Navigator.pushNamed(context, RouteName.tabScreen,
-              arguments: 'messages',);
+          Navigator.pushNamed(
+            context,
+            RouteName.tabScreen,
+            arguments: 'messages',
+          );
         } else {
-          Navigator.pushNamed(context, RouteName.tabScreen,
-              arguments: 'notification',);
+          Navigator.pushNamed(
+            context,
+            RouteName.tabScreen,
+            arguments: 'notification',
+          );
         }
       }
     });
@@ -269,7 +274,9 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
           body: const TabBarView(
             children: [
               Homepage(
-                  items: {}, isPurchased: false,), // Use existing Homepage
+                items: {},
+                isPurchased: false,
+              ), // Use existing Homepage
               ExploreScreen(),
               MessagesScreen(),
               ProfileScreen(),

@@ -85,7 +85,10 @@ class NotificationsState extends State<Notifications> {
       _isLoadingMore = true;
     });
     final snapshot = await PaginationRepo.getMoreNotifications(
-        perPage, lastVisibleDocument, notificationReference,);
+      perPage,
+      lastVisibleDocument,
+      notificationReference,
+    );
     setState(() {
       notifications.addAll(snapshot.docs);
       _hasMoreMessages = snapshot.docs.length == perPage;
@@ -100,183 +103,196 @@ class NotificationsState extends State<Notifications> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          automaticallyImplyLeading: false,
-          title: Text(
-            'Notifications'.tr().toString(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1,
-            ),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
+        title: Text(
+          'Notifications'.tr().toString(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
           ),
-          elevation: 0,
         ),
-        backgroundColor: Theme.of(context).primaryColor,
-        body: DecoratedBox(
-          decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(50),
-                topRight: Radius.circular(50),
-              ),
-              color: Theme.of(context).primaryColor,),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(50),
-              topRight: Radius.circular(50),
-            ),
-            child: notifications.isEmpty
-                ? Center(
-                    child: Text(
+        elevation: 0,
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(50),
+            topRight: Radius.circular(50),
+          ),
+          color: Theme.of(context).primaryColor,
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(50),
+            topRight: Radius.circular(50),
+          ),
+          child: notifications.isEmpty
+              ? Center(
+                  child: Text(
                     'No match found'.tr().toString(),
                     style: const TextStyle(
-                        color: AppColors.secondaryColor, fontSize: 16,),
-                  ),)
-                : ListView.builder(
-                    controller: _scrollController,
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      if (index == notifications.length) {
-                        // Last item in the ListView
-                        return Column(
-                          children: [
-                            if (_isLoadingMore)
-                              const SizedBox(
-                                  height: 20, width: 20, child: Hookup4uBar(),),
+                      color: AppColors.secondaryColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  controller: _scrollController,
+                  itemCount: notifications.length,
+                  itemBuilder: (context, index) {
+                    if (index == notifications.length) {
+                      // Last item in the ListView
+                      return Column(
+                        children: [
+                          if (_isLoadingMore)
                             const SizedBox(
                               height: 20,
+                              width: 20,
+                              child: Hookup4uBar(),
                             ),
-                          ],
-                        );
-                      } else {
-                        final doc = notifications[index];
-                        return Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: !doc.get('isRead')
-                                  ? themeProvider.isDarkMode
-                                      ? Theme.of(context)
-                                          .scaffoldBackgroundColor
-                                      : primaryColor.withValues(
-                                          alpha: (.15 * 255).toDouble(),)
-                                  : themeProvider.isDarkMode
-                                      ? Theme.of(context)
-                                          .scaffoldBackgroundColor
-                                          .withValues(
-                                              alpha: (0.70 * 255).toDouble(),)
-                                      : AppColors.secondaryColor.withValues(
-                                          alpha: (.15 * 255).toDouble(),),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      );
+                    } else {
+                      final doc = notifications[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: !doc.get('isRead')
+                                ? themeProvider.isDarkMode
+                                    ? Theme.of(context).scaffoldBackgroundColor
+                                    : primaryColor.withValues(
+                                        alpha: (.15 * 255).toDouble(),
+                                      )
+                                : themeProvider.isDarkMode
+                                    ? Theme.of(context)
+                                        .scaffoldBackgroundColor
+                                        .withValues(
+                                          alpha: (0.70 * 255).toDouble(),
+                                        )
+                                    : AppColors.secondaryColor.withValues(
+                                        alpha: (.15 * 255).toDouble(),
+                                      ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(5),
+                            leading: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: AppColors.secondaryColor,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: CustomCNImage(
+                                  imageUrl: doc.get('pictureUrl') ?? '',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(5),
-                              leading: CircleAvatar(
-                                radius: 25,
-                                backgroundColor: AppColors.secondaryColor,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: CustomCNImage(
-                                    imageUrl: doc.get('pictureUrl') ?? '',
-                                    fit: BoxFit.cover,
+                            title: Text(
+                              'you are matched with'.tr().toString(),
+                            ).tr(args: ["${doc.get('userName') ?? '__'}"]),
+                            subtitle: Text("${doc.get('timestamp').toDate()}"),
+                            trailing: Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  if (!doc.get('isRead'))
+                                    Container(
+                                      width: 50,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                        color: primaryColor,
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'NEW'.tr().toString(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    const Text(''),
+                                ],
+                              ),
+                            ),
+                            onTap: () async {
+                              log(doc.get('Matches'));
+                              showDialog(
+                                context: context,
+                                builder: (context) => const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      primaryColor,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              title: Text(
-                                      'you are matched with'.tr().toString(),)
-                                  .tr(args: ["${doc.get('userName') ?? '__'}"]),
-                              subtitle:
-                                  Text("${doc.get('timestamp').toDate()}"),
-                              trailing: Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    if (!doc.get('isRead')) Container(
-                                            width: 50,
-                                            height: 20,
-                                            decoration: BoxDecoration(
-                                              color: primaryColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                            ),
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              'NEW'.tr().toString(),
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ) else const Text(''),
-                                  ],
-                                ),
-                              ),
-                              onTap: () async {
-                                log(doc.get('Matches'));
-                                showDialog(
+                              );
+
+                              final DocumentSnapshot userdoc = await db
+                                  .collection('users')
+                                  .doc(doc.get('Matches'))
+                                  .get();
+                              if (!context.mounted) return;
+                              if (userdoc.exists) {
+                                Navigator.pop(context);
+                                final UserModel tempuser =
+                                    UserModel.fromDocument(userdoc);
+                                tempuser.distanceBW =
+                                    UserSearchRepo.calculateDistance(
+                                  currentUser!.coordinates!['latitude'],
+                                  currentUser!.coordinates!['longitude'],
+                                  tempuser.coordinates!['latitude'],
+                                  tempuser.coordinates!['longitude'],
+                                ).round();
+
+                                await showDialog(
+                                  barrierDismissible: false,
                                   context: context,
-                                  builder: (context) => const Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                primaryColor,),
-                                      ),
-                                    ),
+                                  builder: (context) {
+                                    if (!doc.get('isRead')) {
+                                      PaginationRepo.updateNotification(
+                                        currentUser!,
+                                        doc,
+                                      );
+                                    }
+                                    return Info(
+                                      tempuser,
+                                      currentUser!,
+                                      false,
+                                    );
+                                  },
                                 );
-
-                                final DocumentSnapshot userdoc = await db
-                                    .collection('users')
-                                    .doc(doc.get('Matches'))
-                                    .get();
-                                if (!context.mounted) return;
-                                if (userdoc.exists) {
-                                  Navigator.pop(context);
-                                  final UserModel tempuser =
-                                      UserModel.fromDocument(userdoc);
-                                  tempuser.distanceBW =
-                                      UserSearchRepo.calculateDistance(
-                                              currentUser!
-                                                  .coordinates!['latitude'],
-                                              currentUser!
-                                                  .coordinates!['longitude'],
-                                              tempuser.coordinates!['latitude'],
-                                              tempuser
-                                                  .coordinates!['longitude'],)
-                                          .round();
-
-                                  await showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) {
-                                      if (!doc.get('isRead')) {
-                                        PaginationRepo.updateNotification(
-                                            currentUser!, doc,);
-                                      }
-                                      return Info(
-                                          tempuser, currentUser!, false,);
-                                    },
-                                  );
-                                } else {
-                                  Navigator.pop(context);
-                                  CustomSnackbar.showSnackBarSimple(
-                                    'User does not exist'.tr().toString(),
-                                    context,
-                                  );
-                                }
-                              },
-                            ),
+                              } else {
+                                Navigator.pop(context);
+                                CustomSnackbar.showSnackBarSimple(
+                                  'User does not exist'.tr().toString(),
+                                  context,
+                                );
+                              }
+                            },
                           ),
-                        );
-                      }
-                    },
-                  ),
-          ),
-        ),);
+                        ),
+                      );
+                    }
+                  },
+                ),
+        ),
+      ),
+    );
   }
 }

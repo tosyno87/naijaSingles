@@ -67,10 +67,12 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           children: [
             BlocListener<EventCreationBloc, EventCreationState>(
               listener: (context, state) {
-                AppLogger.debug('🔄 EventCreationBloc State: ${state.runtimeType}');
+                AppLogger.debug(
+                    '🔄 EventCreationBloc State: ${state.runtimeType}');
 
                 if (state is EventDeleted) {
-                  AppLogger.info('✅ Event deleted successfully: ${state.eventId}');
+                  AppLogger.info(
+                      '✅ Event deleted successfully: ${state.eventId}');
                   // Only clear loading if this is the event we're deleting
                   if (_deletingEventId == state.eventId) {
                     setState(() {
@@ -195,201 +197,207 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   }
 
   PreferredSizeWidget _buildAppBar() => AppBar(
-      backgroundColor: AppColors.backgroundColor,
-      elevation: 0,
-      iconTheme: const IconThemeData(
-        color: Color(0xFF333333), // Dark color for back button
-        size: 24,
-      ),
-      leading: IconButton(
-        onPressed: () {
-          // Safety check for navigation
-          if (Navigator.canPop(context)) {
-            Navigator.of(context).pop();
-          } else {
-            // If we can't pop, navigate to main navigation
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              RouteName.mainNavigation,
-              (route) => false,
-            );
-          }
-        },
-        icon: const Icon(
-          Icons.arrow_back_ios,
-          color: Color(0xFF333333),
+        backgroundColor: AppColors.backgroundColor,
+        elevation: 0,
+        iconTheme: const IconThemeData(
+          color: Color(0xFF333333), // Dark color for back button
           size: 24,
         ),
-        tooltip: 'Back',
-      ),
-      title: Text(
-        'My Events',
-        style: GoogleFonts.montserrat(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF333333),
-        ),
-      ),
-      actions: [
-        IconButton(
+        leading: IconButton(
           onPressed: () {
-            context.read<EventCreationBloc>().add(
-                  LoadUserEventsEvent(_currentUserId!),
-                );
+            // Safety check for navigation
+            if (Navigator.canPop(context)) {
+              Navigator.of(context).pop();
+            } else {
+              // If we can't pop, navigate to main navigation
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                RouteName.mainNavigation,
+                (route) => false,
+              );
+            }
           },
           icon: const Icon(
-            Icons.refresh,
-            color: Color(0xFF008037),
+            Icons.arrow_back_ios,
+            color: Color(0xFF333333),
+            size: 24,
           ),
-          tooltip: 'Refresh',
+          tooltip: 'Back',
         ),
-      ],
-      systemOverlayStyle: const SystemUiOverlayStyle(
-        statusBarColor: AppColors.backgroundColor,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
+        title: Text(
+          'My Events',
+          style: GoogleFonts.montserrat(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF333333),
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.read<EventCreationBloc>().add(
+                    LoadUserEventsEvent(_currentUserId!),
+                  );
+            },
+            icon: const Icon(
+              Icons.refresh,
+              color: Color(0xFF008037),
+            ),
+            tooltip: 'Refresh',
+          ),
+        ],
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: AppColors.backgroundColor,
+          statusBarIconBrightness: Brightness.dark,
+        ),
+      );
 
   Widget _buildTabBar() => Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      height: 50,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: const Color(0xFF008037),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding: const EdgeInsets.all(4),
-        labelColor: Colors.white,
-        unselectedLabelColor: const Color(0xFF666666),
-        labelStyle: GoogleFonts.montserrat(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: GoogleFonts.montserrat(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-        ),
-        dividerColor: Colors.transparent,
-        overlayColor: WidgetStateProperty.all(Colors.transparent),
-        tabs: [
-          Tab(
-            child: Container(
-              alignment: Alignment.center,
-              child: const Text('Published'),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
+          ],
+        ),
+        child: TabBar(
+          controller: _tabController,
+          indicator: BoxDecoration(
+            color: const Color(0xFF008037),
+            borderRadius: BorderRadius.circular(10),
           ),
-          Tab(
-            child: Container(
-              alignment: Alignment.center,
-              child: const Text('Drafts'),
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicatorPadding: const EdgeInsets.all(4),
+          labelColor: Colors.white,
+          unselectedLabelColor: const Color(0xFF666666),
+          labelStyle: GoogleFonts.montserrat(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+          unselectedLabelStyle: GoogleFonts.montserrat(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+          dividerColor: Colors.transparent,
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          tabs: [
+            Tab(
+              child: Container(
+                alignment: Alignment.center,
+                child: const Text('Published'),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+            Tab(
+              child: Container(
+                alignment: Alignment.center,
+                child: const Text('Drafts'),
+              ),
+            ),
+          ],
+        ),
+      );
 
-  Widget _buildPublishedEventsTab() => BlocBuilder<EventCreationBloc, EventCreationState>(
-      builder: (context, state) {
-        if (state is UserEventsLoading) {
-          return _buildLoadingState();
-        }
-
-        if (state is UserEventsError) {
-          return _buildErrorState(state.message);
-        }
-
-        if (state is UserEventsLoaded) {
-          final publishedEvents = state.events
-              .where((event) =>
-                  event.status == EventStatus.published ||
-                  event.status == EventStatus.underReview ||
-                  event.status == EventStatus.completed,)
-              .toList();
-
-          if (publishedEvents.isEmpty) {
-            // Don't show empty state if we're in the middle of a delete operation
-            if (_isDeleting) {
-              return _buildLoadingState();
-            }
-            return _buildEmptyState(
-              title: 'No Published Events',
-              message:
-                  'You haven\'t published any events yet.\nCreate your first event to get started!',
-              icon: Icons.event_busy,
-              showCreateButton: false,
-            );
+  Widget _buildPublishedEventsTab() =>
+      BlocBuilder<EventCreationBloc, EventCreationState>(
+        builder: (context, state) {
+          if (state is UserEventsLoading) {
+            return _buildLoadingState();
           }
 
-          return _buildEventsList(publishedEvents);
-        }
-
-        return _buildEmptyState(
-          title: 'No Published Events',
-          message:
-              'You haven\'t published any events yet.\nCreate your first event to get started!',
-          icon: Icons.event_busy,
-          showCreateButton: false,
-        );
-      },
-    );
-
-  Widget _buildDraftsTab() => BlocBuilder<EventCreationBloc, EventCreationState>(
-      builder: (context, state) {
-        if (state is UserEventsLoading) {
-          return _buildLoadingState();
-        }
-
-        if (state is UserEventsError) {
-          return _buildErrorState(state.message);
-        }
-
-        if (state is UserEventsLoaded) {
-          final draftEvents = state.drafts
-              .where((event) => event.status == EventStatus.draft)
-              .toList();
-
-          if (draftEvents.isEmpty) {
-            // Don't show empty state if we're in the middle of a delete operation
-            if (_isDeleting) {
-              return _buildLoadingState();
-            }
-            return _buildEmptyState(
-              title: 'No Draft Events',
-              message:
-                  'You don\'t have any draft events.\nSave an event as draft while creating it.',
-              icon: Icons.drafts,
-              showCreateButton: false,
-            );
+          if (state is UserEventsError) {
+            return _buildErrorState(state.message);
           }
 
-          return _buildEventsList(draftEvents, isDrafts: true);
-        }
+          if (state is UserEventsLoaded) {
+            final publishedEvents = state.events
+                .where(
+                  (event) =>
+                      event.status == EventStatus.published ||
+                      event.status == EventStatus.underReview ||
+                      event.status == EventStatus.completed,
+                )
+                .toList();
 
-        return _buildEmptyState(
-          title: 'No Draft Events',
-          message:
-              'You don\'t have any draft events.\nSave an event as draft while creating it.',
-          icon: Icons.drafts,
-          showCreateButton: false,
-        );
-      },
-    );
+            if (publishedEvents.isEmpty) {
+              // Don't show empty state if we're in the middle of a delete operation
+              if (_isDeleting) {
+                return _buildLoadingState();
+              }
+              return _buildEmptyState(
+                title: 'No Published Events',
+                message:
+                    'You haven\'t published any events yet.\nCreate your first event to get started!',
+                icon: Icons.event_busy,
+                showCreateButton: false,
+              );
+            }
 
-  Widget _buildEventsList(List<EnhancedEventModel> events,
-      {bool isDrafts = false,}) {
+            return _buildEventsList(publishedEvents);
+          }
+
+          return _buildEmptyState(
+            title: 'No Published Events',
+            message:
+                'You haven\'t published any events yet.\nCreate your first event to get started!',
+            icon: Icons.event_busy,
+            showCreateButton: false,
+          );
+        },
+      );
+
+  Widget _buildDraftsTab() =>
+      BlocBuilder<EventCreationBloc, EventCreationState>(
+        builder: (context, state) {
+          if (state is UserEventsLoading) {
+            return _buildLoadingState();
+          }
+
+          if (state is UserEventsError) {
+            return _buildErrorState(state.message);
+          }
+
+          if (state is UserEventsLoaded) {
+            final draftEvents = state.drafts
+                .where((event) => event.status == EventStatus.draft)
+                .toList();
+
+            if (draftEvents.isEmpty) {
+              // Don't show empty state if we're in the middle of a delete operation
+              if (_isDeleting) {
+                return _buildLoadingState();
+              }
+              return _buildEmptyState(
+                title: 'No Draft Events',
+                message:
+                    'You don\'t have any draft events.\nSave an event as draft while creating it.',
+                icon: Icons.drafts,
+                showCreateButton: false,
+              );
+            }
+
+            return _buildEventsList(draftEvents, isDrafts: true);
+          }
+
+          return _buildEmptyState(
+            title: 'No Draft Events',
+            message:
+                'You don\'t have any draft events.\nSave an event as draft while creating it.',
+            icon: Icons.drafts,
+            showCreateButton: false,
+          );
+        },
+      );
+
+  Widget _buildEventsList(
+    List<EnhancedEventModel> events, {
+    bool isDrafts = false,
+  }) {
     // Only apply optimistic update if there are multiple events to prevent empty state flash
     final filteredEvents = events.length > 1 && _deletingEventId != null
         ? events.where((event) => event.id != _deletingEventId).toList()
@@ -450,250 +458,50 @@ class _MyEventsScreenState extends State<MyEventsScreen>
   }
 
   Widget _buildLoadingState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFF008037).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
-                strokeWidth: 3,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Loading your events...',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF666666),
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildErrorState(String message) => Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 80,
-              color: Color(0xFF999999),
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFF008037).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation(Color(0xFF008037)),
+                  strokeWidth: 3,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             Text(
-              'Something went wrong',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF333333),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
+              'Loading your events...',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
+                fontWeight: FontWeight.w500,
                 color: const Color(0xFF666666),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                context.read<EventCreationBloc>().add(
-                      LoadUserEventsEvent(_currentUserId!),
-                    );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008037),
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(
-                'Try Again',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
 
-  Widget _buildEmptyState({
-    required String title,
-    required String message,
-    required IconData icon,
-    bool showCreateButton = false,
-  }) => Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Animated icon container
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF008037).withOpacity(0.1),
-                    const Color(0xFF008037).withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: Icon(
-                icon,
-                size: 60,
-                color: const Color(0xFF008037),
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            Text(
-              title,
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF333333),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-
-            Text(
-              message,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                color: const Color(0xFF666666),
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            if (showCreateButton) ...[
-              const SizedBox(height: 40),
-
-              // Feature highlights
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8F9FA),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFF008037).withOpacity(0.1),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    _buildFeatureHighlight(
-                      icon: Icons.people,
-                      text: 'Connect with your community',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildFeatureHighlight(
-                      icon: Icons.location_on,
-                      text: 'Host events in your area',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildFeatureHighlight(
-                      icon: Icons.favorite,
-                      text: 'Meet like-minded people',
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              ElevatedButton.icon(
-                onPressed: _createNewEvent,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-                icon: const Icon(Icons.add, size: 20),
-                label: Text(
-                  'Create Your First Event',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-
-  Widget _buildFeatureHighlight({
-    required IconData icon,
-    required String text,
-  }) => Row(
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: const Color(0xFF008037),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: const Color(0xFF666666),
-            ),
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildAuthRequiredScreen() => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Center(
+  Widget _buildErrorState(String message) => Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(
-                Icons.login,
+                Icons.error_outline,
                 size: 80,
                 color: Color(0xFF999999),
               ),
               const SizedBox(height: 24),
               Text(
-                'Sign In Required',
+                'Something went wrong',
                 style: GoogleFonts.montserrat(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -702,33 +510,235 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               ),
               const SizedBox(height: 12),
               Text(
-                'Please sign in to view and manage your events.',
+                message,
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
                   color: const Color(0xFF666666),
                 ),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<EventCreationBloc>().add(
+                        LoadUserEventsEvent(_currentUserId!),
+                      );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF008037),
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Try Again',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
+      );
+
+  Widget _buildEmptyState({
+    required String title,
+    required String message,
+    required IconData icon,
+    bool showCreateButton = false,
+  }) =>
+      Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Animated icon container
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF008037).withOpacity(0.1),
+                      const Color(0xFF008037).withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(60),
+                ),
+                child: Icon(
+                  icon,
+                  size: 60,
+                  color: const Color(0xFF008037),
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              Text(
+                title,
+                style: GoogleFonts.montserrat(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF333333),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+
+              Text(
+                message,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: const Color(0xFF666666),
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              if (showCreateButton) ...[
+                const SizedBox(height: 40),
+
+                // Feature highlights
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8F9FA),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFF008037).withOpacity(0.1),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildFeatureHighlight(
+                        icon: Icons.people,
+                        text: 'Connect with your community',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildFeatureHighlight(
+                        icon: Icons.location_on,
+                        text: 'Host events in your area',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildFeatureHighlight(
+                        icon: Icons.favorite,
+                        text: 'Meet like-minded people',
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                ElevatedButton.icon(
+                  onPressed: _createNewEvent,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF008037),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
+                  ),
+                  icon: const Icon(Icons.add, size: 20),
+                  label: Text(
+                    'Create Your First Event',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+
+  Widget _buildFeatureHighlight({
+    required IconData icon,
+    required String text,
+  }) =>
+      Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: const Color(0xFF008037),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: const Color(0xFF666666),
+              ),
+            ),
+          ),
+        ],
+      );
+
+  Widget _buildAuthRequiredScreen() => Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.login,
+                  size: 80,
+                  color: Color(0xFF999999),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Sign In Required',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF333333),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Please sign in to view and manage your events.',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    color: const Color(0xFF666666),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
 
   Widget _buildCreateEventFAB() => FloatingActionButton.extended(
-      heroTag: 'my_events_screen_fab',
-      onPressed: _createNewEvent,
-      backgroundColor: const Color(0xFF008037),
-      foregroundColor: Colors.white,
-      icon: const Icon(Icons.add),
-      label: Text(
-        'Create Event',
-        style: GoogleFonts.montserrat(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
+        heroTag: 'my_events_screen_fab',
+        onPressed: _createNewEvent,
+        backgroundColor: const Color(0xFF008037),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: Text(
+          'Create Event',
+          style: GoogleFonts.montserrat(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
-    );
+      );
 
   void _createNewEvent() {
     Navigator.pushNamed(context, RouteName.createEvent).then((_) {
@@ -817,7 +827,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
           ),
           ElevatedButton(
             onPressed: () {
-              AppLogger.debug('🗑️ Delete button pressed for event: ${event.id}');
+              AppLogger.debug(
+                  '🗑️ Delete button pressed for event: ${event.id}');
               Navigator.of(dialogContext).pop();
 
               // Track which event is being deleted
@@ -850,7 +861,8 @@ class _MyEventsScreenState extends State<MyEventsScreen>
               });
 
               // Use the passed screen context that has access to EventCreationBloc
-              AppLogger.debug('📤 Dispatching DeleteEventEvent for: ${event.id}');
+              AppLogger.debug(
+                  '📤 Dispatching DeleteEventEvent for: ${event.id}');
               screenContext
                   .read<EventCreationBloc>()
                   .add(DeleteEventEvent(event.id));
@@ -1208,53 +1220,55 @@ Join me at this amazing event! 🚀
     required String title,
     required String value,
     required Color color,
-  }) => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF333333),
+  }) =>
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF333333),
+              ),
             ),
-          ),
-          Text(
-            title,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              color: const Color(0xFF666666),
+            Text(
+              title,
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                color: const Color(0xFF666666),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildInsightRow({
     required IconData icon,
     required String text,
     required Color color,
-  }) => Row(
-      children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: GoogleFonts.montserrat(
-              fontSize: 13,
-              color: const Color(0xFF666666),
+  }) =>
+      Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                color: const Color(0xFF666666),
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 }

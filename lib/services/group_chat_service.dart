@@ -402,7 +402,11 @@ class GroupChatService {
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => GroupMessage.fromMap(doc.id, doc.data())).toList(),);
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => GroupMessage.fromMap(doc.id, doc.data()))
+              .toList(),
+        );
   }
 
   /// Get user's groups
@@ -418,7 +422,11 @@ class GroupChatService {
         .where('isActive', isEqualTo: true)
         .orderBy('lastMessageAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => GroupChat.fromMap(doc.id, doc.data())).toList(),);
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => GroupChat.fromMap(doc.id, doc.data()))
+              .toList(),
+        );
   }
 
   /// Get group details
@@ -572,8 +580,11 @@ class GroupChatService {
   }
 
   /// Notify group members (internal method)
-  Future<void> _notifyGroupMembers(String groupId, String message,
-      {String? excludeUserId,}) async {
+  Future<void> _notifyGroupMembers(
+    String groupId,
+    String message, {
+    String? excludeUserId,
+  }) async {
     try {
       final groupDoc =
           await _firestore.collection('unifiedGroups').doc(groupId).get();
@@ -624,37 +635,46 @@ enum MessageType {
 
 /// Group chat model
 class GroupChat {
-
   const GroupChat({
     required this.id,
     required this.name,
     required this.description,
     required this.type,
-    required this.creatorId, required this.adminIds, required this.memberIds, required this.memberCount, required this.isActive, required this.createdAt, required this.lastMessageAt, required this.lastMessageText, required this.lastMessageSenderId, this.location,
+    required this.creatorId,
+    required this.adminIds,
+    required this.memberIds,
+    required this.memberCount,
+    required this.isActive,
+    required this.createdAt,
+    required this.lastMessageAt,
+    required this.lastMessageText,
+    required this.lastMessageSenderId,
+    this.location,
     this.eventId,
   });
 
   factory GroupChat.fromMap(String id, Map<String, dynamic> data) => GroupChat(
-      id: id,
-      name: data['name'] ?? '',
-      description: data['description'] ?? '',
-      type: GroupType.values.firstWhere(
-        (e) => e.name == data['type'],
-        orElse: () => GroupType.custom,
-      ),
-      location: data['location'],
-      eventId: data['eventId'],
-      creatorId: data['creatorId'] ?? '',
-      adminIds: List<String>.from(data['adminIds'] ?? []),
-      memberIds: List<String>.from(data['memberIds'] ?? []),
-      memberCount: data['memberCount'] ?? 0,
-      isActive: data['isActive'] ?? true,
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastMessageAt:
-          (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastMessageText: data['lastMessageText'] ?? '',
-      lastMessageSenderId: data['lastMessageSenderId'] ?? '',
-    );
+        id: id,
+        name: data['name'] ?? '',
+        description: data['description'] ?? '',
+        type: GroupType.values.firstWhere(
+          (e) => e.name == data['type'],
+          orElse: () => GroupType.custom,
+        ),
+        location: data['location'],
+        eventId: data['eventId'],
+        creatorId: data['creatorId'] ?? '',
+        adminIds: List<String>.from(data['adminIds'] ?? []),
+        memberIds: List<String>.from(data['memberIds'] ?? []),
+        memberCount: data['memberCount'] ?? 0,
+        isActive: data['isActive'] ?? true,
+        createdAt:
+            (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        lastMessageAt:
+            (data['lastMessageAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        lastMessageText: data['lastMessageText'] ?? '',
+        lastMessageSenderId: data['lastMessageSenderId'] ?? '',
+      );
   final String id;
   final String name;
   final String description;
@@ -686,34 +706,38 @@ class GroupChat {
 
 /// Group message model
 class GroupMessage {
-
   const GroupMessage({
     required this.id,
     required this.groupId,
     required this.senderId,
     required this.text,
     required this.messageType,
-    required this.timestamp, required this.isRead, required this.readBy, this.mediaUrl,
+    required this.timestamp,
+    required this.isRead,
+    required this.readBy,
+    this.mediaUrl,
     this.mediaType,
     this.replyToMessageId,
   });
 
-  factory GroupMessage.fromMap(String id, Map<String, dynamic> data) => GroupMessage(
-      id: id,
-      groupId: data['groupId'] ?? '',
-      senderId: data['senderId'] ?? '',
-      text: data['text'] ?? '',
-      messageType: MessageType.values.firstWhere(
-        (e) => e.name == data['messageType'],
-        orElse: () => MessageType.text,
-      ),
-      mediaUrl: data['mediaUrl'],
-      mediaType: data['mediaType'],
-      replyToMessageId: data['replyToMessageId'],
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isRead: data['isRead'] ?? false,
-      readBy: List<String>.from(data['readBy'] ?? []),
-    );
+  factory GroupMessage.fromMap(String id, Map<String, dynamic> data) =>
+      GroupMessage(
+        id: id,
+        groupId: data['groupId'] ?? '',
+        senderId: data['senderId'] ?? '',
+        text: data['text'] ?? '',
+        messageType: MessageType.values.firstWhere(
+          (e) => e.name == data['messageType'],
+          orElse: () => MessageType.text,
+        ),
+        mediaUrl: data['mediaUrl'],
+        mediaType: data['mediaType'],
+        replyToMessageId: data['replyToMessageId'],
+        timestamp:
+            (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        isRead: data['isRead'] ?? false,
+        readBy: List<String>.from(data['readBy'] ?? []),
+      );
   final String id;
   final String groupId;
   final String senderId;

@@ -29,10 +29,11 @@ class AppColors {
       Color(0xFF2D2D2D); // Dark text for white background
   static const Color textSecondary = Color(0xFF666666); // Medium grey
   static const Color textTertiary = Color(0xFF94A3B8);
-  
+
   // ⚠️ DEPRECATED: Use textSecondary instead. Kept for backward compatibility.
   @Deprecated('Use AppColors.textSecondary instead')
-  static const Color secondaryColor = Color(0xFF8D6E63); // Light brown (old secondary color)
+  static const Color secondaryColor =
+      Color(0xFF8D6E63); // Light brown (old secondary color)
   static const Color textOnPrimary = Colors.white; // White text on green
   static const Color textOnSurface = Color(0xFF2D2D2D); // Dark text on white
 
@@ -97,9 +98,10 @@ class AppColors {
   static const Color divider = Color(0xFFE2E8F0);
   static const Color shadow = Color(0x1A000000);
   static const Color disabled = Color(0xFF94A3B8);
-  
+
   // 🎨 AUTH SCREEN COLORS
-  static const Color iconBackgroundColor = Color(0xFFDFF5E2); // Light green for icon background
+  static const Color iconBackgroundColor =
+      Color(0xFFDFF5E2); // Light green for icon background
 
   // 📱 NAVIGATION COLORS - Afrocentric Theme
   static const Color navSelected = Color(0xFF008037); // Green for active

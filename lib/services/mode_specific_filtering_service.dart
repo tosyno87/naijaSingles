@@ -67,7 +67,8 @@ class ModeSpecificFilteringService {
 
     // TEMPORARILY DISABLED: lookingFor filter (field might not exist or have different name)
     debugPrint(
-        '🔍 TEMPORARILY DISABLING lookingFor FILTER - field might not exist',);
+      '🔍 TEMPORARILY DISABLING lookingFor FILTER - field might not exist',
+    );
     // try {
     //   query = query.where('lookingFor', whereIn: ['Dating', 'Romance', 'Relationship', 'Love', 'Marriage']);
     //   debugPrint('💕 Filtering by lookingFor: Dating/Romance/Relationship/Love/Marriage');
@@ -82,7 +83,8 @@ class ModeSpecificFilteringService {
 
     // TEMPORARILY DISABLED: Filter for users with complete dating profiles
     debugPrint(
-        '🔍 TEMPORARILY DISABLING hasDatingProfile FILTER FOR DEBUGGING',);
+      '🔍 TEMPORARILY DISABLING hasDatingProfile FILTER FOR DEBUGGING',
+    );
     // query = query.where('hasDatingProfile', isEqualTo: true);
 
     return query;
@@ -109,10 +111,13 @@ class ModeSpecificFilteringService {
     if (currentUser.maxDistance != null) {
       // Expand max distance for friendship
       final friendshipMaxDistance = (currentUser.maxDistance! * 1.5).round();
-      query = query.where('maxDistance',
-          isGreaterThanOrEqualTo: friendshipMaxDistance,);
+      query = query.where(
+        'maxDistance',
+        isGreaterThanOrEqualTo: friendshipMaxDistance,
+      );
       debugPrint(
-          '🤝 Friendship distance filter: ${(friendshipMaxDistance * 0.621371).round()} miles',);
+        '🤝 Friendship distance filter: ${(friendshipMaxDistance * 0.621371).round()} miles',
+      );
     }
 
     // Filter for users looking for friendship
@@ -148,15 +153,20 @@ class ModeSpecificFilteringService {
     // Location is important for networking (business meetings)
     if (currentUser.maxDistance != null) {
       // Keep original distance for networking
-      query = query.where('maxDistance',
-          isGreaterThanOrEqualTo: currentUser.maxDistance,);
+      query = query.where(
+        'maxDistance',
+        isGreaterThanOrEqualTo: currentUser.maxDistance,
+      );
       debugPrint(
-          '💼 Networking distance filter: ${(currentUser.maxDistance! * 0.621371).round()} miles',);
+        '💼 Networking distance filter: ${(currentUser.maxDistance! * 0.621371).round()} miles',
+      );
     }
 
     // Filter for users looking for networking
-    query = query.where('lookingFor',
-        whereIn: ['Networking', 'Business', 'Professional'],);
+    query = query.where(
+      'lookingFor',
+      whereIn: ['Networking', 'Business', 'Professional'],
+    );
 
     // Filter for users with professional profiles
     query = query.where('hasProfessionalProfile', isEqualTo: true);
@@ -259,10 +269,11 @@ class ModeSpecificFilteringService {
 
   static bool _validateFriendshipMatch(UserModel user) {
     // Check if user has social interests
-    return user.bio?.isNotEmpty ?? false &&
-        (user.lookingFor == 'Friendship' ||
-            user.lookingFor == 'Friends' ||
-            user.lookingFor == 'Social');
+    return user.bio?.isNotEmpty ??
+        false &&
+            (user.lookingFor == 'Friendship' ||
+                user.lookingFor == 'Friends' ||
+                user.lookingFor == 'Social');
   }
 
   static bool _validateNetworkingMatch(UserModel user) {

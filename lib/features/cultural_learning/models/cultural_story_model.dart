@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CulturalStory {
-
   const CulturalStory({
     required this.id,
     required this.title,
@@ -60,26 +59,25 @@ class CulturalStory {
   final bool isPublished;
 
   Map<String, dynamic> toFirestore() => {
-      'title': title,
-      'content': content,
-      'authorId': authorId,
-      'authorName': authorName,
-      'country': country,
-      'category': category,
-      'tags': tags,
-      'imageUrl': imageUrl,
-      'isVerified': isVerified,
-      'likesCount': likesCount,
-      'commentsCount': commentsCount,
-      'likedBy': likedBy,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'isPublished': isPublished,
-    };
+        'title': title,
+        'content': content,
+        'authorId': authorId,
+        'authorName': authorName,
+        'country': country,
+        'category': category,
+        'tags': tags,
+        'imageUrl': imageUrl,
+        'isVerified': isVerified,
+        'likesCount': likesCount,
+        'commentsCount': commentsCount,
+        'likedBy': likedBy,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+        'isPublished': isPublished,
+      };
 }
 
 class LanguageExchange {
-
   const LanguageExchange({
     required this.id,
     required this.nativeLanguage,
@@ -132,18 +130,18 @@ class LanguageExchange {
   final bool isActive;
 
   Map<String, dynamic> toFirestore() => {
-      'nativeLanguage': nativeLanguage,
-      'learningLanguage': learningLanguage,
-      'userId': userId,
-      'userName': userName,
-      'proficiency': proficiency,
-      'country': country,
-      'city': city,
-      'isOnline': isOnline,
-      'isInPerson': isInPerson,
-      'description': description,
-      'interests': interests,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'isActive': isActive,
-    };
+        'nativeLanguage': nativeLanguage,
+        'learningLanguage': learningLanguage,
+        'userId': userId,
+        'userName': userName,
+        'proficiency': proficiency,
+        'country': country,
+        'city': city,
+        'isOnline': isOnline,
+        'isInPerson': isInPerson,
+        'description': description,
+        'interests': interests,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'isActive': isActive,
+      };
 }

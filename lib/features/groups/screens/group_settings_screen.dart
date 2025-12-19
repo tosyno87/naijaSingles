@@ -7,7 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/utils/app_logger.dart';
-import '../../../services/unified_group_service.dart' show UnifiedGroupService, UnifiedGroup, GroupType;
+import '../../../services/unified_group_service.dart'
+    show UnifiedGroupService, UnifiedGroup, GroupType;
 import '../../../services/image_upload_service.dart';
 import '../../../services/validation_service.dart';
 import '../../../widgets/group_avatar_picker.dart';
@@ -16,9 +17,9 @@ import '../../../widgets/tag_input_widget.dart';
 
 /// Screen for editing group settings (creator/admin only)
 class GroupSettingsScreen extends StatefulWidget {
-
   const GroupSettingsScreen({
-    required this.group, super.key,
+    required this.group,
+    super.key,
   });
   final UnifiedGroup group;
 
@@ -124,7 +125,8 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
           imageUrl = await _imageService.uploadImage(
             imageFile: _selectedImage!,
             path: 'group_avatars',
-            fileName: '${widget.group.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
+            fileName:
+                '${widget.group.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
           );
           AppLogger.info('Image uploaded successfully: $imageUrl');
         } catch (e) {
@@ -314,178 +316,178 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
   }
 
   Widget _buildAvatarSection() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Group Photo',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Group Photo',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        Center(
-          child: GroupAvatarPicker(
-            selectedImage: _selectedImage,
-            defaultImageUrl: _uploadedImageUrl,
-            onImageSelected: (image) {
-              setState(() {
-                _selectedImage = image;
-                // Clear uploaded URL when new image is selected
-                if (image == null) {
-                  _uploadedImageUrl = null;
-                }
-              });
-            },
-            size: 120,
+          const SizedBox(height: 16),
+          Center(
+            child: GroupAvatarPicker(
+              selectedImage: _selectedImage,
+              defaultImageUrl: _uploadedImageUrl,
+              onImageSelected: (image) {
+                setState(() {
+                  _selectedImage = image;
+                  // Clear uploaded URL when new image is selected
+                  if (image == null) {
+                    _uploadedImageUrl = null;
+                  }
+                });
+              },
+              size: 120,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
   Widget _buildGroupInfoSection() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Group Information',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _nameController,
-          decoration: InputDecoration(
-            labelText: 'Group Name',
-            hintText: 'Enter group name',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Group Information',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
             ),
-            prefixIcon: const Icon(Icons.group),
           ),
-          validator: ValidationService.validateGroupName,
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _descriptionController,
-          decoration: InputDecoration(
-            labelText: 'Description',
-            hintText: 'Describe your group',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _nameController,
+            decoration: InputDecoration(
+              labelText: 'Group Name',
+              hintText: 'Enter group name',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.group),
             ),
-            prefixIcon: const Icon(Icons.description),
+            validator: ValidationService.validateGroupName,
           ),
-          maxLines: 3,
-          validator: ValidationService.validateGroupDescription,
-        ),
-      ],
-    );
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _descriptionController,
+            decoration: InputDecoration(
+              labelText: 'Description',
+              hintText: 'Describe your group',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.description),
+            ),
+            maxLines: 3,
+            validator: ValidationService.validateGroupDescription,
+          ),
+        ],
+      );
 
   Widget _buildGroupTypeSection() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Group Type',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 16),
-        DropdownButtonFormField<String>(
-          initialValue: _selectedType.isNotEmpty ? _selectedType : null,
-          decoration: InputDecoration(
-            labelText: 'Select group type',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Group Type',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
             ),
-            prefixIcon: const Icon(Icons.category),
           ),
-          items: GroupType.values.map((type) {
-            final displayName = _getGroupTypeDisplayName(type.name);
-            return DropdownMenuItem<String>(
-              value: type.name,
-              child: Text(displayName),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedType = value ?? '';
-            });
-          },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a group type';
-            }
-            return null;
-          },
-        ),
-      ],
-    );
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedType.isNotEmpty ? _selectedType : null,
+            decoration: InputDecoration(
+              labelText: 'Select group type',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.category),
+            ),
+            items: GroupType.values.map((type) {
+              final displayName = _getGroupTypeDisplayName(type.name);
+              return DropdownMenuItem<String>(
+                value: type.name,
+                child: Text(displayName),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedType = value ?? '';
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please select a group type';
+              }
+              return null;
+            },
+          ),
+        ],
+      );
 
   Widget _buildTagsSection() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Tags',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Tags',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Add tags to help others discover your group',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: Colors.grey[600],
+          const SizedBox(height: 8),
+          Text(
+            'Add tags to help others discover your group',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        TagInputWidget(
-          tags: _tags,
-          onTagsChanged: (tags) {
-            setState(() {
-              _tags = tags;
-            });
-          },
-          hintText: 'e.g., music, nigerian, afrobeats',
-          suggestions: _tagSuggestions,
-        ),
-      ],
-    );
+          const SizedBox(height: 12),
+          TagInputWidget(
+            tags: _tags,
+            onTagsChanged: (tags) {
+              setState(() {
+                _tags = tags;
+              });
+            },
+            hintText: 'e.g., music, nigerian, afrobeats',
+            suggestions: _tagSuggestions,
+          ),
+        ],
+      );
 
   Widget _buildLocationSection() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Location',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _locationController,
-          decoration: InputDecoration(
-            labelText: 'Location',
-            hintText: 'Enter group location',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Location',
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
             ),
-            prefixIcon: const Icon(Icons.location_on),
           ),
-        ),
-      ],
-    );
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _locationController,
+            decoration: InputDecoration(
+              labelText: 'Location',
+              hintText: 'Enter group location',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.location_on),
+            ),
+          ),
+        ],
+      );
 
   String _getGroupTypeDisplayName(String typeName) {
     // Convert enum name to display name (e.g., 'music' -> 'Music')
@@ -494,34 +496,34 @@ class _GroupSettingsScreenState extends State<GroupSettingsScreen> {
   }
 
   Widget _buildSaveButton() => SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _saveSettings,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: _isLoading ? null : _saveSettings,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryGreen,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 0,
           ),
-          elevation: 0,
+          child: _isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Text(
+                  'Save Settings',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
         ),
-        child: _isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Text(
-                'Save Settings',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-      ),
-    );
+      );
 }

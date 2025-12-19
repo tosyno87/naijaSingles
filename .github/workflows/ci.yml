@@ -94,7 +94,7 @@ jobs:
       
     - name: SonarQube Quality Gate Check
       id: sonarqube-quality-gate-check
-      uses: SonarSource/sonarqube-quality-gate-action@v2
+      uses: SonarSource/sonarqube-quality-gate-action@master
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       continue-on-error: true
@@ -139,8 +139,8 @@ jobs:
           exit 1
         fi
         
-        # Check for Firebase config patterns
-        if grep -r "firebase.*key\|api.*key" lib/ --exclude-dir=generated 2>/dev/null; then
+        # Check for Firebase config patterns (exclude false positives)
+        if grep -r "firebase.*key\|api.*key" lib/ --exclude-dir=generated 2>/dev/null | grep -v "_apiKeyKey\|_key.*=.*'api_key'\|//.*api.*key\|#.*api.*key\|meetup_api/key"; then
           echo "⚠️  Potential Firebase configuration found in code"
           exit 1
         fi

@@ -3,8 +3,9 @@ name: Production Deployment
 on:
   push:
     branches: [ main, release/* ]
-  pull_request:
-    branches: [ main ]
+  # Note: Removed pull_request trigger to prevent duplicate runs
+  # PRs should use feature-development.yml workflow for testing
+  # Production deployment should only occur on actual merges to main
 
 
 permissions:
@@ -63,7 +64,7 @@ jobs:
     name: Build and Deploy Production
     runs-on: macos-latest
     needs: test
-    if: github.ref_type != 'pull_request'
+    # Only runs on push to main/release (not on PRs)
     permissions:
       contents: read
       id-token: write
@@ -400,24 +401,5 @@ jobs:
       # Deployment record creation removed - not essential for App Store deployment
       # The actual deployment to App Store Connect is what matters
 
-  security-scan:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    if: github.ref_type == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-        
-      - name: Setup Flutter
-        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
-        with:
-          flutter-version: '3.35.5'
-          
-      - name: Install dependencies
-        run: flutter pub get
-        
-      - name: Run security audit
-        run: flutter pub audit
-
-      - name: Check for outdated packages
-        run: flutter pub outdated || true
+  # Security scan removed - PRs should use feature-development.yml or ci.yml
+  # Production deployment should focus on building and deploying to App Store

@@ -5,6 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform, debugPrint;
 
+// Note: Using hardcoded values from GoogleService-Info.plist for production
+// SecureConfig is only used in development when .env file is available
 import 'config/secure_config.dart';
 
 /// Default Firebase configuration options for the current platform
@@ -38,7 +40,9 @@ class DefaultFirebaseOptions {
   }
 
   // Web configuration
-  static FirebaseOptions get web => FirebaseOptions(
+  static FirebaseOptions get web {
+    try {
+      return FirebaseOptions(
         apiKey: SecureConfig.firebaseWebApiKey,
         appId:
             '1:${SecureConfig.firebaseMessagingSenderId}:web:95ea92b8c7288e31704e49',
@@ -47,9 +51,23 @@ class DefaultFirebaseOptions {
         authDomain: SecureConfig.firebaseAuthDomain,
         storageBucket: SecureConfig.firebaseStorageBucket,
       );
+    } catch (e) {
+      // Fallback to production values
+      return FirebaseOptions(
+        apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
+        appId: '1:888697307756:web:95ea92b8c7288e31704e49',
+        messagingSenderId: '888697307756',
+        projectId: 'naijasingles-74a75',
+        authDomain: 'naijasingles-74a75.firebaseapp.com',
+        storageBucket: 'naijasingles-74a75.appspot.com',
+      );
+    }
+  }
 
   // Android configuration
-  static FirebaseOptions get android => FirebaseOptions(
+  static FirebaseOptions get android {
+    try {
+      return FirebaseOptions(
         apiKey: SecureConfig.firebaseAndroidApiKey,
         appId:
             '1:${SecureConfig.firebaseMessagingSenderId}:android:a62a339c4079bebc704e49',
@@ -57,9 +75,25 @@ class DefaultFirebaseOptions {
         projectId: SecureConfig.firebaseProjectId,
         storageBucket: SecureConfig.firebaseStorageBucket,
       );
+    } catch (e) {
+      // Fallback to production values
+      return FirebaseOptions(
+        apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
+        appId: '1:888697307756:android:a62a339c4079bebc704e49',
+        messagingSenderId: '888697307756',
+        projectId: 'naijasingles-74a75',
+        storageBucket: 'naijasingles-74a75.appspot.com',
+      );
+    }
+  }
 
   // iOS configuration
-  static FirebaseOptions get ios => FirebaseOptions(
+  // Using hardcoded values from GoogleService-Info.plist for production
+  // Falls back to SecureConfig in development if .env is available
+  static FirebaseOptions get ios {
+    try {
+      // Try to use SecureConfig if available (development with .env)
+      return FirebaseOptions(
         apiKey: SecureConfig.firebaseIosApiKey,
         appId:
             '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
@@ -69,9 +103,26 @@ class DefaultFirebaseOptions {
         iosClientId: SecureConfig.firebaseIosClientId,
         iosBundleId: SecureConfig.firebaseIosBundleId,
       );
+    } catch (e) {
+      // Fallback to hardcoded production values from GoogleService-Info.plist
+      // These values are safe to include in the app bundle
+      return FirebaseOptions(
+        apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
+        appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
+        messagingSenderId: '888697307756',
+        projectId: 'naijasingles-74a75',
+        storageBucket: 'naijasingles-74a75.appspot.com',
+        iosClientId:
+            '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
+        iosBundleId: 'com.app.naijasingles',
+      );
+    }
+  }
 
   // macOS configuration
-  static FirebaseOptions get macos => FirebaseOptions(
+  static FirebaseOptions get macos {
+    try {
+      return FirebaseOptions(
         apiKey: SecureConfig.firebaseIosApiKey,
         appId:
             '1:${SecureConfig.firebaseMessagingSenderId}:ios:95ea92b8c7288e31704e49',
@@ -81,6 +132,20 @@ class DefaultFirebaseOptions {
         iosClientId: SecureConfig.firebaseIosClientId,
         iosBundleId: SecureConfig.firebaseIosBundleId,
       );
+    } catch (e) {
+      // Fallback to production values (same as iOS)
+      return FirebaseOptions(
+        apiKey: 'AIzaSyAwsU8j3acGo_cKOECbgsXHd3-qvvLn_Fw',
+        appId: '1:888697307756:ios:95ea92b8c7288e31704e49',
+        messagingSenderId: '888697307756',
+        projectId: 'naijasingles-74a75',
+        storageBucket: 'naijasingles-74a75.appspot.com',
+        iosClientId:
+            '888697307756-c0gm1rhh6f0dd7fh8f3geqbn12ctmmho.apps.googleusercontent.com',
+        iosBundleId: 'com.app.naijasingles',
+      );
+    }
+  }
 }
 
 /// Helper class to connect to Firebase emulators in development
@@ -88,6 +153,7 @@ class FirebaseEmulators {
   /// Connect to Firebase emulators if in debug mode
   static void connectToEmulators() {
     // Disable emulator connections for production
+    // ignore: dead_code
     if (false) {
       // Changed from kDebugMode to false to disable emulators
       try {

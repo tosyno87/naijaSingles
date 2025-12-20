@@ -34,14 +34,19 @@ Future<void> main() async {
   await EasyLocalization.ensureInitialized();
 
   // Initialize Secure Configuration first
+  // Note: In production, .env file may not be bundled - Firebase uses firebase_options.dart
   try {
     await SecureConfig.initialize();
     SecureConfig.validate();
     log('🔒 Secure configuration loaded successfully');
   } catch (e) {
     log('❌ Secure configuration error: $e');
-    log('💡 Make sure you have created a .env file with your Firebase configuration');
-    // Continue anyway in development mode
+    if (kDebugMode) {
+      log('💡 Make sure you have created a .env file with your Firebase configuration');
+    } else {
+      log('⚠️ .env file not available in production - Firebase will use firebase_options.dart');
+    }
+    // Continue anyway - Firebase initialization will use firebase_options.dart
   }
 
   // Initialize Secure Storage Service

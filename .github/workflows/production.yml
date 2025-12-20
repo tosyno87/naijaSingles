@@ -256,7 +256,15 @@ jobs:
           CURRENT_VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: \(.*\)+.*/\1/')
           sed -i.bak "s/version: .*+.*/version: ${CURRENT_VERSION}+${NEW_BUILD}/" pubspec.yaml
           
+          # Also update iOS Info.plist to ensure it's synced
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $NEW_BUILD" ios/Runner/Info.plist 2>/dev/null || echo "⚠️ Could not update Info.plist (may use Flutter variable)"
+          
+          # Update Xcode project version
+          sed -i.bak "s/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = $NEW_BUILD/g" ios/Runner.xcodeproj/project.pbxproj
+          
           echo "✅ Updated pubspec.yaml to: $(grep 'version:' pubspec.yaml)"
+          echo "✅ Updated Info.plist CFBundleVersion to: $NEW_BUILD"
+          echo "✅ Updated Xcode CURRENT_PROJECT_VERSION to: $NEW_BUILD"
           
       - name: Build iOS Release with Fastlane
         run: |

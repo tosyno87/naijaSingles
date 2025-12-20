@@ -3,8 +3,9 @@ name: Staging Deployment
 on:
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+  # Note: Removed pull_request trigger to prevent deployments on PRs
+  # Staging deployment should only occur on actual merges to develop
+  # PRs should use feature-development.yml workflow for testing only
 
 env:
   FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID_STAGING || secrets.FIREBASE_PROJECT_ID_STAGING }}

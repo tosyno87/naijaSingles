@@ -133,9 +133,10 @@ jobs:
     - name: Check for secrets and sensitive data
       run: |
         echo "Checking for potential secrets in code..."
-        # Check for hardcoded API keys
-        if grep -r "AIza[0-9A-Za-z_-]" lib/ --exclude-dir=generated 2>/dev/null; then
-          echo "⚠️  Potential API key found in code"
+        # Check for hardcoded API keys (exclude Firebase public keys in firebase_options.dart)
+        # Firebase API keys are public and safe to include in app bundle
+        if grep -r "AIza[0-9A-Za-z_-]" lib/ --exclude-dir=generated 2>/dev/null | grep -v "firebase_options.dart"; then
+          echo "⚠️  Potential API key found in code (excluding Firebase public keys)"
           exit 1
         fi
         

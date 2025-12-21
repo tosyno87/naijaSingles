@@ -17,15 +17,15 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Communities',
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+        appBar: AppBar(
+          title: Text(
+            'Discover',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
-        ),
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         centerTitle: true,
@@ -45,7 +45,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                 ),
               );
             },
-            tooltip: 'Search Communities',
+              tooltip: 'Search Discover',
           ),
         ],
       ),
@@ -67,24 +67,24 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
   Widget _buildWelcomeSection() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Welcome to Communities! 🌍',
-          style: GoogleFonts.montserrat(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-            height: 1.2,
+          Text(
+            'Welcome to Discover! 🌍',
+            style: GoogleFonts.montserrat(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              height: 1.2,
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Connect with amazing people and discover exciting events in your community',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            color: AppColors.textSecondary,
-            height: 1.4,
+          const SizedBox(height: 12),
+          Text(
+            'Explore events and communities around you',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
           ),
-        ),
       ],
     );
 

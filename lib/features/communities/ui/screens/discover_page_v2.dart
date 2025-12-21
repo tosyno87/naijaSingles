@@ -52,25 +52,25 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
               const SizedBox(height: 32),
 
               // Start Here Section
-              _buildSectionHeader('Start Here'),
+              _buildSectionHeader('Start Here', fontSize: 22),
               const SizedBox(height: 16),
               _buildStartHereCards(context),
               const SizedBox(height: 32),
 
               // Recommended for You Section
-              _buildSectionHeader('Recommended for You'),
+              _buildSectionHeader('Recommended for You', fontSize: 20),
               const SizedBox(height: 16),
               _buildRecommendedList(context),
               const SizedBox(height: 32),
 
               // Happening Near You Section
-              _buildSectionHeader('Happening Near You'),
+              _buildSectionHeader('Happening Near You', fontSize: 20),
               const SizedBox(height: 16),
               _buildHappeningNearYou(context),
               const SizedBox(height: 32),
 
               // Explore More Section
-              _buildSectionHeader('Explore More'),
+              _buildSectionHeader('Explore More', fontSize: 20),
               const SizedBox(height: 16),
               _buildExploreMore(context),
               const SizedBox(height: 20),
@@ -105,11 +105,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, {double fontSize = 20}) {
     return Text(
       title,
       style: GoogleFonts.montserrat(
-        fontSize: 22,
+        fontSize: fontSize,
         fontWeight: FontWeight.bold,
         color: AppColors.textPrimary,
       ),
@@ -248,17 +248,48 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       ),
     ];
 
-    return Column(
-      children: recommendations.map((item) {
-        return _buildListTile(
-          context: context,
-          title: item.title,
-          type: item.type,
-          onTap: () {
-            _showComingSoonSnackBar(context);
-          },
-        );
-      }).toList(),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.1),
+        ),
+      ),
+      child: Column(
+        children: recommendations.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          return Column(
+            children: [
+              _buildListTile(
+                context: context,
+                title: item.title,
+                type: item.type,
+                onTap: () {
+                  _showComingSoonSnackBar(context);
+                },
+              ),
+              // Add divider between items (not after last item)
+              if (index < recommendations.length - 1)
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey.withOpacity(0.1),
+                  indent: 16,
+                  endIndent: 16,
+                ),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -278,33 +309,16 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.grey.withOpacity(0.1),
-            ),
-          ),
           child: Row(
             children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 12),
               Icon(
                 icon,
                 size: 18,
                 color: iconColor,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -12,12 +12,37 @@ import '../../../groups/screens/unified_groups_screen.dart';
 /// - Recommended for You section
 /// - Happening Near You section with location-based stats
 /// - Explore More section with navigation options
-class DiscoverPageV2 extends StatelessWidget {
+class DiscoverPageV2 extends StatefulWidget {
   const DiscoverPageV2({super.key});
+
+  @override
+  State<DiscoverPageV2> createState() => _DiscoverPageV2State();
+}
+
+class _DiscoverPageV2State extends State<DiscoverPageV2> {
 
   // Hardcoded constants (can be replaced with Firestore data later)
   static const int eventsThisWeek = 3;
   static const int activeCommunities = 5;
+  bool _hasShownFabTooltip = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Show FAB tooltip on first launch (after first frame)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_hasShownFabTooltip) {
+        _showFabTooltip();
+        _hasShownFabTooltip = true;
+      }
+    });
+  }
+
+  void _showFabTooltip() {
+    // Show tooltip for FAB if it exists
+    // This is a placeholder - FAB can be added later if needed
+    // For now, we'll just set the flag to prevent showing it again
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +106,7 @@ class DiscoverPageV2 extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Find people, events, and',
+          'Discover people, events, and',
           style: GoogleFonts.montserrat(
             fontSize: 16,
             color: AppColors.textSecondary,
@@ -89,7 +114,7 @@ class DiscoverPageV2 extends StatelessWidget {
           ),
         ),
         Text(
-          'communities around you',
+          'communities near you',
           style: GoogleFonts.montserrat(
             fontSize: 16,
             color: AppColors.textSecondary,
@@ -225,17 +250,30 @@ class DiscoverPageV2 extends StatelessWidget {
 
   Widget _buildRecommendedList(BuildContext context) {
     final recommendations = [
-      'Lagos Diaspora Professionals',
-      'Afro Tech Meetup – This Saturday',
-      'Singles Game Night (5 miles away)',
-      'New Community: Book Lovers 🇳🇬',
+      _RecommendationItem(
+        title: 'Lagos Diaspora Professionals',
+        type: RecommendationType.community,
+      ),
+      _RecommendationItem(
+        title: 'Afro Tech Meetup – This Saturday',
+        type: RecommendationType.event,
+      ),
+      _RecommendationItem(
+        title: 'Singles Game Night (5 miles away)',
+        type: RecommendationType.event,
+      ),
+      _RecommendationItem(
+        title: 'New Community: Book Lovers 🇳🇬',
+        type: RecommendationType.community,
+      ),
     ];
 
     return Column(
       children: recommendations.map((item) {
         return _buildListTile(
           context: context,
-          title: item,
+          title: item.title,
+          type: item.type,
           onTap: () {
             _showComingSoonSnackBar(context);
           },
@@ -247,8 +285,14 @@ class DiscoverPageV2 extends StatelessWidget {
   Widget _buildListTile({
     required BuildContext context,
     required String title,
+    required RecommendationType type,
     required VoidCallback onTap,
   }) {
+    final isEvent = type == RecommendationType.event;
+    final icon = isEvent ? Icons.celebration_rounded : Icons.groups_rounded;
+    final label = isEvent ? 'Event' : 'Community';
+    final iconColor = isEvent ? const Color(0xFFFF9800) : const Color(0xFF6B46C1);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -275,14 +319,34 @@ class DiscoverPageV2 extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
+              Icon(
+                icon,
+                size: 18,
+                color: iconColor,
+              ),
+              const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 15,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      label,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -293,50 +357,81 @@ class DiscoverPageV2 extends StatelessWidget {
   }
 
   Widget _buildHappeningNearYou(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          // Navigate to Events screen (can be filtered by location later)
+          Navigator.pushNamed(context, RouteName.eventsScreen);
+        },
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-        border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Location hint
-          Row(
-            children: [
-              const Icon(
-                Icons.location_on_rounded,
-                size: 18,
-                color: AppColors.primaryGreen,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
-              const SizedBox(width: 6),
-              Text(
-                'Based on your location',
-                style: GoogleFonts.montserrat(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  fontStyle: FontStyle.italic,
-                ),
+            ],
+            border: Border.all(
+              color: AppColors.primaryGreen.withOpacity(0.1),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Location hint
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on_rounded,
+                    size: 18,
+                    color: AppColors.primaryGreen,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Based on your location',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Stats rows
+              _buildStatRow('$eventsThisWeek events this week'),
+              const SizedBox(height: 10),
+              _buildStatRow('$activeCommunities active communities'),
+              const SizedBox(height: 12),
+              // CTA line
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'See what\'s nearby',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      color: AppColors.primaryGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 16,
+                    color: AppColors.primaryGreen,
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Stats rows
-          _buildStatRow('$eventsThisWeek events this week'),
-          const SizedBox(height: 10),
-          _buildStatRow('$activeCommunities active communities'),
-        ],
+        ),
       ),
     );
   }
@@ -451,5 +546,22 @@ class DiscoverPageV2 extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Enum to distinguish between event and community recommendations
+enum RecommendationType {
+  event,
+  community,
+}
+
+/// Helper class to represent recommendation items with their type
+class _RecommendationItem {
+  final String title;
+  final RecommendationType type;
+
+  _RecommendationItem({
+    required this.title,
+    required this.type,
+  });
 }
 

@@ -398,7 +398,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           BottomNavigationBarItem(
             icon: Custom3DIcons.communities(),
-            label: 'Communities',
+            label: 'Discover',
           ),
           BottomNavigationBarItem(
             icon: Custom3DIcons.messages(),

@@ -19,7 +19,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
           title: Text(
-            'Communities',
+            'Discover',
             style: GoogleFonts.montserrat(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -45,7 +45,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                   ),
                 );
               },
-              tooltip: 'Search Communities',
+              tooltip: 'Search Discover',
             ),
           ],
         ),
@@ -68,7 +68,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welcome to Communities! 🌍',
+            'Welcome to Discover! 🌍',
             style: GoogleFonts.montserrat(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -78,7 +78,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Connect with amazing people and discover exciting events in your community',
+            'Explore events and communities around you',
             style: GoogleFonts.montserrat(
               fontSize: 16,
               color: AppColors.textSecondary,

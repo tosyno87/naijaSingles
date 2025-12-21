@@ -232,11 +232,8 @@ class _EventsScreenState extends State<EventsScreen> {
           // Category Filters
           _buildCategoryFilters(),
 
-          // Date Range Filters
-          _buildDateRangeFilters(),
-
-          // Advanced Filter Button
-          _buildAdvancedFilterButton(),
+          // Date Range Dropdown and Advanced Filter (in same row)
+          _buildDateAndAdvancedFilters(),
         ],
       );
 
@@ -294,8 +291,10 @@ class _EventsScreenState extends State<EventsScreen> {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          final isSelected = _currentFilter.category == category ||
-              (_currentFilter.category == null && category == 'All');
+          // Mutually exclusive: selecting a category deselects "All"
+          final isSelected = category == 'All'
+              ? _currentFilter.category == null
+              : _currentFilter.category == category;
 
           return Container(
             margin: const EdgeInsets.only(right: 8),
@@ -303,10 +302,9 @@ class _EventsScreenState extends State<EventsScreen> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
+                  // Mutually exclusive selection
                   final newFilter = _currentFilter.copyWith(
-                    category: isSelected
-                        ? null
-                        : (category == 'All' ? null : category),
+                    category: category == 'All' ? null : category,
                   );
                   _onFilterChanged(newFilter);
                 },
@@ -351,64 +349,69 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  Widget _buildDateRangeFilters() {
+  Widget _buildDateAndAdvancedFilters() => Container(
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        child: Row(
+          children: [
+            // Date Range Dropdown
+            Expanded(
+              child: _buildDateRangeDropdown(),
+            ),
+            const SizedBox(width: 12),
+            // Advanced Filter Link
+            _buildAdvancedFilterLink(),
+          ],
+        ),
+      );
+
+  Widget _buildDateRangeDropdown() {
     final dateRanges = ['All Time', 'Today', 'This Week', 'This Month'];
+    String selectedDateRange = 'All Time';
+
+    // Determine current selection
+    if (_currentFilter.startDate != null || _currentFilter.endDate != null) {
+      if (_isDateRangeSelected('Today')) {
+        selectedDateRange = 'Today';
+      } else if (_isDateRangeSelected('This Week')) {
+        selectedDateRange = 'This Week';
+      } else if (_isDateRangeSelected('This Month')) {
+        selectedDateRange = 'This Month';
+      }
+    }
 
     return Container(
-      height: 40,
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: dateRanges.length,
-        itemBuilder: (context, index) {
-          final dateRange = dateRanges[index];
-          final isSelected = _isDateRangeSelected(dateRange);
-
-          return Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  final newFilter = _getDateRangeFilter(dateRange, !isSelected);
-                  _onFilterChanged(newFilter);
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF008037) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF008037)
-                          : const Color(0xFFE0E0E0),
-                    ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Text(
-                    dateRange,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.w500,
-                      color:
-                          isSelected ? Colors.white : const Color(0xFF008037),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFE0E0E0),
+        ),
+      ),
+      child: DropdownButton<String>(
+        value: selectedDateRange,
+        isExpanded: true,
+        underline: const SizedBox.shrink(),
+        icon: const Icon(
+          Icons.arrow_drop_down,
+          color: Color(0xFF008037),
+        ),
+        style: GoogleFonts.montserrat(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF333333),
+        ),
+        items: dateRanges.map((String range) {
+          return DropdownMenuItem<String>(
+            value: range,
+            child: Text(range),
           );
+        }).toList(),
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            final newFilter = _getDateRangeFilter(newValue, true);
+            _onFilterChanged(newFilter);
+          }
         },
       ),
     );
@@ -443,7 +446,10 @@ class _EventsScreenState extends State<EventsScreen> {
 
   EventFilter _getDateRangeFilter(String dateRange, bool selected) {
     if (!selected || dateRange == 'All Time') {
-      return _currentFilter.copyWith();
+      return _currentFilter.copyWith(
+        startDate: null,
+        endDate: null,
+      );
     }
 
     final now = DateTime.now();
@@ -469,60 +475,41 @@ class _EventsScreenState extends State<EventsScreen> {
     return _currentFilter.copyWith(startDate: startDate, endDate: endDate);
   }
 
-  Widget _buildAdvancedFilterButton() => Container(
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-        child: Row(
-          children: [
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // TODO: Implement advanced filter dialog
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Advanced filters coming soon!'),
-                      backgroundColor: Color(0xFF008037),
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008037), // Deep green
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.tune,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Advanced',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+  Widget _buildAdvancedFilterLink() => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            // TODO: Implement advanced filter dialog
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Advanced filters coming soon!'),
+                backgroundColor: Color(0xFF008037),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.tune,
+                  color: Color(0xFF008037),
+                  size: 18,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Advanced',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF008037),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       );
 
@@ -891,8 +878,8 @@ class _EventsScreenState extends State<EventsScreen> {
                   20,
                   0,
                   20,
-                  80,
-                ), // Bottom padding for FAB
+                  100,
+                ), // Increased bottom padding to prevent FAB overlap with RSVP buttons
                 itemCount: state.events.length + (state.isLoadingMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= state.events.length) {

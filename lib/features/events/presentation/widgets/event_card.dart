@@ -225,9 +225,7 @@ class EventCard extends StatelessWidget {
           const SizedBox(height: 8),
           _buildDetailRow(
             icon: Icons.location_on,
-            text: event.location.displayAddress.isNotEmpty
-                ? event.location.displayAddress
-                : 'Location TBA',
+            text: _getLocationDisplayText(),
           ),
         ],
       );
@@ -360,6 +358,53 @@ class EventCard extends StatelessWidget {
 
     return 'Starts at $startTime';
   }
+
+  String _getLocationDisplayText() {
+    final displayAddress = event.location.displayAddress.trim();
+    
+    // Check if location is empty or contains placeholder/malformed data
+    if (displayAddress.isEmpty) {
+      return 'Location TBD';
+    }
+    
+    // Check for common placeholder patterns
+    final lowerAddress = displayAddress.toLowerCase();
+    if (lowerAddress.contains('tba') ||
+        lowerAddress.contains('tbd') ||
+        lowerAddress.contains('to be announced') ||
+        lowerAddress.contains('to be determined') ||
+        lowerAddress.contains('online') ||
+        lowerAddress == 'location' ||
+        lowerAddress == 'address' ||
+        // Check for repeated characters (e.g., "ree, re, re")
+        _isMalformedLocation(displayAddress)) {
+      // Check if it's explicitly marked as online
+      if (lowerAddress.contains('online') || lowerAddress.contains('virtual')) {
+        return 'Online';
+      }
+      return 'Location TBD';
+    }
+    
+    return displayAddress;
+  }
+
+  bool _isMalformedLocation(String address) {
+    // Check for patterns like "ree, re, re" or very short repeated words
+    final words = address.split(',').map((w) => w.trim().toLowerCase()).toList();
+    if (words.length > 2) {
+      // Check if all words are very short (likely malformed)
+      final allShort = words.every((w) => w.length <= 3);
+      if (allShort && words.length >= 3) {
+        return true;
+      }
+      // Check for repeated words
+      final uniqueWords = words.toSet();
+      if (uniqueWords.length < words.length * 0.5) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 // Compact version for lists
@@ -371,6 +416,46 @@ class CompactEventCard extends StatelessWidget {
   });
   final EventModel event;
   final VoidCallback? onTap;
+  
+  String _getLocationText() {
+    final displayAddress = event.location.displayAddress.trim();
+    
+    if (displayAddress.isEmpty) {
+      return 'Location TBD';
+    }
+    
+    final lowerAddress = displayAddress.toLowerCase();
+    if (lowerAddress.contains('tba') ||
+        lowerAddress.contains('tbd') ||
+        lowerAddress.contains('to be announced') ||
+        lowerAddress.contains('to be determined') ||
+        lowerAddress.contains('online') ||
+        lowerAddress == 'location' ||
+        lowerAddress == 'address' ||
+        _isMalformedLocation(displayAddress)) {
+      if (lowerAddress.contains('online') || lowerAddress.contains('virtual')) {
+        return 'Online';
+      }
+      return 'Location TBD';
+    }
+    
+    return displayAddress;
+  }
+  
+  bool _isMalformedLocation(String address) {
+    final words = address.split(',').map((w) => w.trim().toLowerCase()).toList();
+    if (words.length > 2) {
+      final allShort = words.every((w) => w.length <= 3);
+      if (allShort && words.length >= 3) {
+        return true;
+      }
+      final uniqueWords = words.toSet();
+      if (uniqueWords.length < words.length * 0.5) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) => GestureDetector(
@@ -450,9 +535,7 @@ class CompactEventCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      event.location.displayAddress.isNotEmpty
-                          ? event.location.displayAddress
-                          : 'Location TBA',
+                      _getLocationText(),
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         color: const Color(0xFF999999),

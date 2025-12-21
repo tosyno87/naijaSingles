@@ -47,7 +47,7 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Quick Actions',
+            'Explore Afropeep',
             style: GoogleFonts.montserrat(
               fontSize: 22,
               fontWeight: FontWeight.bold,

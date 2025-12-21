@@ -6,7 +6,8 @@
 // TODO: Migrate all imports from 'constants/colors.dart' to 'constants/app_colors.dart'
 // Then delete this file.
 
-@Deprecated('Use app_colors.dart instead. This file will be removed in a future version.')
+@Deprecated(
+    'Use app_colors.dart instead. This file will be removed in a future version.')
 library;
 
 import 'package:flutter/material.dart';
@@ -18,7 +19,8 @@ export 'app_colors.dart' show AppColors;
 @Deprecated('Use AppColors.primaryGreen from app_colors.dart')
 const Color primaryColor = Color(0xFF008037);
 
-@Deprecated('Use AppColors.backgroundColor (white) from app_colors.dart. Old cream color is deprecated.')
+@Deprecated(
+    'Use AppColors.backgroundColor (white) from app_colors.dart. Old cream color is deprecated.')
 const Color backgroundColor = Colors.white; // Updated to white (was cream)
 
 @Deprecated('Use AppColors.cardColor from app_colors.dart')

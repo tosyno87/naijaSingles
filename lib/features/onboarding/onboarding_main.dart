@@ -49,21 +49,27 @@ class _OnboardingMainState extends State<OnboardingMain> {
     // Debug: Print current controller state
     debugPrint('🔍 OnboardingMain: Current page: $_currentPage');
     debugPrint(
-        '🔍 OnboardingMain: Controller instance: ${controller.hashCode}',);
+      '🔍 OnboardingMain: Controller instance: ${controller.hashCode}',
+    );
     debugPrint('🔍 OnboardingMain: Controller state:');
     debugPrint(
-        '   Name: "${controller.fullName}" (length: ${controller.fullName.length})',);
+      '   Name: "${controller.fullName}" (length: ${controller.fullName.length})',
+    );
     debugPrint('   DOB: ${controller.dateOfBirth}');
     debugPrint(
-        '   Gender: "${controller.gender}" (length: ${controller.gender.length})',);
+      '   Gender: "${controller.gender}" (length: ${controller.gender.length})',
+    );
     debugPrint('   Location: "${controller.locationName ?? 'Not set'}"');
     debugPrint(
-        '   Tribe: "${controller.tribe}" (length: ${controller.tribe.length})',);
+      '   Tribe: "${controller.tribe}" (length: ${controller.tribe.length})',
+    );
     debugPrint(
-        '   Bio: "${controller.bio}" (length: ${controller.bio.length})',);
+      '   Bio: "${controller.bio}" (length: ${controller.bio.length})',
+    );
     debugPrint('   Interests: ${controller.interests}');
     debugPrint(
-        '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5',);
+      '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5',
+    );
     debugPrint('   Photo validation: ${controller.isPhotoUploaded()}');
     debugPrint('   Height: ${controller.heightDisplay}');
     debugPrint('   Looking For: ${controller.lookingFor}');
@@ -111,7 +117,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
       }
     } else if (_currentPage == 3) {
       // Nationality selection page (tribe optional)
-      if (controller.nationality == null || controller.nationality!.trim().isEmpty) {
+      if (controller.nationality == null ||
+          controller.nationality!.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select your nationality')),
         );
@@ -129,7 +136,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
       if (controller.interestedIn.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text("Please select who you're interested in"),),
+            content: Text("Please select who you're interested in"),
+          ),
         );
         return;
       }
@@ -176,7 +184,8 @@ class _OnboardingMainState extends State<OnboardingMain> {
     debugPrint('   Bio: ${controller.bio}');
     debugPrint('   Interests: ${controller.interests}');
     debugPrint(
-        '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5',);
+      '   Photos uploaded: ${controller.profilePhotos.where((photo) => photo != null).length}/5',
+    );
     debugPrint('   Height: ${controller.heightDisplay}');
     debugPrint('   Looking For: ${controller.lookingFor}');
     debugPrint('   Relationship Intent: ${controller.relationshipIntent}');
@@ -356,17 +365,20 @@ class _OnboardingMainState extends State<OnboardingMain> {
                     // Debug logging for continue labelLarge state
                     if (_currentPage >= 5) {
                       debugPrint(
-                          '🔍 Continue labelLarge state for page $_currentPage:',);
+                        '🔍 Continue labelLarge state for page $_currentPage:',
+                      );
                       debugPrint('   canContinue: $canContinue');
                       if (_currentPage == 5) {
                         debugPrint(
-                            '   interestedIn: "${controller.interestedIn}"',);
+                          '   interestedIn: "${controller.interestedIn}"',
+                        );
                         debugPrint('   ageRange: ${controller.ageRange}');
                       } else if (_currentPage == 6) {
                         debugPrint('   height: ${controller.height}');
                         debugPrint('   lookingFor: "${controller.lookingFor}"');
                         debugPrint(
-                            '   relationshipIntent: "${controller.relationshipIntent}"',);
+                          '   relationshipIntent: "${controller.relationshipIntent}"',
+                        );
                       }
                     }
 
@@ -386,9 +398,7 @@ class _OnboardingMainState extends State<OnboardingMain> {
                           elevation: 2,
                         ),
                         child: Text(
-                          _currentPage < _totalPages - 1
-                              ? 'Next'
-                              : 'Finish',
+                          _currentPage < _totalPages - 1 ? 'Next' : 'Finish',
                           style: GoogleFonts.montserrat(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,

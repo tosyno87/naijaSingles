@@ -44,19 +44,20 @@ class SplashState extends State<Splash> {
       // Trigger auth check - navigation will be handled by BlocListener
       final authBloc = BlocProvider.of<AuthstatusBloc>(context);
       authBloc.add(AuthRequestEvent());
-      
+
       // Wait for auth state to be determined with timeout
       // The BlocListener will handle navigation when state changes
       const maxWaitTime = Duration(seconds: 3);
       final startTime = DateTime.now();
-      
-      while (DateTime.now().difference(startTime) < maxWaitTime && !_hasNavigated) {
+
+      while (DateTime.now().difference(startTime) < maxWaitTime &&
+          !_hasNavigated) {
         await Future.delayed(const Duration(milliseconds: 200));
         if (!mounted) return;
-        
+
         final currentState = authBloc.state;
-        if (currentState is AuthenticatedState || 
-            currentState is UnauthenticatedState || 
+        if (currentState is AuthenticatedState ||
+            currentState is UnauthenticatedState ||
             currentState is AuthFailed) {
           // State is determined, BlocListener should have handled it
           // If not, handle it here
@@ -75,10 +76,10 @@ class SplashState extends State<Splash> {
           }
         }
       }
-      
+
       // Final fallback: navigate to welcome screen if still stuck
       if (!mounted || _hasNavigated) return;
-      
+
       _hasNavigated = true;
       log('Final fallback: Navigating to welcome screen');
       Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
@@ -96,7 +97,8 @@ class SplashState extends State<Splash> {
     // Modern splash screen colors - white background matching app theme
     const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryGreen = Color(0xFF008037); // Afropeep green
-    const Color textColor = Color(0xFF3B3B3B); // Dark brown/charcoal (not pure black)
+    const Color textColor =
+        Color(0xFF3B3B3B); // Dark brown/charcoal (not pure black)
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -128,7 +130,8 @@ class SplashState extends State<Splash> {
             log('Authentication failed in listener: ${state.message}');
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Authentication error: ${state.message}')),
+                SnackBar(
+                    content: Text('Authentication error: ${state.message}')),
               );
               Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
             }
@@ -148,7 +151,8 @@ class SplashState extends State<Splash> {
                       end: Alignment.bottomCenter,
                       colors: [
                         backgroundColor,
-                        const Color(0xFF27A957).withOpacity(0.1), // Very subtle green tint at bottom
+                        const Color(0xFF27A957).withOpacity(
+                            0.1), // Very subtle green tint at bottom
                       ],
                       stops: const [0.7, 1.0],
                     ),
@@ -195,7 +199,8 @@ class SplashState extends State<Splash> {
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      primaryGreen.withOpacity(0.6), // Soft green, not too prominent
+                      primaryGreen
+                          .withOpacity(0.6), // Soft green, not too prominent
                     ),
                   ),
                 ),

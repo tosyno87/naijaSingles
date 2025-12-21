@@ -27,9 +27,10 @@ class UserBloc extends Bloc<UserEvents, UserStates> {
       try {
         log('file is in bloc ${event.photo}');
         final task = await FireStoreClass.uploadFile(
-            currentUser: event.currentUser,
-            checktype: event.checktype,
-            file: event.photo,);
+          currentUser: event.currentUser,
+          checktype: event.checktype,
+          file: event.photo,
+        );
         final imageUrl = await task?.snapshot.ref.getDownloadURL();
         log('from bloc $imageUrl');
 

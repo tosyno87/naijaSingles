@@ -248,8 +248,9 @@ class _UserNationalityState extends State<UserNationality> {
         filteredCountries = List.from(countries);
       } else {
         filteredCountries = countries
-            .where((country) =>
-                country.toLowerCase().contains(query.toLowerCase()),)
+            .where(
+              (country) => country.toLowerCase().contains(query.toLowerCase()),
+            )
             .toList();
       }
     });
@@ -432,7 +433,9 @@ class _UserNationalityState extends State<UserNationality> {
                             onTap: () => _selectCountry(country),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 16,),
+                                vertical: 12,
+                                horizontal: 16,
+                              ),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? const Color(0xFFE8F5E9)
@@ -489,11 +492,15 @@ class _UserNationalityState extends State<UserNationality> {
                         });
                         log(widget.userData.toString());
                         Navigator.pushNamed(
-                            context, RouteName.sexualorientationScreen,
-                            arguments: widget.userData,);
+                          context,
+                          RouteName.sexualorientationScreen,
+                          arguments: widget.userData,
+                        );
                       } else {
                         CustomSnackbar.showSnackBarSimple(
-                            'Please select your country', context,);
+                          'Please select your country',
+                          context,
+                        );
                       }
                     },
                     text: 'CONTINUE',

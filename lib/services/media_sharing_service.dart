@@ -435,7 +435,10 @@ class MediaSharingService {
 
   /// Update thread metadata
   Future<void> _updateThreadMetadata(
-      String threadId, String lastMessageText, String senderId,) async {
+    String threadId,
+    String lastMessageText,
+    String senderId,
+  ) async {
     try {
       await _firestore.collection('chatThreads').doc(threadId).update({
         'lastMessageText': lastMessageText,
@@ -449,13 +452,17 @@ class MediaSharingService {
 
   /// Get media messages for a thread
   Stream<List<MediaMessage>> getMediaMessages(String threadId) => _firestore
-        .collection('chatThreads')
-        .doc(threadId)
-        .collection('messages')
-        .where('type', whereIn: ['image', 'video', 'audio', 'document'])
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => MediaMessage.fromMap(doc.id, doc.data())).toList(),);
+      .collection('chatThreads')
+      .doc(threadId)
+      .collection('messages')
+      .where('type', whereIn: ['image', 'video', 'audio', 'document'])
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => MediaMessage.fromMap(doc.id, doc.data()))
+            .toList(),
+      );
 
   /// Delete media message
   Future<void> deleteMediaMessage(String threadId, String messageId) async {
@@ -485,35 +492,39 @@ enum MediaType {
 
 /// Media message model
 class MediaMessage {
-
   MediaMessage({
     required this.id,
     required this.threadId,
     required this.senderId,
     required this.type,
     required this.mediaUrl,
-    required this.fileSize, required this.timestamp, required this.isRead, required this.readBy, this.thumbnailUrl,
+    required this.fileSize,
+    required this.timestamp,
+    required this.isRead,
+    required this.readBy,
+    this.thumbnailUrl,
     this.caption,
     this.duration,
   });
 
-  factory MediaMessage.fromMap(String id, Map<String, dynamic> map) => MediaMessage(
-      id: id,
-      threadId: map['threadId'] ?? '',
-      senderId: map['senderId'] ?? '',
-      type: MediaType.values.firstWhere(
-        (e) => e.name == map['type'],
-        orElse: () => MediaType.image,
-      ),
-      mediaUrl: map['mediaUrl'] ?? '',
-      thumbnailUrl: map['thumbnailUrl'],
-      caption: map['caption'],
-      fileSize: map['fileSize'] ?? 0,
-      duration: map['duration']?.toDouble(),
-      timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isRead: map['isRead'] ?? false,
-      readBy: List<String>.from(map['readBy'] ?? []),
-    );
+  factory MediaMessage.fromMap(String id, Map<String, dynamic> map) =>
+      MediaMessage(
+        id: id,
+        threadId: map['threadId'] ?? '',
+        senderId: map['senderId'] ?? '',
+        type: MediaType.values.firstWhere(
+          (e) => e.name == map['type'],
+          orElse: () => MediaType.image,
+        ),
+        mediaUrl: map['mediaUrl'] ?? '',
+        thumbnailUrl: map['thumbnailUrl'],
+        caption: map['caption'],
+        fileSize: map['fileSize'] ?? 0,
+        duration: map['duration']?.toDouble(),
+        timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        isRead: map['isRead'] ?? false,
+        readBy: List<String>.from(map['readBy'] ?? []),
+      );
   String id;
   final String threadId;
   final String senderId;
@@ -528,18 +539,18 @@ class MediaMessage {
   final List<String> readBy;
 
   Map<String, dynamic> toMap() => {
-      'threadId': threadId,
-      'senderId': senderId,
-      'type': type.name,
-      'mediaUrl': mediaUrl,
-      'thumbnailUrl': thumbnailUrl,
-      'caption': caption,
-      'fileSize': fileSize,
-      'duration': duration,
-      'timestamp': timestamp,
-      'isRead': isRead,
-      'readBy': readBy,
-    };
+        'threadId': threadId,
+        'senderId': senderId,
+        'type': type.name,
+        'mediaUrl': mediaUrl,
+        'thumbnailUrl': thumbnailUrl,
+        'caption': caption,
+        'fileSize': fileSize,
+        'duration': duration,
+        'timestamp': timestamp,
+        'isRead': isRead,
+        'readBy': readBy,
+      };
 
   /// Get file size in human readable format
   String get fileSizeFormatted {

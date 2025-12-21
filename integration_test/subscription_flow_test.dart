@@ -7,7 +7,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('US Market Subscription Flow', () {
-    testWidgets('Premium subscription flow with US payment methods', (tester) async {
+    testWidgets('Premium subscription flow with US payment methods',
+        (tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -167,13 +168,13 @@ Future<void> _testCulturalPremiumFeatures(WidgetTester tester) async {
 /// Helper function to navigate to premium screen
 Future<void> _navigateToPremiumScreen(WidgetTester tester) async {
   // Look for premium/upgrade button in various locations
-  
+
   // Check profile screen
   final profileTab = find.text('Profile');
   if (profileTab.evaluate().isNotEmpty) {
     await tester.tap(profileTab);
     await tester.pumpAndSettle();
-    
+
     final upgradeButton = find.text('Upgrade to Premium');
     if (upgradeButton.evaluate().isNotEmpty) {
       await tester.tap(upgradeButton);
@@ -187,7 +188,7 @@ Future<void> _navigateToPremiumScreen(WidgetTester tester) async {
   if (settingsIcon.evaluate().isNotEmpty) {
     await tester.tap(settingsIcon);
     await tester.pumpAndSettle();
-    
+
     final premiumOption = find.text('Premium Features');
     if (premiumOption.evaluate().isNotEmpty) {
       await tester.tap(premiumOption);
@@ -226,7 +227,7 @@ Future<void> _testPremiumPlanSelection(WidgetTester tester) async {
       // Verify plan details are shown
       expect(find.textContaining('month'), findsWidgets);
       expect(find.textContaining(r'$'), findsWidgets);
-      
+
       print('✓ Tested plan: $plan');
       break; // Test first available plan
     }
@@ -256,7 +257,7 @@ Future<void> _testUSPaymentMethods(WidgetTester tester) async {
     // Test US payment methods
     final usPaymentMethods = [
       'Credit Card',
-      'Debit Card', 
+      'Debit Card',
       'PayPal',
       'Apple Pay',
       'Google Pay',
@@ -311,7 +312,7 @@ Future<void> _testSubscriptionConfirmation(WidgetTester tester) async {
     if (finalConfirmButton.evaluate().isNotEmpty) {
       // In a real test, we would mock the payment processing
       print('✓ Would process payment here (mocked)');
-      
+
       // Instead of tapping, just verify the button exists
       expect(finalConfirmButton, findsOneWidget);
     }

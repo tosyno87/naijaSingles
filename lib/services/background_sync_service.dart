@@ -110,8 +110,9 @@ class BackgroundSyncService {
         if (remoteDoc.exists) {
           final remoteData = remoteDoc.data()!;
           final localData = Map<String, dynamic>.from(
-              Map<String, dynamic>.from(remoteData)
-                ..addAll(Map<String, dynamic>.from(localProfileData as Map)),);
+            Map<String, dynamic>.from(remoteData)
+              ..addAll(Map<String, dynamic>.from(localProfileData as Map)),
+          );
 
           // Update remote with local changes
           await _firestore.collection('users').doc(userId).update(localData);
@@ -122,7 +123,9 @@ class BackgroundSyncService {
       final profileDoc = await _firestore.collection('users').doc(userId).get();
       if (profileDoc.exists) {
         await prefs.setString(
-            'user_profile_$userId', profileDoc.data().toString(),);
+          'user_profile_$userId',
+          profileDoc.data().toString(),
+        );
       }
 
       log('✅ User profile synced');
@@ -183,8 +186,10 @@ class BackgroundSyncService {
         }
 
         final sortedMessages = uniqueMessages.values.toList()
-          ..sort((a, b) => (b['timestamp'] as Timestamp)
-              .compareTo(a['timestamp'] as Timestamp),);
+          ..sort(
+            (a, b) => (b['timestamp'] as Timestamp)
+                .compareTo(a['timestamp'] as Timestamp),
+          );
 
         // Save merged messages locally
         await prefs.setString(localMessagesKey, sortedMessages.toString());
@@ -242,7 +247,9 @@ class BackgroundSyncService {
         final preferences = userDoc.data()?['preferences'];
         if (preferences != null) {
           await prefs.setString(
-              'user_preferences_$userId', preferences.toString(),);
+            'user_preferences_$userId',
+            preferences.toString(),
+          );
         }
       }
 
@@ -440,12 +447,12 @@ class BackgroundSyncService {
 
   /// Get sync status
   SyncStatus getSyncStatus() => SyncStatus(
-      isSyncing: _isSyncing,
-      queueLength: _syncQueue.length,
-      lastSyncTime: _lastSyncTimes.values.isNotEmpty
-          ? _lastSyncTimes.values.reduce((a, b) => a.isAfter(b) ? a : b)
-          : null,
-    );
+        isSyncing: _isSyncing,
+        queueLength: _syncQueue.length,
+        lastSyncTime: _lastSyncTimes.values.isNotEmpty
+            ? _lastSyncTimes.values.reduce((a, b) => a.isAfter(b) ? a : b)
+            : null,
+      );
 
   /// Dispose resources
   void dispose() {
@@ -464,7 +471,6 @@ enum SyncTaskType {
 
 /// Sync task model
 class SyncTask {
-
   SyncTask({
     required this.id,
     required this.type,
@@ -475,16 +481,16 @@ class SyncTask {
   });
 
   factory SyncTask.fromMap(Map<String, dynamic> map) => SyncTask(
-      id: map['id'],
-      type: SyncTaskType.values.firstWhere(
-        (e) => e.name == map['type'],
-        orElse: () => SyncTaskType.profileUpdate,
-      ),
-      userId: map['userId'],
-      data: Map<String, dynamic>.from(map['data']),
-      createdAt: DateTime.parse(map['createdAt']),
-      retryCount: map['retryCount'] ?? 0,
-    );
+        id: map['id'],
+        type: SyncTaskType.values.firstWhere(
+          (e) => e.name == map['type'],
+          orElse: () => SyncTaskType.profileUpdate,
+        ),
+        userId: map['userId'],
+        data: Map<String, dynamic>.from(map['data']),
+        createdAt: DateTime.parse(map['createdAt']),
+        retryCount: map['retryCount'] ?? 0,
+      );
   final String id;
   final SyncTaskType type;
   final String userId;
@@ -493,13 +499,13 @@ class SyncTask {
   int retryCount;
 
   Map<String, dynamic> toMap() => {
-      'id': id,
-      'type': type.name,
-      'userId': userId,
-      'data': data,
-      'createdAt': createdAt.toIso8601String(),
-      'retryCount': retryCount,
-    };
+        'id': id,
+        'type': type.name,
+        'userId': userId,
+        'data': data,
+        'createdAt': createdAt.toIso8601String(),
+        'retryCount': retryCount,
+      };
 
   @override
   String toString() => 'SyncTask(${type.name}, retries: $retryCount)';
@@ -507,7 +513,6 @@ class SyncTask {
 
 /// Sync status model
 class SyncStatus {
-
   const SyncStatus({
     required this.isSyncing,
     required this.queueLength,
@@ -518,5 +523,6 @@ class SyncStatus {
   final DateTime? lastSyncTime;
 
   @override
-  String toString() => 'SyncStatus(syncing: $isSyncing, queue: $queueLength, lastSync: $lastSyncTime)';
+  String toString() =>
+      'SyncStatus(syncing: $isSyncing, queue: $queueLength, lastSync: $lastSyncTime)';
 }

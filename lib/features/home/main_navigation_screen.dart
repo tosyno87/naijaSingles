@@ -20,7 +20,6 @@ import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-
   const MainNavigationScreen({
     super.key,
     this.backgroundTasksRunning = false,
@@ -79,12 +78,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Future<void> _checkUserRegistration() async {
     if (_hasCheckedRegistration || !mounted) return;
-    
+
     // FIRST: Check if user is actually authenticated
     // If not authenticated, redirect to welcome screen (don't go to onboarding)
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      developer.log('⚠️ User not authenticated - redirecting to welcome screen');
+      developer
+          .log('⚠️ User not authenticated - redirecting to welcome screen');
       _hasCheckedRegistration = true;
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -94,29 +94,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
       return;
     }
-    
+
     developer.log('✅ User is authenticated: ${currentUser.uid}');
-    
+
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    
+
     // Set a maximum timeout to prevent infinite loading
     const maxWaitTime = Duration(seconds: 3);
     final startTime = DateTime.now();
-    
+
     // Force reload user data from Firestore (in case we just completed onboarding)
     try {
       await userProvider.listenCurrentUserdetails();
     } catch (e) {
       developer.log('⚠️ Error reloading user data: $e');
     }
-    
+
     // Wait for user data with timeout
     while (DateTime.now().difference(startTime) < maxWaitTime) {
       if (!mounted) return;
-      
+
       // Check if user data is loaded
-      if (userProvider.currentUser != null && 
-          userProvider.currentUser?.name != null && 
+      if (userProvider.currentUser != null &&
+          userProvider.currentUser?.name != null &&
           userProvider.currentUser!.name!.isNotEmpty) {
         developer.log('✅ User data loaded, showing main navigation');
         if (mounted) {
@@ -126,16 +126,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }
         return;
       }
-      
+
       // Wait a bit before checking again
       await Future.delayed(const Duration(milliseconds: 300));
     }
-    
+
     // Timeout reached - check Firestore directly as fallback
     if (!mounted) return;
-    
+
     developer.log('⚠️ Timeout reached, checking Firestore directly...');
-    
+
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -144,14 +144,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             .doc(user.uid)
             .get()
             .timeout(const Duration(seconds: 2));
-        
+
         if (doc.exists) {
           final data = doc.data();
-          if (data != null && data['name'] != null && data['name'].toString().isNotEmpty) {
-            developer.log('✅ User data found in Firestore, updating UserProvider...');
+          if (data != null &&
+              data['name'] != null &&
+              data['name'].toString().isNotEmpty) {
+            developer.log(
+                '✅ User data found in Firestore, updating UserProvider...');
             final userModel = UserModel.fromDocument(doc);
             userProvider.currentUser = userModel;
-            
+
             if (mounted) {
               setState(() {
                 _hasCheckedRegistration = true;
@@ -164,12 +167,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     } catch (e) {
       developer.log('⚠️ Error checking Firestore: $e');
     }
-    
+
     // User is authenticated but no profile data found - redirect to onboarding
     // This means they started sign-up but didn't complete it
     _hasCheckedRegistration = true;
-    developer.log('⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
-    
+    developer.log(
+        '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+
     if (mounted) {
       Navigator.of(context).pushNamedAndRemoveUntil(
         RouteName.onboarding,
@@ -189,10 +193,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
-    
+
     // Show loading screen while checking registration - prevent any content flash
-    if (!_hasCheckedRegistration || 
-        userProvider.currentUser == null || 
+    if (!_hasCheckedRegistration ||
+        userProvider.currentUser == null ||
         userProvider.currentUser?.name == null ||
         (userProvider.currentUser?.name?.isEmpty ?? false)) {
       // If we haven't checked yet or user doesn't exist, show loading
@@ -225,7 +229,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       // If not authenticated, redirect to welcome screen (not onboarding)
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
-        developer.log('⚠️ User not authenticated in build - redirecting to welcome screen');
+        developer.log(
+            '⚠️ User not authenticated in build - redirecting to welcome screen');
         Future.microtask(() {
           if (mounted) {
             Navigator.of(context).pushNamedAndRemoveUntil(
@@ -256,9 +261,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         );
       }
-      
+
       // Authenticated but no user data - redirect to onboarding to complete profile
-      developer.log('⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+      developer.log(
+          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
       Future.microtask(() {
         if (mounted) {
           Navigator.of(context).pushNamedAndRemoveUntil(
@@ -289,7 +295,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       );
     }
-    
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       // The body will switch between screens based on the selected index
@@ -369,7 +375,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             // Ensure index is within valid range
             _selectedIndex = index.clamp(0, _pages.length - 1);
             AppLogger.debug(
-                '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',);
+              '🔄 Tab tapped: index=$index, _selectedIndex=$_selectedIndex, _validSelectedIndex=$_validSelectedIndex',
+            );
             AppLogger.debug('📱 Pages length: ${_pages.length}');
           });
         },
@@ -419,7 +426,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               '📊 User Analysis',
               style: GoogleFonts.montserrat(
-                  fontSize: 20, fontWeight: FontWeight.bold,),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -430,8 +439,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text(
-                            'Analysis complete! Check console for results.',),),
+                      content: Text(
+                        'Analysis complete! Check console for results.',
+                      ),
+                    ),
                   );
                 }
               },
@@ -445,8 +456,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text(
-                            'Cleanup complete! Check console for results.',),),
+                      content: Text(
+                        'Cleanup complete! Check console for results.',
+                      ),
+                    ),
                   );
                 }
               },

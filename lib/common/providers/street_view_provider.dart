@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../data/streetview_prefrences.dart';
 
 class StreetViewProvider extends ChangeNotifier {
-
   StreetViewProvider(this.userId)
       : _preferences = StretViewPreferences(userId) {
     // Pass userId to the StretViewPreferences constructor
@@ -16,7 +15,7 @@ class StreetViewProvider extends ChangeNotifier {
   Future<void> initializeView() async {
     final savedView = await _preferences.getView();
     streetMode = savedView;
-      notifyListeners();
+    notifyListeners();
   }
 
   void toggleView(String value, List<String> userIds) {

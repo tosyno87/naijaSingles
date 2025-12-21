@@ -63,7 +63,8 @@ class _FirebaseCallbackHandler extends StatefulWidget {
   const _FirebaseCallbackHandler();
 
   @override
-  State<_FirebaseCallbackHandler> createState() => _FirebaseCallbackHandlerState();
+  State<_FirebaseCallbackHandler> createState() =>
+      _FirebaseCallbackHandlerState();
 }
 
 class _FirebaseCallbackHandlerState extends State<_FirebaseCallbackHandler> {
@@ -136,16 +137,19 @@ abstract class AppRouter {
     },
     RouteName.searchLocationpage: (context) => const SearchLocation(),
     RouteName.updateLocationScreen: (context) => UpdateLocation(
-        selectedLocation: ModalRoute.of(context)!.settings.arguments
-            as Map<dynamic, dynamic>,),
+          selectedLocation: ModalRoute.of(context)!.settings.arguments
+              as Map<dynamic, dynamic>,
+        ),
     RouteName.chatPageScreen: (context) => ChatPage(
-        sender: (ModalRoute.of(context)!.settings.arguments as Map)['sender'],
-        chatId: (ModalRoute.of(context)!.settings.arguments as Map)['chatID']
-            .toString(),
-        second: (ModalRoute.of(context)!.settings.arguments as Map)['second'],),
+          sender: (ModalRoute.of(context)!.settings.arguments as Map)['sender'],
+          chatId: (ModalRoute.of(context)!.settings.arguments as Map)['chatID']
+              .toString(),
+          second: (ModalRoute.of(context)!.settings.arguments as Map)['second'],
+        ),
     RouteName.editProfileScreen: (context) => const EditProfileScreen(),
     RouteName.largeImageScreen: (context) => LargeImage(
-        largeImage: ModalRoute.of(context)!.settings.arguments as String,),
+          largeImage: ModalRoute.of(context)!.settings.arguments as String,
+        ),
     RouteName.onboarding: (context) => const OnboardingMain(),
     RouteName.mainNavigation: (context) => const MainNavigationScreen(),
     RouteName.updatePhoneScreen: (context) =>
@@ -169,7 +173,7 @@ abstract class AppRouter {
     RouteName.otpScreen: (context) {
       // Safely extract arguments with null checks
       final arguments = ModalRoute.of(context)?.settings.arguments;
-      
+
       // Validate arguments - if invalid, show loading state instead of navigating away
       // This prevents the "Page Not Found" flash
       if (arguments == null || arguments is! Map) {
@@ -194,9 +198,9 @@ abstract class AppRouter {
           ),
         );
       }
-      
+
       final argsMap = arguments;
-      
+
       // Validate required arguments exist
       if (argsMap['verificationId'] == null || argsMap['phoneNumber'] == null) {
         // Missing critical arguments - show error but don't navigate away immediately
@@ -242,7 +246,7 @@ abstract class AppRouter {
           ),
         );
       }
-      
+
       return OtpPage(
         codeController: argsMap['codeController']?.toString() ?? '',
         verificationId: argsMap['verificationId']!.toString(),
@@ -252,10 +256,12 @@ abstract class AppRouter {
       );
     },
     RouteName.userDobScreen: (context) => UserDOB(
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,),
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
+        ),
     RouteName.userNameScreen: (context) => const UserName(),
     RouteName.nationalityScreen: (context) => UserNationality(
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,),
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
+        ),
     RouteName.onboardingFlow: (context) => const OnboardingFlow(),
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(), // No back button by default
@@ -303,7 +309,8 @@ abstract class AppRouter {
       } else {
         // Fallback for any other type - this shouldn't happen but provides safety
         throw ArgumentError(
-            'Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}',);
+          'Invalid event type passed to EventDetailsScreen: ${arguments.runtimeType}',
+        );
       }
     },
 
@@ -319,7 +326,8 @@ abstract class AppRouter {
         );
       } else {
         throw ArgumentError(
-            'Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}',);
+          'Invalid user type passed to UserDetailScreen: ${arguments.runtimeType}',
+        );
       }
     },
   };
@@ -335,13 +343,15 @@ abstract class AppRouter {
     // Firebase phone auth uses /link?deep_link_id=... to redirect back to app after reCAPTCHA
     // The route name includes the full path with query parameters
     if (routeName.startsWith('/link')) {
-      debugPrint('✅ Router: Handling Firebase auth callback deep link: $routeName');
-      
+      debugPrint(
+          '✅ Router: Handling Firebase auth callback deep link: $routeName');
+
       // Simplified check: if route starts with /link and contains deep_link_id, treat as Firebase callback
       // This prevents "Page Not Found" errors - Firebase will handle the callback automatically
       if (routeName.contains('deep_link_id')) {
-        debugPrint('✅ Router: Firebase auth callback detected, processing silently');
-        
+        debugPrint(
+            '✅ Router: Firebase auth callback detected, processing silently');
+
         // Return a completely transparent route that immediately pops
         // This prevents any visible flash while Firebase processes the callback
         return PageRouteBuilder(
@@ -367,10 +377,12 @@ abstract class AppRouter {
           try {
             debugPrint('🏗️ Router: Building widget for route "$routeName"');
             final widget = builder(context);
-            debugPrint('✅ Router: Widget built successfully for route "$routeName"');
+            debugPrint(
+                '✅ Router: Widget built successfully for route "$routeName"');
             return widget;
           } catch (e, stackTrace) {
-            debugPrint('❌ Router: Error building widget for route "$routeName": $e');
+            debugPrint(
+                '❌ Router: Error building widget for route "$routeName": $e');
             debugPrint('Stack trace: $stackTrace');
             // Return error widget instead of crashing
             return Scaffold(

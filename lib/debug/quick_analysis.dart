@@ -20,9 +20,11 @@ class QuickAnalysis {
       debugPrint('📊 Quick Analysis Results:');
       debugPrint('   Total Users: ${analytics.totalUsers}');
       debugPrint(
-          '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
+        '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',
+      );
       debugPrint(
-          '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
+        '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',
+      );
       debugPrint('   Complete Profiles: ${analytics.completeProfiles}');
       debugPrint('   Incomplete Profiles: ${analytics.incompleteProfiles}');
       debugPrint('   Very Incomplete: ${analytics.veryIncompleteProfiles}');

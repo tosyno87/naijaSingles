@@ -53,81 +53,82 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: AppColors.primaryGradient,
-          ),
-        ),
-        title: Text(
-          'Profile',
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              icon: Custom3DIcons.edit(size: 20),
-              onPressed: () {
-                Navigator.pushNamed(context, RouteName.settingsScreen);
-              },
+        backgroundColor: AppColors.backgroundColor,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: AppColors.primaryGradient,
             ),
           ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryGreen),)
-          : SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // Cultural Identity Header
-                    _buildCulturalIdentityHeader(),
-                    const SizedBox(height: 24),
-
-                    // Cultural Heritage Badge
-                    _buildCulturalHeritageBadge(),
-                    const SizedBox(height: 20),
-
-                    // Community Involvement
-                    _buildCommunityInvolvement(),
-                    const SizedBox(height: 20),
-
-                    // Professional Networking
-                    _buildProfessionalNetworking(),
-                    const SizedBox(height: 20),
-
-                    // Cultural Interests & Skills
-                    _buildCulturalInterests(),
-                    const SizedBox(height: 20),
-
-                    // Connection Preferences
-                    _buildConnectionPreferences(),
-                    const SizedBox(height: 20),
-
-                    // Cultural Contributions
-                    _buildCulturalContributions(),
-                    const SizedBox(height: 32),
-                  ],
-                ),
+          title: Text(
+            'Profile',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: IconButton(
+                icon: Custom3DIcons.edit(size: 20),
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteName.settingsScreen);
+                },
               ),
             ),
-    );
+          ],
+        ),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.primaryGreen),
+              )
+            : SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      // Cultural Identity Header
+                      _buildCulturalIdentityHeader(),
+                      const SizedBox(height: 24),
+
+                      // Cultural Heritage Badge
+                      _buildCulturalHeritageBadge(),
+                      const SizedBox(height: 20),
+
+                      // Community Involvement
+                      _buildCommunityInvolvement(),
+                      const SizedBox(height: 20),
+
+                      // Professional Networking
+                      _buildProfessionalNetworking(),
+                      const SizedBox(height: 20),
+
+                      // Cultural Interests & Skills
+                      _buildCulturalInterests(),
+                      const SizedBox(height: 20),
+
+                      // Connection Preferences
+                      _buildConnectionPreferences(),
+                      const SizedBox(height: 20),
+
+                      // Cultural Contributions
+                      _buildCulturalContributions(),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
+              ),
+      );
 
   Widget _buildCulturalIdentityHeader() {
     final name = _userData?['name']?.toString() ?? 'Cultural Community Member';
@@ -173,9 +174,9 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
                       mainPhoto,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => ColoredBox(
-                          color: Colors.white.withOpacity(0.2),
-                          child: Custom3DIcons.profile(size: 60),
-                        ),
+                        color: Colors.white.withOpacity(0.2),
+                        child: Custom3DIcons.profile(size: 60),
+                      ),
                     )
                   : ColoredBox(
                       color: Colors.white.withOpacity(0.2),
@@ -522,25 +523,30 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: skills.take(5).map((skill) => Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.primaryGreen.withOpacity(0.3),
+              children: skills
+                  .take(5)
+                  .map(
+                    (skill) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primaryGreen.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        skill.toString(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    skill.toString(),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
-                ),).toList(),
+                  )
+                  .toList(),
             ),
           ],
         ],
@@ -604,25 +610,29 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: culturalInterests.map((interest) => Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.primaryGreen.withOpacity(0.3),
+              children: culturalInterests
+                  .map(
+                    (interest) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primaryGreen.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        interest.toString(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    interest.toString(),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
-                ),).toList(),
+                  )
+                  .toList(),
             ),
             const SizedBox(height: 16),
           ],
@@ -639,25 +649,30 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: interests.take(8).map((interest) => Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.textSecondary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.textSecondary.withOpacity(0.3),
+              children: interests
+                  .take(8)
+                  .map(
+                    (interest) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.textSecondary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.textSecondary.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        interest.toString(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    interest.toString(),
-                    style: GoogleFonts.montserrat(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),).toList(),
+                  )
+                  .toList(),
             ),
           ],
         ],
@@ -803,67 +818,67 @@ class _CulturalProfileScreenState extends State<CulturalProfileScreen> {
   }
 
   Widget _buildInfoRow(String label, String value, Widget icon) => Row(
-      children: [
-        icon,
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              Text(
-                value,
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-
-  Widget _buildStatCard(String label, String value, Widget icon) => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.primaryGreen.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primaryGreen.withOpacity(0.2),
-        ),
-      ),
-      child: Column(
         children: [
           icon,
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryGreen,
-            ),
-          ),
-          Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
+      );
+
+  Widget _buildStatCard(String label, String value, Widget icon) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.primaryGreen.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.primaryGreen.withOpacity(0.2),
+          ),
+        ),
+        child: Column(
+          children: [
+            icon,
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryGreen,
+              ),
+            ),
+            Text(
+              label,
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
 
   String _getNationalityText() {
     // Extract nationality from user data - using available fields

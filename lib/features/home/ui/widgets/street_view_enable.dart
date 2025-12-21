@@ -46,7 +46,8 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
             matchedUsers = state.users;
             userIds = matchedUsers
                 .where(
-                    (user) => user.id != null,) // Filter out users with null IDs
+                  (user) => user.id != null,
+                ) // Filter out users with null IDs
                 .map((user) => user.id!) // Extract non-null IDs
                 .toList();
           });
@@ -58,241 +59,253 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Center(
-                    child: Text(
-                      'Street View Settings'.tr().toString(),
-                      style: TextStyle(
-                          color: themeProvider.isDarkMode
-                              ? Colors.white
-                              : primaryColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Center(
+                  child: Text(
+                    'Street View Settings'.tr().toString(),
+                    style: TextStyle(
+                      color: themeProvider.isDarkMode
+                          ? Colors.white
+                          : primaryColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  InkResponse(
-                    child: selectedOption == 'None'
-                        ? const Icon(
-                            Icons.location_off_outlined,
-                            color: primaryColor,
-                          )
-                        : const Icon(
-                            Icons.location_on_outlined,
-                            color: primaryColor,
+                ),
+                InkResponse(
+                  child: selectedOption == 'None'
+                      ? const Icon(
+                          Icons.location_off_outlined,
+                          color: primaryColor,
+                        )
+                      : const Icon(
+                          Icons.location_on_outlined,
+                          color: primaryColor,
+                        ),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext dialogContext) => StatefulBuilder(
+                        builder:
+                            (BuildContext context, StateSetter setState1) =>
+                                AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext dialogContext) => StatefulBuilder(builder:
-                              (BuildContext context, StateSetter setState1) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                title: Text('Who can see my street view'
-                                    .tr()
-                                    .toString(),),
-                                content: StatefulBuilder(
-                                  builder: (BuildContext context,
-                                      StateSetter setState,) {
-                                    if (showUserList) {
-                                      return matchedUsers.isEmpty
-                                          ? Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  "You don't have any matches"
-                                                      .tr()
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w600,),
-                                                ),
-                                                const SizedBox(height: 10),
-                                                Text(
-                                                  'Swipe more to find matches!'
-                                                      .tr()
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                      fontSize: 16,),
-                                                ),
-                                              ],
-                                            )
-                                          : Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                for (UserModel user
-                                                    in matchedUsers)
-                                                  CheckboxListTile(
-                                                    activeColor: primaryColor,
-                                                    title: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        CircleAvatar(
-                                                          radius: 20,
-                                                          backgroundImage:
-                                                              NetworkImage(user
-                                                                  .imageUrl
-                                                                  ?.first,),
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 5,
-                                                        ),
-                                                        Text(user.name!),
-                                                      ],
-                                                    ),
-                                                    value: selectedUserIds
-                                                        .contains(user.id),
-                                                    onChanged:
-                                                        (bool? isChecked) {
-                                                      setState1(() {
-                                                        if (isChecked!) {
-                                                          selectedUserIds
-                                                              .add(user.id!);
-                                                        } else {
-                                                          selectedUserIds
-                                                              .remove(user.id);
-                                                        }
-                                                      });
-                                                    },
-                                                  ),
-                                              ],
-                                            );
-                                    } else {
-                                      return Column(
+                          title: Text(
+                            'Who can see my street view'.tr().toString(),
+                          ),
+                          content: StatefulBuilder(
+                            builder: (
+                              BuildContext context,
+                              StateSetter setState,
+                            ) {
+                              if (showUserList) {
+                                return matchedUsers.isEmpty
+                                    ? Column(
                                         mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          RadioListTile<String>(
-                                            title: Text(
-                                                'Everyone'.tr().toString(),),
-                                            value: 'Everyone',
-                                            activeColor: primaryColor,
-                                            groupValue: selectedOption,
-                                            onChanged: (String? value) {
-                                              setState1(() {
-                                                selectedOption = value!;
-                                              });
-
-                                              log('theme $value');
-                                            },
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "You don't have any matches"
+                                                .tr()
+                                                .toString(),
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
-                                          RadioListTile<String>(
-                                            title: Text(
-                                                'My Matches'.tr().toString(),),
-                                            activeColor: primaryColor,
-                                            value: 'My Matches',
-                                            groupValue: selectedOption,
-                                            onChanged: (String? value) {
-                                              setState1(() {
-                                                selectedOption = value!;
-                                                context
-                                                    .read<MatchUserBloc>()
-                                                    .add(LoadMatchUserEvent(
-                                                        currentUser: widget
-                                                            .currentUser,),);
-                                              });
-                                            },
-                                          ),
-                                          RadioListTile<String>(
-                                            title: Text(
-                                                'My Matches including...'
-                                                    .tr()
-                                                    .toString(),),
-                                            activeColor: primaryColor,
-                                            value: 'Only',
-                                            groupValue: selectedOption,
-                                            onChanged: (String? value) {
-                                              setState1(() {
-                                                selectedOption = value!;
-                                                showUserList = true;
-                                              });
-                                            },
-                                          ),
-                                          RadioListTile<String>(
-                                            title:
-                                                Text('Nobody'.tr().toString()),
-                                            activeColor: primaryColor,
-                                            value: 'None',
-                                            groupValue: selectedOption,
-                                            onChanged: (String? value) {
-                                              setState1(() {
-                                                selectedOption = value!;
-                                              });
-                                            },
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            'Swipe more to find matches!'
+                                                .tr()
+                                                .toString(),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                            ),
                                           ),
                                         ],
+                                      )
+                                    : Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          for (UserModel user in matchedUsers)
+                                            CheckboxListTile(
+                                              activeColor: primaryColor,
+                                              title: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  CircleAvatar(
+                                                    radius: 20,
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      user.imageUrl?.first,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Text(user.name!),
+                                                ],
+                                              ),
+                                              value: selectedUserIds
+                                                  .contains(user.id),
+                                              onChanged: (bool? isChecked) {
+                                                setState1(() {
+                                                  if (isChecked!) {
+                                                    selectedUserIds
+                                                        .add(user.id!);
+                                                  } else {
+                                                    selectedUserIds
+                                                        .remove(user.id);
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                        ],
                                       );
-                                    }
-                                  },
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text(
-                                      'Cancel'.tr().toString(),
-                                      style: const TextStyle(
-                                          color: AppColors.secondaryColor,),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        showUserList = false;
-                                        selectedUserIds.clear();
-                                      });
-                                      Navigator.of(dialogContext).pop();
-                                    },
-                                  ),
-                                  if (selectedOption != 'Only')
-                                    TextButton(
-                                      onPressed: () {
-                                        switch (selectedOption) {
-                                          case 'None':
-                                            provider
-                                                .toggleView(selectedOption, []);
-                                            Navigator.of(dialogContext).pop();
-                                            break;
-                                          case 'Everyone':
-                                            provider
-                                                .toggleView(selectedOption, []);
-                                            Navigator.of(dialogContext).pop();
-                                            break;
-
-                                          case 'My Matches':
-                                            provider.toggleView(
-                                                selectedOption, userIds,);
-                                            Navigator.of(dialogContext).pop();
-                                            break;
-                                        }
-                                      },
-                                      child: Text(
-                                        'Apply'.tr().toString(),
-                                        style: const TextStyle(color: primaryColor),
+                              } else {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    RadioListTile<String>(
+                                      title: Text(
+                                        'Everyone'.tr().toString(),
                                       ),
-                                    )
-                                  else if (selectedOption == 'Only' &&
-                                      userIds.isNotEmpty &&
-                                      selectedUserIds.isNotEmpty)
-                                    TextButton(
-                                      onPressed: () {
-                                        provider.toggleView(
-                                            selectedOption, selectedUserIds,);
-                                        setState(() {
-                                          showUserList = false;
+                                      value: 'Everyone',
+                                      activeColor: primaryColor,
+                                      groupValue: selectedOption,
+                                      onChanged: (String? value) {
+                                        setState1(() {
+                                          selectedOption = value!;
                                         });
-                                        Navigator.of(dialogContext).pop();
+
+                                        log('theme $value');
                                       },
-                                      child: Text(
-                                        'Apply'.tr().toString(),
-                                        style: const TextStyle(color: primaryColor),
-                                      ),
                                     ),
-                                ],),),
-                      );
-                    },
-                  ),
-                ],),
+                                    RadioListTile<String>(
+                                      title: Text(
+                                        'My Matches'.tr().toString(),
+                                      ),
+                                      activeColor: primaryColor,
+                                      value: 'My Matches',
+                                      groupValue: selectedOption,
+                                      onChanged: (String? value) {
+                                        setState1(() {
+                                          selectedOption = value!;
+                                          context.read<MatchUserBloc>().add(
+                                                LoadMatchUserEvent(
+                                                  currentUser:
+                                                      widget.currentUser,
+                                                ),
+                                              );
+                                        });
+                                      },
+                                    ),
+                                    RadioListTile<String>(
+                                      title: Text(
+                                        'My Matches including...'
+                                            .tr()
+                                            .toString(),
+                                      ),
+                                      activeColor: primaryColor,
+                                      value: 'Only',
+                                      groupValue: selectedOption,
+                                      onChanged: (String? value) {
+                                        setState1(() {
+                                          selectedOption = value!;
+                                          showUserList = true;
+                                        });
+                                      },
+                                    ),
+                                    RadioListTile<String>(
+                                      title: Text('Nobody'.tr().toString()),
+                                      activeColor: primaryColor,
+                                      value: 'None',
+                                      groupValue: selectedOption,
+                                      onChanged: (String? value) {
+                                        setState1(() {
+                                          selectedOption = value!;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }
+                            },
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text(
+                                'Cancel'.tr().toString(),
+                                style: const TextStyle(
+                                  color: AppColors.secondaryColor,
+                                ),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  showUserList = false;
+                                  selectedUserIds.clear();
+                                });
+                                Navigator.of(dialogContext).pop();
+                              },
+                            ),
+                            if (selectedOption != 'Only')
+                              TextButton(
+                                onPressed: () {
+                                  switch (selectedOption) {
+                                    case 'None':
+                                      provider.toggleView(selectedOption, []);
+                                      Navigator.of(dialogContext).pop();
+                                      break;
+                                    case 'Everyone':
+                                      provider.toggleView(selectedOption, []);
+                                      Navigator.of(dialogContext).pop();
+                                      break;
+
+                                    case 'My Matches':
+                                      provider.toggleView(
+                                        selectedOption,
+                                        userIds,
+                                      );
+                                      Navigator.of(dialogContext).pop();
+                                      break;
+                                  }
+                                },
+                                child: Text(
+                                  'Apply'.tr().toString(),
+                                  style: const TextStyle(color: primaryColor),
+                                ),
+                              )
+                            else if (selectedOption == 'Only' &&
+                                userIds.isNotEmpty &&
+                                selectedUserIds.isNotEmpty)
+                              TextButton(
+                                onPressed: () {
+                                  provider.toggleView(
+                                    selectedOption,
+                                    selectedUserIds,
+                                  );
+                                  setState(() {
+                                    showUserList = false;
+                                  });
+                                  Navigator.of(dialogContext).pop();
+                                },
+                                child: Text(
+                                  'Apply'.tr().toString(),
+                                  style: const TextStyle(color: primaryColor),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

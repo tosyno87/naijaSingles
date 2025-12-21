@@ -43,115 +43,118 @@ class BulkPhotoPickerService {
 
   /// Show bulk photo source selection dialog
   static Future<ImageSource?> _showBulkPhotoSourceDialog(
-      BuildContext context,) async => showModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Select Photos',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF3A1D0F),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Choose up to 5 photos from your gallery',
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: const Color(0xFF8B6C59),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildBulkSourceOption(
-              icon: Icons.photo_library,
-              title: 'Choose from Gallery',
-              subtitle: 'Select multiple photos at once',
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-            const SizedBox(height: 16),
-            _buildBulkSourceOption(
-              icon: Icons.camera_alt,
-              title: 'Take Photos',
-              subtitle: 'Take photos one by one',
-              onTap: () => Navigator.pop(context, ImageSource.camera),
-            ),
-          ],
+    BuildContext context,
+  ) async =>
+      showModalBottomSheet<ImageSource>(
+        context: context,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-      ),
-    );
+        builder: (context) => Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Photos',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF3A1D0F),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Choose up to 5 photos from your gallery',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: const Color(0xFF8B6C59),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildBulkSourceOption(
+                icon: Icons.photo_library,
+                title: 'Choose from Gallery',
+                subtitle: 'Select multiple photos at once',
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+              const SizedBox(height: 16),
+              _buildBulkSourceOption(
+                icon: Icons.camera_alt,
+                title: 'Take Photos',
+                subtitle: 'Take photos one by one',
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+            ],
+          ),
+        ),
+      );
 
   static Widget _buildBulkSourceOption({
     required IconData icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) => InkWell(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF008037).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: const Color(0xFF008037).withValues(alpha: 0.3),
+  }) =>
+      InkWell(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF008037).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF008037).withValues(alpha: 0.3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF008037).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: const Color(0xFF008037),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF3A1D0F),
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: const Color(0xFF8B6C59),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Color(0xFF008037),
+                size: 16,
+              ),
+            ],
           ),
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF008037).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: const Color(0xFF008037),
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF3A1D0F),
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      color: const Color(0xFF8B6C59),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Color(0xFF008037),
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
+      );
 
   /// Crop individual photos after bulk selection
   static Future<List<File>> cropSelectedPhotos({

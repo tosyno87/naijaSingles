@@ -9,9 +9,11 @@ import '../../../auth_status/bloc/registration/bloc/registration_bloc.dart';
 import '../../bloc/phone_auth_bloc.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-
   const OtpVerificationScreen({
-    required this.phoneNumber, required this.verificationId, required this.updatePhoneNumber, super.key,
+    required this.phoneNumber,
+    required this.verificationId,
+    required this.updatePhoneNumber,
+    super.key,
   });
   final String phoneNumber;
   final String verificationId;
@@ -86,7 +88,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     }
   }
 
-  String _formatTime(int seconds) => '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
+  String _formatTime(int seconds) =>
+      '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
@@ -229,24 +232,27 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           color: Colors.black54,
                         ),
                       ),
-                      if (_canResend) TextButton(
-                              onPressed: _resendOtp,
-                              child: Text(
-                                'Resend',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: primaryColor,
-                                ),
-                              ),
-                            ) else Text(
-                              _formatTime(_remainingTime),
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: accentColor,
-                              ),
+                      if (_canResend)
+                        TextButton(
+                          onPressed: _resendOtp,
+                          child: Text(
+                            'Resend',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
                             ),
+                          ),
+                        )
+                      else
+                        Text(
+                          _formatTime(_remainingTime),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: accentColor,
+                          ),
+                        ),
                     ],
                   ),
 
@@ -308,35 +314,35 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       height: 56,
                       child: BlocBuilder<PhoneAuthBloc, PhoneAuthState>(
                         builder: (context, state) => ElevatedButton(
-                            onPressed:
-                                state is PhoneAuthLoading ? null : _verifyOtp,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor:
-                                  primaryColor.withValues(alpha: 0.5),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 2,
+                          onPressed:
+                              state is PhoneAuthLoading ? null : _verifyOtp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor:
+                                primaryColor.withValues(alpha: 0.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            child: state is PhoneAuthLoading
-                                ? const SizedBox(
-                                    height: 24,
-                                    width: 24,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    'Verify',
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                            elevation: 2,
                           ),
+                          child: state is PhoneAuthLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'Verify',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
                   ),

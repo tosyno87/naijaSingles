@@ -180,26 +180,26 @@ class EnhancedChatService {
   }
 
   /// Listen to typing indicators
-  Stream<List<String>> listenToTyping(String threadId) => _firestore
-        .collection('chatThreads')
-        .doc(threadId)
-        .snapshots()
-        .map((doc) {
-      final data = doc.data();
-      if (data == null) return <String>[];
+  Stream<List<String>> listenToTyping(String threadId) =>
+      _firestore.collection('chatThreads').doc(threadId).snapshots().map((doc) {
+        final data = doc.data();
+        if (data == null) return <String>[];
 
-      final currentUserId = _auth.currentUser?.uid;
-      final typingUsers = List<String>.from(data['typingUsers'] ?? []);
+        final currentUserId = _auth.currentUser?.uid;
+        final typingUsers = List<String>.from(data['typingUsers'] ?? []);
 
-      // Remove current user from typing list
-      typingUsers.remove(currentUserId);
+        // Remove current user from typing list
+        typingUsers.remove(currentUserId);
 
-      return typingUsers;
-    });
+        return typingUsers;
+      });
 
   /// Add reaction to message
   Future<void> addReaction(
-      String threadId, String messageId, String emoji,) async {
+    String threadId,
+    String messageId,
+    String emoji,
+  ) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return;
@@ -221,7 +221,10 @@ class EnhancedChatService {
 
   /// Remove reaction from message
   Future<void> removeReaction(
-      String threadId, String messageId, String emoji,) async {
+    String threadId,
+    String messageId,
+    String emoji,
+  ) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return;
@@ -243,7 +246,10 @@ class EnhancedChatService {
 
   /// Edit message
   Future<void> editMessage(
-      String threadId, String messageId, String newText,) async {
+    String threadId,
+    String messageId,
+    String newText,
+  ) async {
     try {
       final currentUserId = _auth.currentUser?.uid;
       if (currentUserId == null) return;
@@ -306,23 +312,24 @@ class EnhancedChatService {
   }
 
   /// Get user online status
-  Stream<bool> getUserOnlineStatus(String userId) => _firestore.collection('users').doc(userId).snapshots().map((doc) {
-      final data = doc.data();
-      if (data == null) return false;
+  Stream<bool> getUserOnlineStatus(String userId) =>
+      _firestore.collection('users').doc(userId).snapshots().map((doc) {
+        final data = doc.data();
+        if (data == null) return false;
 
-      final isOnline = data['isOnline'] ?? false;
-      final lastSeen = (data['lastSeen'] as Timestamp?)?.toDate();
+        final isOnline = data['isOnline'] ?? false;
+        final lastSeen = (data['lastSeen'] as Timestamp?)?.toDate();
 
-      // Consider user online if last seen within 5 minutes
-      if (isOnline) return true;
-      if (lastSeen != null) {
-        final now = DateTime.now();
-        final difference = now.difference(lastSeen);
-        return difference.inMinutes < 5;
-      }
+        // Consider user online if last seen within 5 minutes
+        if (isOnline) return true;
+        if (lastSeen != null) {
+          final now = DateTime.now();
+          final difference = now.difference(lastSeen);
+          return difference.inMinutes < 5;
+        }
 
-      return false;
-    });
+        return false;
+      });
 
   /// Get last seen time
   Future<DateTime?> getLastSeen(String userId) async {
@@ -342,7 +349,10 @@ class EnhancedChatService {
 
   /// Update thread metadata
   Future<void> _updateThreadMetadata(
-      String threadId, String text, String senderId,) async {
+    String threadId,
+    String text,
+    String senderId,
+  ) async {
     try {
       await _firestore.collection('chatThreads').doc(threadId).update({
         'lastMessageText': text,
@@ -431,12 +441,16 @@ class EnhancedChatService {
 
   /// Listen to messages with enhanced features
   Stream<List<EnhancedMessage>> listenToMessages(String threadId) => _firestore
-        .collection('chatThreads')
-        .doc(threadId)
-        .collection('messages')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => EnhancedMessage.fromMap(doc.id, doc.data())).toList(),);
+      .collection('chatThreads')
+      .doc(threadId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => EnhancedMessage.fromMap(doc.id, doc.data()))
+            .toList(),
+      );
 
   /// Dispose resources
   void dispose() {
@@ -456,7 +470,6 @@ class EnhancedChatService {
 
 /// Enhanced message model with additional features
 class EnhancedMessage {
-
   const EnhancedMessage({
     required this.id,
     required this.text,
@@ -465,26 +478,31 @@ class EnhancedMessage {
     required this.isRead,
     required this.readBy,
     required this.reactions,
-    required this.attachments, required this.isEdited, required this.isDeleted, this.replyToMessageId,
+    required this.attachments,
+    required this.isEdited,
+    required this.isDeleted,
+    this.replyToMessageId,
     this.editedAt,
     this.deletedAt,
   });
 
-  factory EnhancedMessage.fromMap(String id, Map<String, dynamic> data) => EnhancedMessage(
-      id: id,
-      text: data['text'] ?? '',
-      senderId: data['senderId'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isRead: data['isRead'] ?? false,
-      readBy: List<String>.from(data['readBy'] ?? []),
-      reactions: Map<String, List<String>>.from(data['reactions'] ?? {}),
-      replyToMessageId: data['replyToMessageId'],
-      attachments: List<String>.from(data['attachments'] ?? []),
-      isEdited: data['isEdited'] ?? false,
-      editedAt: (data['editedAt'] as Timestamp?)?.toDate(),
-      isDeleted: data['isDeleted'] ?? false,
-      deletedAt: (data['deletedAt'] as Timestamp?)?.toDate(),
-    );
+  factory EnhancedMessage.fromMap(String id, Map<String, dynamic> data) =>
+      EnhancedMessage(
+        id: id,
+        text: data['text'] ?? '',
+        senderId: data['senderId'] ?? '',
+        timestamp:
+            (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        isRead: data['isRead'] ?? false,
+        readBy: List<String>.from(data['readBy'] ?? []),
+        reactions: Map<String, List<String>>.from(data['reactions'] ?? {}),
+        replyToMessageId: data['replyToMessageId'],
+        attachments: List<String>.from(data['attachments'] ?? []),
+        isEdited: data['isEdited'] ?? false,
+        editedAt: (data['editedAt'] as Timestamp?)?.toDate(),
+        isDeleted: data['isDeleted'] ?? false,
+        deletedAt: (data['deletedAt'] as Timestamp?)?.toDate(),
+      );
   final String id;
   final String text;
   final String senderId;
@@ -506,11 +524,13 @@ class EnhancedMessage {
   int getReactionCount(String emoji) => reactions[emoji]?.length ?? 0;
 
   /// Check if user reacted with emoji
-  bool hasUserReacted(String userId, String emoji) => reactions[emoji]?.contains(userId) ?? false;
+  bool hasUserReacted(String userId, String emoji) =>
+      reactions[emoji]?.contains(userId) ?? false;
 
   /// Get all users who reacted with emoji
   List<String> getUsersWhoReacted(String emoji) => reactions[emoji] ?? [];
 
   @override
-  String toString() => 'EnhancedMessage(id: $id, text: $text, senderId: $senderId, timestamp: $timestamp)';
+  String toString() =>
+      'EnhancedMessage(id: $id, text: $text, senderId: $senderId, timestamp: $timestamp)';
 }

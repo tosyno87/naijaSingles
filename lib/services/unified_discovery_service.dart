@@ -28,13 +28,16 @@ class UnifiedDiscoveryService {
   }) async {
     try {
       debugPrint(
-          '🔍 UnifiedDiscoveryService: Getting users for ${currentUser.name}',);
+        '🔍 UnifiedDiscoveryService: Getting users for ${currentUser.name}',
+      );
       debugPrint('   - Intent filter: $intentFilter');
       debugPrint('   - Gender preference: ${currentUser.showGender}');
       debugPrint(
-          '   - Age range: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}',);
+        '   - Age range: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}',
+      );
       debugPrint(
-          '   - Max distance: ${(currentUser.maxDistance! * 0.621371).round()} miles',);
+        '   - Max distance: ${(currentUser.maxDistance! * 0.621371).round()} miles',
+      );
 
       // Get already checked users
       final checkedUserIds = await _getCheckedUserIds(currentUser.id!);
@@ -43,7 +46,10 @@ class UnifiedDiscoveryService {
       // Build optimized query with mode-specific filtering
       Query query = _buildOptimizedQuery(currentUser, intentFilter);
       query = ModeSpecificFilteringService.applyModeSpecificFilters(
-          query, currentUser, intentFilter ?? 'Dating',);
+        query,
+        currentUser,
+        intentFilter ?? 'Dating',
+      );
 
       // Execute query
       final querySnapshot = await query.get();
@@ -66,7 +72,9 @@ class UnifiedDiscoveryService {
 
           // Apply mode-specific validation
           if (!ModeSpecificFilteringService.validateModeMatch(
-              user, intentFilter ?? 'Dating',)) {
+            user,
+            intentFilter ?? 'Dating',
+          )) {
             debugPrint('⚠️ User $userId does not match $intentFilter criteria');
             continue;
           }
@@ -96,7 +104,8 @@ class UnifiedDiscoveryService {
           }
 
           debugPrint(
-              '✅ Adding user: ${user.name} (${user.distanceBW ?? 'unknown'} miles away)',);
+            '✅ Adding user: ${user.name} (${user.distanceBW ?? 'unknown'} miles away)',
+          );
           userList.add(user);
         } catch (e) {
           debugPrint('⚠️ Error processing user ${doc.id}: $e');
@@ -120,12 +129,15 @@ class UnifiedDiscoveryService {
 
   /// Build optimized Firestore query
   static Query _buildOptimizedQuery(
-      UserModel currentUser, String? intentFilter,) {
+    UserModel currentUser,
+    String? intentFilter,
+  ) {
     Query query = _usersCollection;
 
     // TEMPORARILY DISABLED: Gender filtering (field names might be wrong)
     debugPrint(
-        '🔍 TEMPORARILY DISABLING GENDER FILTERING - field names might be wrong',);
+      '🔍 TEMPORARILY DISABLING GENDER FILTERING - field names might be wrong',
+    );
     debugPrint('   - Current user showGender: ${currentUser.showGender}');
     debugPrint('   - Current user gender: ${currentUser.userGender}');
     debugPrint('   - Database uses "gender" field, not "userGender"');
@@ -163,7 +175,8 @@ class UnifiedDiscoveryService {
           .where('age', isGreaterThanOrEqualTo: currentUser.ageRangeMin)
           .where('age', isLessThanOrEqualTo: currentUser.ageRangeMax);
       debugPrint(
-          '🔍 Filtering by age: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}',);
+        '🔍 Filtering by age: ${currentUser.ageRangeMin}-${currentUser.ageRangeMax}',
+      );
     }
 
     // Filter by intent if specified
@@ -174,12 +187,14 @@ class UnifiedDiscoveryService {
 
     // TEMPORARILY DISABLED: Filter out blocked users (field might not exist)
     debugPrint(
-        '🔍 TEMPORARILY DISABLING isBlocked FILTER - field might not exist',);
+      '🔍 TEMPORARILY DISABLING isBlocked FILTER - field might not exist',
+    );
     // query = query.where('isBlocked', isEqualTo: false);
 
     // TEMPORARILY DISABLED: Profile completeness filter (most users don't have this field)
     debugPrint(
-        '🔍 TEMPORARILY DISABLING PROFILE COMPLETENESS FILTER - most users missing this field',);
+      '🔍 TEMPORARILY DISABLING PROFILE COMPLETENESS FILTER - most users missing this field',
+    );
     // try {
     //   query = query.where('isProfileComplete', isEqualTo: true);
     //   debugPrint('🔍 Filtering by profile completeness: true');
@@ -189,7 +204,8 @@ class UnifiedDiscoveryService {
 
     // TEMPORARILY DISABLED: Order by last active (field doesn't exist in most documents)
     debugPrint(
-        '🔍 TEMPORARILY DISABLING lastActive ORDERING - field missing in most documents',);
+      '🔍 TEMPORARILY DISABLING lastActive ORDERING - field missing in most documents',
+    );
     // query = query.orderBy('lastActive', descending: true);
 
     return query;
@@ -314,7 +330,9 @@ class UnifiedDiscoveryService {
 
   /// Check if match already exists
   static Future<String?> _getExistingMatch(
-      String userAId, String userBId,) async {
+    String userAId,
+    String userBId,
+  ) async {
     try {
       final querySnapshot = await _firestore
           .collection('matches')

@@ -105,7 +105,8 @@ class IndustryStandardImageService {
 
       final compressedSize = await _getFileSizeInMB(File(compressedFile.path));
       debugPrint(
-          'Image optimization: ${originalSize.toStringAsFixed(2)}MB -> ${compressedSize.toStringAsFixed(2)}MB ($quality% quality)',);
+        'Image optimization: ${originalSize.toStringAsFixed(2)}MB -> ${compressedSize.toStringAsFixed(2)}MB ($quality% quality)',
+      );
 
       return File(compressedFile.path);
     } catch (e) {
@@ -235,7 +236,6 @@ typedef ImageUploadProgressCallback = void Function(int current, int total);
 
 /// Image upload result
 class ImageUploadResult {
-
   ImageUploadResult({
     required this.success,
     this.image,

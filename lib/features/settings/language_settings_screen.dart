@@ -257,121 +257,121 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Language Settings',
-          style: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
+            onPressed: () => Navigator.pop(context),
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: _isLoading
-          ? _buildLoadingState()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Section
-                  _buildHeaderSection(),
-                  const SizedBox(height: 24),
-
-                  // Available Languages
-                  _buildAvailableLanguagesSection(),
-                  const SizedBox(height: 24),
-
-                  // Coming Soon Languages
-                  _buildComingSoonLanguagesSection(),
-                  const SizedBox(height: 24),
-
-                  // Language Info
-                  _buildLanguageInfoSection(),
-                ],
-              ),
-            ),
-    );
-
-  Widget _buildLoadingState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            color: primaryColor,
-            strokeWidth: 3,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Loading language settings...',
+          title: Text(
+            'Language Settings',
             style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildHeaderSection() => Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.language,
-              size: 40,
-              color: primaryColor,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Choose Your Language',
-            style: GoogleFonts.montserrat(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: textPrimary,
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Select your preferred language for the Afropeep app. We support multiple Nigerian languages to make your experience more comfortable.',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: textSecondary,
-              height: 1.5,
+          centerTitle: true,
+        ),
+        body: _isLoading
+            ? _buildLoadingState()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Section
+                    _buildHeaderSection(),
+                    const SizedBox(height: 24),
+
+                    // Available Languages
+                    _buildAvailableLanguagesSection(),
+                    const SizedBox(height: 24),
+
+                    // Coming Soon Languages
+                    _buildComingSoonLanguagesSection(),
+                    const SizedBox(height: 24),
+
+                    // Language Info
+                    _buildLanguageInfoSection(),
+                  ],
+                ),
+              ),
+      );
+
+  Widget _buildLoadingState() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              color: primaryColor,
+              strokeWidth: 3,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            Text(
+              'Loading language settings...',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: textSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildHeaderSection() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.language,
+                size: 40,
+                color: primaryColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Choose Your Language',
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: textPrimary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Select your preferred language for the Afropeep app. We support multiple Nigerian languages to make your experience more comfortable.',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: textSecondary,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
 
   Widget _buildAvailableLanguagesSection() {
     final availableLanguages =
@@ -390,8 +390,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ),
         const SizedBox(height: 12),
         ...availableLanguages
-            .map((language) => _buildLanguageCard(language, true))
-            ,
+            .map((language) => _buildLanguageCard(language, true)),
       ],
     );
   }
@@ -415,8 +414,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ),
         const SizedBox(height: 12),
         ...comingSoonLanguages
-            .map((language) => _buildLanguageCard(language, false))
-            ,
+            .map((language) => _buildLanguageCard(language, false)),
       ],
     );
   }
@@ -496,7 +494,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                         const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4,),
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -560,50 +560,53 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   }
 
   Widget _buildLanguageInfoSection() => Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.info_outline, color: primaryColor, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Language Support',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: textPrimary,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: primaryColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: primaryColor.withOpacity(0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.info_outline, color: primaryColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Language Support',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildInfoItem(
-              '🇳🇬 Nigerian languages are prioritized for local users',),
-          _buildInfoItem(
-              '🔄 App restart may be required for full language change',),
-          _buildInfoItem(
-              '📱 More languages will be added based on user demand',),
-          _buildInfoItem('🌍 Help us translate by sending feedback'),
-        ],
-      ),
-    );
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildInfoItem(
+              '🇳🇬 Nigerian languages are prioritized for local users',
+            ),
+            _buildInfoItem(
+              '🔄 App restart may be required for full language change',
+            ),
+            _buildInfoItem(
+              '📱 More languages will be added based on user demand',
+            ),
+            _buildInfoItem('🌍 Help us translate by sending feedback'),
+          ],
+        ),
+      );
 
   Widget _buildInfoItem(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        text,
-        style: GoogleFonts.montserrat(
-          fontSize: 14,
-          color: textSecondary,
-          height: 1.4,
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text(
+          text,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: textSecondary,
+            height: 1.4,
+          ),
         ),
-      ),
-    );
+      );
 }

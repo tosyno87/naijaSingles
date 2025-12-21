@@ -82,15 +82,15 @@ class ProfileImageCropperService {
         developer.log('📷 iOS detected - camera permission handled by system');
         return true; // iOS will show permission dialog automatically
       }
-      
+
       developer.log('📷 Checking camera permission (Android)...');
       final status = await Permission.camera.status;
-      
+
       if (status.isGranted) {
         developer.log('✅ Camera permission already granted');
         return true;
       }
-      
+
       if (status.isDenied) {
         developer.log('🔒 Camera permission denied, requesting...');
         final result = await Permission.camera.request();
@@ -102,12 +102,12 @@ class ProfileImageCropperService {
           return false;
         }
       }
-      
+
       if (status.isPermanentlyDenied) {
         developer.log('❌ Camera permission permanently denied');
         return false;
       }
-      
+
       return false;
     } catch (e) {
       developer.log('❌ Error requesting camera permission: $e');
@@ -125,23 +125,23 @@ class ProfileImageCropperService {
   static Future<bool> _requestStoragePermission() async {
     try {
       developer.log('📁 Checking storage permission...');
-      
+
       // For Android 13+ (API 33+), use READ_MEDIA_IMAGES
       if (Platform.isAndroid) {
         // Check if we're on Android 13+ (API 33+)
         final photosStatus = await Permission.photos.status;
-        
+
         if (photosStatus.isGranted) {
           developer.log('✅ Photos permission already granted');
           return true;
         }
-        
+
         if (photosStatus.isDenied) {
           developer.log('🔒 Photos permission denied, requesting...');
           final result = await Permission.photos.request();
           return result.isGranted;
         }
-        
+
         if (photosStatus.isPermanentlyDenied) {
           developer.log('❌ Photos permission permanently denied');
           return false;
@@ -149,10 +149,11 @@ class ProfileImageCropperService {
       } else {
         // For iOS, permissions are handled automatically by the system
         // when accessing photo library. We can return true here.
-        developer.log('📁 iOS detected - photo library permission handled by system');
+        developer.log(
+            '📁 iOS detected - photo library permission handled by system');
         return true; // iOS will show permission dialog automatically
       }
-      
+
       return false;
     } catch (e) {
       developer.log('❌ Error requesting storage permission: $e');
@@ -174,7 +175,7 @@ class ProfileImageCropperService {
   }) async {
     try {
       developer.log('📸 Starting image pick with source: $source');
-      
+
       // Request appropriate permission based on source
       bool hasPermission = false;
       if (source == ImageSource.camera) {
@@ -198,16 +199,16 @@ class ProfileImageCropperService {
           return null;
         }
       }
-      
+
       if (!hasPermission) {
         developer.log('❌ Permission not granted, cannot proceed');
         return null;
       }
-      
+
       // First pick the image
       final ImagePicker picker = ImagePicker();
       developer.log('📷 Picking image with picker...');
-      
+
       XFile? image;
       try {
         // On iOS, don't use preferredCameraDevice (it's Android-only and causes crashes)
@@ -228,22 +229,28 @@ class ProfileImageCropperService {
           );
         }
       } on PlatformException catch (e) {
-        developer.log('❌ PlatformException picking image: ${e.code} - ${e.message}');
+        developer
+            .log('❌ PlatformException picking image: ${e.code} - ${e.message}');
         developer.log('❌ Details: ${e.details}');
-        
-        String errorMessage = 'Failed to access ${source == ImageSource.camera ? 'camera' : 'photo library'}.';
-        
+
+        String errorMessage =
+            'Failed to access ${source == ImageSource.camera ? 'camera' : 'photo library'}.';
+
         // Handle iOS-specific errors
         if (Platform.isIOS) {
-          if (e.code == 'camera_access_denied' || e.code == 'photo_library_access_denied') {
-            errorMessage = 'Camera access was denied. Please enable it in Settings > Privacy & Security > Camera.';
+          if (e.code == 'camera_access_denied' ||
+              e.code == 'photo_library_access_denied') {
+            errorMessage =
+                'Camera access was denied. Please enable it in Settings > Privacy & Security > Camera.';
           } else if (e.code == 'camera_unavailable') {
-            errorMessage = 'Camera is not available. It may be in use by another app.';
+            errorMessage =
+                'Camera is not available. It may be in use by another app.';
           } else if (e.message?.contains('permission') ?? false) {
-            errorMessage = 'Permission denied. Please enable camera access in Settings.';
+            errorMessage =
+                'Permission denied. Please enable camera access in Settings.';
           }
         }
-        
+
         if (context != null && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -280,7 +287,7 @@ class ProfileImageCropperService {
         developer.log('⚠️ No image selected by user');
         return null;
       }
-      
+
       developer.log('✅ Image picked successfully: ${image.path}');
 
       // Then crop it
@@ -290,18 +297,18 @@ class ProfileImageCropperService {
         cropType: cropType,
         title: title,
       );
-      
+
       if (croppedFile != null) {
         developer.log('✅ Image cropped successfully: ${croppedFile.path}');
       } else {
         developer.log('⚠️ Image cropping cancelled or failed');
       }
-      
+
       return croppedFile;
     } catch (e, stackTrace) {
       developer.log('❌ Error picking and cropping image: $e');
       developer.log('❌ Stack trace: $stackTrace');
-      
+
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -312,7 +319,7 @@ class ProfileImageCropperService {
           ),
         );
       }
-      
+
       return null;
     }
   }
@@ -405,53 +412,54 @@ class ProfileImageCropperService {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) => InkWell(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF008037).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+  }) =>
+      InkWell(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF008037).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFF008037),
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFF008037),
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF3A1D0F),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF3A1D0F),
+                    ),
                   ),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF8B6C59),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF8B6C59),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(
-            Icons.arrow_forward_ios,
-            color: Color(0xFF008037),
-            size: 16,
-          ),
-        ],
-      ),
-    );
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Color(0xFF008037),
+              size: 16,
+            ),
+          ],
+        ),
+      );
 }
 
 /// Crop type enum for different photo types

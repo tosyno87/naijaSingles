@@ -99,10 +99,12 @@ class MatchService {
           .get();
 
       return querySnapshot.docs
-          .map((doc) => {
-                'id': doc.id,
-                ...doc.data() as Map<String, dynamic>,
-              },)
+          .map(
+            (doc) => {
+              'id': doc.id,
+              ...doc.data() as Map<String, dynamic>,
+            },
+          )
           .toList();
     } catch (e) {
       debugPrint('Error getting user matches: $e');

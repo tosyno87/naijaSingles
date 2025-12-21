@@ -5,9 +5,10 @@ import '../services/group_reporting_service.dart';
 
 /// Modal for reporting a group
 class GroupReportModal extends StatefulWidget {
-
   const GroupReportModal({
-    required this.groupId, required this.groupName, super.key,
+    required this.groupId,
+    required this.groupName,
+    super.key,
   });
   final String groupId;
   final String groupName;
@@ -77,7 +78,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'Report submitted successfully. Thank you for helping keep our community safe.',),
+              'Report submitted successfully. Thank you for helping keep our community safe.',
+            ),
             backgroundColor: AppColors.primaryGreen,
           ),
         );
@@ -102,11 +104,11 @@ class _GroupReportModalState extends State<GroupReportModal> {
 
   @override
   Widget build(BuildContext context) => DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.5,
-      maxChildSize: 0.9,
-      expand: false,
-      builder: (context, scrollController) => DecoratedBox(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => DecoratedBox(
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -181,8 +183,11 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.info_outline,
-                                color: Colors.orange, size: 20,),
+                            const Icon(
+                              Icons.info_outline,
+                              color: Colors.orange,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -218,7 +223,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                     ),
                     const SizedBox(height: 12),
 
-                    ...GroupReportingService.reportReasons.map((reason) => RadioListTile<String>(
+                    ...GroupReportingService.reportReasons.map(
+                      (reason) => RadioListTile<String>(
                         value: reason,
                         groupValue: _selectedReason,
                         onChanged: _hasUserReported
@@ -238,7 +244,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         ),
                         activeColor: AppColors.primaryGreen,
                         contentPadding: EdgeInsets.zero,
-                      ),),
+                      ),
+                    ),
 
                     const SizedBox(height: 20),
 
@@ -273,7 +280,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: AppColors.primaryGreen),
+                          borderSide:
+                              const BorderSide(color: AppColors.primaryGreen),
                         ),
                         contentPadding: const EdgeInsets.all(12),
                       ),
@@ -305,7 +313,8 @@ class _GroupReportModalState extends State<GroupReportModal> {
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,),
+                                    Colors.white,
+                                  ),
                                 ),
                               )
                             : Text(
@@ -327,5 +336,5 @@ class _GroupReportModalState extends State<GroupReportModal> {
             ],
           ),
         ),
-    );
+      );
 }

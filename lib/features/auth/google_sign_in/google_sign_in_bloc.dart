@@ -25,7 +25,6 @@ class GoogleSignInInitial extends GoogleSignInState {}
 class GoogleSignInLoading extends GoogleSignInState {}
 
 class GoogleSignInSuccess extends GoogleSignInState {
-
   GoogleSignInSuccess({required this.user});
   final User user;
 
@@ -34,7 +33,6 @@ class GoogleSignInSuccess extends GoogleSignInState {
 }
 
 class GoogleSignInFailure extends GoogleSignInState {
-
   GoogleSignInFailure({required this.error});
   final String error;
 
@@ -44,7 +42,6 @@ class GoogleSignInFailure extends GoogleSignInState {
 
 // BLoC
 class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
-
   GoogleSignInBloc() : super(GoogleSignInInitial()) {
     on<GoogleSignInRequested>(_onGoogleSignInRequested);
   }
@@ -114,8 +111,11 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
       }
     } catch (e) {
       log('Google Sign In error: $e');
-      emit(GoogleSignInFailure(
-          error: 'Error signing in with Google: ${e.toString()}',),);
+      emit(
+        GoogleSignInFailure(
+          error: 'Error signing in with Google: ${e.toString()}',
+        ),
+      );
     }
   }
 

@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 /// Model class for app notifications
-class AppNotification { // ID for the related item (profile, message, etc.)
+class AppNotification {
+  // ID for the related item (profile, message, etc.)
 
   AppNotification({
     required this.id,
@@ -40,14 +41,14 @@ class AppNotification { // ID for the related item (profile, message, etc.)
 
   /// Convert to Firestore document
   Map<String, dynamic> toFirestore() => {
-      'title': title,
-      'message': message,
-      'timestamp': Timestamp.fromDate(timestamp),
-      'type': type,
-      'avatarUrl': avatarUrl,
-      'isRead': isRead,
-      'actionId': actionId,
-    };
+        'title': title,
+        'message': message,
+        'timestamp': Timestamp.fromDate(timestamp),
+        'type': type,
+        'avatarUrl': avatarUrl,
+        'isRead': isRead,
+        'actionId': actionId,
+      };
 
   /// Returns the appropriate icon for the notification type
   IconData get typeIcon {
@@ -118,14 +119,15 @@ class AppNotification { // ID for the related item (profile, message, etc.)
     String? type,
     bool? isRead,
     String? actionId,
-  }) => AppNotification(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      message: message ?? this.message,
-      timestamp: timestamp ?? this.timestamp,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      type: type ?? this.type,
-      isRead: isRead ?? this.isRead,
-      actionId: actionId ?? this.actionId,
-    );
+  }) =>
+      AppNotification(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        message: message ?? this.message,
+        timestamp: timestamp ?? this.timestamp,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
+        type: type ?? this.type,
+        isRead: isRead ?? this.isRead,
+        actionId: actionId ?? this.actionId,
+      );
 }

@@ -26,11 +26,12 @@ import '../../widgets/update_address.dart';
 import 'bloc/userfilter_bloc.dart';
 
 class SettingPage extends StatefulWidget {
-  const SettingPage(
-      {required this.currentUser,
-      required this.isPurchased,
-      required this.items,
-      super.key,});
+  const SettingPage({
+    required this.currentUser,
+    required this.isPurchased,
+    required this.items,
+    super.key,
+  });
   final UserModel currentUser;
   final bool isPurchased;
   final Map items;
@@ -81,10 +82,13 @@ class SettingPageState extends State<SettingPage> {
                         BlocProvider.of<UserfilterBloc>(context)
                             .add(ChangefilterRequest(details: changeValues));
                         context.read<SearchUserBloc>().add(
-                            LoadUserEvent(currentUser: widget.currentUser),);
+                              LoadUserEvent(currentUser: widget.currentUser),
+                            );
                       },
-                      child: Text('Save'.tr().toString(),
-                          style: const TextStyle(color: primaryColor),),
+                      child: Text(
+                        'Save'.tr().toString(),
+                        style: const TextStyle(color: primaryColor),
+                      ),
                     );
                   },
                 ),
@@ -135,10 +139,14 @@ class SettingPageState extends State<SettingPage> {
       listener: (context, state) {
         if (state is UserFilterUpdationFailed) {
           CustomSnackbar.showSnackBarSimple(
-              'Filter not applied..'.tr().toString(), context,);
+            'Filter not applied..'.tr().toString(),
+            context,
+          );
         } else if (state is UserFilterUpdated) {
           CustomSnackbar.showSnackBarSimple(
-              'Changes saved.'.tr().toString(), context,);
+            'Changes saved.'.tr().toString(),
+            context,
+          );
           log('filter succesfully applied ....'.tr().toString());
 
           changeValues.clear();
@@ -159,30 +167,35 @@ class SettingPageState extends State<SettingPage> {
         child: Scaffold(
           // backgroundColor: primaryColor,
           appBar: AppBar(
-              centerTitle: false,
-              title: Text(
-                'Settings'.tr().toString(),
-                style: const TextStyle(color: Colors.white),
+            centerTitle: false,
+            title: Text(
+              'Settings'.tr().toString(),
+              style: const TextStyle(color: Colors.white),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout_outlined),
+                onPressed: () async {
+                  showLogoutDialog(context);
+                },
               ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.logout_outlined),
-                  onPressed: () async {
-                    showLogoutDialog(context);
-                  },
-                ),
-              ],
-              elevation: 0,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,),
+            ],
+            elevation: 0,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          ),
           body: DecoratedBox(
             decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),),
-                color: Theme.of(context).primaryColor,),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              color: Theme.of(context).primaryColor,
+            ),
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20), topRight: Radius.circular(20),),
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -193,74 +206,82 @@ class SettingPageState extends State<SettingPage> {
                       child: Text(
                         'Account settings'.tr().toString(),
                         style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : primaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,),
+                          color: themeProvider.isDarkMode
+                              ? Colors.white
+                              : primaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
 
                     ListTile(
                       title: Card(
-                          child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: InkWell(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text('Phone Number'.tr().toString()),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                ),
-                                child: Text(
-                                  widget.currentUser.phoneNumber!.isNotEmpty
-                                      ? '${widget.currentUser.phoneNumber}'
-                                      : 'Add phone Number'.tr().toString(),
-                                  style: const TextStyle(
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: InkWell(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text('Phone Number'.tr().toString()),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 20,
+                                  ),
+                                  child: Text(
+                                    widget.currentUser.phoneNumber!.isNotEmpty
+                                        ? '${widget.currentUser.phoneNumber}'
+                                        : 'Add phone Number'.tr().toString(),
+                                    style: const TextStyle(
                                       color: AppColors.secondaryColor,
-                                      fontWeight: FontWeight.w400,),
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              const Icon(
-                                Icons.arrow_forward_ios,
-                                color: primaryColor,
-                                size: 15,
-                              ),
-                            ],
+                                const Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: primaryColor,
+                                  size: 15,
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                RouteName.updatePhoneScreen,
+                                arguments: widget.currentUser,
+                              );
+                            },
                           ),
-                          onTap: () {
-                            Navigator.pushNamed(
-                                context, RouteName.updatePhoneScreen,
-                                arguments: widget.currentUser,);
-                          },
                         ),
-                      ),),
+                      ),
                       subtitle: Text(
-                          'Verify a phone number to secure your account'
-                              .tr()
-                              .toString(),),
+                        'Verify a phone number to secure your account'
+                            .tr()
+                            .toString(),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(15),
                       child: Text(
                         'Discovery settings'.tr().toString(),
                         style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : primaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,),
+                          color: themeProvider.isDarkMode
+                              ? Colors.white
+                              : primaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: UpdateAddressWidget(
-                          currentUser: widget.currentUser,
-                          hasSubscription: widget.isPurchased,
-                          items: widget.items,
-                        ),),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: UpdateAddressWidget(
+                        currentUser: widget.currentUser,
+                        hasSubscription: widget.isPurchased,
+                        items: widget.items,
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 15,
@@ -270,41 +291,48 @@ class SettingPageState extends State<SettingPage> {
                             .tr()
                             .toString(),
                         style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? AppColors.secondaryColor
-                                : Colors.black54,),
+                          color: themeProvider.isDarkMode
+                              ? AppColors.secondaryColor
+                              : Colors.black54,
+                        ),
                       ),
                     ),
                     Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: ShowmeWidget(
-                          currentUser: widget.currentUser,
-                          changeValues: changeValues,
-                        ),),
+                      padding: const EdgeInsets.all(15),
+                      child: ShowmeWidget(
+                        currentUser: widget.currentUser,
+                        changeValues: changeValues,
+                      ),
+                    ),
                     Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: DistanceWidget(
-                          changeValues: changeValues,
-                          currentUser: widget.currentUser,
-                          max: widget.isPurchased
-                              ? paidR.toDouble()
-                              : freeR.toDouble(),
-                        ),),
+                      padding: const EdgeInsets.all(15),
+                      child: DistanceWidget(
+                        changeValues: changeValues,
+                        currentUser: widget.currentUser,
+                        max: widget.isPurchased
+                            ? paidR.toDouble()
+                            : freeR.toDouble(),
+                      ),
+                    ),
                     Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: AgeRangeWidget(
-                          currentUser: widget.currentUser,
-                          changeValues: changeValues,
-                        ),),
+                      padding: const EdgeInsets.all(15),
+                      child: AgeRangeWidget(
+                        currentUser: widget.currentUser,
+                        changeValues: changeValues,
+                      ),
+                    ),
                     // remove notification should be used here already made notification widget
 
                     const LanguageWidget(),
 
                     // for streetview setting of users
                     ChangeNotifierProvider(
-                        create: (context) => StreetViewProvider(widget.currentUser.id!),
-                        child: StreetViewButtonWigdet(
-                            currentUser: widget.currentUser,),),
+                      create: (context) =>
+                          StreetViewProvider(widget.currentUser.id!),
+                      child: StreetViewButtonWigdet(
+                        currentUser: widget.currentUser,
+                      ),
+                    ),
                     // for theme change and set labelLarge
                     const ChangeThemeButtonWidget(),
                     TextButtonWidget(
@@ -325,19 +353,21 @@ class SettingPageState extends State<SettingPage> {
                       icon: Icons.logout_outlined,
                     ),
                     Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Center(
-                          child: SizedBox(
-                              height: 50,
-                              width: 100,
-                              child: Image.asset(
-                                'asset/hookup4u-Logo-BP.png',
-                                fit: BoxFit.contain,
-                                color: themeProvider.isDarkMode
-                                    ? Colors.white
-                                    : primaryColor,
-                              ),),
-                        ),),
+                      padding: const EdgeInsets.all(20),
+                      child: Center(
+                        child: SizedBox(
+                          height: 50,
+                          width: 100,
+                          child: Image.asset(
+                            'asset/hookup4u-Logo-BP.png',
+                            fit: BoxFit.contain,
+                            color: themeProvider.isDarkMode
+                                ? Colors.white
+                                : primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
                     const DeleteAccountWidget(),
                     const SizedBox(
                       height: 80,

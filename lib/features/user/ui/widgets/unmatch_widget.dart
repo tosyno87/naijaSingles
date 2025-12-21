@@ -12,17 +12,21 @@ import '../../../home/bloc/searchuser_bloc.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 
 class UnMatcheWidget extends StatelessWidget {
-  const UnMatcheWidget(
-      {required this.currentUser, required this.user, required this.fromChatPage, super.key,});
+  const UnMatcheWidget({
+    required this.currentUser,
+    required this.user,
+    required this.fromChatPage,
+    super.key,
+  });
   final UserModel currentUser;
   final UserModel user;
   final bool fromChatPage;
 
   @override
   Widget build(BuildContext context) => InkWell(
-      onTap: () => showDialog(
-        context: context,
-        builder: (BuildContext ctx) => ClipRRect(
+        onTap: () => showDialog(
+          context: context,
+          builder: (BuildContext ctx) => ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: AlertDialog(
               title: Text(
@@ -30,9 +34,10 @@ class UnMatcheWidget extends StatelessWidget {
                 style: const TextStyle(fontSize: 18, color: primaryColor),
               ),
               content: Text(
-                  'Do you want to unmatch with'
-                      .tr(args: ['${user.name}'.toString()]).toString(),
-                  style: const TextStyle(fontSize: 16),),
+                'Do you want to unmatch with'
+                    .tr(args: ['${user.name}'.toString()]).toString(),
+                style: const TextStyle(fontSize: 16),
+              ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
@@ -51,9 +56,10 @@ class UnMatcheWidget extends StatelessWidget {
                     BlocProvider.of<MatchUserBloc>(context)
                         .add(LoadMatchUserEvent(currentUser: currentUser));
                     CustomSnackbar.showSnackBarSimple(
-                        'unmatched'
-                            .tr(args: ['${user.name}'.toString()]).toString(),
-                        context,);
+                      'unmatched'
+                          .tr(args: ['${user.name}'.toString()]).toString(),
+                      context,
+                    );
                     if (fromChatPage) {
                       Navigator.pop(context);
                       Navigator.pop(context);
@@ -69,8 +75,8 @@ class UnMatcheWidget extends StatelessWidget {
               ],
             ),
           ),
-      ),
-      child: SizedBox(
+        ),
+        child: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: Center(
             child: Text(
@@ -78,10 +84,12 @@ class UnMatcheWidget extends StatelessWidget {
                   .tr(args: ['${user.name}'.toUpperCase()]).toString(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.secondaryColor,),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.secondaryColor,
+              ),
             ),
-          ),),
-    );
+          ),
+        ),
+      );
 }

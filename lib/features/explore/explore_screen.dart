@@ -11,7 +11,6 @@ import '../../models/user_model.dart';
 import 'screens/tribe_connect_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
-
   const ExploreScreen({
     super.key,
     this.showBackButton = false,

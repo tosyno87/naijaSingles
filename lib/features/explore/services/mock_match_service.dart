@@ -12,7 +12,9 @@ class MockMatchService extends MatchService {
   // Override the createMessageThread method to return a mock thread ID
   @override
   Future<String> createMessageThread(
-      String currentUserId, String matchedUserId,) async {
+    String currentUserId,
+    String matchedUserId,
+  ) async {
     // For testing, just return a mock thread ID
     return 'mock_thread_${currentUserId}_$matchedUserId';
   }

@@ -6,9 +6,9 @@ import '../../../../models/group_model.dart';
 import '../../../../services/group_service.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
-
   const GroupDetailsScreen({
-    required this.group, super.key,
+    required this.group,
+    super.key,
   });
   final GroupModel group;
 
@@ -119,385 +119,390 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          // App Bar
-          _buildSliverAppBar(),
+        backgroundColor: AppColors.backgroundColor,
+        body: CustomScrollView(
+          slivers: [
+            // App Bar
+            _buildSliverAppBar(),
 
-          // Group Info
-          _buildGroupInfo(),
+            // Group Info
+            _buildGroupInfo(),
 
-          // Tab Bar
-          _buildTabBar(),
+            // Tab Bar
+            _buildTabBar(),
 
-          // Tab Content
-          _buildTabContent(),
-        ],
-      ),
-    );
+            // Tab Content
+            _buildTabContent(),
+          ],
+        ),
+      );
 
   Widget _buildSliverAppBar() => SliverAppBar(
-      expandedHeight: 200,
-      pinned: true,
-      backgroundColor: AppColors.primaryGreen,
-      flexibleSpace: FlexibleSpaceBar(
-        background: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: _getCategoryGradient(),
-          ),
-          child: Stack(
-            children: [
-              // Group Image
-              if (widget.group.imageUrl != null)
-                Positioned.fill(
-                  child: Image.network(
-                    widget.group.imageUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => _buildDefaultBackground(),
-                  ),
-                )
-              else
-                _buildDefaultBackground(),
+        expandedHeight: 200,
+        pinned: true,
+        backgroundColor: AppColors.primaryGreen,
+        flexibleSpace: FlexibleSpaceBar(
+          background: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: _getCategoryGradient(),
+            ),
+            child: Stack(
+              children: [
+                // Group Image
+                if (widget.group.imageUrl != null)
+                  Positioned.fill(
+                    child: Image.network(
+                      widget.group.imageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildDefaultBackground(),
+                    ),
+                  )
+                else
+                  _buildDefaultBackground(),
 
-              // Overlay
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.7),
-                      ],
+                // Overlay
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.7),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              // Group Name
-              Positioned(
-                bottom: 16,
-                left: 16,
-                right: 16,
-                child: Text(
-                  widget.group.name,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                // Group Name
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: Text(
+                    widget.group.name,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-      actions: [
-        if (_isCreator || _isAdmin)
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (value) {
-              switch (value) {
-                case 'edit':
-                  // TODO: Navigate to edit group screen
-                  break;
-                case 'settings':
-                  // TODO: Navigate to group settings
-                  break;
-                case 'delete':
-                  _showDeleteDialog();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit),
-                    SizedBox(width: 8),
-                    Text('Edit Group'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 8),
-                    Text('Settings'),
-                  ],
-                ),
-              ),
-              if (_isCreator)
+        actions: [
+          if (_isCreator || _isAdmin)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onSelected: (value) {
+                switch (value) {
+                  case 'edit':
+                    // TODO: Navigate to edit group screen
+                    break;
+                  case 'settings':
+                    // TODO: Navigate to group settings
+                    break;
+                  case 'delete':
+                    _showDeleteDialog();
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
                 const PopupMenuItem(
-                  value: 'delete',
+                  value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: Colors.red),
+                      Icon(Icons.edit),
                       SizedBox(width: 8),
-                      Text('Delete Group', style: TextStyle(color: Colors.red)),
+                      Text('Edit Group'),
                     ],
                   ),
                 ),
-            ],
-          ),
-      ],
-    );
+                const PopupMenuItem(
+                  value: 'settings',
+                  child: Row(
+                    children: [
+                      Icon(Icons.settings),
+                      SizedBox(width: 8),
+                      Text('Settings'),
+                    ],
+                  ),
+                ),
+                if (_isCreator)
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Delete Group',
+                            style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+        ],
+      );
 
   Widget _buildDefaultBackground() => DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: _getCategoryGradient(),
-      ),
-      child: Center(
-        child: Custom3DIcons.groups(size: 80, color: Colors.white),
-      ),
-    );
+        decoration: BoxDecoration(
+          gradient: _getCategoryGradient(),
+        ),
+        child: Center(
+          child: Custom3DIcons.groups(size: 80, color: Colors.white),
+        ),
+      );
 
   Widget _buildGroupInfo() => SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: AppColors.cardShadow,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Category and Cultural Info
-            Row(
-              children: [
-                _buildInfoChip(
-                  icon: GroupCategories.categoryIcons[widget.group.category] ??
-                      '🌟',
-                  label: widget.group.categoryDisplay,
-                  color: AppColors.primaryGreen,
-                ),
-                const SizedBox(width: 8),
-                if (widget.group.culturalInfo != null)
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: AppColors.cardShadow,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Category and Cultural Info
+              Row(
+                children: [
                   _buildInfoChip(
-                    icon: '🌍',
-                    label: widget.group.culturalDisplay,
-                    color: AppColors.culture,
+                    icon:
+                        GroupCategories.categoryIcons[widget.group.category] ??
+                            '🌟',
+                    label: widget.group.categoryDisplay,
+                    color: AppColors.primaryGreen,
                   ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Description
-            Text(
-              widget.group.description,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                height: 1.5,
+                  const SizedBox(width: 8),
+                  if (widget.group.culturalInfo != null)
+                    _buildInfoChip(
+                      icon: '🌍',
+                      label: widget.group.culturalDisplay,
+                      color: AppColors.culture,
+                    ),
+                ],
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Stats Row
-            Row(
-              children: [
-                _buildStatItem(
-                  icon: Icons.people,
-                  label: 'Members',
-                  value:
-                      '${widget.group.memberCount}/${widget.group.maxMembers}',
+              // Description
+              Text(
+                widget.group.description,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                  height: 1.5,
                 ),
-                const SizedBox(width: 24),
-                if (widget.group.location != null)
+              ),
+
+              const SizedBox(height: 16),
+
+              // Stats Row
+              Row(
+                children: [
                   _buildStatItem(
-                    icon: Icons.location_on,
-                    label: 'Location',
-                    value: widget.group.location!,
+                    icon: Icons.people,
+                    label: 'Members',
+                    value:
+                        '${widget.group.memberCount}/${widget.group.maxMembers}',
                   ),
-                const SizedBox(width: 24),
-                _buildStatItem(
-                  icon: Icons.calendar_today,
-                  label: 'Created',
-                  value: _formatDate(widget.group.createdAt),
-                ),
-              ],
-            ),
+                  const SizedBox(width: 24),
+                  if (widget.group.location != null)
+                    _buildStatItem(
+                      icon: Icons.location_on,
+                      label: 'Location',
+                      value: widget.group.location!,
+                    ),
+                  const SizedBox(width: 24),
+                  _buildStatItem(
+                    icon: Icons.calendar_today,
+                    label: 'Created',
+                    value: _formatDate(widget.group.createdAt),
+                  ),
+                ],
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // Action Buttons
-            _buildActionButtons(),
-          ],
+              // Action Buttons
+              _buildActionButtons(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   Widget _buildInfoChip({
     required String icon,
     required String label,
     required Color color,
-  }) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: AppColors.textSecondary),
+            Text(icon, style: const TextStyle(fontSize: 14)),
             const SizedBox(width: 4),
             Text(
               label,
               style: GoogleFonts.montserrat(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+                color: color,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+      );
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
-    );
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      );
 
   Widget _buildActionButtons() => Row(
-      children: [
-        if (!_isMember)
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: _joinGroup,
-              icon: Custom3DIcons.add(size: 20),
-              label: const Text('Join Group'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          )
-        else ...[
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: _leaveGroup,
-              icon: const Icon(Icons.exit_to_app),
-              label: const Text('Leave Group'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.error,
-                side: const BorderSide(color: AppColors.error),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Navigate to group chat
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Group chat coming soon!'),
-                    backgroundColor: AppColors.info,
+        children: [
+          if (!_isMember)
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _joinGroup,
+                icon: Custom3DIcons.add(size: 20),
+                label: const Text('Join Group'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              },
-              icon: Custom3DIcons.chat(size: 20),
-              label: const Text('Chat'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.info,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            )
+          else ...[
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _leaveGroup,
+                icon: const Icon(Icons.exit_to_app),
+                label: const Text('Leave Group'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.error,
+                  side: const BorderSide(color: AppColors.error),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // TODO: Navigate to group chat
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Group chat coming soon!'),
+                      backgroundColor: AppColors.info,
+                    ),
+                  );
+                },
+                icon: Custom3DIcons.chat(size: 20),
+                label: const Text('Chat'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.info,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
-      ],
-    );
+      );
 
   Widget _buildTabBar() => SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: AppColors.cardShadow,
-        ),
-        child: TabBar(
-          controller: _tabController,
-          indicator: BoxDecoration(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            color: AppColors.primaryGreen,
+            boxShadow: AppColors.cardShadow,
           ),
-          labelColor: Colors.white,
-          unselectedLabelColor: AppColors.textSecondary,
-          labelStyle: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
+          child: TabBar(
+            controller: _tabController,
+            indicator: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.primaryGreen,
+            ),
+            labelColor: Colors.white,
+            unselectedLabelColor: AppColors.textSecondary,
+            labelStyle: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+            unselectedLabelStyle: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w400,
+              fontSize: 14,
+            ),
+            tabs: const [
+              Tab(text: 'Members'),
+              Tab(text: 'Posts'),
+              Tab(text: 'Events'),
+            ],
           ),
-          unselectedLabelStyle: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-          ),
-          tabs: const [
-            Tab(text: 'Members'),
-            Tab(text: 'Posts'),
-            Tab(text: 'Events'),
-          ],
         ),
-      ),
-    );
+      );
 
   Widget _buildTabContent() => SliverFillRemaining(
-      child: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildMembersTab(),
-          _buildPostsTab(),
-          _buildEventsTab(),
-        ],
-      ),
-    );
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildMembersTab(),
+            _buildPostsTab(),
+            _buildEventsTab(),
+          ],
+        ),
+      );
 
   Widget _buildMembersTab() {
     if (_isLoading) {
@@ -519,190 +524,191 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   }
 
   Widget _buildMemberCard(Map<String, dynamic> member) => Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: AppColors.cardShadow,
-      ),
-      child: Row(
-        children: [
-          // Profile Image
-          CircleAvatar(
-            radius: 24,
-            backgroundImage: member['imageUrl'] != null
-                ? NetworkImage(member['imageUrl'])
-                : null,
-            child: member['imageUrl'] == null
-                ? Custom3DIcons.profile()
-                : null,
-          ),
-
-          const SizedBox(width: 12),
-
-          // Member Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      member['name'],
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    if (member['isCreator'])
-                      _buildRoleBadge('Creator', AppColors.warning)
-                    else if (member['isAdmin'])
-                      _buildRoleBadge('Admin', AppColors.info),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Joined ${_formatDate(DateTime.parse(member['joinedAt']))}',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: AppColors.cardShadow,
+        ),
+        child: Row(
+          children: [
+            // Profile Image
+            CircleAvatar(
+              radius: 24,
+              backgroundImage: member['imageUrl'] != null
+                  ? NetworkImage(member['imageUrl'])
+                  : null,
+              child:
+                  member['imageUrl'] == null ? Custom3DIcons.profile() : null,
             ),
-          ),
 
-          // Actions
-          if (_isAdmin &&
-              !member['isCreator'] &&
-              member['id'] != _groupService.currentUserId)
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                switch (value) {
-                  case 'make_admin':
-                    _makeAdmin(member['id']);
-                    break;
-                  case 'remove_admin':
-                    _removeAdmin(member['id']);
-                    break;
-                  case 'remove_member':
-                    _removeMember(member['id']);
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                if (!member['isAdmin'])
-                  const PopupMenuItem(
-                    value: 'make_admin',
-                    child: Row(
-                      children: [
-                        Icon(Icons.admin_panel_settings),
-                        SizedBox(width: 8),
-                        Text('Make Admin'),
-                      ],
-                    ),
-                  ),
-                if (member['isAdmin'])
-                  const PopupMenuItem(
-                    value: 'remove_admin',
-                    child: Row(
-                      children: [
-                        Icon(Icons.remove_moderator),
-                        SizedBox(width: 8),
-                        Text('Remove Admin'),
-                      ],
-                    ),
-                  ),
-                const PopupMenuItem(
-                  value: 'remove_member',
-                  child: Row(
+            const SizedBox(width: 12),
+
+            // Member Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Icon(Icons.person_remove, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Remove Member',
-                          style: TextStyle(color: Colors.red),),
+                      Text(
+                        member['name'],
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (member['isCreator'])
+                        _buildRoleBadge('Creator', AppColors.warning)
+                      else if (member['isAdmin'])
+                        _buildRoleBadge('Admin', AppColors.info),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    'Joined ${_formatDate(DateTime.parse(member['joinedAt']))}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-        ],
-      ),
-    );
+
+            // Actions
+            if (_isAdmin &&
+                !member['isCreator'] &&
+                member['id'] != _groupService.currentUserId)
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  switch (value) {
+                    case 'make_admin':
+                      _makeAdmin(member['id']);
+                      break;
+                    case 'remove_admin':
+                      _removeAdmin(member['id']);
+                      break;
+                    case 'remove_member':
+                      _removeMember(member['id']);
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  if (!member['isAdmin'])
+                    const PopupMenuItem(
+                      value: 'make_admin',
+                      child: Row(
+                        children: [
+                          Icon(Icons.admin_panel_settings),
+                          SizedBox(width: 8),
+                          Text('Make Admin'),
+                        ],
+                      ),
+                    ),
+                  if (member['isAdmin'])
+                    const PopupMenuItem(
+                      value: 'remove_admin',
+                      child: Row(
+                        children: [
+                          Icon(Icons.remove_moderator),
+                          SizedBox(width: 8),
+                          Text('Remove Admin'),
+                        ],
+                      ),
+                    ),
+                  const PopupMenuItem(
+                    value: 'remove_member',
+                    child: Row(
+                      children: [
+                        Icon(Icons.person_remove, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text(
+                          'Remove Member',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      );
 
   Widget _buildRoleBadge(String role, Color color) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Text(
-        role,
-        style: GoogleFonts.montserrat(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: color,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.3)),
         ),
-      ),
-    );
+        child: Text(
+          role,
+          style: GoogleFonts.montserrat(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      );
 
   Widget _buildPostsTab() => const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.post_add, size: 64, color: AppColors.textSecondary),
-          SizedBox(height: 16),
-          Text(
-            'Group Posts Coming Soon!',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.post_add, size: 64, color: AppColors.textSecondary),
+            SizedBox(height: 16),
+            Text(
+              'Group Posts Coming Soon!',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Share updates, photos, and discussions with your group members.',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
+            SizedBox(height: 8),
+            Text(
+              'Share updates, photos, and discussions with your group members.',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildEventsTab() => const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.event, size: 64, color: AppColors.textSecondary),
-          SizedBox(height: 16),
-          Text(
-            'Group Events Coming Soon!',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.event, size: 64, color: AppColors.textSecondary),
+            SizedBox(height: 16),
+            Text(
+              'Group Events Coming Soon!',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Create and join events organized by your group members.',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
+            SizedBox(height: 8),
+            Text(
+              'Create and join events organized by your group members.',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Future<void> _makeAdmin(String userId) async {
     final success = await _groupService.addAdmin(widget.group.id!, userId);
@@ -746,7 +752,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       builder: (context) => AlertDialog(
         title: const Text('Delete Group'),
         content: Text(
-            'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.',),
+          'Are you sure you want to delete "${widget.group.name}"? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

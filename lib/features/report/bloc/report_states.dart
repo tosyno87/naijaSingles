@@ -12,7 +12,6 @@ class ReportUserInitial extends ReportStates {}
 class ReportUserLoading extends ReportStates {}
 
 class ReportUserSuccess extends ReportStates {
-
   const ReportUserSuccess({required this.message});
   final String message;
 
@@ -21,7 +20,6 @@ class ReportUserSuccess extends ReportStates {
 }
 
 class ReportUserFailed extends ReportStates {
-
   const ReportUserFailed({required this.message});
   final String message;
 

@@ -12,10 +12,11 @@ class ReportBloc extends Bloc<ReportEvents, ReportStates> {
       emit(ReportUserLoading());
       try {
         await ReportRepositoryImpl().reportUser(
-            reason: event.reason,
-            moreReason: event.moreReason,
-            reported: event.reported,
-            reportedBy: event.reportedBy,);
+          reason: event.reason,
+          moreReason: event.moreReason,
+          reported: event.reported,
+          reportedBy: event.reportedBy,
+        );
         emit(const ReportUserSuccess(message: 'User Reported'));
       } catch (e) {
         emit(ReportUserFailed(message: e.toString()));

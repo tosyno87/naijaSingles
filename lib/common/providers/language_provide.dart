@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 /// Provides locale management for the app.
 class LanguageProvider extends ChangeNotifier {
-
   /// Creates a [LanguageProvider].
   LanguageProvider(this.context);
+
   /// The [BuildContext] used by EasyLocalization.
   BuildContext context;
 

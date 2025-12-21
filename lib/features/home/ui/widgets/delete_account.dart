@@ -35,15 +35,17 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
 
   @override
   Widget build(BuildContext context) => TextButtonWidget(
-      text: 'Delete Account',
-      onTap: () async {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => Theme(
+        text: 'Delete Account',
+        onTap: () async {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => Theme(
               data: Theme.of(context).copyWith(
                 colorScheme: Theme.of(context).colorScheme.copyWith(
                       surface: Colors.white,
-                    ), dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+                    ),
+                dialogTheme:
+                    const DialogThemeData(backgroundColor: Colors.white),
               ),
               child: AlertDialog(
                 backgroundColor: Colors.white,
@@ -57,9 +59,10 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                       height: 8,
                     ),
                     Text(
-                        "We're sorry to see you go, but we understand your decision. Deleting your account will permanently remove all your personal information and data associated with it."
-                            .tr()
-                            .toString(),),
+                      "We're sorry to see you go, but we understand your decision. Deleting your account will permanently remove all your personal information and data associated with it."
+                          .tr()
+                          .toString(),
+                    ),
                   ],
                 ),
                 actions: <Widget>[
@@ -67,8 +70,10 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     },
-                    child: Text('No'.tr().toString(),
-                        style: const TextStyle(color: primaryColor),),
+                    child: Text(
+                      'No'.tr().toString(),
+                      style: const TextStyle(color: primaryColor),
+                    ),
                   ),
                   TextButton(
                     onPressed: () async {
@@ -76,106 +81,109 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                       // Show final confirmation dialog with DELETE input
                       _showFinalConfirmationDialog();
                     },
-                    child: Text('Yes'.tr().toString(),
-                        style: const TextStyle(color: primaryColor),),
+                    child: Text(
+                      'Yes'.tr().toString(),
+                      style: const TextStyle(color: primaryColor),
+                    ),
                   ),
                 ],
               ),
             ),
-        );
-      },
-      icon: Icons.delete_forever_outlined,
-    );
+          );
+        },
+        icon: Icons.delete_forever_outlined,
+      );
 
   void _showFinalConfirmationDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) => Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  surface: Colors.white,
-                ), dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        data: Theme.of(context).copyWith(
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+                surface: Colors.white,
+              ),
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        ),
+        child: AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            'Final Confirmation',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
           ),
-          child: AlertDialog(
-            backgroundColor: Colors.white,
-            title: const Text(
-              'Final Confirmation',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Type "DELETE" to confirm account deletion:',
+                style: TextStyle(fontSize: 16),
               ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Type "DELETE" to confirm account deletion:',
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _confirmationController,
-                  decoration: InputDecoration(
-                    hintText: 'Type DELETE here',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.red, width: 2),
-                    ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _confirmationController,
+                decoration: InputDecoration(
+                  hintText: 'Type DELETE here',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  '⚠️ This action cannot be undone. All your data will be permanently deleted.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.red,
-                    fontWeight: FontWeight.w500,
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
                   ),
                 ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  _confirmationController.clear();
-                  Navigator.of(context).pop();
+                onChanged: (value) {
+                  setState(() {});
                 },
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.grey),
-                ),
               ),
-              TextButton(
-                onPressed: _confirmationController.text.trim().toUpperCase() ==
-                        'DELETE'
-                    ? () {
-                        Navigator.of(context).pop();
-                        _confirmationController.clear();
-                        _performAccountDeletion();
-                      }
-                    : null,
-                child: Text(
-                  'Confirm Delete',
-                  style: TextStyle(
-                    color: _confirmationController.text.trim().toUpperCase() ==
-                            'DELETE'
-                        ? Colors.red
-                        : Colors.grey,
-                    fontWeight: FontWeight.bold,
-                  ),
+              const SizedBox(height: 16),
+              const Text(
+                '⚠️ This action cannot be undone. All your data will be permanently deleted.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                _confirmationController.clear();
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed:
+                  _confirmationController.text.trim().toUpperCase() == 'DELETE'
+                      ? () {
+                          Navigator.of(context).pop();
+                          _confirmationController.clear();
+                          _performAccountDeletion();
+                        }
+                      : null,
+              child: Text(
+                'Confirm Delete',
+                style: TextStyle(
+                  color: _confirmationController.text.trim().toUpperCase() ==
+                          'DELETE'
+                      ? Colors.red
+                      : Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
+      ),
     );
   }
 
@@ -190,7 +198,8 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
           providerData.any((info) => info.providerId == 'google.com');
       final bool isFacebookUser =
           providerData.any((info) => info.providerId == 'facebook.com');
-      final bool isPhoneUser = providerData.any((info) => info.providerId == 'phone');
+      final bool isPhoneUser =
+          providerData.any((info) => info.providerId == 'phone');
 
       if (isGoogleUser) {
         // For Google users, try direct deletion first
@@ -301,29 +310,30 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Re-authentication Required'),
-          content: const Text(
-              'Please sign in with Google again to confirm account deletion.',),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                // Implement Google re-auth here
-                // This would require Google Sign-In re-authentication
-                CustomSnackbar.showSnackBarSimple(
-                  'Google re-authentication not yet implemented',
-                  context,
-                );
-              },
-              child: const Text('Continue'),
-            ),
-          ],
+        backgroundColor: Colors.white,
+        title: const Text('Re-authentication Required'),
+        content: const Text(
+          'Please sign in with Google again to confirm account deletion.',
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              // Implement Google re-auth here
+              // This would require Google Sign-In re-authentication
+              CustomSnackbar.showSnackBarSimple(
+                'Google re-authentication not yet implemented',
+                context,
+              );
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -331,37 +341,38 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Re-authentication Required'),
-          content: const Text(
-              'Please sign in with Facebook again to confirm account deletion.',),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                try {
-                  final User? fbUser =
-                      await FaceBookLoginRepositoryImpl().signInWithFacebook();
-                  if (fbUser != null) {
-                    await fbUser.delete();
-                    await _cleanupUserData(fbUser);
-                    await _showSuccessAndNavigate();
-                  }
-                } catch (e) {
-                  CustomSnackbar.showSnackBarSimple(
-                    'Facebook re-authentication failed',
-                    context,
-                  );
-                }
-              },
-              child: const Text('Continue'),
-            ),
-          ],
+        backgroundColor: Colors.white,
+        title: const Text('Re-authentication Required'),
+        content: const Text(
+          'Please sign in with Facebook again to confirm account deletion.',
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                final User? fbUser =
+                    await FaceBookLoginRepositoryImpl().signInWithFacebook();
+                if (fbUser != null) {
+                  await fbUser.delete();
+                  await _cleanupUserData(fbUser);
+                  await _showSuccessAndNavigate();
+                }
+              } catch (e) {
+                CustomSnackbar.showSnackBarSimple(
+                  'Facebook re-authentication failed',
+                  context,
+                );
+              }
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -369,28 +380,29 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Re-authentication Required'),
-          content: const Text(
-              'Please verify your phone number again to confirm account deletion.',),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                // Implement phone re-auth here
-                CustomSnackbar.showSnackBarSimple(
-                  'Phone re-authentication not yet implemented',
-                  context,
-                );
-              },
-              child: const Text('Continue'),
-            ),
-          ],
+        backgroundColor: Colors.white,
+        title: const Text('Re-authentication Required'),
+        content: const Text(
+          'Please verify your phone number again to confirm account deletion.',
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              // Implement phone re-auth here
+              CustomSnackbar.showSnackBarSimple(
+                'Phone re-authentication not yet implemented',
+                context,
+              );
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -398,20 +410,21 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text('Re-authentication Required'),
-          content: const Text('Please sign in again to confirm account deletion.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Continue'),
-            ),
-          ],
-        ),
+        backgroundColor: Colors.white,
+        title: const Text('Re-authentication Required'),
+        content:
+            const Text('Please sign in again to confirm account deletion.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -16,9 +16,11 @@ class AuthMethodSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set system UI overlay style for status bar
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-    ),);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    );
 
     // Define colors based on Afrocentric design guidelines
     const Color backgroundColor = Colors.white; // White background (MVP color)
@@ -96,7 +98,8 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => PhoneNumber(
-                              updatePhoneNumber: false,),
+                            updatePhoneNumber: false,
+                          ),
                         ),
                       );
                     },
@@ -125,7 +128,9 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                         if (state is GoogleSignInSuccess) {
                           // Navigate to onboarding or home based on user status
                           Navigator.pushReplacementNamed(
-                              context, '/onboarding',);
+                            context,
+                            '/onboarding',
+                          );
                         } else if (state is GoogleSignInFailure) {
                           CustomSnackbar.showSnackBarSimple(
                             state.error,
@@ -134,17 +139,17 @@ class AuthMethodSelectionScreen extends StatelessWidget {
                         }
                       },
                       builder: (context, state) => _buildAuthMethodButton(
-                          context: context,
-                          icon: Icons.g_mobiledata_rounded,
-                          text: 'Continue with Google',
-                          color: googleBlue,
-                          isLoading: state is GoogleSignInLoading,
-                          onTap: () {
-                            BlocProvider.of<GoogleSignInBloc>(context).add(
-                              GoogleSignInRequested(),
-                            );
-                          },
-                        ),
+                        context: context,
+                        icon: Icons.g_mobiledata_rounded,
+                        text: 'Continue with Google',
+                        color: googleBlue,
+                        isLoading: state is GoogleSignInLoading,
+                        onTap: () {
+                          BlocProvider.of<GoogleSignInBloc>(context).add(
+                            GoogleSignInRequested(),
+                          );
+                        },
+                      ),
                     ),
                   ),
 
@@ -218,57 +223,57 @@ class AuthMethodSelectionScreen extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
     bool isLoading = false,
-  }) => Container(
-      width: double.infinity,
-      height: 56, // 56dp height as specified
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16), // 16dp radius as specified
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white
-                .withValues(alpha: 0.5), // Soft cream shadow
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+  }) =>
+      Container(
+        width: double.infinity,
+        height: 56, // 56dp height as specified
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16), // 16dp radius as specified
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.5), // Soft cream shadow
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        child: isLoading
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, size: 24, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Text(
-                    text,
-                    style: GoogleFonts.montserrat(
-                      // Montserrat font as specified
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+        child: ElevatedButton(
+          onPressed: isLoading ? null : onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 2,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+          ),
+          child: isLoading
+              ? const SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
                   ),
-                ],
-              ),
-      ),
-    );
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, size: 24, color: Colors.white),
+                    const SizedBox(width: 12),
+                    Text(
+                      text,
+                      style: GoogleFonts.montserrat(
+                        // Montserrat font as specified
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      );
 }

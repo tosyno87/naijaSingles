@@ -84,7 +84,8 @@ class PrivacyAwareUserSearchRepo {
       // If no privacy-aware users found, fallback to traditional method
       if (userList.isEmpty) {
         debugPrint(
-            '📋 No privacy-aware users found, falling back to traditional search',);
+          '📋 No privacy-aware users found, falling back to traditional search',
+        );
         userList = await _getFallbackUsers(currentUser, checkedUserIds);
       }
 
@@ -98,14 +99,17 @@ class PrivacyAwareUserSearchRepo {
 
   /// Get users using privacy-aware public profiles
   static Future<List<UserModel>> _getPrivacyAwareUsers(
-      UserModel currentUser, List<String> checkedUserIds,) async {
+    UserModel currentUser,
+    List<String> checkedUserIds,
+  ) async {
     final List<UserModel> userList = [];
 
     try {
       // Get all users (we'll filter by privacy settings)
       final querySnapshot = await _buildPrivacyAwareQuery(currentUser).get();
       debugPrint(
-          '🔍 Privacy query returned ${querySnapshot.docs.length} documents',);
+        '🔍 Privacy query returned ${querySnapshot.docs.length} documents',
+      );
 
       for (var doc in querySnapshot.docs) {
         try {
@@ -133,10 +137,11 @@ class PrivacyAwareUserSearchRepo {
               currentUser.latitude != null &&
               currentUser.longitude != null) {
             final calculatedDistance = distance.calculateDistance(
-                currentUser.latitude!,
-                currentUser.longitude!,
-                user.latitude!,
-                user.longitude!,);
+              currentUser.latitude!,
+              currentUser.longitude!,
+              user.latitude!,
+              user.longitude!,
+            );
             user.distanceBW = calculatedDistance.round();
 
             // Apply distance filter
@@ -154,7 +159,8 @@ class PrivacyAwareUserSearchRepo {
           userList.add(user);
         } catch (e) {
           debugPrint(
-              '⚠️ Error processing privacy-aware document ${doc.id}: $e',);
+            '⚠️ Error processing privacy-aware document ${doc.id}: $e',
+          );
           continue;
         }
       }
@@ -168,23 +174,27 @@ class PrivacyAwareUserSearchRepo {
 
   /// Fallback to traditional user loading (for users not yet migrated)
   static Future<List<UserModel>> _getFallbackUsers(
-      UserModel currentUser, List<String> checkedUserIds,) async {
+    UserModel currentUser,
+    List<String> checkedUserIds,
+  ) async {
     final List<UserModel> userList = [];
 
     try {
       final querySnapshot = await _buildTraditionalQuery(currentUser).get();
       debugPrint(
-          '📋 Fallback query returned ${querySnapshot.docs.length} documents',);
+        '📋 Fallback query returned ${querySnapshot.docs.length} documents',
+      );
 
       for (var doc in querySnapshot.docs) {
         try {
           final UserModel temp = UserModel.fromDocument(doc);
 
           final calculatedDistance = distance.calculateDistance(
-              currentUser.latitude!,
-              currentUser.longitude!,
-              temp.latitude!,
-              temp.longitude!,);
+            currentUser.latitude!,
+            currentUser.longitude!,
+            temp.latitude!,
+            temp.longitude!,
+          );
           temp.distanceBW = calculatedDistance.round();
 
           if (checkedUserIds.contains(temp.id)) {
@@ -232,10 +242,14 @@ class PrivacyAwareUserSearchRepo {
 
     if (currentUser.ageRange != null) {
       query = query
-          .where('age',
-              isGreaterThanOrEqualTo: int.parse(currentUser.ageRange!['min']),)
-          .where('age',
-              isLessThanOrEqualTo: int.parse(currentUser.ageRange!['max']),)
+          .where(
+            'age',
+            isGreaterThanOrEqualTo: int.parse(currentUser.ageRange!['min']),
+          )
+          .where(
+            'age',
+            isLessThanOrEqualTo: int.parse(currentUser.ageRange!['max']),
+          )
           .orderBy('age', descending: false);
     }
 
@@ -244,11 +258,16 @@ class PrivacyAwareUserSearchRepo {
 
   /// Create UserModel from privacy-filtered data (public method)
   static Future<UserModel> createUserModelFromFilteredData(
-      Map<String, dynamic> data, String userId,) async => _createUserModelFromFilteredData(data, userId);
+    Map<String, dynamic> data,
+    String userId,
+  ) async =>
+      _createUserModelFromFilteredData(data, userId);
 
   /// Create UserModel from privacy-filtered data (private implementation)
   static Future<UserModel> _createUserModelFromFilteredData(
-      Map<String, dynamic> data, String userId,) async {
+    Map<String, dynamic> data,
+    String userId,
+  ) async {
     // Handle location data based on privacy settings
     double? latitude;
     double? longitude;
@@ -279,9 +298,13 @@ class PrivacyAwareUserSearchRepo {
       latitude: latitude,
       longitude: longitude,
       imageUrl: data['photos'] is List
-          ? List<String>.from((data['photos'] as List).map((e) => e?.toString() ?? '').where((url) => url.toString().isNotEmpty))
+          ? List<String>.from((data['photos'] as List)
+              .map((e) => e?.toString() ?? '')
+              .where((url) => url.toString().isNotEmpty))
           : data['Pictures'] is List
-              ? List<String>.from((data['Pictures'] as List).map((e) => e?.toString() ?? '').where((url) => url.toString().isNotEmpty))
+              ? List<String>.from((data['Pictures'] as List)
+                  .map((e) => e?.toString() ?? '')
+                  .where((url) => url.toString().isNotEmpty))
               : [],
       isBlocked: data['isBlocked'] ?? false,
       // Only include data that user has chosen to share
@@ -332,7 +355,9 @@ class PrivacyAwareUserSearchRepo {
                   await _privacyService.getFilteredUserData(doc.id);
               if (filteredData != null) {
                 final user = await _createUserModelFromFilteredData(
-                    filteredData, doc.id,);
+                  filteredData,
+                  doc.id,
+                );
 
                 // Calculate actual distance
                 if (user.latitude != null && user.longitude != null) {

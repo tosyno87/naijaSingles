@@ -23,7 +23,8 @@ class OnboardingController extends ChangeNotifier {
   String _tribe = '';
   String _bio = '';
   List<String> _interests = [];
-  final List<File?> _profilePhotos = List.filled(9, null); // Support up to 9 photos (Tinder standard)
+  final List<File?> _profilePhotos =
+      List.filled(9, null); // Support up to 9 photos (Tinder standard)
   bool _isLoading = false;
 
   // Additional user data (for compatibility with existing code)
@@ -376,21 +377,22 @@ class OnboardingController extends ChangeNotifier {
 
   bool isPhotoUploaded() {
     // Tinder requires at least 1 photo to proceed
-    final int photoCount = _profilePhotos.where((photo) => photo != null).length;
+    final int photoCount =
+        _profilePhotos.where((photo) => photo != null).length;
     return photoCount >= 1;
   }
 
   // Photo selection for a specific index with industry-standard cropping
-  Future<void> pickProfilePhoto(ImageSource source, int index, BuildContext? context) async {
+  Future<void> pickProfilePhoto(
+      ImageSource source, int index, BuildContext? context) async {
     try {
       log('📸 Starting photo pick for index $index with source: $source');
-      
+
       // All photos use square (1:1) crop - Industry standard (Tinder, Bumble, Hinge)
       // This is simpler and more flexible than forcing different aspect ratios
       const CropType cropType = CropType.square;
-      final String title = index == 0 
-          ? 'Crop Main Photo' 
-          : 'Crop Photo ${index + 1}';
+      final String title =
+          index == 0 ? 'Crop Main Photo' : 'Crop Photo ${index + 1}';
 
       // Pick and crop image with industry-standard settings and permission handling
       final File? croppedImage =
@@ -411,7 +413,7 @@ class OnboardingController extends ChangeNotifier {
     } catch (e, stackTrace) {
       log('❌ Error picking and cropping image: $e');
       log('❌ Stack trace: $stackTrace');
-      
+
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -477,7 +479,8 @@ class OnboardingController extends ChangeNotifier {
 
       if (!isDataValid) {
         debugPrint(
-            '❌ Onboarding data validation failed - some required fields are missing',);
+          '❌ Onboarding data validation failed - some required fields are missing',
+        );
         // Still proceed with save but log the issues
       }
 
@@ -576,26 +579,26 @@ class OnboardingController extends ChangeNotifier {
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final user = FirebaseAuth.instance.currentUser;
-      
+
       if (user != null) {
         // Force UserProvider to reload user data from Firestore
         // This ensures MainNavigationScreen sees the updated profile
         await userProvider.listenCurrentUserdetails();
-        
+
         // Wait a bit for the listener to update
         await Future.delayed(const Duration(milliseconds: 300));
-        
+
         // Verify user data is loaded before navigating
         int retries = 0;
-        while (retries < 5 && 
-               (userProvider.currentUser == null || 
+        while (retries < 5 &&
+            (userProvider.currentUser == null ||
                 userProvider.currentUser?.name == null ||
                 (userProvider.currentUser?.name?.isEmpty ?? false))) {
           await Future.delayed(const Duration(milliseconds: 200));
           retries++;
         }
-        
-        if (userProvider.currentUser?.name != null && 
+
+        if (userProvider.currentUser?.name != null &&
             userProvider.currentUser!.name!.isNotEmpty) {
           log('✅ UserProvider updated with profile, navigating to main screen');
         } else {
@@ -606,7 +609,7 @@ class OnboardingController extends ChangeNotifier {
       log('⚠️ Error updating UserProvider before navigation: $e');
       // Navigate anyway - MainNavigationScreen will handle the check
     }
-    
+
     if (context.mounted) {
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -719,7 +722,8 @@ class OnboardingController extends ChangeNotifier {
     AppLogger.debug('   Gender: $_gender');
     AppLogger.debug('   Location: ${_locationName ?? 'Not set'}');
     AppLogger.debug(
-        '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}',);
+      '   Coordinates: ${_latitude ?? 'Not set'}, ${_longitude ?? 'Not set'}',
+    );
     AppLogger.debug('   Tribe: $_tribe');
     AppLogger.debug('   Bio: ${_bio.length} characters');
     AppLogger.debug('   Interests: ${_interests.length} items - $_interests');
@@ -739,29 +743,27 @@ class OnboardingController extends ChangeNotifier {
     AppLogger.debug('     Smoking: $_smokingPreference');
     AppLogger.debug('     Nationality: $_nationality');
     AppLogger.debug(
-        '   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos',);
+      '   Profile photos: ${_profilePhotos.where((p) => p != null).length} photos',
+    );
 
     // Save essential data to Firestore
     AppLogger.info('🔍 Saving essential user data to Firestore...');
-    
+
     // Use set with merge: true to preserve existing fields (like email from account creation)
     // and add/update onboarding data
     await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .set(essentialData, SetOptions(merge: true));
-    
+
     // Ensure completion flags are explicitly set (merge might not override if field exists)
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .update({
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
       'onboardingCompleted': true,
       'profileSetupComplete': true,
       'isProfileComplete': true,
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    
+
     // Update display name in Firebase Auth
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -805,7 +807,7 @@ class OnboardingController extends ChangeNotifier {
         log('📤 Uploading photo $i/${validPhotos.length} (${(fileSize / 1024).toStringAsFixed(2)}KB)...');
 
         bool uploadSuccess = false;
-        
+
         try {
           // Create storage reference
           final storageRef = FirebaseStorage.instance
@@ -842,7 +844,7 @@ class OnboardingController extends ChangeNotifier {
           log('✅ Photo $i uploaded successfully: $url');
         } catch (uploadError) {
           log('❌ Error uploading photo $i: $uploadError', error: uploadError);
-          
+
           // If putData failed, try putFile as fallback (shouldn't happen, but just in case)
           if (!uploadSuccess) {
             log('🔄 Retrying photo $i with putFile as fallback...');
@@ -850,7 +852,7 @@ class OnboardingController extends ChangeNotifier {
               final storageRef = FirebaseStorage.instance
                   .ref()
                   .child('users/$userId/profile_photo_$i.jpg');
-              
+
               final uploadTask = storageRef.putFile(
                 photo,
                 SettableMetadata(
@@ -861,14 +863,15 @@ class OnboardingController extends ChangeNotifier {
                   },
                 ),
               );
-              
+
               final snapshot = await uploadTask.timeout(
                 const Duration(minutes: 2),
                 onTimeout: () {
-                  throw TimeoutException('Photo upload timed out after 2 minutes');
+                  throw TimeoutException(
+                      'Photo upload timed out after 2 minutes');
                 },
               );
-              
+
               final url = await snapshot.ref.getDownloadURL();
               photoUrls.add(url);
               uploadSuccess = true;
@@ -878,7 +881,7 @@ class OnboardingController extends ChangeNotifier {
               // Continue with next photo instead of failing all
             }
           }
-          
+
           if (!uploadSuccess) {
             log('⚠️ Photo $i could not be uploaded, continuing with remaining photos...');
           }
@@ -1023,9 +1026,11 @@ class OnboardingController extends ChangeNotifier {
       AppLogger.debug('   Interested in: $_interestedIn');
       AppLogger.debug('   Age range: ${_ageRange[0]}-${_ageRange[1]}');
       AppLogger.debug(
-          '   Photos: ${_profilePhotos.where((p) => p != null).length} uploaded',);
+        '   Photos: ${_profilePhotos.where((p) => p != null).length} uploaded',
+      );
     } else {
-      AppLogger.warning('❌ Missing required fields: ${missingFields.join(', ')}');
+      AppLogger.warning(
+          '❌ Missing required fields: ${missingFields.join(', ')}');
     }
 
     return isValid;
@@ -1033,21 +1038,21 @@ class OnboardingController extends ChangeNotifier {
 
   // Method to get a summary of all onboarding data for debugging
   Map<String, dynamic> getOnboardingDataSummary() => {
-      'fullName': _fullName,
-      'age': age,
-      'gender': _gender,
-      'location': _locationName,
-      'tribe': _tribe,
-      'bioLength': _bio.length,
-      'interestsCount': _interests.length,
-      'interests': _interests,
-      'height': _height,
-      'heightDisplay': _getHeightFtIn(),
-      'lookingFor': _lookingFor,
-      'relationshipIntent': _relationshipIntent,
-      'interestedIn': _interestedIn,
-      'ageRange': _ageRange,
-      'photosCount': _profilePhotos.where((p) => p != null).length,
-      'hasAllRequiredData': validateOnboardingData(),
-    };
+        'fullName': _fullName,
+        'age': age,
+        'gender': _gender,
+        'location': _locationName,
+        'tribe': _tribe,
+        'bioLength': _bio.length,
+        'interestsCount': _interests.length,
+        'interests': _interests,
+        'height': _height,
+        'heightDisplay': _getHeightFtIn(),
+        'lookingFor': _lookingFor,
+        'relationshipIntent': _relationshipIntent,
+        'interestedIn': _interestedIn,
+        'ageRange': _ageRange,
+        'photosCount': _profilePhotos.where((p) => p != null).length,
+        'hasAllRequiredData': validateOnboardingData(),
+      };
 }

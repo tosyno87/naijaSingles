@@ -3,18 +3,19 @@ import 'package:dio/dio.dart';
 import '../models/event_model.dart';
 
 class MeetupService {
-
   MeetupService() : _dio = Dio() {
     _dio.options.baseUrl = _baseUrl;
     _dio.options.connectTimeout = const Duration(seconds: 10);
     _dio.options.receiveTimeout = const Duration(seconds: 10);
 
     // Add interceptor for logging
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      logPrint: (obj) => log(obj.toString(), name: 'MeetupAPI'),
-    ),);
+    _dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+        logPrint: (obj) => log(obj.toString(), name: 'MeetupAPI'),
+      ),
+    );
   }
   static const String _baseUrl = 'https://api.meetup.com';
   // You'll get this from: https://secure.meetup.com/meetup_api/key/
@@ -39,8 +40,10 @@ class MeetupService {
         endDate: endDate,
       );
 
-      log('🔍 Fetching Meetup events with params: $queryParams',
-          name: 'MeetupService',);
+      log(
+        '🔍 Fetching Meetup events with params: $queryParams',
+        name: 'MeetupService',
+      );
 
       // Meetup API endpoint for finding events
       final response =
@@ -49,13 +52,16 @@ class MeetupService {
       if (response.statusCode == 200) {
         final data = response.data;
         final events = (data as List<dynamic>?)
-                ?.map((item) => _convertMeetupToEventModel(item as Map<String, dynamic>))
+                ?.map((item) =>
+                    _convertMeetupToEventModel(item as Map<String, dynamic>))
                 .whereType<EventModel>()
                 .toList() ??
             [];
 
-        log('✅ Fetched ${events.length} Afrocentric events from Meetup',
-            name: 'MeetupService',);
+        log(
+          '✅ Fetched ${events.length} Afrocentric events from Meetup',
+          name: 'MeetupService',
+        );
         return events;
       } else {
         throw MeetupException('Failed to fetch events: ${response.statusCode}');
@@ -64,8 +70,10 @@ class MeetupService {
       log('❌ Error fetching events from Meetup: $e', name: 'MeetupService');
 
       if (e is DioException) {
-        log('🔄 API not configured, returning empty list',
-            name: 'MeetupService',);
+        log(
+          '🔄 API not configured, returning empty list',
+          name: 'MeetupService',
+        );
         return [];
       }
 
@@ -251,8 +259,10 @@ class MeetupService {
         queryParams['location'] = 'New York, NY';
       }
 
-      log('🔍 Searching Meetup events with query: $query',
-          name: 'MeetupService',);
+      log(
+        '🔍 Searching Meetup events with query: $query',
+        name: 'MeetupService',
+      );
 
       final response =
           await _dio.get('/find/events', queryParameters: queryParams);
@@ -260,17 +270,21 @@ class MeetupService {
       if (response.statusCode == 200) {
         final data = response.data;
         final events = (data as List<dynamic>?)
-                ?.map((item) => _convertMeetupToEventModel(item as Map<String, dynamic>))
+                ?.map((item) =>
+                    _convertMeetupToEventModel(item as Map<String, dynamic>))
                 .whereType<EventModel>()
                 .toList() ??
             [];
 
-        log('✅ Found ${events.length} events for query: $query',
-            name: 'MeetupService',);
+        log(
+          '✅ Found ${events.length} events for query: $query',
+          name: 'MeetupService',
+        );
         return events;
       } else {
         throw MeetupException(
-            'Failed to search events: ${response.statusCode}',);
+          'Failed to search events: ${response.statusCode}',
+        );
       }
     } catch (e) {
       log('❌ Error searching events: $e', name: 'MeetupService');
@@ -362,7 +376,6 @@ class MeetupService {
 }
 
 class MeetupException implements Exception {
-
   const MeetupException(this.message);
   final String message;
 

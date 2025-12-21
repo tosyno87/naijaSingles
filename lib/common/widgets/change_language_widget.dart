@@ -133,10 +133,11 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           .setLocale(const Locale('en', 'US'));
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar(),),);
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -149,10 +150,11 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           .setLocale(const Locale('es', 'ES'));
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar(),),);
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -164,10 +166,11 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                       EasyLocalization.of(context)!
                                           .setLocale(const Locale('de', 'DE'));
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar(),),);
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -180,12 +183,13 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           .setLocale(const Locale('ru', 'RU'));
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar(
-                                                      isPaymentSuccess:
-                                                          false,),),);
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(
+                                            isPaymentSuccess: false,
+                                          ),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -198,10 +202,11 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           .setLocale(const Locale('fr', 'FR'));
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar(),),);
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -214,27 +219,33 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                           .setLocale(const Locale('hi', 'IN'));
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar(),),);
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
                               }
                             },
-                            items: languages.map((language) => DropdownMenuItem<String>(
-                                value: language,
-                                child: Text(
-                                  language.tr().toString(),
-                                  style: TextStyle(
-                                      color: themeProvider.isDarkMode
-                                          ? Colors.white70
-                                          : primaryColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,),
-                                ),
-                              ),).toList(),
+                            items: languages
+                                .map(
+                                  (language) => DropdownMenuItem<String>(
+                                    value: language,
+                                    child: Text(
+                                      language.tr().toString(),
+                                      style: TextStyle(
+                                        color: themeProvider.isDarkMode
+                                            ? Colors.white70
+                                            : primaryColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ],
                       ),
@@ -244,10 +255,11 @@ class _LanguageWidgetState extends State<LanguageWidget> {
               );
             } catch (e) {
               return Center(
-                  child: Text(
-                'Unable to load'.tr().toString(),
-                style: const TextStyle(color: primaryColor),
-              ),);
+                child: Text(
+                  'Unable to load'.tr().toString(),
+                  style: const TextStyle(color: primaryColor),
+                ),
+              );
             }
           },
         ),
@@ -257,27 +269,33 @@ class _LanguageWidgetState extends State<LanguageWidget> {
 }
 
 void showChangeDialog(
-    BuildContext context, String language, VoidCallback onTap,) {
+  BuildContext context,
+  String language,
+  VoidCallback onTap,
+) {
   showDialog(
     context: context,
     builder: (BuildContext context) => AlertDialog(
-        title: Text('Change Language'.tr().toString()),
-        content: Text(
-            'Do you want to change the language to $language?'.tr().toString(),),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'.tr().toString(),
-                style: const TextStyle(color: primaryColor),),
-          ),
-          TextButton(
-            onPressed: onTap,
-            child: Text(
-              'Yes'.tr().toString(),
-              style: const TextStyle(color: primaryColor),
-            ),
-          ),
-        ],
+      title: Text('Change Language'.tr().toString()),
+      content: Text(
+        'Do you want to change the language to $language?'.tr().toString(),
       ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(
+            'No'.tr().toString(),
+            style: const TextStyle(color: primaryColor),
+          ),
+        ),
+        TextButton(
+          onPressed: onTap,
+          child: Text(
+            'Yes'.tr().toString(),
+            style: const TextStyle(color: primaryColor),
+          ),
+        ),
+      ],
+    ),
   );
 }

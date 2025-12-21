@@ -50,52 +50,64 @@ class ImageProperties {
   ) async {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return showDialog(
-        context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-              title: Text(isProfilePicture
-                  ? 'Update profile picture'.tr()
-                  : 'Add pictures'.tr(),),
-              content: Text('Select source'.tr()),
-              actions: canUploadMoreImages(currentUser)
-                  ? <Widget>[
-                      _buildSourceOption(
-                        icon: Icons.photo_camera,
-                        label: ' Camera'.tr(),
-                        themeProvider: themeProvider,
-                        onTap: () => _handleImageSource(context, currentUser,
-                            isProfilePicture, ImageSource.camera,),
-                      ),
-                      _buildSourceOption(
-                        icon: Icons.photo_library,
-                        label: ' Gallery'.tr(),
-                        themeProvider: themeProvider,
-                        onTap: () => _handleImageSource(context, currentUser,
-                            isProfilePicture, ImageSource.gallery,),
-                      ),
-                    ]
-                  : [
-                      Padding(
-                        padding: const EdgeInsets.all(25),
-                        child: Center(
-                          child: Column(
-                            children: <Widget>[
-                              const Icon(Icons.error),
-                              Text(
-                                "Can't upload more than $maxImagesAllowed pictures"
-                                    .tr(),
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: themeProvider.isDarkMode
-                                      ? Colors.white
-                                      : Colors.black,
-                                  decoration: TextDecoration.none,
-                                ),
-                              ),
-                            ],
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text(
+          isProfilePicture
+              ? 'Update profile picture'.tr()
+              : 'Add pictures'.tr(),
+        ),
+        content: Text('Select source'.tr()),
+        actions: canUploadMoreImages(currentUser)
+            ? <Widget>[
+                _buildSourceOption(
+                  icon: Icons.photo_camera,
+                  label: ' Camera'.tr(),
+                  themeProvider: themeProvider,
+                  onTap: () => _handleImageSource(
+                    context,
+                    currentUser,
+                    isProfilePicture,
+                    ImageSource.camera,
+                  ),
+                ),
+                _buildSourceOption(
+                  icon: Icons.photo_library,
+                  label: ' Gallery'.tr(),
+                  themeProvider: themeProvider,
+                  onTap: () => _handleImageSource(
+                    context,
+                    currentUser,
+                    isProfilePicture,
+                    ImageSource.gallery,
+                  ),
+                ),
+              ]
+            : [
+                Padding(
+                  padding: const EdgeInsets.all(25),
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        const Icon(Icons.error),
+                        Text(
+                          "Can't upload more than $maxImagesAllowed pictures"
+                              .tr(),
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                            decoration: TextDecoration.none,
                           ),
                         ),
-                      ),
-                    ],),);
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+      ),
+    );
   }
 
   static Future<void> getImage(
@@ -133,7 +145,10 @@ class ImageProperties {
 
       if (croppedFile != null) {
         await uploadFile(
-            await compressImage(croppedFile), currentUser, isProfilePicture,);
+          await compressImage(croppedFile),
+          currentUser,
+          isProfilePicture,
+        );
       }
 
       if (context.mounted) {
@@ -223,7 +238,8 @@ class ImageProperties {
 
       final documentDirectory = await getApplicationDocumentsDirectory();
       final file = File(
-          '${documentDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg',);
+        '${documentDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
 
       await file.writeAsBytes(response.bodyBytes);
       return file;
@@ -239,26 +255,27 @@ class ImageProperties {
     required String label,
     required ThemeProvider themeProvider,
     required VoidCallback onTap,
-  }) => Padding(
-      padding: const EdgeInsets.all(20),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(icon, size: 28),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black,
-                decoration: TextDecoration.none,
+  }) =>
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: GestureDetector(
+          onTap: onTap,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(icon, size: 28),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                  decoration: TextDecoration.none,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   /// Helper method to handle image source selection
   static void _handleImageSource(

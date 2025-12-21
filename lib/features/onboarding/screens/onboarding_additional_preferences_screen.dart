@@ -5,7 +5,6 @@ import '../../user/controllers/onboarding_controller.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingAdditionalPreferencesScreen extends StatefulWidget {
-
   const OnboardingAdditionalPreferencesScreen({super.key, this.onNext});
   final VoidCallback? onNext;
 
@@ -157,40 +156,48 @@ class _OnboardingAdditionalPreferencesScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) => Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _lookingFor,
-          onSelected: (value) {
-            setState(() {
-              _lookingFor = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      ),).toList();
+    return _lookingForOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _lookingFor,
+              onSelected: (value) {
+                setState(() {
+                  _lookingFor = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) => Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _relationshipIntent,
-          onSelected: (value) {
-            setState(() {
-              _relationshipIntent = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      ),).toList();
+    return _relationshipIntentOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _relationshipIntent,
+              onSelected: (value) {
+                setState(() {
+                  _relationshipIntent = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   void _saveAndContinue() {

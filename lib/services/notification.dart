@@ -7,9 +7,7 @@ class NotificationData {
 
   // Request notification permissions
   static Future<bool> requestNotificationPermissions() async {
-    final settings = await firebaseInstance.requestPermission(
-      
-    );
+    final settings = await firebaseInstance.requestPermission();
 
     return settings.authorizationStatus == AuthorizationStatus.authorized;
   }

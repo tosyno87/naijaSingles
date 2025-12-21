@@ -8,7 +8,6 @@ abstract class BlocUserListEvent extends Equatable {
 }
 
 class LoadBlockUserEvent extends BlocUserListEvent {
-
   const LoadBlockUserEvent({required this.currentUser});
   final UserModel currentUser;
 
@@ -17,7 +16,6 @@ class LoadBlockUserEvent extends BlocUserListEvent {
 }
 
 class LoadMoreBlockUserEvent extends BlocUserListEvent {
-
   const LoadMoreBlockUserEvent({required this.currentUser});
   final UserModel currentUser;
 

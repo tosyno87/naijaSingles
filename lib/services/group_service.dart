@@ -79,8 +79,7 @@ class GroupService {
       }
 
       final snapshot = await query.get();
-      final groups =
-          snapshot.docs.map(GroupModel.fromDocument).toList();
+      final groups = snapshot.docs.map(GroupModel.fromDocument).toList();
 
       debugPrint('✅ Retrieved ${groups.length} public groups');
       return groups;
@@ -103,8 +102,7 @@ class GroupService {
           .orderBy('updatedAt', descending: true)
           .get();
 
-      final groups =
-          snapshot.docs.map(GroupModel.fromDocument).toList();
+      final groups = snapshot.docs.map(GroupModel.fromDocument).toList();
 
       debugPrint('✅ Retrieved ${groups.length} user groups');
       return groups;
@@ -127,8 +125,7 @@ class GroupService {
           .orderBy('createdAt', descending: true)
           .get();
 
-      final groups =
-          snapshot.docs.map(GroupModel.fromDocument).toList();
+      final groups = snapshot.docs.map(GroupModel.fromDocument).toList();
 
       debugPrint('✅ Retrieved ${groups.length} user created groups');
       return groups;
@@ -335,8 +332,7 @@ class GroupService {
       }
 
       final snapshot = await firestoreQuery.get();
-      final allGroups =
-          snapshot.docs.map(GroupModel.fromDocument).toList();
+      final allGroups = snapshot.docs.map(GroupModel.fromDocument).toList();
 
       // Filter by search query (Firestore doesn't support full-text search)
       final filteredGroups = allGroups.where((group) {

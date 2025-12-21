@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
 
 class ReverseGeocode extends Equatable {
-
   const ReverseGeocode({required this.formattedAddress, required this.placeId});
 
   factory ReverseGeocode.fromJson(Map<String, dynamic> json) => ReverseGeocode(
-        placeId: json['place_id'], formattedAddress: json['formatted_address'],);
+        placeId: json['place_id'],
+        formattedAddress: json['formatted_address'],
+      );
   final String placeId;
   final String formattedAddress;
 

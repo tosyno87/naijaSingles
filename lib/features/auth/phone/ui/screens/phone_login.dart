@@ -6,7 +6,6 @@ import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
 
 class PhoneNumber extends StatefulWidget {
-
   const PhoneNumber({required this.updatePhoneNumber, super.key});
   final bool updatePhoneNumber;
 
@@ -63,16 +62,19 @@ class _PhoneNumberState extends State<PhoneNumber> {
   @override
   Widget build(BuildContext context) {
     // Set system UI overlay style for status bar
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-    ),);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    );
 
     // Define colors - Consistent with phone signup screen
     const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color textColor = Color(0xFF3E1F0D); // Deep brown
     const Color subtextColor = Color(0xFF6E6E6E); // Gray for subtext
-    const Color iconBackgroundColor = Color(0xFFDFF5E2); // Light green for icon background
+    const Color iconBackgroundColor =
+        Color(0xFFDFF5E2); // Light green for icon background
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -145,80 +147,85 @@ class _PhoneNumberState extends State<PhoneNumber> {
                   ),
                   const SizedBox(height: 40),
 
-              // Phone number input with country code
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                  // Phone number input with country code
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // Country code dropdown
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey.withValues(alpha: 0.3),
+                    child: Row(
+                      children: [
+                        // Country code dropdown
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey.withValues(alpha: 0.3),
+                              ),
+                            ),
+                          ),
+                          child: DropdownButton<String>(
+                            value: _selectedCountryCode,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            elevation: 16,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              color: textColor,
+                            ),
+                            underline: Container(
+                              height: 0,
+                            ),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedCountryCode = newValue!;
+                              });
+                            },
+                            items: _countryCodes
+                                .map<DropdownMenuItem<String>>(
+                                  (Map<String, String> value) =>
+                                      DropdownMenuItem<String>(
+                                    value: value['code'],
+                                    child: Text(
+                                        "${value['code']} (${value['name']})"),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
-                      ),
-                      child: DropdownButton<String>(
-                        value: _selectedCountryCode,
-                        icon: const Icon(Icons.arrow_drop_down),
-                        elevation: 16,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          color: textColor,
-                        ),
-                        underline: Container(
-                          height: 0,
-                        ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedCountryCode = newValue!;
-                          });
-                        },
-                        items: _countryCodes.map<DropdownMenuItem<String>>(
-                            (Map<String, String> value) => DropdownMenuItem<String>(
-                            value: value['code'],
-                            child: Text("${value['code']} (${value['name']})"),
-                          ),).toList(),
-                      ),
-                    ),
 
-                    // Phone number input
-                    Expanded(
-                      child: TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          color: textColor,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Phone number',
-                          hintStyle: GoogleFonts.montserrat(
-                            color: Colors.grey,
+                        // Phone number input
+                        Expanded(
+                          child: TextField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              color: textColor,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Phone number',
+                              hintStyle: GoogleFonts.montserrat(
+                                color: Colors.grey,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
+                            ),
                           ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
-                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
                   const SizedBox(height: 40),
 
@@ -229,9 +236,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _verifyPhoneNumber,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isLoading
-                            ? Colors.grey.shade400
-                            : primaryColor,
+                        backgroundColor:
+                            _isLoading ? Colors.grey.shade400 : primaryColor,
                         foregroundColor: Colors.white,
                         disabledBackgroundColor: Colors.grey.shade400,
                         shape: RoundedRectangleBorder(

@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../models/user_model.dart';
 
 class ModernProfileCard extends StatefulWidget {
-
   const ModernProfileCard({
-    required this.user, super.key,
+    required this.user,
+    super.key,
     this.onConnect,
     this.onTap,
   });
@@ -115,152 +115,152 @@ class _ModernProfileCardState extends State<ModernProfileCard>
   }
 
   Widget _buildHeroPhoto(String? photoUrl, int photoCount) => Container(
-      height: 250,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        image: photoUrl != null
-            ? DecorationImage(
-                image: NetworkImage(photoUrl),
-                fit: BoxFit.cover,
-                onError: (exception, stackTrace) {
-                  // Handle image loading error
-                },
-              )
-            : null,
-        color: photoUrl == null ? Colors.grey[300] : null,
-      ),
-      child: Stack(
-        children: [
-          // Photo count indicator
-          if (photoCount > 1)
+        height: 250,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          image: photoUrl != null
+              ? DecorationImage(
+                  image: NetworkImage(photoUrl),
+                  fit: BoxFit.cover,
+                  onError: (exception, stackTrace) {
+                    // Handle image loading error
+                  },
+                )
+              : null,
+          color: photoUrl == null ? Colors.grey[300] : null,
+        ),
+        child: Stack(
+          children: [
+            // Photo count indicator
+            if (photoCount > 1)
+              Positioned(
+                top: 16,
+                right: 16,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.photo_library,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$photoCount',
+                        style: GoogleFonts.montserrat(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // Tap to view indicator
             Positioned(
-              top: 16,
+              bottom: 16,
               right: 16,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.photo_library,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$photoCount',
-                      style: GoogleFonts.montserrat(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  color: const Color(0xFF008037),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF008037).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
+                child: const Icon(
+                  Icons.visibility,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
             ),
 
-          // Tap to view indicator
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF008037),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF008037).withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.visibility,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ),
-
-          // Photo dots indicator
-          if (photoCount > 1)
-            Positioned(
-              bottom: 16,
-              left: 16,
-              child: Row(
-                children: List.generate(
-                  photoCount > 5 ? 5 : photoCount,
-                  (index) => Container(
-                    margin: const EdgeInsets.only(right: 6),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: index == 0
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
-                      shape: BoxShape.circle,
+            // Photo dots indicator
+            if (photoCount > 1)
+              Positioned(
+                bottom: 16,
+                left: 16,
+                child: Row(
+                  children: List.generate(
+                    photoCount > 5 ? 5 : photoCount,
+                    (index) => Container(
+                      margin: const EdgeInsets.only(right: 6),
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: index == 0
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Widget _buildNameAndStatus() => Row(
-      children: [
-        Expanded(
-          child: Text(
-            "${widget.user.name ?? 'Unknown'}, ${widget.user.age ?? 'N/A'}",
-            style: GoogleFonts.montserrat(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF2D2D2D),
+        children: [
+          Expanded(
+            child: Text(
+              "${widget.user.name ?? 'Unknown'}, ${widget.user.age ?? 'N/A'}",
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF2D2D2D),
+              ),
             ),
           ),
-        ),
-        // Active status indicator
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFF008037),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
+          // Active status indicator
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF008037),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                'Active',
-                style: GoogleFonts.montserrat(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                const SizedBox(width: 4),
+                Text(
+                  'Active',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
 
   Widget _buildNationalityTribeTags() {
     final nationality = widget.user.nationality ?? 'Nigerian';
@@ -329,65 +329,70 @@ class _ModernProfileCardState extends State<ModernProfileCard>
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: interests.take(3).map((interest) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: const Color(0xFF008037).withOpacity(0.2),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+      children: interests
+          .take(3)
+          .map(
+            (interest) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFF008037).withOpacity(0.2),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Text(
-            interest,
-            style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF2D2D2D),
+              child: Text(
+                interest,
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF2D2D2D),
+                ),
+              ),
             ),
-          ),
-        ),).toList(),
+          )
+          .toList(),
     );
   }
 
   Widget _buildConnectButton() => SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: widget.onConnect,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF008037),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+        width: double.infinity,
+        height: 56,
+        child: ElevatedButton(
+          onPressed: widget.onConnect,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF008037),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
+            shadowColor: Colors.transparent,
           ),
-          elevation: 0,
-          shadowColor: Colors.transparent,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.favorite,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Connect',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.favorite,
+                size: 20,
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Text(
+                'Connect',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 }

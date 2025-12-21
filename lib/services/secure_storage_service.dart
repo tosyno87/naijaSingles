@@ -23,7 +23,8 @@ class SecureStorageService {
       SecureStorageService._internal();
 
   // Configure secure storage with platform-specific options
-  late final FlutterSecureStorage _storage;
+  FlutterSecureStorage? _storage;
+  bool _initialized = false;
 
   // Storage keys - centralized for consistency
   static const String _authTokenKey = 'auth_token';
@@ -32,11 +33,9 @@ class SecureStorageService {
   static const String _apiKeyKey = 'api_key';
   static const String _biometricCredentialsKey = 'biometric_credentials';
 
-  /// Initialize the secure storage service
-  /// Should be called during app initialization
-  Future<void> initialize() async {
-    try {
-      // Configure secure storage with platform-specific options
+  /// Get the storage instance, initializing if necessary
+  FlutterSecureStorage get storage {
+    if (_storage == null) {
       _storage = const FlutterSecureStorage(
         // Android options - use encrypted shared preferences
         aOptions: AndroidOptions(
@@ -45,7 +44,35 @@ class SecureStorageService {
         // iOS options - default secure storage (Keychain)
         // Web options - encrypted by default
       );
+    }
+    return _storage!;
+  }
 
+  /// Initialize the secure storage service
+  /// Should be called during app initialization
+  /// This method is idempotent - safe to call multiple times
+  Future<void> initialize() async {
+    if (_initialized) {
+      if (kDebugMode) {
+        log('ℹ️ Secure storage already initialized, skipping');
+      }
+      return;
+    }
+
+    try {
+      // Initialize storage if not already done
+      if (_storage == null) {
+        _storage = const FlutterSecureStorage(
+          // Android options - use encrypted shared preferences
+          aOptions: AndroidOptions(
+            encryptedSharedPreferences: true,
+          ),
+          // iOS options - default secure storage (Keychain)
+          // Web options - encrypted by default
+        );
+      }
+
+      _initialized = true;
       if (kDebugMode) {
         log('✅ Secure storage service initialized');
       }
@@ -56,14 +83,14 @@ class SecureStorageService {
   }
 
   /// Write secure data
-  /// 
+  ///
   /// [key] - The key to store the data under
   /// [value] - The value to store (must be a String)
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> write(String key, String value) async {
     try {
-      await _storage.write(key: key, value: value);
+      await storage.write(key: key, value: value);
       if (kDebugMode) {
         log('✅ Secure data written for key: $key');
       }
@@ -75,13 +102,13 @@ class SecureStorageService {
   }
 
   /// Read secure data
-  /// 
+  ///
   /// [key] - The key to read the data from
-  /// 
+  ///
   /// Returns the stored value or null if not found
   Future<String?> read(String key) async {
     try {
-      final value = await _storage.read(key: key);
+      final value = await storage.read(key: key);
       if (kDebugMode && value != null) {
         log('✅ Secure data read for key: $key');
       }
@@ -93,13 +120,13 @@ class SecureStorageService {
   }
 
   /// Delete secure data
-  /// 
+  ///
   /// [key] - The key to delete
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> delete(String key) async {
     try {
-      await _storage.delete(key: key);
+      await storage.delete(key: key);
       if (kDebugMode) {
         log('✅ Secure data deleted for key: $key');
       }
@@ -111,11 +138,11 @@ class SecureStorageService {
   }
 
   /// Read all secure data
-  /// 
+  ///
   /// Returns a map of all stored key-value pairs
   Future<Map<String, String>> readAll() async {
     try {
-      final allData = await _storage.readAll();
+      final allData = await storage.readAll();
       if (kDebugMode) {
         log('✅ Read all secure data: ${allData.length} entries');
       }
@@ -127,13 +154,13 @@ class SecureStorageService {
   }
 
   /// Delete all secure data
-  /// 
+  ///
   /// WARNING: This will delete all stored secure data
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> deleteAll() async {
     try {
-      await _storage.deleteAll();
+      await storage.deleteAll();
       if (kDebugMode) {
         log('✅ All secure data deleted');
       }
@@ -145,13 +172,13 @@ class SecureStorageService {
   }
 
   /// Check if a key exists
-  /// 
+  ///
   /// [key] - The key to check
-  /// 
+  ///
   /// Returns true if the key exists, false otherwise
   Future<bool> containsKey(String key) async {
     try {
-      final value = await _storage.read(key: key);
+      final value = await storage.read(key: key);
       return value != null;
     } catch (e) {
       log('❌ Error checking if key exists: $key - $e');
@@ -254,4 +281,3 @@ class SecureStorageService {
     }
   }
 }
-

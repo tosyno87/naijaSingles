@@ -7,7 +7,6 @@ import '../models/event_model.dart';
 
 /// Helper class to store event with its recommendation score
 class ScoredEvent {
-
   ScoredEvent({required this.event, required this.score});
   final EventModel event;
   final double score;
@@ -63,8 +62,12 @@ class EventSearchService {
 
       final querySnapshot = await eventsQuery.get();
       List<EventModel> events = querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(
-              doc.data() as Map<String, dynamic>, doc.id,),)
+          .map(
+            (doc) => EventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
           .toList();
 
       // Apply text search filter (client-side for better flexibility)
@@ -102,8 +105,12 @@ class EventSearchService {
 
       final querySnapshot = await eventsQuery.get();
       return querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(
-              doc.data(), doc.id,),)
+          .map(
+            (doc) => EventModel.fromFirestoreJson(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
       AppLogger.error('Error getting trending events', error: e);
@@ -125,11 +132,15 @@ class EventSearchService {
   }
 
   /// Get free events
-  Future<List<EventModel>> getFreeEvents({int limit = 15}) async => searchEvents(isFree: true, limit: limit);
+  Future<List<EventModel>> getFreeEvents({int limit = 15}) async =>
+      searchEvents(isFree: true, limit: limit);
 
   /// Get events by category with recommendations
-  Future<List<EventModel>> getEventsByCategory(String category,
-      {int limit = 20,}) async => searchEvents(category: category, limit: limit);
+  Future<List<EventModel>> getEventsByCategory(
+    String category, {
+    int limit = 20,
+  }) async =>
+      searchEvents(category: category, limit: limit);
 
   /// Get recommended events based on user interests
   Future<List<EventModel>> getRecommendedEvents({
@@ -148,8 +159,12 @@ class EventSearchService {
 
       final querySnapshot = await eventsQuery.get();
       final List<EventModel> events = querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(
-              doc.data(), doc.id,),)
+          .map(
+            (doc) => EventModel.fromFirestoreJson(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
 
       // Score events based on user interests
@@ -166,39 +181,51 @@ class EventSearchService {
   }
 
   /// Filter events by text search (name, description, tags)
-  List<EventModel> _filterByTextSearch(List<EventModel> events, String query) => events.where((event) {
-      final searchableText =
-          '${event.name} ${event.description} ${event.category}'.toLowerCase();
-      return searchableText.contains(query);
-    }).toList();
+  List<EventModel> _filterByTextSearch(List<EventModel> events, String query) =>
+      events.where((event) {
+        final searchableText =
+            '${event.name} ${event.description} ${event.category}'
+                .toLowerCase();
+        return searchableText.contains(query);
+      }).toList();
 
   /// Filter events by location using Haversine formula
   List<EventModel> _filterByLocation(
-      List<EventModel> events, double lat, double lng, double radiusKm,) => events.where((event) {
-      if (event.location.latitude == null || event.location.longitude == null) {
-        return false;
-      }
+    List<EventModel> events,
+    double lat,
+    double lng,
+    double radiusKm,
+  ) =>
+      events.where((event) {
+        if (event.location.latitude == null ||
+            event.location.longitude == null) {
+          return false;
+        }
 
-      final distance = _calculateDistance(
-        lat,
-        lng,
-        event.location.latitude!,
-        event.location.longitude!,
-      );
+        final distance = _calculateDistance(
+          lat,
+          lng,
+          event.location.latitude!,
+          event.location.longitude!,
+        );
 
-      return distance <= radiusKm;
-    }).toList();
+        return distance <= radiusKm;
+      }).toList();
 
   /// Filter events by tags
-  List<EventModel> _filterByTags(List<EventModel> events, List<String> tags) => events.where((event) {
-      // Check if event has any of the specified tags
-      return tags.any(
-          (tag) => event.category.toLowerCase().contains(tag.toLowerCase()),);
-    }).toList();
+  List<EventModel> _filterByTags(List<EventModel> events, List<String> tags) =>
+      events.where((event) {
+        // Check if event has any of the specified tags
+        return tags.any(
+          (tag) => event.category.toLowerCase().contains(tag.toLowerCase()),
+        );
+      }).toList();
 
   /// Score events based on user interests
   List<ScoredEvent> _scoreEventsByInterests(
-      List<EventModel> events, List<String> userInterests,) {
+    List<EventModel> events,
+    List<String> userInterests,
+  ) {
     final List<ScoredEvent> scoredEvents = [];
 
     for (final event in events) {
@@ -236,7 +263,11 @@ class EventSearchService {
 
   /// Calculate distance between two points using Haversine formula
   double _calculateDistance(
-      double lat1, double lng1, double lat2, double lng2,) {
+    double lat1,
+    double lng1,
+    double lat2,
+    double lng2,
+  ) {
     const double earthRadius = 6371; // Earth's radius in kilometers
 
     final double dLat = _degreesToRadians(lat2 - lat1);

@@ -12,7 +12,6 @@ class BlocUserListInitial extends BlocUserListState {}
 class BlockUserLoadingState extends BlocUserListState {}
 
 class BlockUserLoadedState extends BlocUserListState {
-
   const BlockUserLoadedState(this.users);
   final List<BlockUserModel> users;
 

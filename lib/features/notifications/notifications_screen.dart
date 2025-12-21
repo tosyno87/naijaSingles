@@ -142,85 +142,85 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildLoadingState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            color: Color(0xFF008037),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Loading notifications...',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: Colors.grey[700],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              color: Color(0xFF008037),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            Text(
+              'Loading notifications...',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildEmptyState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.notifications_off_outlined,
-            size: 80,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No notifications yet',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.notifications_off_outlined,
+              size: 80,
+              color: Colors.grey[400],
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'We\'ll notify you when something happens',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              color: Colors.grey[600],
+            const SizedBox(height: 16),
+            Text(
+              'No notifications yet',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 8),
+            Text(
+              'We\'ll notify you when something happens',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
 
   Widget _buildNotificationsList() => ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _notifications.length,
-      itemBuilder: (context, index) {
-        final notification = _notifications[index];
-        return Dismissible(
-          key: Key(notification.id),
-          background: Container(
-            color: Colors.red,
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
-            child: const Icon(
-              Icons.delete,
-              color: Colors.white,
-            ),
-          ),
-          direction: DismissDirection.endToStart,
-          onDismissed: (direction) {
-            _deleteNotification(notification.id);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Notification removed'),
-                duration: Duration(seconds: 2),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: _notifications.length,
+        itemBuilder: (context, index) {
+          final notification = _notifications[index];
+          return Dismissible(
+            key: Key(notification.id),
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              child: const Icon(
+                Icons.delete,
+                color: Colors.white,
               ),
-            );
-          },
-          child: _buildNotificationItem(notification),
-        );
-      },
-    );
+            ),
+            direction: DismissDirection.endToStart,
+            onDismissed: (direction) {
+              _deleteNotification(notification.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Notification removed'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            child: _buildNotificationItem(notification),
+          );
+        },
+      );
 
   Widget _buildNotificationItem(AppNotification notification) {
     final bool isRead = notification.isRead;

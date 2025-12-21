@@ -12,7 +12,6 @@ class SwipeblocInitial extends SwipeblocState {}
 class SwipeFailedState extends SwipeblocState {}
 
 class SwipeSucessState extends SwipeblocState {
-
   const SwipeSucessState(this.users);
   final List<UserModel> users;
 
@@ -21,7 +20,6 @@ class SwipeSucessState extends SwipeblocState {
 }
 
 class SwipeMatchCreatedState extends SwipeblocState {
-
   const SwipeMatchCreatedState({
     required this.users,
     required this.matchedUser,

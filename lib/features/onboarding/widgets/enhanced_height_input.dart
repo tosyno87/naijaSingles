@@ -3,10 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'ios_height_picker.dart';
 
 /// Enhanced height input widget with iOS-style picker option
-class EnhancedHeightInput extends StatefulWidget { // Toggle between iOS picker and text input
+class EnhancedHeightInput extends StatefulWidget {
+  // Toggle between iOS picker and text input
 
   const EnhancedHeightInput({
-    required this.initialHeight, required this.initialUnit, required this.onChanged, super.key,
+    required this.initialHeight,
+    required this.initialUnit,
+    required this.onChanged,
+    super.key,
     this.useIOSPicker = true, // Default to iOS picker
   });
   final double initialHeight;

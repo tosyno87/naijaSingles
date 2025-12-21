@@ -8,7 +8,6 @@ abstract class MatchUserEvent extends Equatable {
 }
 
 class LoadMatchUserEvent extends MatchUserEvent {
-
   const LoadMatchUserEvent({required this.currentUser});
   final UserModel currentUser;
 

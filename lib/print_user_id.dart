@@ -31,26 +31,26 @@ class PrintUserIdApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('User ID Check'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Check the console output',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Current User ID: ${FirebaseAuth.instance.currentUser?.uid ?? 'Not signed in'}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('User ID Check'),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Check the console output',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Current User ID: ${FirebaseAuth.instance.currentUser?.uid ?? 'Not signed in'}',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 }

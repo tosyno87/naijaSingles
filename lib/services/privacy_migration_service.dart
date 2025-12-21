@@ -93,7 +93,9 @@ class PrivacyMigrationService {
 
   /// Extract public data based on privacy settings
   Map<String, dynamic> _extractPublicData(
-      Map<String, dynamic> userData, UserPrivacySettings privacy,) {
+    Map<String, dynamic> userData,
+    UserPrivacySettings privacy,
+  ) {
     final Map<String, dynamic> publicData = {
       'name': userData['name'] ?? '',
       'bio': userData['bio'] ?? '',
@@ -162,29 +164,31 @@ class PrivacyMigrationService {
 
   /// Extract private/sensitive data
   Map<String, dynamic> _extractPrivateData(Map<String, dynamic> userData) => {
-      'phoneNumber': userData['phoneNumber'],
-      'email': userData['email'],
-      'address': userData['address'],
-      'latitude': userData['latitude'],
-      'longitude': userData['longitude'],
-      'coordinates': userData['coordinates'],
-      'currentCoordinates': userData['currentCoordinates'],
-      'company': userData['company'],
-      'jobTitle': userData['jobTitle'],
-      'workAddress': userData['workAddress'],
-      'homeAddress': userData['homeAddress'],
-      'emergencyContact': userData['emergencyContact'],
-      'socialMediaLinks': userData['socialMediaLinks'],
-      'deviceInfo': userData['deviceInfo'],
-      'loginHistory': userData['loginHistory'],
-      'paymentInfo': userData['paymentInfo'],
-      'subscriptionData': userData['subscriptionData'],
-      'migrationDate': FieldValue.serverTimestamp(),
-    };
+        'phoneNumber': userData['phoneNumber'],
+        'email': userData['email'],
+        'address': userData['address'],
+        'latitude': userData['latitude'],
+        'longitude': userData['longitude'],
+        'coordinates': userData['coordinates'],
+        'currentCoordinates': userData['currentCoordinates'],
+        'company': userData['company'],
+        'jobTitle': userData['jobTitle'],
+        'workAddress': userData['workAddress'],
+        'homeAddress': userData['homeAddress'],
+        'emergencyContact': userData['emergencyContact'],
+        'socialMediaLinks': userData['socialMediaLinks'],
+        'deviceInfo': userData['deviceInfo'],
+        'loginHistory': userData['loginHistory'],
+        'paymentInfo': userData['paymentInfo'],
+        'subscriptionData': userData['subscriptionData'],
+        'migrationDate': FieldValue.serverTimestamp(),
+      };
 
   /// Clean main user document by removing sensitive data
   Future<void> _cleanMainUserDocument(
-      String userId, Map<String, dynamic> userData,) async {
+    String userId,
+    Map<String, dynamic> userData,
+  ) async {
     // Fields to remove from main document
     final sensitiveFields = [
       'phoneNumber',
@@ -246,7 +250,8 @@ class PrivacyMigrationService {
           // Progress update every 10 users
           if ((migratedCount + errorCount) % 10 == 0) {
             debugPrint(
-                '📈 Progress: $migratedCount migrated, $errorCount errors, ${totalUsers - migratedCount - errorCount} remaining',);
+              '📈 Progress: $migratedCount migrated, $errorCount errors, ${totalUsers - migratedCount - errorCount} remaining',
+            );
           }
 
           // Small delay to avoid overwhelming Firestore

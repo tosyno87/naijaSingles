@@ -6,9 +6,14 @@ import '../services/photo_quality_analyzer.dart';
 import 'photo_type_indicator.dart';
 
 class ReorderablePhotoGrid extends StatefulWidget {
-
   const ReorderablePhotoGrid({
-    required this.photos, required this.photoGuidance, required this.onReorder, required this.onTap, required this.onRemove, required this.onSetPrimary, super.key,
+    required this.photos,
+    required this.photoGuidance,
+    required this.onReorder,
+    required this.onTap,
+    required this.onRemove,
+    required this.onSetPrimary,
+    super.key,
   });
   final List<File?> photos;
   final Map<int, PhotoTypeGuidance> photoGuidance;
@@ -35,67 +40,67 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Reordering instructions
-        Container(
-          padding: const EdgeInsets.all(12),
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: afropeepGreen.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: afropeepGreen.withValues(alpha: 0.3),
-            ),
-          ),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.drag_indicator,
-                color: afropeepGreen,
-                size: 20,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Reordering instructions
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: afropeepGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: afropeepGreen.withValues(alpha: 0.3),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Long press and drag photos to reorder them. Your first photo will be your main profile photo.',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: afropeepGreen,
-                    fontWeight: FontWeight.w500,
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.drag_indicator,
+                  color: afropeepGreen,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Long press and drag photos to reorder them. Your first photo will be your main profile photo.',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: afropeepGreen,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        // Primary photo (always first)
-        _buildPhotoCard(0, isPrimary: true),
+          // Primary photo (always first)
+          _buildPhotoCard(0, isPrimary: true),
 
-        const SizedBox(height: 12),
+          const SizedBox(height: 12),
 
-        // Reorderable grid for other photos
-        ReorderableWrap(
-          spacing: 12,
-          runSpacing: 12,
-          onReorder: (oldIndex, newIndex) {
-            // Adjust indices since we're not including the primary photo
-            final adjustedOldIndex = oldIndex + 1;
-            final adjustedNewIndex = newIndex + 1;
-            widget.onReorder(adjustedOldIndex, adjustedNewIndex);
-          },
-          children: List.generate(4, (index) {
-            final photoIndex = index + 1; // Skip primary photo
-            return _buildPhotoCard(
-              photoIndex,
-              key: ValueKey('photo_$photoIndex'),
-              isPrimary: false,
-            );
-          }),
-        ),
-      ],
-    );
+          // Reorderable grid for other photos
+          ReorderableWrap(
+            spacing: 12,
+            runSpacing: 12,
+            onReorder: (oldIndex, newIndex) {
+              // Adjust indices since we're not including the primary photo
+              final adjustedOldIndex = oldIndex + 1;
+              final adjustedNewIndex = newIndex + 1;
+              widget.onReorder(adjustedOldIndex, adjustedNewIndex);
+            },
+            children: List.generate(4, (index) {
+              final photoIndex = index + 1; // Skip primary photo
+              return _buildPhotoCard(
+                photoIndex,
+                key: ValueKey('photo_$photoIndex'),
+                isPrimary: false,
+              );
+            }),
+          ),
+        ],
+      );
 
   Widget _buildPhotoCard(int index, {required bool isPrimary, Key? key}) {
     final photo = widget.photos[index];
@@ -169,7 +174,8 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                 left: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   decoration: const BoxDecoration(
                     color: goldAccent,
                     borderRadius: BorderRadius.only(
@@ -342,7 +348,8 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                 child: GestureDetector(
                   onTap: () => _showSetPrimaryDialog(index),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
                       color: goldAccent.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
@@ -527,9 +534,10 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
 
 // Custom reorderable wrap widget
 class ReorderableWrap extends StatefulWidget {
-
   const ReorderableWrap({
-    required this.children, required this.onReorder, super.key,
+    required this.children,
+    required this.onReorder,
+    super.key,
     this.spacing = 0,
     this.runSpacing = 0,
   });
@@ -545,22 +553,23 @@ class ReorderableWrap extends StatefulWidget {
 class _ReorderableWrapState extends State<ReorderableWrap> {
   @override
   Widget build(BuildContext context) => ReorderableListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      onReorder: widget.onReorder,
-      children: widget.children.asMap().entries.map((entry) {
-        final index = entry.key;
-        final child = entry.value;
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        onReorder: widget.onReorder,
+        children: widget.children.asMap().entries.map((entry) {
+          final index = entry.key;
+          final child = entry.value;
 
-        return Container(
-          key: ValueKey('reorderable_$index'),
-          margin: EdgeInsets.only(
-            right: (index % 2 == 0) ? widget.spacing : 0,
-            bottom: widget.runSpacing,
-          ),
-          width: (MediaQuery.of(context).size.width - 48 - widget.spacing) / 2,
-          child: child,
-        );
-      }).toList(),
-    );
+          return Container(
+            key: ValueKey('reorderable_$index'),
+            margin: EdgeInsets.only(
+              right: (index % 2 == 0) ? widget.spacing : 0,
+              bottom: widget.runSpacing,
+            ),
+            width:
+                (MediaQuery.of(context).size.width - 48 - widget.spacing) / 2,
+            child: child,
+          );
+        }).toList(),
+      );
 }

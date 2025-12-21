@@ -12,7 +12,6 @@ abstract class EmailAuthEvent extends Equatable {
 }
 
 class EmailSignUpRequested extends EmailAuthEvent {
-
   EmailSignUpRequested({required this.email, required this.password});
   final String email;
   final String password;
@@ -22,7 +21,6 @@ class EmailSignUpRequested extends EmailAuthEvent {
 }
 
 class EmailSignInRequested extends EmailAuthEvent {
-
   EmailSignInRequested({required this.email, required this.password});
   final String email;
   final String password;
@@ -32,7 +30,6 @@ class EmailSignInRequested extends EmailAuthEvent {
 }
 
 class EmailPasswordResetRequested extends EmailAuthEvent {
-
   EmailPasswordResetRequested({required this.email});
   final String email;
 
@@ -51,7 +48,6 @@ class EmailAuthInitial extends EmailAuthState {}
 class EmailAuthLoading extends EmailAuthState {}
 
 class EmailAuthSuccess extends EmailAuthState {
-
   EmailAuthSuccess({required this.user});
   final User user;
 
@@ -62,7 +58,6 @@ class EmailAuthSuccess extends EmailAuthState {
 class EmailPasswordResetSent extends EmailAuthState {}
 
 class EmailAuthError extends EmailAuthState {
-
   EmailAuthError({required this.error});
   final String error;
 
@@ -72,7 +67,6 @@ class EmailAuthError extends EmailAuthState {
 
 // BLoC
 class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
-
   EmailAuthBloc() : super(EmailAuthInitial()) {
     on<EmailSignUpRequested>(_onEmailSignUpRequested);
     on<EmailSignInRequested>(_onEmailSignInRequested);
@@ -130,8 +124,11 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       emit(EmailAuthError(error: errorMessage));
     } catch (e) {
       log('Error during sign up: $e');
-      emit(EmailAuthError(
-          error: 'An unexpected error occurred. Please try again.',),);
+      emit(
+        EmailAuthError(
+          error: 'An unexpected error occurred. Please try again.',
+        ),
+      );
     }
   }
 
@@ -185,8 +182,11 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       emit(EmailAuthError(error: errorMessage));
     } catch (e) {
       log('Error during sign in: $e');
-      emit(EmailAuthError(
-          error: 'An unexpected error occurred. Please try again.',),);
+      emit(
+        EmailAuthError(
+          error: 'An unexpected error occurred. Please try again.',
+        ),
+      );
     }
   }
 
@@ -221,8 +221,11 @@ class EmailAuthBloc extends Bloc<EmailAuthEvent, EmailAuthState> {
       emit(EmailAuthError(error: errorMessage));
     } catch (e) {
       log('Error sending password reset: $e');
-      emit(EmailAuthError(
-          error: 'An unexpected error occurred. Please try again.',),);
+      emit(
+        EmailAuthError(
+          error: 'An unexpected error occurred. Please try again.',
+        ),
+      );
     }
   }
 

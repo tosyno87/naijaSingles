@@ -8,7 +8,10 @@ import '../../../../models/user_model.dart';
 
 class DistanceWidget extends StatefulWidget {
   const DistanceWidget({
-    required this.currentUser, required this.max, required this.changeValues, super.key,
+    required this.currentUser,
+    required this.max,
+    required this.changeValues,
+    super.key,
   });
   final UserModel currentUser;
   final Map<String, dynamic> changeValues;
@@ -29,27 +32,28 @@ class _DistanceWidgetState extends State<DistanceWidget> {
           title: Text(
             'Maximum distance'.tr().toString(),
             style: TextStyle(
-                fontSize: 18,
-                color: themeProvider.isDarkMode ? Colors.white : primaryColor,
-                fontWeight: FontWeight.w500,),
+              fontSize: 18,
+              color: themeProvider.isDarkMode ? Colors.white : primaryColor,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           trailing: Text(
             '${(widget.currentUser.maxDistance! * 0.621371).round()} mi.',
             style: const TextStyle(fontSize: 16),
           ),
           subtitle: Slider(
-              value: widget.currentUser.maxDistance!.toDouble(),
-              inactiveColor: AppColors.secondaryColor,
-              min: 1,
-              max: widget.max,
-              activeColor:
-                  themeProvider.isDarkMode ? Colors.white : primaryColor,
-              onChanged: (val) {
-                widget.changeValues.addAll({'maximum_distance': val.round()});
-                setState(() {
-                  widget.currentUser.maxDistance = val.round();
-                });
-              },),
+            value: widget.currentUser.maxDistance!.toDouble(),
+            inactiveColor: AppColors.secondaryColor,
+            min: 1,
+            max: widget.max,
+            activeColor: themeProvider.isDarkMode ? Colors.white : primaryColor,
+            onChanged: (val) {
+              widget.changeValues.addAll({'maximum_distance': val.round()});
+              setState(() {
+                widget.currentUser.maxDistance = val.round();
+              });
+            },
+          ),
         ),
       ),
     );

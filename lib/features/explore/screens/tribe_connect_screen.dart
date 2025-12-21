@@ -9,9 +9,10 @@ import '../widgets/match_confirmation_modal.dart';
 import '../widgets/hinge_profile_card.dart';
 
 class TribeConnectScreen extends StatefulWidget {
-
   const TribeConnectScreen({
-    required this.currentUser, required this.users, super.key,
+    required this.currentUser,
+    required this.users,
+    super.key,
   });
   final UserModel currentUser;
   final List<UserModel> users;
@@ -45,31 +46,31 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: _buildAppBar(),
-      body: _buildBody(),
-    );
+        backgroundColor: AppColors.backgroundColor,
+        appBar: _buildAppBar(),
+        body: _buildBody(),
+      );
 
   PreferredSizeWidget _buildAppBar() => AppBar(
-      backgroundColor: AppColors.backgroundColor,
-      elevation: 0,
-      title: Text(
-        'Connect',
-        style: GoogleFonts.montserrat(
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+        backgroundColor: AppColors.backgroundColor,
+        elevation: 0,
+        title: Text(
+          'Connect',
+          style: GoogleFonts.montserrat(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
         ),
-      ),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          onPressed: _showFilters,
-          icon: Custom3DIcons.filter(),
-        ),
-        const SizedBox(width: 8),
-      ],
-    );
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: _showFilters,
+            icon: Custom3DIcons.filter(),
+          ),
+          const SizedBox(width: 8),
+        ],
+      );
 
   Widget _buildBody() {
     if (widget.users.isEmpty) {
@@ -94,51 +95,52 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   Widget _buildEmptyState() => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Custom3DIcons.communities(size: 80, color: AppColors.primaryGreen),
-          const SizedBox(height: 24),
-          Text(
-            'No More Profiles',
-            style: GoogleFonts.montserrat(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'You\'ve seen all available profiles in your area.\nCheck back later for new connections!',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: _refreshUsers,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Custom3DIcons.communities(size: 80, color: AppColors.primaryGreen),
+            const SizedBox(height: 24),
+            Text(
+              'No More Profiles',
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
             ),
-            child: Text(
-              'Refresh',
+            const SizedBox(height: 12),
+            Text(
+              'You\'ve seen all available profiles in your area.\nCheck back later for new connections!',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _refreshUsers,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryGreen,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              child: Text(
+                'Refresh',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Future<void> _refreshUsers() async {
     // TODO: Implement refresh logic
@@ -158,74 +160,74 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   }
 
   Widget _buildFilterSheet() => Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Filter Your Tribe',
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildFilterOption('Age Range', '18-35'),
-          _buildFilterOption('Heritage', 'Any'),
-          _buildFilterOption('Location', 'Within 50km'),
-          _buildFilterOption('Languages', 'Any'),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(
-                'Apply Filters',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Filter Your Tribe',
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 24),
+            _buildFilterOption('Age Range', '18-35'),
+            _buildFilterOption('Heritage', 'Any'),
+            _buildFilterOption('Location', 'Within 50km'),
+            _buildFilterOption('Languages', 'Any'),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Apply Filters',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildFilterOption(String title, String value) => Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          Text(
-            value,
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textSecondary,
+            Text(
+              value,
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Future<void> _handleConnect(UserModel user) async {
     try {

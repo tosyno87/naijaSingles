@@ -34,11 +34,11 @@ class UserMessagingRepo {
               tempuser.latitude != null &&
               tempuser.longitude != null) {
             tempuser.distanceBW = calculateDistance(
-                    currentUser.latitude!,
-                    currentUser.longitude!,
-                    tempuser.latitude!,
-                    tempuser.longitude!,)
-                .round();
+              currentUser.latitude!,
+              currentUser.longitude!,
+              tempuser.latitude!,
+              tempuser.longitude!,
+            ).round();
           }
           matches.add(tempuser);
           // matches.sort((a, b) => b.lastmsg!.compareTo(
@@ -50,7 +50,9 @@ class UserMessagingRepo {
   }
 
   static Future<List<BlockUserModel>> getBlockUserList(
-      UserModel currentUser, int perPage,) async {
+    UserModel currentUser,
+    int perPage,
+  ) async {
     final User user = firebaseAuth.currentUser!;
     final QuerySnapshot querySnapshot = await db
         .collection('users')
@@ -68,7 +70,8 @@ class UserMessagingRepo {
             await docRef.doc(documentSnapshot['blockedID']).get();
         if (userDoc.exists) {
           final UserModel user = UserModel.fromDocument(userDoc);
-          final DateTime blockedTimestamp = documentSnapshot['timestamp'].toDate();
+          final DateTime blockedTimestamp =
+              documentSnapshot['timestamp'].toDate();
           final BlockUserModel blockedUser = BlockUserModel(
             name: user.name!,
             imageUrl: user.imageUrl!.first,
@@ -85,8 +88,10 @@ class UserMessagingRepo {
   }
 
   static Future<List<BlockUserModel>> loadMoreBlockUsers(
-      UserModel currentUser, int perPage,
-      {BlockUserModel? lastDocumentData,}) async {
+    UserModel currentUser,
+    int perPage, {
+    BlockUserModel? lastDocumentData,
+  }) async {
     final User user = firebaseAuth.currentUser!;
     Query query = db
         .collection('users')
@@ -109,7 +114,8 @@ class UserMessagingRepo {
             await docRef.doc(documentSnapshot['blockedID']).get();
         if (userDoc.exists) {
           final UserModel user = UserModel.fromDocument(userDoc);
-          final DateTime blockedTimestamp = documentSnapshot['timestamp'].toDate();
+          final DateTime blockedTimestamp =
+              documentSnapshot['timestamp'].toDate();
           final BlockUserModel blockedUser = BlockUserModel(
             name: user.name!,
             imageUrl: user.imageUrl!.first,
@@ -154,8 +160,13 @@ class UserMessagingRepo {
     return user!;
   }
 
-  static void addTexttoDb(CollectionReference chatReference, String text,
-      String chatId, String senderId, secondId,) {
+  static void addTexttoDb(
+    CollectionReference chatReference,
+    String text,
+    String chatId,
+    String senderId,
+    secondId,
+  ) {
     chatReference.add({
       'type': 'Msg',
       'text': text,
@@ -167,16 +178,19 @@ class UserMessagingRepo {
       'users': [senderId, secondId],
       'unmatched': false,
     }).then((documentReference) {
-      db.collection('chats').doc(chatId).set({
-        'text': text,
-        'isRead': false,
-        'sender_id': senderId,
-        'receiver_id': secondId,
-        'type': 'Msg',
-        'time': FieldValue.serverTimestamp(),
-        'users': [secondId, senderId],
-        'unmatched': false,
-      }, SetOptions(merge: true),);
+      db.collection('chats').doc(chatId).set(
+        {
+          'text': text,
+          'isRead': false,
+          'sender_id': senderId,
+          'receiver_id': secondId,
+          'type': 'Msg',
+          'time': FieldValue.serverTimestamp(),
+          'users': [secondId, senderId],
+          'unmatched': false,
+        },
+        SetOptions(merge: true),
+      );
     });
     // Check if the "blocked" document exists in chatReference collection
     chatReference.doc('blocked').get().then((blockedDocSnapshot) {
@@ -193,12 +207,13 @@ class UserMessagingRepo {
   }
 
   static void sendImage(
-      String? messageText,
-      String? imageUrl,
-      CollectionReference chatReference,
-      String chatId,
-      String? senderId,
-      secondId,) {
+    String? messageText,
+    String? imageUrl,
+    CollectionReference chatReference,
+    String chatId,
+    String? senderId,
+    secondId,
+  ) {
     chatReference.add({
       'type': 'Image',
       'text': messageText,
@@ -210,16 +225,19 @@ class UserMessagingRepo {
       'users': [secondId, senderId],
       'unmatched': false,
     }).then((value) {
-      db.collection('chats').doc(chatId).set({
-        'text': messageText,
-        'isRead': false,
-        'sender_id': senderId,
-        'receiver_id': secondId,
-        'type': 'Image',
-        'time': FieldValue.serverTimestamp(),
-        'users': [secondId, senderId],
-        'unmatched': false,
-      }, SetOptions(merge: true),);
+      db.collection('chats').doc(chatId).set(
+        {
+          'text': messageText,
+          'isRead': false,
+          'sender_id': senderId,
+          'receiver_id': secondId,
+          'type': 'Image',
+          'time': FieldValue.serverTimestamp(),
+          'users': [secondId, senderId],
+          'unmatched': false,
+        },
+        SetOptions(merge: true),
+      );
     });
     // Check if the "blocked" document exists in chatReference collection
     chatReference.doc('blocked').get().then((blockedDocSnapshot) {

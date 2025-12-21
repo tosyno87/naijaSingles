@@ -9,9 +9,9 @@ import '../../../../../common/constants/app_colors.dart';
 import '../../../data/models/enhanced_event_model.dart';
 
 class MediaStep extends StatefulWidget {
-
   const MediaStep({
-    required this.eventData, super.key,
+    required this.eventData,
+    super.key,
   });
   final EventCreationData eventData;
 
@@ -26,180 +26,181 @@ class _MediaStepState extends State<MediaStep> {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Add Photos'),
-          const SizedBox(height: 8),
-          Text(
-            'Add photos to make your event more attractive (optional)',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: const Color(0xFF666666),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Add Photos'),
+            const SizedBox(height: 8),
+            Text(
+              'Add photos to make your event more attractive (optional)',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: const Color(0xFF666666),
+              ),
             ),
-          ),
-          const SizedBox(height: 32),
-          _buildImageUploadSection(),
-          const SizedBox(height: 32),
-          if (widget.eventData.imageUrls.isNotEmpty) _buildImagePreview(),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
+            const SizedBox(height: 32),
+            _buildImageUploadSection(),
+            const SizedBox(height: 32),
+            if (widget.eventData.imageUrls.isNotEmpty) _buildImagePreview(),
+            const SizedBox(height: 40),
+          ],
+        ),
+      );
 
   Widget _buildSectionTitle(String title) => Text(
-      title,
-      style: GoogleFonts.montserrat(
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        color: const Color(0xFF333333),
-      ),
-    );
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF333333),
+        ),
+      );
 
   Widget _buildImageUploadSection() => Container(
-      width: double.infinity,
-      height: 220,
-      decoration: BoxDecoration(
-        color: AppColors.backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF008037).withOpacity(0.3),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.cloud_upload_outlined,
-            size: 40,
-            color: Color(0xFF008037),
+        width: double.infinity,
+        height: 220,
+        decoration: BoxDecoration(
+          color: AppColors.backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFF008037).withOpacity(0.3),
+            width: 1.5,
           ),
-          const SizedBox(height: 12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.cloud_upload_outlined,
+              size: 40,
+              color: Color(0xFF008037),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Upload Event Photos',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF333333),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Drag and drop or click to browse',
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                color: const Color(0xFF666666),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _isProcessingImage ? null : _selectImages,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _isProcessingImage
+                    ? const Color(0xFF008037).withOpacity(0.6)
+                    : const Color(0xFF008037),
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: _isProcessingImage
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Processing...',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      'Choose Photos',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Supports JPG, PNG (Max 10 photos) • ${widget.eventData.imageUrls.length}/10 used',
+              style: GoogleFonts.montserrat(
+                fontSize: 11,
+                color: const Color(0xFF999999),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildImagePreview() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Text(
-            'Upload Event Photos',
+            'Photo Preview',
             style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: const Color(0xFF333333),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
-            'Drag and drop or click to browse',
+            'This is how your photo will appear in the event card',
             style: GoogleFonts.montserrat(
-              fontSize: 13,
+              fontSize: 14,
               color: const Color(0xFF666666),
             ),
           ),
-          const SizedBox(height: 12),
-          ElevatedButton(
-            onPressed: _isProcessingImage ? null : _selectImages,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _isProcessingImage
-                  ? const Color(0xFF008037).withOpacity(0.6)
-                  : const Color(0xFF008037),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: _isProcessingImage
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Processing...',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  )
-                : Text(
-                    'Choose Photos',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-          ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 16),
+
+          // Card preview showing how image will be cropped
+          _buildCardPreview(),
+
+          const SizedBox(height: 24),
+
+          // Grid of selected images
           Text(
-            'Supports JPG, PNG (Max 10 photos) • ${widget.eventData.imageUrls.length}/10 used',
+            'Selected Photos (${widget.eventData.imageUrls.length})',
             style: GoogleFonts.montserrat(
-              fontSize: 11,
-              color: const Color(0xFF999999),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
             ),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio:
+                  1.2, // Slightly rectangular to better show landscape images
+            ),
+            itemCount: widget.eventData.imageUrls.length,
+            itemBuilder: (context, index) => _buildImageTile(index),
           ),
         ],
-      ),
-    );
-
-  Widget _buildImagePreview() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Photo Preview',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'This is how your photo will appear in the event card',
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            color: const Color(0xFF666666),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Card preview showing how image will be cropped
-        _buildCardPreview(),
-
-        const SizedBox(height: 24),
-
-        // Grid of selected images
-        Text(
-          'Selected Photos (${widget.eventData.imageUrls.length})',
-          style: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio:
-                1.2, // Slightly rectangular to better show landscape images
-          ),
-          itemCount: widget.eventData.imageUrls.length,
-          itemBuilder: (context, index) => _buildImageTile(index),
-        ),
-      ],
-    );
+      );
 
   Widget _buildCardPreview() {
     if (widget.eventData.imageUrls.isEmpty) return const SizedBox.shrink();
@@ -243,16 +244,17 @@ class _MediaStepState extends State<MediaStep> {
                     height: double.infinity,
                     fit: BoxFit.cover, // Same as event card
                     filterQuality: FilterQuality.high,
-                    errorBuilder: (context, error, stackTrace) => const ColoredBox(
-                        color: Color(0xFFF0F0F0),
-                        child: Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            size: 48,
-                            color: Color(0xFF999999),
-                          ),
+                    errorBuilder: (context, error, stackTrace) =>
+                        const ColoredBox(
+                      color: Color(0xFFF0F0F0),
+                      child: Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 48,
+                          color: Color(0xFF999999),
                         ),
                       ),
+                    ),
                   ),
                 ),
 
@@ -361,117 +363,120 @@ class _MediaStepState extends State<MediaStep> {
   }
 
   Widget _buildImageTile(int index) => DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: const Color(0xFF008037).withOpacity(0.3),
-          width: 1.5,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: const Color(0xFF008037).withOpacity(0.3),
+            width: 1.5,
+          ),
         ),
-      ),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: AppColors.backgroundColor,
-              child: widget.eventData.imageUrls[index].startsWith('http')
-                  ? Image.network(
-                      widget.eventData.imageUrls[index],
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Color(0xFF999999),
-                          ),
-                        ),
-                    )
-                  : Image.file(
-                      File(widget.eventData.imageUrls[index]),
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Color(0xFF999999),
-                          ),
-                        ),
-                    ),
-            ),
-          ),
-
-          // Action buttons overlay
-          Positioned(
-            top: 4,
-            right: 4,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Crop button
-                GestureDetector(
-                  onTap: _isProcessingImage ? null : () => _cropImage(index),
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: _isProcessingImage
-                          ? const Color(0xFF008037).withOpacity(0.6)
-                          : const Color(0xFF008037),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.crop,
-                      size: 14,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                // Delete button
-                GestureDetector(
-                  onTap: () => _removeImage(index),
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      size: 14,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Primary image indicator
-          if (index == 0)
-            Positioned(
-              bottom: 4,
-              left: 4,
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF008037),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'MAIN',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                width: double.infinity,
+                height: double.infinity,
+                color: AppColors.backgroundColor,
+                child: widget.eventData.imageUrls[index].startsWith('http')
+                    ? Image.network(
+                        widget.eventData.imageUrls[index],
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Color(0xFF999999),
+                          ),
+                        ),
+                      )
+                    : Image.file(
+                        File(widget.eventData.imageUrls[index]),
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Color(0xFF999999),
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+
+            // Action buttons overlay
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Crop button
+                  GestureDetector(
+                    onTap: _isProcessingImage ? null : () => _cropImage(index),
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: _isProcessingImage
+                            ? const Color(0xFF008037).withOpacity(0.6)
+                            : const Color(0xFF008037),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.crop,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  // Delete button
+                  GestureDetector(
+                    onTap: () => _removeImage(index),
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Primary image indicator
+            if (index == 0)
+              Positioned(
+                bottom: 4,
+                left: 4,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF008037),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'MAIN',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
   Future<void> _cropImage(int index) async {
     if (index < 0 || index >= widget.eventData.imageUrls.length) {
@@ -483,7 +488,8 @@ class _MediaStepState extends State<MediaStep> {
       final imagePath = widget.eventData.imageUrls[index];
       if (imagePath.startsWith('http')) {
         _showErrorSnackBar(
-            'Cannot crop uploaded images. Please select a new image.',);
+          'Cannot crop uploaded images. Please select a new image.',
+        );
         return;
       }
 
@@ -589,7 +595,8 @@ class _MediaStepState extends State<MediaStep> {
       // Check if already at maximum limit
       if (widget.eventData.imageUrls.length >= 10) {
         _showErrorSnackBar(
-            'Maximum 10 photos allowed. Please remove some photos first.',);
+          'Maximum 10 photos allowed. Please remove some photos first.',
+        );
         return;
       }
 
@@ -633,31 +640,32 @@ class _MediaStepState extends State<MediaStep> {
     }
   }
 
-  Future<ImageSource?> _showImageSourceDialog() async => showDialog<ImageSource>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Select Image Source',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+  Future<ImageSource?> _showImageSourceDialog() async =>
+      showDialog<ImageSource>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Select Image Source',
+            style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading:
+                    const Icon(Icons.photo_library, color: Color(0xFF008037)),
+                title: Text('Gallery', style: GoogleFonts.montserrat()),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: Color(0xFF008037)),
+                title: Text('Camera', style: GoogleFonts.montserrat()),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+            ],
+          ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading:
-                  const Icon(Icons.photo_library, color: Color(0xFF008037)),
-              title: Text('Gallery', style: GoogleFonts.montserrat()),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: Color(0xFF008037)),
-              title: Text('Camera', style: GoogleFonts.montserrat()),
-              onTap: () => Navigator.pop(context, ImageSource.camera),
-            ),
-          ],
-        ),
-      ),
-    );
+      );
 
   Future<void> _showCropDialogForNewImage(String imagePath) async {
     try {

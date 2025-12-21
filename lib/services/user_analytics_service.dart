@@ -106,13 +106,16 @@ class UserAnalyticsService {
       debugPrint('📈 Analytics Summary:');
       debugPrint('   Total Users: ${analytics.totalUsers}');
       debugPrint(
-          '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
+        '   Male: ${analytics.maleCount} (${(analytics.maleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',
+      );
       debugPrint(
-          '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',);
+        '   Female: ${analytics.femaleCount} (${(analytics.femaleCount / analytics.totalUsers * 100).toStringAsFixed(1)}%)',
+      );
       debugPrint('   Complete Profiles: ${analytics.completeProfiles}');
       debugPrint('   Incomplete Profiles: ${analytics.incompleteProfiles}');
       debugPrint(
-          '   Very Incomplete Profiles: ${analytics.veryIncompleteProfiles}',);
+        '   Very Incomplete Profiles: ${analytics.veryIncompleteProfiles}',
+      );
 
       return analytics;
     } catch (e) {
@@ -123,7 +126,8 @@ class UserAnalyticsService {
 
   /// Analyze individual profile completeness
   static ProfileCompleteness _analyzeProfileCompleteness(
-      Map<String, dynamic> data,) {
+    Map<String, dynamic> data,
+  ) {
     int score = 0;
     final List<String> missingFields = [];
 
@@ -194,7 +198,8 @@ class UserAnalyticsService {
       }
 
       debugPrint(
-          '🗑️ Deleting ${userIdsToDelete.length} very incomplete profiles...',);
+        '🗑️ Deleting ${userIdsToDelete.length} very incomplete profiles...',
+      );
 
       int deletedCount = 0;
       for (final userId in userIdsToDelete) {
@@ -262,15 +267,18 @@ class UserAnalyticsService {
       }
       if (!hasGoodGenderBalance) {
         recommendations.add(
-            'Need both male and female users (M: ${analytics.maleCount}, F: ${analytics.femaleCount})',);
+          'Need both male and female users (M: ${analytics.maleCount}, F: ${analytics.femaleCount})',
+        );
       }
       if (!hasCompleteProfiles) {
         recommendations.add(
-            'Need at least 5 complete profiles (currently: ${analytics.completeProfiles})',);
+          'Need at least 5 complete profiles (currently: ${analytics.completeProfiles})',
+        );
       }
       if (genderBalance < 0.2 || genderBalance > 0.8) {
         recommendations.add(
-            'Gender balance is skewed (${(genderBalance * 100).toStringAsFixed(1)}% male)',);
+          'Gender balance is skewed (${(genderBalance * 100).toStringAsFixed(1)}% male)',
+        );
       }
 
       return AlgorithmStatus(
@@ -292,7 +300,6 @@ class UserAnalyticsService {
 
 /// User analytics data model
 class UserAnalytics {
-
   UserAnalytics({
     required this.totalUsers,
     required this.maleCount,
@@ -308,18 +315,18 @@ class UserAnalytics {
   });
 
   factory UserAnalytics.empty() => UserAnalytics(
-      totalUsers: 0,
-      maleCount: 0,
-      femaleCount: 0,
-      otherGenderCount: 0,
-      unknownGenderCount: 0,
-      completeProfiles: 0,
-      incompleteProfiles: 0,
-      veryIncompleteProfiles: 0,
-      incompleteUserIds: [],
-      veryIncompleteUserIds: [],
-      ageGroups: {},
-    );
+        totalUsers: 0,
+        maleCount: 0,
+        femaleCount: 0,
+        otherGenderCount: 0,
+        unknownGenderCount: 0,
+        completeProfiles: 0,
+        incompleteProfiles: 0,
+        veryIncompleteProfiles: 0,
+        incompleteUserIds: [],
+        veryIncompleteUserIds: [],
+        ageGroups: {},
+      );
   final int totalUsers;
   final int maleCount;
   final int femaleCount;
@@ -335,7 +342,6 @@ class UserAnalytics {
 
 /// Profile completeness data model
 class ProfileCompleteness {
-
   ProfileCompleteness({
     required this.score,
     required this.missingFields,
@@ -350,7 +356,6 @@ class ProfileCompleteness {
 
 /// Cleanup result data model
 class CleanupResult {
-
   CleanupResult({
     required this.deletedCount,
     required this.remainingUsers,
@@ -365,7 +370,6 @@ class CleanupResult {
 
 /// Algorithm status data model
 class AlgorithmStatus {
-
   AlgorithmStatus({
     required this.isReady,
     required this.status,
@@ -378,15 +382,15 @@ class AlgorithmStatus {
   });
 
   factory AlgorithmStatus.error(String error) => AlgorithmStatus(
-      isReady: false,
-      status: 'Error',
-      totalUsers: 0,
-      maleCount: 0,
-      femaleCount: 0,
-      completeProfiles: 0,
-      genderBalance: 0,
-      recommendations: ['Error: $error'],
-    );
+        isReady: false,
+        status: 'Error',
+        totalUsers: 0,
+        maleCount: 0,
+        femaleCount: 0,
+        completeProfiles: 0,
+        genderBalance: 0,
+        recommendations: ['Error: $error'],
+      );
   final bool isReady;
   final String status;
   final int totalUsers;

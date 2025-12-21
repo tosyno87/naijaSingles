@@ -247,7 +247,8 @@ class PhotoQualityAnalyzer {
 }
 
 /// Data class to hold photo quality analysis results
-class PhotoQuality { // 0-100
+class PhotoQuality {
+  // 0-100
 
   const PhotoQuality({
     required this.hasFace,
@@ -264,6 +265,6 @@ class PhotoQuality { // 0-100
 
   @override
   String toString() => 'PhotoQuality(hasFace: $hasFace, isWellLit: $isWellLit, '
-        'isSharp: $isSharp, isAppropriate: $isAppropriate, '
-        'qualityScore: $qualityScore)';
+      'isSharp: $isSharp, isAppropriate: $isAppropriate, '
+      'qualityScore: $qualityScore)';
 }

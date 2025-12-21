@@ -51,7 +51,8 @@ class AutoLoginService {
 
         if (userCredential.user != null) {
           debugPrint(
-              '✅ Test user created and signed in: ${userCredential.user!.uid}',);
+            '✅ Test user created and signed in: ${userCredential.user!.uid}',
+          );
           return true;
         }
       } catch (createError) {

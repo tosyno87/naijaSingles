@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfessionalProfile {
-
   const ProfessionalProfile({
     required this.id,
     required this.userId,
@@ -87,35 +86,34 @@ class ProfessionalProfile {
   final List<String> connectionIds;
 
   Map<String, dynamic> toFirestore() => {
-      'userId': userId,
-      'userName': userName,
-      'jobTitle': jobTitle,
-      'company': company,
-      'industry': industry,
-      'country': country,
-      'city': city,
-      'experience': experience,
-      'skills': skills,
-      'certifications': certifications,
-      'bio': bio,
-      'linkedinUrl': linkedinUrl,
-      'portfolioUrl': portfolioUrl,
-      'languages': languages,
-      'education': education,
-      'university': university,
-      'isAvailableForMentorship': isAvailableForMentorship,
-      'isSeekingMentorship': isSeekingMentorship,
-      'mentorshipAreas': mentorshipAreas,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'isVerified': isVerified,
-      'connectionsCount': connectionsCount,
-      'connectionIds': connectionIds,
-    };
+        'userId': userId,
+        'userName': userName,
+        'jobTitle': jobTitle,
+        'company': company,
+        'industry': industry,
+        'country': country,
+        'city': city,
+        'experience': experience,
+        'skills': skills,
+        'certifications': certifications,
+        'bio': bio,
+        'linkedinUrl': linkedinUrl,
+        'portfolioUrl': portfolioUrl,
+        'languages': languages,
+        'education': education,
+        'university': university,
+        'isAvailableForMentorship': isAvailableForMentorship,
+        'isSeekingMentorship': isSeekingMentorship,
+        'mentorshipAreas': mentorshipAreas,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+        'isVerified': isVerified,
+        'connectionsCount': connectionsCount,
+        'connectionIds': connectionIds,
+      };
 }
 
 class MentorshipRequest {
-
   const MentorshipRequest({
     required this.id,
     required this.mentorId,
@@ -166,18 +164,18 @@ class MentorshipRequest {
   final String? feedback;
 
   Map<String, dynamic> toFirestore() => {
-      'mentorId': mentorId,
-      'menteeId': menteeId,
-      'mentorName': mentorName,
-      'menteeName': menteeName,
-      'area': area,
-      'message': message,
-      'status': status,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'respondedAt':
-          respondedAt != null ? Timestamp.fromDate(respondedAt!) : null,
-      'completedAt':
-          completedAt != null ? Timestamp.fromDate(completedAt!) : null,
-      'feedback': feedback,
-    };
+        'mentorId': mentorId,
+        'menteeId': menteeId,
+        'mentorName': mentorName,
+        'menteeName': menteeName,
+        'area': area,
+        'message': message,
+        'status': status,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'respondedAt':
+            respondedAt != null ? Timestamp.fromDate(respondedAt!) : null,
+        'completedAt':
+            completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+        'feedback': feedback,
+      };
 }

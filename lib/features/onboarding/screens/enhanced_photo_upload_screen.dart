@@ -16,7 +16,6 @@ enum PhotoType {
 
 /// Guidance information for each photo type
 class PhotoTypeGuidance {
-
   const PhotoTypeGuidance({
     required this.type,
     required this.title,
@@ -87,11 +86,12 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   runSpacing: 12,
                   alignment: WrapAlignment.center,
                   children: List.generate(9, (index) {
-                    final photo = index < uploadedPhotos.length 
-                        ? uploadedPhotos[index] 
+                    final photo = index < uploadedPhotos.length
+                        ? uploadedPhotos[index]
                         : null;
                     return SizedBox(
-                      width: (MediaQuery.of(context).size.width - 72) / 3, // 3 columns
+                      width: (MediaQuery.of(context).size.width - 72) /
+                          3, // 3 columns
                       child: AspectRatio(
                         aspectRatio: 1.0,
                         child: _buildPhotoGridItem(
@@ -159,7 +159,8 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   top: 8,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: primaryGreen,
                       borderRadius: BorderRadius.circular(12),
@@ -215,10 +216,11 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   }
 
   Future<void> _showAddPhotoOptions(int index) async {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
-    
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
+
     // If clicking on existing photo, show options
-    if (index < controller.profilePhotos.length && 
+    if (index < controller.profilePhotos.length &&
         controller.profilePhotos[index] != null) {
       _showPhotoOptionsBottomSheet(index);
       return;
@@ -322,13 +324,15 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               ),
               onTap: () async {
                 Navigator.pop(context);
-                final controller = Provider.of<OnboardingController>(context, listen: false);
+                final controller =
+                    Provider.of<OnboardingController>(context, listen: false);
                 final currentContext = context; // Capture context before async
                 final source = await showModalBottomSheet<ImageSource>(
                   context: context,
                   backgroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   builder: (context) => SafeArea(
                     child: Column(
@@ -344,24 +348,28 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                           ),
                         ),
                         ListTile(
-                          leading: const Icon(Icons.camera_alt, color: primaryGreen),
+                          leading:
+                              const Icon(Icons.camera_alt, color: primaryGreen),
                           title: Text(
                             'Take Photo',
                             style: GoogleFonts.montserrat(
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          onTap: () => Navigator.pop(context, ImageSource.camera),
+                          onTap: () =>
+                              Navigator.pop(context, ImageSource.camera),
                         ),
                         ListTile(
-                          leading: const Icon(Icons.photo_library, color: primaryGreen),
+                          leading: const Icon(Icons.photo_library,
+                              color: primaryGreen),
                           title: Text(
                             'Choose from Gallery',
                             style: GoogleFonts.montserrat(
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          onTap: () => Navigator.pop(context, ImageSource.gallery),
+                          onTap: () =>
+                              Navigator.pop(context, ImageSource.gallery),
                         ),
                         const SizedBox(height: 8),
                       ],
@@ -369,7 +377,8 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   ),
                 );
                 if (source != null && currentContext.mounted) {
-                  await controller.pickProfilePhoto(source, index, currentContext);
+                  await controller.pickProfilePhoto(
+                      source, index, currentContext);
                   if (mounted) {
                     setState(() {});
                   }
@@ -398,13 +407,15 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   }
 
   void _removePhoto(int index) {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     controller.removeProfilePhoto(index);
     setState(() {});
   }
 
   void _movePhoto(int fromIndex, int toIndex) {
-    final controller = Provider.of<OnboardingController>(context, listen: false);
+    final controller =
+        Provider.of<OnboardingController>(context, listen: false);
     final photos = List<File?>.from(controller.profilePhotos);
     final photo = photos.removeAt(fromIndex);
     photos.insert(toIndex, photo);

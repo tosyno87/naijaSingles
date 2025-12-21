@@ -60,13 +60,15 @@ class SettingsService {
                 (blockData?['blockedAt'] as Timestamp?)?.toDate() ??
                     DateTime.now();
 
-            blockedUsers.add(BlockedUser(
-              id: blockedId,
-              name: userData['name'] ?? 'Unknown User',
-              imageUrl: userData['imageUrl']?[0] ?? '',
-              blockedAt: blockedAt,
-              reason: blockData?['reason'] ?? 'No reason provided',
-            ),);
+            blockedUsers.add(
+              BlockedUser(
+                id: blockedId,
+                name: userData['name'] ?? 'Unknown User',
+                imageUrl: userData['imageUrl']?[0] ?? '',
+                blockedAt: blockedAt,
+                reason: blockData?['reason'] ?? 'No reason provided',
+              ),
+            );
           }
         } catch (e) {
           debugPrint('❌ Error getting blocked user details for $blockedId: $e');
@@ -83,8 +85,11 @@ class SettingsService {
   }
 
   /// Block a user
-  static Future<bool> blockUser(String userId, String blockedUserId,
-      {String? reason,}) async {
+  static Future<bool> blockUser(
+    String userId,
+    String blockedUserId, {
+    String? reason,
+  }) async {
     try {
       debugPrint('🚫 Blocking user: $userId blocks $blockedUserId');
 
@@ -119,14 +124,15 @@ class SettingsService {
 
       // Remove from each other's liked lists (only if we have permission)
       try {
-        batch.delete(_usersCollection
-            .doc(userId)
-            .collection('LikedBy')
-            .doc(blockedUserId),);
-        batch.delete(_usersCollection
-            .doc(userId)
-            .collection('CheckedUser')
-            .doc(blockedUserId),);
+        batch.delete(
+          _usersCollection.doc(userId).collection('LikedBy').doc(blockedUserId),
+        );
+        batch.delete(
+          _usersCollection
+              .doc(userId)
+              .collection('CheckedUser')
+              .doc(blockedUserId),
+        );
       } catch (e) {
         debugPrint('⚠️ Could not remove from liked/checked lists: $e');
         // Continue with blocking even if this fails
@@ -150,10 +156,12 @@ class SettingsService {
       final batch = _firestore.batch();
 
       // Remove from current user's blocked list only
-      batch.delete(_usersCollection
-          .doc(userId)
-          .collection('blockedlist')
-          .doc(blockedUserId),);
+      batch.delete(
+        _usersCollection
+            .doc(userId)
+            .collection('blockedlist')
+            .doc(blockedUserId),
+      );
 
       await batch.commit();
 
@@ -185,7 +193,8 @@ class SettingsService {
 
   /// Get notification settings for a user
   static Future<NotificationSettings> getNotificationSettings(
-      String userId,) async {
+    String userId,
+  ) async {
     try {
       final settingsDoc =
           await _firestore.collection('notificationSettings').doc(userId).get();
@@ -204,7 +213,9 @@ class SettingsService {
 
   /// Update notification settings
   static Future<bool> updateNotificationSettings(
-      String userId, NotificationSettings settings,) async {
+    String userId,
+    NotificationSettings settings,
+  ) async {
     try {
       await _firestore
           .collection('notificationSettings')
@@ -277,7 +288,8 @@ class SettingsService {
 
   /// Get account deletion eligibility
   static Future<AccountDeletionInfo> getAccountDeletionInfo(
-      String userId,) async {
+    String userId,
+  ) async {
     try {
       // Check for active subscriptions, pending matches, etc.
       final userDoc = await _usersCollection.doc(userId).get();
@@ -358,7 +370,6 @@ class SettingsService {
 
 /// Model for blocked user information
 class BlockedUser {
-
   const BlockedUser({
     required this.id,
     required this.name,
@@ -378,7 +389,6 @@ class BlockedUser {
 
 /// Model for notification settings
 class NotificationSettings {
-
   const NotificationSettings({
     required this.matchNotifications,
     required this.messageNotifications,
@@ -392,28 +402,29 @@ class NotificationSettings {
   });
 
   factory NotificationSettings.defaultSettings() => const NotificationSettings(
-      matchNotifications: true,
-      messageNotifications: true,
-      likeNotifications: true,
-      superLikeNotifications: true,
-      soundEnabled: true,
-      vibrationEnabled: true,
-      quietHoursStart: '22:00',
-      quietHoursEnd: '08:00',
-      quietHoursEnabled: false,
-    );
+        matchNotifications: true,
+        messageNotifications: true,
+        likeNotifications: true,
+        superLikeNotifications: true,
+        soundEnabled: true,
+        vibrationEnabled: true,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+        quietHoursEnabled: false,
+      );
 
-  factory NotificationSettings.fromMap(Map<String, dynamic> map) => NotificationSettings(
-      matchNotifications: map['matchNotifications'] ?? true,
-      messageNotifications: map['messageNotifications'] ?? true,
-      likeNotifications: map['likeNotifications'] ?? true,
-      superLikeNotifications: map['superLikeNotifications'] ?? true,
-      soundEnabled: map['soundEnabled'] ?? true,
-      vibrationEnabled: map['vibrationEnabled'] ?? true,
-      quietHoursStart: map['quietHoursStart'] ?? '22:00',
-      quietHoursEnd: map['quietHoursEnd'] ?? '08:00',
-      quietHoursEnabled: map['quietHoursEnabled'] ?? false,
-    );
+  factory NotificationSettings.fromMap(Map<String, dynamic> map) =>
+      NotificationSettings(
+        matchNotifications: map['matchNotifications'] ?? true,
+        messageNotifications: map['messageNotifications'] ?? true,
+        likeNotifications: map['likeNotifications'] ?? true,
+        superLikeNotifications: map['superLikeNotifications'] ?? true,
+        soundEnabled: map['soundEnabled'] ?? true,
+        vibrationEnabled: map['vibrationEnabled'] ?? true,
+        quietHoursStart: map['quietHoursStart'] ?? '22:00',
+        quietHoursEnd: map['quietHoursEnd'] ?? '08:00',
+        quietHoursEnabled: map['quietHoursEnabled'] ?? false,
+      );
   final bool matchNotifications;
   final bool messageNotifications;
   final bool likeNotifications;
@@ -425,16 +436,16 @@ class NotificationSettings {
   final bool quietHoursEnabled;
 
   Map<String, dynamic> toMap() => {
-      'matchNotifications': matchNotifications,
-      'messageNotifications': messageNotifications,
-      'likeNotifications': likeNotifications,
-      'superLikeNotifications': superLikeNotifications,
-      'soundEnabled': soundEnabled,
-      'vibrationEnabled': vibrationEnabled,
-      'quietHoursStart': quietHoursStart,
-      'quietHoursEnd': quietHoursEnd,
-      'quietHoursEnabled': quietHoursEnabled,
-    };
+        'matchNotifications': matchNotifications,
+        'messageNotifications': messageNotifications,
+        'likeNotifications': likeNotifications,
+        'superLikeNotifications': superLikeNotifications,
+        'soundEnabled': soundEnabled,
+        'vibrationEnabled': vibrationEnabled,
+        'quietHoursStart': quietHoursStart,
+        'quietHoursEnd': quietHoursEnd,
+        'quietHoursEnabled': quietHoursEnabled,
+      };
 
   NotificationSettings copyWith({
     bool? matchNotifications,
@@ -446,23 +457,23 @@ class NotificationSettings {
     String? quietHoursStart,
     String? quietHoursEnd,
     bool? quietHoursEnabled,
-  }) => NotificationSettings(
-      matchNotifications: matchNotifications ?? this.matchNotifications,
-      messageNotifications: messageNotifications ?? this.messageNotifications,
-      likeNotifications: likeNotifications ?? this.likeNotifications,
-      superLikeNotifications:
-          superLikeNotifications ?? this.superLikeNotifications,
-      soundEnabled: soundEnabled ?? this.soundEnabled,
-      vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
-      quietHoursStart: quietHoursStart ?? this.quietHoursStart,
-      quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
-      quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
-    );
+  }) =>
+      NotificationSettings(
+        matchNotifications: matchNotifications ?? this.matchNotifications,
+        messageNotifications: messageNotifications ?? this.messageNotifications,
+        likeNotifications: likeNotifications ?? this.likeNotifications,
+        superLikeNotifications:
+            superLikeNotifications ?? this.superLikeNotifications,
+        soundEnabled: soundEnabled ?? this.soundEnabled,
+        vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+        quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+        quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+        quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
+      );
 }
 
 /// Model for account deletion information
 class AccountDeletionInfo {
-
   const AccountDeletionInfo({
     required this.canDelete,
     this.hasActiveSubscription = false,

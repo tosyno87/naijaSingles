@@ -11,9 +11,9 @@ import 'shared_styles.dart';
 /// This screen collects basic information about the user including
 /// full name, age, location, and a short bio.
 class OnboardingStepBio extends StatefulWidget {
-
   const OnboardingStepBio({
-    required this.onNext, super.key,
+    required this.onNext,
+    super.key,
     this.backgroundColor = OnboardingStyles.backgroundColor,
   });
   final VoidCallback onNext;
@@ -77,7 +77,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
       }
 
       _bioController.text = controller.bio;
-        });
+    });
   }
 
   @override
@@ -103,119 +103,117 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) => SafeArea(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Select Your Age',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Select Your Age',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Age grid
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.5,
                   ),
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      childAspectRatio: 1.5,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
-                    itemCount: _ageOptions.length,
-                    itemBuilder: (context, index) {
-                      final age = _ageOptions[index];
-                      final isSelected = _selectedAge == age;
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
 
-                      return InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectedAge = age;
-                          });
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: isSelected ? deepGreen : Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: isSelected ? deepGreen : Colors.grey[300]!,
-                              width: isSelected ? 2 : 1,
-                            ),
+              // Age grid
+              Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.5,
+                ),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    childAspectRatio: 1.5,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: _ageOptions.length,
+                  itemBuilder: (context, index) {
+                    final age = _ageOptions[index];
+                    final isSelected = _selectedAge == age;
+
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedAge = age;
+                        });
+                        Navigator.pop(context);
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: isSelected ? deepGreen : Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isSelected ? deepGreen : Colors.grey[300]!,
+                            width: isSelected ? 2 : 1,
                           ),
-                          child: Center(
-                            child: Text(
-                              age.toString(),
-                              style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color:
-                                    isSelected ? Colors.white : Colors.black87,
-                              ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            age.toString(),
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected ? Colors.white : Colors.black87,
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
+              ),
 
-                const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-                // Done labelLarge
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: deepGreen,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Done',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+              // Done labelLarge
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: deepGreen,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  child: Text(
+                    'Done',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 
@@ -262,7 +260,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6,),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: deepGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -374,8 +374,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                BorderSide(color: Colors.red[400]!),
+                            borderSide: BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -440,7 +439,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16,),
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey[400]!),
                             borderRadius: BorderRadius.circular(12),
@@ -580,8 +581,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                BorderSide(color: Colors.red[400]!),
+                            borderSide: BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -692,8 +692,7 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                BorderSide(color: Colors.red[400]!),
+                            borderSide: BorderSide(color: Colors.red[400]!),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -737,14 +736,20 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                           if (_selectedAge != null) {
                             final now = DateTime.now();
                             final dob = DateTime(
-                                now.year - _selectedAge!, now.month, now.day,);
+                              now.year - _selectedAge!,
+                              now.month,
+                              now.day,
+                            );
                             controller.updateDateOfBirth(dob);
                           }
 
                           // Save location (in a real app, we would also save lat/lng)
                           // For now, we'll just use a placeholder for lat/lng
                           controller.updateLocation(
-                              0, 0, _locationController.text.trim(),);
+                            0,
+                            0,
+                            _locationController.text.trim(),
+                          );
 
                           // Save bio
                           controller.updateBio(_bioController.text.trim());

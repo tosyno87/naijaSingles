@@ -198,11 +198,15 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
                               };
                               userData.addAll(userGender);
                               Navigator.pushNamed(
-                                  context, RouteName.nationalityScreen,
-                                  arguments: userData,);
+                                context,
+                                RouteName.nationalityScreen,
+                                arguments: userData,
+                              );
                             } else {
                               CustomSnackbar.showSnackBarSimple(
-                                  'Please select your gender', context,);
+                                'Please select your gender',
+                                context,
+                              );
                             }
                           },
                     style: ElevatedButton.styleFrom(
@@ -236,64 +240,71 @@ class GenderState extends State<Gender> with SingleTickerProviderStateMixin {
 
   // Card-style gender option with shadow and rounded corners
   Widget _buildGenderCard(
-      String title, bool isSelected, VoidCallback onTap, IconData icon,) => GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected ? const Color(0xFF27AE60) : Colors.grey[200]!,
-            width: isSelected ? 2 : 1,
+    String title,
+    bool isSelected,
+    VoidCallback onTap,
+    IconData icon,
+  ) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSelected ? const Color(0xFF27AE60) : Colors.grey[200]!,
+              width: isSelected ? 2 : 1,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            color: isSelected ? const Color(0xFFE8F5E9) : Colors.grey[50],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          borderRadius: BorderRadius.circular(16),
-          color: isSelected ? const Color(0xFFE8F5E9) : Colors.grey[50],
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFB7E4C7) : Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: isSelected ? const Color(0xFF27AE60) : Colors.grey[600],
-                size: 28,
-              ),
-            ),
-            const SizedBox(width: 20),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? const Color(0xFF27AE60) : Colors.black87,
-              ),
-            ),
-            const Spacer(),
-            if (isSelected)
+          child: Row(
+            children: [
               Container(
-                padding: const EdgeInsets.all(2),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF27AE60),
+                  color:
+                      isSelected ? const Color(0xFFB7E4C7) : Colors.grey[100],
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 20,
+                child: Icon(
+                  icon,
+                  color:
+                      isSelected ? const Color(0xFF27AE60) : Colors.grey[600],
+                  size: 28,
                 ),
               ),
-          ],
+              const SizedBox(width: 20),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? const Color(0xFF27AE60) : Colors.black87,
+                ),
+              ),
+              const Spacer(),
+              if (isSelected)
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF27AE60),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 }

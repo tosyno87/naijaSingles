@@ -139,7 +139,13 @@ class LikesService {
 
       // Update legacy match collections for backward compatibility
       await _updateLegacyMatches(
-          userAId, userBId, userAName, userBName, userAData, userBData,);
+        userAId,
+        userBId,
+        userAName,
+        userBName,
+        userAData,
+        userBData,
+      );
 
       return matchId;
     } catch (e) {
@@ -159,38 +165,46 @@ class LikesService {
   ) async {
     try {
       // Get image URLs for legacy format
-      final userAImageUrl = (userAData['imageUrl'] as List?)?.isNotEmpty ?? false
-          ? userAData['imageUrl'][0]
-          : '';
-      final userBImageUrl = (userBData['imageUrl'] as List?)?.isNotEmpty ?? false
-          ? userBData['imageUrl'][0]
-          : '';
+      final userAImageUrl =
+          (userAData['imageUrl'] as List?)?.isNotEmpty ?? false
+              ? userAData['imageUrl'][0]
+              : '';
+      final userBImageUrl =
+          (userBData['imageUrl'] as List?)?.isNotEmpty ?? false
+              ? userBData['imageUrl'][0]
+              : '';
 
       // Update User A's matches collection
       await _usersCollection
           .doc(userAId)
           .collection('Matches')
           .doc(userBId)
-          .set({
-        'Matches': userBId,
-        'isRead': false,
-        'userName': userBName,
-        'pictureUrl': userBImageUrl,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true),);
+          .set(
+        {
+          'Matches': userBId,
+          'isRead': false,
+          'userName': userBName,
+          'pictureUrl': userBImageUrl,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       // Update User B's matches collection
       await _usersCollection
           .doc(userBId)
           .collection('Matches')
           .doc(userAId)
-          .set({
-        'Matches': userAId,
-        'userName': userAName,
-        'pictureUrl': userAImageUrl,
-        'isRead': false,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true),);
+          .set(
+        {
+          'Matches': userAId,
+          'userName': userAName,
+          'pictureUrl': userAImageUrl,
+          'isRead': false,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       debugPrint('Legacy match collections updated');
     } catch (e) {
@@ -224,7 +238,8 @@ class LikesService {
   Future<void> _triggerMatchNotification(String userAId, String userBId) async {
     try {
       debugPrint(
-          '🎉 Match created! Cloud Function will handle notifications automatically',);
+        '🎉 Match created! Cloud Function will handle notifications automatically',
+      );
       debugPrint('   User A: $userAId');
       debugPrint('   User B: $userBId');
 
@@ -320,9 +335,7 @@ class LikesService {
           .orderBy('matchedAt', descending: true)
           .get();
 
-      return querySnapshot.docs
-          .map(MatchModel.fromDocument)
-          .toList();
+      return querySnapshot.docs.map(MatchModel.fromDocument).toList();
     } catch (e) {
       debugPrint('Error getting user matches: $e');
       return [];
@@ -359,9 +372,10 @@ class LikesService {
 
   /// Stream of matches for real-time updates
   Stream<List<MatchModel>> getMatchesStream(String userId) => _matchesCollection
-        .where('users', arrayContains: userId)
-        .orderBy('matchedAt', descending: true)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map(MatchModel.fromDocument).toList(),);
+      .where('users', arrayContains: userId)
+      .orderBy('matchedAt', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) => snapshot.docs.map(MatchModel.fromDocument).toList(),
+      );
 }

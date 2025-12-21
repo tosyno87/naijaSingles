@@ -18,12 +18,17 @@ import '../../../user/ui/widgets/user_info.dart';
 // import 'MatchedAnimation.dart';
 
 class UsersList extends StatefulWidget {
-
   // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they are not typical in dating apps
   // and can create pressure or anxiety for users
 
-  const UsersList(
-      {required this.users, required this.usersList, required this.currentUser, required this.stackController, required this.onswiped, super.key,});
+  const UsersList({
+    required this.users,
+    required this.usersList,
+    required this.currentUser,
+    required this.stackController,
+    required this.onswiped,
+    super.key,
+  });
   final UserModel currentUser;
   final List<UserModel> users;
 
@@ -139,26 +144,25 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                     onTap: () =>
                         _navigateToUserProfile(widget.users[itemIndex]),
                     child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
-                        child: Container(
-                          padding: const EdgeInsets.all(15),
-                          height: MediaQuery.of(context).size.height * .80,
-                          width: MediaQuery.of(context).size.width,
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                            child: ColoredBox(
-                              color: Colors.white,
-                              child: CustomCNImage(
-                                imageUrl:
-                                    widget.users[itemIndex].imageUrl!.first ??
-                                        '',
-                                fit: BoxFit.cover,
-                              ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      child: Container(
+                        padding: const EdgeInsets.all(15),
+                        height: MediaQuery.of(context).size.height * .80,
+                        width: MediaQuery.of(context).size.width,
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
+                          child: ColoredBox(
+                            color: Colors.white,
+                            child: CustomCNImage(
+                              imageUrl:
+                                  widget.users[itemIndex].imageUrl!.first ?? '',
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),),
+                        ),
+                      ),
+                    ),
                   ),
                   Padding(
                     padding:
@@ -170,16 +174,18 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                           DecoratedBox(
                             decoration: const BoxDecoration(
                               borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(20),
-                                  bottomRight: Radius.circular(20),),
+                                bottomLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
+                              ),
                               gradient: LinearGradient(
-                                  colors: [
-                                    Colors.black45,
-                                    Colors.transparent,
-                                  ],
-                                  begin: FractionalOffset(0, 0),
-                                  end: FractionalOffset(1, 0),
-                                  stops: [0.0, 1.0],),
+                                colors: [
+                                  Colors.black45,
+                                  Colors.transparent,
+                                ],
+                                begin: FractionalOffset(0, 0),
+                                end: FractionalOffset(1, 0),
+                                stops: [0.0, 1.0],
+                              ),
                             ),
                             child: ListTile(
                               title: Row(
@@ -196,12 +202,15 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                   ),
                                   const SizedBox(width: 5),
                                   if (widget.users[itemIndex]
-                                              .editInfo!['showOnProfile'] ??
-                                          false) GenderSign(
-                                          gender: widget
-                                              .users[itemIndex].userGender!,
-                                          iconColor: Colors.white,
-                                        ) else const SizedBox.shrink(),
+                                          .editInfo!['showOnProfile'] ??
+                                      false)
+                                    GenderSign(
+                                      gender:
+                                          widget.users[itemIndex].userGender!,
+                                      iconColor: Colors.white,
+                                    )
+                                  else
+                                    const SizedBox.shrink(),
                                 ],
                               ),
                               subtitle: Padding(
@@ -259,22 +268,23 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                 ),
                               ),
                               trailing: IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (context) => Info(
-                                          widget.users[itemIndex],
-                                          widget.currentUser,
-                                          true,
-                                          controller: widget.stackController,
-                                        ),
-                                    );
-                                  },
-                                  icon: const Icon(
-                                    Icons.arrow_upward,
-                                    color: primaryColor,
-                                  ),),
+                                onPressed: () {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (context) => Info(
+                                      widget.users[itemIndex],
+                                      widget.currentUser,
+                                      true,
+                                      controller: widget.stackController,
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.arrow_upward,
+                                  color: primaryColor,
+                                ),
+                              ),
                             ),
                           ),
                           // Positioned.fill(

@@ -8,7 +8,10 @@ class ModeSpecificCompatibilityEngine {
   /// Calculate compatibility score based on the selected mode
   /// Returns a score between 0.0 (no compatibility) and 1.0 (perfect match)
   static double calculateModeCompatibility(
-      UserModel user1, UserModel user2, String mode,) {
+    UserModel user1,
+    UserModel user2,
+    String mode,
+  ) {
     try {
       switch (mode) {
         case 'Dating':
@@ -29,7 +32,9 @@ class ModeSpecificCompatibilityEngine {
   /// Calculate dating-specific compatibility
   /// Focuses on romantic compatibility factors
   static double _calculateDatingCompatibility(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     double totalScore = 0;
 
     // Age compatibility (30% - more important for dating)
@@ -55,9 +60,11 @@ class ModeSpecificCompatibilityEngine {
     totalScore = totalScore.clamp(0.0, 1.0);
 
     debugPrint(
-        '💕 Dating Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',);
+      '💕 Dating Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',
+    );
     debugPrint(
-        '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Lifestyle: ${(lifestyleScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',);
+      '   Age: ${(ageScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Lifestyle: ${(lifestyleScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',
+    );
 
     return totalScore;
   }
@@ -65,7 +72,9 @@ class ModeSpecificCompatibilityEngine {
   /// Calculate friendship-specific compatibility
   /// Focuses on social compatibility factors
   static double _calculateFriendshipCompatibility(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     double totalScore = 0;
 
     // Social activity alignment (35% - most important for friendship)
@@ -91,9 +100,11 @@ class ModeSpecificCompatibilityEngine {
     totalScore = totalScore.clamp(0.0, 1.0);
 
     debugPrint(
-        '🤝 Friendship Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',);
+      '🤝 Friendship Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',
+    );
     debugPrint(
-        '   Social: ${(socialScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Age: ${(ageScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',);
+      '   Social: ${(socialScore * 100).toStringAsFixed(1)}%, Interest: ${(interestScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Age: ${(ageScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',
+    );
 
     return totalScore;
   }
@@ -101,7 +112,9 @@ class ModeSpecificCompatibilityEngine {
   /// Calculate networking-specific compatibility
   /// Focuses on professional compatibility factors
   static double _calculateNetworkingCompatibility(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     double totalScore = 0;
 
     // Professional alignment (40% - most important for networking)
@@ -123,9 +136,11 @@ class ModeSpecificCompatibilityEngine {
     totalScore = totalScore.clamp(0.0, 1.0);
 
     debugPrint(
-        '💼 Networking Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',);
+      '💼 Networking Compatibility ${user1.name} ↔ ${user2.name}: ${(totalScore * 100).toStringAsFixed(1)}%',
+    );
     debugPrint(
-        '   Professional: ${(professionalScore * 100).toStringAsFixed(1)}%, Industry: ${(industryScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',);
+      '   Professional: ${(professionalScore * 100).toStringAsFixed(1)}%, Industry: ${(industryScore * 100).toStringAsFixed(1)}%, Location: ${(locationScore * 100).toStringAsFixed(1)}%, Completeness: ${(completenessScore * 100).toStringAsFixed(1)}%',
+    );
 
     return totalScore;
   }
@@ -168,7 +183,9 @@ class ModeSpecificCompatibilityEngine {
   }
 
   static double _calculateLifestyleCompatibility(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     try {
       // This would compare lifestyle factors like:
       // - Drinking habits
@@ -187,7 +204,9 @@ class ModeSpecificCompatibilityEngine {
   }
 
   static double _calculateSocialCompatibility(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     try {
       // This would compare social factors like:
       // - Group activity preferences
@@ -204,7 +223,9 @@ class ModeSpecificCompatibilityEngine {
   }
 
   static double _calculateProfessionalCompatibility(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     try {
       // This would compare professional factors like:
       // - Career level compatibility
@@ -221,7 +242,9 @@ class ModeSpecificCompatibilityEngine {
   }
 
   static double _calculateIndustryCompatibility(
-      UserModel user1, UserModel user2,) {
+    UserModel user1,
+    UserModel user2,
+  ) {
     try {
       // Compare job titles and industries
       final job1 = user1.job_title?.toLowerCase() ?? '';
@@ -258,14 +281,10 @@ class ModeSpecificCompatibilityEngine {
 
       final isTech1 = techKeywords.any(job1.contains);
       final isTech2 = techKeywords.any(job2.contains);
-      final isBusiness1 =
-          businessKeywords.any(job1.contains);
-      final isBusiness2 =
-          businessKeywords.any(job2.contains);
-      final isCreative1 =
-          creativeKeywords.any(job1.contains);
-      final isCreative2 =
-          creativeKeywords.any(job2.contains);
+      final isBusiness1 = businessKeywords.any(job1.contains);
+      final isBusiness2 = businessKeywords.any(job2.contains);
+      final isCreative1 = creativeKeywords.any(job1.contains);
+      final isCreative2 = creativeKeywords.any(job2.contains);
 
       if ((isTech1 && isTech2) ||
           (isBusiness1 && isBusiness2) ||
@@ -341,7 +360,10 @@ class ModeSpecificCompatibilityEngine {
 
   /// Get compatibility breakdown for debugging
   static Map<String, double> getCompatibilityBreakdown(
-      UserModel user1, UserModel user2, String mode,) {
+    UserModel user1,
+    UserModel user2,
+    String mode,
+  ) {
     switch (mode) {
       case 'Dating':
         return {

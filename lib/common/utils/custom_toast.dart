@@ -9,11 +9,12 @@ class CustomToast {
   ) {
     Fluttertoast.cancel();
     Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: primaryColor,
-        textColor: Colors.white,
-        fontSize: 16,);
+      msg: msg,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: primaryColor,
+      textColor: Colors.white,
+      fontSize: 16,
+    );
   }
 }

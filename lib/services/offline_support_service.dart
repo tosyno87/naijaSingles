@@ -53,23 +53,25 @@ class OfflineSupportService {
 
       // Convert profiles to JSON using basic serialization
       final profilesJson = profiles
-          .map((profile) => {
-                'id': profile.id,
-                'name': profile.name,
-                'userGender': profile.userGender,
-                'age': profile.age,
-                'showGender': profile.showGender,
-                'maxDistance': profile.maxDistance,
-                'latitude': profile.latitude,
-                'longitude': profile.longitude,
-                'imageUrl': profile.imageUrl,
-                'bio': profile.bio,
-                'nationality': profile.nationality,
-                'tribe': profile.tribe,
-                'occupation': profile.occupation,
-                'languages': profile.languages,
-                'religion': profile.religion,
-              },)
+          .map(
+            (profile) => {
+              'id': profile.id,
+              'name': profile.name,
+              'userGender': profile.userGender,
+              'age': profile.age,
+              'showGender': profile.showGender,
+              'maxDistance': profile.maxDistance,
+              'latitude': profile.latitude,
+              'longitude': profile.longitude,
+              'imageUrl': profile.imageUrl,
+              'bio': profile.bio,
+              'nationality': profile.nationality,
+              'tribe': profile.tribe,
+              'occupation': profile.occupation,
+              'languages': profile.languages,
+              'religion': profile.religion,
+            },
+          )
           .toList();
       final jsonString = jsonEncode(profilesJson);
 
@@ -104,22 +106,26 @@ class OfflineSupportService {
 
   /// Cache messages for offline viewing
   Future<void> cacheMessages(
-      String threadId, List<MessageThreadInfo> messages,) async {
+    String threadId,
+    List<MessageThreadInfo> messages,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
 
       // Convert messages to JSON using basic serialization
       final messagesJson = messages
-          .map((message) => {
-                'threadId': message.threadId,
-                'otherUserId': message.otherUserId,
-                'otherUserName': message.otherUserName,
-                'lastMessage': message.lastMessage,
-                'lastMessageSenderId': message.lastMessageSenderId,
-                'timestamp': message.timestamp.toIso8601String(),
-                'unread': message.unread,
-                'avatarUrl': message.avatarUrl,
-              },)
+          .map(
+            (message) => {
+              'threadId': message.threadId,
+              'otherUserId': message.otherUserId,
+              'otherUserName': message.otherUserName,
+              'lastMessage': message.lastMessage,
+              'lastMessageSenderId': message.lastMessageSenderId,
+              'timestamp': message.timestamp.toIso8601String(),
+              'unread': message.unread,
+              'avatarUrl': message.avatarUrl,
+            },
+          )
           .toList();
       final jsonString = jsonEncode(messagesJson);
 
@@ -349,8 +355,9 @@ class OfflineSupportService {
   }
 
   /// Check if cache is stale
-  Future<bool> isCacheStale(
-      {Duration maxAge = const Duration(hours: 24),}) async {
+  Future<bool> isCacheStale({
+    Duration maxAge = const Duration(hours: 24),
+  }) async {
     try {
       final lastSync = await getLastSyncTime();
       if (lastSync == null) return true;
@@ -431,7 +438,6 @@ enum OfflineActionType {
 
 /// Offline action model
 class OfflineAction {
-
   const OfflineAction({
     required this.id,
     required this.type,
@@ -440,25 +446,25 @@ class OfflineAction {
   });
 
   factory OfflineAction.fromJson(Map<String, dynamic> json) => OfflineAction(
-      id: json['id'],
-      type: OfflineActionType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => OfflineActionType.like,
-      ),
-      data: Map<String, dynamic>.from(json['data']),
-      timestamp: DateTime.parse(json['timestamp']),
-    );
+        id: json['id'],
+        type: OfflineActionType.values.firstWhere(
+          (e) => e.name == json['type'],
+          orElse: () => OfflineActionType.like,
+        ),
+        data: Map<String, dynamic>.from(json['data']),
+        timestamp: DateTime.parse(json['timestamp']),
+      );
   final String id;
   final OfflineActionType type;
   final Map<String, dynamic> data;
   final DateTime timestamp;
 
   Map<String, dynamic> toJson() => {
-      'id': id,
-      'type': type.name,
-      'data': data,
-      'timestamp': timestamp.toIso8601String(),
-    };
+        'id': id,
+        'type': type.name,
+        'data': data,
+        'timestamp': timestamp.toIso8601String(),
+      };
 
   @override
   String toString() => 'OfflineAction(${type.name}, $timestamp)';
@@ -466,7 +472,6 @@ class OfflineAction {
 
 /// Cache statistics
 class CacheStats {
-
   const CacheStats({
     required this.cachedProfiles,
     required this.queuedActions,
@@ -479,5 +484,6 @@ class CacheStats {
   final bool isOnline;
 
   @override
-  String toString() => 'CacheStats(profiles: $cachedProfiles, actions: $queuedActions, online: $isOnline)';
+  String toString() =>
+      'CacheStats(profiles: $cachedProfiles, actions: $queuedActions, online: $isOnline)';
 }

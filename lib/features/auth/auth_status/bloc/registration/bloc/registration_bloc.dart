@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../../../services/secure_storage_service.dart';
 
 import '../../../../../../models/user_model.dart';
 
@@ -35,15 +36,28 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
         final user = await phoneAuthRepository.getCurrentUser();
 
         if (user!.displayName != null || user.phoneNumber != null) {
+          // Store authentication token securely
+          if (event.token.isNotEmpty) {
+            try {
+              final secureStorage = SecureStorageService();
+              await secureStorage.storeAuthToken(event.token);
+              await secureStorage.storeUserId(user.uid);
+              log('✅ Token stored securely after phone verification');
+            } catch (e) {
+              log('⚠️ Error storing token securely: $e');
+              // Continue even if secure storage fails
+            }
+          }
+
           log('🔍 Checking registration for user: ${user.uid}');
           final isRegistered = await phoneAuthRepository.userDetails(user.uid);
           log('📋 Registration check result: $isRegistered');
-          
+
           if (isRegistered) {
             try {
               final usr = await phoneAuthRepository.getRegisterUser();
               log('👤 Retrieved user data: ${usr.name ?? "no name"}');
-              
+
               // Only consider user registered if they have a name (completed onboarding)
               if (usr.name != null && usr.name!.isNotEmpty) {
                 log('✅ User already registered with complete profile: ${usr.name}');
@@ -58,7 +72,7 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
             } catch (getUserError) {
               log('❌ Error getting user data: $getUserError');
               log('❌ Error type: ${getUserError.runtimeType}');
-              
+
               // If userDetails returned true but we can't get user data,
               // there might be a data inconsistency
               // In this case, treat as new registration to allow onboarding
@@ -70,12 +84,14 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
             if (user.displayName != null || user.phoneNumber != null) {
               emit(NewRegistration(token: event.token, user: user));
             } else {
-              emit(const RegistrationFailed(message: 'Error: No user identifier found'));
+              emit(const RegistrationFailed(
+                  message: 'Error: No user identifier found'));
             }
           }
         } else {
           log('❌ User has no displayName or phoneNumber');
-          emit(const RegistrationFailed(message: 'Error: No user identifier found'));
+          emit(const RegistrationFailed(
+              message: 'Error: No user identifier found'));
         }
       } on SocketException {
         log('❌ Network error during registration check');

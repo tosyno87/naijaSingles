@@ -1,7 +1,6 @@
 import 'repo/user_repo.dart';
 
 class StretViewPreferences {
-
   StretViewPreferences(
     this.userId,
   );

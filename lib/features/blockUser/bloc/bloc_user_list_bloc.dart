@@ -12,14 +12,15 @@ part 'bloc_user_list_event.dart';
 part 'bloc_user_list_state.dart';
 
 class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
-
   BlocUserListBloc() : super(BlocUserListInitial()) {
     on<LoadBlockUserEvent>((event, emit) async {
       emit(BlockUserLoadingState());
       try {
         final List<BlockUserModel> blockList =
             await UserMessagingRepo.getBlockUserList(
-                event.currentUser, perPageData,);
+          event.currentUser,
+          perPageData,
+        );
         lastDocument = blockList.isNotEmpty ? blockList.last : null;
         emit(BlockUserLoadedState(blockList));
       } catch (e) {
@@ -31,7 +32,8 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
     on<LoadMoreBlockUserEvent>((event, emit) async {
       try {
         if (state is BlockUserLoadedState) {
-          final BlockUserLoadedState currentState = state as BlockUserLoadedState;
+          final BlockUserLoadedState currentState =
+              state as BlockUserLoadedState;
           final List<BlockUserModel> currentList = currentState.users;
           final List<BlockUserModel> moreBlockList =
               await UserMessagingRepo.loadMoreBlockUsers(
@@ -44,7 +46,10 @@ class BlocUserListBloc extends Bloc<BlocUserListEvent, BlocUserListState> {
             lastDocument = moreBlockList.last;
           }
 
-          final List<BlockUserModel> updatedList = [...currentList, ...moreBlockList];
+          final List<BlockUserModel> updatedList = [
+            ...currentList,
+            ...moreBlockList
+          ];
 
           emit(BlockUserLoadedState(updatedList));
         }

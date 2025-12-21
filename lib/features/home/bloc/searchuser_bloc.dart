@@ -39,7 +39,9 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
         log('🗺️ Loading nearby users within ${event.radiusMiles} miles');
 
         final List<UserModel> userList = await DiscoveryService.getNearbyUsers(
-            event.currentUser, event.radiusMiles,);
+          event.currentUser,
+          event.radiusMiles,
+        );
 
         emit(SearchUserLoadUserState(userList));
       } catch (e) {

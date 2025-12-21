@@ -53,7 +53,8 @@ class EnhancedNotificationServiceV2 {
 
       // Setup background message handler
       FirebaseMessaging.onBackgroundMessage(
-          _firebaseMessagingBackgroundHandler,);
+        _firebaseMessagingBackgroundHandler,
+      );
 
       debugPrint('✅ Enhanced notification service initialized');
     } catch (e) {
@@ -65,9 +66,7 @@ class EnhancedNotificationServiceV2 {
   Future<void> _initializeLocalNotifications() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings(
-      
-    );
+    const iosSettings = DarwinInitializationSettings();
 
     const initSettings = InitializationSettings(
       android: androidSettings,
@@ -124,9 +123,7 @@ class EnhancedNotificationServiceV2 {
   /// Request notification permissions
   Future<void> _requestPermissions() async {
     // Request FCM permissions
-    final settings = await _messaging.requestPermission(
-      
-    );
+    final settings = await _messaging.requestPermission();
 
     debugPrint('🔐 FCM Permission status: ${settings.authorizationStatus}');
 
@@ -332,7 +329,8 @@ class EnhancedNotificationServiceV2 {
     await PerformanceMonitor.measure('send_super_like_notification', () async {
       try {
         debugPrint(
-            '⭐ Sending super like notification: $fromUserName → $toUserId',);
+          '⭐ Sending super like notification: $fromUserName → $toUserId',
+        );
 
         // Check notification settings
         final settings = await _getNotificationSettings(toUserId);
@@ -390,7 +388,8 @@ class EnhancedNotificationServiceV2 {
     await PerformanceMonitor.measure('send_message_notification', () async {
       try {
         debugPrint(
-            '💬 Sending message notification: $fromUserName → $toUserId',);
+          '💬 Sending message notification: $fromUserName → $toUserId',
+        );
 
         // Check notification settings
         final settings = await _getNotificationSettings(toUserId);
@@ -452,7 +451,8 @@ class EnhancedNotificationServiceV2 {
     await PerformanceMonitor.measure('send_expiry_notification', () async {
       try {
         debugPrint(
-            '⏰ Sending match expiry notification: $otherUserName → $toUserId',);
+          '⏰ Sending match expiry notification: $otherUserName → $toUserId',
+        );
 
         // Check notification settings
         final settings = await _getNotificationSettings(toUserId);
@@ -554,7 +554,9 @@ class EnhancedNotificationServiceV2 {
 
   /// Update notification settings
   Future<void> updateNotificationSettings(
-      String userId, NotificationSettings settings,) async {
+    String userId,
+    NotificationSettings settings,
+  ) async {
     try {
       await _notificationSettingsCollection
           .doc(userId)
@@ -682,12 +684,17 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 /// Represents an app notification
 class AppNotification {
-
   const AppNotification({
     required this.id,
     required this.type,
     required this.toUserId,
-    required this.title, required this.body, required this.timestamp, required this.read, required this.priority, required this.data, this.fromUserId,
+    required this.title,
+    required this.body,
+    required this.timestamp,
+    required this.read,
+    required this.priority,
+    required this.data,
+    this.fromUserId,
     this.imageUrl,
   });
 
@@ -708,19 +715,20 @@ class AppNotification {
     );
   }
 
-  factory AppNotification.fromRemoteMessage(RemoteMessage message) => AppNotification(
-      id: message.messageId ?? '',
-      type: message.data['type'] ?? '',
-      toUserId: message.data['toUserId'] ?? '',
-      fromUserId: message.data['fromUserId'],
-      title: message.notification?.title ?? '',
-      body: message.notification?.body ?? '',
-      timestamp: DateTime.now(),
-      read: false,
-      priority: message.data['priority'] ?? 'default',
-      data: message.data,
-      imageUrl: message.notification?.android?.imageUrl,
-    );
+  factory AppNotification.fromRemoteMessage(RemoteMessage message) =>
+      AppNotification(
+        id: message.messageId ?? '',
+        type: message.data['type'] ?? '',
+        toUserId: message.data['toUserId'] ?? '',
+        fromUserId: message.data['fromUserId'],
+        title: message.notification?.title ?? '',
+        body: message.notification?.body ?? '',
+        timestamp: DateTime.now(),
+        read: false,
+        priority: message.data['priority'] ?? 'default',
+        data: message.data,
+        imageUrl: message.notification?.android?.imageUrl,
+      );
   final String id;
   final String type;
   final String toUserId;
@@ -739,7 +747,6 @@ class AppNotification {
 
 /// Notification settings for a user
 class NotificationSettings {
-
   const NotificationSettings({
     required this.matchNotifications,
     required this.superLikeNotifications,
@@ -752,15 +759,15 @@ class NotificationSettings {
   });
 
   factory NotificationSettings.defaultSettings() => const NotificationSettings(
-      matchNotifications: true,
-      superLikeNotifications: true,
-      messageNotifications: true,
-      expiryNotifications: true,
-      soundEnabled: true,
-      vibrationEnabled: true,
-      quietHoursStart: '22:00',
-      quietHoursEnd: '08:00',
-    );
+        matchNotifications: true,
+        superLikeNotifications: true,
+        messageNotifications: true,
+        expiryNotifications: true,
+        soundEnabled: true,
+        vibrationEnabled: true,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+      );
 
   factory NotificationSettings.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -785,25 +792,26 @@ class NotificationSettings {
   final String quietHoursEnd;
 
   Map<String, dynamic> toMap() => {
-      'matchNotifications': matchNotifications,
-      'superLikeNotifications': superLikeNotifications,
-      'messageNotifications': messageNotifications,
-      'expiryNotifications': expiryNotifications,
-      'soundEnabled': soundEnabled,
-      'vibrationEnabled': vibrationEnabled,
-      'quietHoursStart': quietHoursStart,
-      'quietHoursEnd': quietHoursEnd,
-    };
+        'matchNotifications': matchNotifications,
+        'superLikeNotifications': superLikeNotifications,
+        'messageNotifications': messageNotifications,
+        'expiryNotifications': expiryNotifications,
+        'soundEnabled': soundEnabled,
+        'vibrationEnabled': vibrationEnabled,
+        'quietHoursStart': quietHoursStart,
+        'quietHoursEnd': quietHoursEnd,
+      };
 }
 
 /// Notification event for real-time updates
 class NotificationEvent {
-
   const NotificationEvent._(this.type, this.notification);
 
-  factory NotificationEvent.received(AppNotification notification) => NotificationEvent._(NotificationEventType.received, notification);
+  factory NotificationEvent.received(AppNotification notification) =>
+      NotificationEvent._(NotificationEventType.received, notification);
 
-  factory NotificationEvent.tapped(AppNotification notification) => NotificationEvent._(NotificationEventType.tapped, notification);
+  factory NotificationEvent.tapped(AppNotification notification) =>
+      NotificationEvent._(NotificationEventType.tapped, notification);
   final NotificationEventType type;
   final AppNotification notification;
 

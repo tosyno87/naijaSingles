@@ -35,7 +35,6 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFF008037);
@@ -98,5 +97,4 @@ class _EnhancedBioScreenState extends State<EnhancedBioScreen> {
       ),
     );
   }
-
 }

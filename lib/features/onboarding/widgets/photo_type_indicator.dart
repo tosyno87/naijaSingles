@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../screens/enhanced_photo_upload_screen.dart';
 
 class PhotoTypeIndicator extends StatelessWidget {
-
   const PhotoTypeIndicator({
-    required this.type, super.key,
+    required this.type,
+    super.key,
   });
   final PhotoType type;
 
@@ -15,31 +15,31 @@ class PhotoTypeIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: _getTypeColor().withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            _getTypeIcon(),
-            size: 12,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 3),
-          Text(
-            _getTypeLabel(),
-            style: GoogleFonts.montserrat(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: _getTypeColor().withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _getTypeIcon(),
+              size: 12,
               color: Colors.white,
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(width: 3),
+            Text(
+              _getTypeLabel(),
+              style: GoogleFonts.montserrat(
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Color _getTypeColor() {
     switch (type) {

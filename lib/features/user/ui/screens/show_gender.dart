@@ -152,8 +152,10 @@ class _ShowGenderState extends State<ShowGender> {
                           userData.addAll({'showGender': selectedPreference});
                           log(userData.toString());
                           Navigator.pushNamed(
-                              context, RouteName.universityScreen,
-                              arguments: userData,);
+                            context,
+                            RouteName.universityScreen,
+                            arguments: userData,
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),

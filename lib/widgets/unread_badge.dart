@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// Widget for displaying unread message count badge
 class UnreadBadge extends StatelessWidget {
-
   const UnreadBadge({
-    required this.count, super.key,
+    required this.count,
+    super.key,
     this.size,
     this.backgroundColor,
     this.textColor,
@@ -54,9 +54,9 @@ class UnreadBadge extends StatelessWidget {
 
 /// Widget for displaying unread indicator dot
 class UnreadDot extends StatelessWidget {
-
   const UnreadDot({
-    required this.hasUnread, super.key,
+    required this.hasUnread,
+    super.key,
     this.size,
     this.color,
   });
@@ -91,7 +91,6 @@ class UnreadDot extends StatelessWidget {
 
 /// Widget for displaying unread indicator with optional badge
 class UnreadIndicator extends StatelessWidget {
-
   const UnreadIndicator({
     super.key,
     this.count,

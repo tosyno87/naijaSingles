@@ -14,7 +14,7 @@ import '../../common/utils/app_logger.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../debug/quick_analysis.dart';
 import '../../models/user_model.dart';
-import '../communities/ui/screens/communities_hub_screen.dart';
+import '../communities/ui/screens/discover_page_v2.dart';
 import '../explore/explore_screen.dart';
 import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
@@ -43,7 +43,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // CONNECT-FIRST NAVIGATION (Connect is the home page)
   final List<Widget> _pages = [
     const ExploreScreen(), // Tab 0: Connect (Dating/Friendship) - HOME PAGE
-    const CommunitiesHubScreen(), // Tab 1: Communities Hub (All community features)
+    const DiscoverPageV2(), // Tab 1: Discover (Events & Communities)
     const MessagesScreen(), // Tab 2: Messages
     const ProfileScreen(), // Tab 3: Profile
   ];

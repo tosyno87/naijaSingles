@@ -28,6 +28,7 @@ import 'features/user/controllers/onboarding_controller.dart';
 import 'firebase_options.dart';
 import 'services/enhanced_notification_service.dart';
 import 'services/secure_storage_service.dart';
+import 'services/crashlytics_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -81,6 +82,15 @@ Future<void> main() async {
       }
     }
 
+    // Initialize Crashlytics for crash reporting
+    try {
+      await CrashlyticsService().initialize();
+      log('📊 Crashlytics initialized successfully');
+    } catch (e) {
+      log('❌ Crashlytics initialization error: $e');
+      // Continue anyway - app should work without Crashlytics
+    }
+
     // Initialize Enhanced Notification Service
     await EnhancedNotificationService.initialize();
     log('🔔 Enhanced Notification Service initialized');
@@ -115,6 +125,13 @@ Future<void> main() async {
   FirebaseAuth.instance.authStateChanges().listen(
     (User? user) {
       log("👤 Auth state changed: ${user?.uid ?? 'No user'}");
+      
+      // Update Crashlytics user identifier
+      if (user != null) {
+        CrashlyticsService().setUserId(user.uid);
+      } else {
+        CrashlyticsService().clearUserId();
+      }
 
       // Seed events when user authenticates (seedEventsIfEmpty checks if events exist, so safe to call multiple times)
       if (user != null) {

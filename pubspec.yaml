@@ -44,6 +44,7 @@ dependencies:
   equatable: ^2.0.7              # Updated to latest
   firebase_auth: ^6.0.1          # Updated to latest
   firebase_core: ^4.0.0         # Updated to latest
+  firebase_crashlytics: ^5.0.1   # Crash reporting and analytics
   firebase_messaging: ^16.0.0    # Updated to latest
   firebase_storage: ^13.0.0      # Updated to latest
   flutter:

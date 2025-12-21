@@ -20,29 +20,9 @@ class DiscoverPageV2 extends StatefulWidget {
 }
 
 class _DiscoverPageV2State extends State<DiscoverPageV2> {
-
   // Hardcoded constants (can be replaced with Firestore data later)
   static const int eventsThisWeek = 3;
   static const int activeCommunities = 5;
-  bool _hasShownFabTooltip = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Show FAB tooltip on first launch (after first frame)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && !_hasShownFabTooltip) {
-        _showFabTooltip();
-        _hasShownFabTooltip = true;
-      }
-    });
-  }
-
-  void _showFabTooltip() {
-    // Show tooltip for FAB if it exists
-    // This is a placeholder - FAB can be added later if needed
-    // For now, we'll just set the flag to prevent showing it again
-  }
 
   @override
   Widget build(BuildContext context) {

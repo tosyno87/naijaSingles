@@ -1,10 +1,17 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_3d_icons.dart';
+import '../../../events/data/models/event_model.dart';
+import '../../../events/data/services/events_firestore_service.dart';
+import '../../../groups/screens/group_details_screen.dart';
 import '../../../groups/screens/unified_groups_screen.dart';
+import '../../../../services/unified_group_service.dart';
 
 /// DiscoverPageV2 - A comprehensive discover screen matching the wireframe
 /// Features:
@@ -23,6 +30,136 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   // Hardcoded constants (can be replaced with Firestore data later)
   static const int eventsThisWeek = 3;
   static const int activeCommunities = 5;
+
+  final EventsFirestoreService _eventsService = EventsFirestoreService();
+  final UnifiedGroupService _groupService = UnifiedGroupService();
+
+  List<_RecommendationItem> _recommendations = [];
+  bool _isLoadingRecommendations = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecommendations();
+  }
+
+  Future<void> _loadRecommendations() async {
+    setState(() => _isLoadingRecommendations = true);
+
+    try {
+      // Fetch upcoming events (limit 2 for recommendations)
+      final events = await _eventsService.fetchEvents(
+        limit: 2,
+        startDate: DateTime.now(),
+      );
+
+      // Fetch public groups (limit 2 for recommendations)
+      final groupsStream = _groupService.getPublicGroups();
+      final groupsSnapshot = await groupsStream.first;
+      final groups = groupsSnapshot.take(2).toList();
+
+      // Combine events and groups into recommendations
+      final recommendations = <_RecommendationItem>[];
+
+      // Add groups first (communities)
+      for (final group in groups) {
+        recommendations.add(
+          _RecommendationItem(
+            title: group.name,
+            type: RecommendationType.community,
+            group: group,
+          ),
+        );
+      }
+
+      // Add events
+      for (final event in events) {
+        // Format event title with date
+        String title = event.name;
+        final now = DateTime.now();
+        final eventDate = event.startDate;
+        final daysUntil = eventDate.difference(now).inDays;
+
+        if (daysUntil == 0) {
+          title = '$title – Today';
+        } else if (daysUntil == 1) {
+          title = '$title – Tomorrow';
+        } else if (daysUntil <= 7) {
+          title = '$title – This ${_getDayName(eventDate.weekday)}';
+        }
+
+        recommendations.add(
+          _RecommendationItem(
+            title: title,
+            type: RecommendationType.event,
+            event: event,
+          ),
+        );
+      }
+
+      // If we don't have enough recommendations, add placeholder items
+      while (recommendations.length < 4) {
+        if (recommendations.length % 2 == 0) {
+          recommendations.add(
+            _RecommendationItem(
+              title: 'More events coming soon',
+              type: RecommendationType.event,
+            ),
+          );
+        } else {
+          recommendations.add(
+            _RecommendationItem(
+              title: 'More communities coming soon',
+              type: RecommendationType.community,
+            ),
+          );
+        }
+      }
+
+      // Limit to 4 items
+      setState(() {
+        _recommendations = recommendations.take(4).toList();
+        _isLoadingRecommendations = false;
+      });
+    } catch (e) {
+      log('Error loading recommendations: $e');
+      // Fallback to placeholder items on error
+      setState(() {
+        _recommendations = [
+          _RecommendationItem(
+            title: 'Lagos Diaspora Professionals',
+            type: RecommendationType.community,
+          ),
+          _RecommendationItem(
+            title: 'Afro Tech Meetup – This Saturday',
+            type: RecommendationType.event,
+          ),
+          _RecommendationItem(
+            title: 'Singles Game Night (5 miles away)',
+            type: RecommendationType.event,
+          ),
+          _RecommendationItem(
+            title: 'New Community: Book Lovers 🇳🇬',
+            type: RecommendationType.community,
+          ),
+        ];
+        _isLoadingRecommendations = false;
+      });
+    }
+  }
+
+  String _getDayName(int weekday) {
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return days[weekday - 1];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,24 +366,59 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
   }
 
   Widget _buildRecommendedList(BuildContext context) {
-    final recommendations = [
-      _RecommendationItem(
-        title: 'Lagos Diaspora Professionals',
-        type: RecommendationType.community,
-      ),
-      _RecommendationItem(
-        title: 'Afro Tech Meetup – This Saturday',
-        type: RecommendationType.event,
-      ),
-      _RecommendationItem(
-        title: 'Singles Game Night (5 miles away)',
-        type: RecommendationType.event,
-      ),
-      _RecommendationItem(
-        title: 'New Community: Book Lovers 🇳🇬',
-        type: RecommendationType.community,
-      ),
-    ];
+    if (_isLoadingRecommendations) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(
+            color: Colors.grey.withOpacity(0.1),
+          ),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(
+            color: AppColors.primaryGreen,
+          ),
+        ),
+      );
+    }
+
+    if (_recommendations.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(
+            color: Colors.grey.withOpacity(0.1),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            'No recommendations available',
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -264,7 +436,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         ),
       ),
       child: Column(
-        children: recommendations.asMap().entries.map((entry) {
+        children: _recommendations.asMap().entries.map((entry) {
           final index = entry.key;
           final item = entry.value;
           return Column(
@@ -274,11 +446,11 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                 title: item.title,
                 type: item.type,
                 onTap: () {
-                  _showComingSoonSnackBar(context);
+                  _handleRecommendationTap(context, item);
                 },
               ),
               // Add divider between items (not after last item)
-              if (index < recommendations.length - 1)
+              if (index < _recommendations.length - 1)
                 Divider(
                   height: 1,
                   thickness: 1,
@@ -291,6 +463,42 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         }).toList(),
       ),
     );
+  }
+
+  void _handleRecommendationTap(BuildContext context, _RecommendationItem item) {
+    if (item.type == RecommendationType.event && item.event != null) {
+      // Navigate to event details
+      Navigator.pushNamed(
+        context,
+        RouteName.eventDetails,
+        arguments: item.event,
+      );
+    } else if (item.type == RecommendationType.community && item.group != null) {
+      // Navigate to group details
+      final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+      final isMember = item.group!.isMember(currentUserId);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupDetailsScreen(
+            group: item.group!,
+            isMember: isMember,
+          ),
+        ),
+      );
+    } else {
+      // Fallback: navigate to the respective list screen
+      if (item.type == RecommendationType.event) {
+        Navigator.pushNamed(context, RouteName.eventsScreen);
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const UnifiedGroupsScreen(),
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildListTile({
@@ -524,22 +732,6 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
     );
   }
 
-  void _showComingSoonSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Coming soon',
-          style: GoogleFonts.montserrat(color: Colors.white),
-        ),
-        backgroundColor: AppColors.primaryGreen,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 }
 
 /// Enum to distinguish between event and community recommendations
@@ -552,10 +744,14 @@ enum RecommendationType {
 class _RecommendationItem {
   final String title;
   final RecommendationType type;
+  final EventModel? event;
+  final UnifiedGroup? group;
 
   _RecommendationItem({
     required this.title,
     required this.type,
+    this.event,
+    this.group,
   });
 }
 

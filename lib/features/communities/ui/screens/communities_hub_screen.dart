@@ -29,25 +29,6 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
           backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.search_rounded,
-                color: AppColors.primaryGreen,
-                size: 28,
-              ),
-              onPressed: () {
-                // Navigate to UnifiedGroupsScreen which has full search functionality
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const UnifiedGroupsScreen(),
-                  ),
-                );
-              },
-              tooltip: 'Search Discover',
-            ),
-          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -55,8 +36,6 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildWelcomeSection(),
-                const SizedBox(height: 32),
                 _buildQuickActions(),
               ],
             ),
@@ -64,35 +43,11 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
         ),
       );
 
-  Widget _buildWelcomeSection() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Welcome to Discover! 🌍',
-            style: GoogleFonts.montserrat(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Explore events and communities around you',
-            style: GoogleFonts.montserrat(
-              fontSize: 16,
-              color: AppColors.textSecondary,
-              height: 1.4,
-            ),
-          ),
-        ],
-      );
-
   Widget _buildQuickActions() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Quick Actions',
+            'Explore Afropeep',
             style: GoogleFonts.montserrat(
               fontSize: 22,
               fontWeight: FontWeight.bold,

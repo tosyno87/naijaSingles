@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../data/models/event_model.dart';
 import '../../data/services/location_service.dart';
+import '../utils/location_formatter.dart';
 import 'rsvp_button.dart';
 
 class EventCard extends StatelessWidget {
@@ -225,9 +226,7 @@ class EventCard extends StatelessWidget {
           const SizedBox(height: 8),
           _buildDetailRow(
             icon: Icons.location_on,
-            text: event.location.displayAddress.isNotEmpty
-                ? event.location.displayAddress
-                : 'Location TBA',
+            text: _getLocationDisplayText(),
           ),
         ],
       );
@@ -360,6 +359,10 @@ class EventCard extends StatelessWidget {
 
     return 'Starts at $startTime';
   }
+
+  String _getLocationDisplayText() {
+    return LocationFormatter.formatLocation(event.location.displayAddress);
+  }
 }
 
 // Compact version for lists
@@ -371,6 +374,10 @@ class CompactEventCard extends StatelessWidget {
   });
   final EventModel event;
   final VoidCallback? onTap;
+
+  String _getLocationText() {
+    return LocationFormatter.formatLocation(event.location.displayAddress);
+  }
 
   @override
   Widget build(BuildContext context) => GestureDetector(
@@ -450,9 +457,7 @@ class CompactEventCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      event.location.displayAddress.isNotEmpty
-                          ? event.location.displayAddress
-                          : 'Location TBA',
+                      _getLocationText(),
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         color: const Color(0xFF999999),

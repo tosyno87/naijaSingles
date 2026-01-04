@@ -310,13 +310,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
             ],
             border: Border.all(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
             ),
           ),
           child: Column(
@@ -327,8 +327,8 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      color.withOpacity(0.1),
-                      color.withOpacity(0.05),
+                      color.withValues(alpha: 0.1),
+                      color.withValues(alpha: 0.05),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -374,13 +374,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
           ],
           border: Border.all(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
           ),
         ),
         child: const Center(
@@ -399,13 +399,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
           ],
           border: Border.all(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
           ),
         ),
         child: Center(
@@ -426,13 +426,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
         ],
         border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
+          color: Colors.grey.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -454,7 +454,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                 Divider(
                   height: 1,
                   thickness: 1,
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   indent: 16,
                   endIndent: 16,
                 ),
@@ -574,13 +574,13 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
             ],
             border: Border.all(
-              color: AppColors.primaryGreen.withOpacity(0.1),
+              color: AppColors.primaryGreen.withValues(alpha: 0.1),
             ),
           ),
           child: Column(
@@ -624,7 +624,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(
+                  const Icon(
                     Icons.arrow_forward_rounded,
                     size: 16,
                     color: AppColors.primaryGreen,
@@ -645,7 +645,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
           width: 6,
           height: 6,
           margin: const EdgeInsets.only(right: 12),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppColors.primaryGreen,
             shape: BoxShape.circle,
           ),
@@ -705,7 +705,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
             ),
           ),
           child: Row(
@@ -720,7 +720,7 @@ class _DiscoverPageV2State extends State<DiscoverPageV2> {
                   ),
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.chevron_right_rounded,
                 color: AppColors.textSecondary,
                 size: 24,

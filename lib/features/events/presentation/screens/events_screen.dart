@@ -201,10 +201,10 @@ class _EventsScreenState extends State<EventsScreen> {
           child: Container(
             height: 1,
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 2,
                   offset: const Offset(0, 1),
                 ),
@@ -324,7 +324,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),

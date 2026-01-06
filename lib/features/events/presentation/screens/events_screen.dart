@@ -11,6 +11,7 @@ import '../../data/services/events_firestore_service.dart';
 import '../../data/services/location_service.dart';
 import '../bloc/events_bloc.dart';
 import '../bloc/rsvp_bloc.dart';
+import '../widgets/advanced_search_dialog.dart';
 import '../widgets/event_card.dart';
 import '../widgets/events_loading_shimmer.dart';
 
@@ -478,14 +479,21 @@ class _EventsScreenState extends State<EventsScreen> {
   Widget _buildAdvancedFilterLink() => Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            // TODO: Implement advanced filter dialog
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Advanced filters coming soon!'),
-                backgroundColor: Color(0xFF008037),
+          onTap: () async {
+            final newFilter = await showDialog<EventFilter>(
+              context: context,
+              builder: (context) => AdvancedSearchDialog(
+                currentFilter: _currentFilter,
+                onFilterApplied: (filter) {
+                  _onFilterChanged(filter);
+                },
               ),
             );
+            // Note: The dialog handles filter application via onFilterApplied callback
+            // This return value is just for potential future use
+            if (newFilter != null) {
+              _onFilterChanged(newFilter);
+            }
           },
           borderRadius: BorderRadius.circular(8),
           child: Padding(
@@ -500,10 +508,10 @@ class _EventsScreenState extends State<EventsScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Advanced',
+                  'Advanced Filters',
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: const Color(0xFF008037),
                   ),
                 ),

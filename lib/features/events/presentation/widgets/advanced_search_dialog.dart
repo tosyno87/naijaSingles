@@ -86,7 +86,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -521,7 +521,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF008037).withOpacity(0.1)
+                ? const Color(0xFF008037).withValues(alpha: 0.1)
                 : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
@@ -532,7 +532,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

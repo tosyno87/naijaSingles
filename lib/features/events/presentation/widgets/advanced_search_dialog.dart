@@ -238,57 +238,63 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                   color: const Color(0xFF666666),
                 ),
               ),
-              DropdownButton<double>(
-                value: _radiusKm,
-                dropdownColor: Colors.white,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: const Color(0xFF333333),
-                ),
-                underline: Container(),
-                items: _radiusOptionsInCurrentUnit
-                    .map(
-                      (radius) => DropdownMenuItem(
-                        value: _useMiles
-                            ? _milesToKm(radius)
-                            : radius, // Store in km internally
-                        child: Text(
-                          '${radius.toStringAsFixed(radius.truncateToDouble() == radius ? 0 : 1)} ${_getRadiusUnit()}',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            color: const Color(0xFF333333),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _radiusKm = value;
-                  });
-                },
-              ),
-              const Spacer(),
-              // Lightweight current location button
-              TextButton.icon(
-                onPressed: _useCurrentLocation,
-                icon: const Icon(
-                  Icons.my_location,
-                  size: 16,
-                  color: Color(0xFF008037),
-                ),
-                label: Text(
-                  'Use current location',
+              Flexible(
+                child: DropdownButton<double>(
+                  value: _radiusKm,
+                  dropdownColor: Colors.white,
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF008037),
+                    color: const Color(0xFF333333),
                   ),
+                  underline: Container(),
+                  isExpanded: false,
+                  items: _radiusOptionsInCurrentUnit
+                      .map(
+                        (radius) => DropdownMenuItem(
+                          value: _useMiles
+                              ? _milesToKm(radius)
+                              : radius, // Store in km internally
+                          child: Text(
+                            '${radius.toStringAsFixed(radius.truncateToDouble() == radius ? 0 : 1)} ${_getRadiusUnit()}',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              color: const Color(0xFF333333),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _radiusKm = value;
+                    });
+                  },
                 ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  minimumSize: const Size(44, 44),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              const SizedBox(width: 8),
+              // Lightweight current location button
+              Flexible(
+                child: TextButton.icon(
+                  onPressed: _useCurrentLocation,
+                  icon: const Icon(
+                    Icons.my_location,
+                    size: 16,
+                    color: Color(0xFF008037),
+                  ),
+                  label: Text(
+                    'Use current location',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF008037),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    minimumSize: const Size(44, 44),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
                 ),
               ),
             ],

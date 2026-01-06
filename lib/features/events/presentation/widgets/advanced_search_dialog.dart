@@ -67,7 +67,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
     _startDate = _filter.startDate;
     _endDate = _filter.endDate;
     _selectedCategory = _filter.category;
-    _radiusKm = _filter.radiusKm;
+    _radiusKm = _filter.radiusKm ?? defaultRadiusKm; // Always have a default value
     
     // Initialize event type from filter
     if (_filter.freeOnly) {
@@ -188,7 +188,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               color: const Color(0xFF333333),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           // City/address input
           TextFormField(
             controller: _locationController,
@@ -228,76 +228,96 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
             ),
           ),
           const SizedBox(height: 12),
-          // Distance selector row
-          Row(
-            children: [
-              Text(
-                'Distance: ',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: const Color(0xFF666666),
-                ),
+          // Distance and location controls - visually grouped
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F8F8).withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFFE0E0E0).withValues(alpha: 0.5),
+                width: 1,
               ),
-              Flexible(
-                child: DropdownButton<double>(
-                  value: _radiusKm,
-                  dropdownColor: Colors.white,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: const Color(0xFF333333),
-                  ),
-                  underline: Container(),
-                  isExpanded: false,
-                  items: _radiusOptionsInCurrentUnit
-                      .map(
-                        (radius) => DropdownMenuItem(
-                          value: _useMiles
-                              ? _milesToKm(radius)
-                              : radius, // Store in km internally
-                          child: Text(
-                            '${radius.toStringAsFixed(radius.truncateToDouble() == radius ? 0 : 1)} ${_getRadiusUnit()}',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 14,
-                              color: const Color(0xFF333333),
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _radiusKm = value;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Lightweight current location button
-              Flexible(
-                child: TextButton.icon(
-                  onPressed: _useCurrentLocation,
-                  icon: const Icon(
-                    Icons.my_location,
-                    size: 16,
-                    color: Color(0xFF008037),
-                  ),
-                  label: Text(
-                    'Use current location',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF008037),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Distance selector with explicit value display
+                Row(
+                  children: [
+                    Text(
+                      'Distance: ',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: const Color(0xFF666666),
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    minimumSize: const Size(44, 44),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    DropdownButton<double>(
+                      value: _radiusKm ?? defaultRadiusKm, // Always show a value
+                      dropdownColor: Colors.white,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF333333),
+                      ),
+                      underline: Container(),
+                      isExpanded: false,
+                      items: _radiusOptionsInCurrentUnit
+                          .map(
+                            (radius) => DropdownMenuItem(
+                              value: _useMiles
+                                  ? _milesToKm(radius)
+                                  : radius, // Store in km internally
+                              child: Text(
+                                '${radius.toStringAsFixed(radius.truncateToDouble() == radius ? 0 : 1)} ${_getRadiusUnit()}',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  color: const Color(0xFF333333),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _radiusKm = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Current location button - full width, no truncation
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: _useCurrentLocation,
+                    icon: const Icon(
+                      Icons.my_location,
+                      size: 16,
+                      color: Color(0xFF008037),
+                    ),
+                    label: Text(
+                      'Use current location',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF008037),
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      minimumSize: const Size(44, 44),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      alignment: Alignment.centerLeft,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       );
@@ -313,7 +333,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               color: const Color(0xFF333333),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
@@ -327,7 +347,14 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                   },
                 ),
               ),
-              const SizedBox(width: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(
+                  Icons.arrow_forward,
+                  size: 18,
+                  color: const Color(0xFF999999).withValues(alpha: 0.6),
+                ),
+              ),
               Expanded(
                 child: _buildDateField(
                   label: 'End date',
@@ -440,7 +467,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               color: const Color(0xFF333333),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             value: _selectedCategory,
             decoration: InputDecoration(
@@ -502,7 +529,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
               color: const Color(0xFF333333),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(

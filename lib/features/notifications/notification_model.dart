@@ -133,8 +133,8 @@ class AppNotification {
 }
 
 /// Notification settings model
-class NotificationSettings {
-  NotificationSettings({
+class AppNotificationSettings {
+  AppNotificationSettings({
     required this.matchNotifications,
     required this.messageNotifications,
     required this.likeNotifications,
@@ -146,7 +146,7 @@ class NotificationSettings {
     required this.quietHoursEnd,
   });
 
-  factory NotificationSettings.defaultSettings() => NotificationSettings(
+  factory AppNotificationSettings.defaultSettings() => AppNotificationSettings(
         matchNotifications: true,
         messageNotifications: true,
         likeNotifications: true,
@@ -158,9 +158,9 @@ class NotificationSettings {
         quietHoursEnd: '08:00',
       );
 
-  factory NotificationSettings.fromFirestore(DocumentSnapshot doc) {
+  factory AppNotificationSettings.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return NotificationSettings(
+    return AppNotificationSettings(
       matchNotifications: data['matchNotifications'] ?? true,
       messageNotifications: data['messageNotifications'] ?? true,
       likeNotifications: data['likeNotifications'] ?? true,
@@ -195,7 +195,7 @@ class NotificationSettings {
         'quietHoursEnd': quietHoursEnd,
       };
 
-  NotificationSettings copyWith({
+  AppNotificationSettings copyWith({
     bool? matchNotifications,
     bool? messageNotifications,
     bool? likeNotifications,
@@ -206,7 +206,7 @@ class NotificationSettings {
     String? quietHoursStart,
     String? quietHoursEnd,
   }) =>
-      NotificationSettings(
+      AppNotificationSettings(
         matchNotifications: matchNotifications ?? this.matchNotifications,
         messageNotifications: messageNotifications ?? this.messageNotifications,
         likeNotifications: likeNotifications ?? this.likeNotifications,

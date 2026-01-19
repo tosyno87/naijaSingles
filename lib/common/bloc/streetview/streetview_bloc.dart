@@ -10,6 +10,7 @@ part 'streetview_state.dart';
 /// Replaces StreetViewProvider with BLoC pattern
 class StreetViewBloc extends Bloc<StreetViewEvent, StreetViewState> {
   StreetViewBloc(this.userId) : super(const StreetViewInitial()) {
+    _preferences = StretViewPreferences(userId);
     on<StreetViewInitialized>(_onStreetViewInitialized);
     on<StreetViewModeChanged>(_onStreetViewModeChanged);
 
@@ -18,7 +19,7 @@ class StreetViewBloc extends Bloc<StreetViewEvent, StreetViewState> {
   }
 
   final String userId;
-  final StretViewPreferences _preferences = StretViewPreferences(userId);
+  late final StretViewPreferences _preferences;
 
   Future<void> _onStreetViewInitialized(
     StreetViewInitialized event,

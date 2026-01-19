@@ -1,7 +1,5 @@
 part of 'language_bloc.dart';
 
-import 'package:flutter/material.dart';
-
 /// Base class for language events
 abstract class LanguageEvent extends Equatable {
   const LanguageEvent();

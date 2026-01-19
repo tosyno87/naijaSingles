@@ -1,8 +1,5 @@
 part of 'theme_bloc.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-
 /// Base class for theme states
 abstract class ThemeState extends Equatable {
   const ThemeState();

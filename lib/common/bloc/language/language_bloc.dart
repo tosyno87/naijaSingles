@@ -9,7 +9,7 @@ part 'language_state.dart';
 /// BLoC for managing app language/locale
 /// Replaces LanguageProvider with BLoC pattern
 class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
-  LanguageBloc() : super(const LanguageInitial(Locale('en', 'US'))) {
+  LanguageBloc() : super(LanguageInitial(const Locale('en', 'US'))) {
     on<LanguageLocaleChanged>(_onLanguageLocaleChanged);
   }
 

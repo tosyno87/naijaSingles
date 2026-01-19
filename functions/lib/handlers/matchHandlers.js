@@ -37,14 +37,14 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchHandlers = void 0;
-const functions = __importStar(require("firebase-functions"));
+const functions = __importStar(require("firebase-functions/v1"));
 const admin = __importStar(require("firebase-admin"));
 const userService_1 = require("../services/userService");
 const notificationService_1 = require("../services/notificationService");
 class MatchHandlers {
     constructor() {
         /**
-         * Handle match creation
+         * Handle match creation (Gen 1 - compatible with existing deployments)
          */
         this.onMatchCreated = functions.firestore
             .document('matches/{matchId}')

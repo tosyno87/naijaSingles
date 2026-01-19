@@ -8,8 +8,11 @@ COUNT=${1:-60}  # Default to 60 users if not specified
 
 FUNCTION_URL="https://us-central1-naijasingles-74a75.cloudfunctions.net/createTestUsers"
 
-# Get admin secret from environment or use default (development)
-# For production, set ADMIN_SECRET environment variable or Firebase Functions config
+# Get admin secret from .env.local file, environment variable, or default
+# Priority: .env.local > environment variable > default
+if [ -f .env.local ]; then
+  source .env.local
+fi
 ADMIN_SECRET="${ADMIN_SECRET:-dev-secret-change-in-production}"
 
 echo "🚀 Creating $COUNT test users via Cloud Function..."

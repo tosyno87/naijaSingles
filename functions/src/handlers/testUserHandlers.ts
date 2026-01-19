@@ -77,7 +77,11 @@ export class TestUserHandlers {
       try {
         // 1. Authentication check
         const authHeader = req.headers.authorization;
-        const adminSecret = process.env.ADMIN_SECRET || 'dev-secret-change-in-production';
+        // Read from Firebase Functions config (set via firebase functions:config:set)
+        // Falls back to environment variable, then default dev secret
+        const adminSecret = functions.config().admin?.secret || 
+                           process.env.ADMIN_SECRET || 
+                           'dev-secret-change-in-production';
         
         if (!authHeader || authHeader !== `Bearer ${adminSecret}`) {
           res.status(401).json({

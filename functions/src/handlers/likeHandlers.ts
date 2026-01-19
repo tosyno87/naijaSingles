@@ -2,7 +2,7 @@
  * Like-related Cloud Function handlers
  */
 
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 import {UserService} from '../services/userService';
 import {NotificationService} from '../services/notificationService';
@@ -18,11 +18,11 @@ export class LikeHandlers {
   }
 
   /**
-   * Handle super like creation
+   * Handle super like creation (Gen 1 - compatible with existing deployments)
    */
   onSuperLikeCreated = functions.firestore
     .document('superLikes/{superLikeId}')
-    .onCreate(async (snap, context) => {
+    .onCreate(async (snap: admin.firestore.QueryDocumentSnapshot, context: functions.EventContext) => {
       const superLikeData = snap.data() as SuperLike;
       const superLikeId = context.params.superLikeId;
       
@@ -66,11 +66,11 @@ export class LikeHandlers {
     });
 
   /**
-   * Handle like creation
+   * Handle like creation (Gen 1 - compatible with existing deployments)
    */
   onLikeCreated = functions.firestore
     .document('users/{userId}/LikedBy/{likeId}')
-    .onCreate(async (snap, context) => {
+    .onCreate(async (snap: admin.firestore.QueryDocumentSnapshot, context: functions.EventContext) => {
       const likeData = snap.data() as Like;
       const likedUserId = context.params.userId;
       const likeId = context.params.likeId;

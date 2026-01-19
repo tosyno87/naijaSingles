@@ -13,9 +13,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import 'common/bloc/language/language_bloc.dart';
+import 'common/bloc/streetview/streetview_bloc.dart';
+import 'common/bloc/theme/theme_bloc.dart';
 import 'common/bloc/user/user_bloc.dart';
 import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
+import 'common/providers/language_provide.dart';
+import 'common/providers/street_view_provider.dart';
 import 'common/providers/theme_provider.dart';
 import 'common/providers/user_provider.dart';
 import 'common/routes/route_name.dart';
@@ -234,15 +239,21 @@ Future<void> main() async {
                 phoneAuthRepository: PhoneAuthRepository(),
               ),
             ),
-            // UserBloc - replacing UserProvider (Phase 2 migration)
+            // Phase 2: BLoC providers replacing ChangeNotifier providers
             BlocProvider<UserBloc>(
               create: (context) => UserBloc(),
+            ),
+            BlocProvider<ThemeBloc>(
+              create: (context) => ThemeBloc(),
+            ),
+            BlocProvider<LanguageBloc>(
+              create: (context) => LanguageBloc(),
             ),
           ],
           child: MultiProvider(
             providers: [
+              // Keep Provider instances during migration (will be removed in Phase 2)
               ChangeNotifierProvider(create: (_) => ThemeProvider()),
-              // Keep UserProvider during migration (will be removed in Phase 2)
               ChangeNotifierProvider(create: (_) => UserProvider()),
               ChangeNotifierProvider(create: (_) => OnboardingController()),
             ],

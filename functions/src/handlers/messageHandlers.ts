@@ -2,7 +2,7 @@
  * Message-related Cloud Function handlers
  */
 
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 import {UserService} from '../services/userService';
 import {NotificationService} from '../services/notificationService';
@@ -18,11 +18,11 @@ export class MessageHandlers {
   }
 
   /**
-   * Handle message creation
+   * Handle message creation (Gen 1 - compatible with existing deployments)
    */
   onMessageSent = functions.firestore
     .document('chatThreads/{threadId}/messages/{messageId}')
-    .onCreate(async (snap, context) => {
+    .onCreate(async (snap: admin.firestore.QueryDocumentSnapshot, context: functions.EventContext) => {
       const messageData = snap.data() as Message;
       const threadId = context.params.threadId;
       const messageId = context.params.messageId;

@@ -37,14 +37,14 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageHandlers = void 0;
-const functions = __importStar(require("firebase-functions"));
+const functions = __importStar(require("firebase-functions/v1"));
 const admin = __importStar(require("firebase-admin"));
 const userService_1 = require("../services/userService");
 const notificationService_1 = require("../services/notificationService");
 class MessageHandlers {
     constructor() {
         /**
-         * Handle message creation
+         * Handle message creation (Gen 1 - compatible with existing deployments)
          */
         this.onMessageSent = functions.firestore
             .document('chatThreads/{threadId}/messages/{messageId}')

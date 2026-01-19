@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../models/user_model.dart';
 
-import '../../../services/discovery_service.dart';
+import '../../../features/discovery/data/services/discovery_service.dart';
 
 part 'searchuser_event.dart';
 part 'searchuser_state.dart';

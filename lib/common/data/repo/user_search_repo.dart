@@ -6,7 +6,7 @@ import '../../../models/user_model.dart';
 import '../../../services/cached_user_service.dart';
 import '../../../features/match/data/services/match_service.dart';
 import '../../../services/paginated_user_service.dart';
-import '../../../services/unified_discovery_service.dart';
+import '../../../features/discovery/data/services/discovery_service.dart';
 import '../../constants/constants.dart';
 import '../../utils/distance.dart' as distance;
 
@@ -229,11 +229,10 @@ class UserSearchRepo {
         debugPrint('🎯 Filtering by intent: $intentFilter');
       }
 
-      // Use unified discovery service for better performance and consistency
-      final users = await UnifiedDiscoveryService.getUsersForDiscovery(
+      // Use consolidated discovery service for better performance and consistency
+      final users = await DiscoveryService.getUsersForDiscovery(
         currentUser,
         intentFilter: intentFilter,
-        forceRefresh: forceRefresh,
       );
 
       debugPrint('✅ Retrieved ${users.length} users from unified service');

@@ -27,7 +27,7 @@ class NotificationService {
 
   // Instance-based API (for IndustryNotificationService compatibility)
   String? _currentUserId;
-  NotificationSettings? _settings;
+  AppNotificationSettings? _settings;
   StreamSubscription<QuerySnapshot>? _notificationsSubscription;
   final StreamController<List<AppNotification>> _notificationsController =
       StreamController<List<AppNotification>>.broadcast();
@@ -562,14 +562,14 @@ class NotificationService {
           .get();
 
       if (doc.exists) {
-        _settings = NotificationSettings.fromFirestore(doc);
+        _settings = AppNotificationSettings.fromFirestore(doc);
       } else {
-        _settings = NotificationSettings.defaultSettings();
+        _settings = AppNotificationSettings.defaultSettings();
         await _saveUserSettings();
       }
     } catch (e) {
       debugPrint('Error loading notification settings: $e');
-      _settings = NotificationSettings.defaultSettings();
+      _settings = AppNotificationSettings.defaultSettings();
     }
   }
 
@@ -588,7 +588,7 @@ class NotificationService {
   }
 
   /// Update notification settings - Instance API
-  Future<void> updateSettings(NotificationSettings settings) async {
+  Future<void> updateSettings(AppNotificationSettings settings) async {
     _settings = settings;
     await _saveUserSettings();
   }

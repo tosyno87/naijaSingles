@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import 'common/bloc/user/user_bloc.dart';
 import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/providers/theme_provider.dart';
@@ -233,10 +234,15 @@ Future<void> main() async {
                 phoneAuthRepository: PhoneAuthRepository(),
               ),
             ),
+            // UserBloc - replacing UserProvider (Phase 2 migration)
+            BlocProvider<UserBloc>(
+              create: (context) => UserBloc(),
+            ),
           ],
           child: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              // Keep UserProvider during migration (will be removed in Phase 2)
               ChangeNotifierProvider(create: (_) => UserProvider()),
               ChangeNotifierProvider(create: (_) => OnboardingController()),
             ],

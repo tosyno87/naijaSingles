@@ -8,9 +8,11 @@ abstract class LanguageState extends Equatable {
 
   @override
   List<Object?> get props => [locale];
+}
 
 /// Initial state - default locale
 class LanguageInitial extends LanguageState {
+  @override
   final Locale locale;
 
   const LanguageInitial(this.locale);
@@ -21,6 +23,7 @@ class LanguageInitial extends LanguageState {
 
 /// Locale changed
 class LanguageChanged extends LanguageState {
+  @override
   final Locale locale;
 
   const LanguageChanged(this.locale);

@@ -26,7 +26,7 @@ import 'features/events/data/services/seed_events_service.dart';
 import 'features/user/controllers/onboarding_controller.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
-import 'services/enhanced_notification_service.dart';
+import 'features/notifications/data/services/notification_service.dart';
 import 'services/secure_storage_service.dart';
 import 'services/crashlytics_service.dart';
 
@@ -91,9 +91,9 @@ Future<void> main() async {
       // Continue anyway - app should work without Crashlytics
     }
 
-    // Initialize Enhanced Notification Service
-    await EnhancedNotificationService.initialize();
-    log('🔔 Enhanced Notification Service initialized');
+    // Initialize Notification Service
+    await NotificationService.initialize();
+    log('🔔 Notification Service initialized');
 
     // Initialize seed events if database is empty (only if user is authenticated)
     // Events seeding requires authentication per Firestore security rules
@@ -258,7 +258,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set navigator key for notification service
-    EnhancedNotificationService.setNavigatorKey(navigatorKey);
+    NotificationService.setNavigatorKey(navigatorKey);
 
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) => MaterialApp(

@@ -131,3 +131,91 @@ class AppNotification {
         actionId: actionId ?? this.actionId,
       );
 }
+
+/// Notification settings model
+class NotificationSettings {
+  NotificationSettings({
+    required this.matchNotifications,
+    required this.messageNotifications,
+    required this.likeNotifications,
+    required this.superLikeNotifications,
+    required this.soundEnabled,
+    required this.vibrationEnabled,
+    required this.quietHoursEnabled,
+    required this.quietHoursStart,
+    required this.quietHoursEnd,
+  });
+
+  factory NotificationSettings.defaultSettings() => NotificationSettings(
+        matchNotifications: true,
+        messageNotifications: true,
+        likeNotifications: true,
+        superLikeNotifications: true,
+        soundEnabled: true,
+        vibrationEnabled: true,
+        quietHoursEnabled: false,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+      );
+
+  factory NotificationSettings.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return NotificationSettings(
+      matchNotifications: data['matchNotifications'] ?? true,
+      messageNotifications: data['messageNotifications'] ?? true,
+      likeNotifications: data['likeNotifications'] ?? true,
+      superLikeNotifications: data['superLikeNotifications'] ?? true,
+      soundEnabled: data['soundEnabled'] ?? true,
+      vibrationEnabled: data['vibrationEnabled'] ?? true,
+      quietHoursEnabled: data['quietHoursEnabled'] ?? false,
+      quietHoursStart: data['quietHoursStart'] ?? '22:00',
+      quietHoursEnd: data['quietHoursEnd'] ?? '08:00',
+    );
+  }
+
+  final bool matchNotifications;
+  final bool messageNotifications;
+  final bool likeNotifications;
+  final bool superLikeNotifications;
+  final bool soundEnabled;
+  final bool vibrationEnabled;
+  final bool quietHoursEnabled;
+  final String quietHoursStart;
+  final String quietHoursEnd;
+
+  Map<String, dynamic> toFirestore() => {
+        'matchNotifications': matchNotifications,
+        'messageNotifications': messageNotifications,
+        'likeNotifications': likeNotifications,
+        'superLikeNotifications': superLikeNotifications,
+        'soundEnabled': soundEnabled,
+        'vibrationEnabled': vibrationEnabled,
+        'quietHoursEnabled': quietHoursEnabled,
+        'quietHoursStart': quietHoursStart,
+        'quietHoursEnd': quietHoursEnd,
+      };
+
+  NotificationSettings copyWith({
+    bool? matchNotifications,
+    bool? messageNotifications,
+    bool? likeNotifications,
+    bool? superLikeNotifications,
+    bool? soundEnabled,
+    bool? vibrationEnabled,
+    bool? quietHoursEnabled,
+    String? quietHoursStart,
+    String? quietHoursEnd,
+  }) =>
+      NotificationSettings(
+        matchNotifications: matchNotifications ?? this.matchNotifications,
+        messageNotifications: messageNotifications ?? this.messageNotifications,
+        likeNotifications: likeNotifications ?? this.likeNotifications,
+        superLikeNotifications:
+            superLikeNotifications ?? this.superLikeNotifications,
+        soundEnabled: soundEnabled ?? this.soundEnabled,
+        vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+        quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
+        quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+        quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+      );
+}

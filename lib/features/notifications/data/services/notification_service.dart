@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,10 +6,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import '../features/notifications/notification_model.dart';
+import '../../notification_model.dart';
 
-/// Enhanced notification service with real-time capabilities
-class EnhancedNotificationService {
+/// Consolidated notification service with real-time capabilities
+/// Replaces EnhancedNotificationService, EnhancedNotificationServiceV2, and IndustryNotificationService
+class NotificationService {
+  // Singleton instance for instance-based API
+  factory NotificationService() => _instance;
+  NotificationService._internal();
+  static final NotificationService _instance = NotificationService._internal();
+
+  // Static instances (for static API compatibility)
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FlutterLocalNotificationsPlugin _localNotifications =
@@ -17,16 +25,25 @@ class EnhancedNotificationService {
   static bool _initialized = false;
   static GlobalKey<NavigatorState>? _navigatorKey;
 
+  // Instance-based API (for IndustryNotificationService compatibility)
+  String? _currentUserId;
+  NotificationSettings? _settings;
+  StreamSubscription<QuerySnapshot>? _notificationsSubscription;
+  final StreamController<List<AppNotification>> _notificationsController =
+      StreamController<List<AppNotification>>.broadcast();
+  final StreamController<int> _unreadCountController =
+      StreamController<int>.broadcast();
+
   /// Set navigator key for navigation
   static void setNavigatorKey(GlobalKey<NavigatorState> navigatorKey) {
     _navigatorKey = navigatorKey;
   }
 
-  /// Initialize the enhanced notification service
+  /// Initialize the notification service - Static API
   static Future<void> initialize() async {
     if (_initialized) return;
 
-    debugPrint('🔔 Initializing Enhanced Notification Service...');
+    debugPrint('🔔 Initializing Notification Service...');
 
     try {
       // Initialize local notifications
@@ -41,8 +58,27 @@ class EnhancedNotificationService {
       // Setup message handlers
       _setupMessageHandlers();
 
+      // Initialize instance-based API
+      _instance._currentUserId = FirebaseAuth.instance.currentUser?.uid;
+      if (_instance._currentUserId != null) {
+        await _instance._loadUserSettings();
+        _instance._startNotificationListener();
+      }
+
+      // Listen for auth changes
+      FirebaseAuth.instance.authStateChanges().listen((user) {
+        _instance._currentUserId = user?.uid;
+        if (_instance._currentUserId != null) {
+          _instance._startNotificationListener();
+        } else {
+          _instance._notificationsSubscription?.cancel();
+          _instance._notificationsController.add([]);
+          _instance._unreadCountController.add(0);
+        }
+      });
+
       _initialized = true;
-      debugPrint('✅ Enhanced Notification Service initialized successfully');
+      debugPrint('✅ Notification Service initialized successfully');
     } catch (e) {
       debugPrint('❌ Error initializing notification service: $e');
     }
@@ -383,7 +419,7 @@ class EnhancedNotificationService {
     }
   }
 
-  /// Get user's notifications from Firestore (real-time)
+  /// Get user's notifications from Firestore (real-time) - Static API
   static Stream<List<AppNotification>> getUserNotifications(String userId) =>
       _firestore
           .collection('users')
@@ -397,7 +433,7 @@ class EnhancedNotificationService {
                 snapshot.docs.map(AppNotification.fromFirestore).toList(),
           );
 
-  /// Get unread notification count (real-time)
+  /// Get unread notification count (real-time) - Static API
   static Stream<int> getUnreadCount(String userId) => _firestore
       .collection('users')
       .doc(userId)
@@ -406,7 +442,35 @@ class EnhancedNotificationService {
       .snapshots()
       .map((snapshot) => snapshot.docs.length);
 
-  /// Mark notification as read
+  /// Start listening to notifications (instance-based API)
+  void _startNotificationListener() {
+    if (_currentUserId == null) return;
+
+    _notificationsSubscription?.cancel();
+    _notificationsSubscription = _firestore
+        .collection('notifications')
+        .where('userId', isEqualTo: _currentUserId)
+        .orderBy('timestamp', descending: true)
+        .limit(50)
+        .snapshots()
+        .listen((snapshot) {
+      final notifications =
+          snapshot.docs.map(AppNotification.fromFirestore).toList();
+      _notificationsController.add(notifications);
+
+      final unreadCount = notifications.where((n) => !n.isRead).length;
+      _unreadCountController.add(unreadCount);
+    });
+  }
+
+  /// Stream of notifications (instance-based API)
+  Stream<List<AppNotification>> get notificationsStream =>
+      _notificationsController.stream;
+
+  /// Stream of unread count (instance-based API)
+  Stream<int> get unreadCountStream => _unreadCountController.stream;
+
+  /// Mark notification as read - Static API
   static Future<void> markNotificationAsRead(
     String userId,
     String notificationId,
@@ -423,7 +487,19 @@ class EnhancedNotificationService {
     }
   }
 
-  /// Mark all notifications as read
+  /// Mark notification as read - Instance API
+  Future<void> markAsRead(String notificationId) async {
+    try {
+      await _firestore
+          .collection('notifications')
+          .doc(notificationId)
+          .update({'isRead': true});
+    } catch (e) {
+      debugPrint('❌ Error marking notification as read: $e');
+    }
+  }
+
+  /// Mark all notifications as read - Static API
   static Future<void> markAllNotificationsAsRead(String userId) async {
     try {
       final batch = _firestore.batch();
@@ -442,6 +518,79 @@ class EnhancedNotificationService {
     } catch (e) {
       debugPrint('❌ Error marking all notifications as read: $e');
     }
+  }
+
+  /// Mark all notifications as read - Instance API
+  Future<void> markAllAsRead() async {
+    if (_currentUserId == null) return;
+
+    try {
+      final batch = _firestore.batch();
+      final query = await _firestore
+          .collection('notifications')
+          .where('userId', isEqualTo: _currentUserId)
+          .where('isRead', isEqualTo: false)
+          .get();
+
+      for (final doc in query.docs) {
+        batch.update(doc.reference, {'isRead': true});
+      }
+
+      await batch.commit();
+    } catch (e) {
+      debugPrint('❌ Error marking all notifications as read: $e');
+    }
+  }
+
+  /// Delete notification - Instance API
+  Future<void> deleteNotification(String notificationId) async {
+    try {
+      await _firestore.collection('notifications').doc(notificationId).delete();
+    } catch (e) {
+      debugPrint('❌ Error deleting notification: $e');
+    }
+  }
+
+  /// Load user notification settings
+  Future<void> _loadUserSettings() async {
+    if (_currentUserId == null) return;
+
+    try {
+      final doc = await _firestore
+          .collection('notification_settings')
+          .doc(_currentUserId)
+          .get();
+
+      if (doc.exists) {
+        _settings = NotificationSettings.fromFirestore(doc);
+      } else {
+        _settings = NotificationSettings.defaultSettings();
+        await _saveUserSettings();
+      }
+    } catch (e) {
+      debugPrint('Error loading notification settings: $e');
+      _settings = NotificationSettings.defaultSettings();
+    }
+  }
+
+  /// Save user notification settings
+  Future<void> _saveUserSettings() async {
+    if (_currentUserId == null || _settings == null) return;
+
+    try {
+      await _firestore
+          .collection('notification_settings')
+          .doc(_currentUserId)
+          .set(_settings!.toFirestore());
+    } catch (e) {
+      debugPrint('Error saving notification settings: $e');
+    }
+  }
+
+  /// Update notification settings - Instance API
+  Future<void> updateSettings(NotificationSettings settings) async {
+    _settings = settings;
+    await _saveUserSettings();
   }
 
   /// Test notification (for debugging)

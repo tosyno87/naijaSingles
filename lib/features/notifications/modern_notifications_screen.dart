@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/constants/app_colors.dart';
-import '../../services/industry_notification_service.dart';
+import '../../features/notifications/data/services/notification_service.dart';
 
 /// Modern notifications screen following industry standards
 /// Features:
@@ -24,8 +24,7 @@ class ModernNotificationsScreen extends StatefulWidget {
 
 class _ModernNotificationsScreenState extends State<ModernNotificationsScreen>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService =
-      IndustryNotificationService();
+  final NotificationService _notificationService = NotificationService();
 
   List<AppNotification> _notifications = [];
   int _unreadCount = 0;

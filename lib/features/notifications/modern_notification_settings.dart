@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../common/constants/app_colors.dart';
-import '../../services/industry_notification_service.dart';
+import '../../features/notifications/data/services/notification_service.dart';
 
 /// Modern notification settings screen with industry-standard features
 /// Features:
@@ -23,8 +23,7 @@ class ModernNotificationSettings extends StatefulWidget {
 
 class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService =
-      IndustryNotificationService();
+  final NotificationService _notificationService = NotificationService();
 
   NotificationSettings? _settings;
   bool _isLoading = true;

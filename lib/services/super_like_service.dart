@@ -24,8 +24,6 @@ class SuperLikeService {
   CollectionReference get _superLikesCollection =>
       _firestore.collection('superLikes');
   CollectionReference get _likesCollection => _firestore.collection('likes');
-  CollectionReference get _matchesCollection =>
-      _firestore.collection('matches');
 
   /// Send a super like to another user
   Future<SuperLikeResult> sendSuperLike({

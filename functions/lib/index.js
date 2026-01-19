@@ -39,17 +39,19 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.healthCheck = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
+exports.healthCheck = exports.createTestUsers = exports.onLikeCreated = exports.onSuperLikeCreated = exports.onMessageSent = exports.onMatchCreated = void 0;
 const admin = __importStar(require("firebase-admin"));
 const matchHandlers_1 = require("./handlers/matchHandlers");
 const messageHandlers_1 = require("./handlers/messageHandlers");
 const likeHandlers_1 = require("./handlers/likeHandlers");
+const testUserHandlers_1 = require("./handlers/testUserHandlers");
 // Initialize Firebase Admin SDK
 admin.initializeApp();
 // Initialize handlers
 const matchHandlers = new matchHandlers_1.MatchHandlers();
 const messageHandlers = new messageHandlers_1.MessageHandlers();
 const likeHandlers = new likeHandlers_1.LikeHandlers();
+const testUserHandlers = new testUserHandlers_1.TestUserHandlers();
 // Export all Cloud Functions
 // Match-related functions
 exports.onMatchCreated = matchHandlers.onMatchCreated;
@@ -58,6 +60,8 @@ exports.onMessageSent = messageHandlers.onMessageSent;
 // Like-related functions
 exports.onSuperLikeCreated = likeHandlers.onSuperLikeCreated;
 exports.onLikeCreated = likeHandlers.onLikeCreated;
+// Test user creation function (development/testing)
+exports.createTestUsers = testUserHandlers.createTestUsers;
 // Health check function
 const healthCheck = async (req, res) => {
     res.status(200).json({

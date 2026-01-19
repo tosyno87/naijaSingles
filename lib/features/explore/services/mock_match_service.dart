@@ -1,4 +1,4 @@
-import 'match_service.dart';
+import 'match_service.dart'; // This is explore's MatchService, not the main one
 
 /// A mock implementation of MatchService for testing purposes
 class MockMatchService extends MatchService {

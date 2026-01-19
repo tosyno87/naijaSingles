@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../models/user_model.dart';
 import '../../../services/cached_user_service.dart';
-import '../../../services/optimized_match_service.dart';
+import '../../../features/match/data/services/match_service.dart';
 import '../../../services/paginated_user_service.dart';
 import '../../../services/unified_discovery_service.dart';
 import '../../constants/constants.dart';
@@ -18,8 +18,7 @@ class UserSearchRepo {
   // static final LikesService _likesService = LikesService(); // Removed - using unified service
 
   // New optimized services
-  static final OptimizedMatchService _optimizedMatchService =
-      OptimizedMatchService();
+  static final MatchService _matchService = MatchService();
   static final CachedUserService _cachedUserService = CachedUserService();
   // static final PaginatedUserService _paginatedUserService = PaginatedUserService(); // Removed - using unified service
 
@@ -89,22 +88,14 @@ class UserSearchRepo {
       final selectedUserId = selectedUser.id;
 
       if (currentUserId != null && selectedUserId != null) {
-        final result = await _optimizedMatchService.handleLike(
-          currentUserId,
-          selectedUserId,
-        );
+        // Use MatchService which internally uses optimized LikesService
+        final matchId = await _matchService.handleLike(selectedUserId);
 
-        if (result.isSuccess) {
-          if (result.isMatch) {
-            debugPrint('🎉 Match created! Match ID: ${result.matchId}');
-            return result.matchId;
-          } else {
-            debugPrint('💌 Like saved, waiting for mutual like');
-          }
+        if (matchId != null) {
+          debugPrint('🎉 Match created! Match ID: $matchId');
+          return matchId;
         } else {
-          debugPrint('❌ Error in optimized match service: ${result.error}');
-          // Fall back to legacy system
-          return await _legacyRightSwipe(currentUser, selectedUser);
+          debugPrint('💌 Like saved, waiting for mutual like');
         }
       }
 

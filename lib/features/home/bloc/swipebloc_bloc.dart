@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../models/user_model.dart';
-import '../../match/services/match_service.dart';
+import '../../match/data/services/match_service.dart';
 
 part 'swipebloc_event.dart';
 part 'swipebloc_state.dart';

@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/facebooklogin_repo.dart';
@@ -296,12 +298,17 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
         'Account deleted successfully'.tr().toString(),
         context,
       );
+      // Capture bloc/provider before navigation (context may be unmounted after)
+      final userBloc = context.read<UserBloc>();
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
       Navigator.pushNamedAndRemoveUntil(
         context,
         RouteName.welcomeScreen,
         (route) => false,
       ).then((value) {
-        Provider.of<UserProvider>(context, listen: false).currentUser = null;
+        userBloc.add(const UserDataUpdated(null));
+        userBloc.add(const UserListenStopped());
+        userProvider.currentUser = null;
       });
     }
   }

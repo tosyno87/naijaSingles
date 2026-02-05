@@ -4,8 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/providers/user_provider.dart';
@@ -97,6 +99,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     developer.log('✅ User is authenticated: ${currentUser.uid}');
 
+    // Use UserBloc instead of UserProvider (Phase 2 migration)
+    final userBloc = context.read<UserBloc>();
+    // Keep Provider for backward compatibility during migration
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // Set a maximum timeout to prevent infinite loading
@@ -114,10 +119,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     while (DateTime.now().difference(startTime) < maxWaitTime) {
       if (!mounted) return;
 
-      // Check if user data is loaded
-      if (userProvider.currentUser != null &&
-          userProvider.currentUser?.name != null &&
-          userProvider.currentUser!.name!.isNotEmpty) {
+      // Check if user data is loaded (use BLoC)
+      final currentUserFromBloc = userBloc.currentUser;
+      if (currentUserFromBloc != null &&
+          currentUserFromBloc.name != null &&
+          currentUserFromBloc.name!.isNotEmpty) {
         developer.log('✅ User data loaded, showing main navigation');
         if (mounted) {
           setState(() {
@@ -151,8 +157,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               data['name'] != null &&
               data['name'].toString().isNotEmpty) {
             developer.log(
-                '✅ User data found in Firestore, updating UserProvider...');
+                '✅ User data found in Firestore, updating UserBloc...');
             final userModel = UserModel.fromDocument(doc);
+            // Update UserBloc (BLoC will automatically update via Firestore listener)
+            // Also update Provider for backward compatibility
             userProvider.currentUser = userModel;
 
             if (mounted) {
@@ -192,12 +200,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Use UserBloc instead of UserProvider (Phase 2 migration)
+    final userBloc = context.watch<UserBloc>();
+    final currentUser = userBloc.currentUser;
+    
+    // Keep Provider for backward compatibility during migration
     final userProvider = Provider.of<UserProvider>(context);
 
     // Show loading screen while checking registration - prevent any content flash
     if (!_hasCheckedRegistration ||
-        userProvider.currentUser == null ||
-        userProvider.currentUser?.name == null ||
+        currentUser == null ||
+        currentUser.name == null ||
         (userProvider.currentUser?.name?.isEmpty ?? false)) {
       // If we haven't checked yet or user doesn't exist, show loading
       // This prevents the wrong screen from appearing

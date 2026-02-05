@@ -4,8 +4,10 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/providers/theme_provider.dart';
@@ -128,7 +130,8 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
     showCupertinoModalPopup(
       context: context,
       builder: (ctx) {
-        final themeProvider = Provider.of<ThemeProvider>(context);
+        final themeBloc = context.read<ThemeBloc>();
+        final isDarkMode = themeBloc.isDarkMode;
         return Container(
           color: Theme.of(context).primaryColor,
           width: MediaQuery.of(context).size.width,
@@ -152,7 +155,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                   trailing: IconButton(
                     icon: Icon(
                       Icons.cancel,
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : Colors.black26,
                     ),
@@ -164,7 +167,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                       child: Text(
                         address['address'] ?? '',
                         style: TextStyle(
-                          color: themeProvider.isDarkMode
+                          color: isDarkMode
                               ? Colors.white
                               : Colors.black,
                           fontSize: 16,
@@ -229,7 +232,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         decoration: TextDecoration.none,
-                                        color: themeProvider.isDarkMode
+                                        color: isDarkMode
                                             ? Colors.black
                                             : Colors.black,
                                         fontSize: 20,

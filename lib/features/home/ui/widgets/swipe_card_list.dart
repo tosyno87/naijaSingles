@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/constants/colors.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/controllers/home_controller.dart';
@@ -31,7 +32,8 @@ class SwipeCardList extends StatefulWidget {
 class _SwipeCardListState extends State<SwipeCardList> {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeBloc = context.watch<ThemeBloc>();
+    final isDarkMode = themeBloc.isDarkMode;
     return BlocBuilder<SearchUserBloc, SearchUserState>(
       builder: (context, state) {
         if (state is SearchUserLoadingState) {
@@ -49,7 +51,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
               'Error to load data.'.tr().toString(),
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black54,
+                color: isDarkMode ? Colors.white : Colors.black54,
                 fontStyle: FontStyle.normal,
                 letterSpacing: 1,
                 decoration: TextDecoration.none,
@@ -88,7 +90,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
                           "There's no one new around you.".tr().toString(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.black54,
                             fontStyle: FontStyle.normal,

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/providers/street_view_provider.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
@@ -35,7 +36,8 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeBloc = context.watch<ThemeBloc>();
+    final isDarkMode = themeBloc.isDarkMode;
     final streetviewProvider = Provider.of<StreetViewProvider>(context);
     String selectedOption = streetviewProvider.streetMode;
     final provider = Provider.of<StreetViewProvider>(context, listen: false);
@@ -65,7 +67,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                   child: Text(
                     'Street View Settings'.tr().toString(),
                     style: TextStyle(
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : primaryColor,
                       fontSize: 18,

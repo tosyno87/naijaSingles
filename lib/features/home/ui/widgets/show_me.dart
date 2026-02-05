@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
@@ -22,7 +24,7 @@ class ShowmeWidget extends StatefulWidget {
 class _ShowmeWidgetState extends State<ShowmeWidget> {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8),
@@ -33,7 +35,7 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
               'Show me'.tr().toString(),
               style: TextStyle(
                 fontSize: 18,
-                color: themeProvider.isDarkMode ? Colors.white : primaryColor,
+                color: isDarkMode ? Colors.white : primaryColor,
                 fontWeight: FontWeight.w500,
               ),
             ),

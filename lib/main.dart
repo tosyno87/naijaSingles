@@ -277,32 +277,38 @@ class MyApp extends StatelessWidget {
     // Set navigator key for notification service
     NotificationService.setNavigatorKey(navigatorKey);
 
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) => MaterialApp(
-        navigatorKey: navigatorKey, // Add navigator key
-        title: 'Afropeep',
-        debugShowCheckedModeBanner: false,
-        theme:
-            themeProvider.isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        initialRoute: RouteName
-            .welcomeScreen, // Direct to WelcomeScreen - no splash flash
-        onGenerateRoute: AppRouter.generateRoute,
-        // Add safety check for Navigator during hot reload
-        builder: (context, child) {
-          // Ensure Navigator has proper state during hot reload
-          if (child == null) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-          return child;
-        },
-      ),
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        // Get theme mode from BLoC state
+        final isDarkMode = themeState is ThemeLoaded
+            ? themeState.isDarkMode
+            : false; // Default to light mode if not loaded
+
+        return MaterialApp(
+          navigatorKey: navigatorKey, // Add navigator key
+          title: 'Afropeep',
+          debugShowCheckedModeBanner: false,
+          theme: isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          initialRoute: RouteName
+              .welcomeScreen, // Direct to WelcomeScreen - no splash flash
+          onGenerateRoute: AppRouter.generateRoute,
+          // Add safety check for Navigator during hot reload
+          builder: (context, child) {
+            // Ensure Navigator has proper state during hot reload
+            if (child == null) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            return child;
+          },
+        );
+      },
     );
   }
 }

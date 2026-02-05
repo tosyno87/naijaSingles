@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
 
 class AgeRangeWidget extends StatefulWidget {
@@ -22,7 +22,7 @@ class AgeRangeWidget extends StatefulWidget {
 class _AgeRangeWidgetState extends State<AgeRangeWidget> {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8),
@@ -31,7 +31,7 @@ class _AgeRangeWidgetState extends State<AgeRangeWidget> {
             'Age range'.tr().toString(),
             style: TextStyle(
               fontSize: 18,
-              color: themeProvider.isDarkMode ? Colors.white : primaryColor,
+              color: isDarkMode ? Colors.white : primaryColor,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -48,7 +48,7 @@ class _AgeRangeWidgetState extends State<AgeRangeWidget> {
             min: 18,
             max: 100,
             divisions: 25,
-            activeColor: themeProvider.isDarkMode ? Colors.white : primaryColor,
+            activeColor: isDarkMode ? Colors.white : primaryColor,
             labels: RangeLabels(
               widget.currentUser.ageRange!['min'].toString(),
               widget.currentUser.ageRange!['max'].toString(),

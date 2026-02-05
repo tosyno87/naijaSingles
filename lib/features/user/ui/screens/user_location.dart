@@ -10,10 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/utils/welcome_dialog.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
@@ -27,7 +27,7 @@ class AllowLocation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     final auth = firebaseAuthInstance;
     final userData = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['userData'];

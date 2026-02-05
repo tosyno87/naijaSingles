@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../common/widgets/image_widget.dart';
 import '../../../../models/user_model.dart';
@@ -33,7 +33,7 @@ class _MatchesState extends State<Matches> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -80,7 +80,7 @@ class _MatchesState extends State<Matches> {
                     'Error to load data.'.tr().toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : Colors.black54,
                       fontStyle: FontStyle.normal,

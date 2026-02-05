@@ -10,7 +10,7 @@ import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
 import '../../../../models/chat_model.dart';
@@ -93,7 +93,7 @@ class _RecentChatsState extends State<RecentChats> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return BlocBuilder<MatchUserBloc, MatchUserState>(
       builder: (context, state) {
         if (state is MatchUserLoadingState) {
@@ -107,7 +107,7 @@ class _RecentChatsState extends State<RecentChats> {
               'Error to load data.'.tr().toString(),
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black54,
+                color: isDarkMode ? Colors.white : Colors.black54,
                 fontStyle: FontStyle.normal,
                 letterSpacing: 1,
                 decoration: TextDecoration.none,

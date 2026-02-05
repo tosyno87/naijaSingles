@@ -28,7 +28,7 @@ class SimpleDebug {
         final data = doc.data();
         debugPrint('👤 User: ${doc.id} - ${data['name'] ?? 'No name'}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Database connection error: $e');
     }
   }
@@ -52,7 +52,7 @@ class SimpleDebug {
 
       await batch.commit();
       debugPrint('✅ Cleared ${checkedUsers.docs.length} checked users');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error clearing swipe history: $e');
     }
   }
@@ -74,7 +74,7 @@ class SimpleDebug {
       });
 
       debugPrint('✅ Like created successfully');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error creating like: $e');
     }
   }
@@ -107,7 +107,7 @@ class SimpleDebug {
       for (final doc in blockedUsers.docs) {
         debugPrint('   - ${doc.id}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking excluded users: $e');
     }
   }

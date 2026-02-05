@@ -2,11 +2,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/image_widget.dart';
 import '../../../../models/user_model.dart';
@@ -52,9 +53,9 @@ class _InfoState extends State<Info> {
   @override
   Widget build(BuildContext context) {
     final bool isMe = widget.user.id == widget.currentUser.id;
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Scaffold(
-      backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       body: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
@@ -120,7 +121,7 @@ class _InfoState extends State<Info> {
                                 Text(
                                   "${widget.user.name}, ${widget.user.editInfo!['showMyAge'] != null ? !widget.user.editInfo!['showMyAge'] ? widget.user.age : "" : widget.user.age}",
                                   style: TextStyle(
-                                    color: themeProvider.isDarkMode
+                                    color: isDarkMode
                                         ? Colors.white
                                         : Colors.black,
                                     fontSize: 25,

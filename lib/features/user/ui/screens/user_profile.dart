@@ -7,9 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/adds.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/crousle_slider.dart';
@@ -45,7 +45,7 @@ final PageController pageController = PageController();
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     final currentUser = Provider.of<UserProvider>(context).currentUser;
     return BlocListener<UserBloc, UserStates>(
       listener: (context, state) {
@@ -168,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           .toString()
                       : ''.tr().toString(),
                   style: TextStyle(
-                    color: themeProvider.isDarkMode
+                    color: isDarkMode
                         ? Colors.white
                         : Colors.black87,
                     fontWeight: FontWeight.w500,
@@ -183,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : ''.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: themeProvider.isDarkMode
+                    color: isDarkMode
                         ? Colors.white
                         : Colors.black54,
                     fontWeight: FontWeight.w400,
@@ -199,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : ''.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: themeProvider.isDarkMode
+                    color: isDarkMode
                         ? Colors.white
                         : Colors.black54,
                     fontWeight: FontWeight.w400,

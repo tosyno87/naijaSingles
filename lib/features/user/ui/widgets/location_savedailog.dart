@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 
 Future<Map<String, dynamic>?> showLocationDialog(
@@ -16,7 +17,7 @@ Future<Map<String, dynamic>?> showLocationDialog(
   double? longitude,
 ) {
   final Map<String, dynamic> updatedLocation = {};
-  final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+  final isDarkMode = context.read<ThemeBloc>().isDarkMode;
   return showDialog<Map<String, dynamic>?>(
     context: context,
     builder: (BuildContext context) => Dialog(
@@ -32,7 +33,7 @@ Future<Map<String, dynamic>?> showLocationDialog(
               'Save changes!'.tr().toString(),
               style: TextStyle(
                 fontSize: 18,
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
             const SizedBox(height: 16),

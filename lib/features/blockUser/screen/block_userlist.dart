@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../common/constants/colors.dart';
 import '../../../common/constants/constants.dart';
-import '../../../common/providers/theme_provider.dart';
+import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/utils/custom_toast.dart';
 import '../../../common/widgets/hookup_circularbar.dart';
 import '../../../common/widgets/image_widget.dart';
@@ -59,7 +59,7 @@ class _BlockedUserState extends State<BlockedUser> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return BlocBuilder<BlocUserListBloc, BlocUserListState>(
       builder: (context, state) {
         if (state is BlockUserLoadingState) {
@@ -75,7 +75,7 @@ class _BlockedUserState extends State<BlockedUser> {
               'Error to load data.'.tr().toString(),
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black54,
+                color: isDarkMode ? Colors.white : Colors.black54,
                 fontStyle: FontStyle.normal,
                 letterSpacing: 1,
                 fontSize: 18,
@@ -120,7 +120,7 @@ class _BlockedUserState extends State<BlockedUser> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: themeProvider.isDarkMode
+                          color: isDarkMode
                               ? Theme.of(context)
                                   .scaffoldBackgroundColor
                                   .withValues(alpha: (0.60 * 255).toDouble())
@@ -156,7 +156,7 @@ class _BlockedUserState extends State<BlockedUser> {
                           subtitle: Text(
                             'You blocked this user'.tr().toString(),
                             style: TextStyle(
-                              color: themeProvider.isDarkMode
+                              color: isDarkMode
                                   ? Colors.white
                                   : Colors.blueGrey,
                               fontSize: 15,

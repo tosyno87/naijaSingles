@@ -66,7 +66,7 @@ class DatabaseDebug {
       debugPrint(
         '   Users in age range 18-35: $usersInAgeRange/${allUsersQuery.docs.length}',
       );
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking database: $e');
     }
   }
@@ -111,7 +111,7 @@ class DatabaseDebug {
       for (final doc in matches.docs) {
         debugPrint('   - ${doc.id}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking exclusions: $e');
     }
   }
@@ -142,7 +142,7 @@ class DatabaseDebug {
           '👤 Found user: ${doc.id} (age: ${data['age']}, gender: ${data['gender']})',
         );
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error testing query: $e');
 
       // Try simpler query without ordering
@@ -156,7 +156,7 @@ class DatabaseDebug {
             .get();
 
         debugPrint('📊 Simple query results: ${simpleQuery.docs.length} users');
-      } catch (e2) {
+      } on Object catch (e2) {
         debugPrint('❌ Simple query also failed: $e2');
       }
     }
@@ -235,7 +235,7 @@ class DatabaseDebug {
       await batch.commit();
 
       debugPrint('✅ Created ${testUsers.length} test users');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error creating test users: $e');
     }
   }
@@ -261,7 +261,7 @@ class DatabaseDebug {
       await batch.commit();
 
       debugPrint('✅ Cleared ${checkedUsers.docs.length} checked users');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error clearing exclusions: $e');
     }
   }

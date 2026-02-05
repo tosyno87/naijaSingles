@@ -2,18 +2,19 @@ import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
-import '../providers/theme_provider.dart';
 
 class ChangeThemeButtonWidget extends StatelessWidget {
   const ChangeThemeButtonWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    ThemeMode currentThemeMode = themeProvider.themeMode;
+    final themeBloc = context.watch<ThemeBloc>();
+    ThemeMode currentThemeMode =
+        themeBloc.currentThemeMode ?? ThemeMode.system;
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Card(
@@ -27,14 +28,14 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                   'Change Theme'.tr().toString(),
                   style: TextStyle(
                     color:
-                        themeProvider.isDarkMode ? Colors.white : primaryColor,
+                        themeBloc.isDarkMode ? Colors.white : primaryColor,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
               InkResponse(
-                child: !themeProvider.isDarkMode
+                child: !themeBloc.isDarkMode
                     ? const Icon(
                         Icons.wb_sunny,
                         color: primaryColor,
@@ -110,11 +111,9 @@ class ChangeThemeButtonWidget extends StatelessWidget {
                             style: const TextStyle(color: primaryColor),
                           ),
                           onPressed: () {
-                            final provider = Provider.of<ThemeProvider>(
-                              context,
-                              listen: false,
-                            );
-                            provider.toggleTheme(currentThemeMode);
+                            context
+                                .read<ThemeBloc>()
+                                .add(ThemeModeChanged(currentThemeMode));
                             Navigator.of(dialogContext).pop();
                           },
                         ),

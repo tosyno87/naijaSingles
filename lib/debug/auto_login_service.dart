@@ -38,7 +38,7 @@ class AutoLoginService {
       }
 
       return false;
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Auto-login failed: $e');
 
       // If test user doesn't exist, try to create it
@@ -55,7 +55,7 @@ class AutoLoginService {
           );
           return true;
         }
-      } catch (createError) {
+      } on Object catch (createError) {
         debugPrint('❌ Failed to create test user: $createError');
       }
 
@@ -70,7 +70,7 @@ class AutoLoginService {
     try {
       await _auth.signOut();
       debugPrint('✅ Test user signed out');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error signing out: $e');
     }
   }

@@ -14,7 +14,6 @@ class PaymentDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,

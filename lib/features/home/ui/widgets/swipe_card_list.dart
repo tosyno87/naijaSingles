@@ -6,7 +6,6 @@ import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/controllers/home_controller.dart';
 import '../../../match/ui/widget/match_dialog_new.dart';

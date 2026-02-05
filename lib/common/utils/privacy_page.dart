@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
-import '../providers/theme_provider.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
   const PrivacyPolicyPage({required this.url, required this.tittle, super.key});
@@ -22,11 +22,11 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   @override
   void initState() {
     super.initState();
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = context.read<ThemeBloc>().isDarkMode;
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(
-        themeProvider.isDarkMode ? Colors.white : const Color(0x00000000),
+        isDarkMode ? Colors.white : const Color(0x00000000),
       )
       ..setNavigationDelegate(
         NavigationDelegate(

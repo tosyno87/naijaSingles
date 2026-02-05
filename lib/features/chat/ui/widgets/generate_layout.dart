@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/custom_toast.dart';
 import '../../../../common/widgets/image_widget.dart';
@@ -15,7 +15,7 @@ class Layout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
@@ -109,7 +109,7 @@ class Layout extends StatelessWidget {
                       right: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? AppColors.secondaryColor
                               .withValues(alpha: (.5 * 255).toDouble())
                           : primaryColor.withValues(
@@ -123,7 +123,7 @@ class Layout extends StatelessWidget {
                         Text(
                           documentSnapshot.get('text'),
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.black87,
                             fontSize: 16,

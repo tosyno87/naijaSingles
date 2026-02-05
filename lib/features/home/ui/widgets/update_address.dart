@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../models/user_model.dart';
 import '../../bloc/searchuser_bloc.dart';

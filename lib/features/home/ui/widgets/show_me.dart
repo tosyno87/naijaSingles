@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
 
 class ShowmeWidget extends StatefulWidget {

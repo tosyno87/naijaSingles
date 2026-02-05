@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/providers/street_view_provider.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/user_model.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 

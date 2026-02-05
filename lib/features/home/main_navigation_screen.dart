@@ -99,9 +99,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     developer.log('✅ User is authenticated: ${currentUser.uid}');
 
-    // Use UserBloc instead of UserProvider (Phase 2 migration)
     final userBloc = context.read<UserBloc>();
-    // Keep Provider for backward compatibility during migration
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // Set a maximum timeout to prevent infinite loading
@@ -200,11 +199,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Use UserBloc instead of UserProvider (Phase 2 migration)
     final userBloc = context.watch<UserBloc>();
     final currentUser = userBloc.currentUser;
-    
-    // Keep Provider for backward compatibility during migration
     final userProvider = Provider.of<UserProvider>(context);
 
     // Show loading screen while checking registration - prevent any content flash

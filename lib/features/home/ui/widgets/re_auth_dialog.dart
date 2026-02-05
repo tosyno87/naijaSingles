@@ -11,7 +11,6 @@ import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
@@ -34,7 +33,6 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
 
   @override
   Widget build(BuildContext context) {
-    // Use ThemeBloc instead of ThemeProvider (Phase 2 migration)
     final themeBloc = context.watch<ThemeBloc>();
     final isDarkMode = themeBloc.isDarkMode;
     return AlertDialog(

@@ -4,12 +4,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../config/app_config.dart';
@@ -59,7 +60,7 @@ class UpdateLocationState extends State<UpdateLocation> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = context.read<ThemeBloc>().isDarkMode;
     return PopScope(
       onPopInvokedWithResult: (bool didPop, Object? result) async {
         if (didPop) return;
@@ -109,7 +110,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                           'Use Current Location?'.tr().toString(),
                           style: TextStyle(
                             fontSize: 20,
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white70
                                 : Colors.black87,
                           ),

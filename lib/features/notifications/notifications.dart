@@ -3,13 +3,14 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
-import '../../common/providers/theme_provider.dart';
 import '../../common/providers/user_provider.dart';
 import '../../common/widgets/custom_snackbar.dart';
 import '../../common/widgets/hookup_circularbar.dart';
@@ -100,7 +101,7 @@ class NotificationsState extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
 
     return Scaffold(
       appBar: AppBar(
@@ -168,12 +169,12 @@ class NotificationsState extends State<Notifications> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: !doc.get('isRead')
-                                ? themeProvider.isDarkMode
+                                ? isDarkMode
                                     ? Theme.of(context).scaffoldBackgroundColor
                                     : primaryColor.withValues(
                                         alpha: (.15 * 255).toDouble(),
                                       )
-                                : themeProvider.isDarkMode
+                                : isDarkMode
                                     ? Theme.of(context)
                                         .scaffoldBackgroundColor
                                         .withValues(

@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../providers/theme_provider.dart';
+import '../bloc/theme/theme_bloc.dart';
 
 class CustomCNImage extends StatelessWidget {
   const CustomCNImage({
@@ -23,7 +23,7 @@ class CustomCNImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return CachedNetworkImage(
       fit: fit,
       maxHeightDiskCache: 800,
@@ -54,7 +54,7 @@ class CustomCNImage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : Colors.black,
+                        isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
               ],

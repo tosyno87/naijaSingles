@@ -8,8 +8,7 @@ import '../../data/theme_prefrences.dart';
 part 'theme_event.dart';
 part 'theme_state.dart';
 
-/// BLoC for managing app theme
-/// Replaces ThemeProvider with BLoC pattern
+/// BLoC for managing app theme (dark/light/system).
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   ThemeBloc() : super(const ThemeInitial()) {
     on<ThemeInitialized>(_onThemeInitialized);

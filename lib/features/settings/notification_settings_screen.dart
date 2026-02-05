@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/colors.dart';
-import '../../common/providers/theme_provider.dart';
 import '../../common/providers/user_provider.dart';
 import '../../services/settings_service.dart';
 
@@ -157,8 +158,7 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,

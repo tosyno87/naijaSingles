@@ -21,7 +21,6 @@ import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
 import 'common/providers/language_provide.dart';
 import 'common/providers/street_view_provider.dart';
-import 'common/providers/theme_provider.dart';
 import 'common/providers/user_provider.dart';
 import 'common/routes/route_name.dart';
 import 'common/routes/router.dart';
@@ -239,7 +238,6 @@ Future<void> main() async {
                 phoneAuthRepository: PhoneAuthRepository(),
               ),
             ),
-            // Phase 2: BLoC providers replacing ChangeNotifier providers
             BlocProvider<UserBloc>(
               create: (context) => UserBloc(),
             ),
@@ -252,8 +250,6 @@ Future<void> main() async {
           ],
           child: MultiProvider(
             providers: [
-              // Keep Provider instances during migration (will be removed in Phase 2)
-              ChangeNotifierProvider(create: (_) => ThemeProvider()),
               ChangeNotifierProvider(create: (_) => UserProvider()),
               ChangeNotifierProvider(create: (_) => OnboardingController()),
             ],

@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/home/ui/tab/tabbar.dart';
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
 import '../constants/constants.dart';
-import '../providers/theme_provider.dart';
 
 class LanguageWidget extends StatefulWidget {
   const LanguageWidget({super.key});
@@ -53,7 +53,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Card(
@@ -101,7 +101,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                       'Change Language'.tr().toString(),
                       style: TextStyle(
                         fontSize: 18,
-                        color: themeProvider.isDarkMode
+                        color: isDarkMode
                             ? Colors.white
                             : primaryColor,
                         fontWeight: FontWeight.w500,
@@ -236,7 +236,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     child: Text(
                                       language.tr().toString(),
                                       style: TextStyle(
-                                        color: themeProvider.isDarkMode
+                                        color: isDarkMode
                                             ? Colors.white70
                                             : primaryColor,
                                         fontSize: 14,

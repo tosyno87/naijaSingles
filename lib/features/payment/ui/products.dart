@@ -20,7 +20,7 @@ import '../../../common/constants/adds.dart';
 import '../../../common/constants/colors.dart';
 import '../../../common/constants/constants.dart';
 import '../../../common/data/repo/in_app_purchase_repo.dart';
-import '../../../common/providers/theme_provider.dart';
+import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/utils/crousle_slider.dart';
 import '../../../common/utils/privacy_page.dart';
 import '../../../common/widgets/custom_button.dart';
@@ -163,7 +163,7 @@ class ProductsState extends State<Products> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return BlocBuilder<GetInAppProductsBloc, GetInAppProductsStates>(
       builder: (context, state) {
         if (state is GetInAppProductsLoadingState) {
@@ -182,7 +182,7 @@ class ProductsState extends State<Products> {
             backgroundColor: Theme.of(context).primaryColor,
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: themeProvider.isDarkMode
+              backgroundColor: isDarkMode
                   ? const Color(0xff252020)
                   : Colors.white,
               centerTitle: true,
@@ -198,7 +198,7 @@ class ProductsState extends State<Products> {
               automaticallyImplyLeading: false,
               actions: [
                 IconButton(
-                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                  color: isDarkMode ? Colors.white : Colors.black,
                   icon: const Icon(
                     Icons.cancel,
                     size: 25,
@@ -289,7 +289,7 @@ class ProductsState extends State<Products> {
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 width: 2,
-                                                color: themeProvider.isDarkMode
+                                                color: isDarkMode
                                                     ? const Color(
                                                         0x33FFFFFF,
                                                       )
@@ -582,7 +582,7 @@ class ProductsState extends State<Products> {
     required ProductDetails product,
     required String price,
   }) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return AnimatedContainer(
       curve: Curves.easeIn,
       height: 100, //setting up dimention if product get selected
@@ -609,7 +609,7 @@ class ProductsState extends State<Products> {
             style: TextStyle(
               color: selectedProduct !=
                       product //setting up color if product get selected
-                  ? themeProvider.isDarkMode
+                  ? isDarkMode
                       ? Colors.white
                       : Colors.black
                   : primaryColor,
@@ -622,7 +622,7 @@ class ProductsState extends State<Products> {
             style: TextStyle(
               color: selectedProduct !=
                       product //setting up color if product get selected
-                  ? themeProvider.isDarkMode
+                  ? isDarkMode
                       ? Colors.white
                       : Colors.black
                   : primaryColor,
@@ -635,7 +635,7 @@ class ProductsState extends State<Products> {
             style: TextStyle(
               color: selectedProduct !=
                       product //setting up product if product get selected
-                  ? themeProvider.isDarkMode
+                  ? isDarkMode
                       ? Colors.white
                       : Colors.black
                   : primaryColor,

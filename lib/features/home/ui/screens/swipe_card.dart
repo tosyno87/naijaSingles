@@ -7,8 +7,9 @@ import 'package:provider/provider.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/image_widget.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../models/user_model.dart';
 import '../../../dating/screens/user_detail_screen.dart';
 import '../../../user/ui/widgets/card_level.dart';
@@ -72,7 +73,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return widget.usersList.length == widget.stackController?.currentIndex
         ? Align(
             child: Column(
@@ -97,7 +98,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                   "There's no one new around you.".tr().toString(),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.montserrat(
-                    color: themeProvider.isDarkMode
+                    color: isDarkMode
                         ? Colors.white
                         : Colors.black54,
                     fontStyle: FontStyle.normal,

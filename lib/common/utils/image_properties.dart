@@ -10,13 +10,13 @@ import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as i;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
 import '../constants/constants.dart';
-import '../providers/theme_provider.dart';
 
 class ImageProperties {
   static Future<File> compressImage(CroppedFile image) async {
@@ -48,7 +48,7 @@ class ImageProperties {
     UserModel currentUser,
     bool isProfilePicture,
   ) async {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.read<ThemeBloc>().isDarkMode;
     return showDialog(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
@@ -63,7 +63,7 @@ class ImageProperties {
                 _buildSourceOption(
                   icon: Icons.photo_camera,
                   label: ' Camera'.tr(),
-                  themeProvider: themeProvider,
+                  isDarkMode: isDarkMode,
                   onTap: () => _handleImageSource(
                     context,
                     currentUser,
@@ -74,7 +74,7 @@ class ImageProperties {
                 _buildSourceOption(
                   icon: Icons.photo_library,
                   label: ' Gallery'.tr(),
-                  themeProvider: themeProvider,
+                  isDarkMode: isDarkMode,
                   onTap: () => _handleImageSource(
                     context,
                     currentUser,
@@ -95,7 +95,7 @@ class ImageProperties {
                               .tr(),
                           style: TextStyle(
                             fontSize: 15,
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.black,
                             decoration: TextDecoration.none,
@@ -253,7 +253,7 @@ class ImageProperties {
   static Widget _buildSourceOption({
     required IconData icon,
     required String label,
-    required ThemeProvider themeProvider,
+    required bool isDarkMode,
     required VoidCallback onTap,
   }) =>
       Padding(
@@ -268,7 +268,7 @@ class ImageProperties {
                 label,
                 style: TextStyle(
                   fontSize: 15,
-                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                  color: isDarkMode ? Colors.white : Colors.black,
                   decoration: TextDecoration.none,
                 ),
               ),

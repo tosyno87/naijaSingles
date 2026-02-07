@@ -8,7 +8,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 // Removed no_user.dart import - file deleted
 // import 'package:naijasingles/features/explore/premium_map.dart';
 // Removed street view import - feature deleted
-import 'package:provider/provider.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/colors.dart';

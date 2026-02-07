@@ -80,7 +80,6 @@ dependencies:
   permission_handler: ^12.0.1
   flutter_secure_storage: ^9.2.2
   pin_code_fields: ^8.0.1        # Kept at 8.0.1
-  provider: ^6.1.5               # Updated to latest
   share_plus: ^11.0.0           # Updated to latest
   shared_preferences: ^2.5.3     # Updated to latest
   shimmer: ^3.0.0                # Kept at 3.0.0

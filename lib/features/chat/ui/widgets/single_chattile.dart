@@ -78,7 +78,7 @@ class SingleChatTile extends StatelessWidget {
                           ? 'Photo'
                           : chat.text!.replaceAll('\n', ' '),
                       style: TextStyle(
-                        color: themeProvider.isDarkMode
+                        color: isDarkMode
                             ? Colors.white
                             : Colors.blueGrey,
                         fontSize: 15,
@@ -91,7 +91,7 @@ class SingleChatTile extends StatelessWidget {
                       ? Text(
                           'You blocked this contact'.tr().toString(),
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.blueGrey,
                             fontSize: 15,
@@ -102,7 +102,7 @@ class SingleChatTile extends StatelessWidget {
                       : Text(
                           'This contact has blocked you'.tr().toString(),
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.blueGrey,
                             fontSize: 15,

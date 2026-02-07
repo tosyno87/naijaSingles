@@ -24,7 +24,7 @@ import 'config/secure_config.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
 import 'features/events/data/services/seed_events_service.dart';
 import 'features/onboarding/bloc/onboarding_bloc.dart';
-import 'features/onboarding/data/onboarding_repository.dart';
+import 'features/onboarding/data/repositories/onboarding_repository.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
 import 'features/notifications/data/services/notification_service.dart';

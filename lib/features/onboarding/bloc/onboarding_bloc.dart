@@ -12,7 +12,7 @@ import '../../../common/bloc/user/user_bloc.dart';
 import '../../../common/widgets/loading_transition_screen.dart';
 import '../../../services/bulk_photo_picker_service.dart';
 import '../../../services/profile_image_cropper_service.dart';
-import '../data/onboarding_repository.dart';
+import '../data/repositories/onboarding_repository.dart';
 import 'onboarding_data.dart';
 
 part 'onboarding_event.dart';

@@ -199,10 +199,10 @@ lib/features/{feature}/
 - `match/` - Already well-structured ✅
 
 **Steps:**
-1. ⏳ Audit each feature's structure
-2. ⏳ Create migration plan per feature
-3. ⏳ Move files to standard structure
-4. ⏳ Update imports
+1. ✅ Audit each feature's structure
+2. ✅ Profile: Remove 5 dead backup/alternative screens
+3. ✅ Onboarding: Move services→data/services, repository→data/repositories
+4. ✅ Update imports
 
 **Estimated Effort:** 2-3 days  
 **Risk:** Medium
@@ -430,7 +430,7 @@ If issues arise:
 - [x] Phase 2.1: State Management Decision
 - [x] Phase 2.2: Provider → BLoC Migration
 - [x] Phase 3.1: Service Relocation
-- [ ] Phase 3.2: Feature Structure Standardization
+- [x] Phase 3.2: Feature Structure Standardization
 - [ ] Phase 4: Dependency Cleanup
 - [ ] Phase 5: Code Cleanup
 - [ ] Phase 6: Testing & Documentation

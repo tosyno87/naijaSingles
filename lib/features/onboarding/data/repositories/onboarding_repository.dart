@@ -8,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import '../../../common/utils/app_logger.dart';
-import '../bloc/onboarding_data.dart';
+import '../../bloc/onboarding_data.dart';
 
 /// Repository for saving onboarding data to Firestore and Storage
 class OnboardingRepository {

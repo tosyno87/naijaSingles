@@ -1,67 +1,68 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'data/services/notification_service.dart';
 import 'notification_model.dart';
-import 'notification_service.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  Widget build(BuildContext context) {
+    final notificationService = NotificationService();
+
+    return StreamBuilder<List<AppNotification>>(
+      stream: notificationService.notificationsStream,
+      builder: (context, snapshot) {
+        final isLoading = snapshot.connectionState == ConnectionState.waiting;
+        final notifications = snapshot.data ?? [];
+
+        return _NotificationsContent(
+          notifications: notifications,
+          isLoading: isLoading,
+          notificationService: notificationService,
+        );
+      },
+    );
+  }
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  final NotificationService _notificationService = NotificationService();
-  late List<AppNotification> _notifications;
-  bool _isLoading = true;
+class _NotificationsContent extends StatelessWidget {
+  const _NotificationsContent({
+    required this.notifications,
+    required this.isLoading,
+    required this.notificationService,
+  });
 
-  @override
-  void initState() {
-    super.initState();
-    _loadNotifications();
+  final List<AppNotification> notifications;
+  final bool isLoading;
+  final NotificationService notificationService;
+
+  Future<void> _markAsRead(String id) async {
+    await notificationService.markAsRead(id);
   }
 
-  void _loadNotifications() {
-    // In a real app, this would be an async call to a backend service
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        _notifications = _notificationService.getAllNotifications();
-        _isLoading = false;
-      });
-    });
+  Future<void> _deleteNotification(String id) async {
+    await notificationService.deleteNotification(id);
   }
 
-  void _markAsRead(String id) {
-    setState(() {
-      _notificationService.markAsRead(id);
-      _notifications = _notificationService.getAllNotifications();
-    });
+  Future<void> _markAllAsRead() async {
+    await notificationService.markAllAsRead();
   }
 
-  void _deleteNotification(String id) {
-    setState(() {
-      _notificationService.deleteNotification(id);
-      _notifications = _notificationService.getAllNotifications();
-    });
-  }
-
-  void _markAllAsRead() {
-    setState(() {
-      _notificationService.markAllAsRead();
-      _notifications = _notificationService.getAllNotifications();
-    });
-  }
-
-  void _handleNotificationTap(AppNotification notification) {
+  void _handleNotificationTap(
+    BuildContext context,
+    AppNotification notification,
+  ) {
     // Mark as read when tapped
-    _markAsRead(notification.id);
+    unawaited(_markAsRead(notification.id));
 
     // In a real app, navigate to the appropriate screen based on notification type
     switch (notification.type) {
       case 'match':
       case 'like':
-        // Navigate to profile
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Navigating to profile: ${notification.actionId}'),
@@ -70,7 +71,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
         break;
       case 'message':
-        // Navigate to chat
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Navigating to chat: ${notification.actionId}'),
@@ -79,7 +79,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
         break;
       case 'invite':
-        // Navigate to group or event
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Navigating to invitation: ${notification.actionId}'),
@@ -88,7 +87,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
         break;
       default:
-        // Default action
         break;
     }
   }
@@ -119,9 +117,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          if (!_isLoading && _notifications.isNotEmpty)
+          if (!isLoading && notifications.isNotEmpty)
             TextButton(
-              onPressed: _markAllAsRead,
+              onPressed: () => unawaited(_markAllAsRead()),
               child: Text(
                 'Mark all read',
                 style: GoogleFonts.montserrat(
@@ -133,11 +131,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
         ],
       ),
-      body: _isLoading
+      body: isLoading
           ? _buildLoadingState()
-          : _notifications.isEmpty
+          : notifications.isEmpty
               ? _buildEmptyState()
-              : _buildNotificationsList(),
+              : _buildNotificationsList(context),
     );
   }
 
@@ -191,11 +189,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
       );
 
-  Widget _buildNotificationsList() => ListView.builder(
+  Widget _buildNotificationsList(BuildContext context) => ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: _notifications.length,
+        itemCount: notifications.length,
         itemBuilder: (context, index) {
-          final notification = _notifications[index];
+          final notification = notifications[index];
           return Dismissible(
             key: Key(notification.id),
             background: Container(
@@ -209,7 +207,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) {
-              _deleteNotification(notification.id);
+              unawaited(_deleteNotification(notification.id));
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Notification removed'),
@@ -217,16 +215,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
               );
             },
-            child: _buildNotificationItem(notification),
+            child: _buildNotificationItem(context, notification),
           );
         },
       );
 
-  Widget _buildNotificationItem(AppNotification notification) {
+  Widget _buildNotificationItem(
+    BuildContext context,
+    AppNotification notification,
+  ) {
     final bool isRead = notification.isRead;
 
     return InkWell(
-      onTap: () => _handleNotificationTap(notification),
+      onTap: () => _handleNotificationTap(context, notification),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
@@ -244,7 +245,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             if (notification.avatarUrl != null)
               CircleAvatar(
                 radius: 24,
-                backgroundImage: AssetImage(notification.avatarUrl!),
+                backgroundImage: notification.avatarUrl!.startsWith('http')
+                    ? NetworkImage(notification.avatarUrl!)
+                    : AssetImage(notification.avatarUrl!) as ImageProvider,
                 backgroundColor: Colors.grey[300],
               )
             else

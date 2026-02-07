@@ -66,22 +66,24 @@ This document outlines a comprehensive refactoring plan to address service dupli
 
 ### 1.3 Discovery Services Consolidation
 
-**Current State:**
-- `lib/services/discovery_service.dart` (249 lines) - Privacy wrapper
-- `lib/services/unified_discovery_service.dart` (389 lines) - Consolidated
-- `lib/services/realtime_discovery_service.dart` (284 lines) - Stream-based
+**Current State:** ✅ Already consolidated
+- Single `lib/features/discovery/data/services/discovery_service.dart` combines:
+  - Privacy-aware discovery (from legacy DiscoveryService)
+  - Comprehensive filtering (from UnifiedDiscoveryService)
+  - Real-time streams (from RealtimeDiscoveryService)
+- No legacy discovery services remain in `lib/services/`
 
-**Target State:**
+**Target State:** ✅ Achieved
 - Primary: `lib/features/discovery/data/services/discovery_service.dart`
-- Optional: `lib/features/discovery/data/services/realtime_discovery_service.dart` (if needed)
+- Realtime logic integrated into main service
 
 **Steps:**
 1. ✅ Audit all usages
-2. ⏳ Use `unified_discovery_service` as base
-3. ⏳ Keep realtime as optional feature
-4. ⏳ Migrate privacy logic into unified service
-5. ⏳ Update all imports
-6. ⏳ Remove old files
+2. ✅ Use `unified_discovery_service` as base
+3. ✅ Keep realtime as optional feature (integrated)
+4. ✅ Migrate privacy logic into unified service
+5. ✅ Update all imports
+6. ✅ Remove old files
 
 **Estimated Effort:** 1 day  
 **Risk:** Low
@@ -107,23 +109,21 @@ This document outlines a comprehensive refactoring plan to address service dupli
 
 ### 2.2 Provider → BLoC Migration Plan
 
-**Affected Components:**
-- `UserProvider` → `UserBloc`
-- `ThemeProvider` → `ThemeBloc`
-- `OnboardingController` → `OnboardingBloc`
-- `StreetViewProvider` → `StreetViewBloc` (if needed)
-- `LanguageProvider` → `LanguageBloc` (if needed)
+**Affected Components:** ✅ Migrated
+- `UserProvider` → `UserBloc` ✅
+- `ThemeProvider` → `ThemeBloc` ✅
+- `OnboardingController` → `OnboardingBloc` ✅
+- `StreetViewProvider` → `StreetViewBloc` ✅
+- `LanguageProvider` → `LanguageBloc` ✅
 
 **Steps:**
-1. ⏳ Create `UserBloc` with same functionality
-2. ⏳ Create `ThemeBloc` with same functionality
-3. ⏳ Create `OnboardingBloc` with same functionality
-4. ⏳ Update `main.dart` to use BLoC providers
-5. ⏳ Migrate screens one by one:
-   - Replace `Consumer<UserProvider>` → `BlocBuilder<UserBloc>`
-   - Replace `Provider.of<UserProvider>` → `context.read<UserBloc>()`
-6. ⏳ Remove Provider dependency after migration
-7. ⏳ Update `.cursorrules` to reflect BLoC-only approach
+1. ✅ Create `UserBloc` with same functionality
+2. ✅ Create `ThemeBloc` with same functionality
+3. ✅ Create `OnboardingBloc` with same functionality
+4. ✅ Update `main.dart` to use BLoC providers
+5. ✅ Migrate screens (app uses BlocProvider/BlocConsumer throughout)
+6. ✅ Remove Provider dependency (package:provider not in pubspec)
+7. ✅ Update test_helpers to use BlocProvider instead of ChangeNotifierProvider
 
 **Estimated Effort:** 3-5 days  
 **Risk:** High (touches many files, needs careful testing)
@@ -421,10 +421,10 @@ If issues arise:
 ## Progress Tracking
 
 - [x] Phase 1.1: Match Services Consolidation
-- [ ] Phase 1.2: Notification Services Consolidation
-- [ ] Phase 1.3: Discovery Services Consolidation
-- [ ] Phase 2.1: State Management Decision
-- [ ] Phase 2.2: Provider → BLoC Migration
+- [x] Phase 1.2: Notification Services Consolidation
+- [x] Phase 1.3: Discovery Services Consolidation
+- [x] Phase 2.1: State Management Decision
+- [x] Phase 2.2: Provider → BLoC Migration
 - [ ] Phase 3.1: Service Relocation
 - [ ] Phase 3.2: Feature Structure Standardization
 - [ ] Phase 4: Dependency Cleanup

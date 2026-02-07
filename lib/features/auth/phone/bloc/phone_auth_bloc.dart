@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -132,14 +131,6 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
             );
           },
           verificationFailed: (FirebaseAuthException e) {
-            // #region agent log
-            try {
-              File('/Users/babatundetosin/Documents/naijaSingles/.cursor/debug.log').writeAsStringSync(
-                '${jsonEncode({"timestamp": DateTime.now().millisecondsSinceEpoch, "location": "phone_auth_bloc.dart:verificationFailed", "message": "verificationFailed invoked", "data": {"code": e.code, "platform": "iOS"}, "hypothesisId": "D"})}\n',
-                mode: FileMode.append,
-              );
-            } catch (_) {}
-            // #endregion
             log('❌ Phone verification failed: ${e.code} - ${e.message}');
             log('💡 Error code: ${e.code}');
             if (e.code == 'invalid-phone-number') {
@@ -164,26 +155,10 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
         await phoneAuthRepository.verifyPhone(
           phoneNumber: normalizedPhone,
           verificationCompleted: (PhoneAuthCredential credential) async {
-            // #region agent log
-            try {
-              File('/Users/babatundetosin/Documents/naijaSingles/.cursor/debug.log').writeAsStringSync(
-                '${jsonEncode({"timestamp": DateTime.now().millisecondsSinceEpoch, "location": "phone_auth_bloc.dart:verificationCompleted", "message": "verificationCompleted invoked", "data": {"platform": "Android"}, "hypothesisId": "D"})}\n',
-                mode: FileMode.append,
-              );
-            } catch (_) {}
-            // #endregion
             log('✅ Phone verification completed automatically');
             add(OnPhoneAuthVerificationCompleteEvent(credential: credential));
           },
           codeSent: (String verificationId, int? resendToken) {
-            // #region agent log
-            try {
-              File('/Users/babatundetosin/Documents/naijaSingles/.cursor/debug.log').writeAsStringSync(
-                '${jsonEncode({"timestamp": DateTime.now().millisecondsSinceEpoch, "location": "phone_auth_bloc.dart:codeSent", "message": "codeSent invoked", "data": {"verificationIdLength": verificationId.length, "platform": "Android"}, "hypothesisId": "B,D"})}\n',
-                mode: FileMode.append,
-              );
-            } catch (_) {}
-            // #endregion
             log('📨 Verification code sent. Verification ID: $verificationId');
             add(
               OnPhoneOtpSent(

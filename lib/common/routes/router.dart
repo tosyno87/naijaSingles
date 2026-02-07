@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -78,15 +75,6 @@ class _FirebaseCallbackHandlerState extends State<_FirebaseCallbackHandler> {
     // Firebase will process the callback and trigger auth state changes
     // The PhoneAuthBloc listener will handle navigation to OTP screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // #region agent log
-      try {
-        final canPop = mounted && Navigator.canPop(context);
-        File('/Users/babatundetosin/Documents/naijaSingles/.cursor/debug.log').writeAsStringSync(
-          '${jsonEncode({"timestamp": DateTime.now().millisecondsSinceEpoch, "location": "router.dart:FirebaseCallbackHandler", "message": "FirebaseCallbackHandler about to pop", "data": {"mounted": mounted, "canPop": canPop}, "hypothesisId": "C"})}\n',
-          mode: FileMode.append,
-        );
-      } catch (_) {}
-      // #endregion
       if (mounted && Navigator.canPop(context)) {
         Navigator.of(context).pop();
       }
@@ -363,14 +351,6 @@ abstract class AppRouter {
       if (routeName.contains('deep_link_id')) {
         debugPrint(
             '✅ Router: Firebase auth callback detected, processing silently');
-        // #region agent log
-        try {
-          File('/Users/babatundetosin/Documents/naijaSingles/.cursor/debug.log').writeAsStringSync(
-            '${jsonEncode({"timestamp": DateTime.now().millisecondsSinceEpoch, "location": "router.dart:deep_link", "message": "Router handling auth deep link", "data": {"routePrefix": routeName.substring(0, routeName.length > 80 ? 80 : routeName.length)}, "hypothesisId": "A,E"})}\n',
-            mode: FileMode.append,
-          );
-        } catch (_) {}
-        // #endregion
 
         // Return a completely transparent route that immediately pops
         // This prevents any visible flash while Firebase processes the callback

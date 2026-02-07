@@ -1,5 +1,4 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -110,14 +109,6 @@ class _PhoneNumberState extends State<PhoneNumber> {
               // The OTP screen will handle navigation after checking registration status
 
               if (state is PhoneAuthCodeSentSuccess) {
-                // #region agent log
-                try {
-                  File('/Users/babatundetosin/Documents/naijaSingles/.cursor/debug.log').writeAsStringSync(
-                    '${jsonEncode({"timestamp": DateTime.now().millisecondsSinceEpoch, "location": "phone_number.dart:BlocListener", "message": "BlocListener PhoneAuthCodeSentSuccess", "data": {"verificationIdLength": state.verificationId.length, "mounted": mounted}, "hypothesisId": "B"})}\n',
-                    mode: FileMode.append,
-                  );
-                } catch (_) {}
-                // #endregion
                 log('phone auth code sent success listener called');
                 if (mounted) {
                   setState(() {

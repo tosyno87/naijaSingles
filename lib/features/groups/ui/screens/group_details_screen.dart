@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../models/group_model.dart';
-import '../../../../services/group_service.dart';
+import '../../../data/services/group_service.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
   const GroupDetailsScreen({

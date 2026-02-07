@@ -1,8 +1,8 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/group_join_exception.dart';
-import 'content_moderation_service.dart';
+import '../../../../models/group_join_exception.dart';
+import '../../../../services/content_moderation_service.dart';
 
 /// Unified Group Service that combines Cultural Groups and Group Chats
 /// This eliminates redundancy and creates synergy between features

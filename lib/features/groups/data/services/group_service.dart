@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import '../models/group_model.dart';
+
+import '../../../../models/group_model.dart';
 
 /// Service for managing cultural groups
 class GroupService {

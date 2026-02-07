@@ -162,10 +162,14 @@ This document outlines a comprehensive refactoring plan to address service dupli
 - `image_upload_service.dart` (if used across features)
 
 **Steps:**
-1. ⏳ Identify all feature-specific services
-2. ⏳ Move services to appropriate feature folders
-3. ⏳ Update all imports
-4. ⏳ Verify builds pass
+1. ✅ Identify all feature-specific services
+2. ✅ Move services to appropriate feature folders:
+   - `group_service.dart` → `lib/features/groups/data/services/`
+   - `unified_group_service.dart` → `lib/features/groups/data/services/`
+   - `group_chat_service.dart` → `lib/features/group_chat/data/services/`
+   - (match, notification, discovery, chat, events already in feature folders)
+3. ✅ Update all imports
+4. ✅ Verify builds pass
 
 **Estimated Effort:** 1 day  
 **Risk:** Low (mostly file moves)
@@ -425,7 +429,7 @@ If issues arise:
 - [x] Phase 1.3: Discovery Services Consolidation
 - [x] Phase 2.1: State Management Decision
 - [x] Phase 2.2: Provider → BLoC Migration
-- [ ] Phase 3.1: Service Relocation
+- [x] Phase 3.1: Service Relocation
 - [ ] Phase 3.2: Feature Structure Standardization
 - [ ] Phase 4: Dependency Cleanup
 - [ ] Phase 5: Code Cleanup

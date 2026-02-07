@@ -11,7 +11,7 @@ import '../../../events/data/models/event_model.dart';
 import '../../../events/data/services/events_firestore_service.dart';
 import '../../../groups/screens/group_details_screen.dart';
 import '../../../groups/screens/unified_groups_screen.dart';
-import '../../../../services/unified_group_service.dart';
+import '../../../groups/data/services/unified_group_service.dart';
 
 /// DiscoverPageV2 - A comprehensive discover screen matching the wireframe
 /// Features:

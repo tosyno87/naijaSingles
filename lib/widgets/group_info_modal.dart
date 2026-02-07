@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../common/constants/app_colors.dart';
-import '../services/unified_group_service.dart';
+import '../features/groups/data/services/unified_group_service.dart';
 
 /// Modal for displaying detailed group information
 class GroupInfoModal extends StatelessWidget {

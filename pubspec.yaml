@@ -55,7 +55,6 @@ dependencies:
   flutter_flushbar: ^0.0.2       # Kept at 0.0.2
   google_sign_in: ^6.1.6
   animated_text_kit: ^4.2.2     # Added for rotating greetings
-  swipe_cards: ^2.0.0+1          # Added for Explore screen
   flutter_image_compress: ^2.4.0 # Updated to latest
   flutter_swiper_null_safety: ^1.0.2 # Kept at 1.0.2
   fluttertoast: ^8.2.12          # Updated to latest

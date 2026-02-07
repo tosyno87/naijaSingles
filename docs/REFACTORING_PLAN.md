@@ -209,15 +209,15 @@ lib/features/{feature}/
 
 ---
 
-## Phase 4: Dependency Cleanup (Priority: Medium)
+## Phase 4: Dependency Cleanup (Priority: Medium) ✅
 
-### 4.1 State Management Dependencies
+### 4.1 State Management Dependencies ✅
 
 **Current:**
-- `provider: ^6.1.5`
+- `provider` - transitive dep of flutter_bloc (not in pubspec)
 - `flutter_bloc: ^9.1.1`
 
-**Action:** Remove `provider` after BLoC migration
+**Done:** Migrated onboarding tests from `ChangeNotifierProvider`/`OnboardingController` to `BlocProvider`/`OnboardingBloc`. No direct provider usage in app or tests.
 
 ---
 
@@ -226,21 +226,21 @@ lib/features/{feature}/
 **Current:**
 - `image_picker: ^1.2.0`
 - `image_cropper: ^9.1.0`
-- `crop_image: ^1.0.16`
+- `crop_image: ^1.0.16` (used by lib/common/utils/crop_image.dart)
 - `flutter_image_compress: ^2.4.0`
 
-**Action:** Keep `image_picker` + `image_cropper`, remove `crop_image` if redundant
+**Deferred:** Migrating CropMedia from crop_image to image_cropper requires UI rewrite. Both kept for now.
 
 ---
 
-### 4.3 Swiper Package Consolidation
+### 4.3 Swiper Package Consolidation ✅
 
 **Current:**
-- `swipe_cards: ^2.0.0+1`
-- `flutter_swiper_null_safety: ^1.0.2`
-- `swipable_stack: ^2.0.0`
+- ~~`swipe_cards: ^2.0.0+1`~~ (removed - unused in lib)
+- `flutter_swiper_null_safety: ^1.0.2` (used: user_info, crousle_slider)
+- `swipable_stack: ^2.0.0` (used: swipe_card_list, home_page, etc.)
 
-**Action:** Audit usage, keep one, remove others
+**Done:** Removed swipe_cards. Kept flutter_swiper and swipable_stack (both in use).
 
 ---
 
@@ -249,8 +249,8 @@ lib/features/{feature}/
 **Steps:**
 1. ⏳ Create script to find unused imports
 2. ⏳ Run `flutter pub deps` analysis
-3. ⏳ Remove unused dependencies
-4. ⏳ Test app still works
+3. ✅ Removed swipe_cards (unused)
+4. ✅ Tests pass, app builds
 
 **Estimated Effort:** 1 day  
 **Risk:** Low
@@ -379,9 +379,9 @@ lib/features/{feature}/
 - ✅ Clear separation of concerns
 
 ### Phase 4 (Dependencies)
-- ✅ Provider removed
-- ✅ Redundant packages removed
-- ✅ Dependency count <70
+- ✅ No direct provider usage (transitive via flutter_bloc)
+- ✅ swipe_cards removed (unused)
+- ✅ Onboarding tests migrated to BlocProvider
 
 ### Phase 5 (Cleanup)
 - ✅ All `*_old.dart` files removed
@@ -431,7 +431,7 @@ If issues arise:
 - [x] Phase 2.2: Provider → BLoC Migration
 - [x] Phase 3.1: Service Relocation
 - [x] Phase 3.2: Feature Structure Standardization
-- [ ] Phase 4: Dependency Cleanup
+- [x] Phase 4: Dependency Cleanup
 - [ ] Phase 5: Code Cleanup
 - [ ] Phase 6: Testing & Documentation
 

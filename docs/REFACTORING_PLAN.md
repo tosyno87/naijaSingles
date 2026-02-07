@@ -27,11 +27,11 @@ This document outlines a comprehensive refactoring plan to address service dupli
 
 **Steps:**
 1. ✅ Audit all usages of each match service
-2. ⏳ Identify which service is most used/complete
-3. ⏳ Extract compatibility scoring logic to `CompatibilityEngine`
-4. ⏳ Merge functionality into single `MatchService`
-5. ⏳ Update all imports and usages
-6. ⏳ Remove old service files
+2. ✅ Identify which service is most used/complete (main MatchService in features/match)
+3. ✅ Extract compatibility scoring logic to `CompatibilityEngine` (moved to features/match/data/services/)
+4. ✅ Merge functionality into single `MatchService` (main service already canonical)
+5. ✅ Update all imports and usages
+6. ✅ Remove old service files (explore match_service, mock_match_service)
 7. ⏳ Add comprehensive tests
 
 **Estimated Effort:** 2-3 days  
@@ -420,7 +420,7 @@ If issues arise:
 
 ## Progress Tracking
 
-- [ ] Phase 1.1: Match Services Consolidation
+- [x] Phase 1.1: Match Services Consolidation
 - [ ] Phase 1.2: Notification Services Consolidation
 - [ ] Phase 1.3: Discovery Services Consolidation
 - [ ] Phase 2.1: State Management Decision

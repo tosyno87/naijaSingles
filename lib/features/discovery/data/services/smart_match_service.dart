@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../models/user_model.dart';
 import '../../../../services/cached_user_service.dart';
-import '../../../../services/compatibility_engine.dart';
 import '../../../../services/mode_specific_compatibility_engine.dart';
+import '../../../match/data/services/compatibility_engine.dart';
 import '../../../../services/paginated_user_service.dart';
 import '../../../../services/performance_monitor.dart';
 

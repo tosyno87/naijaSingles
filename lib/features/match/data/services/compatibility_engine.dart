@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-import '../common/utils/distance.dart' as distance;
-import '../models/user_model.dart';
+import '../../../../common/utils/distance.dart' as distance;
+import '../../../../models/user_model.dart';
 
 /// Compatibility engine that calculates match scores between users
 /// Implements Priority 2: Enhanced Matching Algorithm
@@ -63,25 +63,22 @@ class CompatibilityEngine {
   }
 
   /// Calculate age compatibility score
-  /// Perfect score for ideal age difference, decreasing as difference increases
   static double _calculateAgeCompatibility(UserModel user1, UserModel user2) {
     try {
-      final age1 = user1.age ?? 25; // Default age if not provided
+      final age1 = user1.age ?? 25;
       final age2 = user2.age ?? 25;
-
       final ageDifference = (age1 - age2).abs();
 
       if (ageDifference <= IDEAL_AGE_DIFFERENCE) {
-        return 1; // Perfect score for ideal age difference
+        return 1;
       } else if (ageDifference <= MAX_AGE_DIFFERENCE) {
-        // Linear decrease from 1.0 to 0.3 as age difference increases
         final score = 1.0 -
             ((ageDifference - IDEAL_AGE_DIFFERENCE) /
                     (MAX_AGE_DIFFERENCE - IDEAL_AGE_DIFFERENCE)) *
                 0.7;
         return score.clamp(0.3, 1.0);
       } else {
-        return 0.1; // Very low score for large age differences
+        return 0.1;
       }
     } catch (e) {
       debugPrint('❌ Error calculating age compatibility: $e');
@@ -90,15 +87,13 @@ class CompatibilityEngine {
   }
 
   /// Calculate location proximity score
-  /// Higher score for users who are closer together
   static double _calculateLocationScore(UserModel user1, UserModel user2) {
     try {
-      // Check if both users have location data
       if (user1.coordinates == null ||
           user2.coordinates == null ||
           user1.coordinates!.isEmpty ||
           user2.coordinates!.isEmpty) {
-        return 0.5; // Neutral score if location data is missing
+        return 0.5;
       }
 
       final lat1 = user1.coordinates!['latitude'] as double?;
@@ -107,21 +102,19 @@ class CompatibilityEngine {
       final lng2 = user2.coordinates!['longitude'] as double?;
 
       if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) {
-        return 0.5; // Neutral score if coordinates are invalid
+        return 0.5;
       }
 
-      // Calculate distance between users
       final distanceKm = distance.calculateDistance(lat1, lng1, lat2, lng2);
 
       if (distanceKm <= 3.1) {
-        return 1; // Perfect score for very close users (within 3.1 miles)
+        return 1;
       } else if (distanceKm <= MAX_DISTANCE_MILES) {
-        // Linear decrease from 1.0 to 0.2 as distance increases
         final score =
             1.0 - ((distanceKm - 3.1) / (MAX_DISTANCE_MILES - 3.1)) * 0.8;
         return score.clamp(0.2, 1.0);
       } else {
-        return 0.1; // Very low score for distant users
+        return 0.1;
       }
     } catch (e) {
       debugPrint('❌ Error calculating location score: $e');
@@ -130,17 +123,15 @@ class CompatibilityEngine {
   }
 
   /// Calculate interest matching score
-  /// Based on shared interests, hobbies, and preferences
   static double _calculateInterestScore(UserModel user1, UserModel user2) {
     try {
       final interests1 = _extractInterests(user1);
       final interests2 = _extractInterests(user2);
 
       if (interests1.isEmpty || interests2.isEmpty) {
-        return 0.3; // Low score if no interests are provided
+        return 0.3;
       }
 
-      // Calculate Jaccard similarity (intersection / union)
       final intersection = interests1.intersection(interests2);
       final union = interests1.union(interests2);
 
@@ -149,29 +140,19 @@ class CompatibilityEngine {
       }
 
       final jaccardSimilarity = intersection.length / union.length;
-
-      // Boost score if there are many shared interests
       final sharedCount = intersection.length;
       final boost = sharedCount >= 3 ? 0.2 : (sharedCount >= 2 ? 0.1 : 0.0);
 
-      final score = (jaccardSimilarity + boost).clamp(0.0, 1.0);
-
-      debugPrint(
-        '🎨 Interest matching: ${intersection.length} shared interests out of ${union.length} total',
-      );
-
-      return score;
+      return (jaccardSimilarity + boost).clamp(0.0, 1.0);
     } catch (e) {
       debugPrint('❌ Error calculating interest score: $e');
       return 0.5;
     }
   }
 
-  /// Extract interests from user profile
   static Set<String> _extractInterests(UserModel user) {
     final interests = <String>{};
 
-    // Add bio keywords (simple keyword extraction)
     if (user.bio != null && user.bio!.isNotEmpty) {
       final bioWords = user.bio!
           .toLowerCase()
@@ -182,7 +163,6 @@ class CompatibilityEngine {
       interests.addAll(bioWords);
     }
 
-    // Add location-based interests
     if (user.address != null && user.address!.isNotEmpty) {
       final locationWords = user.address!
           .toLowerCase()
@@ -192,17 +172,14 @@ class CompatibilityEngine {
       interests.addAll(locationWords);
     }
 
-    // Add profession-based interests
     if (user.profession != null && user.profession!.isNotEmpty) {
       interests.add(user.profession!.toLowerCase());
     }
 
-    // Add education-based interests
     if (user.education != null && user.education!.isNotEmpty) {
       interests.add(user.education!.toLowerCase());
     }
 
-    // Add lifestyle interests based on profile data
     if (user.drinkingStatus != null) {
       interests.add('drinking_${user.drinkingStatus!.toLowerCase()}');
     }
@@ -214,51 +191,38 @@ class CompatibilityEngine {
     return interests;
   }
 
-  /// Calculate activity level compatibility
-  /// Prefers users who are both active or both less active
   static double _calculateActivityScore(UserModel user1, UserModel user2) {
     try {
       final activity1 = _calculateUserActivity(user1);
       final activity2 = _calculateUserActivity(user2);
-
-      // Calculate similarity in activity levels (0.0 = very different, 1.0 = very similar)
       final activityDifference = (activity1 - activity2).abs();
       final similarityScore = 1.0 - activityDifference;
-
-      // Boost score for highly active users
       final averageActivity = (activity1 + activity2) / 2;
       final activityBoost = averageActivity > 0.7 ? 0.2 : 0.0;
-
-      final score = (similarityScore + activityBoost).clamp(0.0, 1.0);
-
-      return score;
+      return (similarityScore + activityBoost).clamp(0.0, 1.0);
     } catch (e) {
       debugPrint('❌ Error calculating activity score: $e');
       return 0.5;
     }
   }
 
-  /// Calculate user activity level (0.0 = inactive, 1.0 = very active)
   static double _calculateUserActivity(UserModel user) {
     double activityScore = 0;
 
-    // Recent login activity
     if (user.lastSeen != null) {
       final daysSinceLastSeen =
           DateTime.now().difference(user.lastSeen!).inDays;
       if (daysSinceLastSeen <= 1) {
-        activityScore += 0.4; // Very recent activity
+        activityScore += 0.4;
       } else if (daysSinceLastSeen <= ACTIVITY_THRESHOLD_DAYS) {
         activityScore +=
             0.3 - (daysSinceLastSeen / ACTIVITY_THRESHOLD_DAYS) * 0.2;
       }
     }
 
-    // Profile completeness indicates engagement
     final completeness = _calculateProfileCompleteness(user);
     activityScore += completeness * 0.3;
 
-    // Number of photos indicates engagement
     final photoCount = user.imageUrl?.length ?? 0;
     if (photoCount >= 5) {
       activityScore += 0.2;
@@ -266,7 +230,6 @@ class CompatibilityEngine {
       activityScore += 0.1;
     }
 
-    // Bio length indicates engagement
     final bioLength = user.bio?.length ?? 0;
     if (bioLength >= 100) {
       activityScore += 0.1;
@@ -275,35 +238,24 @@ class CompatibilityEngine {
     return activityScore.clamp(0.0, 1.0);
   }
 
-  /// Calculate profile completeness score
-  /// Higher score for users with complete profiles
   static double _calculateCompletenessScore(UserModel user1, UserModel user2) {
     try {
       final completeness1 = _calculateProfileCompleteness(user1);
       final completeness2 = _calculateProfileCompleteness(user2);
-
-      // Average completeness of both profiles
       final averageCompleteness = (completeness1 + completeness2) / 2;
-
-      // Boost score if both profiles are highly complete
       final boost = (completeness1 > 0.8 && completeness2 > 0.8) ? 0.2 : 0.0;
-
-      final score = (averageCompleteness + boost).clamp(0.0, 1.0);
-
-      return score;
+      return (averageCompleteness + boost).clamp(0.0, 1.0);
     } catch (e) {
       debugPrint('❌ Error calculating completeness score: $e');
       return 0.5;
     }
   }
 
-  /// Calculate individual profile completeness (0.0 = empty, 1.0 = complete)
   static double _calculateProfileCompleteness(UserModel user) {
     double completeness = 0;
     int totalFields = 0;
     int completedFields = 0;
 
-    // Essential fields
     final essentialFields = [
       user.name,
       user.age?.toString(),
@@ -318,13 +270,11 @@ class CompatibilityEngine {
       }
     }
 
-    // Photos
     totalFields++;
     if (user.imageUrl != null && user.imageUrl!.isNotEmpty) {
       completedFields++;
     }
 
-    // Optional fields
     final optionalFields = [
       user.profession,
       user.education,
@@ -340,18 +290,15 @@ class CompatibilityEngine {
       }
     }
 
-    // Location
     totalFields++;
     if (user.coordinates != null && user.coordinates!.isNotEmpty) {
       completedFields++;
     }
 
     completeness = totalFields > 0 ? completedFields / totalFields : 0.0;
-
     return completeness.clamp(0.0, 1.0);
   }
 
-  /// Get detailed compatibility breakdown for debugging
   static CompatibilityBreakdown getCompatibilityBreakdown(
     UserModel user1,
     UserModel user2,
@@ -382,7 +329,6 @@ class CompatibilityEngine {
     );
   }
 
-  /// Batch calculate compatibility scores for multiple users
   static List<UserCompatibility> calculateBatchCompatibility(
     UserModel currentUser,
     List<UserModel> targetUsers,
@@ -399,10 +345,8 @@ class CompatibilityEngine {
       );
     }
 
-    // Sort by compatibility score (highest first)
     results
         .sort((a, b) => b.compatibilityScore.compareTo(a.compatibilityScore));
-
     return results;
   }
 }
@@ -452,18 +396,14 @@ class UserCompatibility {
   final UserModel user;
   final double compatibilityScore;
 
-  /// Get compatibility percentage as string
   String get compatibilityPercentage =>
       '${(compatibilityScore * 100).toStringAsFixed(1)}%';
 
-  /// Check if this is a high compatibility match
   bool get isHighCompatibility => compatibilityScore >= 0.7;
 
-  /// Check if this is a medium compatibility match
   bool get isMediumCompatibility =>
       compatibilityScore >= 0.5 && compatibilityScore < 0.7;
 
-  /// Check if this is a low compatibility match
   bool get isLowCompatibility => compatibilityScore < 0.5;
 
   @override

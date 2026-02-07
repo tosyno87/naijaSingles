@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
+
+import '../features/match/data/services/compatibility_engine.dart';
 import '../models/user_model.dart';
-import 'compatibility_engine.dart';
 
 /// Mode-specific compatibility engine that calculates different scores based on relationship intent
 /// Implements Priority 2: Enhanced Matching Algorithm with mode differentiation

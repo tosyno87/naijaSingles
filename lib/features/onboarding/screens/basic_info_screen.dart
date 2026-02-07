@@ -234,14 +234,13 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,
-                  child: BlocBuilder<OnboardingBloc, OnboardingState>(
-                    builder: (context, state) => Text(
-                      'Age: ${state.data?.age ?? 0}',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: afropeepGreen,
-                      ),
+                child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                  builder: (context, state) => Text(
+                    'Age: ${state.data?.age ?? 0}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: afropeepGreen,
                     ),
                   ),
                 ),

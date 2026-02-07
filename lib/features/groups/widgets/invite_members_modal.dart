@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../../data/services/unified_group_service.dart';
+import '../data/services/unified_group_service.dart';
 import '../../../services/user_service.dart';
 import '../../../common/utils/app_logger.dart';
 

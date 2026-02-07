@@ -8,9 +8,9 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/adds.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/crousle_slider.dart';
 import '../../../../common/utils/upload_media.dart';
@@ -46,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
-    final currentUser = Provider.of<UserProvider>(context).currentUser;
+    final currentUser = context.watch<UserBloc>().currentUser;
     return BlocListener<UserBloc, UserStates>(
       listener: (context, state) {
         if (state is UpdatingUserProfilePicture) {

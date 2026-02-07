@@ -5,13 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 
@@ -176,10 +174,7 @@ Future<void> deleteUserAndNavigateToLogin(
         'Account deleted Successfully'.tr().toString(),
         context,
       );
-      // Capture bloc/provider before navigation (context may be unmounted after)
       final userBloc = context.read<UserBloc>();
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      // Navigate to welcome screen to show all sign-in options
       Navigator.pushNamedAndRemoveUntil(
         context,
         RouteName.welcomeScreen,
@@ -187,7 +182,6 @@ Future<void> deleteUserAndNavigateToLogin(
       ).then((value) {
         userBloc.add(const UserDataUpdated(null));
         userBloc.add(const UserListenStopped());
-        userProvider.currentUser = null;
       });
     }
   } catch (e) {

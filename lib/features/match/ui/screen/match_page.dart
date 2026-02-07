@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../models/user_model.dart';
 import '../../../blockUser/screen/block_userlist.dart';
 import '../../../chat/ui/widgets/recent_chats.dart';
@@ -21,8 +21,7 @@ class MatchScreenState extends State<MatchScreen> {
   final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    currentUser = userProvider.currentUser;
+    currentUser = context.read<UserBloc>().currentUser!;
     super.initState();
   }
 

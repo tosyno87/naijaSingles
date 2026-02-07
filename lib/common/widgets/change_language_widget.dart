@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/home/ui/tab/tabbar.dart';
+import '../bloc/language/language_bloc.dart';
 import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
 import '../constants/constants.dart';
@@ -129,8 +130,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'English',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('en', 'US'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('en', 'US'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
                                         context,
@@ -146,8 +151,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'Spanish',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('es', 'ES'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('es', 'ES'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
                                         context,
@@ -163,8 +172,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'German',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('de', 'DE'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('de', 'DE'),
+                                              context,
+                                            ),
+                                          );
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -179,8 +192,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'Russian',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('ru', 'RU'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('ru', 'RU'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
                                         context,
@@ -198,8 +215,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'French',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('fr', 'FR'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('fr', 'FR'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
                                         context,
@@ -215,8 +236,12 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'Hindi',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('hi', 'IN'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('hi', 'IN'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
                                         context,

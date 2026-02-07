@@ -6,8 +6,7 @@ import '../../data/streetview_prefrences.dart';
 part 'streetview_event.dart';
 part 'streetview_state.dart';
 
-/// BLoC for managing street view preferences
-/// Replaces StreetViewProvider with BLoC pattern
+/// BLoC for managing street view preferences (who can see location).
 class StreetViewBloc extends Bloc<StreetViewEvent, StreetViewState> {
   StreetViewBloc(this.userId) : super(const StreetViewInitial()) {
     _preferences = StretViewPreferences(userId);

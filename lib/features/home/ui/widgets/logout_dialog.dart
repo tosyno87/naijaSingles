@@ -2,11 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../services/secure_storage_service.dart';
 
@@ -14,11 +14,9 @@ void showLogoutDialog(BuildContext context) {
   final FirebaseAuth auth = firebaseAuthInstance;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   Future<void> clearUserData() async {
-    // Clear any cached user data
-    final UserProvider userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-    userProvider.currentUser = null; // Reset user data in provider
-    userProvider.cancelCurrentUserSubscription(); // Cancel any subscriptions
+    final userBloc = context.read<UserBloc>();
+    userBloc.add(const UserDataUpdated(null));
+    userBloc.add(const UserListenStopped());
 
     // Clear secure storage (authentication tokens, user IDs, etc.)
     try {

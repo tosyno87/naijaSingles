@@ -12,8 +12,7 @@ import '../../utils/app_logger.dart';
 part 'user_event.dart';
 part 'user_state.dart';
 
-/// BLoC for managing current user state
-/// Replaces UserProvider with BLoC pattern
+/// BLoC for managing current user state (listens to Firestore user doc and auth).
 class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc() : super(const UserInitial()) {
     on<UserListenStarted>(_onUserListenStarted);

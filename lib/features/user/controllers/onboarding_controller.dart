@@ -6,10 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../../common/providers/user_provider.dart';
+import '../../../common/bloc/user/user_bloc.dart';
 import '../../../common/utils/app_logger.dart';
 import '../../../common/widgets/loading_transition_screen.dart';
 import '../../../services/bulk_photo_picker_service.dart';
@@ -574,40 +575,32 @@ class OnboardingController extends ChangeNotifier {
 
   // Navigate to main screen
   Future<void> _navigateToMainScreen(BuildContext context) async {
-    // Ensure UserProvider is updated before navigation
-    // This prevents MainNavigationScreen from redirecting back to onboarding
     try {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final userBloc = context.read<UserBloc>();
       final user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // Force UserProvider to reload user data from Firestore
-        // This ensures MainNavigationScreen sees the updated profile
-        await userProvider.listenCurrentUserdetails();
-
-        // Wait a bit for the listener to update
+        userBloc.add(const UserListenStarted());
         await Future.delayed(const Duration(milliseconds: 300));
 
-        // Verify user data is loaded before navigating
         int retries = 0;
         while (retries < 5 &&
-            (userProvider.currentUser == null ||
-                userProvider.currentUser?.name == null ||
-                (userProvider.currentUser?.name?.isEmpty ?? false))) {
+            (userBloc.currentUser == null ||
+                userBloc.currentUser?.name == null ||
+                (userBloc.currentUser?.name?.isEmpty ?? false))) {
           await Future.delayed(const Duration(milliseconds: 200));
           retries++;
         }
 
-        if (userProvider.currentUser?.name != null &&
-            userProvider.currentUser!.name!.isNotEmpty) {
-          log('✅ UserProvider updated with profile, navigating to main screen');
+        if (userBloc.currentUser?.name != null &&
+            userBloc.currentUser!.name!.isNotEmpty) {
+          log('✅ UserBloc updated with profile, navigating to main screen');
         } else {
-          log('⚠️ UserProvider not updated after retries, navigating anyway');
+          log('⚠️ UserBloc not updated after retries, navigating anyway');
         }
       }
-    } catch (e) {
-      log('⚠️ Error updating UserProvider before navigation: $e');
-      // Navigate anyway - MainNavigationScreen will handle the check
+    } on Object catch (e) {
+      log('⚠️ Error updating UserBloc before navigation: $e');
     }
 
     if (context.mounted) {

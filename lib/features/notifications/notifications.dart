@@ -11,7 +11,7 @@ import '../../common/constants/colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
-import '../../common/providers/user_provider.dart';
+import '../../common/bloc/user/user_bloc.dart';
 import '../../common/widgets/custom_snackbar.dart';
 import '../../common/widgets/hookup_circularbar.dart';
 import '../../common/widgets/image_widget.dart';
@@ -39,8 +39,7 @@ class NotificationsState extends State<Notifications> {
 
   @override
   void initState() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    currentUser = userProvider.currentUser;
+    currentUser = context.read<UserBloc>().currentUser;
     notificationReference =
         db.collection('users').doc(currentUser!.id).collection('Matches');
     _loadInitialNotifications();

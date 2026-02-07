@@ -5,12 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
-import '../../common/providers/user_provider.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/utils/app_logger.dart';
 import '../../common/widgets/custom_3d_icons.dart';
@@ -100,8 +98,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     developer.log('✅ User is authenticated: ${currentUser.uid}');
 
     final userBloc = context.read<UserBloc>();
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // Set a maximum timeout to prevent infinite loading
     const maxWaitTime = Duration(seconds: 3);
@@ -109,8 +105,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     // Force reload user data from Firestore (in case we just completed onboarding)
     try {
-      await userProvider.listenCurrentUserdetails();
-    } catch (e) {
+      userBloc.add(const UserListenStarted());
+    } on Object catch (e) {
       developer.log('⚠️ Error reloading user data: $e');
     }
 
@@ -158,9 +154,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             developer.log(
                 '✅ User data found in Firestore, updating UserBloc...');
             final userModel = UserModel.fromDocument(doc);
-            // Update UserBloc (BLoC will automatically update via Firestore listener)
-            // Also update Provider for backward compatibility
-            userProvider.currentUser = userModel;
+            userBloc.add(UserDataUpdated(userModel));
 
             if (mounted) {
               setState(() {
@@ -201,13 +195,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final userBloc = context.watch<UserBloc>();
     final currentUser = userBloc.currentUser;
-    final userProvider = Provider.of<UserProvider>(context);
 
     // Show loading screen while checking registration - prevent any content flash
     if (!_hasCheckedRegistration ||
         currentUser == null ||
         currentUser.name == null ||
-        (userProvider.currentUser?.name?.isEmpty ?? false)) {
+        (currentUser.name?.isEmpty ?? false)) {
       // If we haven't checked yet or user doesn't exist, show loading
       // This prevents the wrong screen from appearing
       if (!_hasCheckedRegistration) {

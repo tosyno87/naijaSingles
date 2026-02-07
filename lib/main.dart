@@ -19,9 +19,6 @@ import 'common/bloc/theme/theme_bloc.dart';
 import 'common/bloc/user/user_bloc.dart';
 import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
-import 'common/providers/language_provide.dart';
-import 'common/providers/street_view_provider.dart';
-import 'common/providers/user_provider.dart';
 import 'common/routes/route_name.dart';
 import 'common/routes/router.dart';
 import 'common/utils/observer.dart';
@@ -102,7 +99,7 @@ Future<void> main() async {
 
     // Initialize seed events if database is empty (only if user is authenticated)
     // Events seeding requires authentication per Firestore security rules
-    // This will be handled after user login in UserProvider or similar
+    // This will be handled after user login in UserBloc or similar
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
@@ -250,7 +247,6 @@ Future<void> main() async {
           ],
           child: MultiProvider(
             providers: [
-              ChangeNotifierProvider(create: (_) => UserProvider()),
               ChangeNotifierProvider(create: (_) => OnboardingController()),
             ],
             child: const MyApp(),

@@ -6,8 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'language_event.dart';
 part 'language_state.dart';
 
-/// BLoC for managing app language/locale
-/// Replaces LanguageProvider with BLoC pattern
+/// BLoC for managing app language/locale (delegates to EasyLocalization).
 class LanguageBloc extends Bloc<LanguageEvent, LanguageState> {
   LanguageBloc() : super(LanguageInitial(const Locale('en', 'US'))) {
     on<LanguageLocaleChanged>(_onLanguageLocaleChanged);

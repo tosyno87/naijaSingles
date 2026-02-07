@@ -11,10 +11,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../common/utils/welcome_dialog.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
@@ -212,8 +212,7 @@ class AllowLocation extends StatelessWidget {
                         }
                         if (state is RegistrationSuccess) {
                           log('userregistrationsuccess');
-                          Provider.of<UserProvider>(context, listen: false)
-                              .currentUser = state.user;
+                          context.read<UserBloc>().add(UserDataUpdated(state.user));
                           isProcessing.value = false;
                           showWelcomDialog(context);
                         }

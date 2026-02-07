@@ -13,7 +13,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/data/repo/phone_auth_repo.dart';
-import '../../../../../common/providers/user_provider.dart';
+import '../../../../../common/bloc/user/user_bloc.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../../../../common/widgets/hookup_circularbar.dart';
@@ -355,8 +355,7 @@ class _OtpPageState extends State<OtpPage> {
 
                           // Only proceed to main navigation if this is a LOGIN flow AND user has complete profile
                           _hasNavigated = true;
-                          Provider.of<UserProvider>(context, listen: false)
-                              .currentUser = state.user;
+                          context.read<UserBloc>().add(UserDataUpdated(state.user));
 
                           // Small delay to ensure all state is properly set
                           Future.microtask(() {

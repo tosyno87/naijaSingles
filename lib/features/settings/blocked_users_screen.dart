@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/app_colors.dart';
-import '../../common/providers/user_provider.dart';
+import '../../common/bloc/user/user_bloc.dart';
 import '../../services/settings_service.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
@@ -27,8 +27,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
   }
 
   void _initializeData() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    _currentUserId = userProvider.currentUser?.id;
+    _currentUserId = context.read<UserBloc>().currentUser?.id;
     if (_currentUserId != null) {
       _loadBlockedUsers();
     }

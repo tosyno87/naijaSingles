@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../common/providers/user_provider.dart';
+import '../../common/bloc/user/user_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../common/routes/route_name.dart';
 import '../settings/account_deletion_screen.dart';
 import '../settings/help_center_screen.dart';
@@ -718,9 +719,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       // Cancel subscriptions and clear user data BEFORE sign out
       try {
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        userProvider.currentUser = null;
-        userProvider.cancelCurrentUserSubscription();
+        final userBloc = context.read<UserBloc>();
+        userBloc.add(const UserDataUpdated(null));
+        userBloc.add(const UserListenStopped());
       } catch (e) {
         log('Error clearing user provider: $e');
       }

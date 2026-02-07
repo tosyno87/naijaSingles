@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../common/constants/colors.dart';
-import '../../../../../common/providers/street_view_provider.dart';
+import '../../../../../common/bloc/streetview/streetview_bloc.dart';
 import '../../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/change_language_widget.dart';
@@ -326,9 +326,9 @@ class SettingPageState extends State<SettingPage> {
                     const LanguageWidget(),
 
                     // for streetview setting of users
-                    ChangeNotifierProvider(
+                    BlocProvider<StreetViewBloc>(
                       create: (context) =>
-                          StreetViewProvider(widget.currentUser.id!),
+                          StreetViewBloc(widget.currentUser.id!),
                       child: StreetViewButtonWigdet(
                         currentUser: widget.currentUser,
                       ),

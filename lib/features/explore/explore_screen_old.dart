@@ -6,7 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../common/data/repo/user_search_repo.dart';
-import '../../common/providers/user_provider.dart';
+import '../../common/bloc/user/user_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../models/user_model.dart';
 import 'screens/tribe_connect_screen.dart';
 
@@ -69,9 +70,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   Future<void> _loadCurrentUser() async {
     try {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      if (userProvider.currentUser != null) {
-        _currentUser = userProvider.currentUser;
+      final userFromBloc = context.read<UserBloc>().currentUser;
+      if (userFromBloc != null) {
+        _currentUser = userFromBloc;
         // Ensure maxDistance is reasonable for testing
         if (_currentUser!.maxDistance == null ||
             _currentUser!.maxDistance! < 100) {

@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/language/language_bloc.dart';
 import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
 import '../constants/constants.dart';
@@ -217,7 +218,9 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
   }
 }
 
-void _refreshPage(BuildContext context, {required String lCode, cCode}) {
-  EasyLocalization.of(context)!.setLocale(Locale(lCode, cCode));
+void _refreshPage(BuildContext context, {required String lCode, required String cCode}) {
+  context.read<LanguageBloc>().add(
+        LanguageLocaleChanged(Locale(lCode, cCode), context),
+      );
   Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
 }

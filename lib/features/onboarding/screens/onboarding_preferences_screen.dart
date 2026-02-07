@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingPreferencesScreen extends StatefulWidget {
@@ -21,13 +22,14 @@ class _OnboardingPreferencesScreenState
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    _selectedInterestedIn = controller.interestedIn;
-    _ageRange = RangeValues(
-      controller.ageRange[0].toDouble(),
-      controller.ageRange[1].toDouble(),
-    );
+    final data = context.read<OnboardingBloc>().state.data;
+    if (data != null) {
+      _selectedInterestedIn = data.interestedIn;
+      _ageRange = RangeValues(
+        data.ageRange[0].toDouble(),
+        data.ageRange[1].toDouble(),
+      );
+    }
   }
 
   @override
@@ -170,14 +172,12 @@ class _OnboardingPreferencesScreenState
   }
 
   void _saveAndContinue() {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    context.read<OnboardingBloc>()
+      ..add(OnboardingInterestedInUpdated(_selectedInterestedIn))
+      ..add(OnboardingAgeRangeUpdated(
+        [_ageRange.start.round(), _ageRange.end.round()],
+      ));
 
-    // Save preferences to controller
-    controller.setInterestedIn(_selectedInterestedIn);
-    controller.setAgeRange([_ageRange.start.round(), _ageRange.end.round()]);
-
-    // Call the onNext callback to move to next page
     if (widget.onNext != null) {
       widget.onNext!();
     }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
-import '../../../common/utils/app_logger.dart';
-import '../../user/controllers/onboarding_controller.dart';
+import '../bloc/onboarding_bloc.dart';
 
 class PreferencesOnboardingScreen extends StatefulWidget {
   const PreferencesOnboardingScreen({super.key});
@@ -22,21 +21,16 @@ class _PreferencesOnboardingScreenState
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    _selectedInterestedIn = controller.interestedIn;
-    _ageRange = RangeValues(
-      controller.ageRange[0].toDouble(),
-      controller.ageRange[1].toDouble(),
-    );
-    _maxDistance = controller.maxDistance.toDouble();
+    final data = context.read<OnboardingBloc>().state.data;
 
-    // Debug logging
-    AppLogger.debug('🔍 PreferencesOnboardingScreen initState:');
-    AppLogger.debug('   Initial interestedIn: "${controller.interestedIn}"');
-    AppLogger.debug('   Initial ageRange: ${controller.ageRange}');
-    AppLogger.debug('   Local selectedInterestedIn: "$_selectedInterestedIn"');
-    AppLogger.debug('   Local ageRange: $_ageRange');
+    if (data != null) {
+      _selectedInterestedIn = data.interestedIn;
+      _ageRange = RangeValues(
+        data.ageRange[0].toDouble(),
+        data.ageRange[1].toDouble(),
+      );
+      _maxDistance = data.maxDistance.toDouble();
+    }
   }
 
   @override
@@ -137,21 +131,10 @@ class _PreferencesOnboardingScreenState
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedInterestedIn = value;
-        });
-        // Save to controller immediately
-        final controller =
-            Provider.of<OnboardingController>(context, listen: false);
-        controller.setInterestedIn(value);
-
-        // Debug logging
-        AppLogger.debug(
-          '🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"',
-        );
-        AppLogger.debug(
-          '   Controller interestedIn after setting: "${controller.interestedIn}"',
-        );
+        setState(() => _selectedInterestedIn = value);
+        context.read<OnboardingBloc>().add(
+              OnboardingInterestedInUpdated(value),
+            );
       },
       child: Container(
         width: double.infinity,
@@ -230,21 +213,13 @@ class _PreferencesOnboardingScreenState
           activeColor: const Color(0xFF008037),
           inactiveColor: Colors.grey.shade300,
           onChanged: (RangeValues values) {
-            setState(() {
-              _ageRange = values;
-            });
-            // Save to controller immediately
-            final controller =
-                Provider.of<OnboardingController>(context, listen: false);
-            controller.setAgeRange([values.start.round(), values.end.round()]);
-
-            // Debug logging
-            AppLogger.debug(
-              '🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}',
-            );
-            AppLogger.debug(
-              '   Controller ageRange after setting: ${controller.ageRange}',
-            );
+            setState(() => _ageRange = values);
+            context.read<OnboardingBloc>().add(
+                  OnboardingAgeRangeUpdated([
+                    values.start.round(),
+                    values.end.round(),
+                  ]),
+                );
           },
         ),
       ],
@@ -279,18 +254,10 @@ class _PreferencesOnboardingScreenState
               ? 'Anywhere'
               : '${_maxDistance.round()} miles',
           onChanged: (double value) {
-            setState(() {
-              _maxDistance = value;
-            });
-            // Save to controller immediately
-            final controller =
-                Provider.of<OnboardingController>(context, listen: false);
-            controller.setMaxDistance(value.round());
-
-            // Debug logging
-            AppLogger.debug(
-              '🔍 PreferencesOnboardingScreen: Max distance changed to: ${value.round()} miles',
-            );
+            setState(() => _maxDistance = value);
+            context.read<OnboardingBloc>().add(
+                  OnboardingMaxDistanceUpdated(value.round()),
+                );
           },
         ),
         Padding(

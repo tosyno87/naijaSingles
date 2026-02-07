@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../user/controllers/onboarding_controller.dart';
+import 'bloc/onboarding_bloc.dart';
+import 'bloc/onboarding_data.dart';
 import 'shared_styles.dart';
 
 /// Bio Info step of onboarding focusing on personal details.
@@ -49,34 +50,28 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
   void initState() {
     super.initState();
 
-    // Initialize text controllers with existing values if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
-
-      if (controller.userName != null) {
-        _nameController.text = controller.userName!;
+      final data = context.read<OnboardingBloc>().state.data;
+      if (data != null) {
+        if (data.userName != null) {
+          _nameController.text = data.userName!;
+        }
+        if (data.dateOfBirth != null) {
+          final now = DateTime.now();
+          final age = now.year -
+              data.dateOfBirth!.year -
+              (now.month < data.dateOfBirth!.month ||
+                      (now.month == data.dateOfBirth!.month &&
+                          now.day < data.dateOfBirth!.day)
+                  ? 1
+                  : 0);
+          _selectedAge = age;
+        }
+        if (data.locationName != null) {
+          _locationController.text = data.locationName!;
+        }
+        _bioController.text = data.bio;
       }
-
-      if (controller.dateOfBirth != null) {
-        // Calculate age from date of birth
-        final now = DateTime.now();
-        final age = now.year -
-            controller.dateOfBirth!.year -
-            (now.month < controller.dateOfBirth!.month ||
-                    (now.month == controller.dateOfBirth!.month &&
-                        now.day < controller.dateOfBirth!.day)
-                ? 1
-                : 0);
-
-        _selectedAge = age;
-      }
-
-      if (controller.locationName != null) {
-        _locationController.text = controller.locationName!;
-      }
-
-      _bioController.text = controller.bio;
     });
   }
 
@@ -237,7 +232,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data ?? OnboardingData();
 
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);
@@ -728,11 +725,9 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                       onPressed: () {
                         // Validate form
                         if (_validateFields()) {
-                          // Save data to controller
-                          controller
-                              .updateUserName(_nameController.text.trim());
+                          final bloc = context.read<OnboardingBloc>();
+                          bloc.add(OnboardingFullNameUpdated(_nameController.text.trim()));
 
-                          // Create a date of birth from the age
                           if (_selectedAge != null) {
                             final now = DateTime.now();
                             final dob = DateTime(
@@ -740,19 +735,16 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
                               now.month,
                               now.day,
                             );
-                            controller.updateDateOfBirth(dob);
+                            bloc.add(OnboardingDateOfBirthUpdated(dob));
                           }
 
-                          // Save location (in a real app, we would also save lat/lng)
-                          // For now, we'll just use a placeholder for lat/lng
-                          controller.updateLocation(
+                          bloc.add(OnboardingLocationUpdated(
                             0,
                             0,
                             _locationController.text.trim(),
-                          );
+                          ));
 
-                          // Save bio
-                          controller.updateBio(_bioController.text.trim());
+                          bloc.add(OnboardingBioUpdated(_bioController.text.trim()));
 
                           // Proceed to next step
                           HapticFeedback.mediumImpact();
@@ -792,6 +784,8 @@ class _OnboardingStepBioState extends State<OnboardingStepBio> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

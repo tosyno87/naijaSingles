@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 
 class BioScreen extends StatefulWidget {
   const BioScreen({super.key});
@@ -19,15 +20,12 @@ class _BioScreenState extends State<BioScreen> {
   void initState() {
     super.initState();
 
-    // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
-
-      if (controller.bio.isNotEmpty) {
-        _bioController.text = controller.bio;
+      final data = context.read<OnboardingBloc>().state.data;
+      if (data != null && data.bio.isNotEmpty) {
+        _bioController.text = data.bio;
         setState(() {
-          _currentLength = controller.bio.length;
+          _currentLength = data.bio.length;
         });
       }
     });
@@ -113,9 +111,7 @@ class _BioScreenState extends State<BioScreen> {
                   _currentLength = value.length;
                 });
 
-                // Save to controller
-                Provider.of<OnboardingController>(context, listen: false)
-                    .setBio(value);
+                context.read<OnboardingBloc>().add(OnboardingBioUpdated(value));
               },
             ),
           ),

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../common/utils/app_logger.dart';
-import '../user/controllers/onboarding_controller.dart';
+import 'bloc/onboarding_bloc.dart';
+import 'bloc/onboarding_data.dart';
 import 'shared_styles.dart';
 
 /// First step of onboarding focusing on cultural roots.
@@ -119,18 +120,15 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
       setState(() {});
     });
 
-    // Initialize text controller with existing value if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
-      if (controller.tribe.isNotEmpty) {
-        AppLogger.debug("Setting initial tribe: '${controller.tribe}'");
-        _tribeController.text = controller.tribe;
+      final data = context.read<OnboardingBloc>().state.data;
+      if (data != null && data.tribe.isNotEmpty) {
+        AppLogger.debug("Setting initial tribe: '${data.tribe}'");
+        _tribeController.text = data.tribe;
 
-        // Check if the tribe is in our dropdown list
-        if (_africanTribes.contains(controller.tribe)) {
+        if (_africanTribes.contains(data.tribe)) {
           setState(() {
-            _selectedTribe = controller.tribe;
+            _selectedTribe = data.tribe;
             _isCustomTribe = false;
           });
         } else {
@@ -153,7 +151,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data ?? OnboardingData();
 
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
@@ -254,7 +254,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             _selectedTribe = value;
                             _isCustomTribe = false;
                             _tribeController.text = value ?? '';
-                            controller.updateTribe(value ?? '');
+                            context.read<OnboardingBloc>().add(OnboardingTribeUpdated(value ?? ''));
                           });
                         }
                       },
@@ -351,7 +351,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           color: Colors.black87,
                         ),
                         onChanged: (value) {
-                          controller.updateTribe(value.trim());
+                          context.read<OnboardingBloc>().add(OnboardingTribeUpdated(value.trim()));
                         },
                       ),
                     ],
@@ -370,11 +370,11 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     const SizedBox(height: 12),
 
                     // Display selected languages as chips
-                    if (controller.languages.isNotEmpty) ...[
+                    if (data.languages.isNotEmpty) ...[
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: controller.languages
+                        children: data.languages
                             .map(
                               (language) => Chip(
                                 label: Text(
@@ -390,11 +390,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 onDeleted: () {
                                   setState(() {
                                     final List<String> updatedLanguages = [
-                                      ...controller.languages,
+                                      ...data.languages,
                                     ];
                                     updatedLanguages.remove(language);
-                                    controller
-                                        .updateLanguages(updatedLanguages);
+                                    context.read<OnboardingBloc>().add(
+                                      OnboardingLanguagesUpdated(updatedLanguages),
+                                    );
                                   });
                                 },
                               ),
@@ -427,12 +428,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             _isCustomLanguage = false;
 
                             // Add to languages list if not already there
-                            if (!controller.languages.contains(value)) {
+                            if (!data.languages.contains(value)) {
                               final List<String> updatedLanguages = [
-                                ...controller.languages,
+                                ...data.languages,
                               ];
                               updatedLanguages.add(value);
-                              controller.updateLanguages(updatedLanguages);
+                              context.read<OnboardingBloc>().add(OnboardingLanguagesUpdated(updatedLanguages));
 
                               // Reset dropdown after selection
                               _selectedLanguage = null;
@@ -549,14 +550,15 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               if (customLanguage.isNotEmpty) {
                                 setState(() {
                                   // Add custom language to the list
-                                  if (!controller.languages
+                                  if (!data.languages
                                       .contains(customLanguage)) {
                                     final List<String> updatedLanguages = [
-                                      ...controller.languages,
+                                      ...data.languages,
                                     ];
                                     updatedLanguages.add(customLanguage);
-                                    controller
-                                        .updateLanguages(updatedLanguages);
+                                    context.read<OnboardingBloc>().add(
+                                      OnboardingLanguagesUpdated(updatedLanguages),
+                                    );
                                   }
 
                                   // Reset custom language state
@@ -613,8 +615,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     ..._intentOptions.map(
                       (option) => _buildIntentOption(
                         option: option,
-                        isSelected: controller.intent == option['value'],
-                        onTap: () => controller.updateIntent(option['value']),
+                        isSelected: data.intent == option['value'],
+                        onTap: () => context.read<OnboardingBloc>().add(OnboardingIntentUpdated(option['value'])),
                         deepGreen: deepGreen,
                       ),
                     ),
@@ -631,7 +633,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   height: 56,
                   child: ElevatedButton(
                     key: _continueButtonKey,
-                    onPressed: _isStepValid(controller)
+                    onPressed: _isStepValid(data)
                         ? () {
                             HapticFeedback.mediumImpact();
                             widget.onNext();
@@ -661,6 +663,8 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 
@@ -762,15 +766,13 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
       );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) {
-    // For tribe, check if a dropdown option is selected or custom tribe is entered
+  bool _isStepValid(OnboardingData data) {
     bool isTribeValid = _selectedTribe != null;
     if (_selectedTribe == 'Other') {
       isTribeValid = _tribeController.text.trim().isNotEmpty;
     }
-
     return isTribeValid &&
-        controller.languages.isNotEmpty &&
-        controller.intent != null;
+        data.languages.isNotEmpty &&
+        data.intent != null;
   }
 }

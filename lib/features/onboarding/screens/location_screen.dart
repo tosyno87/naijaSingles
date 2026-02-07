@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import '../../../common/utils/app_logger.dart';
-import '../../user/controllers/onboarding_controller.dart';
+import '../bloc/onboarding_bloc.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -32,13 +32,12 @@ class _LocationScreenState extends State<LocationScreen> {
 
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
+      final data = context.read<OnboardingBloc>().state.data;
 
-      if (controller.locationName != null &&
-          controller.locationName!.isNotEmpty) {
+      if (data?.locationName != null &&
+          data!.locationName!.isNotEmpty) {
         setState(() {
-          _currentLocation = controller.locationName;
+          _currentLocation = data.locationName;
         });
       }
     });
@@ -119,14 +118,14 @@ class _LocationScreenState extends State<LocationScreen> {
           _isLoadingLocation = false;
         });
 
-        // Save to controller - CRITICAL FOR DISCOVERY
-        final controller =
-            Provider.of<OnboardingController>(context, listen: false);
-        controller.setLocationName(location);
-        controller.setLocationCoordinates(
-          position.latitude,
-          position.longitude,
-        );
+        // Save to bloc - CRITICAL FOR DISCOVERY
+        context.read<OnboardingBloc>().add(
+              OnboardingLocationUpdated(
+                position.latitude,
+                position.longitude,
+                location,
+              ),
+            );
 
         AppLogger.info('🔍 LocationScreen: GPS location set to "$location"');
         AppLogger.info(

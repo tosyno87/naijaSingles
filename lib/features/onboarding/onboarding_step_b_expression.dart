@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/constants/app_colors.dart';
 
-import '../user/controllers/onboarding_controller.dart';
+import 'bloc/onboarding_bloc.dart';
+import 'bloc/onboarding_data.dart';
 import 'shared_styles.dart';
 
 /// Second step of onboarding focusing on self-expression.
@@ -71,15 +72,15 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
       duration: const Duration(milliseconds: 300),
     );
 
-    // Initialize text controllers with existing values if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
-      if (controller.fashionStyle != null) {
-        _fashionController.text = controller.fashionStyle!;
-      }
-      if (controller.weekendVibe != null) {
-        _weekendController.text = controller.weekendVibe!;
+      final data = context.read<OnboardingBloc>().state.data;
+      if (data != null) {
+        if (data.fashionStyle != null) {
+          _fashionController.text = data.fashionStyle!;
+        }
+        if (data.weekendVibe != null) {
+          _weekendController.text = data.weekendVibe!;
+        }
       }
     });
   }
@@ -94,7 +95,9 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data ?? OnboardingData();
 
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
@@ -223,7 +226,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                             runSpacing: 12,
                             children: _musicGenres.map((genre) {
                               final isSelected =
-                                  controller.genres.contains(genre);
+                                  data.genres.contains(genre);
                               return FilterChip(
                                 label: Text(
                                   genre,
@@ -238,14 +241,14 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                                 selected: isSelected,
                                 onSelected: (selected) {
                                   final List<String> updatedGenres = [
-                                    ...controller.genres,
+                                    ...data.genres,
                                   ];
                                   if (selected) {
                                     updatedGenres.add(genre);
                                   } else {
                                     updatedGenres.remove(genre);
                                   }
-                                  controller.updateGenres(updatedGenres);
+                                  context.read<OnboardingBloc>().add(OnboardingGenresUpdated(updatedGenres));
                                   HapticFeedback.selectionClick();
                                 },
                                 backgroundColor: Colors.white,
@@ -342,7 +345,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                             ),
                           ),
                           onChanged: (value) {
-                            controller.updateFashionStyle(value.trim());
+                            context.read<OnboardingBloc>().add(OnboardingFashionStyleUpdated(value.trim()));
                           },
                         ),
                       ],
@@ -423,7 +426,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                             ),
                           ),
                           onChanged: (value) {
-                            controller.updateWeekendVibe(value.trim());
+                            context.read<OnboardingBloc>().add(OnboardingWeekendVibeUpdated(value.trim()));
                           },
                         ),
                       ],
@@ -488,7 +491,7 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
                       height: 56,
                       child: ElevatedButton(
                         key: _continueButtonKey,
-                        onPressed: _isStepValid(controller)
+                        onPressed: _isStepValid(data)
                             ? () {
                                 HapticFeedback.mediumImpact();
                                 widget.onNext();
@@ -520,6 +523,8 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
         ),
       ),
     );
+      },
+    );
   }
 
   /// Builds a section title with consistent styling
@@ -533,10 +538,10 @@ class _OnboardingStepBExpressionState extends State<OnboardingStepBExpression>
       );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) =>
-      controller.genres.isNotEmpty &&
-      controller.fashionStyle != null &&
-      controller.fashionStyle!.trim().isNotEmpty &&
-      controller.weekendVibe != null &&
-      controller.weekendVibe!.trim().isNotEmpty;
+  bool _isStepValid(OnboardingData data) =>
+      data.genres.isNotEmpty &&
+      data.fashionStyle != null &&
+      data.fashionStyle!.trim().isNotEmpty &&
+      data.weekendVibe != null &&
+      data.weekendVibe!.trim().isNotEmpty;
 }

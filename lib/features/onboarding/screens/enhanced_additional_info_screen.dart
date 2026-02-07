@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/afropeep_height_dropdown.dart';
 
 class EnhancedAdditionalInfoScreen extends StatefulWidget {
@@ -443,21 +444,21 @@ class _EnhancedAdditionalInfoScreenState
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    final data = context.read<OnboardingBloc>().state.data;
 
-    // Initialize from controller if available
-    if (controller.height > 0) {
-      _heightCm = controller.height.round();
+    if (data != null && data.height > 0) {
+      _heightCm = data.height.round();
       final String? ftIn = HeightData.getFtInFromCm(_heightCm);
       if (ftIn != null) {
         _heightFtIn = ftIn;
       }
     }
 
+    if (data == null) return;
+
     // Map controller value to display value
     String displayValue;
-    switch (controller.lookingFor) {
+    switch (data.lookingFor) {
       case 'Dating':
         displayValue = 'Dating & Romance';
         break;
@@ -474,13 +475,13 @@ class _EnhancedAdditionalInfoScreenState
         displayValue = 'Dating & Romance';
     }
     _platformPurpose = displayValue;
-    _relationshipIntent = controller.relationshipIntent;
-    _education = controller.educationLevel;
-    _religion = controller.religion;
+    _relationshipIntent = data.relationshipIntent;
+    _education = data.education ?? '';
+    _religion = data.religion;
 
     // Handle primary language - check if it's in our predefined list
-    if (controller.spokenLanguages.isNotEmpty) {
-      final controllerLanguage = controller.spokenLanguages.first;
+    if (data.languages.isNotEmpty) {
+      final controllerLanguage = data.languages.first;
       final isInPredefinedList = _languageOptions
           .any((option) => option['value'] == controllerLanguage);
 
@@ -494,9 +495,9 @@ class _EnhancedAdditionalInfoScreenState
       }
     }
 
-    _occupation = controller.occupation;
-    _drinkingPreference = controller.drinkingPreference;
-    _smokingPreference = controller.smokingPreference;
+    _occupation = data.occupation ?? '';
+    _drinkingPreference = data.drinkingPreference;
+    _smokingPreference = data.smokingPreference;
   }
 
   int _getCompletedFieldsCount() {
@@ -667,9 +668,9 @@ class _EnhancedAdditionalInfoScreenState
                 _heightFtIn = heightFtIn;
                 _heightCm = heightCm;
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              controller.setHeightFromDropdown(heightFtIn, heightCm);
+              context.read<OnboardingBloc>().add(
+                OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
+              );
             },
           ),
 
@@ -701,9 +702,9 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _relationshipIntent = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setRelationshipIntent(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingRelationshipIntentUpdated(value),
+                );
               },
             ),
           ],
@@ -767,9 +768,9 @@ class _EnhancedAdditionalInfoScreenState
               setState(() {
                 _education = value;
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              controller.setEducation(value);
+              context.read<OnboardingBloc>().add(
+                OnboardingEducationUpdated(value),
+              );
             },
           ),
 
@@ -790,9 +791,9 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _religion = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setReligion(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingReligionUpdated(value),
+                );
               },
             ),
             SizedBox(height: isTablet ? 32 : 24),
@@ -825,12 +826,11 @@ class _EnhancedAdditionalInfoScreenState
                   _customLanguageController.clear();
                 }
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              // Update controller with selected language or custom language
               final languageToSave = value == 'Other' ? _customLanguage : value;
               if (languageToSave.isNotEmpty) {
-                controller.setSpokenLanguages([languageToSave]);
+                context.read<OnboardingBloc>().add(
+                  OnboardingLanguagesUpdated([languageToSave]),
+                );
               }
             },
           ),
@@ -883,11 +883,10 @@ class _EnhancedAdditionalInfoScreenState
                   setState(() {
                     _customLanguage = value;
                   });
-                  final controller =
-                      Provider.of<OnboardingController>(context, listen: false);
-                  // Update controller with custom language
                   if (value.isNotEmpty) {
-                    controller.setSpokenLanguages([value]);
+                    context.read<OnboardingBloc>().add(
+                      OnboardingLanguagesUpdated([value]),
+                    );
                   }
                 },
               ),
@@ -922,9 +921,9 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _drinkingPreference = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setDrinkingPreference(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingDrinkingPreferenceUpdated(value),
+                );
               },
             ),
 
@@ -948,9 +947,9 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _smokingPreference = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setSmokingPreference(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingSmokingPreferenceUpdated(value),
+                );
               },
             ),
 
@@ -1417,9 +1416,6 @@ class _EnhancedAdditionalInfoScreenState
               setState(() {
                 _platformPurpose = value;
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              // Map display values back to controller values
               String controllerValue;
               switch (value) {
                 case 'Dating & Romance':
@@ -1437,7 +1433,9 @@ class _EnhancedAdditionalInfoScreenState
                 default:
                   controllerValue = 'Dating';
               }
-              controller.setLookingFor(controllerValue);
+              context.read<OnboardingBloc>().add(
+                OnboardingLookingForUpdated(controllerValue),
+              );
             }
           },
         ),

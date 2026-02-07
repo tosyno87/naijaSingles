@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/afropeep_height_dropdown.dart';
 
 class AdditionalInfoOnboardingScreen extends StatefulWidget {
@@ -59,12 +60,10 @@ class _AdditionalInfoOnboardingScreenState
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    final data = context.read<OnboardingBloc>().state.data;
 
-    // Initialize height from controller if available
-    if (controller.height > 0) {
-      _heightCm = controller.height.round();
+    if (data != null && data.height > 0) {
+      _heightCm = data.height.round();
       // Try to find matching ft/in value
       final String? ftIn = HeightData.getFtInFromCm(_heightCm);
       if (ftIn != null) {
@@ -72,8 +71,10 @@ class _AdditionalInfoOnboardingScreenState
       }
     }
 
-    _lookingFor = controller.lookingFor;
-    _relationshipIntent = controller.relationshipIntent;
+    if (data != null) {
+      _lookingFor = data.lookingFor;
+      _relationshipIntent = data.relationshipIntent;
+    }
   }
 
   @override
@@ -120,10 +121,9 @@ class _AdditionalInfoOnboardingScreenState
                 _heightFtIn = heightFtIn;
                 _heightCm = heightCm;
               });
-              // Save to controller
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              controller.setHeightFromDropdown(heightFtIn, heightCm);
+              context.read<OnboardingBloc>().add(
+                OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
+              );
             },
           ),
 
@@ -196,10 +196,9 @@ class _AdditionalInfoOnboardingScreenState
                 setState(() {
                   _lookingFor = value;
                 });
-                // Save to controller
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setLookingFor(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingLookingForUpdated(value),
+                );
               },
               option['icon'],
             ),
@@ -224,10 +223,9 @@ class _AdditionalInfoOnboardingScreenState
                 setState(() {
                   _relationshipIntent = value;
                 });
-                // Save to controller
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setRelationshipIntent(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingRelationshipIntentUpdated(value),
+                );
               },
               option['icon'],
             ),

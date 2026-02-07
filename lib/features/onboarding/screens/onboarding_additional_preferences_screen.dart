@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingAdditionalPreferencesScreen extends StatefulWidget {
@@ -15,8 +16,8 @@ class OnboardingAdditionalPreferencesScreen extends StatefulWidget {
 
 class _OnboardingAdditionalPreferencesScreenState
     extends State<OnboardingAdditionalPreferencesScreen> {
-  late double _height;
-  late String _heightUnit;
+  double _height = 170;
+  String _heightUnit = 'cm';
   String _lookingFor = 'Dating';
   String _relationshipIntent = 'Not sure yet';
 
@@ -60,12 +61,13 @@ class _OnboardingAdditionalPreferencesScreenState
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    _height = controller.height;
-    _heightUnit = controller.heightUnit;
-    _lookingFor = controller.lookingFor;
-    _relationshipIntent = controller.relationshipIntent;
+    final data = context.read<OnboardingBloc>().state.data;
+    if (data != null) {
+      _height = data.height.toDouble();
+      _heightUnit = data.heightUnit;
+      _lookingFor = data.lookingFor;
+      _relationshipIntent = data.relationshipIntent;
+    }
   }
 
   @override
@@ -201,15 +203,11 @@ class _OnboardingAdditionalPreferencesScreenState
   }
 
   void _saveAndContinue() {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    context.read<OnboardingBloc>()
+      ..add(OnboardingHeightUpdated(_height, _heightUnit))
+      ..add(OnboardingLookingForUpdated(_lookingFor))
+      ..add(OnboardingRelationshipIntentUpdated(_relationshipIntent));
 
-    // Save all preferences
-    controller.setHeight(_height, _heightUnit);
-    controller.setLookingFor(_lookingFor);
-    controller.setRelationshipIntent(_relationshipIntent);
-
-    // Call the onNext callback to complete onboarding
     if (widget.onNext != null) {
       widget.onNext!();
     }

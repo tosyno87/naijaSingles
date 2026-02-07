@@ -1,4 +1,4 @@
-import '../../user/controllers/onboarding_controller.dart';
+import '../../onboarding/bloc/onboarding_data.dart';
 import '../models/matched_user_model.dart';
 
 /// Service for managing match-related operations including personalized matching,
@@ -140,12 +140,12 @@ class MatchService {
 
   /// Get personalized matches based on user preferences
   ///
-  /// [controller] - The onboarding controller containing user preferences
+  /// [data] - The onboarding data containing user preferences
   /// [limit] - Maximum number of matches to return (default: 5)
   ///
   /// Returns a list of MatchedUser objects sorted by compatibility
   static List<MatchedUser> getPersonalizedMatches(
-    OnboardingController controller, {
+    OnboardingData data, {
     int limit = 5,
   }) {
     // Validate input parameters
@@ -157,12 +157,12 @@ class MatchService {
     final List<MatchedUser> filteredMatches = List.from(_allPotentialMatches);
 
     // Apply filters based on user preferences
-    if (controller.tribe.isNotEmpty) {
+    if (data.tribe.isNotEmpty) {
       // Prioritize matches from the same tribe but don't exclude others
       filteredMatches.sort((a, b) {
-        if (a.tribe == controller.tribe && b.tribe != controller.tribe) {
+        if (a.tribe == data.tribe && b.tribe != data.tribe) {
           return -1; // a comes first
-        } else if (a.tribe != controller.tribe && b.tribe == controller.tribe) {
+        } else if (a.tribe != data.tribe && b.tribe == data.tribe) {
           return 1; // b comes first
         }
         return 0; // no change in order
@@ -170,9 +170,9 @@ class MatchService {
     }
 
     // Filter by location if available
-    if (controller.locationName != null) {
+    if (data.locationName != null) {
       // Extract city from location (assuming format is "City, Country")
-      final userCity = controller.locationName!.split(',').first.trim();
+      final userCity = data.locationName!.split(',').first.trim();
 
       // Prioritize matches from the same location
       filteredMatches.sort((a, b) {
@@ -189,14 +189,14 @@ class MatchService {
     }
 
     // Filter by interests if available
-    if (controller.genres.isNotEmpty) {
+    if (data.genres.isNotEmpty) {
       // Calculate interest match score for each potential match
       final Map<String, int> matchScores = {};
 
       for (final match in filteredMatches) {
         int score = 0;
         for (final interest in match.interests) {
-          if (controller.genres.contains(interest)) {
+          if (data.genres.contains(interest)) {
             score++;
           }
         }
@@ -218,13 +218,13 @@ class MatchService {
   /// Get matches based on specific criteria (for Friendship/Networking tabs)
   ///
   /// [category] - The category to filter by (nearby, same_tribe, shared_interests)
-  /// [controller] - The onboarding controller containing user preferences
+  /// [data] - The onboarding data containing user preferences
   /// [limit] - Maximum number of matches to return (default: 5)
   ///
   /// Returns a list of MatchedUser objects filtered by the specified category
   static List<MatchedUser> getMatchesByCategory(
     String category,
-    OnboardingController controller, {
+    OnboardingData data, {
     int limit = 5,
   }) {
     // Validate input parameters
@@ -240,8 +240,8 @@ class MatchService {
     switch (category) {
       case 'nearby':
         // Get matches near the user's location
-        if (controller.locationName != null) {
-          final userCity = controller.locationName!.split(',').first.trim();
+        if (data.locationName != null) {
+          final userCity = data.locationName!.split(',').first.trim();
           matches = _allPotentialMatches.where((match) {
             final matchCity = match.location.split(',').first.trim();
             return matchCity == userCity;
@@ -251,19 +251,19 @@ class MatchService {
 
       case 'same_tribe':
         // Get matches from the same tribe
-        if (controller.tribe.isNotEmpty) {
+        if (data.tribe.isNotEmpty) {
           matches = _allPotentialMatches
-              .where((match) => match.tribe == controller.tribe)
+              .where((match) => match.tribe == data.tribe)
               .toList();
         }
         break;
 
       case 'shared_interests':
         // Get matches with shared interests
-        if (controller.genres.isNotEmpty) {
+        if (data.genres.isNotEmpty) {
           matches = _allPotentialMatches.where((match) {
             for (final interest in match.interests) {
-              if (controller.genres.contains(interest)) {
+              if (data.genres.contains(interest)) {
                 return true;
               }
             }

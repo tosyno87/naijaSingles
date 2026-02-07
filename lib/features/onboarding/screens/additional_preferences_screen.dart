@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class AdditionalPreferencesScreen extends StatefulWidget {
@@ -14,8 +15,8 @@ class AdditionalPreferencesScreen extends StatefulWidget {
 
 class _AdditionalPreferencesScreenState
     extends State<AdditionalPreferencesScreen> {
-  late double _height;
-  late String _heightUnit;
+  double _height = 170;
+  String _heightUnit = 'cm';
   String _lookingFor = 'Dating';
   String _relationshipIntent = 'Not sure yet';
 
@@ -59,12 +60,13 @@ class _AdditionalPreferencesScreenState
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    _height = controller.height;
-    _heightUnit = controller.heightUnit;
-    _lookingFor = controller.lookingFor;
-    _relationshipIntent = controller.relationshipIntent;
+    final data = context.read<OnboardingBloc>().state.data;
+    if (data != null) {
+      _height = data.height.toDouble();
+      _heightUnit = data.heightUnit;
+      _lookingFor = data.lookingFor;
+      _relationshipIntent = data.relationshipIntent;
+    }
   }
 
   @override
@@ -224,13 +226,10 @@ class _AdditionalPreferencesScreenState
   }
 
   void _saveAndContinue() {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-
-    // Save all preferences
-    controller.setHeight(_height, _heightUnit);
-    controller.setLookingFor(_lookingFor);
-    controller.setRelationshipIntent(_relationshipIntent);
+    context.read<OnboardingBloc>()
+      ..add(OnboardingHeightUpdated(_height, _heightUnit))
+      ..add(OnboardingLookingForUpdated(_lookingFor))
+      ..add(OnboardingRelationshipIntentUpdated(_relationshipIntent));
 
     // Navigate to next screen or complete onboarding
     // You can customize this based on your onboarding flow

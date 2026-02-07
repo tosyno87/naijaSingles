@@ -1,8 +1,11 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
+import '../bloc/onboarding_data.dart';
 
 class ProfilePreviewScreen extends StatefulWidget {
   const ProfilePreviewScreen({super.key});
@@ -63,9 +66,12 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             ),
           ],
         ),
-        body: Consumer<OnboardingController>(
-          builder: (context, controller, _) {
-            final photos = controller.profilePhotos
+        body: BlocBuilder<OnboardingBloc, OnboardingState>(
+          builder: (context, state) {
+            final data = state.data;
+            if (data == null) return _buildNoPhotosState();
+
+            final photos = data.profilePhotos
                 .where((p) => p != null)
                 .cast<File>()
                 .toList();
@@ -77,24 +83,13 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  // Photo carousel section
                   _buildPhotoCarousel(photos),
-
                   const SizedBox(height: 20),
-
-                  // Profile card preview
-                  _buildProfileCard(controller),
-
+                  _buildProfileCard(data),
                   const SizedBox(height: 20),
-
-                  // Match potential indicator
-                  _buildMatchPotentialCard(controller),
-
+                  _buildMatchPotentialCard(data),
                   const SizedBox(height: 20),
-
-                  // Improvement suggestions
-                  _buildQuickImprovements(controller),
-
+                  _buildQuickImprovements(data),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -256,7 +251,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ),
       );
 
-  Widget _buildProfileCard(OnboardingController controller) => Container(
+  Widget _buildProfileCard(OnboardingData data) => Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -277,7 +272,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             Row(
               children: [
                 Text(
-                  '${controller.fullName}, ${controller.age}',
+                  '${data.fullName}, ${data.age}',
                   style: GoogleFonts.montserrat(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
@@ -293,7 +288,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    controller.tribe,
+                    data.tribe,
                     style: GoogleFonts.montserrat(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -307,9 +302,9 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             const SizedBox(height: 12),
 
             // Bio
-            if (controller.bio.isNotEmpty)
+            if (data.bio.isNotEmpty)
               Text(
-                controller.bio,
+                data.bio,
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
                   color: textLightBrown,
@@ -320,7 +315,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
             const SizedBox(height: 16),
 
             // Interests
-            if (controller.interests.isNotEmpty) ...[
+            if (data.interests.isNotEmpty) ...[
               Text(
                 'Interests',
                 style: GoogleFonts.montserrat(
@@ -333,7 +328,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: controller.interests
+                children: data.interests
                     .take(6)
                     .map(
                       (interest) => Container(
@@ -358,11 +353,11 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
                     )
                     .toList(),
               ),
-              if (controller.interests.length > 6)
+              if (data.interests.length > 6)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    '+${controller.interests.length - 6} more interests',
+                    '+${data.interests.length - 6} more interests',
                     style: GoogleFonts.montserrat(
                       fontSize: 12,
                       color: textLightBrown,
@@ -375,10 +370,10 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ),
       );
 
-  Widget _buildMatchPotentialCard(OnboardingController controller) {
-    final photos = controller.profilePhotos.where((p) => p != null).length;
-    final hasGoodBio = controller.bio.length >= 50;
-    final hasInterests = controller.interests.length >= 5;
+  Widget _buildMatchPotentialCard(OnboardingData data) {
+    final photos = data.profilePhotos.where((p) => p != null).length;
+    final hasGoodBio = data.bio.length >= 50;
+    final hasInterests = data.interests.length >= 5;
 
     int score = 0;
     if (photos >= 3) score += 40;
@@ -504,13 +499,13 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
         ),
       );
 
-  Widget _buildQuickImprovements(OnboardingController controller) {
+  Widget _buildQuickImprovements(OnboardingData data) {
     final List<String> improvements = [];
 
-    final photos = controller.profilePhotos.where((p) => p != null).length;
+    final photos = data.profilePhotos.where((p) => p != null).length;
     if (photos < 5) improvements.add('Add ${5 - photos} more photos');
-    if (controller.bio.length < 50) improvements.add('Write a longer bio');
-    if (controller.interests.length < 5) improvements.add('Add more interests');
+    if (data.bio.length < 50) improvements.add('Write a longer bio');
+    if (data.interests.length < 5) improvements.add('Add more interests');
 
     if (improvements.isEmpty) {
       return Container(

@@ -1,9 +1,11 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-import '../../../features/user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 
 /// Enum representing different types of photos for user profiles
 enum PhotoType {
@@ -45,8 +47,16 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
-    final uploadedPhotos = controller.profilePhotos;
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final uploadedPhotos =
+            state.data?.profilePhotos ?? List<File?>.filled(9, null);
+        return _buildContent(context, uploadedPhotos);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) {
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -216,12 +226,11 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   }
 
   Future<void> _showAddPhotoOptions(int index) async {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    final bloc = context.read<OnboardingBloc>();
+    final photos = bloc.state.data?.profilePhotos ?? <File?>[];
 
     // If clicking on existing photo, show options
-    if (index < controller.profilePhotos.length &&
-        controller.profilePhotos[index] != null) {
+    if (index < photos.length && photos[index] != null) {
       _showPhotoOptionsBottomSheet(index);
       return;
     }
@@ -273,10 +282,7 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
     );
 
     if (source != null) {
-      await controller.pickProfilePhoto(source, index, context);
-      if (mounted) {
-        setState(() {});
-      }
+      bloc.add(OnboardingProfilePhotoPicked(source, index, context));
     }
   }
 
@@ -324,9 +330,8 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
               ),
               onTap: () async {
                 Navigator.pop(context);
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                final currentContext = context; // Capture context before async
+                final bloc = context.read<OnboardingBloc>();
+                final currentContext = context;
                 final source = await showModalBottomSheet<ImageSource>(
                   context: context,
                   backgroundColor: Colors.white,
@@ -377,11 +382,13 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
                   ),
                 );
                 if (source != null && currentContext.mounted) {
-                  await controller.pickProfilePhoto(
-                      source, index, currentContext);
-                  if (mounted) {
-                    setState(() {});
-                  }
+                  bloc.add(
+                    OnboardingProfilePhotoPicked(
+                      source,
+                      index,
+                      currentContext,
+                    ),
+                  );
                 }
               },
             ),
@@ -407,24 +414,15 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   }
 
   void _removePhoto(int index) {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    controller.removeProfilePhoto(index);
-    setState(() {});
+    context.read<OnboardingBloc>().add(
+          OnboardingProfilePhotoRemoved(index),
+        );
   }
 
   void _movePhoto(int fromIndex, int toIndex) {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    final photos = List<File?>.from(controller.profilePhotos);
-    final photo = photos.removeAt(fromIndex);
-    photos.insert(toIndex, photo);
-
-    // Update controller
-    for (int i = 0; i < photos.length; i++) {
-      controller.profilePhotos[i] = photos[i];
-    }
-    setState(() {});
+    context.read<OnboardingBloc>().add(
+          OnboardingProfilePhotosReordered(fromIndex, toIndex),
+        );
   }
 
   void _setAsMainPhoto(int index) {

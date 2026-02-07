@@ -18,6 +18,11 @@ class UserListenStopped extends UserEvent {
   const UserListenStopped();
 }
 
+/// Event to refresh user details (auth logged in) - does NOT re-add auth listener
+class UserRefreshUserDetails extends UserEvent {
+  const UserRefreshUserDetails();
+}
+
 /// Event when user data is updated
 class UserDataUpdated extends UserEvent {
   final UserModel? user;

@@ -16,6 +16,7 @@ part 'user_state.dart';
 class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc() : super(const UserInitial()) {
     on<UserListenStarted>(_onUserListenStarted);
+    on<UserRefreshUserDetails>(_onUserRefreshUserDetails);
     on<UserListenStopped>(_onUserListenStopped);
     on<UserDataUpdated>(_onUserDataUpdated);
     on<UserAuthStateChanged>(_onUserAuthStateChanged);
@@ -51,8 +52,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     await _authStateSubscription?.cancel();
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
-        // User logged in - start listening to user details
-        add(const UserListenStarted());
+        // User logged in - refresh user details only (avoid re-adding listener = infinite loop)
+        add(const UserRefreshUserDetails());
       } else {
         // User is logged out - cancel any active subscriptions and clear user data
         add(const UserListenStopped());
@@ -61,6 +62,15 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     });
 
     // Start listening to current user details
+    await _listenCurrentUserDetails(emit);
+  }
+
+  Future<void> _onUserRefreshUserDetails(
+    UserRefreshUserDetails event,
+    Emitter<UserState> emit,
+  ) async {
+    await _userSubscription?.cancel();
+    _userSubscription = null;
     await _listenCurrentUserDetails(emit);
   }
 

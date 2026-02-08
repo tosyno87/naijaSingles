@@ -8,24 +8,32 @@ class EventsFirestoreService {
 
   // Collection references
   CollectionReference get _eventsCollection => _firestore.collection('events');
-  CollectionReference get _userRSVPsCollection => _firestore.collection('user_rsvps');
-  CollectionReference get _eventAttendeesCollection => _firestore.collection('event_attendees');
+  CollectionReference get _userRSVPsCollection =>
+      _firestore.collection('user_rsvps');
+  CollectionReference get _eventAttendeesCollection =>
+      _firestore.collection('event_attendees');
 
   /// Save events to Firestore (batch operation for efficiency)
   Future<void> saveEvents(List<EventModel> events) async {
     try {
       final batch = _firestore.batch();
-      
+
       for (final event in events) {
         // Use event.id instead of eventbriteId for user-generated events
         final docRef = _eventsCollection.doc(event.id);
         batch.set(docRef, event.toFirestoreJson(), SetOptions(merge: true));
       }
-      
+
       await batch.commit();
-      log('Saved ${events.length} events to Firestore', name: 'EventsFirestoreService');
+      log(
+        'Saved ${events.length} events to Firestore',
+        name: 'EventsFirestoreService',
+      );
     } catch (e) {
-      log('Error saving events to Firestore: $e', name: 'EventsFirestoreService');
+      log(
+        'Error saving events to Firestore: $e',
+        name: 'EventsFirestoreService',
+      );
       throw FirestoreException('Failed to save events: $e');
     }
   }
@@ -39,7 +47,10 @@ class EventsFirestoreService {
   }) async {
     try {
       Query query = _eventsCollection
-          .where('startDate', isGreaterThanOrEqualTo: startDate ?? DateTime.now())
+          .where(
+            'startDate',
+            isGreaterThanOrEqualTo: startDate ?? DateTime.now(),
+          )
           .orderBy('startDate')
           .limit(limit);
 
@@ -52,18 +63,26 @@ class EventsFirestoreService {
       }
 
       final querySnapshot = await query.get();
-      
+
       final events = querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ))
+          .map(
+            (doc) => EventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
           .toList();
 
-      log('Fetched ${events.length} events from Firestore', name: 'EventsFirestoreService');
+      log(
+        'Fetched ${events.length} events from Firestore',
+        name: 'EventsFirestoreService',
+      );
       return events;
     } catch (e) {
-      log('Error fetching events from Firestore: $e', name: 'EventsFirestoreService');
+      log(
+        'Error fetching events from Firestore: $e',
+        name: 'EventsFirestoreService',
+      );
       throw FirestoreException('Failed to fetch events: $e');
     }
   }
@@ -72,7 +91,7 @@ class EventsFirestoreService {
   Future<EventModel?> getEventById(String eventId) async {
     try {
       final doc = await _eventsCollection.doc(eventId).get();
-      
+
       if (doc.exists) {
         return EventModel.fromFirestoreJson(
           doc.data() as Map<String, dynamic>,
@@ -96,7 +115,7 @@ class EventsFirestoreService {
   }) async {
     try {
       final batch = _firestore.batch();
-      
+
       // Create RSVP model
       final rsvp = RSVPModel(
         id: '${userId}_$eventId',
@@ -109,10 +128,8 @@ class EventsFirestoreService {
       );
 
       // Save to user_rsvps collection
-      final userRSVPRef = _userRSVPsCollection
-          .doc(userId)
-          .collection('events')
-          .doc(eventId);
+      final userRSVPRef =
+          _userRSVPsCollection.doc(userId).collection('events').doc(eventId);
       batch.set(userRSVPRef, rsvp.toFirestoreJson());
 
       // Save to event_attendees collection
@@ -132,8 +149,10 @@ class EventsFirestoreService {
       }
 
       await batch.commit();
-      log('RSVP saved for user $userId to event $eventId with status ${status.value}', 
-          name: 'EventsFirestoreService');
+      log(
+        'RSVP saved for user $userId to event $eventId with status ${status.value}',
+        name: 'EventsFirestoreService',
+      );
     } catch (e) {
       log('Error saving RSVP: $e', name: 'EventsFirestoreService');
       throw FirestoreException('Failed to save RSVP: $e');
@@ -149,12 +168,10 @@ class EventsFirestoreService {
   }) async {
     try {
       final batch = _firestore.batch();
-      
+
       // Update user RSVP
-      final userRSVPRef = _userRSVPsCollection
-          .doc(userId)
-          .collection('events')
-          .doc(eventId);
+      final userRSVPRef =
+          _userRSVPsCollection.doc(userId).collection('events').doc(eventId);
       batch.update(userRSVPRef, {
         'status': newStatus.value,
         'rsvpDate': FieldValue.serverTimestamp(),
@@ -173,13 +190,14 @@ class EventsFirestoreService {
       // Update event RSVP count
       final eventRef = _eventsCollection.doc(eventId);
       int countChange = 0;
-      
+
       if (oldStatus == RSVPStatus.going && newStatus != RSVPStatus.going) {
         countChange = -1; // Decrement if changing from going to something else
-      } else if (oldStatus != RSVPStatus.going && newStatus == RSVPStatus.going) {
+      } else if (oldStatus != RSVPStatus.going &&
+          newStatus == RSVPStatus.going) {
         countChange = 1; // Increment if changing to going
       }
-      
+
       if (countChange != 0) {
         batch.update(eventRef, {
           'rsvpCount': FieldValue.increment(countChange),
@@ -188,8 +206,10 @@ class EventsFirestoreService {
       }
 
       await batch.commit();
-      log('RSVP updated for user $userId to event $eventId: ${oldStatus.value} -> ${newStatus.value}', 
-          name: 'EventsFirestoreService');
+      log(
+        'RSVP updated for user $userId to event $eventId: ${oldStatus.value} -> ${newStatus.value}',
+        name: 'EventsFirestoreService',
+      );
     } catch (e) {
       log('Error updating RSVP: $e', name: 'EventsFirestoreService');
       throw FirestoreException('Failed to update RSVP: $e');
@@ -204,7 +224,7 @@ class EventsFirestoreService {
           .collection('events')
           .doc(eventId)
           .get();
-      
+
       if (doc.exists) {
         return RSVPModel.fromFirestoreJson(
           doc.data() as Map<String, dynamic>,
@@ -226,12 +246,14 @@ class EventsFirestoreService {
           .collection('events')
           .orderBy('rsvpDate', descending: true)
           .get();
-      
+
       return querySnapshot.docs
-          .map((doc) => RSVPModel.fromFirestoreJson(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ))
+          .map(
+            (doc) => RSVPModel.fromFirestoreJson(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
       log('Error fetching user RSVPs: $e', name: 'EventsFirestoreService');
@@ -240,7 +262,10 @@ class EventsFirestoreService {
   }
 
   /// Get event attendees
-  Future<List<EventAttendeeModel>> getEventAttendees(String eventId, {RSVPStatus? status}) async {
+  Future<List<EventAttendeeModel>> getEventAttendees(
+    String eventId, {
+    RSVPStatus? status,
+  }) async {
     try {
       Query query = _eventAttendeesCollection
           .doc(eventId)
@@ -252,9 +277,13 @@ class EventsFirestoreService {
       }
 
       final querySnapshot = await query.get();
-      
+
       return querySnapshot.docs
-          .map((doc) => EventAttendeeModel.fromFirestoreJson(doc.data() as Map<String, dynamic>))
+          .map(
+            (doc) => EventAttendeeModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+            ),
+          )
           .toList();
     } catch (e) {
       log('Error fetching event attendees: $e', name: 'EventsFirestoreService');
@@ -272,12 +301,14 @@ class EventsFirestoreService {
           .where('name', isLessThanOrEqualTo: '$query\uf8ff')
           .limit(20)
           .get();
-      
+
       return querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ))
+          .map(
+            (doc) => EventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
       log('Error searching events: $e', name: 'EventsFirestoreService');
@@ -286,7 +317,10 @@ class EventsFirestoreService {
   }
 
   /// Get events by category
-  Future<List<EventModel>> getEventsByCategory(String category, {int limit = 20}) async {
+  Future<List<EventModel>> getEventsByCategory(
+    String category, {
+    int limit = 20,
+  }) async {
     try {
       final querySnapshot = await _eventsCollection
           .where('category', isEqualTo: category)
@@ -294,15 +328,20 @@ class EventsFirestoreService {
           .orderBy('startDate')
           .limit(limit)
           .get();
-      
+
       return querySnapshot.docs
-          .map((doc) => EventModel.fromFirestoreJson(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ))
+          .map(
+            (doc) => EventModel.fromFirestoreJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      log('Error fetching events by category: $e', name: 'EventsFirestoreService');
+      log(
+        'Error fetching events by category: $e',
+        name: 'EventsFirestoreService',
+      );
       throw FirestoreException('Failed to fetch events by category: $e');
     }
   }
@@ -311,18 +350,21 @@ class EventsFirestoreService {
   Future<void> deleteOldEvents({int daysOld = 30}) async {
     try {
       final cutoffDate = DateTime.now().subtract(Duration(days: daysOld));
-      
+
       final querySnapshot = await _eventsCollection
           .where('endDate', isLessThan: cutoffDate)
           .get();
-      
+
       final batch = _firestore.batch();
       for (final doc in querySnapshot.docs) {
         batch.delete(doc.reference);
       }
-      
+
       await batch.commit();
-      log('Deleted ${querySnapshot.docs.length} old events', name: 'EventsFirestoreService');
+      log(
+        'Deleted ${querySnapshot.docs.length} old events',
+        name: 'EventsFirestoreService',
+      );
     } catch (e) {
       log('Error deleting old events: $e', name: 'EventsFirestoreService');
     }
@@ -330,10 +372,9 @@ class EventsFirestoreService {
 }
 
 class FirestoreException implements Exception {
-  final String message;
-  
   const FirestoreException(this.message);
-  
+  final String message;
+
   @override
   String toString() => 'FirestoreException: $message';
 }

@@ -6,46 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class UserModel {
-  final String? id;
-  final String? name;
-  final bool? isBlocked;
-  String? address;
-  final double? latitude;
-  final double? longitude;
-  final Map? coordinates;
-  final Map? currentCoordinates;
-  final Map? sexualOrientation;
-  final String? userGender;
-  final String? living_in;
-  final String? job_title;
-  final String? company;
-  final bool? showMyAge;
-  String? showGender;
-  final int? age;
-  final String? phoneNumber;
-  int? maxDistance;
-  Timestamp? lastmsg;
-  Map? ageRange;
-  final Map? editInfo;
-  final Map? streetView;
-  final bool? isBot;
-  final String? bio;
-  final String? profession;
-  final String? education;
-  final String? drinkingStatus;
-  final String? smokingStatus;
-  final DateTime? lastSeen;
-  final String? lookingFor; // What the user is looking for: Dating, Friendship, Networking
-  
-  // Cultural fields
-  final String? nationality;
-  final String? tribe;
-  final List<String>? languages;
-  final String? religion;
-  final String? occupation;
-
-  List? imageUrl = [];
-  int? distanceBW;
   UserModel({
     this.living_in,
     this.job_title,
@@ -87,11 +47,6 @@ class UserModel {
     this.occupation,
   });
 
-  @override
-  String toString() {
-    return 'UserModel{id: $id, name: $name, age: $age, phone: $phoneNumber}';
-  }
-
   factory UserModel.fromDocument(DocumentSnapshot doc) {
     try {
       // Get the document ID as the user ID
@@ -117,8 +72,11 @@ class UserModel {
       }
 
       // Helper function to safely get nested values
-      T? safeGetNested<T>(String parentKey, String childKey,
-          [T? defaultValue]) {
+      T? safeGetNested<T>(
+        String parentKey,
+        String childKey, [
+        T? defaultValue,
+      ]) {
         try {
           if (data.containsKey(parentKey) && data[parentKey] is Map) {
             final parent = data[parentKey] as Map;
@@ -226,35 +184,35 @@ class UserModel {
             : data.containsKey('Pictures') && data['Pictures'] is List
                 ? List<String>.from(data['Pictures'])
                 : [],
-        bio: safeGet<String>('bio') ?? 
+        bio: safeGet<String>('bio') ??
             safeGetNested<String>('editInfo', 'bio', ''),
-        profession: safeGet<String>('profession') ?? 
+        profession: safeGet<String>('profession') ??
             safeGetNested<String>('editInfo', 'profession', '') ??
             safeGetNested<String>('editInfo', 'job_title', ''),
-        education: safeGet<String>('education') ?? 
+        education: safeGet<String>('education') ??
             safeGetNested<String>('editInfo', 'education', ''),
-        drinkingStatus: safeGet<String>('drinkingStatus') ?? 
+        drinkingStatus: safeGet<String>('drinkingStatus') ??
             safeGetNested<String>('editInfo', 'drinkingStatus', ''),
-        smokingStatus: safeGet<String>('smokingStatus') ?? 
+        smokingStatus: safeGet<String>('smokingStatus') ??
             safeGetNested<String>('editInfo', 'smokingStatus', ''),
         lastSeen: data.containsKey('lastSeen') && data['lastSeen'] is Timestamp
             ? (data['lastSeen'] as Timestamp).toDate()
             : data.containsKey('lastActive') && data['lastActive'] is Timestamp
                 ? (data['lastActive'] as Timestamp).toDate()
                 : null,
-        lookingFor: safeGet<String>('lookingFor') ?? 
+        lookingFor: safeGet<String>('lookingFor') ??
             safeGetNested<String>('editInfo', 'lookingFor', 'Dating'),
         // Cultural fields
-        nationality: safeGet<String>('nationality') ?? 
+        nationality: safeGet<String>('nationality') ??
             safeGetNested<String>('editInfo', 'nationality', ''),
-        tribe: safeGet<String>('tribe') ?? 
+        tribe: safeGet<String>('tribe') ??
             safeGetNested<String>('editInfo', 'tribe', ''),
         languages: data.containsKey('languages') && data['languages'] is List
             ? List<String>.from(data['languages'])
             : [],
-        religion: safeGet<String>('religion') ?? 
+        religion: safeGet<String>('religion') ??
             safeGetNested<String>('editInfo', 'religion', ''),
-        occupation: safeGet<String>('occupation') ?? 
+        occupation: safeGet<String>('occupation') ??
             safeGetNested<String>('editInfo', 'occupation', ''),
       );
     } catch (e) {
@@ -268,8 +226,8 @@ class UserModel {
         showGender: 'everyone',
         ageRange: {'min': '18', 'max': '50'},
         maxDistance: 10,
-        latitude: 0.0,
-        longitude: 0.0,
+        latitude: 0,
+        longitude: 0,
         address: '',
         imageUrl: [],
         editInfo: {},
@@ -278,7 +236,6 @@ class UserModel {
         education: '',
         drinkingStatus: '',
         smokingStatus: '',
-        lastSeen: null,
         lookingFor: 'Dating',
         // Cultural fields
         nationality: '',
@@ -290,66 +247,189 @@ class UserModel {
     }
   }
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      // Use the document ID as the user ID if available, otherwise fall back to 'userId'
-      id: json['id'] ?? json['userId'] ?? "",
-      name: json['name'] ?? json['UserName'] ?? "",
-      isBlocked: json['isBlocked'] ?? false,
-      address:
-          json['location'] != null ? json['location']['address'] ?? "" : "",
-      latitude:
-          json['location'] != null ? json['location']['latitude'] ?? 0 : 0,
-      longitude:
-          json['location'] != null ? json['location']['longitude'] ?? 0 : 0,
-      coordinates: json['coordinates'] ?? {},
-      currentCoordinates: json['currentCoordinates'],
-      sexualOrientation: json['sexualOrientation'],
-      userGender: json['gender'] ??
-          (json['editInfo'] != null ? json['editInfo']['userGender'] : null),
-      living_in: json['living_in'],
-      job_title: json['job_title'],
-      company: json['company'],
-      showMyAge: json['showMyAge'],
-      showGender: json['showGender'],
-      age: json['age'],
-      phoneNumber: json['phoneNumber'],
-      maxDistance: json['maximum_distance'] ?? 10,
-      ageRange: json['age_range'] ??
-          (json['preferences'] != null
-              ? {
-                  'min': json['preferences']['ageRange'][0],
-                  'max': json['preferences']['ageRange'][1]
-                }
-              : null),
-      editInfo: json['editInfo'],
-      streetView: json['streetView'],
-      imageUrl: json['photos'] ?? json['Pictures'],
-      distanceBW: json['distanceBW'] != null
-          ? (json['distanceBW'] as num).round()
-          : null,
-      isBot: json['isBot'] ?? false,
-      bio: json['bio'] ?? (json['editInfo'] != null ? json['editInfo']['bio'] : null),
-      profession: json['profession'] ?? (json['editInfo'] != null ? json['editInfo']['profession'] : null),
-      education: json['education'] ?? (json['editInfo'] != null ? json['editInfo']['education'] : null),
-      drinkingStatus: json['drinkingStatus'] ?? (json['editInfo'] != null ? json['editInfo']['drinkingStatus'] : null),
-      smokingStatus: json['smokingStatus'] ?? (json['editInfo'] != null ? json['editInfo']['smokingStatus'] : null),
-      lastSeen: json['lastSeen'] != null 
-          ? DateTime.tryParse(json['lastSeen'].toString())
-          : json['lastActive'] != null
-              ? DateTime.tryParse(json['lastActive'].toString())
-              : null,
-      lookingFor: json['lookingFor'] ?? (json['editInfo'] != null ? json['editInfo']['lookingFor'] : 'Dating'),
-      // Cultural fields
-      nationality: json['nationality'] ?? (json['editInfo'] != null ? json['editInfo']['nationality'] : null),
-      tribe: json['tribe'] ?? (json['editInfo'] != null ? json['editInfo']['tribe'] : null),
-      languages: json['languages'] != null && json['languages'] is List
-          ? List<String>.from(json['languages'])
-          : [],
-      religion: json['religion'] ?? (json['editInfo'] != null ? json['editInfo']['religion'] : null),
-      occupation: json['occupation'] ?? (json['editInfo'] != null ? json['editInfo']['occupation'] : null),
-    );
-  }
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        // Use the document ID as the user ID if available, otherwise fall back to 'userId'
+        id: json['id'] ?? json['userId'] ?? '',
+        name: json['name'] ?? json['UserName'] ?? '',
+        isBlocked: json['isBlocked'] ?? false,
+        address:
+            json['location'] != null ? json['location']['address'] ?? '' : '',
+        latitude:
+            json['location'] != null ? json['location']['latitude'] ?? 0 : 0,
+        longitude:
+            json['location'] != null ? json['location']['longitude'] ?? 0 : 0,
+        coordinates: json['coordinates'] ?? {},
+        currentCoordinates: json['currentCoordinates'],
+        sexualOrientation: json['sexualOrientation'],
+        userGender: json['gender'] ??
+            (json['editInfo'] != null ? json['editInfo']['userGender'] : null),
+        living_in: json['living_in'],
+        job_title: json['job_title'],
+        company: json['company'],
+        showMyAge: json['showMyAge'],
+        showGender: json['showGender'],
+        age: json['age'],
+        phoneNumber: json['phoneNumber'],
+        maxDistance: json['maximum_distance'] ?? 10,
+        ageRange: json['age_range'] ??
+            (json['preferences'] != null
+                ? {
+                    'min': json['preferences']['ageRange'][0],
+                    'max': json['preferences']['ageRange'][1],
+                  }
+                : null),
+        editInfo: json['editInfo'],
+        streetView: json['streetView'],
+        imageUrl: json['photos'] is List
+            ? List<String>.from(json['photos']
+                .map((e) => e?.toString() ?? '')
+                .where((url) => url.isNotEmpty))
+            : json['Pictures'] is List
+                ? List<String>.from(json['Pictures']
+                    .map((e) => e?.toString() ?? '')
+                    .where((url) => url.isNotEmpty))
+                : [],
+        distanceBW: json['distanceBW'] != null
+            ? (json['distanceBW'] as num).round()
+            : null,
+        isBot: json['isBot'] ?? false,
+        bio: json['bio'] ??
+            (json['editInfo'] != null ? json['editInfo']['bio'] : null),
+        profession: json['profession'] ??
+            (json['editInfo'] != null ? json['editInfo']['profession'] : null),
+        education: json['education'] ??
+            (json['editInfo'] != null ? json['editInfo']['education'] : null),
+        drinkingStatus: json['drinkingStatus'] ??
+            (json['editInfo'] != null
+                ? json['editInfo']['drinkingStatus']
+                : null),
+        smokingStatus: json['smokingStatus'] ??
+            (json['editInfo'] != null
+                ? json['editInfo']['smokingStatus']
+                : null),
+        lastSeen: json['lastSeen'] != null
+            ? DateTime.tryParse(json['lastSeen'].toString())
+            : json['lastActive'] != null
+                ? DateTime.tryParse(json['lastActive'].toString())
+                : null,
+        lookingFor: json['lookingFor'] ??
+            (json['editInfo'] != null
+                ? json['editInfo']['lookingFor']
+                : 'Dating'),
+        // Cultural fields
+        nationality: json['nationality'] ??
+            (json['editInfo'] != null ? json['editInfo']['nationality'] : null),
+        tribe: json['tribe'] ??
+            (json['editInfo'] != null ? json['editInfo']['tribe'] : null),
+        languages: json['languages'] != null && json['languages'] is List
+            ? List<String>.from(json['languages'])
+            : [],
+        religion: json['religion'] ??
+            (json['editInfo'] != null ? json['editInfo']['religion'] : null),
+        occupation: json['occupation'] ??
+            (json['editInfo'] != null ? json['editInfo']['occupation'] : null),
+      );
+
+  /// Create UserModel from Map (for caching)
+  factory UserModel.fromMap(Map<String, dynamic> map, String userId) =>
+      UserModel(
+        id: userId,
+        name: map['name']?.toString(),
+        isBlocked: map['isBlocked'] as bool? ?? false,
+        address: map['address']?.toString(),
+        latitude:
+            map['latitude'] is num ? (map['latitude'] as num).toDouble() : null,
+        longitude: map['longitude'] is num
+            ? (map['longitude'] as num).toDouble()
+            : null,
+        coordinates: map['coordinates'] as Map?,
+        currentCoordinates: map['currentCoordinates'] as Map?,
+        sexualOrientation: map['sexualOrientation'] as Map?,
+        userGender: map['gender']?.toString(),
+        living_in: map['living_in']?.toString(),
+        job_title: map['job_title']?.toString(),
+        company: map['company']?.toString(),
+        showMyAge: map['showMyAge'] as bool?,
+        showGender: map['showGender']?.toString(),
+        age: map['age'] is num ? (map['age'] as num).toInt() : null,
+        phoneNumber: map['phoneNumber']?.toString(),
+        maxDistance: map['maximum_distance'] is num
+            ? (map['maximum_distance'] as num).toInt()
+            : null,
+        ageRange: map['age_range'] as Map?,
+        editInfo: map['editInfo'] as Map?,
+        streetView: map['streetView'] as Map?,
+        isBot: map['isBot'] as bool? ?? false,
+        imageUrl: map['photos'] is List
+            ? List<String>.from((map['photos'] as List)
+                .map((e) => e?.toString() ?? '')
+                .where((url) => url.isNotEmpty))
+            : null,
+        distanceBW: map['distanceBW'] is num
+            ? (map['distanceBW'] as num).toInt()
+            : null,
+        bio: map['bio']?.toString(),
+        profession: map['profession']?.toString(),
+        education: map['education']?.toString(),
+        drinkingStatus: map['drinkingStatus']?.toString(),
+        smokingStatus: map['smokingStatus']?.toString(),
+        lastSeen: map['lastSeen'] != null
+            ? DateTime.tryParse(map['lastSeen'].toString())
+            : null,
+        lookingFor: map['lookingFor']?.toString() ?? 'Dating',
+        // Cultural fields
+        nationality: map['nationality']?.toString(),
+        tribe: map['tribe']?.toString(),
+        languages:
+            map['languages'] is List ? List<String>.from(map['languages']) : [],
+        religion: map['religion']?.toString(),
+        occupation: map['occupation']?.toString(),
+      );
+  final String? id;
+  final String? name;
+  final bool? isBlocked;
+  String? address;
+  final double? latitude;
+  final double? longitude;
+  final Map? coordinates;
+  final Map? currentCoordinates;
+  final Map? sexualOrientation;
+  final String? userGender;
+  final String? living_in;
+  final String? job_title;
+  final String? company;
+  final bool? showMyAge;
+  String? showGender;
+  final int? age;
+  final String? phoneNumber;
+  int? maxDistance;
+  Timestamp? lastmsg;
+  Map? ageRange;
+  final Map? editInfo;
+  final Map? streetView;
+  final bool? isBot;
+  final String? bio;
+  final String? profession;
+  final String? education;
+  final String? drinkingStatus;
+  final String? smokingStatus;
+  final DateTime? lastSeen;
+  final String?
+      lookingFor; // What the user is looking for: Dating, Friendship, Networking
+
+  // Cultural fields
+  final String? nationality;
+  final String? tribe;
+  final List<String>? languages;
+  final String? religion;
+  final String? occupation;
+
+  List? imageUrl = [];
+  int? distanceBW;
+
+  @override
+  String toString() =>
+      'UserModel{id: $id, name: $name, age: $age, phone: $phoneNumber}';
 
   static UserModel convertStringToUserModel(String userString) {
     final userMap = jsonDecode(userString);
@@ -359,97 +439,45 @@ class UserModel {
   // Add missing methods for compatibility with new services
 
   /// Convert UserModel to Map for caching and storage
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'isBlocked': isBlocked,
-      'address': address,
-      'latitude': latitude,
-      'longitude': longitude,
-      'coordinates': coordinates,
-      'currentCoordinates': currentCoordinates,
-      'sexualOrientation': sexualOrientation,
-      'gender': userGender,
-      'living_in': living_in,
-      'job_title': job_title,
-      'company': company,
-      'showMyAge': showMyAge,
-      'showGender': showGender,
-      'age': age,
-      'phoneNumber': phoneNumber,
-      'maximum_distance': maxDistance,
-      'age_range': ageRange,
-      'editInfo': editInfo,
-      'streetView': streetView,
-      'isBot': isBot,
-      'photos': imageUrl,
-      'distanceBW': distanceBW,
-      'bio': bio,
-      'profession': profession,
-      'education': education,
-      'drinkingStatus': drinkingStatus,
-      'smokingStatus': smokingStatus,
-      'lastSeen': lastSeen?.toIso8601String(),
-      'lookingFor': lookingFor,
-      // Cultural fields
-      'nationality': nationality,
-      'tribe': tribe,
-      'languages': languages,
-      'religion': religion,
-      'occupation': occupation,
-    };
-  }
-
-  /// Create UserModel from Map (for caching)
-  factory UserModel.fromMap(Map<String, dynamic> map, String userId) {
-    return UserModel(
-      id: userId,
-      name: map['name']?.toString(),
-      isBlocked: map['isBlocked'] as bool? ?? false,
-      address: map['address']?.toString(),
-      latitude:
-          map['latitude'] is num ? (map['latitude'] as num).toDouble() : null,
-      longitude:
-          map['longitude'] is num ? (map['longitude'] as num).toDouble() : null,
-      coordinates: map['coordinates'] as Map?,
-      currentCoordinates: map['currentCoordinates'] as Map?,
-      sexualOrientation: map['sexualOrientation'] as Map?,
-      userGender: map['gender']?.toString(),
-      living_in: map['living_in']?.toString(),
-      job_title: map['job_title']?.toString(),
-      company: map['company']?.toString(),
-      showMyAge: map['showMyAge'] as bool?,
-      showGender: map['showGender']?.toString(),
-      age: map['age'] is num ? (map['age'] as num).toInt() : null,
-      phoneNumber: map['phoneNumber']?.toString(),
-      maxDistance: map['maximum_distance'] is num
-          ? (map['maximum_distance'] as num).toInt()
-          : null,
-      ageRange: map['age_range'] as Map?,
-      editInfo: map['editInfo'] as Map?,
-      streetView: map['streetView'] as Map?,
-      isBot: map['isBot'] as bool? ?? false,
-      imageUrl: map['photos'] is List ? List<String>.from(map['photos']) : null,
-      distanceBW:
-          map['distanceBW'] is num ? (map['distanceBW'] as num).toInt() : null,
-      bio: map['bio']?.toString(),
-      profession: map['profession']?.toString(),
-      education: map['education']?.toString(),
-      drinkingStatus: map['drinkingStatus']?.toString(),
-      smokingStatus: map['smokingStatus']?.toString(),
-      lastSeen: map['lastSeen'] != null 
-          ? DateTime.tryParse(map['lastSeen'].toString())
-          : null,
-      lookingFor: map['lookingFor']?.toString() ?? 'Dating',
-      // Cultural fields
-      nationality: map['nationality']?.toString(),
-      tribe: map['tribe']?.toString(),
-      languages: map['languages'] is List ? List<String>.from(map['languages']) : [],
-      religion: map['religion']?.toString(),
-      occupation: map['occupation']?.toString(),
-    );
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'name': name,
+        'isBlocked': isBlocked,
+        'address': address,
+        'latitude': latitude,
+        'longitude': longitude,
+        'coordinates': coordinates,
+        'currentCoordinates': currentCoordinates,
+        'sexualOrientation': sexualOrientation,
+        'gender': userGender,
+        'living_in': living_in,
+        'job_title': job_title,
+        'company': company,
+        'showMyAge': showMyAge,
+        'showGender': showGender,
+        'age': age,
+        'phoneNumber': phoneNumber,
+        'maximum_distance': maxDistance,
+        'age_range': ageRange,
+        'editInfo': editInfo,
+        'streetView': streetView,
+        'isBot': isBot,
+        'photos': imageUrl,
+        'distanceBW': distanceBW,
+        'bio': bio,
+        'profession': profession,
+        'education': education,
+        'drinkingStatus': drinkingStatus,
+        'smokingStatus': smokingStatus,
+        'lastSeen': lastSeen?.toIso8601String(),
+        'lookingFor': lookingFor,
+        // Cultural fields
+        'nationality': nationality,
+        'tribe': tribe,
+        'languages': languages,
+        'religion': religion,
+        'occupation': occupation,
+      };
 
   // Add missing getters for compatibility with new services
 
@@ -460,8 +488,9 @@ class UserModel {
   int? get ageRangeMin {
     if (ageRange != null && ageRange!['min'] != null) {
       if (ageRange!['min'] is int) return ageRange!['min'] as int;
-      if (ageRange!['min'] is String)
+      if (ageRange!['min'] is String) {
         return int.tryParse(ageRange!['min'] as String);
+      }
     }
     return 18; // Default minimum age
   }
@@ -470,8 +499,9 @@ class UserModel {
   int? get ageRangeMax {
     if (ageRange != null && ageRange!['max'] != null) {
       if (ageRange!['max'] is int) return ageRange!['max'] as int;
-      if (ageRange!['max'] is String)
+      if (ageRange!['max'] is String) {
         return int.tryParse(ageRange!['max'] as String);
+      }
     }
     return 50; // Default maximum age
   }

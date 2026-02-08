@@ -37,14 +37,14 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LikeHandlers = void 0;
-const functions = __importStar(require("firebase-functions"));
+const functions = __importStar(require("firebase-functions/v1"));
 const admin = __importStar(require("firebase-admin"));
 const userService_1 = require("../services/userService");
 const notificationService_1 = require("../services/notificationService");
 class LikeHandlers {
     constructor() {
         /**
-         * Handle super like creation
+         * Handle super like creation (Gen 1 - compatible with existing deployments)
          */
         this.onSuperLikeCreated = functions.firestore
             .document('superLikes/{superLikeId}')
@@ -83,7 +83,7 @@ class LikeHandlers {
             }
         });
         /**
-         * Handle like creation
+         * Handle like creation (Gen 1 - compatible with existing deployments)
          */
         this.onLikeCreated = functions.firestore
             .document('users/{userId}/LikedBy/{likeId}')

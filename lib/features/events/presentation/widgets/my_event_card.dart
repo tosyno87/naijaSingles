@@ -1,10 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../common/constants/app_colors.dart';
+import '../../../../common/utils/app_logger.dart';
 import '../../data/models/enhanced_event_model.dart';
 
 class MyEventCard extends StatelessWidget {
+  const MyEventCard({
+    required this.event,
+    super.key,
+    this.isDraft = false,
+    this.onTap,
+    this.onEdit,
+    this.onDelete,
+    this.onPublish,
+    this.onShare,
+    this.onAnalytics,
+  });
   final EnhancedEventModel event;
   final bool isDraft;
   final VoidCallback? onTap;
@@ -14,71 +29,58 @@ class MyEventCard extends StatelessWidget {
   final VoidCallback? onShare;
   final VoidCallback? onAnalytics;
 
-  const MyEventCard({
-    Key? key,
-    required this.event,
-    this.isDraft = false,
-    this.onTap,
-    this.onEdit,
-    this.onDelete,
-    this.onPublish,
-    this.onShare,
-    this.onAnalytics,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildEventImage(context),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildEventHeader(),
-                  const SizedBox(height: 12),
-                  _buildEventDetails(),
-                  const SizedBox(height: 16),
-                  _buildEventStats(),
-                  const SizedBox(height: 16),
-                  _buildActionButtons(),
-                ],
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildEventImage(context),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildEventHeader(),
+                    const SizedBox(height: 12),
+                    _buildEventDetails(),
+                    const SizedBox(height: 16),
+                    _buildEventStats(),
+                    const SizedBox(height: 16),
+                    _buildActionButtons(),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _buildEventImage(BuildContext context) {
     // Debug logging
-    print('🖼️ Event ${event.id} - hasImages: ${event.hasImages}');
-    print('🖼️ Event ${event.id} - imageUrls: ${event.imageUrls}');
-    print('🖼️ Event ${event.id} - primaryImageUrl: ${event.primaryImageUrl}');
-    
+    AppLogger.debug('🖼️ Event ${event.id} - hasImages: ${event.hasImages}');
+    AppLogger.debug('🖼️ Event ${event.id} - imageUrls: ${event.imageUrls}');
+    AppLogger.debug(
+        '🖼️ Event ${event.id} - primaryImageUrl: ${event.primaryImageUrl}');
+
     return Container(
       height: 200, // Increased height for better poster visibility
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: const BorderRadius.only(
+      decoration: const BoxDecoration(
+        color: Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
@@ -86,149 +88,192 @@ class MyEventCard extends StatelessWidget {
       child: Stack(
         children: [
           // Image or placeholder
-          if (event.hasImages)
-            GestureDetector(
-              onTap: () => _showFullScreenPoster(context),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-                child: Image.network(
-                  event.primaryImageUrl,
+          event.hasImages
+              ? GestureDetector(
+                  onTap: () => _showFullScreenPoster(context),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                    child: Container(
+                      color: Colors
+                          .grey.shade100, // Background for contained images
+                      child: event.primaryImageUrl.startsWith('http')
+                          ? Image.network(
+                              event.primaryImageUrl,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.high,
+                              isAntiAlias: true,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  color: const Color(0xFFF8F8F8),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
+                                            valueColor:
+                                                const AlwaysStoppedAnimation<
+                                                    Color>(
+                                              Color(0xFF008037),
+                                            ),
+                                            strokeWidth: 3,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Loading poster...',
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 12,
+                                            color: const Color(0xFF666666),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                AppLogger.error(
+                                  '❌ Error loading image for event ${event.id}',
+                                  error: error,
+                                  stackTrace: stackTrace,
+                                );
+                                AppLogger.debug(
+                                    '❌ Image URL: ${event.primaryImageUrl}');
+                                return Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  color: const Color(0xFFF0F0F0),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.broken_image_outlined,
+                                          size: 48,
+                                          color: Color(0xFF999999),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Poster failed to load',
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 14,
+                                            color: const Color(0xFF666666),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Tap to retry',
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 12,
+                                            color: const Color(0xFF999999),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : Image.file(
+                              File(event.primaryImageUrl),
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.high,
+                              errorBuilder: (context, error, stackTrace) {
+                                AppLogger.error(
+                                  '❌ Error loading local image for event ${event.id}',
+                                  error: error,
+                                  stackTrace: stackTrace,
+                                );
+                                return Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  color: const Color(0xFFF0F0F0),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.broken_image_outlined,
+                                      size: 48,
+                                      color: Color(0xFF999999),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ),
+                )
+              : Container(
                   width: double.infinity,
                   height: double.infinity,
-                  fit: BoxFit.cover, // Perfect for posters - fills space while maintaining aspect ratio
-                  filterQuality: FilterQuality.high, // High quality rendering
-                  isAntiAlias: true, // Smooth edges
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: const Color(0xFFF8F8F8),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF008037),
-                                ),
-                                strokeWidth: 3,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Loading poster...',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: const Color(0xFF666666),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF008037).withOpacity(0.1),
+                        AppColors.backgroundColor,
+                      ],
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.event_outlined,
+                          size: 56,
+                          color: const Color(0xFF008037).withOpacity(0.7),
                         ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    print('❌ Error loading image for event ${event.id}: $error');
-                    print('❌ Image URL: ${event.primaryImageUrl}');
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: const Color(0xFFF0F0F0),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.broken_image_outlined,
-                              size: 48,
-                              color: const Color(0xFF999999),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Poster failed to load',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                color: const Color(0xFF666666),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Tap to retry',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 12,
-                                color: const Color(0xFF999999),
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 12),
+                        Text(
+                          'No Poster',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            color: const Color(0xFF666666),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            )
-          else
-            // Enhanced placeholder for events without images
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF008037).withOpacity(0.1),
-                    const Color(0xFFFFF6E5),
-                  ],
-                ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.event_outlined,
-                      size: 56,
-                      color: const Color(0xFF008037).withOpacity(0.7),
+                        Text(
+                          'Event details below',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            color: const Color(0xFF999999),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'No Poster',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        color: const Color(0xFF666666),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Event details below',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: const Color(0xFF999999),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          
+
           // Gradient overlay for better text readability on posters
           if (event.hasImages)
             Positioned(
@@ -253,14 +298,14 @@ class MyEventCard extends StatelessWidget {
                 ),
               ),
             ),
-          
+
           // Status badge
           Positioned(
             top: 12,
             left: 12,
             child: _buildStatusBadge(),
           ),
-          
+
           // Image count badge for multiple images
           if (event.imageUrls.length > 1)
             Positioned(
@@ -354,71 +399,70 @@ class MyEventCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEventHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF008037).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                event.category,
-                style: GoogleFonts.montserrat(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF008037),
-                ),
-              ),
-            ),
-            const Spacer(),
-            if (event.isPromoted)
+  Widget _buildEventHeader() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.1),
+                  color: const Color(0xFF008037).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.star,
-                      size: 12,
-                      color: Colors.purple,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'PROMOTED',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  event.category,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF008037),
+                  ),
                 ),
               ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          event.name,
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF333333),
+              const Spacer(),
+              if (event.isPromoted)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.star,
+                        size: 12,
+                        color: Colors.purple,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'PROMOTED',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.purple,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
+          const SizedBox(height: 8),
+          Text(
+            event.name,
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF333333),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
 
   Widget _buildEventDetails() {
     final dateFormat = DateFormat('MMM dd, yyyy');
@@ -428,10 +472,10 @@ class MyEventCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.schedule,
               size: 16,
-              color: const Color(0xFF666666),
+              color: Color(0xFF666666),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -448,10 +492,10 @@ class MyEventCard extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.location_on,
               size: 16,
-              color: const Color(0xFF666666),
+              color: Color(0xFF666666),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -477,9 +521,9 @@ class MyEventCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              event.isFree 
+              event.isFree
                   ? 'Free Event'
-                  : '₦${event.ticketPrice?.toStringAsFixed(0) ?? '0'}',
+                  : '${event.currencySymbol}${event.ticketPrice?.toStringAsFixed(0) ?? '0'}',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -492,171 +536,159 @@ class MyEventCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEventStats() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildStatItem(
-              icon: Icons.people,
-              label: 'Attendees',
-              value: '${event.attendeeCount}/${event.maxAttendees}',
+  Widget _buildEventStats() => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8F9FA),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE0E0E0)),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildStatItem(
+                icon: Icons.people,
+                label: 'Attendees',
+                value: '${event.attendeeCount}/${event.maxAttendees}',
+              ),
             ),
-          ),
-          Container(
-            width: 1,
-            height: 24,
-            color: const Color(0xFFE0E0E0),
-          ),
-          Expanded(
-            child: _buildStatItem(
-              icon: Icons.visibility,
-              label: 'Views',
-              value: '${event.metadata['views'] ?? 0}',
+            Container(
+              width: 1,
+              height: 24,
+              color: const Color(0xFFE0E0E0),
             ),
-          ),
-          Container(
-            width: 1,
-            height: 24,
-            color: const Color(0xFFE0E0E0),
-          ),
-          Expanded(
-            child: _buildStatItem(
-              icon: Icons.favorite,
-              label: 'Interested',
-              value: '${event.rsvpCount}',
+            Expanded(
+              child: _buildStatItem(
+                icon: Icons.visibility,
+                label: 'Views',
+                value: '${event.metadata['views'] ?? 0}',
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            Container(
+              width: 1,
+              height: 24,
+              color: const Color(0xFFE0E0E0),
+            ),
+            Expanded(
+              child: _buildStatItem(
+                icon: Icons.favorite,
+                label: 'Interested',
+                value: '${event.rsvpCount}',
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildStatItem({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: const Color(0xFF008037),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
+  }) =>
+      Column(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: const Color(0xFF008037),
           ),
-        ),
-        Text(
-          label,
-          style: GoogleFonts.montserrat(
-            fontSize: 10,
-            color: const Color(0xFF666666),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.montserrat(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
+            ),
           ),
-        ),
-      ],
-    );
-  }
+          Text(
+            label,
+            style: GoogleFonts.montserrat(
+              fontSize: 10,
+              color: const Color(0xFF666666),
+            ),
+          ),
+        ],
+      );
 
-  Widget _buildActionButtons() {
-    return Row(
-      children: [
-        if (isDraft && onPublish != null)
-          Expanded(
-            child: ElevatedButton(
-              onPressed: onPublish,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008037),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+  Widget _buildActionButtons() => Row(
+        children: [
+          if (isDraft && onPublish != null)
+            Expanded(
+              child: ElevatedButton(
+                onPressed: onPublish,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF008037),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Publish',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        
-        if (isDraft && onPublish != null) const SizedBox(width: 8),
-        
-        if (onEdit != null)
-          Expanded(
-            child: OutlinedButton(
-              onPressed: onEdit,
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF008037)),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'Edit',
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF008037),
+                child: Text(
+                  'Publish',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
-        
-        if (onEdit != null) const SizedBox(width: 8),
-        
-        if (onDelete != null)
+          if (isDraft && onPublish != null) const SizedBox(width: 8),
+          if (onEdit != null)
+            Expanded(
+              child: OutlinedButton(
+                onPressed: onEdit,
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFF008037)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Edit',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF008037),
+                  ),
+                ),
+              ),
+            ),
+          if (onEdit != null) const SizedBox(width: 8),
+          if (onDelete != null)
+            IconButton(
+              onPressed: onDelete,
+              icon: const Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+              ),
+              tooltip: 'Delete Event',
+            ),
+          const Spacer(),
           IconButton(
-            onPressed: onDelete,
+            onPressed: onShare,
             icon: const Icon(
-              Icons.delete_outline,
-              color: Colors.red,
+              Icons.share_outlined,
+              color: Color(0xFF666666),
             ),
-            tooltip: 'Delete Event',
+            tooltip: 'Share Event',
           ),
-        
-        const Spacer(),
-        
-        IconButton(
-          onPressed: onShare,
-          icon: const Icon(
-            Icons.share_outlined,
-            color: Color(0xFF666666),
+          IconButton(
+            onPressed: onAnalytics,
+            icon: const Icon(
+              Icons.analytics_outlined,
+              color: Color(0xFF666666),
+            ),
+            tooltip: 'View Analytics',
           ),
-          tooltip: 'Share Event',
-        ),
-        
-        IconButton(
-          onPressed: onAnalytics,
-          icon: const Icon(
-            Icons.analytics_outlined,
-            color: Color(0xFF666666),
-          ),
-          tooltip: 'View Analytics',
-        ),
-      ],
-    );
-  }
+        ],
+      );
 
   void _showFullScreenPoster(BuildContext context) {
     if (!event.hasImages) return;
-    
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Scaffold(
@@ -683,10 +715,9 @@ class MyEventCard extends StatelessWidget {
           ),
           body: Center(
             child: InteractiveViewer(
-              panEnabled: true,
               boundaryMargin: const EdgeInsets.all(20),
               minScale: 0.5,
-              maxScale: 4.0,
+              maxScale: 4,
               child: Image.network(
                 event.primaryImageUrl,
                 fit: BoxFit.contain,
@@ -725,37 +756,35 @@ class MyEventCard extends StatelessWidget {
                     ),
                   );
                 },
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.broken_image_outlined,
-                          size: 80,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.broken_image_outlined,
+                        size: 80,
+                        color: Colors.white54,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Failed to load poster',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Check your internet connection',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
                           color: Colors.white54,
                         ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Failed to load poster',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Check your internet connection',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            color: Colors.white54,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

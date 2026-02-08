@@ -1,17 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naijasingles/services/group_chat_service.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../data/services/group_chat_service.dart';
 
 /// Group chat screen for displaying and managing group conversations
 class GroupChatScreen extends StatefulWidget {
-  final String groupId;
-
   const GroupChatScreen({
-    super.key,
     required this.groupId,
+    super.key,
   });
+  final String groupId;
 
   @override
   State<GroupChatScreen> createState() => _GroupChatScreenState();
@@ -38,7 +38,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   Future<void> _loadGroupDetails() async {
     try {
       final group = await _groupChatService.getGroupDetails(widget.groupId);
-      
+
       if (mounted) {
         setState(() {
           _group = group;
@@ -207,7 +207,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
   Widget _buildMessageBubble(GroupMessage message) {
     final isSystemMessage = message.messageType == MessageType.system;
-    final isCurrentUser = message.senderId == FirebaseAuth.instance.currentUser?.uid;
+    final isCurrentUser =
+        message.senderId == FirebaseAuth.instance.currentUser?.uid;
 
     if (isSystemMessage) {
       return Container(
@@ -235,7 +236,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isCurrentUser) ...[
             CircleAvatar(
@@ -256,7 +258,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isCurrentUser ? AppColors.primaryGreen : Colors.grey[200],
+                color:
+                    isCurrentUser ? AppColors.primaryGreen : Colors.grey[200],
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -264,7 +267,8 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 children: [
                   if (!isCurrentUser)
                     Text(
-                      message.senderId, // In real app, you'd get the user's name
+                      message
+                          .senderId, // In real app, you'd get the user's name
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -292,10 +296,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           ),
           if (isCurrentUser) ...[
             const SizedBox(width: 8),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primaryGreen,
-              child: const Icon(
+              child: Icon(
                 Icons.person,
                 color: Colors.white,
                 size: 16,
@@ -307,66 +311,64 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
-  Widget _buildMessageInput() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: TextField(
-                controller: _messageController,
-                decoration: InputDecoration(
-                  hintText: 'Type a message...',
-                  hintStyle: GoogleFonts.montserrat(
-                    color: Colors.grey[500],
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
+  Widget _buildMessageInput() => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                maxLines: null,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _sendMessage(),
+                child: TextField(
+                  controller: _messageController,
+                  decoration: InputDecoration(
+                    hintText: 'Type a message...',
+                    hintStyle: GoogleFonts.montserrat(
+                      color: Colors.grey[500],
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                  maxLines: null,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => _sendMessage(),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: _sendMessage,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: AppColors.primaryGreen,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.send,
-                color: Colors.white,
-                size: 20,
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: _sendMessage,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryGreen,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 
   String _formatTime(DateTime timestamp) {
     final now = DateTime.now();
@@ -392,93 +394,101 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
     );
   }
 
-  Widget _buildGroupInfoSheet() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+  Widget _buildGroupInfoSheet() => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                Text(
-                  'Group Info',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Group Info',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildInfoRow(Icons.group, 'Name', _group!.name),
+                    _buildInfoRow(
+                      Icons.description,
+                      'Description',
+                      _group!.description,
+                    ),
+                    _buildInfoRow(
+                      Icons.people,
+                      'Members',
+                      '${_group!.memberCount}',
+                    ),
+                    _buildInfoRow(Icons.category, 'Type', _group!.type.name),
+                    if (_group!.location != null)
+                      _buildInfoRow(
+                        Icons.location_on,
+                        'Location',
+                        _group!.location!,
+                      ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Members',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ..._group!.memberIds.map(_buildMemberTile),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                _buildInfoRow(Icons.group, 'Name', _group!.name),
-                _buildInfoRow(Icons.description, 'Description', _group!.description),
-                _buildInfoRow(Icons.people, 'Members', '${_group!.memberCount}'),
-                _buildInfoRow(Icons.category, 'Type', _group!.type.name),
-                if (_group!.location != null)
-                  _buildInfoRow(Icons.location_on, 'Location', _group!.location!),
-                const SizedBox(height: 20),
-                Text(
-                  'Members',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ..._group!.memberIds.map((memberId) => _buildMemberTile(memberId)),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-      ),
-    );
-  }
+        ),
+      );
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.primaryGreen, size: 20),
-          const SizedBox(width: 12),
-          Text(
-            '$label: ',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
+  Widget _buildInfoRow(IconData icon, String label, String value) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.primaryGreen, size: 20),
+            const SizedBox(width: 12),
+            Text(
+              '$label: ',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
-                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            Expanded(
+              child: Text(
+                value,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildMemberTile(String memberId) {
     final isAdmin = _group!.adminIds.contains(memberId);

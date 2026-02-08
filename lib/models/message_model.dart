@@ -3,10 +3,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Message {
-  String senderName, senderId, selectedUserId, text, photoUrl;
-  File photo;
-  Timestamp timestamp;
-
   Message({
     required this.senderName,
     required this.senderId,
@@ -16,4 +12,11 @@ class Message {
     required this.photo,
     required this.timestamp,
   });
+  String senderName;
+  String senderId;
+  String selectedUserId;
+  String text;
+  String photoUrl;
+  File photo;
+  Timestamp timestamp;
 }

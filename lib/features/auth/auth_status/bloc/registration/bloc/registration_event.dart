@@ -7,18 +7,16 @@ abstract class RegistrationEvents extends Equatable {
 }
 
 class RegistrationRequest extends RegistrationEvents {
-  final Map<String, dynamic> userdata;
-
   const RegistrationRequest({required this.userdata});
+  final Map<String, dynamic> userdata;
 
   @override
   List<Object> get props => [userdata];
 }
 
 class CheckRegistration extends RegistrationEvents {
-  final String token;
-
   const CheckRegistration({required this.token});
+  final String token;
 
   @override
   List<Object> get props => [token];

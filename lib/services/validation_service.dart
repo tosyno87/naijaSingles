@@ -2,9 +2,9 @@ import 'dart:async';
 
 /// Service for handling input validation
 class ValidationService {
-  static final ValidationService _instance = ValidationService._internal();
   factory ValidationService() => _instance;
   ValidationService._internal();
+  static final ValidationService _instance = ValidationService._internal();
 
   // Profanity filter - basic implementation
   static const List<String> _profanityWords = [
@@ -132,7 +132,8 @@ class ValidationService {
   /// Check if text contains profanity
   static bool _containsProfanity(String text) {
     final String lowerText = text.toLowerCase();
-    return _profanityWords.any((word) => lowerText.contains(word.toLowerCase()));
+    return _profanityWords
+        .any((word) => lowerText.contains(word.toLowerCase()));
   }
 
   /// Check if text contains special characters
@@ -146,15 +147,23 @@ class ValidationService {
   static String sanitizeText(String text) {
     return text
         .trim()
-        .replaceAll(RegExp(r'\s+'), ' ') // Replace multiple spaces with single space
-        .replaceAll(RegExp(r'[^\w\s\-]'), ''); // Remove special characters except allowed ones
+        .replaceAll(
+          RegExp(r'\s+'),
+          ' ',
+        ) // Replace multiple spaces with single space
+        .replaceAll(
+          RegExp(r'[^\w\s\-]'),
+          '',
+        ); // Remove special characters except allowed ones
   }
 
   /// Check if group name is available (placeholder for future implementation)
   static Future<bool> isGroupNameAvailable(String groupName) async {
     // TODO: Implement actual check against Firestore
     // For now, return true (available)
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate network delay
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+    ); // Simulate network delay
     return true;
   }
 
@@ -165,7 +174,8 @@ class ValidationService {
     }
 
     final String trimmedValue = value.trim();
-    final RegExp emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final RegExp emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
     if (!emailRegex.hasMatch(trimmedValue)) {
       return 'Please enter a valid email address';
@@ -200,15 +210,15 @@ class ValidationService {
       return 'Password must be at least 8 characters';
     }
 
-    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+    if (!RegExp('[A-Z]').hasMatch(value)) {
       return 'Password must contain at least one uppercase letter';
     }
 
-    if (!RegExp(r'[a-z]').hasMatch(value)) {
+    if (!RegExp('[a-z]').hasMatch(value)) {
       return 'Password must contain at least one lowercase letter';
     }
 
-    if (!RegExp(r'[0-9]').hasMatch(value)) {
+    if (!RegExp('[0-9]').hasMatch(value)) {
       return 'Password must contain at least one number';
     }
 
@@ -221,9 +231,9 @@ class ValidationService {
 
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
-    if (RegExp(r'[A-Z]').hasMatch(password)) score++;
-    if (RegExp(r'[a-z]').hasMatch(password)) score++;
-    if (RegExp(r'[0-9]').hasMatch(password)) score++;
+    if (RegExp('[A-Z]').hasMatch(password)) score++;
+    if (RegExp('[a-z]').hasMatch(password)) score++;
+    if (RegExp('[0-9]').hasMatch(password)) score++;
     if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) score++;
 
     return score;

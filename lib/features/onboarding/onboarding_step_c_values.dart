@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../user/controllers/onboarding_controller.dart';
+import '../../../common/constants/app_colors.dart';
+
+import 'bloc/onboarding_bloc.dart';
+import 'bloc/onboarding_data.dart';
 import 'shared_styles.dart';
 
 /// Third step of onboarding focusing on personal values.
@@ -11,16 +14,15 @@ import 'shared_styles.dart';
 /// This screen collects information about what matters to the user
 /// in a partner and their dealbreakers.
 class OnboardingStepCValues extends StatefulWidget {
+  const OnboardingStepCValues({
+    required this.onBack,
+    required this.finishOnboarding,
+    super.key,
+    this.backgroundColor = AppColors.backgroundColor,
+  });
   final VoidCallback onBack;
   final VoidCallback finishOnboarding;
   final Color backgroundColor;
-
-  const OnboardingStepCValues({
-    Key? key,
-    required this.onBack,
-    required this.finishOnboarding,
-    this.backgroundColor = OnboardingStyles.backgroundColor,
-  }) : super(key: key);
 
   @override
   State<OnboardingStepCValues> createState() => _OnboardingStepCValuesState();
@@ -83,7 +85,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data ?? OnboardingData();
 
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
@@ -108,7 +112,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     ),
                     child: Text(
                       'Step 3 of 3',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: deepGreen,
@@ -123,7 +127,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
               // Header
               Text(
                 'Your Values & Preferences',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.brown.shade800,
@@ -133,7 +137,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
               const SizedBox(height: 12),
               Text(
                 'Tell us what matters most to you in relationships.',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 15,
                   color: Colors.brown.shade600,
                 ),
@@ -161,7 +165,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     const SizedBox(height: 8),
                     Text(
                       'Select at least 3 values that are important to you',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: Colors.grey[700],
                       ),
@@ -182,15 +186,15 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                             label: value['label'],
                             isSelected: isSelected,
                             onChanged: (selected) {
-                              List<String> updatedValues = [
-                                ...controller.values
+                              final List<String> updatedValues = [
+                                ...controller.values,
                               ];
                               if (selected) {
                                 updatedValues.add(value['id']);
                               } else {
                                 updatedValues.remove(value['id']);
                               }
-                              controller.updateValues(updatedValues);
+                              context.read<OnboardingBloc>().add(OnboardingValuesUpdated(updatedValues));
                               HapticFeedback.selectionClick();
                             },
                             deepGreen: deepGreen,
@@ -225,7 +229,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     const SizedBox(height: 8),
                     Text(
                       'Select any absolute dealbreakers for you',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: Colors.grey[700],
                       ),
@@ -240,22 +244,23 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                         spacing: 8,
                         runSpacing: 12,
                         children: _dealbreakers.map((dealbreaker) {
-                          final isSelected = controller.dealbreakers
+                          final isSelected = data.dealbreakers
                               .contains(dealbreaker['id']);
                           return _buildValueCheckbox(
                             label: dealbreaker['label'],
                             isSelected: isSelected,
                             onChanged: (selected) {
-                              List<String> updatedDealbreakers = [
-                                ...controller.dealbreakers
+                              final List<String> updatedDealbreakers = [
+                                ...data.dealbreakers,
                               ];
                               if (selected) {
                                 updatedDealbreakers.add(dealbreaker['id']);
                               } else {
                                 updatedDealbreakers.remove(dealbreaker['id']);
                               }
-                              controller
-                                  .updateDealbreakers(updatedDealbreakers);
+                              context.read<OnboardingBloc>().add(
+                                OnboardingDealbreakersUpdated(updatedDealbreakers),
+                              );
                               HapticFeedback.selectionClick();
                             },
                             deepGreen: deepGreen,
@@ -277,7 +282,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     ? Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -294,7 +301,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                             Expanded(
                               child: Text(
                                 'Please select at least 3 values that matter to you',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.montserrat(
                                   fontSize: 14,
                                   color: Colors.amber[800],
                                 ),
@@ -319,7 +326,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     icon: const Icon(Icons.arrow_back, size: 16),
                     label: Text(
                       'Back',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -327,7 +334,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.grey.shade700,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                   ),
 
@@ -337,12 +346,14 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     height: 56,
                     child: ElevatedButton(
                       key: _finishButtonKey,
-                      onPressed: _isStepValid(controller)
+                      onPressed: _isStepValid(data)
                           ? () {
                               HapticFeedback.mediumImpact();
                               // Navigate to Dating Homepage instead of calling finishOnboarding
                               Navigator.pushReplacementNamed(
-                                  context, '/dating');
+                                context,
+                                '/dating',
+                              );
                             }
                           : () {
                               setState(() {
@@ -369,7 +380,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                       ),
                       child: Text(
                         'Finish',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -384,19 +395,19 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
         ),
       ),
     );
+      },
+    );
   }
 
   /// Builds a section title with consistent styling
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-      ),
-    );
-  }
+  Widget _buildSectionTitle(String title) => Text(
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      );
 
   /// Builds a custom checkbox for values selection
   Widget _buildValueCheckbox({
@@ -404,10 +415,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
     required bool isSelected,
     required ValueChanged<bool> onChanged,
     required Color deepGreen,
-  }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return AnimatedScale(
+  }) =>
+      LayoutBuilder(
+        builder: (context, constraints) => AnimatedScale(
           scale: isSelected ? 1.02 : 1.0,
           duration: const Duration(milliseconds: 200),
           child: Material(
@@ -459,7 +469,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     Expanded(
                       child: Text(
                         label,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: isSelected ? deepGreen : Colors.black87,
                           fontWeight:
@@ -474,14 +484,11 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
               ),
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) {
-    // Require at least 3 values
-    return controller.values.length >= 3;
+  bool _isStepValid(OnboardingData data) {
+    return data.values.length >= 3;
   }
 }

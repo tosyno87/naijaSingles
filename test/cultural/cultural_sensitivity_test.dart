@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/data/repo/user_search_repo.dart';
+
 import '../helpers/firebase_test_setup.dart';
 
 void main() {
@@ -8,15 +8,13 @@ void main() {
     await FirebaseTestSetup.setupFirebase();
   });
 
-  tearDownAll(() {
-    FirebaseTestSetup.cleanup();
-  });
+  tearDownAll(FirebaseTestSetup.cleanup);
 
   group('Cultural Sensitivity Tests', () {
     test('Cultural representation accuracy - Nigerian ethnicities', () {
       // Test that Nigerian ethnicities are represented accurately
       final nigerianEthnicities = ['Yoruba', 'Igbo', 'Hausa', 'Fulani', 'Ijaw'];
-      
+
       for (final ethnicity in nigerianEthnicities) {
         expect(ethnicity, isNotEmpty);
         expect(ethnicity.length, greaterThan(2));
@@ -29,7 +27,7 @@ void main() {
     test('Cultural representation accuracy - Ghanaian ethnicities', () {
       // Test that Ghanaian ethnicities are represented accurately
       final ghanaianEthnicities = ['Akan', 'Ewe', 'Ga', 'Dagbani', 'Twi'];
-      
+
       for (final ethnicity in ghanaianEthnicities) {
         expect(ethnicity, isNotEmpty);
         expect(ethnicity.length, greaterThanOrEqualTo(2));
@@ -47,7 +45,7 @@ void main() {
         tribe: 'Yoruba',
         age: 25,
       );
-      
+
       final user2 = UserModel(
         id: '2',
         name: 'Kwame',
@@ -55,7 +53,7 @@ void main() {
         tribe: 'Akan',
         age: 26,
       );
-      
+
       final user3 = UserModel(
         id: '3',
         name: 'Amara',
@@ -63,12 +61,12 @@ void main() {
         tribe: 'Igbo',
         age: 24,
       );
-      
+
       // All users should be treated equally regardless of ethnicity
       expect(user1.tribe, isNot(equals(user2.tribe)));
       expect(user1.tribe, isNot(equals(user3.tribe)));
       expect(user2.tribe, isNot(equals(user3.tribe)));
-      
+
       // Test that cultural diversity is maintained
       final ethnicities = [user1.tribe, user2.tribe, user3.tribe];
       expect(ethnicities.toSet().length, equals(3)); // All different
@@ -77,10 +75,18 @@ void main() {
     test('Traditional name handling', () {
       // Test that traditional African names are handled properly
       final traditionalNames = [
-        'Adebayo', 'Kwame', 'Amara', 'Kofi', 'Ngozi',
-        'Chinwe', 'Tunde', 'Folake', 'Yaw', 'Akosua'
+        'Adebayo',
+        'Kwame',
+        'Amara',
+        'Kofi',
+        'Ngozi',
+        'Chinwe',
+        'Tunde',
+        'Folake',
+        'Yaw',
+        'Akosua',
       ];
-      
+
       for (final name in traditionalNames) {
         expect(name, isNotEmpty);
         expect(name.length, greaterThan(2));
@@ -92,15 +98,23 @@ void main() {
     test('Language support validation', () {
       // Test that African languages are properly supported
       final africanLanguages = [
-        'Yoruba', 'Igbo', 'Hausa', 'Swahili', 'Amharic',
-        'Twi', 'Wolof', 'Zulu', 'Xhosa', 'Shona'
+        'Yoruba',
+        'Igbo',
+        'Hausa',
+        'Swahili',
+        'Amharic',
+        'Twi',
+        'Wolof',
+        'Zulu',
+        'Xhosa',
+        'Shona',
       ];
-      
+
       for (final language in africanLanguages) {
         expect(language, isNotEmpty);
         expect(language.length, greaterThan(2));
         // Languages should be capitalized properly
-        expect(language[0], matches(RegExp(r'[A-Z]')));
+        expect(language[0], matches(RegExp('[A-Z]')));
       }
     });
 
@@ -115,13 +129,13 @@ void main() {
         occupation: 'Software Engineer',
         age: 25,
       );
-      
+
       // Ensure no stereotypical associations
       expect(user.nationality, isNot(equals('African'))); // Too generic
       expect(user.tribe, isNotEmpty);
       expect(user.religion, isNotEmpty);
       expect(user.occupation, isNotEmpty);
-      
+
       // Test that cultural fields are independent
       expect(user.nationality, isNot(equals(user.tribe)));
       expect(user.tribe, isNot(equals(user.religion)));
@@ -134,9 +148,9 @@ void main() {
         'Ghana Independence Day',
         'Ethiopian New Year',
         'Kwanzaa Celebration',
-        'African Cultural Night'
+        'African Cultural Night',
       ];
-      
+
       for (final event in culturalEvents) {
         expect(event, isNotEmpty);
         expect(event.length, greaterThan(5));
@@ -155,9 +169,9 @@ void main() {
         'F1 Student Visa',
         'Green Card Holder',
         'Naturalized Citizen',
-        'Dual Citizen'
+        'Dual Citizen',
       ];
-      
+
       for (final status in immigrationStatuses) {
         expect(status, isNotEmpty);
         expect(status.length, greaterThan(3));
@@ -179,9 +193,9 @@ void main() {
         'Lawyer',
         'Business Analyst',
         'Consultant',
-        'Researcher'
+        'Researcher',
       ];
-      
+
       for (final profession in professions) {
         expect(profession, isNotEmpty);
         expect(profession.length, greaterThan(3));
@@ -199,7 +213,7 @@ void main() {
         UserModel(id: '3', nationality: 'Ethiopia', tribe: 'Amhara', age: 24),
         UserModel(id: '4', nationality: 'Kenya', tribe: 'Kikuyu', age: 27),
       ];
-      
+
       // Test that all users have equal matching potential
       for (final user in users) {
         expect(user.nationality, isNotEmpty);
@@ -207,11 +221,11 @@ void main() {
         expect(user.age, greaterThan(18));
         expect(user.age, lessThan(100));
       }
-      
+
       // Test cultural diversity
       final nationalities = users.map((u) => u.nationality).toSet();
       final tribes = users.map((u) => u.tribe).toSet();
-      
+
       expect(nationalities.length, equals(4)); // All different countries
       expect(tribes.length, equals(4)); // All different tribes
     });

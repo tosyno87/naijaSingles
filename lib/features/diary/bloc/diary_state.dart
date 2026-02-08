@@ -12,18 +12,16 @@ class DiaryInitial extends DiaryState {}
 class DiaryLoading extends DiaryState {}
 
 class DiaryLoaded extends DiaryState {
-  final List<DiaryEntry> entries;
-
   const DiaryLoaded(this.entries);
+  final List<DiaryEntry> entries;
 
   @override
   List<Object> get props => [entries];
 }
 
 class DiaryError extends DiaryState {
-  final String message;
-
   const DiaryError(this.message);
+  final String message;
 
   @override
   List<Object> get props => [message];

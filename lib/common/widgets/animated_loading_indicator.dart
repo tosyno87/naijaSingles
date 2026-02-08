@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-class AnimatedLoadingIndicator extends StatefulWidget {
-  final Color color;
-  final double size;
+import 'package:flutter/material.dart';
 
+class AnimatedLoadingIndicator extends StatefulWidget {
   const AnimatedLoadingIndicator({
-    Key? key,
+    super.key,
     this.color = const Color(0xFF008037),
     this.size = 100,
-  }) : super(key: key);
+  });
+  final Color color;
+  final double size;
 
   @override
   State<AnimatedLoadingIndicator> createState() =>
@@ -36,19 +36,17 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: widget.size,
-      height: widget.size,
-      decoration: BoxDecoration(
-        color: const Color(0xFFDFF5E2),
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Transform.rotate(
+  Widget build(BuildContext context) => Container(
+        width: widget.size,
+        height: widget.size,
+        decoration: const BoxDecoration(
+          color: Color(0xFFDFF5E2),
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) => Transform.rotate(
               angle: _controller.value * 2 * math.pi,
               child: Stack(
                 alignment: Alignment.center,
@@ -84,22 +82,19 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
                   ),
                 ],
               ),
-            );
-          },
+            ),
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 class _LoadingDotPainter extends CustomPainter {
-  final Color color;
-  final double progress;
-
   _LoadingDotPainter({
     required this.color,
     required this.progress,
   });
+  final Color color;
+  final double progress;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -120,7 +115,6 @@ class _LoadingDotPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_LoadingDotPainter oldDelegate) {
-    return oldDelegate.progress != progress;
-  }
+  bool shouldRepaint(_LoadingDotPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }

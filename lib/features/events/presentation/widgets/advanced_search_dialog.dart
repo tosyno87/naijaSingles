@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../bloc/events_bloc.dart';
 import '../../data/services/location_service.dart';
 
 class AdvancedSearchDialog extends StatefulWidget {
-  final EventFilter currentFilter;
-  final Function(EventFilter) onFilterApplied;
-
   const AdvancedSearchDialog({
-    Key? key,
     required this.currentFilter,
     required this.onFilterApplied,
-  }) : super(key: key);
+    super.key,
+  });
+  final EventFilter currentFilter;
+  final Function(EventFilter) onFilterApplied;
 
   @override
   State<AdvancedSearchDialog> createState() => _AdvancedSearchDialogState();
@@ -25,6 +25,7 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
   String? _selectedCategory;
   double? _radiusKm;
   bool _useMiles = false; // Default to km, but can switch to miles
+  String? _eventType; // 'free', 'paid', or null (Any)
 
   static const List<String> categories = [
     'All',
@@ -39,19 +40,19 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
   ];
 
   static const List<double> radiusOptions = [5, 10, 25, 50, 100];
-  static const double defaultRadiusKm = 25.0;
-  
+  static const double defaultRadiusKm = 25;
+
   // Conversion methods
   double _kmToMiles(double km) => km * 0.621371;
   double _milesToKm(double miles) => miles * 1.60934;
-  
+
   List<double> get _radiusOptionsInCurrentUnit {
     if (_useMiles) {
-      return radiusOptions.map((km) => _kmToMiles(km)).toList();
+      return radiusOptions.map(_kmToMiles).toList();
     }
     return radiusOptions;
   }
-  
+
   String _getRadiusUnit() => _useMiles ? 'miles' : 'km';
 
   @override
@@ -66,7 +67,16 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
     _startDate = _filter.startDate;
     _endDate = _filter.endDate;
     _selectedCategory = _filter.category;
-    _radiusKm = _filter.radiusKm;
+    _radiusKm = _filter.radiusKm ?? defaultRadiusKm; // Always have a default value
+    
+    // Initialize event type from filter
+    if (_filter.freeOnly) {
+      _eventType = 'free';
+    } else if (_filter.paidOnly == true) {
+      _eventType = 'paid';
+    } else {
+      _eventType = null; // Any
+    }
   }
 
   @override
@@ -76,555 +86,600 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.95,
-        height: MediaQuery.of(context).size.height * 0.85,
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFF6E5), // NaijaSingles cream background
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
+  Widget build(BuildContext context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.95,
+          height: MediaQuery.of(context).size.height * 0.85,
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLocationSection(),
+                      _buildDivider(),
+                      _buildDateRangeSection(),
+                      _buildDivider(),
+                      _buildCategorySection(),
+                      _buildDivider(),
+                      _buildEventTypeSection(),
+                      const SizedBox(height: 8), // Bottom padding for scroll
+                    ],
+                  ),
+                ),
+              ),
+              _buildActionButtons(),
+            ],
+          ),
         ),
-        child: Column(
+      );
+
+  Widget _buildHeader() => Container(
+        padding: const EdgeInsets.fromLTRB(24, 20, 16, 16),
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Color(0xFFE0E0E0),
+              width: 1,
+            ),
+          ),
+        ),
+        child: Row(
           children: [
-            _buildHeader(),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildLocationSection(),
-                    const SizedBox(height: 24),
-                    _buildDateRangeSection(),
-                    const SizedBox(height: 24),
-                    _buildCategorySection(),
-                    const SizedBox(height: 24),
-                    _buildPriceSection(),
-                    const SizedBox(height: 32),
-                  ],
+              child: Text(
+                'Advanced Search',
+                style: GoogleFonts.montserrat(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF333333),
                 ),
               ),
             ),
-            _buildActionButtons(),
+            IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(
+                Icons.close,
+                color: Color(0xFF666666),
+                size: 24,
+              ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(
+                minWidth: 44,
+                minHeight: 44,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
+      );
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 20, 16, 16),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xFFE0E0E0),
-            width: 1,
-          ),
+  Widget _buildDivider() => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Divider(
+          height: 1,
+          thickness: 1,
+          color: Color(0xFFE0E0E0),
         ),
-      ),
-      child: Row(
+      );
+
+  Widget _buildLocationSection() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Text(
-              'Advanced Search',
-              style: GoogleFonts.montserrat(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF008037),
+          Text(
+            '📍 Location',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // City/address input
+          TextFormField(
+            controller: _locationController,
+            style: GoogleFonts.montserrat(
+              fontSize: 15,
+              color: const Color(0xFF333333),
+            ),
+            decoration: InputDecoration(
+              hintText: 'City or address',
+              hintStyle: GoogleFonts.montserrat(
+                fontSize: 15,
+                color: const Color(0xFF999999),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFF008037), width: 1.5),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
+              fillColor: Colors.white,
+              filled: true,
+              prefixIcon: const Icon(
+                Icons.location_on,
+                size: 20,
+                color: Color(0xFF666666),
               ),
             ),
           ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.close,
-              color: Color(0xFF666666),
-              size: 24,
+          const SizedBox(height: 12),
+          // Distance and location controls - visually grouped
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F8F8).withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFFE0E0E0).withValues(alpha: 0.5),
+                width: 1,
+              ),
             ),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 40,
-              minHeight: 40,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Distance selector with explicit value display
+                Row(
+                  children: [
+                    Text(
+                      'Distance: ',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        color: const Color(0xFF666666),
+                      ),
+                    ),
+                    DropdownButton<double>(
+                      value: _radiusKm ?? defaultRadiusKm, // Always show a value
+                      dropdownColor: Colors.white,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF333333),
+                      ),
+                      underline: Container(),
+                      isExpanded: false,
+                      items: _radiusOptionsInCurrentUnit
+                          .map(
+                            (radius) => DropdownMenuItem(
+                              value: _useMiles
+                                  ? _milesToKm(radius)
+                                  : radius, // Store in km internally
+                              child: Text(
+                                '${radius.toStringAsFixed(radius.truncateToDouble() == radius ? 0 : 1)} ${_getRadiusUnit()}',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  color: const Color(0xFF333333),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _radiusKm = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Current location button - full width, no truncation
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: _useCurrentLocation,
+                    icon: const Icon(
+                      Icons.my_location,
+                      size: 16,
+                      color: Color(0xFF008037),
+                    ),
+                    label: Text(
+                      'Use current location',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF008037),
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      minimumSize: const Size(44, 44),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      alignment: Alignment.centerLeft,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
+      );
 
-  Widget _buildCategorySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Category',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: _selectedCategory,
-          dropdownColor: const Color(0xFFFFF6E5),
-          style: GoogleFonts.montserrat(color: const Color(0xFF333333)),
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+  Widget _buildDateRangeSection() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '📅 Date',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF008037)),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
-            filled: true,
           ),
-          items: categories.map((category) {
-            return DropdownMenuItem(
-              value: category == 'All' ? null : category,
-              child: Text(category, style: GoogleFonts.montserrat(color: const Color(0xFF333333))),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedCategory = value;
-            });
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateRangeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Date Range',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: _buildDateField(
-                label: 'Start Date',
-                date: _startDate,
-                onDateSelected: (date) {
-                  setState(() {
-                    _startDate = date;
-                  });
-                },
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDateField(
+                  label: 'Start date',
+                  date: _startDate,
+                  onDateSelected: (date) {
+                    setState(() {
+                      _startDate = date;
+                    });
+                  },
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildDateField(
-                label: 'End Date',
-                date: _endDate,
-                onDateSelected: (date) {
-                  setState(() {
-                    _endDate = date;
-                  });
-                },
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(
+                  Icons.arrow_forward,
+                  size: 18,
+                  color: const Color(0xFF999999).withValues(alpha: 0.6),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+              Expanded(
+                child: _buildDateField(
+                  label: 'End date',
+                  date: _endDate,
+                  onDateSelected: (date) {
+                    setState(() {
+                      _endDate = date;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
 
   Widget _buildDateField({
     required String label,
     required DateTime? date,
     required Function(DateTime?) onDateSelected,
-  }) {
-    return InkWell(
-      onTap: () async {
-        final selectedDate = await showDatePicker(
-          context: context,
-          initialDate: date ?? DateTime.now(),
-          firstDate: DateTime.now(),
-          lastDate: DateTime.now().add(const Duration(days: 365)),
-          builder: (context, child) {
-            return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: const ColorScheme.light(
-                  primary: Color(0xFF008037), // NaijaSingles green
-                  onPrimary: Colors.white,
-                  surface: Color(0xFFFFF6E5), // NaijaSingles cream background
-                  onSurface: Color(0xFF333333), // Dark text
-                  secondary: Color(0xFF008037),
-                  onSecondary: Colors.white,
-                ),
-                dialogBackgroundColor: const Color(0xFFFFF6E5), // Cream background
-                textTheme: Theme.of(context).textTheme.copyWith(
-                  bodyLarge: GoogleFonts.montserrat(
-                    color: const Color(0xFF333333),
-                  ),
-                  bodyMedium: GoogleFonts.montserrat(
-                    color: const Color(0xFF333333),
-                  ),
-                ),
-              ),
-              child: child!,
-            );
-          },
-        );
-        onDateSelected(selectedDate);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFE0E0E0)),
-          borderRadius: BorderRadius.circular(12),
-          color: const Color(0xFFFFF6E5), // NaijaSingles cream background
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_today,
-              size: 20,
-              color: const Color(0xFF333333),
+  }) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.montserrat(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF666666),
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                date != null 
-                    ? '${date.day}/${date.month}/${date.year}'
-                    : label,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: date != null 
-                      ? const Color(0xFF333333)
-                      : const Color(0xFF666666),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLocationSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Location',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
           ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _locationController,
-          style: GoogleFonts.montserrat(color: const Color(0xFF333333)),
-          decoration: InputDecoration(
-            hintText: 'Enter city or address',
-            hintStyle: GoogleFonts.montserrat(color: const Color(0xFF666666)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF008037)),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            fillColor: const Color(0xFFFFF6E5), // NaijaSingles cream background
-            filled: true,
-            prefixIcon: const Icon(Icons.location_on, color: Color(0xFF333333)),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'Within ',
-                  style: GoogleFonts.montserrat(fontSize: 14, color: const Color(0xFF333333)),
-                ),
-                DropdownButton<double>(
-                  value: _radiusKm,
-                  dropdownColor: const Color(0xFFFFF6E5),
-                  style: GoogleFonts.montserrat(color: const Color(0xFF333333)),
-                  items: _radiusOptionsInCurrentUnit.map((radius) {
-                    return DropdownMenuItem(
-                      value: _useMiles ? _milesToKm(radius) : radius, // Store in km internally
-                      child: Text('${radius.toStringAsFixed(1)} ${_getRadiusUnit()}', 
-                        style: GoogleFonts.montserrat(color: const Color(0xFF333333))),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _radiusKm = value;
-                    });
-                  },
-                ),
-                Text(
-                  ' of location',
-                  style: GoogleFonts.montserrat(fontSize: 14, color: const Color(0xFF333333)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Text(
-                  'Distance unit: ',
-                  style: GoogleFonts.montserrat(fontSize: 12, color: const Color(0xFF666666)),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _useMiles = !_useMiles;
-                      // Convert current radius to new unit
-                      if (_radiusKm != null) {
-                        if (_useMiles) {
-                          _radiusKm = _kmToMiles(_radiusKm!);
-                        } else {
-                          _radiusKm = _milesToKm(_radiusKm!);
-                        }
-                      }
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: _useMiles ? const Color(0xFF008037) : Colors.transparent,
-                      border: Border.all(color: const Color(0xFF008037)),
-                      borderRadius: BorderRadius.circular(4),
+          const SizedBox(height: 6),
+          InkWell(
+            onTap: () async {
+              final selectedDate = await showDatePicker(
+                context: context,
+                initialDate: date ?? DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+                builder: (context, child) => Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: Color(0xFF008037),
+                      onSurface: Color(0xFF333333),
                     ),
+                    textTheme: Theme.of(context).textTheme.copyWith(
+                          bodyLarge: GoogleFonts.montserrat(
+                            color: const Color(0xFF333333),
+                          ),
+                          bodyMedium: GoogleFonts.montserrat(
+                            color: const Color(0xFF333333),
+                          ),
+                        ),
+                    dialogTheme: const DialogThemeData(
+                      backgroundColor: AppColors.backgroundColor,
+                    ),
+                  ),
+                  child: child!,
+                ),
+              );
+              onDateSelected(selectedDate);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: const Color(0xFFE0E0E0),
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 18,
+                    color: Color(0xFF666666),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
                     child: Text(
-                      _useMiles ? 'Miles' : 'Kilometers',
+                      date != null
+                          ? '${date.day}/${date.month}/${date.year}'
+                          : 'Select date',
                       style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: _useMiles ? Colors.white : const Color(0xFF008037),
+                        fontSize: 14,
+                        color: date != null
+                            ? const Color(0xFF333333)
+                            : const Color(0xFF999999),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _useCurrentLocation,
-                icon: const Icon(Icons.my_location, size: 16),
-                label: const Text('Use Current Location'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF008037),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPriceSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Event Type',
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF333333),
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildModernFilterChip(
-          label: 'Free Events Only',
-          isSelected: _filter.freeOnly,
-          onTap: () {
-            setState(() {
-              _filter = _filter.copyWith(freeOnly: !_filter.freeOnly);
-            });
-          },
-        ),
-        const SizedBox(height: 12),
-        _buildModernFilterChip(
-          label: 'Paid Events Only',
-          isSelected: _filter.paidOnly ?? false,
-          onTap: () {
-            setState(() {
-              _filter = _filter.copyWith(paidOnly: !(_filter.paidOnly ?? false));
-            });
-          },
-        ),
-      ],
-    );
-  }
-
-
-
-  Widget _buildModernFilterChip({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected 
-              ? const Color(0xFF008037).withOpacity(0.1)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected 
-                ? const Color(0xFF008037)
-                : const Color(0xFFE0E0E0),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected 
-                      ? const Color(0xFF008037)
-                      : const Color(0xFFCCCCCC),
-                  width: 2,
-                ),
-                color: isSelected 
-                    ? const Color(0xFF008037)
-                    : Colors.transparent,
-              ),
-              child: isSelected
-                  ? const Icon(
-                      Icons.check,
-                      size: 12,
-                      color: Colors.white,
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                label,
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected 
-                      ? const Color(0xFF008037)
-                      : const Color(0xFF333333),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: Color(0xFFE0E0E0),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: _clearFilters,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: const BorderSide(color: Color(0xFF008037), width: 1.5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                backgroundColor: Colors.transparent,
-              ),
-              child: Text(
-                'Clear All',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF008037),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _applyFilters,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008037),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-                shadowColor: Colors.transparent,
-              ),
-              child: Text(
-                'Apply Filters',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+                ],
               ),
             ),
           ),
         ],
+      );
+
+  Widget _buildCategorySection() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '🏷 Category',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
+            ),
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            value: _selectedCategory,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFF008037), width: 1.5),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
+              fillColor: Colors.white,
+              filled: true,
+            ),
+            dropdownColor: Colors.white,
+            style: GoogleFonts.montserrat(
+              fontSize: 15,
+              color: const Color(0xFF333333),
+            ),
+            items: categories
+                .map(
+                  (category) => DropdownMenuItem(
+                    value: category == 'All' ? null : category,
+                    child: Text(
+                      category,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        color: const Color(0xFF333333),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedCategory = value;
+              });
+            },
+          ),
+        ],
+      );
+
+  Widget _buildEventTypeSection() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '🎟 Event Type',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF333333),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildEventTypeChip(
+                  label: 'Free',
+                  value: 'free',
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildEventTypeChip(
+                  label: 'Paid',
+                  value: 'paid',
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildEventTypeChip(
+                  label: 'Any',
+                  value: null,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+
+  Widget _buildEventTypeChip({
+    required String label,
+    required String? value,
+  }) {
+    final isSelected = _eventType == value;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _eventType = value;
+        });
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF008037).withValues(alpha: 0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF008037)
+                : const Color(0xFFE0E0E0),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isSelected) ...[
+              const Icon(
+                Icons.check,
+                size: 16,
+                color: Color(0xFF008037),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected
+                    ? const Color(0xFF008037)
+                    : const Color(0xFF666666),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  Widget _buildActionButtons() => Container(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: const Color(0xFFE0E0E0).withValues(alpha: 0.5),
+              width: 1,
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Row(
+            children: [
+              // Secondary action: Clear All (text button)
+              TextButton(
+                onPressed: _clearFilters,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
+                  minimumSize: const Size(44, 44),
+                ),
+                child: Text(
+                  'Clear all',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF666666),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              // Primary action: Apply Filters (solid green)
+              ElevatedButton(
+                onPressed: _applyFilters,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF008037),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
+                  minimumSize: const Size(44, 44),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Apply filters',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 
   void _clearFilters() {
     setState(() {
@@ -634,49 +689,61 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
       _endDate = null;
       _selectedCategory = null;
       _radiusKm = null;
-      _useMiles = false; // Reset to default km
+      _useMiles = false;
+      _eventType = null; // Any
     });
   }
 
-  void _useCurrentLocation() async {
+  Future<void> _useCurrentLocation() async {
     try {
       final location = await LocationService().getCurrentLocation();
       if (location != null) {
         setState(() {
           _locationController.text = 'Current Location';
-          _radiusKm = _radiusKm ?? defaultRadiusKm; // Default to 25km if not set
+          _radiusKm = _radiusKm ?? defaultRadiusKm;
         });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Location set to current position'),
-            backgroundColor: const Color(0xFF008037),
-          ),
-        );
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location set to current position'),
+              backgroundColor: Color(0xFF008037),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Unable to get current location. Please check permissions.',
+              ),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Unable to get current location. Please check permissions.'),
+            content: Text('Error getting location: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error getting location: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
-  void _applyFilters() async {
+  Future<void> _applyFilters() async {
     // Get user's current location if location filter is being used
     double? userLatitude;
     double? userLongitude;
     double? radiusKm = _radiusKm;
-    
+
     if (_locationController.text.trim().isNotEmpty) {
       if (_locationController.text.trim() == 'Current Location') {
         // Use current location with radius
@@ -685,16 +752,21 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
           if (location != null) {
             userLatitude = location.latitude;
             userLongitude = location.longitude;
-            radiusKm = radiusKm ?? defaultRadiusKm; // Ensure we have a radius
+            radiusKm = radiusKm ?? defaultRadiusKm;
           }
         } catch (e) {
           // If location access fails, show a message but continue with text-based filtering
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Location access denied. Using text-based location filtering.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Location access denied. Using text-based location filtering.',
+                ),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
         }
       } else {
         // Text-based location search - no radius filtering
@@ -704,17 +776,28 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
       }
     }
 
+    // Apply event type filter
+    final freeOnly = _eventType == 'free';
+    final paidOnly = _eventType == 'paid';
+
     final newFilter = _filter.copyWith(
       category: _selectedCategory,
       startDate: _startDate,
       endDate: _endDate,
-      location: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
+      location: _locationController.text.trim().isEmpty
+          ? null
+          : _locationController.text.trim(),
       radiusKm: radiusKm,
       latitude: userLatitude,
       longitude: userLongitude,
+      freeOnly: freeOnly,
+      paidOnly: paidOnly ? true : null,
     );
 
     widget.onFilterApplied(newFilter);
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 }
+

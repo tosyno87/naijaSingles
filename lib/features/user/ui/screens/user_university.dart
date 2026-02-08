@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
+import '../../../../common/routes/route_name.dart';
 
 class UniversityPage extends StatefulWidget {
   const UniversityPage({super.key});
@@ -23,7 +23,7 @@ class _UniversityPage extends State<UniversityPage> {
     'Covenant University',
     'Howard University',
     'University of Cape Town',
-    'Ashesi University'
+    'Ashesi University',
   ];
 
   @override
@@ -53,7 +53,7 @@ class _UniversityPage extends State<UniversityPage> {
   @override
   Widget build(BuildContext context) {
     // For adding userdetails in this user map from navigation
-    var userData =
+    final userData =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final screenSize = MediaQuery.of(context).size;
 
@@ -78,7 +78,7 @@ class _UniversityPage extends State<UniversityPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -102,7 +102,7 @@ class _UniversityPage extends State<UniversityPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Where did you go to school?",
+                            'Where did you go to school?',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -111,7 +111,7 @@ class _UniversityPage extends State<UniversityPage> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            "This helps us connect you with alumni or people nearby",
+                            'This helps us connect you with alumni or people nearby',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey[600],
@@ -123,7 +123,7 @@ class _UniversityPage extends State<UniversityPage> {
                       const SizedBox(height: 40),
 
                       // Input section with card-style design
-                      Container(
+                      DecoratedBox(
                         decoration: BoxDecoration(
                           color: Colors.grey[50],
                           borderRadius: BorderRadius.circular(16),
@@ -142,7 +142,7 @@ class _UniversityPage extends State<UniversityPage> {
                             });
                           },
                           decoration: InputDecoration(
-                            hintText: "e.g. University of Lagos",
+                            hintText: 'e.g. University of Lagos',
                             hintStyle: TextStyle(
                               color: Colors.grey[400],
                               fontSize: 16,
@@ -154,7 +154,9 @@ class _UniversityPage extends State<UniversityPage> {
                                   : Colors.grey[400],
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20, horizontal: 16),
+                              vertical: 20,
+                              horizontal: 16,
+                            ),
                             border: InputBorder.none,
                           ),
                         ),
@@ -167,7 +169,7 @@ class _UniversityPage extends State<UniversityPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Popular universities",
+                            'Popular universities',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -178,33 +180,37 @@ class _UniversityPage extends State<UniversityPage> {
                           Wrap(
                             spacing: 8,
                             runSpacing: 12,
-                            children: _suggestions.map((suggestion) {
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    university = suggestion;
-                                    _universityController.text = suggestion;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[50],
-                                    borderRadius: BorderRadius.circular(20),
-                                    border:
-                                        Border.all(color: Colors.grey[300]!),
-                                  ),
-                                  child: Text(
-                                    suggestion,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[800],
+                            children: _suggestions
+                                .map(
+                                  (suggestion) => GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        university = suggestion;
+                                        _universityController.text = suggestion;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                            color: Colors.grey[300]!),
+                                      ),
+                                      child: Text(
+                                        suggestion,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[800],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            }).toList(),
+                                )
+                                .toList(),
                           ),
                         ],
                       ),
@@ -216,7 +222,7 @@ class _UniversityPage extends State<UniversityPage> {
 
             // Continue labelLarge fixed at the bottom
             Container(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -236,14 +242,16 @@ class _UniversityPage extends State<UniversityPage> {
                             'editInfo': {
                               'university': university,
                               'userGender': userData['userGender'],
-                              'showOnProfile': userData['showOnProfile']
-                            }
+                              'showOnProfile': userData['showOnProfile'],
+                            },
                           });
 
                           log(userData.toString());
                           Navigator.pushNamed(
-                              context, RouteName.profilePicSetScreen,
-                              arguments: userData);
+                            context,
+                            RouteName.profilePicSetScreen,
+                            arguments: userData,
+                          );
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -258,11 +266,11 @@ class _UniversityPage extends State<UniversityPage> {
                     ),
                   ),
                   child: const Text(
-                    "CONTINUE",
+                    'CONTINUE',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),

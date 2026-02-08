@@ -11,10 +11,9 @@ enum GroupJoinErrorType {
 }
 
 class GroupJoinException implements Exception {
+  GroupJoinException(this.message, this.type);
   final String message;
   final GroupJoinErrorType type;
-
-  GroupJoinException(this.message, this.type);
 
   @override
   String toString() => 'GroupJoinException: $message';
@@ -22,10 +21,6 @@ class GroupJoinException implements Exception {
 
 /// Result class for group join operations
 class GroupJoinResult {
-  final bool success;
-  final String? groupName;
-  final GroupJoinException? error;
-
   GroupJoinResult._(this.success, this.groupName, this.error);
 
   factory GroupJoinResult.success(String groupName) =>
@@ -33,4 +28,7 @@ class GroupJoinResult {
 
   factory GroupJoinResult.failure(GroupJoinException error) =>
       GroupJoinResult._(false, null, error);
+  final bool success;
+  final String? groupName;
+  final GroupJoinException? error;
 }

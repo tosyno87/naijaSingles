@@ -11,12 +11,12 @@ class CulturalFieldsMigrationService {
   static Future<Map<String, dynamic>> migrateAllUsers() async {
     try {
       debugPrint('🔄 Starting cultural fields migration for all users...');
-      
+
       final usersSnapshot = await _firestore.collection('users').get();
-      int totalUsers = usersSnapshot.docs.length;
+      final int totalUsers = usersSnapshot.docs.length;
       int migratedUsers = 0;
       int errorUsers = 0;
-      List<String> errors = [];
+      final List<String> errors = [];
 
       debugPrint('📊 Found $totalUsers users to migrate');
 
@@ -24,7 +24,7 @@ class CulturalFieldsMigrationService {
         try {
           await _migrateUser(doc.id, doc.data());
           migratedUsers++;
-          
+
           if (migratedUsers % 10 == 0) {
             debugPrint('✅ Migrated $migratedUsers/$totalUsers users');
           }
@@ -47,7 +47,7 @@ class CulturalFieldsMigrationService {
       debugPrint('   Total users: $totalUsers');
       debugPrint('   Migrated: $migratedUsers');
       debugPrint('   Errors: $errorUsers');
-      
+
       return result;
     } catch (e) {
       debugPrint('❌ Critical error during migration: $e');
@@ -62,7 +62,10 @@ class CulturalFieldsMigrationService {
   }
 
   /// Migrate a single user
-  static Future<bool> _migrateUser(String userId, Map<String, dynamic> userData) async {
+  static Future<bool> _migrateUser(
+    String userId,
+    Map<String, dynamic> userData,
+  ) async {
     try {
       // Check if user already has cultural fields
       if (_hasCulturalFields(userData)) {
@@ -72,10 +75,10 @@ class CulturalFieldsMigrationService {
 
       // Extract cultural data from existing fields
       final culturalData = _extractCulturalData(userData);
-      
+
       // Update user document with cultural fields
       await _firestore.collection('users').doc(userId).update(culturalData);
-      
+
       debugPrint('✅ Migrated user $userId with cultural fields');
       return true;
     } catch (e) {
@@ -85,16 +88,17 @@ class CulturalFieldsMigrationService {
   }
 
   /// Check if user already has cultural fields
-  static bool _hasCulturalFields(Map<String, dynamic> userData) {
-    return userData.containsKey('nationality') ||
-           userData.containsKey('tribe') ||
-           userData.containsKey('languages') ||
-           userData.containsKey('religion') ||
-           userData.containsKey('occupation');
-  }
+  static bool _hasCulturalFields(Map<String, dynamic> userData) =>
+      userData.containsKey('nationality') ||
+      userData.containsKey('tribe') ||
+      userData.containsKey('languages') ||
+      userData.containsKey('religion') ||
+      userData.containsKey('occupation');
 
   /// Extract cultural data from existing user data
-  static Map<String, dynamic> _extractCulturalData(Map<String, dynamic> userData) {
+  static Map<String, dynamic> _extractCulturalData(
+    Map<String, dynamic> userData,
+  ) {
     final culturalData = <String, dynamic>{};
 
     // Extract nationality from living_in or other location fields
@@ -129,7 +133,8 @@ class CulturalFieldsMigrationService {
     // Extract occupation from profession or job_title
     if (userData.containsKey('profession') && userData['profession'] != null) {
       culturalData['occupation'] = userData['profession'];
-    } else if (userData.containsKey('job_title') && userData['job_title'] != null) {
+    } else if (userData.containsKey('job_title') &&
+        userData['job_title'] != null) {
       culturalData['occupation'] = userData['job_title'];
     } else {
       culturalData['occupation'] = ''; // Let user set later
@@ -140,19 +145,30 @@ class CulturalFieldsMigrationService {
 
   /// Derive nationality from location
   static String _deriveNationality(String location) {
-    if (location.contains('nigeria') || location.contains('lagos') || location.contains('abuja')) {
+    if (location.contains('nigeria') ||
+        location.contains('lagos') ||
+        location.contains('abuja')) {
       return 'Nigerian';
     } else if (location.contains('ghana') || location.contains('accra')) {
       return 'Ghanaian';
     } else if (location.contains('kenya') || location.contains('nairobi')) {
       return 'Kenyan';
-    } else if (location.contains('south africa') || location.contains('johannesburg') || location.contains('cape town')) {
+    } else if (location.contains('south africa') ||
+        location.contains('johannesburg') ||
+        location.contains('cape town')) {
       return 'South African';
-    } else if (location.contains('uk') || location.contains('london') || location.contains('manchester')) {
+    } else if (location.contains('uk') ||
+        location.contains('london') ||
+        location.contains('manchester')) {
       return 'British-Nigerian';
-    } else if (location.contains('usa') || location.contains('america') || location.contains('new york') || location.contains('atlanta')) {
+    } else if (location.contains('usa') ||
+        location.contains('america') ||
+        location.contains('new york') ||
+        location.contains('atlanta')) {
       return 'American-Nigerian';
-    } else if (location.contains('canada') || location.contains('toronto') || location.contains('vancouver')) {
+    } else if (location.contains('canada') ||
+        location.contains('toronto') ||
+        location.contains('vancouver')) {
       return 'Canadian-Nigerian';
     }
     return 'Nigerian'; // Default
@@ -160,7 +176,9 @@ class CulturalFieldsMigrationService {
 
   /// Derive tribe from profession
   static String _deriveTribe(String profession) {
-    if (profession.contains('yoruba') || profession.contains('igbo') || profession.contains('hausa')) {
+    if (profession.contains('yoruba') ||
+        profession.contains('igbo') ||
+        profession.contains('hausa')) {
       return profession;
     }
     return 'Yoruba'; // Default
@@ -168,11 +186,20 @@ class CulturalFieldsMigrationService {
 
   /// Derive tribe from name
   static String _deriveTribeFromName(String name) {
-    if (name.contains('ade') || name.contains('tunde') || name.contains('kemi') || name.contains('yemi')) {
+    if (name.contains('ade') ||
+        name.contains('tunde') ||
+        name.contains('kemi') ||
+        name.contains('yemi')) {
       return 'Yoruba';
-    } else if (name.contains('chi') || name.contains('nkechi') || name.contains('chukwu') || name.contains('nnamdi')) {
+    } else if (name.contains('chi') ||
+        name.contains('nkechi') ||
+        name.contains('chukwu') ||
+        name.contains('nnamdi')) {
       return 'Igbo';
-    } else if (name.contains('ahmed') || name.contains('fatima') || name.contains('hassan') || name.contains('aisha')) {
+    } else if (name.contains('ahmed') ||
+        name.contains('fatima') ||
+        name.contains('hassan') ||
+        name.contains('aisha')) {
       return 'Hausa';
     }
     return 'Yoruba'; // Default

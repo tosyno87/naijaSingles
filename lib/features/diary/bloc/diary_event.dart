@@ -10,17 +10,16 @@ abstract class DiaryEvent extends Equatable {
 class LoadDiaryEntries extends DiaryEvent {}
 
 class AddDiaryEntryEvent extends DiaryEvent {
-  final String userId;
-  final String content;
-  final String userName;
-  final String? userImage;
-
   const AddDiaryEntryEvent({
     required this.userId,
     required this.content,
     required this.userName,
     required this.userImage,
   });
+  final String userId;
+  final String content;
+  final String userName;
+  final String? userImage;
 
   @override
   List<Object> get props => [userId, content, userName, userImage ?? ''];

@@ -1,9 +1,10 @@
 import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:equatable/equatable.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Events
 abstract class GoogleSignInEvent extends Equatable {
@@ -24,18 +25,16 @@ class GoogleSignInInitial extends GoogleSignInState {}
 class GoogleSignInLoading extends GoogleSignInState {}
 
 class GoogleSignInSuccess extends GoogleSignInState {
-  final User user;
-
   GoogleSignInSuccess({required this.user});
+  final User user;
 
   @override
   List<Object> get props => [user];
 }
 
 class GoogleSignInFailure extends GoogleSignInState {
-  final String error;
-
   GoogleSignInFailure({required this.error});
+  final String error;
 
   @override
   List<Object> get props => [error];
@@ -43,14 +42,13 @@ class GoogleSignInFailure extends GoogleSignInState {
 
 // BLoC
 class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
+  GoogleSignInBloc() : super(GoogleSignInInitial()) {
+    on<GoogleSignInRequested>(_onGoogleSignInRequested);
+  }
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
   );
-
-  GoogleSignInBloc() : super(GoogleSignInInitial()) {
-    on<GoogleSignInRequested>(_onGoogleSignInRequested);
-  }
 
   Future<void> _onGoogleSignInRequested(
     GoogleSignInRequested event,
@@ -58,33 +56,33 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
   ) async {
     emit(GoogleSignInLoading());
     try {
-      log("Starting Google Sign In process...");
+      log('Starting Google Sign In process...');
 
       // Check if user is already signed in with Google
       final currentUser = _googleSignIn.currentUser;
       if (currentUser != null) {
-        log("User already signed in with Google. Signing out first...");
+        log('User already signed in with Google. Signing out first...');
         await _googleSignIn.signOut();
       }
 
       // Trigger the Google Sign In flow
-      log("Triggering Google Sign In UI...");
+      log('Triggering Google Sign In UI...');
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       log("Google Sign In result: ${googleUser != null ? 'Success' : 'Canceled/Failed'}");
 
       if (googleUser == null) {
         // User canceled the sign-in flow
-        log("Google Sign In was canceled by user");
-        emit(GoogleSignInFailure(error: "Sign in canceled"));
+        log('Google Sign In was canceled by user');
+        emit(GoogleSignInFailure(error: 'Sign in canceled'));
         return;
       }
 
-      log("Getting Google authentication details...");
+      log('Getting Google authentication details...');
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-      log("Got auth tokens - Access token length: ${googleAuth.accessToken?.length ?? 0}, ID token length: ${googleAuth.idToken?.length ?? 0}");
+      log('Got auth tokens - Access token length: ${googleAuth.accessToken?.length ?? 0}, ID token length: ${googleAuth.idToken?.length ?? 0}');
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -93,7 +91,7 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
       );
 
       // Sign in to Firebase with the Google credential
-      log("Signing in to Firebase with Google credential...");
+      log('Signing in to Firebase with Google credential...');
       final userCredential = await _auth.signInWithCredential(credential);
       final user = userCredential.user;
 
@@ -101,20 +99,23 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
         // Check if this is a new user (first time sign-in)
         final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
-        log("Google Sign In successful. User: ${user.uid}, New user: $isNewUser");
+        log('Google Sign In successful. User: ${user.uid}, New user: $isNewUser');
 
         // Create or update user document in Firestore
         await _updateUserData(user, isNewUser);
 
         emit(GoogleSignInSuccess(user: user));
       } else {
-        log("Failed to sign in with Google - user is null");
-        emit(GoogleSignInFailure(error: "Failed to sign in with Google"));
+        log('Failed to sign in with Google - user is null');
+        emit(GoogleSignInFailure(error: 'Failed to sign in with Google'));
       }
     } catch (e) {
-      log("Google Sign In error: $e");
-      emit(GoogleSignInFailure(
-          error: "Error signing in with Google: ${e.toString()}"));
+      log('Google Sign In error: $e');
+      emit(
+        GoogleSignInFailure(
+          error: 'Error signing in with Google: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -135,7 +136,7 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
           'signInMethod': 'google',
           'onboardingCompleted': false,
         });
-        log("Created new user document for: ${user.uid}");
+        log('Created new user document for: ${user.uid}');
       } else {
         // Update existing user document
         await userRef.update({
@@ -145,10 +146,10 @@ class GoogleSignInBloc extends Bloc<GoogleSignInEvent, GoogleSignInState> {
           'name': user.displayName ?? '',
           'photoUrl': user.photoURL ?? '',
         });
-        log("Updated existing user document for: ${user.uid}");
+        log('Updated existing user document for: ${user.uid}');
       }
     } catch (e) {
-      log("Error updating user data: $e");
+      log('Error updating user data: $e');
       // We don't want to fail the sign-in if this fails
       // Just log the error
     }

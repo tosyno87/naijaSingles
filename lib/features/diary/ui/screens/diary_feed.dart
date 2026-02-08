@@ -1,9 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../common/providers/user_provider.dart';
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../bloc/diary_bloc.dart';
 import '../../data/diary_repository.dart';
 
@@ -25,7 +24,7 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).currentUser!;
+    final user = context.watch<UserBloc>().currentUser!;
     return Scaffold(
       appBar: AppBar(
         title: Text('Diary Feed'.tr()),
@@ -33,7 +32,7 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Row(
               children: [
                 Expanded(
@@ -48,19 +47,21 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                   onPressed: () {
                     final text = _controller.text.trim();
                     if (text.isNotEmpty) {
-                      context.read<DiaryBloc>().add(AddDiaryEntryEvent(
-                            userId: user.id!,
-                            content: text,
-                            userName: user.name ?? '',
-                            userImage: user.imageUrl != null &&
-                                    user.imageUrl!.isNotEmpty
-                                ? user.imageUrl!.first
-                                : null,
-                          ));
+                      context.read<DiaryBloc>().add(
+                            AddDiaryEntryEvent(
+                              userId: user.id!,
+                              content: text,
+                              userName: user.name ?? '',
+                              userImage: user.imageUrl != null &&
+                                      user.imageUrl!.isNotEmpty
+                                  ? user.imageUrl!.first
+                                  : null,
+                            ),
+                          );
                       _controller.clear();
                     }
                   },
-                )
+                ),
               ],
             ),
           ),
@@ -85,8 +86,10 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                             : const CircleAvatar(child: Icon(Icons.person)),
                         title: Text(entry.userName),
                         subtitle: Text(entry.content),
-                        trailing: Text(DateFormat('MMM d, HH:mm')
-                            .format(entry.timestamp.toDate())),
+                        trailing: Text(
+                          DateFormat('MMM d, HH:mm')
+                              .format(entry.timestamp.toDate()),
+                        ),
                       );
                     },
                   );
@@ -96,7 +99,7 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
                 return const SizedBox.shrink();
               },
             ),
-          )
+          ),
         ],
       ),
     );
@@ -107,10 +110,8 @@ class DiaryFeedPage extends StatelessWidget {
   const DiaryFeedPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => DiaryBloc(repository: DiaryRepository()),
-      child: const DiaryFeedScreen(),
-    );
-  }
+  Widget build(BuildContext context) => BlocProvider(
+        create: (_) => DiaryBloc(repository: DiaryRepository()),
+        child: const DiaryFeedScreen(),
+      );
 }

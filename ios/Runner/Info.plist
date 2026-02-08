@@ -23,7 +23,7 @@
 		<key>CFBundleSignature</key>
 		<string>????</string>
 		<key>CFBundleVersion</key>
-		<string>4</string>
+		<string>$(FLUTTER_BUILD_NUMBER)</string>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>UIDeviceFamily</key>
@@ -77,9 +77,15 @@
 		<string>499452678798092</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>This app needs location access to find nearby singles and matches in your area.</string>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>This app needs location access to find nearby singles and matches in your area.</string>
-		<key>UIStatusBarHidden</key>
-		<false/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to find nearby singles and matches in your area.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to take photos for your profile pictures.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to select photos for your profile pictures.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs permission to save photos to your photo library.</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
 	</dict>
 </plist>

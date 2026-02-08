@@ -4,25 +4,26 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/features/home/ui/widgets/subscription_dialog.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
+import '../../../../models/user_model.dart';
 import '../../bloc/searchuser_bloc.dart';
+import 'subscription_dialog.dart';
 
 class UpdateAddressWidget extends StatefulWidget {
+  const UpdateAddressWidget({
+    required this.currentUser,
+    required this.hasSubscription,
+    required this.items,
+    super.key,
+  });
   final UserModel currentUser;
   final bool hasSubscription;
   final Map items;
-  const UpdateAddressWidget(
-      {super.key,
-      required this.currentUser,
-      required this.hasSubscription,
-      required this.items});
 
   @override
   State<UpdateAddressWidget> createState() => _UpdateAddressWidgetState();
@@ -34,99 +35,101 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
   @override
   void initState() {
     // Assigning values to selectedlocation map
-    selectedLocation["address"] = widget.currentUser.address;
-    selectedLocation["position"] = {
-      "coordinates": [
-        widget.currentUser.coordinates!["latitude"],
-        widget.currentUser.coordinates!["longitude"],
+    selectedLocation['address'] = widget.currentUser.address;
+    selectedLocation['position'] = {
+      'coordinates': [
+        widget.currentUser.coordinates!['latitude'],
+        widget.currentUser.coordinates!['longitude'],
       ],
     };
 
-    log("selected addresss id $selectedLocation");
+    log('selected addresss id $selectedLocation');
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ExpansionTile(
-        iconColor: primaryColor,
-        textColor: primaryColor,
-        key: UniqueKey(),
-        leading: Text(
-          "Current location :".tr().toString(),
-          style: const TextStyle(
-            fontSize: 14,
-          ),
-        ),
-        title: Text(
-          widget.currentUser.address ?? "".tr().toString(),
-          style: TextStyle(
-            color: AppColors.secondaryColor,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  Icons.location_on,
-                  color: primaryColor,
-                  size: 20,
-                ),
-                InkWell(
-                  child: Text(
-                    "Change location".tr().toString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  onTap: () async {
-                    log("hasSubscription $widget.hasSubscription");
-                    if (widget.hasSubscription) {
-                      var address = await Navigator.pushNamed(
-                          context, RouteName.updateLocationScreen,
-                          arguments: selectedLocation);
-                      if (!context.mounted) return;
-                      log("after pop address is ${address.toString()}");
-                      if (address != null) {
-                        _updateAddress(address as Map);
-
-                        context.read<SearchUserBloc>().add(
-                            LoadUserEvent(currentUser: widget.currentUser));
-                      }
-                    } else {
-                      showSubscriptionDialog(
-                        context: context,
-                        currentUser: widget.currentUser,
-                        items: widget.items,
-                      );
-                    }
-                  },
-                ),
-              ],
+  Widget build(BuildContext context) => Card(
+        child: ExpansionTile(
+          iconColor: primaryColor,
+          textColor: primaryColor,
+          key: UniqueKey(),
+          leading: Text(
+            'Current location :'.tr().toString(),
+            style: const TextStyle(
+              fontSize: 14,
             ),
           ),
-          const SizedBox(
-            height: 20,
+          title: Text(
+            widget.currentUser.address ?? ''.tr().toString(),
+            style: const TextStyle(
+              color: AppColors.secondaryColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ],
-      ),
-    );
-  }
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Icon(
+                    Icons.location_on,
+                    color: primaryColor,
+                    size: 20,
+                  ),
+                  InkWell(
+                    child: Text(
+                      'Change location'.tr().toString(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () async {
+                      log('hasSubscription $widget.hasSubscription');
+                      if (widget.hasSubscription) {
+                        final address = await Navigator.pushNamed(
+                          context,
+                          RouteName.updateLocationScreen,
+                          arguments: selectedLocation,
+                        );
+                        if (!context.mounted) return;
+                        log('after pop address is ${address.toString()}');
+                        if (address != null) {
+                          _updateAddress(address as Map);
+
+                          context.read<SearchUserBloc>().add(
+                                LoadUserEvent(currentUser: widget.currentUser),
+                              );
+                        }
+                      } else {
+                        showSubscriptionDialog(
+                          context: context,
+                          currentUser: widget.currentUser,
+                          items: widget.items,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
+      );
 
   void _updateAddress(Map<dynamic, dynamic> address) {
     showCupertinoModalPopup(
       context: context,
       builder: (ctx) {
-        final themeProvider = Provider.of<ThemeProvider>(context);
+        final themeBloc = context.read<ThemeBloc>();
+        final isDarkMode = themeBloc.isDarkMode;
         return Container(
           color: Theme.of(context).primaryColor,
           width: MediaQuery.of(context).size.width,
@@ -136,7 +139,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
               Material(
                 child: ListTile(
                   title: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Text(
                       'New address:'.tr().toString(),
                       style: const TextStyle(
@@ -150,7 +153,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                   trailing: IconButton(
                     icon: Icon(
                       Icons.cancel,
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : Colors.black26,
                     ),
@@ -158,11 +161,11 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                   ),
                   subtitle: Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8),
                       child: Text(
                         address['address'] ?? '',
                         style: TextStyle(
-                          color: themeProvider.isDarkMode
+                          color: isDarkMode
                               ? Colors.white
                               : Colors.black,
                           fontSize: 16,
@@ -179,13 +182,13 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                   backgroundColor: WidgetStateProperty.all<Color>(primaryColor),
                 ),
                 child: Text(
-                  "Confirm".tr().toString(),
+                  'Confirm'.tr().toString(),
                   style: const TextStyle(color: Colors.white),
                 ),
                 onPressed: () async {
                   Navigator.pop(context);
                   await firebaseFireStoreInstance
-                      .collection("users")
+                      .collection('users')
                       .doc('${widget.currentUser.id}')
                       .update({
                         'location': {
@@ -194,55 +197,53 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                           'address': address['address'],
                         },
                       })
-                      .whenComplete(() => showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) {
-                              Future.delayed(const Duration(seconds: 3), () {
-                                setState(() {
-                                  widget.currentUser.address =
-                                      address['address'];
-                                });
-
-                                Navigator.pop(context);
+                      .whenComplete(
+                        () => showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) {
+                            Future.delayed(const Duration(seconds: 3), () {
+                              setState(() {
+                                widget.currentUser.address = address['address'];
                               });
-                              return Center(
-                                child: Container(
-                                  width: 160.0,
-                                  height: 120.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Image.asset(
-                                        "asset/auth/verified.jpg",
-                                        height: 60,
-                                        color: primaryColor,
-                                        colorBlendMode: BlendMode.color,
-                                      ),
-                                      Text(
-                                        "location\nchanged".tr().toString(),
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          decoration: TextDecoration.none,
-                                          color: themeProvider.isDarkMode
-                                              ? Colors.black
-                                              : Colors.black,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+
+                              Navigator.pop(context);
+                            });
+                            return Center(
+                              child: Container(
+                                width: 160,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                              );
-                            },
-                          ))
-                      .catchError((e) {
-                        log(e);
-                      });
+                                child: Column(
+                                  children: <Widget>[
+                                    Image.asset(
+                                      'asset/auth/verified.jpg',
+                                      height: 60,
+                                      color: primaryColor,
+                                      colorBlendMode: BlendMode.color,
+                                    ),
+                                    Text(
+                                      'location\nchanged'.tr().toString(),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        decoration: TextDecoration.none,
+                                        color: isDarkMode
+                                            ? Colors.black
+                                            : Colors.black,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                      .catchError(log);
                 },
               ),
             ],

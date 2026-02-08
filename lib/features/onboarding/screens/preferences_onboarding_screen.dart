@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 
 class PreferencesOnboardingScreen extends StatefulWidget {
-  const PreferencesOnboardingScreen({Key? key}) : super(key: key);
+  const PreferencesOnboardingScreen({super.key});
 
   @override
   State<PreferencesOnboardingScreen> createState() =>
@@ -15,24 +16,21 @@ class _PreferencesOnboardingScreenState
     extends State<PreferencesOnboardingScreen> {
   String _selectedInterestedIn = 'everyone';
   RangeValues _ageRange = const RangeValues(18, 50);
+  double _maxDistance = 50.0; // Default 50 miles (industry standard)
 
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    _selectedInterestedIn = controller.interestedIn;
-    _ageRange = RangeValues(
-      controller.ageRange[0].toDouble(),
-      controller.ageRange[1].toDouble(),
-    );
+    final data = context.read<OnboardingBloc>().state.data;
 
-    // Debug logging
-    print('🔍 PreferencesOnboardingScreen initState:');
-    print('   Initial interestedIn: "${controller.interestedIn}"');
-    print('   Initial ageRange: ${controller.ageRange}');
-    print('   Local selectedInterestedIn: "$_selectedInterestedIn"');
-    print('   Local ageRange: $_ageRange');
+    if (data != null) {
+      _selectedInterestedIn = data.interestedIn;
+      _ageRange = RangeValues(
+        data.ageRange[0].toDouble(),
+        data.ageRange[1].toDouble(),
+      );
+      _maxDistance = data.maxDistance.toDouble();
+    }
   }
 
   @override
@@ -40,7 +38,7 @@ class _PreferencesOnboardingScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.all(isTablet ? 32 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +46,7 @@ class _PreferencesOnboardingScreenState
           // Header
           Text(
             'Dating Preferences',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 32 : 28,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -57,41 +55,55 @@ class _PreferencesOnboardingScreenState
           SizedBox(height: isTablet ? 12 : 8),
           Text(
             'Help us find your perfect match',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 18 : 16,
               color: Colors.black54,
             ),
           ),
 
-          SizedBox(height: isTablet ? 48 : 40),
+          SizedBox(height: isTablet ? 40 : 32),
 
           // Interested In Section
           Text(
             'I\'m interested in',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 22 : 18,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
-          SizedBox(height: isTablet ? 20 : 16),
+          SizedBox(height: isTablet ? 16 : 12),
           _buildInterestedInOptions(),
 
-          SizedBox(height: isTablet ? 48 : 40),
+          SizedBox(height: isTablet ? 40 : 32),
+
+          // Distance Section (Industry Standard - Tinder, Bumble, Hinge)
+          Text(
+            'Maximum Distance',
+            style: GoogleFonts.montserrat(
+              fontSize: isTablet ? 22 : 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: isTablet ? 16 : 12),
+          _buildDistanceSlider(),
+
+          SizedBox(height: isTablet ? 40 : 32),
 
           // Age Range Section
           Text(
             'Age Range',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 22 : 18,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
-          SizedBox(height: isTablet ? 20 : 16),
+          SizedBox(height: isTablet ? 16 : 12),
           _buildAgeRangeSlider(),
 
-          const Spacer(),
+          SizedBox(height: isTablet ? 40 : 32),
         ],
       ),
     );
@@ -119,19 +131,10 @@ class _PreferencesOnboardingScreenState
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedInterestedIn = value;
-        });
-        // Save to controller immediately
-        final controller =
-            Provider.of<OnboardingController>(context, listen: false);
-        controller.setInterestedIn(value);
-
-        // Debug logging
-        print(
-            '🔍 PreferencesOnboardingScreen: Selected interestedIn: "$value"');
-        print(
-            '   Controller interestedIn after setting: "${controller.interestedIn}"');
+        setState(() => _selectedInterestedIn = value);
+        context.read<OnboardingBloc>().add(
+              OnboardingInterestedInUpdated(value),
+            );
       },
       child: Container(
         width: double.infinity,
@@ -168,7 +171,7 @@ class _PreferencesOnboardingScreenState
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: isTablet ? 18 : 16,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color: isSelected ? const Color(0xFF008037) : Colors.black87,
@@ -195,13 +198,13 @@ class _PreferencesOnboardingScreenState
       children: [
         Text(
           '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 18 : 16,
             fontWeight: FontWeight.w600,
             color: const Color(0xFF008037),
           ),
         ),
-        SizedBox(height: isTablet ? 20 : 16),
+        SizedBox(height: isTablet ? 16 : 12),
         RangeSlider(
           values: _ageRange,
           min: 18,
@@ -210,20 +213,74 @@ class _PreferencesOnboardingScreenState
           activeColor: const Color(0xFF008037),
           inactiveColor: Colors.grey.shade300,
           onChanged: (RangeValues values) {
-            setState(() {
-              _ageRange = values;
-            });
-            // Save to controller immediately
-            final controller =
-                Provider.of<OnboardingController>(context, listen: false);
-            controller.setAgeRange([values.start.round(), values.end.round()]);
-
-            // Debug logging
-            print(
-                '🔍 PreferencesOnboardingScreen: Age range changed to: ${values.start.round()}-${values.end.round()}');
-            print(
-                '   Controller ageRange after setting: ${controller.ageRange}');
+            setState(() => _ageRange = values);
+            context.read<OnboardingBloc>().add(
+                  OnboardingAgeRangeUpdated([
+                    values.start.round(),
+                    values.end.round(),
+                  ]),
+                );
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDistanceSlider() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
+    return Column(
+      children: [
+        Text(
+          _maxDistance.round() == 100
+              ? '${_maxDistance.round()} miles (Anywhere)'
+              : 'Within ${_maxDistance.round()} miles',
+          style: GoogleFonts.montserrat(
+            fontSize: isTablet ? 18 : 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF008037),
+          ),
+        ),
+        SizedBox(height: isTablet ? 16 : 12),
+        Slider(
+          value: _maxDistance,
+          min: 1,
+          max: 100,
+          divisions: 99,
+          activeColor: const Color(0xFF008037),
+          inactiveColor: Colors.grey.shade300,
+          label: _maxDistance.round() == 100
+              ? 'Anywhere'
+              : '${_maxDistance.round()} miles',
+          onChanged: (double value) {
+            setState(() => _maxDistance = value);
+            context.read<OnboardingBloc>().add(
+                  OnboardingMaxDistanceUpdated(value.round()),
+                );
+          },
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: isTablet ? 24 : 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '1 mile',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              Text(
+                '100 miles',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

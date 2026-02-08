@@ -2,29 +2,28 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../providers/theme_provider.dart';
+import '../bloc/theme/theme_bloc.dart';
 
 class CustomCNImage extends StatelessWidget {
+  const CustomCNImage({
+    required this.imageUrl,
+    super.key,
+    this.height,
+    this.fit,
+    this.width,
+    this.main = false,
+  });
   final String? imageUrl;
   final double? height;
   final double? width;
   final bool main;
   final BoxFit? fit;
 
-  const CustomCNImage({
-    super.key,
-    required this.imageUrl,
-    this.height,
-    this.fit,
-    this.width,
-    this.main = false,
-  });
-
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return CachedNetworkImage(
       fit: fit,
       maxHeightDiskCache: 800,
@@ -51,13 +50,13 @@ class CustomCNImage extends StatelessWidget {
                   size: 20,
                 ),
                 Text(
-                  "Unable to load".tr().toString(),
+                  'Unable to load'.tr().toString(),
                   style: TextStyle(
                     fontSize: 12,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : Colors.black,
+                        isDarkMode ? Colors.white : Colors.black,
                   ),
-                )
+                ),
               ],
             ),
       height: height,

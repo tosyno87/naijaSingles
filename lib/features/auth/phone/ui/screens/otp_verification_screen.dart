@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -10,16 +9,15 @@ import '../../../auth_status/bloc/registration/bloc/registration_bloc.dart';
 import '../../bloc/phone_auth_bloc.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  final String phoneNumber;
-  final String verificationId;
-  final bool updatePhoneNumber;
-
   const OtpVerificationScreen({
-    Key? key,
     required this.phoneNumber,
     required this.verificationId,
     required this.updatePhoneNumber,
-  }) : super(key: key);
+    super.key,
+  });
+  final String phoneNumber;
+  final String verificationId;
+  final bool updatePhoneNumber;
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -84,20 +82,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       );
     } else {
       CustomSnackbar.showSnackBarSimple(
-        "Please enter a valid 6-digit code",
+        'Please enter a valid 6-digit code',
         context,
       );
     }
   }
 
-  String _formatTime(int seconds) {
-    return '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
-  }
+  String _formatTime(int seconds) =>
+      '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
     // Define colors
-    const Color backgroundColor = Color(0xFFFFF6E5); // Warm cream/beige
+    const Color backgroundColor = Colors.white; // White background (MVP color)
     const Color primaryColor = Color(0xFF008037); // Deep Green
     const Color accentColor = Color(0xFFE74C3C); // Coral Red
     const Color textColor = Color(0xFF333333);
@@ -114,8 +111,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Verify OTP",
-          style: GoogleFonts.poppins(
+          'Verify OTP',
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: primaryColor,
@@ -138,9 +135,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           // Main content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
 
@@ -154,9 +150,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
                   // Header text
                   Text(
-                    "Verification Code",
+                    'Verification Code',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: textColor,
@@ -169,15 +165,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      text: "Enter the code sent to ",
-                      style: GoogleFonts.poppins(
+                      text: 'Enter the code sent to ',
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         color: Colors.black54,
                       ),
                       children: [
                         TextSpan(
                           text: widget.phoneNumber,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: textColor,
@@ -195,7 +191,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     child: PinCodeTextField(
                       appContext: context,
                       length: 6,
-                      obscureText: false,
                       animationType: AnimationType.fade,
                       pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,
@@ -232,31 +227,32 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     children: [
                       Text(
                         "Didn't receive code? ",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           color: Colors.black54,
                         ),
                       ),
-                      _canResend
-                          ? TextButton(
-                              onPressed: _resendOtp,
-                              child: Text(
-                                "Resend",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: primaryColor,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              _formatTime(_remainingTime),
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: accentColor,
-                              ),
+                      if (_canResend)
+                        TextButton(
+                          onPressed: _resendOtp,
+                          child: Text(
+                            'Resend',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
                             ),
+                          ),
+                        )
+                      else
+                        Text(
+                          _formatTime(_remainingTime),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: accentColor,
+                          ),
+                        ),
                     ],
                   ),
 
@@ -278,7 +274,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               Navigator.pop(context);
                               Navigator.pop(context);
                               CustomSnackbar.showSnackBarSimple(
-                                "Phone number updated successfully",
+                                'Phone number updated successfully',
                                 context,
                               );
                             } else {
@@ -317,38 +313,36 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       width: double.infinity,
                       height: 56,
                       child: BlocBuilder<PhoneAuthBloc, PhoneAuthState>(
-                        builder: (context, state) {
-                          return ElevatedButton(
-                            onPressed:
-                                state is PhoneAuthLoading ? null : _verifyOtp,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor:
-                                  primaryColor.withValues(alpha: 0.5),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 2,
+                        builder: (context, state) => ElevatedButton(
+                          onPressed:
+                              state is PhoneAuthLoading ? null : _verifyOtp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor:
+                                primaryColor.withValues(alpha: 0.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            child: state is PhoneAuthLoading
-                                ? const SizedBox(
-                                    height: 24,
-                                    width: 24,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    "Verify",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                            elevation: 2,
+                          ),
+                          child: state is PhoneAuthLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
                                   ),
-                          );
-                        },
+                                )
+                              : Text(
+                                  'Verify',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
                   ),

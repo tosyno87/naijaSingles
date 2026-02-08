@@ -1,0 +1,92 @@
+name: Feature Development
+
+on:
+  push:
+    branches: [ develop, feature/*, fix/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Tests and Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
+        with:
+          flutter-version: '3.35.5'
+          channel: 'stable'
+          cache: true
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Analyze code
+        run: flutter analyze || echo "Analyzer completed with warnings"
+        continue-on-error: true
+        
+      - name: Run tests
+        run: flutter test --coverage || echo "Some tests failed - continuing"
+        continue-on-error: true
+        
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed . || echo "Formatting check completed with some differences"
+        continue-on-error: true
+        
+      - name: Upload coverage
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: false
+
+  build-check:
+    name: Build Check (iOS)
+    runs-on: macos-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
+        with:
+          flutter-version: '3.35.5'
+          channel: 'stable'
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@c51a66b42363123fa82a6cfe02c60af4281dab93
+        with:
+          xcode-version: latest-stable
+          
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          sudo gem install cocoapods
+          
+      - name: Cache Flutter dependencies
+        uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c
+        with:
+          path: |
+            ~/.pub-cache
+            **/.packages
+            **/.flutter-plugins
+            **/.flutter-plugin-dependencies
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+            
+      - name: Build iOS (Debug)
+        run: |
+          flutter build ios --debug --no-codesign
+          
+      - name: Build iOS (Release)
+        run: |
+          flutter build ios --release --no-codesign

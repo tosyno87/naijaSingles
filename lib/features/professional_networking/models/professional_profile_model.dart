@@ -1,32 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfessionalProfile {
-  final String id;
-  final String userId;
-  final String userName;
-  final String jobTitle;
-  final String company;
-  final String industry;
-  final String country;
-  final String city;
-  final String experience; // 'Entry', 'Mid', 'Senior', 'Executive'
-  final List<String> skills;
-  final List<String> certifications;
-  final String bio;
-  final String linkedinUrl;
-  final String portfolioUrl;
-  final List<String> languages;
-  final String education;
-  final String university;
-  final bool isAvailableForMentorship;
-  final bool isSeekingMentorship;
-  final List<String> mentorshipAreas;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool isVerified; // Professional verification
-  final int connectionsCount;
-  final List<String> connectionIds;
-
   const ProfessionalProfile({
     required this.id,
     required this.userId,
@@ -85,51 +59,61 @@ class ProfessionalProfile {
       connectionIds: List<String>.from(data['connectionIds'] ?? []),
     );
   }
+  final String id;
+  final String userId;
+  final String userName;
+  final String jobTitle;
+  final String company;
+  final String industry;
+  final String country;
+  final String city;
+  final String experience; // 'Entry', 'Mid', 'Senior', 'Executive'
+  final List<String> skills;
+  final List<String> certifications;
+  final String bio;
+  final String linkedinUrl;
+  final String portfolioUrl;
+  final List<String> languages;
+  final String education;
+  final String university;
+  final bool isAvailableForMentorship;
+  final bool isSeekingMentorship;
+  final List<String> mentorshipAreas;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool isVerified; // Professional verification
+  final int connectionsCount;
+  final List<String> connectionIds;
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'userId': userId,
-      'userName': userName,
-      'jobTitle': jobTitle,
-      'company': company,
-      'industry': industry,
-      'country': country,
-      'city': city,
-      'experience': experience,
-      'skills': skills,
-      'certifications': certifications,
-      'bio': bio,
-      'linkedinUrl': linkedinUrl,
-      'portfolioUrl': portfolioUrl,
-      'languages': languages,
-      'education': education,
-      'university': university,
-      'isAvailableForMentorship': isAvailableForMentorship,
-      'isSeekingMentorship': isSeekingMentorship,
-      'mentorshipAreas': mentorshipAreas,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'isVerified': isVerified,
-      'connectionsCount': connectionsCount,
-      'connectionIds': connectionIds,
-    };
-  }
+  Map<String, dynamic> toFirestore() => {
+        'userId': userId,
+        'userName': userName,
+        'jobTitle': jobTitle,
+        'company': company,
+        'industry': industry,
+        'country': country,
+        'city': city,
+        'experience': experience,
+        'skills': skills,
+        'certifications': certifications,
+        'bio': bio,
+        'linkedinUrl': linkedinUrl,
+        'portfolioUrl': portfolioUrl,
+        'languages': languages,
+        'education': education,
+        'university': university,
+        'isAvailableForMentorship': isAvailableForMentorship,
+        'isSeekingMentorship': isSeekingMentorship,
+        'mentorshipAreas': mentorshipAreas,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+        'isVerified': isVerified,
+        'connectionsCount': connectionsCount,
+        'connectionIds': connectionIds,
+      };
 }
 
 class MentorshipRequest {
-  final String id;
-  final String mentorId;
-  final String menteeId;
-  final String mentorName;
-  final String menteeName;
-  final String area; // 'Career', 'Skills', 'Industry', 'Leadership'
-  final String message;
-  final String status; // 'Pending', 'Accepted', 'Declined', 'Completed'
-  final DateTime createdAt;
-  final DateTime? respondedAt;
-  final DateTime? completedAt;
-  final String? feedback;
-
   const MentorshipRequest({
     required this.id,
     required this.mentorId,
@@ -157,29 +141,41 @@ class MentorshipRequest {
       message: data['message'] ?? '',
       status: data['status'] ?? 'Pending',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      respondedAt: data['respondedAt'] != null 
-          ? (data['respondedAt'] as Timestamp).toDate() 
+      respondedAt: data['respondedAt'] != null
+          ? (data['respondedAt'] as Timestamp).toDate()
           : null,
-      completedAt: data['completedAt'] != null 
-          ? (data['completedAt'] as Timestamp).toDate() 
+      completedAt: data['completedAt'] != null
+          ? (data['completedAt'] as Timestamp).toDate()
           : null,
       feedback: data['feedback'],
     );
   }
+  final String id;
+  final String mentorId;
+  final String menteeId;
+  final String mentorName;
+  final String menteeName;
+  final String area; // 'Career', 'Skills', 'Industry', 'Leadership'
+  final String message;
+  final String status; // 'Pending', 'Accepted', 'Declined', 'Completed'
+  final DateTime createdAt;
+  final DateTime? respondedAt;
+  final DateTime? completedAt;
+  final String? feedback;
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'mentorId': mentorId,
-      'menteeId': menteeId,
-      'mentorName': mentorName,
-      'menteeName': menteeName,
-      'area': area,
-      'message': message,
-      'status': status,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'respondedAt': respondedAt != null ? Timestamp.fromDate(respondedAt!) : null,
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
-      'feedback': feedback,
-    };
-  }
+  Map<String, dynamic> toFirestore() => {
+        'mentorId': mentorId,
+        'menteeId': menteeId,
+        'mentorName': mentorName,
+        'menteeName': menteeName,
+        'area': area,
+        'message': message,
+        'status': status,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'respondedAt':
+            respondedAt != null ? Timestamp.fromDate(respondedAt!) : null,
+        'completedAt':
+            completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+        'feedback': feedback,
+      };
 }

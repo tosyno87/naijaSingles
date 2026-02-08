@@ -2,10 +2,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../screens/enhanced_photo_upload_screen.dart';
-import '../services/photo_quality_analyzer.dart';
+import '../data/services/photo_quality_analyzer.dart';
 import 'photo_type_indicator.dart';
 
 class ReorderablePhotoGrid extends StatefulWidget {
+  const ReorderablePhotoGrid({
+    required this.photos,
+    required this.photoGuidance,
+    required this.onReorder,
+    required this.onTap,
+    required this.onRemove,
+    required this.onSetPrimary,
+    super.key,
+  });
   final List<File?> photos;
   final Map<int, PhotoTypeGuidance> photoGuidance;
   final Function(int, int) onReorder;
@@ -13,23 +22,13 @@ class ReorderablePhotoGrid extends StatefulWidget {
   final Function(int) onRemove;
   final Function(int) onSetPrimary;
 
-  const ReorderablePhotoGrid({
-    super.key,
-    required this.photos,
-    required this.photoGuidance,
-    required this.onReorder,
-    required this.onTap,
-    required this.onRemove,
-    required this.onSetPrimary,
-  });
-
   @override
   State<ReorderablePhotoGrid> createState() => _ReorderablePhotoGridState();
 }
 
 class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
   // Theme colors
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -40,73 +39,70 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
   int? _hoveredIndex;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Reordering instructions
-        Container(
-          padding: EdgeInsets.all(12),
-          margin: EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: afropeepGreen.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: afropeepGreen.withValues(alpha: 0.3),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.drag_indicator,
-                color: afropeepGreen,
-                size: 20,
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Reordering instructions
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: afropeepGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: afropeepGreen.withValues(alpha: 0.3),
               ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Long press and drag photos to reorder them. Your first photo will be your main profile photo.",
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: afropeepGreen,
-                    fontWeight: FontWeight.w500,
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.drag_indicator,
+                  color: afropeepGreen,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Long press and drag photos to reorder them. Your first photo will be your main profile photo.',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: afropeepGreen,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        // Primary photo (always first)
-        _buildPhotoCard(0, isPrimary: true),
+          // Primary photo (always first)
+          _buildPhotoCard(0, isPrimary: true),
 
-        SizedBox(height: 12),
+          const SizedBox(height: 12),
 
-        // Reorderable grid for other photos
-        ReorderableWrap(
-          spacing: 12,
-          runSpacing: 12,
-          onReorder: (oldIndex, newIndex) {
-            // Adjust indices since we're not including the primary photo
-            final adjustedOldIndex = oldIndex + 1;
-            final adjustedNewIndex = newIndex + 1;
-            widget.onReorder(adjustedOldIndex, adjustedNewIndex);
-          },
-          children: List.generate(4, (index) {
-            final photoIndex = index + 1; // Skip primary photo
-            return _buildPhotoCard(
-              photoIndex,
-              key: ValueKey('photo_$photoIndex'),
-              isPrimary: false,
-            );
-          }),
-        ),
-      ],
-    );
-  }
+          // Reorderable grid for other photos
+          ReorderableWrap(
+            spacing: 12,
+            runSpacing: 12,
+            onReorder: (oldIndex, newIndex) {
+              // Adjust indices since we're not including the primary photo
+              final adjustedOldIndex = oldIndex + 1;
+              final adjustedNewIndex = newIndex + 1;
+              widget.onReorder(adjustedOldIndex, adjustedNewIndex);
+            },
+            children: List.generate(4, (index) {
+              final photoIndex = index + 1; // Skip primary photo
+              return _buildPhotoCard(
+                photoIndex,
+                key: ValueKey('photo_$photoIndex'),
+                isPrimary: false,
+              );
+            }),
+          ),
+        ],
+      );
 
-  Widget _buildPhotoCard(int index, {Key? key, required bool isPrimary}) {
+  Widget _buildPhotoCard(int index, {required bool isPrimary, Key? key}) {
     final photo = widget.photos[index];
     final guidance = widget.photoGuidance[index]!;
     final bool isRequired = index < 3;
@@ -123,7 +119,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
             }
           : null,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 200),
         width: isPrimary ? double.infinity : null,
         height: isPrimary ? 200 : 150,
         decoration: BoxDecoration(
@@ -144,7 +140,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                   BoxShadow(
                     color: goldAccent.withValues(alpha: 0.3),
                     blurRadius: 8,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : _draggedIndex == index
@@ -152,7 +148,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 12,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ]
                   : null,
@@ -170,7 +166,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                   fit: BoxFit.contain,
                 ),
               ),
-            
+
             // Primary photo badge
             if (isPrimary)
               Positioned(
@@ -178,8 +174,9 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                 left: 0,
                 right: 0,
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  decoration: BoxDecoration(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  decoration: const BoxDecoration(
                     color: goldAccent,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(13),
@@ -189,19 +186,19 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.star, color: Colors.white, size: 16),
-                      SizedBox(width: 4),
+                      const Icon(Icons.star, color: Colors.white, size: 16),
+                      const SizedBox(width: 4),
                       Text(
                         'MAIN PHOTO',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                           letterSpacing: 0.5,
                         ),
                       ),
-                      SizedBox(width: 4),
-                      Icon(Icons.star, color: Colors.white, size: 16),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.star, color: Colors.white, size: 16),
                     ],
                   ),
                 ),
@@ -212,7 +209,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
               Positioned.fill(
                 top: isPrimary ? 40 : 0,
                 child: Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
@@ -237,19 +234,19 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                       SizedBox(height: isPrimary ? 8 : 6),
                       Text(
                         guidance.title,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isPrimary ? 14 : 12,
                           fontWeight: FontWeight.w600,
                           color: textDarkBrown,
                         ),
                       ),
                       if (isPrimary) ...[
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Flexible(
                           child: Text(
                             guidance.description,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.montserrat(
                               fontSize: 10,
                               color: textLightBrown,
                             ),
@@ -271,8 +268,8 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          isRequired ? "REQUIRED" : "OPTIONAL",
-                          style: GoogleFonts.poppins(
+                          isRequired ? 'REQUIRED' : 'OPTIONAL',
+                          style: GoogleFonts.montserrat(
                             fontSize: isPrimary ? 9 : 8,
                             fontWeight: FontWeight.w600,
                             color:
@@ -308,12 +305,12 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                 top: 8,
                 right: 40,
                 child: Container(
-                  padding: EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.drag_indicator,
                     color: Colors.white,
                     size: 16,
@@ -329,12 +326,12 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                 child: GestureDetector(
                   onTap: () => widget.onRemove(index),
                   child: Container(
-                    padding: EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.7),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.close,
                       color: Colors.white,
                       size: 16,
@@ -351,7 +348,8 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                 child: GestureDetector(
                   onTap: () => _showSetPrimaryDialog(index),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
                       color: goldAccent.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
@@ -359,15 +357,15 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.star_border,
                           color: Colors.white,
                           size: 12,
                         ),
-                        SizedBox(width: 2),
+                        const SizedBox(width: 2),
                         Text(
-                          "Set Main",
-                          style: GoogleFonts.poppins(
+                          'Set Main',
+                          style: GoogleFonts.montserrat(
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -388,7 +386,7 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
     final quality = PhotoQualityAnalyzer.analyzePhoto(photo);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: _getQualityColor(quality.qualityScore),
         borderRadius: BorderRadius.circular(8),
@@ -401,10 +399,10 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
             size: 12,
             color: Colors.white,
           ),
-          SizedBox(width: 2),
+          const SizedBox(width: 2),
           Text(
             _getQualityLabel(quality.qualityScore),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 10,
               fontWeight: FontWeight.w500,
               color: Colors.white,
@@ -428,9 +426,9 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
   }
 
   String _getQualityLabel(int score) {
-    if (score >= 80) return "Great";
-    if (score >= 60) return "Good";
-    return "Poor";
+    if (score >= 80) return 'Great';
+    if (score >= 60) return 'Good';
+    return 'Poor';
   }
 
   Color _getPhotoTypeColor(PhotoType type) {
@@ -468,16 +466,16 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.drag_indicator, color: Colors.white),
-            SizedBox(width: 8),
+            const Icon(Icons.drag_indicator, color: Colors.white),
+            const SizedBox(width: 8),
             Text(
-              "Drag to reorder photos",
-              style: GoogleFonts.poppins(fontSize: 14),
+              'Drag to reorder photos',
+              style: GoogleFonts.montserrat(fontSize: 14),
             ),
           ],
         ),
         backgroundColor: afropeepGreen,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -487,16 +485,16 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          "Set as Main Photo?",
-          style: GoogleFonts.poppins(
+          'Set as Main Photo?',
+          style: GoogleFonts.montserrat(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: textDarkBrown,
           ),
         ),
         content: Text(
-          "This photo will become your main profile photo and appear first to potential matches.",
-          style: GoogleFonts.poppins(
+          'This photo will become your main profile photo and appear first to potential matches.',
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             color: textLightBrown,
           ),
@@ -505,8 +503,8 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              "Cancel",
-              style: GoogleFonts.poppins(
+              'Cancel',
+              style: GoogleFonts.montserrat(
                 color: Colors.grey,
                 fontWeight: FontWeight.w500,
               ),
@@ -522,8 +520,8 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
               foregroundColor: Colors.white,
             ),
             child: Text(
-              "Set as Main",
-              style: GoogleFonts.poppins(
+              'Set as Main',
+              style: GoogleFonts.montserrat(
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -536,18 +534,17 @@ class _ReorderablePhotoGridState extends State<ReorderablePhotoGrid> {
 
 // Custom reorderable wrap widget
 class ReorderableWrap extends StatefulWidget {
+  const ReorderableWrap({
+    required this.children,
+    required this.onReorder,
+    super.key,
+    this.spacing = 0,
+    this.runSpacing = 0,
+  });
   final List<Widget> children;
   final double spacing;
   final double runSpacing;
   final Function(int, int) onReorder;
-
-  const ReorderableWrap({
-    super.key,
-    required this.children,
-    this.spacing = 0,
-    this.runSpacing = 0,
-    required this.onReorder,
-  });
 
   @override
   State<ReorderableWrap> createState() => _ReorderableWrapState();
@@ -555,25 +552,24 @@ class ReorderableWrap extends StatefulWidget {
 
 class _ReorderableWrapState extends State<ReorderableWrap> {
   @override
-  Widget build(BuildContext context) {
-    return ReorderableListView(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      onReorder: widget.onReorder,
-      children: widget.children.asMap().entries.map((entry) {
-        final index = entry.key;
-        final child = entry.value;
+  Widget build(BuildContext context) => ReorderableListView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        onReorder: widget.onReorder,
+        children: widget.children.asMap().entries.map((entry) {
+          final index = entry.key;
+          final child = entry.value;
 
-        return Container(
-          key: ValueKey('reorderable_$index'),
-          margin: EdgeInsets.only(
-            right: (index % 2 == 0) ? widget.spacing : 0,
-            bottom: widget.runSpacing,
-          ),
-          width: (MediaQuery.of(context).size.width - 48 - widget.spacing) / 2,
-          child: child,
-        );
-      }).toList(),
-    );
-  }
+          return Container(
+            key: ValueKey('reorderable_$index'),
+            margin: EdgeInsets.only(
+              right: (index % 2 == 0) ? widget.spacing : 0,
+              bottom: widget.runSpacing,
+            ),
+            width:
+                (MediaQuery.of(context).size.width - 48 - widget.spacing) / 2,
+            child: child,
+          );
+        }).toList(),
+      );
 }

@@ -8,9 +8,12 @@ class SettingsService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Collection references
-  static CollectionReference get _usersCollection => _firestore.collection('users');
-  static CollectionReference get _reportsCollection => _firestore.collection('reports');
-  static CollectionReference get _feedbackCollection => _firestore.collection('feedback');
+  static CollectionReference get _usersCollection =>
+      _firestore.collection('users');
+  static CollectionReference get _reportsCollection =>
+      _firestore.collection('reports');
+  static CollectionReference get _feedbackCollection =>
+      _firestore.collection('feedback');
 
   /// Get current user ID
   static String? get _currentUserId => _auth.currentUser?.uid;
@@ -20,10 +23,8 @@ class SettingsService {
   /// Get list of blocked user IDs for current user
   static Future<List<String>> getBlockedUserIds(String userId) async {
     try {
-      final blockedSnapshot = await _usersCollection
-          .doc(userId)
-          .collection('blockedlist')
-          .get();
+      final blockedSnapshot =
+          await _usersCollection.doc(userId).collection('blockedlist').get();
 
       return blockedSnapshot.docs.map((doc) => doc.id).toList();
     } catch (e) {
@@ -46,7 +47,7 @@ class SettingsService {
           final userDoc = await _usersCollection.doc(blockedId).get();
           if (userDoc.exists) {
             final userData = userDoc.data() as Map<String, dynamic>;
-            
+
             // Get block timestamp
             final blockDoc = await _usersCollection
                 .doc(userId)
@@ -54,16 +55,20 @@ class SettingsService {
                 .doc(blockedId)
                 .get();
 
-            final blockData = blockDoc.data() as Map<String, dynamic>?;
-            final blockedAt = (blockData?['blockedAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+            final blockData = blockDoc.data();
+            final blockedAt =
+                (blockData?['blockedAt'] as Timestamp?)?.toDate() ??
+                    DateTime.now();
 
-            blockedUsers.add(BlockedUser(
-              id: blockedId,
-              name: userData['name'] ?? 'Unknown User',
-              imageUrl: userData['imageUrl']?[0] ?? '',
-              blockedAt: blockedAt,
-              reason: blockData?['reason'] ?? 'No reason provided',
-            ));
+            blockedUsers.add(
+              BlockedUser(
+                id: blockedId,
+                name: userData['name'] ?? 'Unknown User',
+                imageUrl: userData['imageUrl']?[0] ?? '',
+                blockedAt: blockedAt,
+                reason: blockData?['reason'] ?? 'No reason provided',
+              ),
+            );
           }
         } catch (e) {
           debugPrint('❌ Error getting blocked user details for $blockedId: $e');
@@ -80,7 +85,11 @@ class SettingsService {
   }
 
   /// Block a user
-  static Future<bool> blockUser(String userId, String blockedUserId, {String? reason}) async {
+  static Future<bool> blockUser(
+    String userId,
+    String blockedUserId, {
+    String? reason,
+  }) async {
     try {
       debugPrint('🚫 Blocking user: $userId blocks $blockedUserId');
 
@@ -88,7 +97,10 @@ class SettingsService {
 
       // Add to current user's blocked list only (can't write to other user's collection due to security rules)
       batch.set(
-        _usersCollection.doc(userId).collection('blockedlist').doc(blockedUserId),
+        _usersCollection
+            .doc(userId)
+            .collection('blockedlist')
+            .doc(blockedUserId),
         {
           'blockedAt': FieldValue.serverTimestamp(),
           'reason': reason ?? 'User blocked',
@@ -112,8 +124,15 @@ class SettingsService {
 
       // Remove from each other's liked lists (only if we have permission)
       try {
-        batch.delete(_usersCollection.doc(userId).collection('LikedBy').doc(blockedUserId));
-        batch.delete(_usersCollection.doc(userId).collection('CheckedUser').doc(blockedUserId));
+        batch.delete(
+          _usersCollection.doc(userId).collection('LikedBy').doc(blockedUserId),
+        );
+        batch.delete(
+          _usersCollection
+              .doc(userId)
+              .collection('CheckedUser')
+              .doc(blockedUserId),
+        );
       } catch (e) {
         debugPrint('⚠️ Could not remove from liked/checked lists: $e');
         // Continue with blocking even if this fails
@@ -137,7 +156,12 @@ class SettingsService {
       final batch = _firestore.batch();
 
       // Remove from current user's blocked list only
-      batch.delete(_usersCollection.doc(userId).collection('blockedlist').doc(blockedUserId));
+      batch.delete(
+        _usersCollection
+            .doc(userId)
+            .collection('blockedlist')
+            .doc(blockedUserId),
+      );
 
       await batch.commit();
 
@@ -168,12 +192,12 @@ class SettingsService {
   // NOTIFICATION SETTINGS
 
   /// Get notification settings for a user
-  static Future<NotificationSettings> getNotificationSettings(String userId) async {
+  static Future<NotificationSettings> getNotificationSettings(
+    String userId,
+  ) async {
     try {
-      final settingsDoc = await _firestore
-          .collection('notificationSettings')
-          .doc(userId)
-          .get();
+      final settingsDoc =
+          await _firestore.collection('notificationSettings').doc(userId).get();
 
       if (settingsDoc.exists) {
         return NotificationSettings.fromMap(settingsDoc.data()!);
@@ -188,7 +212,10 @@ class SettingsService {
   }
 
   /// Update notification settings
-  static Future<bool> updateNotificationSettings(String userId, NotificationSettings settings) async {
+  static Future<bool> updateNotificationSettings(
+    String userId,
+    NotificationSettings settings,
+  ) async {
     try {
       await _firestore
           .collection('notificationSettings')
@@ -260,12 +287,14 @@ class SettingsService {
   // ACCOUNT MANAGEMENT
 
   /// Get account deletion eligibility
-  static Future<AccountDeletionInfo> getAccountDeletionInfo(String userId) async {
+  static Future<AccountDeletionInfo> getAccountDeletionInfo(
+    String userId,
+  ) async {
     try {
       // Check for active subscriptions, pending matches, etc.
       final userDoc = await _usersCollection.doc(userId).get();
       if (!userDoc.exists) {
-        return AccountDeletionInfo(
+        return const AccountDeletionInfo(
           canDelete: false,
           reason: 'User not found',
         );
@@ -273,7 +302,7 @@ class SettingsService {
 
       final userData = userDoc.data() as Map<String, dynamic>;
       final isPremium = userData['isPremium'] == true;
-      
+
       // Check for active matches
       final matchesQuery = await _firestore
           .collection('matches')
@@ -287,11 +316,10 @@ class SettingsService {
         canDelete: true,
         hasActiveSubscription: isPremium,
         hasActiveMatches: hasActiveMatches,
-        reason: null,
       );
     } catch (e) {
       debugPrint('❌ Error getting account deletion info: $e');
-      return AccountDeletionInfo(
+      return const AccountDeletionInfo(
         canDelete: false,
         reason: 'Error checking account status',
       );
@@ -342,12 +370,6 @@ class SettingsService {
 
 /// Model for blocked user information
 class BlockedUser {
-  final String id;
-  final String name;
-  final String imageUrl;
-  final DateTime blockedAt;
-  final String reason;
-
   const BlockedUser({
     required this.id,
     required this.name,
@@ -355,6 +377,11 @@ class BlockedUser {
     required this.blockedAt,
     required this.reason,
   });
+  final String id;
+  final String name;
+  final String imageUrl;
+  final DateTime blockedAt;
+  final String reason;
 
   @override
   String toString() => 'BlockedUser(id: $id, name: $name)';
@@ -362,16 +389,6 @@ class BlockedUser {
 
 /// Model for notification settings
 class NotificationSettings {
-  final bool matchNotifications;
-  final bool messageNotifications;
-  final bool likeNotifications;
-  final bool superLikeNotifications;
-  final bool soundEnabled;
-  final bool vibrationEnabled;
-  final String quietHoursStart;
-  final String quietHoursEnd;
-  final bool quietHoursEnabled;
-
   const NotificationSettings({
     required this.matchNotifications,
     required this.messageNotifications,
@@ -384,47 +401,51 @@ class NotificationSettings {
     required this.quietHoursEnabled,
   });
 
-  factory NotificationSettings.defaultSettings() {
-    return const NotificationSettings(
-      matchNotifications: true,
-      messageNotifications: true,
-      likeNotifications: true,
-      superLikeNotifications: true,
-      soundEnabled: true,
-      vibrationEnabled: true,
-      quietHoursStart: '22:00',
-      quietHoursEnd: '08:00',
-      quietHoursEnabled: false,
-    );
-  }
+  factory NotificationSettings.defaultSettings() => const NotificationSettings(
+        matchNotifications: true,
+        messageNotifications: true,
+        likeNotifications: true,
+        superLikeNotifications: true,
+        soundEnabled: true,
+        vibrationEnabled: true,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+        quietHoursEnabled: false,
+      );
 
-  factory NotificationSettings.fromMap(Map<String, dynamic> map) {
-    return NotificationSettings(
-      matchNotifications: map['matchNotifications'] ?? true,
-      messageNotifications: map['messageNotifications'] ?? true,
-      likeNotifications: map['likeNotifications'] ?? true,
-      superLikeNotifications: map['superLikeNotifications'] ?? true,
-      soundEnabled: map['soundEnabled'] ?? true,
-      vibrationEnabled: map['vibrationEnabled'] ?? true,
-      quietHoursStart: map['quietHoursStart'] ?? '22:00',
-      quietHoursEnd: map['quietHoursEnd'] ?? '08:00',
-      quietHoursEnabled: map['quietHoursEnabled'] ?? false,
-    );
-  }
+  factory NotificationSettings.fromMap(Map<String, dynamic> map) =>
+      NotificationSettings(
+        matchNotifications: map['matchNotifications'] ?? true,
+        messageNotifications: map['messageNotifications'] ?? true,
+        likeNotifications: map['likeNotifications'] ?? true,
+        superLikeNotifications: map['superLikeNotifications'] ?? true,
+        soundEnabled: map['soundEnabled'] ?? true,
+        vibrationEnabled: map['vibrationEnabled'] ?? true,
+        quietHoursStart: map['quietHoursStart'] ?? '22:00',
+        quietHoursEnd: map['quietHoursEnd'] ?? '08:00',
+        quietHoursEnabled: map['quietHoursEnabled'] ?? false,
+      );
+  final bool matchNotifications;
+  final bool messageNotifications;
+  final bool likeNotifications;
+  final bool superLikeNotifications;
+  final bool soundEnabled;
+  final bool vibrationEnabled;
+  final String quietHoursStart;
+  final String quietHoursEnd;
+  final bool quietHoursEnabled;
 
-  Map<String, dynamic> toMap() {
-    return {
-      'matchNotifications': matchNotifications,
-      'messageNotifications': messageNotifications,
-      'likeNotifications': likeNotifications,
-      'superLikeNotifications': superLikeNotifications,
-      'soundEnabled': soundEnabled,
-      'vibrationEnabled': vibrationEnabled,
-      'quietHoursStart': quietHoursStart,
-      'quietHoursEnd': quietHoursEnd,
-      'quietHoursEnabled': quietHoursEnabled,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'matchNotifications': matchNotifications,
+        'messageNotifications': messageNotifications,
+        'likeNotifications': likeNotifications,
+        'superLikeNotifications': superLikeNotifications,
+        'soundEnabled': soundEnabled,
+        'vibrationEnabled': vibrationEnabled,
+        'quietHoursStart': quietHoursStart,
+        'quietHoursEnd': quietHoursEnd,
+        'quietHoursEnabled': quietHoursEnabled,
+      };
 
   NotificationSettings copyWith({
     bool? matchNotifications,
@@ -436,32 +457,31 @@ class NotificationSettings {
     String? quietHoursStart,
     String? quietHoursEnd,
     bool? quietHoursEnabled,
-  }) {
-    return NotificationSettings(
-      matchNotifications: matchNotifications ?? this.matchNotifications,
-      messageNotifications: messageNotifications ?? this.messageNotifications,
-      likeNotifications: likeNotifications ?? this.likeNotifications,
-      superLikeNotifications: superLikeNotifications ?? this.superLikeNotifications,
-      soundEnabled: soundEnabled ?? this.soundEnabled,
-      vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
-      quietHoursStart: quietHoursStart ?? this.quietHoursStart,
-      quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
-      quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
-    );
-  }
+  }) =>
+      NotificationSettings(
+        matchNotifications: matchNotifications ?? this.matchNotifications,
+        messageNotifications: messageNotifications ?? this.messageNotifications,
+        likeNotifications: likeNotifications ?? this.likeNotifications,
+        superLikeNotifications:
+            superLikeNotifications ?? this.superLikeNotifications,
+        soundEnabled: soundEnabled ?? this.soundEnabled,
+        vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+        quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+        quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+        quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
+      );
 }
 
 /// Model for account deletion information
 class AccountDeletionInfo {
-  final bool canDelete;
-  final bool hasActiveSubscription;
-  final bool hasActiveMatches;
-  final String? reason;
-
   const AccountDeletionInfo({
     required this.canDelete,
     this.hasActiveSubscription = false,
     this.hasActiveMatches = false,
     this.reason,
   });
+  final bool canDelete;
+  final bool hasActiveSubscription;
+  final bool hasActiveMatches;
+  final String? reason;
 }

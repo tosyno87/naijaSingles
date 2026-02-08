@@ -19,6 +19,15 @@ service firebase.storage {
       allow read: if request.auth != null;
     }
     
+    // Event images - allow authenticated users to upload and read
+    match /event_images/{allPaths=**} {
+      // Allow authenticated users to upload event images
+      allow write: if request.auth != null;
+      
+      // Allow any authenticated user to read event images
+      allow read: if request.auth != null;
+    }
+    
     // Deny everything else
     match /{allPaths=**} {
       allow read, write: if false;

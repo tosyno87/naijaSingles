@@ -6,31 +6,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/utils/custom_toast.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/features/chat/ui/widgets/send_message_box.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 // Calling functionality temporarily disabled
 // // Calling functionality removed
 import '../../../../common/data/repo/user_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../common/utils/custom_toast.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
+import '../../../../models/user_model.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 import '../../../report/report_user.dart';
+import '../widgets/send_message_box.dart';
 
 class ChatPage extends StatefulWidget {
+  const ChatPage({
+    required this.sender,
+    required this.second,
+    required this.chatId,
+    super.key,
+  });
   final UserModel sender;
   final String chatId;
   final UserModel second;
-  const ChatPage(
-      {super.key,
-      required this.sender,
-      required this.second,
-      required this.chatId});
   @override
   ChatPageState createState() => ChatPageState();
 }
@@ -49,7 +50,7 @@ class ChatPageState extends State<ChatPage> {
     super.initState();
 
     chatReference =
-        db.collection("chats").doc(widget.chatId).collection('messages');
+        db.collection('chats').doc(widget.chatId).collection('messages');
     checkBlock();
   }
 
@@ -59,8 +60,10 @@ class ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  void debounce(VoidCallback callback,
-      {Duration duration = const Duration(seconds: 15)}) {
+  void debounce(
+    VoidCallback callback, {
+    Duration duration = const Duration(seconds: 15),
+  }) {
     if (!isCalling) {
       // Check if a call is not in progress
       callback(); // Execute the callback immediately
@@ -77,7 +80,7 @@ class ChatPageState extends State<ChatPage> {
   }
 
   String? blockedBy;
-  checkBlock() {
+  void checkBlock() {
     chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
@@ -96,249 +99,277 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            centerTitle: false,
-            elevation: 0,
-            title: Text(widget.second.name!),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios),
-              color: Colors.white,
-              onPressed: () => Navigator.pop(context),
-            ),
-            actions: <Widget>[
-              PopupMenuButton(itemBuilder: (ct) {
-                return [
-                  PopupMenuItem(
-                    value: 'value1',
-                    child: InkWell(
-                      onTap: () => showDialog(
-                          barrierDismissible: true,
-                          context: context,
-                          builder: (context) => ReportUser(
-                                reported: widget.second,
-                                reportedBy: widget.sender,
-                              )).then((value) => Navigator.pop(ct)),
-                      child: SizedBox(
-                          width: 100,
-                          height: 30,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.flag_outlined,
-                                color: themeProvider.isDarkMode
-                                    ? Colors.white
-                                    : primaryColor,
-                                size: 20,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                "Report".tr().toString(),
-                              ),
-                            ],
-                          )),
+      key: _scaffoldKey,
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        centerTitle: false,
+        elevation: 0,
+        title: Text(widget.second.name!),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          color: Colors.white,
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: <Widget>[
+          PopupMenuButton(
+            itemBuilder: (ct) => [
+              PopupMenuItem(
+                value: 'value1',
+                child: InkWell(
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (context) => ReportUser(
+                      reported: widget.second,
+                      reportedBy: widget.sender,
                     ),
-                  ),
-                  PopupMenuItem(
+                  ).then((value) => Navigator.pop(ct)),
+                  child: SizedBox(
+                    width: 100,
                     height: 30,
-                    value: 'value2',
-                    child: InkWell(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.block_outlined,
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : primaryColor,
-                            size: 20,
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Text(isBlocked
-                              ? "Unblock user".tr().toString()
-                              : "Block user".tr().toString()),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.pop(ct);
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext ctx) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: AlertDialog(
-                                title: Text(isBlocked
-                                    ? 'Unblock'.tr().toString()
-                                    : 'Block'.tr().toString()),
-                                content: Text("Do you want to".tr(args: [
-                                  "${isBlocked ? 'Unblock'.tr().toString() : 'Block'.tr().toString()}",
-                                  "${widget.second.name}"
-                                ])),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: Text(
-                                      'No'.tr().toString(),
-                                      style: TextStyle(color: primaryColor),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      Navigator.pop(ctx);
-                                      if (isBlocked &&
-                                          blockedBy == widget.sender.id) {
-                                        chatReference.doc('blocked').set({
-                                          'isBlocked': !isBlocked,
-                                          'blockedBy': widget.sender.id,
-                                        }, SetOptions(merge: true));
-                                        // For deleting from   blocklist
-                                        await firebaseFireStoreInstance
-                                            .collection("users")
-                                            .doc(widget.sender.id)
-                                            .collection("blockedlist")
-                                            .doc(widget.second
-                                                .id) // Assuming widget.second.id represents the blocked user's ID
-                                            .delete();
-
-                                        CustomToast.showToast(
-                                            "User Unblocked Successfully"
-                                                .tr()
-                                                .toString());
-                                      } else if (!isBlocked) {
-                                        chatReference.doc('blocked').set({
-                                          'isBlocked': !isBlocked,
-                                          'blockedBy': widget.sender.id,
-                                        }, SetOptions(merge: true));
-                                        // For adding in   blocklist
-                                        await firebaseFireStoreInstance
-                                            .collection("users")
-                                            .doc(widget.sender.id)
-                                            .collection("blockedlist")
-                                            .doc(widget.second
-                                                .id) // Generate a unique document ID for each blocked user
-                                            .set({
-                                          'isBlocked': !isBlocked,
-                                          'blockedID': widget.second.id,
-                                          'timestamp':
-                                              FieldValue.serverTimestamp()
-                                        });
-
-                                        CustomToast.showToast(
-                                            "User blocked Successfully"
-                                                .tr()
-                                                .toString());
-                                      } else {
-                                        CustomSnackbar.showSnackBarSimple(
-                                            "You can't unblock".tr().toString(),
-                                            context);
-                                      }
-                                    },
-                                    child: Text(
-                                      'Yes'.tr().toString(),
-                                      style: TextStyle(color: primaryColor),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.flag_outlined,
+                          color: isDarkMode
+                              ? Colors.white
+                              : primaryColor,
+                          size: 20,
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          'Report'.tr().toString(),
+                        ),
+                      ],
                     ),
                   ),
-                  PopupMenuItem(
-                    value: 'value3',
-                    child: InkWell(
-                      onTap: () => showDialog(
-                        context: context,
-                        builder: (BuildContext ctx) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10.0),
-                            child: AlertDialog(
-                              title: Text(
-                                'Unmatch'.tr().toString(),
-                                style: TextStyle(
-                                    fontSize: 18, color: primaryColor),
-                              ),
-                              content: Text(
-                                  "Do you want to unmatch with".tr(args: [
-                                    "${widget.second.name}".toString()
-                                  ]).toString(),
-                                  style: const TextStyle(fontSize: 16)),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: Text(
-                                    'No'.tr().toString(),
-                                    style: TextStyle(color: primaryColor),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    Navigator.pop(ctx);
-                                    await UserRepo.unmatchUser(
-                                        widget.sender, widget.second.id!);
-                                    context.read<SearchUserBloc>().add(
-                                        LoadUserEvent(
-                                            currentUser: widget.sender));
-                                    context.read<MatchUserBloc>().add(
-                                        LoadMatchUserEvent(
-                                            currentUser: widget.sender));
-                                    CustomSnackbar.showSnackBarSimple(
-                                        "unmatched".tr(args: [
-                                          "${widget.second.name}".toString()
-                                        ]).toString(),
-                                        context);
-                                    Navigator.pop(context);
-                                    // Navigator.pushReplacement(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) => const Tabbar(null, false)));
-                                  },
-                                  child: Text(
-                                    'Yes'.tr().toString(),
-                                    style: TextStyle(color: primaryColor),
-                                  ),
-                                ),
+                ),
+              ),
+              PopupMenuItem(
+                height: 30,
+                value: 'value2',
+                child: InkWell(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.block_outlined,
+                        color: isDarkMode
+                            ? Colors.white
+                            : primaryColor,
+                        size: 20,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        isBlocked
+                            ? 'Unblock user'.tr().toString()
+                            : 'Block user'.tr().toString(),
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.pop(ct);
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext ctx) => ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: AlertDialog(
+                          title: Text(
+                            isBlocked
+                                ? 'Unblock'.tr().toString()
+                                : 'Block'.tr().toString(),
+                          ),
+                          content: Text(
+                            'Do you want to'.tr(
+                              args: [
+                                "${isBlocked ? 'Unblock'.tr().toString() : 'Block'.tr().toString()}",
+                                '${widget.second.name}',
                               ],
                             ),
-                          );
-                        },
-                      ).then((value) => Navigator.pop(ct)),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.cancel_outlined,
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : primaryColor,
-                            size: 20,
                           ),
-                          const SizedBox(
-                            width: 5,
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text(
+                                'No'.tr().toString(),
+                                style: const TextStyle(color: primaryColor),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.pop(ctx);
+                                if (isBlocked &&
+                                    blockedBy == widget.sender.id) {
+                                  chatReference.doc('blocked').set(
+                                    {
+                                      'isBlocked': !isBlocked,
+                                      'blockedBy': widget.sender.id,
+                                    },
+                                    SetOptions(merge: true),
+                                  );
+                                  // For deleting from   blocklist
+                                  await firebaseFireStoreInstance
+                                      .collection('users')
+                                      .doc(widget.sender.id)
+                                      .collection('blockedlist')
+                                      .doc(
+                                        widget.second.id,
+                                      ) // Assuming widget.second.id represents the blocked user's ID
+                                      .delete();
+
+                                  CustomToast.showToast(
+                                    'User Unblocked Successfully'
+                                        .tr()
+                                        .toString(),
+                                  );
+                                } else if (!isBlocked) {
+                                  chatReference.doc('blocked').set(
+                                    {
+                                      'isBlocked': !isBlocked,
+                                      'blockedBy': widget.sender.id,
+                                    },
+                                    SetOptions(merge: true),
+                                  );
+                                  // For adding in   blocklist
+                                  await firebaseFireStoreInstance
+                                      .collection('users')
+                                      .doc(widget.sender.id)
+                                      .collection('blockedlist')
+                                      .doc(
+                                        widget.second.id,
+                                      ) // Generate a unique document ID for each blocked user
+                                      .set({
+                                    'isBlocked': !isBlocked,
+                                    'blockedID': widget.second.id,
+                                    'timestamp': FieldValue.serverTimestamp(),
+                                  });
+
+                                  CustomToast.showToast(
+                                    'User blocked Successfully'.tr().toString(),
+                                  );
+                                } else {
+                                  CustomSnackbar.showSnackBarSimple(
+                                    "You can't unblock".tr().toString(),
+                                    context,
+                                  );
+                                }
+                              },
+                              child: Text(
+                                'Yes'.tr().toString(),
+                                style: const TextStyle(color: primaryColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              PopupMenuItem(
+                value: 'value3',
+                child: InkWell(
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (BuildContext ctx) => ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: AlertDialog(
+                        title: Text(
+                          'Unmatch'.tr().toString(),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: primaryColor,
                           ),
-                          Text(
-                            "Unmatch".tr().toString(),
+                        ),
+                        content: Text(
+                          'Do you want to unmatch with'.tr(
+                            args: [
+                              '${widget.second.name}'.toString(),
+                            ],
+                          ).toString(),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text(
+                              'No'.tr().toString(),
+                              style: const TextStyle(color: primaryColor),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.pop(ctx);
+                              await UserRepo.unmatchUser(
+                                widget.sender,
+                                widget.second.id!,
+                              );
+                              context.read<SearchUserBloc>().add(
+                                    LoadUserEvent(
+                                      currentUser: widget.sender,
+                                    ),
+                                  );
+                              context.read<MatchUserBloc>().add(
+                                    LoadMatchUserEvent(
+                                      currentUser: widget.sender,
+                                    ),
+                                  );
+                              CustomSnackbar.showSnackBarSimple(
+                                'unmatched'.tr(
+                                  args: [
+                                    '${widget.second.name}'.toString(),
+                                  ],
+                                ).toString(),
+                                context,
+                              );
+                              Navigator.pop(context);
+                              // Navigator.pushReplacement(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => const Tabbar(null, false)));
+                            },
+                            child: Text(
+                              'Yes'.tr().toString(),
+                              style: const TextStyle(color: primaryColor),
+                            ),
                           ),
                         ],
                       ),
                     ),
+                  ).then((value) => Navigator.pop(ct)),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.cancel_outlined,
+                        color: isDarkMode
+                            ? Colors.white
+                            : primaryColor,
+                        size: 20,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        'Unmatch'.tr().toString(),
+                      ),
+                    ],
                   ),
-                ];
-              })
-            ]),
-        body: MessageBox(
-            sender: widget.sender,
-            chatId: widget.chatId,
-            second: widget.second));
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: MessageBox(
+        sender: widget.sender,
+        chatId: widget.chatId,
+        second: widget.second,
+      ),
+    );
   }
 }

@@ -8,8 +8,11 @@ gem "fastlane"
 ruby ">= 2.7.0"
 
 # Additional gems for enhanced functionality
-gem "cocoapods" # For iOS dependency management
+gem "cocoapods", ">= 1.15.0" # For iOS dependency management (updated to support activesupport 6.x)
 gem "xcode-install" # For Xcode version management
+
+# Security: Pin activesupport to patched version to fix CVE-2023-38037 and CVE-2023-28120
+gem "activesupport", ">= 6.1.7.5"
 
 # Development gems
 group :development do

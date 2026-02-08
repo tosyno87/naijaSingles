@@ -11,7 +11,7 @@ void main() {
       print('🧪 Testing user registration flow...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 5));
+      await tester.pumpAndSettle(const Duration(seconds: 5));
 
       // Test 1: App launches to registration/login screen
       expect(find.byType(MaterialApp), findsOneWidget);
@@ -21,18 +21,21 @@ void main() {
       // This would typically include phone number input, name input, etc.
       final textFields = find.byType(TextField);
       final textFormFields = find.byType(TextFormField);
-      
-      if (textFields.evaluate().isNotEmpty || textFormFields.evaluate().isNotEmpty) {
+
+      if (textFields.evaluate().isNotEmpty ||
+          textFormFields.evaluate().isNotEmpty) {
         print('✅ Found input fields for registration');
       } else {
-        print('⚠️ No obvious input fields found - may need navigation to registration');
+        print(
+            '⚠️ No obvious input fields found - may need navigation to registration');
       }
 
       // Test 3: Look for registration buttons
       final elevatedButtons = find.byType(ElevatedButton);
       final textButtons = find.byType(TextButton);
-      
-      if (elevatedButtons.evaluate().isNotEmpty || textButtons.evaluate().isNotEmpty) {
+
+      if (elevatedButtons.evaluate().isNotEmpty ||
+          textButtons.evaluate().isNotEmpty) {
         print('✅ Found interactive buttons');
       }
 
@@ -49,21 +52,21 @@ void main() {
       print('🧪 Testing phone number validation...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for phone number input field
       final phoneFields = find.byWidgetPredicate(
-        (widget) => widget is TextField && 
-                   widget.keyboardType == TextInputType.phone,
+        (widget) =>
+            widget is TextField && widget.keyboardType == TextInputType.phone,
       );
 
       if (phoneFields.evaluate().isNotEmpty) {
         print('✅ Found phone number input field');
-        
+
         // Test invalid phone number
         await tester.enterText(phoneFields.first, '123');
         await tester.pump();
-        
+
         // Look for validation error
         final errorTexts = find.textContaining('Invalid');
         if (errorTexts.evaluate().isNotEmpty) {
@@ -80,7 +83,7 @@ void main() {
       print('🧪 Testing age verification...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Look for age-related elements
       final ageElements = find.textContaining('18');
@@ -90,9 +93,10 @@ void main() {
 
       // Look for date picker or age input
       final dateFields = find.byWidgetPredicate(
-        (widget) => widget is TextField && 
-                   (widget.keyboardType == TextInputType.datetime ||
-                    widget.keyboardType == TextInputType.number),
+        (widget) =>
+            widget is TextField &&
+            (widget.keyboardType == TextInputType.datetime ||
+                widget.keyboardType == TextInputType.number),
       );
 
       if (dateFields.evaluate().isNotEmpty) {

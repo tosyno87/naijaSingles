@@ -1,135 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
-import '../lib/features/onboarding/screens/enhanced_bio_screen.dart';
-import '../lib/features/user/controllers/onboarding_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:naijasingles/common/bloc/user/user_bloc.dart';
+import 'package:naijasingles/features/onboarding/bloc/onboarding_bloc.dart';
+import 'package:naijasingles/features/onboarding/data/repositories/onboarding_repository.dart';
+import 'package:naijasingles/features/onboarding/screens/enhanced_bio_screen.dart';
+
+class MockOnboardingRepository extends Mock implements OnboardingRepository {}
+
+class MockUserBloc extends Mock implements UserBloc {}
 
 void main() {
+  late MockOnboardingRepository mockRepository;
+  late MockUserBloc mockUserBloc;
+
+  setUp(() {
+    mockRepository = MockOnboardingRepository();
+    mockUserBloc = MockUserBloc();
+  });
+
+  Widget buildTestWidget(Widget child) {
+    return MaterialApp(
+      home: BlocProvider<OnboardingBloc>(
+        create: (_) => OnboardingBloc(
+          repository: mockRepository,
+          userBloc: mockUserBloc,
+        ),
+        child: Scaffold(body: child),
+      ),
+    );
+  }
+
   group('Enhanced Bio Screen Tests', () {
-    late OnboardingController controller;
-
-    setUp(() {
-      controller = OnboardingController();
-    });
-
     testWidgets('Enhanced bio screen renders correctly',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ChangeNotifierProvider<OnboardingController>(
-            create: (_) => controller,
-            child: const Scaffold(
-              body: EnhancedBioScreen(),
-            ),
-          ),
-        ),
+        buildTestWidget(const EnhancedBioScreen()),
       );
 
-      // Verify key elements are present
+      await tester.pumpAndSettle();
+
+      // Verify key elements are present (simplified bio screen)
       expect(find.text('Tell your story'), findsOneWidget);
-      expect(find.text('Get started with prompts'), findsOneWidget);
-      expect(find.text('Your bio'), findsOneWidget);
-      expect(find.text('Tips for a great bio'), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
     });
 
-    testWidgets('Personality prompts are displayed',
+    testWidgets('Bio screen has text field and header',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ChangeNotifierProvider<OnboardingController>(
-            create: (_) => controller,
-            child: const Scaffold(
-              body: EnhancedBioScreen(),
-            ),
-          ),
-        ),
+        buildTestWidget(const EnhancedBioScreen()),
       );
+      await tester.pumpAndSettle();
 
-      // Verify some personality prompts are present
-      expect(find.text("I'm the type of person who..."), findsOneWidget);
-      expect(find.text("You'll find me on weekends..."), findsOneWidget);
-      expect(find.text("I'm passionate about..."), findsOneWidget);
+      expect(find.text('Tell your story'), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
     });
 
     testWidgets('Bio text field accepts input', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ChangeNotifierProvider<OnboardingController>(
-            create: (_) => controller,
-            child: const Scaffold(
-              body: EnhancedBioScreen(),
-            ),
-          ),
-        ),
+        buildTestWidget(const EnhancedBioScreen()),
       );
+      await tester.pumpAndSettle();
 
-      // Find the bio text field
       final bioField = find.byType(TextField);
       expect(bioField, findsOneWidget);
 
-      // Enter text
       await tester.enterText(bioField,
-          'This is my test bio with enough characters to meet the minimum requirement.');
+          'This is my test bio with enough characters.');
       await tester.pump();
 
-      // Verify character count updates
-      expect(find.textContaining('/300'), findsOneWidget);
+      expect(find.textContaining('This is my test bio'), findsOneWidget);
     });
 
-    testWidgets('Prompt selection works correctly',
+    testWidgets('Bio text field is editable',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ChangeNotifierProvider<OnboardingController>(
-            create: (_) => controller,
-            child: const Scaffold(
-              body: EnhancedBioScreen(),
-            ),
-          ),
-        ),
+        buildTestWidget(const EnhancedBioScreen()),
       );
+      await tester.pumpAndSettle();
 
-      // Find and tap a prompt
-      final prompt = find.text("I'm passionate about...");
-      expect(prompt, findsOneWidget);
-
-      await tester.tap(prompt);
+      final bioField = find.byType(TextField);
+      await tester.enterText(bioField, 'Test bio content');
       await tester.pump();
 
-      // Verify the prompt appears in the bio field
-      final bioField = find.byType(TextField);
-      final textField = tester.widget<TextField>(bioField);
-      expect(textField.controller?.text, contains("I'm passionate about..."));
+      expect(find.text('Test bio content'), findsOneWidget);
     });
 
-    testWidgets('Bio quality indicator shows correctly',
+    testWidgets('Bio screen renders with scroll view',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ChangeNotifierProvider<OnboardingController>(
-            create: (_) => controller,
-            child: const Scaffold(
-              body: EnhancedBioScreen(),
-            ),
-          ),
-        ),
+        buildTestWidget(const EnhancedBioScreen()),
       );
+      await tester.pumpAndSettle();
 
-      // Enter a short bio
-      final bioField = find.byType(TextField);
-      await tester.enterText(bioField, 'Short bio');
-      await tester.pump();
-
-      // Should show improvement message
-      expect(find.textContaining('Add'), findsWidgets);
-
-      // Enter a longer, better bio
-      await tester.enterText(bioField,
-          'I love hiking and exploring new places. Currently passionate about photography and cooking. Looking for someone who shares my love for adventure and good food!');
-      await tester.pump();
-
-      // Should show better quality indicator
-      expect(find.textContaining('Perfect length'), findsOneWidget);
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+      expect(find.text('Tell your story'), findsOneWidget);
     });
   });
 }

@@ -10,9 +10,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - User behavior analysis
 /// - A/B testing support
 class ProfileAnalyticsService {
-  static final ProfileAnalyticsService _instance = ProfileAnalyticsService._internal();
   factory ProfileAnalyticsService() => _instance;
   ProfileAnalyticsService._internal();
+  static final ProfileAnalyticsService _instance =
+      ProfileAnalyticsService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -99,7 +100,11 @@ class ProfileAnalyticsService {
   }
 
   /// Track message sent
-  Future<void> trackMessageSent(String threadId, String senderId, String receiverId) async {
+  Future<void> trackMessageSent(
+    String threadId,
+    String senderId,
+    String receiverId,
+  ) async {
     try {
       log('💬 Tracking message sent: $threadId');
 
@@ -180,13 +185,15 @@ class ProfileAnalyticsService {
       final totalViews = viewsSnapshot.docs.length;
       final totalLikes = likesSnapshot.docs.length;
       final totalPasses = passesSnapshot.docs.length;
-      final totalMatches = matchesSnapshot.docs.length + matchesSnapshot2.docs.length;
+      final totalMatches =
+          matchesSnapshot.docs.length + matchesSnapshot2.docs.length;
 
       // Calculate like rate
       final likeRate = totalViews > 0 ? (totalLikes / totalViews) * 100 : 0.0;
 
       // Calculate match rate
-      final matchRate = totalLikes > 0 ? (totalMatches / totalLikes) * 100 : 0.0;
+      final matchRate =
+          totalLikes > 0 ? (totalMatches / totalLikes) * 100 : 0.0;
 
       // Get daily analytics
       final dailyAnalytics = await _getDailyAnalytics(userId);
@@ -217,8 +224,8 @@ class ProfileAnalyticsService {
         totalLikes: 0,
         totalPasses: 0,
         totalMatches: 0,
-        likeRate: 0.0,
-        matchRate: 0.0,
+        likeRate: 0,
+        matchRate: 0,
         dailyAnalytics: [],
         demographicAnalytics: DemographicAnalytics.empty(),
         lastUpdated: DateTime.now(),
@@ -260,12 +267,14 @@ class ProfileAnalyticsService {
             .where('date', isEqualTo: dateString)
             .get();
 
-        last30Days.add(DailyAnalytics(
-          date: date,
-          views: viewsSnapshot.docs.length,
-          likes: likesSnapshot.docs.length,
-          passes: passesSnapshot.docs.length,
-        ));
+        last30Days.add(
+          DailyAnalytics(
+            date: date,
+            views: viewsSnapshot.docs.length,
+            likes: likesSnapshot.docs.length,
+            passes: passesSnapshot.docs.length,
+          ),
+        );
       }
 
       return last30Days;
@@ -291,25 +300,26 @@ class ProfileAnalyticsService {
 
       for (final doc in viewsSnapshot.docs) {
         final viewerId = doc.data()['viewerId'] as String;
-        
+
         // Get viewer's demographic data
-        final viewerDoc = await _firestore.collection('users').doc(viewerId).get();
+        final viewerDoc =
+            await _firestore.collection('users').doc(viewerId).get();
         if (viewerDoc.exists) {
           final viewerData = viewerDoc.data()!;
-          
+
           // Age group
           final age = viewerData['age'] as int?;
           if (age != null) {
             final ageGroup = _getAgeGroup(age);
             ageGroups[ageGroup] = (ageGroups[ageGroup] ?? 0) + 1;
           }
-          
+
           // Gender
           final gender = viewerData['gender'] as String?;
           if (gender != null) {
             genderGroups[gender] = (genderGroups[gender] ?? 0) + 1;
           }
-          
+
           // Location
           final location = viewerData['locationName'] as String?;
           if (location != null) {
@@ -388,13 +398,16 @@ class ProfileAnalyticsService {
       // Get daily active users (last 24 hours)
       final now = DateTime.now();
       final yesterday = now.subtract(const Duration(days: 1));
-      
+
       final dauSnapshot = await _firestore
           .collection('analytics')
           .where('timestamp', isGreaterThan: yesterday)
           .get();
-      
-      final activeUsers = dauSnapshot.docs.map((doc) => doc.data()['viewerId'] as String).toSet().length;
+
+      final activeUsers = dauSnapshot.docs
+          .map((doc) => doc.data()['viewerId'] as String)
+          .toSet()
+          .length;
 
       return AppAnalytics(
         totalUsers: totalUsers,
@@ -419,24 +432,24 @@ class ProfileAnalyticsService {
   Future<double> getUserEngagementScore(String userId) async {
     try {
       final analytics = await getProfileAnalytics(userId);
-      
+
       // Calculate engagement score based on various factors
-      double score = 0.0;
-      
+      double score = 0;
+
       // Profile completeness (30%)
       final profileCompleteness = await _calculateProfileCompleteness(userId);
       score += 0.3 * profileCompleteness;
-      
+
       // Activity level (25%)
       final activityLevel = await _calculateActivityLevel(userId);
       score += 0.25 * activityLevel;
-      
+
       // Response rate (25%)
       score += 0.25 * analytics.matchRate / 100;
-      
+
       // Profile quality (20%)
       score += 0.2 * analytics.likeRate / 100;
-      
+
       return score.clamp(0.0, 1.0);
     } catch (e) {
       log('❌ Error calculating engagement score: $e');
@@ -449,20 +462,39 @@ class ProfileAnalyticsService {
     try {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists) return 0.0;
-      
+
       final userData = userDoc.data()!;
       int completedFields = 0;
-      int totalFields = 8; // Total number of important fields
-      
-      if (userData['name'] != null && userData['name'].toString().isNotEmpty) completedFields++;
+      const int totalFields = 8; // Total number of important fields
+
+      if (userData['name'] != null && userData['name'].toString().isNotEmpty) {
+        completedFields++;
+      }
       if (userData['age'] != null) completedFields++;
-      if (userData['bio'] != null && userData['bio'].toString().isNotEmpty) completedFields++;
-      if (userData['photos'] != null && (userData['photos'] as List).isNotEmpty) completedFields++;
-      if (userData['nationality'] != null && userData['nationality'].toString().isNotEmpty) completedFields++;
-      if (userData['tribe'] != null && userData['tribe'].toString().isNotEmpty) completedFields++;
-      if (userData['occupation'] != null && userData['occupation'].toString().isNotEmpty) completedFields++;
-      if (userData['interests'] != null && (userData['interests'] as List).isNotEmpty) completedFields++;
-      
+      if (userData['bio'] != null && userData['bio'].toString().isNotEmpty) {
+        completedFields++;
+      }
+      if (userData['photos'] != null &&
+          (userData['photos'] as List).isNotEmpty) {
+        completedFields++;
+      }
+      if (userData['nationality'] != null &&
+          userData['nationality'].toString().isNotEmpty) {
+        completedFields++;
+      }
+      if (userData['tribe'] != null &&
+          userData['tribe'].toString().isNotEmpty) {
+        completedFields++;
+      }
+      if (userData['occupation'] != null &&
+          userData['occupation'].toString().isNotEmpty) {
+        completedFields++;
+      }
+      if (userData['interests'] != null &&
+          (userData['interests'] as List).isNotEmpty) {
+        completedFields++;
+      }
+
       return completedFields / totalFields;
     } catch (e) {
       log('❌ Error calculating profile completeness: $e');
@@ -475,15 +507,15 @@ class ProfileAnalyticsService {
     try {
       final now = DateTime.now();
       final last7Days = now.subtract(const Duration(days: 7));
-      
+
       final activitySnapshot = await _firestore
           .collection('analytics')
           .where('userId', isEqualTo: userId)
           .where('timestamp', isGreaterThan: last7Days)
           .get();
-      
+
       final activityCount = activitySnapshot.docs.length;
-      
+
       // Normalize activity score (0-1)
       return (activityCount / 20).clamp(0.0, 1.0); // 20 activities = 1.0 score
     } catch (e) {
@@ -495,17 +527,6 @@ class ProfileAnalyticsService {
 
 /// Profile analytics model
 class ProfileAnalytics {
-  final String userId;
-  final int totalViews;
-  final int totalLikes;
-  final int totalPasses;
-  final int totalMatches;
-  final double likeRate;
-  final double matchRate;
-  final List<DailyAnalytics> dailyAnalytics;
-  final DemographicAnalytics demographicAnalytics;
-  final DateTime lastUpdated;
-
   const ProfileAnalytics({
     required this.userId,
     required this.totalViews,
@@ -518,67 +539,64 @@ class ProfileAnalytics {
     required this.demographicAnalytics,
     required this.lastUpdated,
   });
+  final String userId;
+  final int totalViews;
+  final int totalLikes;
+  final int totalPasses;
+  final int totalMatches;
+  final double likeRate;
+  final double matchRate;
+  final List<DailyAnalytics> dailyAnalytics;
+  final DemographicAnalytics demographicAnalytics;
+  final DateTime lastUpdated;
 
   @override
-  String toString() {
-    return 'ProfileAnalytics($userId: $totalViews views, $totalLikes likes, ${likeRate.toStringAsFixed(1)}% like rate)';
-  }
+  String toString() =>
+      'ProfileAnalytics($userId: $totalViews views, $totalLikes likes, ${likeRate.toStringAsFixed(1)}% like rate)';
 }
 
 /// Daily analytics model
 class DailyAnalytics {
-  final DateTime date;
-  final int views;
-  final int likes;
-  final int passes;
-
   const DailyAnalytics({
     required this.date,
     required this.views,
     required this.likes,
     required this.passes,
   });
+  final DateTime date;
+  final int views;
+  final int likes;
+  final int passes;
 
   @override
-  String toString() {
-    return 'DailyAnalytics(${date.toIso8601String().split('T')[0]}: $views views, $likes likes)';
-  }
+  String toString() =>
+      'DailyAnalytics(${date.toIso8601String().split('T')[0]}: $views views, $likes likes)';
 }
 
 /// Demographic analytics model
 class DemographicAnalytics {
-  final Map<String, int> ageGroups;
-  final Map<String, int> genderGroups;
-  final Map<String, int> locationGroups;
-
   const DemographicAnalytics({
     required this.ageGroups,
     required this.genderGroups,
     required this.locationGroups,
   });
 
-  factory DemographicAnalytics.empty() {
-    return const DemographicAnalytics(
-      ageGroups: {},
-      genderGroups: {},
-      locationGroups: {},
-    );
-  }
+  factory DemographicAnalytics.empty() => const DemographicAnalytics(
+        ageGroups: {},
+        genderGroups: {},
+        locationGroups: {},
+      );
+  final Map<String, int> ageGroups;
+  final Map<String, int> genderGroups;
+  final Map<String, int> locationGroups;
 
   @override
-  String toString() {
-    return 'DemographicAnalytics(age: ${ageGroups.length}, gender: ${genderGroups.length}, location: ${locationGroups.length})';
-  }
+  String toString() =>
+      'DemographicAnalytics(age: ${ageGroups.length}, gender: ${genderGroups.length}, location: ${locationGroups.length})';
 }
 
 /// App analytics model
 class AppAnalytics {
-  final int totalUsers;
-  final int totalMatches;
-  final int totalMessages;
-  final int dailyActiveUsers;
-  final DateTime lastUpdated;
-
   const AppAnalytics({
     required this.totalUsers,
     required this.totalMatches,
@@ -586,9 +604,13 @@ class AppAnalytics {
     required this.dailyActiveUsers,
     required this.lastUpdated,
   });
+  final int totalUsers;
+  final int totalMatches;
+  final int totalMessages;
+  final int dailyActiveUsers;
+  final DateTime lastUpdated;
 
   @override
-  String toString() {
-    return 'AppAnalytics($totalUsers users, $totalMatches matches, $dailyActiveUsers DAU)';
-  }
+  String toString() =>
+      'AppAnalytics($totalUsers users, $totalMatches matches, $dailyActiveUsers DAU)';
 }

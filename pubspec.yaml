@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.1+13
 
 environment:
   sdk: ^3.5.0
@@ -44,6 +44,7 @@ dependencies:
   equatable: ^2.0.7              # Updated to latest
   firebase_auth: ^6.0.1          # Updated to latest
   firebase_core: ^4.0.0         # Updated to latest
+  firebase_crashlytics: ^5.0.1   # Crash reporting and analytics
   firebase_messaging: ^16.0.0    # Updated to latest
   firebase_storage: ^13.0.0      # Updated to latest
   flutter:
@@ -54,7 +55,6 @@ dependencies:
   flutter_flushbar: ^0.0.2       # Kept at 0.0.2
   google_sign_in: ^6.1.6
   animated_text_kit: ^4.2.2     # Added for rotating greetings
-  swipe_cards: ^2.0.0+1          # Added for Explore screen
   flutter_image_compress: ^2.4.0 # Updated to latest
   flutter_swiper_null_safety: ^1.0.2 # Kept at 1.0.2
   fluttertoast: ^8.2.12          # Updated to latest
@@ -79,7 +79,6 @@ dependencies:
   permission_handler: ^12.0.1
   flutter_secure_storage: ^9.2.2
   pin_code_fields: ^8.0.1        # Kept at 8.0.1
-  provider: ^6.1.5               # Updated to latest
   share_plus: ^11.0.0           # Updated to latest
   shared_preferences: ^2.5.3     # Updated to latest
   shimmer: ^3.0.0                # Kept at 3.0.0
@@ -146,7 +145,7 @@ flutter:
     - asset/translation/
     - asset/images/
     - assets/images/
-    - .env
+    # .env is optional - only included if it exists (gitignored for security)
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see

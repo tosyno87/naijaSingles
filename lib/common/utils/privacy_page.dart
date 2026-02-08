@@ -1,15 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import '../providers/theme_provider.dart';
+
+import '../bloc/theme/theme_bloc.dart';
+import '../constants/colors.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
+  const PrivacyPolicyPage({required this.url, required this.tittle, super.key});
   final String url;
   final String tittle;
-
-  const PrivacyPolicyPage({super.key, required this.url, required this.tittle});
 
   @override
   PrivacyPolicyPageState createState() => PrivacyPolicyPageState();
@@ -22,43 +22,45 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   @override
   void initState() {
     super.initState();
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = context.read<ThemeBloc>().isDarkMode;
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(
-          themeProvider.isDarkMode ? Colors.white : const Color(0x00000000))
-      ..setNavigationDelegate(NavigationDelegate(
-        onPageStarted: (url) {
-          setState(() {
-            loadingPercentage = 0;
-          });
-        },
-        onProgress: (progress) {
-          setState(() {
-            loadingPercentage = progress;
-          });
-        },
-        onPageFinished: (url) {
-          setState(() {
-            loadingPercentage = 100;
-          });
-        },
-        onWebResourceError: (WebResourceError error) {},
-        onNavigationRequest: (NavigationRequest request) {
-          if (request.url.startsWith('https://www.yt.com/')) {
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
-        },
-      ))
+        isDarkMode ? Colors.white : const Color(0x00000000),
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (url) {
+            setState(() {
+              loadingPercentage = 0;
+            });
+          },
+          onProgress: (progress) {
+            setState(() {
+              loadingPercentage = progress;
+            });
+          },
+          onPageFinished: (url) {
+            setState(() {
+              loadingPercentage = 100;
+            });
+          },
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.yt.com/')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
       ..loadRequest(
         Uri.parse(widget.url),
       );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
@@ -77,6 +79,6 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                 color: primaryColor,
               ),
           ],
-        ));
-  }
+        ),
+      );
 }

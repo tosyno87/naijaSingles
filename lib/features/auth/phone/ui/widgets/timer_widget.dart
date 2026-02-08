@@ -2,24 +2,23 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../../common/constants/colors.dart';
-import '../../../../../common/providers/theme_provider.dart';
+import '../../../../../common/bloc/theme/theme_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TimerWidget extends StatefulWidget {
-  final int start;
-  final String phoneNumber;
-  final String resendText;
-  final VoidCallback onResendOtp;
-
   const TimerWidget({
-    super.key,
     required this.start,
     required this.phoneNumber,
     required this.resendText,
     required this.onResendOtp,
+    super.key,
   });
+  final int start;
+  final String phoneNumber;
+  final String resendText;
+  final VoidCallback onResendOtp;
 
   @override
   TimerWidgetState createState() => TimerWidgetState();
@@ -60,13 +59,13 @@ class TimerWidgetState extends State<TimerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
         text: widget.resendText,
         style: TextStyle(
-          color: themeProvider.isDarkMode ? Colors.white70 : Colors.black54,
+          color: isDarkMode ? Colors.white70 : Colors.black54,
           fontSize: 15,
         ),
         children: [
@@ -80,11 +79,13 @@ class TimerWidgetState extends State<TimerWidget> {
               },
               child: Text(
                 _currentTimerValue > 0
-                    ? "Resend OTP in".tr(args: [
-                        "0:${_currentTimerValue.toString().padLeft(2, '0')} sec"
-                      ]).toString()
-                    : "Resend".tr().toString(),
-                style: TextStyle(
+                    ? 'Resend OTP in'.tr(
+                        args: [
+                          "0:${_currentTimerValue.toString().padLeft(2, '0')} sec",
+                        ],
+                      ).toString()
+                    : 'Resend'.tr().toString(),
+                style: const TextStyle(
                   color: primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

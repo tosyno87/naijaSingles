@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-import '../../../features/user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   const PhotoUploadScreen({super.key});
@@ -14,7 +15,7 @@ class PhotoUploadScreen extends StatefulWidget {
 class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   // Afropeep MVP theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -25,10 +26,12 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   Future<void> _pickImage(ImageSource source, int index) async {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    await controller.pickProfilePhoto(source, index);
-    setState(() {});
+    context.read<OnboardingBloc>().add(
+      OnboardingProfilePhotoPicked(source, index, context),
+    );
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _showImageSourceDialog(int index) {
@@ -39,14 +42,14 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Select Photo",
-              style: GoogleFonts.poppins(
+              'Select Photo',
+              style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
@@ -55,8 +58,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             const SizedBox(height: 16),
             _buildImageSourceOption(
               icon: Icons.camera_alt,
-              title: "Take a Photo",
-              subtitle: "Use your camera to take a new photo",
+              title: 'Take a Photo',
+              subtitle: 'Use your camera to take a new photo',
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera, index);
@@ -65,8 +68,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             const Divider(height: 24),
             _buildImageSourceOption(
               icon: Icons.photo_library,
-              title: "Choose from Gallery",
-              subtitle: "Select a photo from your device",
+              title: 'Choose from Gallery',
+              subtitle: 'Select a photo from your device',
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery, index);
@@ -83,59 +86,58 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: afropeepGreen.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+  }) =>
+      InkWell(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: afropeepGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: afropeepGreen,
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: textDarkBrown,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: textLightBrown,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
               color: afropeepGreen,
-              size: 24,
+              size: 16,
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: textDarkBrown,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: textLightBrown,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: afropeepGreen,
-            size: 16,
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 
   Widget _buildPhotoItem(int index) {
-    final controller = Provider.of<OnboardingController>(context);
-    final photo = controller.profilePhotos[index];
+    final data = context.read<OnboardingBloc>().state.data;
+    final photo = data?.profilePhotos.elementAtOrNull(index);
     final bool isRequired = index < 3; // First 3 photos are required
 
     return GestureDetector(
@@ -176,8 +178,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        isRequired ? "Required" : "Add Photo",
-                        style: GoogleFonts.poppins(
+                        isRequired ? 'Required' : 'Add Photo',
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: isRequired
@@ -197,7 +199,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               right: 8,
               child: GestureDetector(
                 onTap: () {
-                  controller.removeProfilePhoto(index);
+                  context.read<OnboardingBloc>().add(
+                    OnboardingProfilePhotoRemoved(index),
+                  );
                   setState(() {});
                 },
                 child: Container(
@@ -221,19 +225,21 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
-    final int uploadedCount =
-        controller.profilePhotos.where((photo) => photo != null).length;
-    final bool hasMinimumPhotos = uploadedCount >= 3;
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data;
+        final int uploadedCount =
+            (data?.profilePhotos.where((photo) => photo != null).length ?? 0);
+        final bool hasMinimumPhotos = uploadedCount >= 3;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+        return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Add Your Profile Photos",
-            style: GoogleFonts.poppins(
+            'Add Your Profile Photos',
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: textDarkBrown,
@@ -243,8 +249,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           const SizedBox(height: 8),
 
           Text(
-            "Upload at least 3 photos to complete your profile",
-            style: GoogleFonts.poppins(
+            'Upload at least 3 photos to complete your profile',
+            style: GoogleFonts.montserrat(
               fontSize: 14,
               color: textLightBrown,
             ),
@@ -262,8 +268,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              "$uploadedCount/5 photos uploaded (minimum 3)",
-              style: GoogleFonts.poppins(
+              '$uploadedCount/5 photos uploaded (minimum 3)',
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: hasMinimumPhotos ? afropeepGreen : Colors.red,
@@ -308,15 +314,14 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: Colors.blue.shade200,
-                width: 1,
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Tips for great profile photos:",
-                  style: GoogleFonts.poppins(
+                  'Tips for great profile photos:',
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.blue.shade800,
@@ -324,19 +329,19 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 ),
                 const SizedBox(height: 8),
                 _buildTipItem(
-                  "Use clear, well-lit photos that show your face",
+                  'Use clear, well-lit photos that show your face',
                 ),
                 _buildTipItem(
-                  "Include at least one full-body photo",
+                  'Include at least one full-body photo',
                 ),
                 _buildTipItem(
-                  "Show your interests and personality",
+                  'Show your interests and personality',
                 ),
                 _buildTipItem(
-                  "Avoid heavily filtered or edited photos",
+                  'Avoid heavily filtered or edited photos',
                 ),
                 _buildTipItem(
-                  "Smile! Profiles with smiling photos get more matches",
+                  'Smile! Profiles with smiling photos get more matches',
                 ),
               ],
             ),
@@ -344,31 +349,31 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         ],
       ),
     );
-  }
-
-  Widget _buildTipItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.check_circle,
-            size: 16,
-            color: Colors.blue.shade800,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.blue.shade900,
-              ),
-            ),
-          ),
-        ],
-      ),
+      },
     );
   }
+
+  Widget _buildTipItem(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.check_circle,
+              size: 16,
+              color: Colors.blue.shade800,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Colors.blue.shade900,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 }

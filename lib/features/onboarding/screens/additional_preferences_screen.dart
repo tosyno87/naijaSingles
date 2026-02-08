@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class AdditionalPreferencesScreen extends StatefulWidget {
-  const AdditionalPreferencesScreen({Key? key}) : super(key: key);
+  const AdditionalPreferencesScreen({super.key});
 
   @override
   State<AdditionalPreferencesScreen> createState() =>
@@ -14,8 +15,8 @@ class AdditionalPreferencesScreen extends StatefulWidget {
 
 class _AdditionalPreferencesScreenState
     extends State<AdditionalPreferencesScreen> {
-  late double _height;
-  late String _heightUnit;
+  double _height = 170;
+  String _heightUnit = 'cm';
   String _lookingFor = 'Dating';
   String _relationshipIntent = 'Not sure yet';
 
@@ -24,12 +25,12 @@ class _AdditionalPreferencesScreenState
     {
       'label': 'Friendship',
       'value': 'Friendship',
-      'icon': Icons.people_outline
+      'icon': Icons.people_outline,
     },
     {
       'label': 'Networking',
       'value': 'Networking',
-      'icon': Icons.business_center_outlined
+      'icon': Icons.business_center_outlined,
     },
   ];
 
@@ -37,34 +38,35 @@ class _AdditionalPreferencesScreenState
     {
       'label': 'Short-term fun',
       'value': 'Short-term',
-      'icon': Icons.flash_on_outlined
+      'icon': Icons.flash_on_outlined,
     },
     {
       'label': 'Long-term relationship',
       'value': 'Long-term',
-      'icon': Icons.favorite_border
+      'icon': Icons.favorite_border,
     },
     {
       'label': 'Casual dating',
       'value': 'Casual',
-      'icon': Icons.coffee_outlined
+      'icon': Icons.coffee_outlined,
     },
     {
       'label': 'Not sure yet',
       'value': 'Not sure yet',
-      'icon': Icons.help_outline
+      'icon': Icons.help_outline,
     },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    _height = controller.height;
-    _heightUnit = controller.heightUnit;
-    _lookingFor = controller.lookingFor;
-    _relationshipIntent = controller.relationshipIntent;
+    final data = context.read<OnboardingBloc>().state.data;
+    if (data != null) {
+      _height = data.height.toDouble();
+      _heightUnit = data.heightUnit;
+      _lookingFor = data.lookingFor;
+      _relationshipIntent = data.relationshipIntent;
+    }
   }
 
   @override
@@ -89,90 +91,87 @@ class _AdditionalPreferencesScreenState
       ),
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: isTablet ? 32 : 24,
-                vertical: 16,
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 32 : 24,
+              vertical: 16,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 32,
               ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 32,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header
-                    Text(
-                      'Tell us more about you',
-                      style: GoogleFonts.poppins(
-                        fontSize: isTablet ? 32 : 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Text(
+                    'Tell us more about you',
+                    style: GoogleFonts.montserrat(
+                      fontSize: isTablet ? 32 : 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
-                    SizedBox(height: isTablet ? 12 : 8),
-                    Text(
-                      'Help us create better matches for you',
-                      style: GoogleFonts.poppins(
-                        fontSize: isTablet ? 18 : 16,
-                        color: Colors.black54,
-                      ),
+                  ),
+                  SizedBox(height: isTablet ? 12 : 8),
+                  Text(
+                    'Help us create better matches for you',
+                    style: GoogleFonts.montserrat(
+                      fontSize: isTablet ? 18 : 16,
+                      color: Colors.black54,
                     ),
+                  ),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Height Section
-                    const SectionHeader(
-                      title: 'Height',
-                      subtitle: 'Your height helps with better matching',
-                    ),
-                    SizedBox(height: isTablet ? 20 : 16),
-                    HeightInput(
-                      initialHeight: _height,
-                      initialUnit: _heightUnit,
-                      onChanged: (height, unit) {
-                        setState(() {
-                          _height = height;
-                          _heightUnit = unit;
-                        });
-                      },
-                    ),
+                  // Height Section
+                  const SectionHeader(
+                    title: 'Height',
+                    subtitle: 'Your height helps with better matching',
+                  ),
+                  SizedBox(height: isTablet ? 20 : 16),
+                  HeightInput(
+                    initialHeight: _height,
+                    initialUnit: _heightUnit,
+                    onChanged: (height, unit) {
+                      setState(() {
+                        _height = height;
+                        _heightUnit = unit;
+                      });
+                    },
+                  ),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Looking For Section
-                    const SectionHeader(
-                      title: 'I\'m looking for',
-                      subtitle: 'What brings you to NaijaSingles?',
-                    ),
-                    SizedBox(height: isTablet ? 20 : 16),
-                    ..._buildLookingForOptions(),
+                  // Looking For Section
+                  const SectionHeader(
+                    title: 'I\'m looking for',
+                    subtitle: 'What brings you to NaijaSingles?',
+                  ),
+                  SizedBox(height: isTablet ? 20 : 16),
+                  ..._buildLookingForOptions(),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Relationship Intent Section
-                    const SectionHeader(
-                      title: 'Relationship goals',
-                      subtitle: 'What are you hoping to find?',
-                    ),
-                    SizedBox(height: isTablet ? 20 : 16),
-                    ..._buildRelationshipIntentOptions(),
+                  // Relationship Intent Section
+                  const SectionHeader(
+                    title: 'Relationship goals',
+                    subtitle: 'What are you hoping to find?',
+                  ),
+                  SizedBox(height: isTablet ? 20 : 16),
+                  ..._buildRelationshipIntentOptions(),
 
-                    SizedBox(height: isTablet ? 48 : 40),
+                  SizedBox(height: isTablet ? 48 : 40),
 
-                    // Continue Button
-                    ContinueButton(
-                      onPressed: _saveAndContinue,
-                      text: 'Continue',
-                    ),
+                  // Continue Button
+                  ContinueButton(
+                    onPressed: _saveAndContinue,
+                  ),
 
-                    SizedBox(height: isTablet ? 32 : 24),
-                  ],
-                ),
+                  SizedBox(height: isTablet ? 32 : 24),
+                ],
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
@@ -182,54 +181,55 @@ class _AdditionalPreferencesScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _lookingFor,
-          onSelected: (value) {
-            setState(() {
-              _lookingFor = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      );
-    }).toList();
+    return _lookingForOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _lookingFor,
+              onSelected: (value) {
+                setState(() {
+                  _lookingFor = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _relationshipIntent,
-          onSelected: (value) {
-            setState(() {
-              _relationshipIntent = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      );
-    }).toList();
+    return _relationshipIntentOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _relationshipIntent,
+              onSelected: (value) {
+                setState(() {
+                  _relationshipIntent = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   void _saveAndContinue() {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-
-    // Save all preferences
-    controller.setHeight(_height, _heightUnit);
-    controller.setLookingFor(_lookingFor);
-    controller.setRelationshipIntent(_relationshipIntent);
+    context.read<OnboardingBloc>()
+      ..add(OnboardingHeightUpdated(_height, _heightUnit))
+      ..add(OnboardingLookingForUpdated(_lookingFor))
+      ..add(OnboardingRelationshipIntentUpdated(_relationshipIntent));
 
     // Navigate to next screen or complete onboarding
     // You can customize this based on your onboarding flow
@@ -240,7 +240,7 @@ class _AdditionalPreferencesScreenState
       SnackBar(
         content: Text(
           'Preferences saved successfully!',
-          style: GoogleFonts.poppins(),
+          style: GoogleFonts.montserrat(),
         ),
         backgroundColor: const Color(0xFF008037),
         behavior: SnackBarBehavior.floating,

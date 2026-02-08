@@ -3,21 +3,32 @@ import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:naijasingles/features/user/ui/widgets/user_info.dart';
-import 'package:provider/provider.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/image_widget.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../models/user_model.dart';
+import '../../../dating/screens/user_detail_screen.dart';
 import '../../../user/ui/widgets/card_level.dart';
 import '../../../user/ui/widgets/gender_sign.dart';
-import '../../../dating/screens/user_detail_screen.dart';
+import '../../../user/ui/widgets/user_info.dart';
 
 // import 'MatchedAnimation.dart';
 
 class UsersList extends StatefulWidget {
+  // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they are not typical in dating apps
+  // and can create pressure or anxiety for users
+
+  const UsersList({
+    required this.users,
+    required this.usersList,
+    required this.currentUser,
+    required this.stackController,
+    required this.onswiped,
+    super.key,
+  });
   final UserModel currentUser;
   final List<UserModel> users;
 
@@ -25,17 +36,6 @@ class UsersList extends StatefulWidget {
 
   final SwipableStackController? stackController;
   final Function(int, SwipeDirection) onswiped;
-  
-  // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they are not typical in dating apps
-  // and can create pressure or anxiety for users
-
-  const UsersList(
-      {super.key,
-      required this.users,
-      required this.usersList,
-      required this.currentUser,
-      required this.stackController,
-      required this.onswiped});
 
   @override
   UsersListState createState() => UsersListState();
@@ -72,41 +72,40 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return widget.usersList.length == widget.stackController?.currentIndex
         ? Align(
-            alignment: Alignment.center,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: CircleAvatar(
                     backgroundColor: Colors.grey[200],
                     radius: 50,
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10),
                       child: Image.asset(
-                        "asset/hookup4u-Logo-BP.png",
+                        'asset/hookup4u-Logo-BP.png',
                         fit: BoxFit.contain,
                         color: primaryColor,
                       ),
                     ),
                   ),
                 ),
-                        Text(
-                          "There's no one new around you.".tr().toString(),
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.montserrat(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.black54,
-                            fontStyle: FontStyle.normal,
-                            letterSpacing: 1,
-                            decoration: TextDecoration.none,
-                            fontSize: 20,
-                          ),
-                        )
+                Text(
+                  "There's no one new around you.".tr().toString(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    color: isDarkMode
+                        ? Colors.white
+                        : Colors.black54,
+                    fontStyle: FontStyle.normal,
+                    letterSpacing: 1,
+                    decoration: TextDecoration.none,
+                    fontSize: 20,
+                  ),
+                ),
               ],
             ),
           )
@@ -114,7 +113,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
             horizontalSwipeThreshold: 0.8,
             verticalSwipeThreshold: 0.8,
             overlayBuilder: (context, properties) {
-              final opacity = min(properties.swipeProgress, 1.0);
+              final opacity = min(properties.swipeProgress, 1.0).toDouble();
               if (properties.direction == SwipeDirection.right) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 25, left: 25),
@@ -142,26 +141,28 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
               return Stack(
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () => _navigateToUserProfile(widget.users[itemIndex]),
+                    onTap: () =>
+                        _navigateToUserProfile(widget.users[itemIndex]),
                     child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
-                        child: Container(
-                          padding: const EdgeInsets.all(15),
-                          height: MediaQuery.of(context).size.height * .80,
-                          width: MediaQuery.of(context).size.width,
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                            child: Container(
-                              color: Colors.white,
-                              child: CustomCNImage(
-                                imageUrl:
-                                    widget.users[itemIndex].imageUrl!.first ?? "",
-                                fit: BoxFit.cover,
-                              ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      child: Container(
+                        padding: const EdgeInsets.all(15),
+                        height: MediaQuery.of(context).size.height * .80,
+                        width: MediaQuery.of(context).size.width,
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
+                          child: ColoredBox(
+                            color: Colors.white,
+                            child: CustomCNImage(
+                              imageUrl:
+                                  widget.users[itemIndex].imageUrl!.first ?? '',
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        )),
+                        ),
+                      ),
+                    ),
                   ),
                   Padding(
                     padding:
@@ -170,20 +171,21 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                       alignment: Alignment.bottomLeft,
                       child: Stack(
                         children: [
-                          Container(
+                          DecoratedBox(
                             decoration: const BoxDecoration(
                               borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(20),
-                                  bottomRight: Radius.circular(20)),
+                                bottomLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
+                              ),
                               gradient: LinearGradient(
-                                  colors: [
-                                    Colors.black45,
-                                    Colors.transparent,
-                                  ],
-                                  begin: FractionalOffset(0.0, 0.0),
-                                  end: FractionalOffset(1.0, 0.0),
-                                  stops: [0.0, 1.0],
-                                  tileMode: TileMode.clamp),
+                                colors: [
+                                  Colors.black45,
+                                  Colors.transparent,
+                                ],
+                                begin: FractionalOffset(0, 0),
+                                end: FractionalOffset(1, 0),
+                                stops: [0.0, 1.0],
+                              ),
                             ),
                             child: ListTile(
                               title: Row(
@@ -199,25 +201,27 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                     ),
                                   ),
                                   const SizedBox(width: 5),
-                                  widget.users[itemIndex]
-                                              .editInfo!['showOnProfile'] ??
-                                          false
-                                      ? GenderSign(
-                                          gender: widget
-                                              .users[itemIndex].userGender!,
-                                          iconColor: Colors.white,
-                                        )
-                                      : const SizedBox.shrink()
+                                  if (widget.users[itemIndex]
+                                          .editInfo!['showOnProfile'] ??
+                                      false)
+                                    GenderSign(
+                                      gender:
+                                          widget.users[itemIndex].userGender!,
+                                      iconColor: Colors.white,
+                                    )
+                                  else
+                                    const SizedBox.shrink(),
                                 ],
                               ),
                               subtitle: Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
+                                padding: const EdgeInsets.only(bottom: 8),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // Tribe/Nationality
-                                    if (widget.users[itemIndex].tribe != null && 
-                                        widget.users[itemIndex].tribe!.isNotEmpty)
+                                    if (widget.users[itemIndex].tribe != null &&
+                                        widget
+                                            .users[itemIndex].tribe!.isNotEmpty)
                                       Text(
                                         widget.users[itemIndex].tribe!,
                                         style: GoogleFonts.montserrat(
@@ -226,8 +230,11 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       )
-                                    else if (widget.users[itemIndex].nationality != null && 
-                                             widget.users[itemIndex].nationality!.isNotEmpty)
+                                    else if (widget
+                                                .users[itemIndex].nationality !=
+                                            null &&
+                                        widget.users[itemIndex].nationality!
+                                            .isNotEmpty)
                                       Text(
                                         widget.users[itemIndex].nationality!,
                                         style: GoogleFonts.montserrat(
@@ -237,16 +244,18 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                         ),
                                       ),
                                     // Distance
-                                    if (widget.users[itemIndex].distanceBW != null)
+                                    if (widget.users[itemIndex].distanceBW !=
+                                        null)
                                       Text(
-                                        "${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away",
+                                        '${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away',
                                         style: GoogleFonts.montserrat(
                                           color: Colors.white.withOpacity(0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),
                                       )
-                                    else if (widget.users[itemIndex].address != null)
+                                    else if (widget.users[itemIndex].address !=
+                                        null)
                                       Text(
                                         widget.users[itemIndex].address!,
                                         style: GoogleFonts.montserrat(
@@ -259,24 +268,23 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                 ),
                               ),
                               trailing: IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (context) {
-                                        return Info(
-                                          widget.users[itemIndex],
-                                          widget.currentUser,
-                                          true,
-                                          controller: widget.stackController,
-                                        );
-                                      },
-                                    );
-                                  },
-                                  icon: Icon(
-                                    Icons.arrow_upward,
-                                    color: primaryColor,
-                                  )),
+                                onPressed: () {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (context) => Info(
+                                      widget.users[itemIndex],
+                                      widget.currentUser,
+                                      true,
+                                      controller: widget.stackController,
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.arrow_upward,
+                                  color: primaryColor,
+                                ),
+                              ),
                             ),
                           ),
                           // Positioned.fill(

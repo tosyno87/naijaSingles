@@ -1,0 +1,273 @@
+# 🚀 Afropeep: Meet & Match - Development Rules
+
+## 📋 **Project Overview**
+This is a Flutter dating app called "Afropeep: Meet & Match" with a complete CI/CD pipeline for iOS App Store deployment.
+
+## 🏗️ **Architecture & Patterns**
+
+### **Flutter Best Practices**
+- Follow **Dart style guidelines** and **Effective Dart** best practices
+- Always use **null safety** throughout the codebase
+- Prioritize **readability and maintainability** over clever one-liners
+- Use **const constructors** where possible to minimize widget rebuilds
+- Implement **Clean Architecture** or **MVVM** patterns when appropriate
+- Use **Riverpod** or **Bloc** for state management (no deprecated Provider)
+
+### **UI & Design**
+- Use **Material 3 (Material You)** components where possible
+- Follow **responsive design principles** (mobile, tablet, and web)
+- Reuse widgets — avoid duplication
+- Implement proper loading states and error handling
+- Use consistent spacing and theming throughout the app
+
+### **Performance**
+- Minimize unnecessary widget rebuilds
+- Cache results when reasonable, avoid redundant async calls
+- Monitor performance with **Flutter DevTools**
+- Use `ListView.builder` for large lists
+- Implement proper image caching and optimization
+
+### **Security**
+- Never hardcode secrets or API keys — use environment configs
+- Validate all user input
+- Follow **OAuth2 / JWT** standards for authentication
+- Use secure storage for sensitive data
+
+## 🔄 **GitHub Workflow Rules**
+
+### **Branch Strategy**
+- **`main`** - Production-ready code with working CI/CD
+- **`feature/feature-name`** - New features or enhancements
+- **`fix/issue-description`** - Bug fixes
+- **`hotfix/critical-fix`** - Critical production fixes
+- **`release/version-number`** - Release preparation (e.g., `release/1.1.0`)
+
+### **Commit Message Convention**
+Use conventional commits for clear history:
+- **`feat:`** - New features
+- **`fix:`** - Bug fixes
+- **`docs:`** - Documentation changes
+- **`style:`** - Code style changes (formatting, etc.)
+- **`refactor:`** - Code refactoring
+- **`test:`** - Adding or updating tests
+- **`chore:`** - Maintenance tasks
+
+**Examples:**
+```bash
+git commit -m "feat: add user profile editing functionality"
+git commit -m "fix: resolve app crash on iOS 17"
+git commit -m "docs: update API documentation"
+```
+
+### **Pull Request Requirements**
+- Clear title describing the change
+- Description of what was changed and why
+- Testing steps for reviewers
+- Screenshots for UI changes
+- Breaking changes documentation (if any)
+- All CI/CD checks must pass before merging
+
+## 🚀 **CI/CD Pipeline Rules**
+
+### **Production Deployment**
+- Only triggers on `main` and `release/*` branches
+- Requires pull request approval before merging to main
+- Automatically deploys to App Store Connect
+- Auto-increments build numbers from App Store Connect
+- Handles version conflicts automatically
+
+### **Feature Development**
+- Feature branches run tests and analysis only
+- No production deployment from feature branches
+- Build validation for pull requests
+- Code quality checks enforced
+
+### **Version Management**
+- iOS Info.plist must be updated directly for version changes
+- pubspec.yaml version updates are not sufficient for iOS builds
+- Use PlistBuddy for iOS version management in CI/CD
+- App Store Connect build numbers are auto-incremented
+
+## 📱 **iOS-Specific Rules**
+
+### **App Store Requirements**
+- App icons must be RGB format (no alpha channel/transparency)
+- All required icon sizes must be provided
+- Bundle identifier: `com.app.naijasingles`
+- Apple ID: `6752229227`
+- Display name: "Afropeep: Meet & Match"
+
+### **Code Signing**
+- Uses Fastlane Match for certificate management
+- Manual signing configuration in Xcode
+- Production builds use Apple Distribution certificate
+- CI/CD handles all signing automatically
+
+### **Build Configuration**
+- Release builds for App Store deployment
+- Debug builds for development and testing
+- Proper provisioning profile configuration
+- CocoaPods dependency management
+
+## 🧪 **Testing Requirements**
+
+### **Test Coverage**
+- Every feature should include unit tests where applicable
+- Widget tests for UI components
+- Integration tests for critical user flows
+- Tests follow **given-when-then** style for clarity
+- Maintain high coverage for critical features
+
+### **Testing Strategy**
+- Run tests before every commit
+- CI/CD runs full test suite
+- Tests must pass before merging to main
+- Use meaningful test descriptions
+
+## 📦 **Dependencies & Packages**
+
+### **Package Management**
+- Prefer **officially maintained packages** over community forks
+- Keep `pubspec.yaml` tidy and version-locked
+- Avoid heavy dependencies for small utilities
+- Regular dependency updates for security
+
+### **Environment Management**
+- Use environment-specific configurations
+- Separate development, staging, and production configs
+- Never commit API keys or secrets
+- Use Firebase for backend services
+
+## 🔍 **Code Quality Standards**
+
+### **Code Review Checklist**
+- [ ] Code follows project conventions
+- [ ] Tests pass locally and in CI
+- [ ] No breaking changes without documentation
+- [ ] UI changes include screenshots
+- [ ] Documentation updated if needed
+- [ ] Performance impact considered
+- [ ] Security implications reviewed
+
+### **Documentation Requirements**
+- Public APIs must be documented
+- Complex business logic requires comments
+- README files for major features
+- Keep documentation up to date with code changes
+
+## 🚨 **Error Handling & Logging**
+
+### **Error Handling**
+- Implement proper try-catch blocks for async operations
+- Provide meaningful error messages to users
+- Log errors for debugging without exposing sensitive data
+- Handle network failures gracefully
+
+### **Logging Strategy**
+- Use structured logging for production
+- Include relevant context in log messages
+- Avoid logging sensitive user data
+- Use appropriate log levels (debug, info, warn, error)
+
+## 📊 **Performance & Monitoring**
+
+### **Performance Guidelines**
+- Monitor app startup time
+- Optimize image loading and caching
+- Implement proper list virtualization
+- Use Flutter DevTools for performance profiling
+
+### **Analytics & Monitoring**
+- Implement crash reporting (Firebase Crashlytics)
+- Add app analytics (Firebase Analytics)
+- Monitor app performance metrics
+- Track user engagement patterns
+
+## 🛡️ **Security Guidelines**
+
+### **Data Protection**
+- Encrypt sensitive data in storage
+- Use secure communication (HTTPS)
+- Implement proper authentication flows
+- Regular security audits of dependencies
+
+### **Privacy Compliance**
+- Follow App Store privacy guidelines
+- Implement proper data retention policies
+- Provide clear privacy policy
+- Handle user data deletion requests
+
+## 🎯 **Development Workflow**
+
+### **Before Starting Work**
+1. Check current branch and ensure you're on the right one
+2. Pull latest changes from main
+3. Create appropriate feature/fix branch
+4. Review existing code and documentation
+
+### **During Development**
+1. Write tests as you develop
+2. Follow naming conventions
+3. Commit frequently with clear messages
+4. Test on multiple devices/simulators
+
+### **Before Submitting**
+1. Run full test suite locally
+2. Check code formatting and analysis
+3. Update documentation if needed
+4. Create comprehensive pull request
+
+### **After Merging**
+1. Verify CI/CD pipeline success
+2. Test deployed changes
+3. Monitor for any issues
+4. Update project documentation
+
+## 🔧 **Troubleshooting Common Issues**
+
+### **Build Issues**
+- Clean Flutter cache: `flutter clean && flutter pub get`
+- Reset iOS build: `cd ios && rm -rf build && pod install`
+- Check Xcode project settings for signing
+- Verify bundle identifier consistency
+
+### **CI/CD Issues**
+- Check GitHub secrets configuration
+- Verify App Store Connect API key permissions
+- Review workflow logs for specific errors
+- Ensure branch protection rules are properly configured
+
+### **App Store Issues**
+- Verify app icon format (RGB, no transparency)
+- Check bundle version increments
+- Review App Store Connect metadata
+- Ensure all required screenshots are provided
+
+## 📚 **Resources & References**
+
+### **Documentation**
+- Flutter Documentation: https://docs.flutter.dev/
+- Dart Style Guide: https://dart.dev/guides/language/effective-dart
+- Material Design: https://material.io/design
+- Apple Human Interface Guidelines: https://developer.apple.com/design/human-interface-guidelines/
+
+### **Tools**
+- Flutter DevTools for debugging
+- Xcode for iOS development
+- Fastlane for deployment automation
+- Firebase for backend services
+
+---
+
+## 🎯 **Key Principles**
+
+1. **Quality First** - Never compromise on code quality
+2. **User Experience** - Every change should improve user experience
+3. **Security** - Security is not optional
+4. **Performance** - Optimize for smooth user experience
+5. **Maintainability** - Write code that others can understand and modify
+6. **Automation** - Automate repetitive tasks and deployments
+7. **Documentation** - Document decisions and complex logic
+8. **Testing** - Test early, test often, test thoroughly
+
+**Remember: This app represents professional Flutter development. Every commit should reflect that standard.** 🚀

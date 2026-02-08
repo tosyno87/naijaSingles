@@ -5,9 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// Service for managing group notification preferences
 /// Handles mute/unmute functionality per group
 class GroupNotificationService {
-  static final GroupNotificationService _instance = GroupNotificationService._internal();
   factory GroupNotificationService() => _instance;
   GroupNotificationService._internal();
+  static final GroupNotificationService _instance =
+      GroupNotificationService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -42,12 +43,15 @@ class GroupNotificationService {
       await _firestore
           .collection('user_group_notifications')
           .doc('${currentUserId}_$groupId')
-          .set({
-        'userId': currentUserId,
-        'groupId': groupId,
-        'isMuted': isMuted,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+          .set(
+        {
+          'userId': currentUserId,
+          'groupId': groupId,
+          'isMuted': isMuted,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       log('✅ Group mute status updated: $groupId -> $isMuted');
     } catch (e) {
@@ -78,9 +82,8 @@ class GroupNotificationService {
   }
 
   /// Check if user should receive notifications for a group
-  Future<bool> shouldReceiveNotifications(String groupId) async {
-    return !(await isGroupMuted(groupId));
-  }
+  Future<bool> shouldReceiveNotifications(String groupId) async =>
+      !(await isGroupMuted(groupId));
 
   /// Stream of mute status for a specific group
   Stream<bool> getGroupMuteStatusStream(String groupId) {

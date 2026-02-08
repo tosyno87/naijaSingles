@@ -3,24 +3,24 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
-import 'package:naijasingles/common/providers/theme_provider.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/bloc/user/user_bloc.dart';
+import '../../../../common/constants/colors.dart';
+import '../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 
 class ReAuthDialog extends StatefulWidget {
-  final String verificationId;
-  final FirebaseAuth auth;
-
   const ReAuthDialog({
-    super.key,
     required this.verificationId,
     required this.auth,
+    super.key,
   });
+  final String verificationId;
+  final FirebaseAuth auth;
 
   @override
   State<ReAuthDialog> createState() => _ReAuthDialogState();
@@ -31,45 +31,50 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeBloc = context.watch<ThemeBloc>();
+    final isDarkMode = themeBloc.isDarkMode;
     return AlertDialog(
       titlePadding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
       title: RichText(
         text: TextSpan(
-            text: "Enter the code sent to ".tr().toString(),
-            children: [
-              TextSpan(
-                  text: widget.auth.currentUser?.phoneNumber,
-                  style: TextStyle(
-                      color: primaryColor,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.bold,
-                      textBaseline: TextBaseline.alphabetic,
-                      fontSize: 15)),
-            ],
-            style: TextStyle(
-                fontFamily: 'Gellix',
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
-                fontSize: 18)),
+          text: 'Enter the code sent to '.tr().toString(),
+          children: [
+            TextSpan(
+              text: widget.auth.currentUser?.phoneNumber,
+              style: const TextStyle(
+                color: primaryColor,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+                textBaseline: TextBaseline.alphabetic,
+                fontSize: 15,
+              ),
+            ),
+          ],
+          style: TextStyle(
+            fontFamily: 'Gellix',
+            color: isDarkMode ? Colors.white : Colors.black87,
+            fontSize: 18,
+          ),
+        ),
         textAlign: TextAlign.center,
       ),
       content: PinCodeTextField(
         controller: otpController,
         keyboardType: TextInputType.number,
         length: 6,
-        obscureText: false,
         animationType: AnimationType.fade,
         pinTheme: PinTheme(
-            shape: PinCodeFieldShape.box,
-            borderRadius: BorderRadius.circular(10),
-            fieldHeight: 50,
-            fieldWidth: 35,
-            inactiveFillColor: Colors.white,
-            inactiveColor: primaryColor,
-            selectedColor: Colors.green,
-            selectedFillColor: Colors.white,
-            activeFillColor: Colors.white,
-            activeColor: Colors.green),
+          shape: PinCodeFieldShape.box,
+          borderRadius: BorderRadius.circular(10),
+          fieldHeight: 50,
+          fieldWidth: 35,
+          inactiveFillColor: Colors.white,
+          inactiveColor: primaryColor,
+          selectedColor: Colors.green,
+          selectedFillColor: Colors.white,
+          activeFillColor: Colors.white,
+          activeColor: Colors.green,
+        ),
         //shape: PinCodeFieldShape.underline,
         animationDuration: const Duration(milliseconds: 300),
         //fieldHeight: 50,
@@ -84,33 +89,34 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
           onPressed: () async {
             Navigator.pop(context);
           },
-          child: Text(
+          child: const Text(
             'Cancel',
             style: TextStyle(color: primaryColor),
           ),
         ),
         TextButton(
           onPressed: () async {
-            String otp = otpController.text.trim();
+            final String otp = otpController.text.trim();
             if (otp.isNotEmpty) {
               // Call your reauthentication method here
               // For demonstration purpose, I'm just printing the OTP
               log('Submitted OTP: $otp');
               await reauthenticateWithPhone(
-                  context: context,
-                  auth: widget.auth,
-                  verificationId: widget.verificationId,
-                  verificationCode: otp);
+                context: context,
+                auth: widget.auth,
+                verificationId: widget.verificationId,
+                verificationCode: otp,
+              );
             } else {
               CustomSnackbar.showSnackBarSimple(
-                "otp can not empty".tr().toString(),
+                'otp can not empty'.tr().toString(),
                 context,
               );
             }
           },
           child: Text(
             'Submit'.tr().toString(),
-            style: TextStyle(color: primaryColor),
+            style: const TextStyle(color: primaryColor),
           ),
         ),
       ],
@@ -127,7 +133,7 @@ Future<void> reauthenticateWithPhone({
   required String verificationCode,
 }) async {
   try {
-    AuthCredential credential = PhoneAuthProvider.credential(
+    final AuthCredential credential = PhoneAuthProvider.credential(
       verificationId: verificationId,
       smsCode: verificationCode,
     );
@@ -142,7 +148,7 @@ Future<void> reauthenticateWithPhone({
     log('Error re-authenticating user: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(
-        "Something Went Wrong".tr().toString(),
+        'Something Went Wrong'.tr().toString(),
         context,
       );
     }
@@ -165,21 +171,24 @@ Future<void> deleteUserAndNavigateToLogin(
     if (context.mounted) {
       // Show success message
       CustomSnackbar.showSnackBarSimple(
-        "Account deleted Successfully".tr().toString(),
+        'Account deleted Successfully'.tr().toString(),
         context,
       );
-      // Navigate to login screen
-      Navigator.pushReplacementNamed(context, RouteName.loginScreen)
-          .then((value) {
-        // Update user provider
-        Provider.of<UserProvider>(context, listen: false).currentUser = null;
+      final userBloc = context.read<UserBloc>();
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteName.welcomeScreen,
+        (route) => false,
+      ).then((value) {
+        userBloc.add(const UserDataUpdated(null));
+        userBloc.add(const UserListenStopped());
       });
     }
   } catch (e) {
     log('Error deleting user account: $e');
     if (context.mounted) {
       CustomSnackbar.showSnackBarSimple(
-        "Something Went Wrong".tr().toString(),
+        'Something Went Wrong'.tr().toString(),
         context,
       );
     }

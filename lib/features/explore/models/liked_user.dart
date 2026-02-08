@@ -1,24 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LikedUser {
-  final String currentUserId;
-  final String likedUserId;
-  final DateTime timestamp;
-
   LikedUser({
     required this.currentUserId,
     required this.likedUserId,
     required this.timestamp,
   });
-
-  // Convert to Map for Firestore
-  Map<String, dynamic> toMap() {
-    return {
-      'currentUserId': currentUserId,
-      'likedUserId': likedUserId,
-      'timestamp': timestamp,
-    };
-  }
 
   // Create from Firestore document
   factory LikedUser.fromDocument(DocumentSnapshot doc) {
@@ -29,4 +16,14 @@ class LikedUser {
       timestamp: (data['timestamp'] as Timestamp).toDate(),
     );
   }
+  final String currentUserId;
+  final String likedUserId;
+  final DateTime timestamp;
+
+  // Convert to Map for Firestore
+  Map<String, dynamic> toMap() => {
+        'currentUserId': currentUserId,
+        'likedUserId': likedUserId,
+        'timestamp': timestamp,
+      };
 }

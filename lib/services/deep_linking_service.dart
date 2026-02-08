@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
+
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:developer';
 
 /// Industry-standard deep linking service
 /// Features:
@@ -9,11 +10,11 @@ import 'dart:developer';
 /// - Handle incoming links
 /// - Fallback to web version
 class DeepLinkingService {
-  static final DeepLinkingService _instance = DeepLinkingService._internal();
   factory DeepLinkingService() => _instance;
   DeepLinkingService._internal();
+  static final DeepLinkingService _instance = DeepLinkingService._internal();
 
-  final StreamController<DeepLinkData> _linkStreamController = 
+  final StreamController<DeepLinkData> _linkStreamController =
       StreamController<DeepLinkData>.broadcast();
 
   /// Initialize deep linking service
@@ -85,8 +86,8 @@ class DeepLinkingService {
         userName: userName,
       );
 
-      final String text = shareText ?? 
-          'Check out $userName\'s profile on NaijaSingles! $link';
+      final String text =
+          shareText ?? 'Check out $userName\'s profile on NaijaSingles! $link';
 
       await Share.share(
         text,
@@ -113,7 +114,7 @@ class DeepLinkingService {
         matchName: matchName,
       );
 
-      final String text = shareText ?? 
+      final String text = shareText ??
           'I have a new match with $matchName on NaijaSingles! $link';
 
       await Share.share(
@@ -143,8 +144,7 @@ class DeepLinkingService {
         eventDate: eventDate,
       );
 
-      final String text = shareText ?? 
-          'Join $eventName on $eventDate! $link';
+      final String text = shareText ?? 'Join $eventName on $eventDate! $link';
 
       await Share.share(
         text,
@@ -164,7 +164,8 @@ class DeepLinkingService {
       log('🔗 Handling incoming link: $link');
 
       // Parse link and navigate accordingly
-      if (link.host == 'naijasingles.app' || link.host == 'naijasingles.page.link') {
+      if (link.host == 'naijasingles.app' ||
+          link.host == 'naijasingles.page.link') {
         final deepLinkData = DeepLinkData.fromUri(link);
         _linkStreamController.add(deepLinkData);
       }
@@ -199,26 +200,22 @@ class DeepLinkingService {
 
 /// Deep link data model
 class DeepLinkData {
-  final String type;
-  final Map<String, String> parameters;
-  final DateTime timestamp;
-
   const DeepLinkData({
     required this.type,
     required this.parameters,
     required this.timestamp,
   });
 
-  factory DeepLinkData.fromUri(Uri uri) {
-    return DeepLinkData(
-      type: uri.pathSegments.isNotEmpty ? uri.pathSegments.first : 'unknown',
-      parameters: uri.queryParameters,
-      timestamp: DateTime.now(),
-    );
-  }
+  factory DeepLinkData.fromUri(Uri uri) => DeepLinkData(
+        type: uri.pathSegments.isNotEmpty ? uri.pathSegments.first : 'unknown',
+        parameters: uri.queryParameters,
+        timestamp: DateTime.now(),
+      );
+  final String type;
+  final Map<String, String> parameters;
+  final DateTime timestamp;
 
   @override
-  String toString() {
-    return 'DeepLinkData(type: $type, parameters: $parameters, timestamp: $timestamp)';
-  }
+  String toString() =>
+      'DeepLinkData(type: $type, parameters: $parameters, timestamp: $timestamp)';
 }

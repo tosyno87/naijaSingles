@@ -1,15 +1,12 @@
 // ignore_for_file: unused_import
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:naijasingles/common/routes/route_name.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/routes/route_name.dart';
+import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 
 class ShowGender extends StatefulWidget {
@@ -36,7 +33,7 @@ class _ShowGenderState extends State<ShowGender> {
   @override
   Widget build(BuildContext context) {
     // for adding userdetails in this user map from navigation
-    var userData =
+    final userData =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final screenSize = MediaQuery.of(context).size;
 
@@ -60,7 +57,7 @@ class _ShowGenderState extends State<ShowGender> {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -84,7 +81,7 @@ class _ShowGenderState extends State<ShowGender> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "Show me",
+                          'Show me',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -93,7 +90,7 @@ class _ShowGenderState extends State<ShowGender> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          "Select who you want to see and match with",
+                          'Select who you want to see and match with',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -108,20 +105,20 @@ class _ShowGenderState extends State<ShowGender> {
                     Column(
                       children: [
                         _buildPreferenceCard(
-                          "Men",
-                          "men",
+                          'Men',
+                          'men',
                           Icons.male_rounded,
                         ),
                         const SizedBox(height: 16),
                         _buildPreferenceCard(
-                          "Women",
-                          "women",
+                          'Women',
+                          'women',
                           Icons.female_rounded,
                         ),
                         const SizedBox(height: 16),
                         _buildPreferenceCard(
-                          "Everyone",
-                          "everyone",
+                          'Everyone',
+                          'everyone',
                           Icons.people_alt_rounded,
                         ),
                       ],
@@ -133,7 +130,7 @@ class _ShowGenderState extends State<ShowGender> {
 
             // Continue labelLarge fixed at the bottom
             Container(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -153,8 +150,10 @@ class _ShowGenderState extends State<ShowGender> {
                           userData.addAll({'showGender': selectedPreference});
                           log(userData.toString());
                           Navigator.pushNamed(
-                              context, RouteName.universityScreen,
-                              arguments: userData);
+                            context,
+                            RouteName.universityScreen,
+                            arguments: userData,
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF27AE60),
@@ -168,11 +167,11 @@ class _ShowGenderState extends State<ShowGender> {
                     ),
                   ),
                   child: const Text(
-                    "CONTINUE",
+                    'CONTINUE',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
@@ -205,7 +204,6 @@ class _ShowGenderState extends State<ShowGender> {
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
-              spreadRadius: 0,
               offset: const Offset(0, 2),
             ),
           ],

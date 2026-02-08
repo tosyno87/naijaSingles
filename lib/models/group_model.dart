@@ -3,39 +3,22 @@ import 'package:flutter/foundation.dart';
 
 /// Model representing a cultural group in the app
 class GroupModel {
-  final String? id;
-  final String name;
-  final String description;
-  final String category;
-  final String? imageUrl;
-  final String creatorId;
-  final List<String> memberIds;
-  final List<String> adminIds;
-  final Map<String, dynamic>? culturalInfo;
-  final bool isPublic;
-  final int maxMembers;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String? location;
-  final List<String> tags;
-  final Map<String, dynamic>? settings;
-
   GroupModel({
-    this.id,
     required this.name,
     required this.description,
     required this.category,
-    this.imageUrl,
     required this.creatorId,
     required this.memberIds,
     required this.adminIds,
-    this.culturalInfo,
     required this.isPublic,
     required this.maxMembers,
     required this.createdAt,
     required this.updatedAt,
-    this.location,
     required this.tags,
+    this.id,
+    this.imageUrl,
+    this.culturalInfo,
+    this.location,
     this.settings,
   });
 
@@ -43,7 +26,7 @@ class GroupModel {
   factory GroupModel.fromDocument(DocumentSnapshot doc) {
     try {
       final data = doc.data() as Map<String, dynamic>;
-      
+
       return GroupModel(
         id: doc.id,
         name: data['name'] ?? '',
@@ -69,69 +52,79 @@ class GroupModel {
   }
 
   /// Create GroupModel from JSON
-  factory GroupModel.fromJson(Map<String, dynamic> json) {
-    return GroupModel(
-      id: json['id'],
-      name: json['name'] ?? '',
-      description: json['description'] ?? '',
-      category: json['category'] ?? 'General',
-      imageUrl: json['imageUrl'],
-      creatorId: json['creatorId'] ?? '',
-      memberIds: List<String>.from(json['memberIds'] ?? []),
-      adminIds: List<String>.from(json['adminIds'] ?? []),
-      culturalInfo: json['culturalInfo'] as Map<String, dynamic>?,
-      isPublic: json['isPublic'] ?? true,
-      maxMembers: json['maxMembers'] ?? 100,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
-      location: json['location'],
-      tags: List<String>.from(json['tags'] ?? []),
-      settings: json['settings'] as Map<String, dynamic>?,
-    );
-  }
+  factory GroupModel.fromJson(Map<String, dynamic> json) => GroupModel(
+        id: json['id'],
+        name: json['name'] ?? '',
+        description: json['description'] ?? '',
+        category: json['category'] ?? 'General',
+        imageUrl: json['imageUrl'],
+        creatorId: json['creatorId'] ?? '',
+        memberIds: List<String>.from(json['memberIds'] ?? []),
+        adminIds: List<String>.from(json['adminIds'] ?? []),
+        culturalInfo: json['culturalInfo'] as Map<String, dynamic>?,
+        isPublic: json['isPublic'] ?? true,
+        maxMembers: json['maxMembers'] ?? 100,
+        createdAt: DateTime.parse(json['createdAt']),
+        updatedAt: DateTime.parse(json['updatedAt']),
+        location: json['location'],
+        tags: List<String>.from(json['tags'] ?? []),
+        settings: json['settings'] as Map<String, dynamic>?,
+      );
+  final String? id;
+  final String name;
+  final String description;
+  final String category;
+  final String? imageUrl;
+  final String creatorId;
+  final List<String> memberIds;
+  final List<String> adminIds;
+  final Map<String, dynamic>? culturalInfo;
+  final bool isPublic;
+  final int maxMembers;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String? location;
+  final List<String> tags;
+  final Map<String, dynamic>? settings;
 
   /// Convert GroupModel to Map for Firestore
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'description': description,
-      'category': category,
-      'imageUrl': imageUrl,
-      'creatorId': creatorId,
-      'memberIds': memberIds,
-      'adminIds': adminIds,
-      'culturalInfo': culturalInfo,
-      'isPublic': isPublic,
-      'maxMembers': maxMembers,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'location': location,
-      'tags': tags,
-      'settings': settings,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'name': name,
+        'description': description,
+        'category': category,
+        'imageUrl': imageUrl,
+        'creatorId': creatorId,
+        'memberIds': memberIds,
+        'adminIds': adminIds,
+        'culturalInfo': culturalInfo,
+        'isPublic': isPublic,
+        'maxMembers': maxMembers,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+        'location': location,
+        'tags': tags,
+        'settings': settings,
+      };
 
   /// Convert GroupModel to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'category': category,
-      'imageUrl': imageUrl,
-      'creatorId': creatorId,
-      'memberIds': memberIds,
-      'adminIds': adminIds,
-      'culturalInfo': culturalInfo,
-      'isPublic': isPublic,
-      'maxMembers': maxMembers,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'location': location,
-      'tags': tags,
-      'settings': settings,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'description': description,
+        'category': category,
+        'imageUrl': imageUrl,
+        'creatorId': creatorId,
+        'memberIds': memberIds,
+        'adminIds': adminIds,
+        'culturalInfo': culturalInfo,
+        'isPublic': isPublic,
+        'maxMembers': maxMembers,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+        'location': location,
+        'tags': tags,
+        'settings': settings,
+      };
 
   /// Create a copy of GroupModel with updated fields
   GroupModel copyWith({
@@ -151,41 +144,34 @@ class GroupModel {
     String? location,
     List<String>? tags,
     Map<String, dynamic>? settings,
-  }) {
-    return GroupModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      category: category ?? this.category,
-      imageUrl: imageUrl ?? this.imageUrl,
-      creatorId: creatorId ?? this.creatorId,
-      memberIds: memberIds ?? this.memberIds,
-      adminIds: adminIds ?? this.adminIds,
-      culturalInfo: culturalInfo ?? this.culturalInfo,
-      isPublic: isPublic ?? this.isPublic,
-      maxMembers: maxMembers ?? this.maxMembers,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      location: location ?? this.location,
-      tags: tags ?? this.tags,
-      settings: settings ?? this.settings,
-    );
-  }
+  }) =>
+      GroupModel(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        category: category ?? this.category,
+        imageUrl: imageUrl ?? this.imageUrl,
+        creatorId: creatorId ?? this.creatorId,
+        memberIds: memberIds ?? this.memberIds,
+        adminIds: adminIds ?? this.adminIds,
+        culturalInfo: culturalInfo ?? this.culturalInfo,
+        isPublic: isPublic ?? this.isPublic,
+        maxMembers: maxMembers ?? this.maxMembers,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        location: location ?? this.location,
+        tags: tags ?? this.tags,
+        settings: settings ?? this.settings,
+      );
 
   /// Check if user is a member of the group
-  bool isMember(String userId) {
-    return memberIds.contains(userId);
-  }
+  bool isMember(String userId) => memberIds.contains(userId);
 
   /// Check if user is an admin of the group
-  bool isAdmin(String userId) {
-    return adminIds.contains(userId);
-  }
+  bool isAdmin(String userId) => adminIds.contains(userId);
 
   /// Check if user is the creator of the group
-  bool isCreator(String userId) {
-    return creatorId == userId;
-  }
+  bool isCreator(String userId) => creatorId == userId;
 
   /// Get member count
   int get memberCount => memberIds.length;
@@ -196,10 +182,10 @@ class GroupModel {
   /// Get cultural info for display
   String get culturalDisplay {
     if (culturalInfo == null) return 'General';
-    
+
     final nationality = culturalInfo!['nationality'] ?? '';
     final tribe = culturalInfo!['tribe'] ?? '';
-    
+
     if (nationality.isNotEmpty && tribe.isNotEmpty) {
       return '$nationality - $tribe';
     } else if (nationality.isNotEmpty) {
@@ -207,7 +193,7 @@ class GroupModel {
     } else if (tribe.isNotEmpty) {
       return tribe;
     }
-    
+
     return 'General';
   }
 
@@ -232,9 +218,8 @@ class GroupModel {
   }
 
   @override
-  String toString() {
-    return 'GroupModel{id: $id, name: $name, category: $category, members: ${memberIds.length}}';
-  }
+  String toString() =>
+      'GroupModel{id: $id, name: $name, category: $category, members: ${memberIds.length}}';
 
   @override
   bool operator ==(Object other) {
@@ -259,7 +244,8 @@ class GroupCategories {
   ];
 
   static const Map<String, String> categoryDescriptions = {
-    'Cultural': 'Groups focused on cultural heritage, traditions, and celebrations',
+    'Cultural':
+        'Groups focused on cultural heritage, traditions, and celebrations',
     'Professional': 'Professional networking and career development groups',
     'Social': 'Social groups for making friends and social connections',
     'Educational': 'Groups focused on learning and education',

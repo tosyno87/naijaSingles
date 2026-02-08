@@ -1,18 +1,17 @@
-import 'package:naijasingles/common/data/repo/user_repo.dart';
+import 'repo/user_repo.dart';
 
 class StretViewPreferences {
-  final String userId;
-
   StretViewPreferences(
     this.userId,
   );
+  final String userId;
 
-  setView(String value, final List<String> userIds) async {
+  Future<void> setView(String value, final List<String> userIds) async {
     UserRepo.streetviewfilter(value, userIds);
   }
 
-  getView() async {
-    Map<String, dynamic> streetViewData =
+  Future<String> getView() async {
+    final Map<String, dynamic> streetViewData =
         await UserRepo.getStreetViewData(userId);
 
     final String savedView = streetViewData['option'];

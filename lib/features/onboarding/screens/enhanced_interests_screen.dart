@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../../../common/constants/app_colors.dart';
+import '../bloc/onboarding_bloc.dart';
 
 class EnhancedInterestsScreen extends StatefulWidget {
   const EnhancedInterestsScreen({super.key});
@@ -14,48 +16,136 @@ class EnhancedInterestsScreen extends StatefulWidget {
 class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
   List<String> _selectedInterests = [];
 
-  // MVP theme colors
-  static const Color afropeepGreen = Color(0xFF007A33);
-  static const Color cardBackground = Color(0xFFF7E8DA);
-  static const Color textDarkBrown = Color(0xFF3A1D0F);
-  static const Color textLightBrown = Color(0xFF8B6C59);
+  // Theme colors - Tinder style
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
 
-  // Simplified interests list - organized by category but presented as flat list
-  final List<String> _allInterests = [
-    // Lifestyle
-    'Fitness', 'Yoga', 'Fashion', 'Photography', 'Reading', 'Writing',
-    'Personal Development',
+  // Track expanded state for each category (Tinder-style show more/less)
+  final Map<String, bool> _categoryExpanded = {
+    'creativity': false,
+    'entertainment': false,
+    'sports': false,
+    'food': false,
+    'culture': false,
+    'lifestyle': false,
+    'travel': false,
+  };
 
-    // Entertainment
-    'Movies', 'Music', 'Concerts', 'Comedy Shows', 'Netflix', 'Podcasts',
-    'Gaming', 'Karaoke',
-
-    // Sports
-    'Football', 'Basketball', 'Tennis', 'Swimming', 'Running', 'Cycling',
-    'Volleyball',
-
-    // Food & Dining
-    'Cooking', 'Fine Dining', 'Street Food', 'Baking', 'Wine Tasting', 'Coffee',
-    'Brunch',
-
-    // Nigerian Culture
-    'Afrobeats', 'Highlife Music', 'Nollywood', 'Jollof Rice', 'Suya',
-    'Owanbe Parties',
-    'Traditional Weddings', 'Ankara Fashion', 'Nigerian Comedy',
-    'Pidgin English',
-
-    // Creative Arts
-    'Painting', 'Drawing', 'Singing', 'Dancing', 'Music Production',
-    'Fashion Design',
-
-    // Social & Community
-    'Church Activities', 'Family Time', 'Volunteering', 'Community Service',
-    'Religious Studies',
-
-    // Travel & Adventure
-    'Travel', 'Hiking', 'Beach Activities', 'Road Trips', 'City Exploration',
-    'Food Tourism',
-  ];
+  // Categorized interests (Tinder-style organization)
+  final Map<String, Map<String, dynamic>> _categories = {
+    'creativity': {
+      'title': 'Creativity',
+      'emoji': '🎨',
+      'interests': [
+        'Photography',
+        'Drawing',
+        'Painting',
+        'Singing',
+        'Dancing',
+        'Music Production',
+        'Fashion Design',
+        'Writing',
+        'Content Creation',
+        'Cosplay',
+      ],
+      'initialCount': 7, // Show first 7 by default
+    },
+    'entertainment': {
+      'title': 'Fan favorites',
+      'emoji': '⭐',
+      'interests': [
+        'Movies',
+        'Music',
+        'Concerts',
+        'Comedy Shows',
+        'Netflix',
+        'Podcasts',
+        'Gaming',
+        'Karaoke',
+        'NBA',
+        'Marvel',
+        'Manga',
+      ],
+      'initialCount': 8,
+    },
+    'sports': {
+      'title': 'Sports & Fitness',
+      'emoji': '⚽',
+      'interests': [
+        'Football',
+        'Basketball',
+        'Tennis',
+        'Swimming',
+        'Running',
+        'Cycling',
+        'Volleyball',
+        'Fitness',
+        'Yoga',
+      ],
+      'initialCount': 7,
+    },
+    'food': {
+      'title': 'Food and drink',
+      'emoji': '🍽️',
+      'interests': [
+        'Foodie',
+        'Cooking',
+        'Fine Dining',
+        'Street Food',
+        'Baking',
+        'Wine Tasting',
+        'Coffee',
+        'Brunch',
+        'Sweet treats',
+        'Mocktails',
+        'Plant-based',
+      ],
+      'initialCount': 8,
+    },
+    'culture': {
+      'title': 'African Culture',
+      'emoji': '🌍',
+      'interests': [
+        'Afrobeats',
+        'Highlife Music',
+        'Nollywood',
+        'Jollof Rice',
+        'Suya',
+        'Owanbe Parties',
+        'Traditional Weddings',
+        'Ankara Fashion',
+        'Nigerian Comedy',
+        'Pidgin English',
+      ],
+      'initialCount': 7,
+    },
+    'lifestyle': {
+      'title': 'Lifestyle',
+      'emoji': '✨',
+      'interests': [
+        'Fashion',
+        'Reading',
+        'Personal Development',
+        'Church Activities',
+        'Family Time',
+        'Volunteering',
+        'Community Service',
+      ],
+      'initialCount': 5,
+    },
+    'travel': {
+      'title': 'Travel & Adventure',
+      'emoji': '✈️',
+      'interests': [
+        'Travel',
+        'Hiking',
+        'Beach Activities',
+        'Road Trips',
+        'City Exploration',
+        'Food Tourism',
+      ],
+      'initialCount': 6,
+    },
+  };
 
   @override
   void initState() {
@@ -63,13 +153,10 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
 
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
+      final data = context.read<OnboardingBloc>().state.data;
 
-      if (controller.interests.isNotEmpty) {
-        setState(() {
-          _selectedInterests = List.from(controller.interests);
-        });
+      if (data != null && data.interests.isNotEmpty) {
+        setState(() => _selectedInterests = List.from(data.interests));
       }
     });
   }
@@ -78,198 +165,169 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
     setState(() {
       if (_selectedInterests.contains(interest)) {
         _selectedInterests.remove(interest);
-        Provider.of<OnboardingController>(context, listen: false)
-            .removeInterest(interest);
+        context.read<OnboardingBloc>().add(
+              OnboardingInterestRemoved(interest),
+            );
       } else {
         _selectedInterests.add(interest);
-        Provider.of<OnboardingController>(context, listen: false)
-            .addInterest(interest);
+        context.read<OnboardingBloc>().add(
+              OnboardingInterestAdded(interest),
+            );
       }
     });
   }
 
+  void _toggleCategoryExpansion(String categoryKey) {
+    setState(() {
+      _categoryExpanded[categoryKey] = !_categoryExpanded[categoryKey]!;
+    });
+  }
+
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Text(
-            "What are your interests?",
-            style: GoogleFonts.poppins(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: textDarkBrown,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            "Select at least 5 interests to help us find your perfect matches",
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: textLightBrown,
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Interests dropdown
-          Text(
-            "Choose your interests",
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: textDarkBrown,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            decoration: BoxDecoration(
-              color: cardBackground,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: DropdownButton<String>(
-              hint: Text(
-                "Select an interest to add",
-                style: GoogleFonts.poppins(
-                  color: textLightBrown,
-                  fontSize: 16,
-                ),
+  Widget build(BuildContext context) => SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header - Tinder style
+            Text(
+              'What are you into?',
+              style: GoogleFonts.montserrat(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
-              isExpanded: true,
-              underline: const SizedBox(),
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: afropeepGreen,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'You like what you like. Now, let everyone know.',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: AppColors.textSecondary,
+                height: 1.4,
               ),
-              dropdownColor: cardBackground,
-              items: _allInterests
-                  .where((interest) => !_selectedInterests.contains(interest))
-                  .map((String interest) {
-                return DropdownMenuItem<String>(
-                  value: interest,
-                  child: Text(
-                    interest,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: textDarkBrown,
-                      fontWeight: FontWeight.w500,
+            ),
+
+            const SizedBox(height: 32),
+
+            // Categorized interests - Tinder style
+            ..._categories.entries.map((entry) {
+              final categoryKey = entry.key;
+              final category = entry.value;
+              final title = category['title'] as String;
+              final emoji = category['emoji'] as String;
+              final interests = category['interests'] as List<String>;
+              final initialCount = category['initialCount'] as int;
+              final isExpanded = _categoryExpanded[categoryKey] ?? false;
+              final displayedInterests = isExpanded
+                  ? interests
+                  : interests.take(initialCount).toList();
+              final hasMore = interests.length > initialCount;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Category header with emoji
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      children: [
+                        Text(
+                          emoji,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          title,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  _toggleInterest(newValue);
-                }
-              },
-            ),
-          ),
 
-          const SizedBox(height: 24),
+                  // Interest tags
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: displayedInterests.map((interest) {
+                      final isSelected = _selectedInterests.contains(interest);
 
-          // Selected interests count
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: _selectedInterests.length >= 5
-                  ? afropeepGreen.withOpacity(0.1)
-                  : Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: _selectedInterests.length >= 5
-                    ? afropeepGreen.withOpacity(0.3)
-                    : Colors.orange.withOpacity(0.3),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  _selectedInterests.length >= 5
-                      ? Icons.check_circle
-                      : Icons.info_outline,
-                  color: _selectedInterests.length >= 5
-                      ? afropeepGreen
-                      : Colors.orange.shade700,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  "${_selectedInterests.length} interests selected ${_selectedInterests.length >= 5 ? '✓' : '(minimum 5)'}",
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: _selectedInterests.length >= 5
-                        ? afropeepGreen
-                        : Colors.orange.shade700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Selected interests display
-          if (_selectedInterests.isNotEmpty) ...[
-            Text(
-              "Your selected interests:",
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkBrown,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _selectedInterests.map((interest) {
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: afropeepGreen.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: afropeepGreen.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        interest,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: afropeepGreen,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
+                      return GestureDetector(
                         onTap: () => _toggleInterest(interest),
-                        child: Icon(
-                          Icons.close,
-                          size: 16,
-                          color: afropeepGreen,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected ? afropeepGreen : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSelected
+                                  ? afropeepGreen
+                                  : Colors.grey.shade300,
+                              width: isSelected ? 0 : 1,
+                            ),
+                          ),
+                          child: Text(
+                            interest,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                  // Show more/less button
+                  if (hasMore)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 24),
+                      child: TextButton(
+                        onPressed: () => _toggleCategoryExpansion(categoryKey),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 36),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              isExpanded ? 'Show less' : 'Show more',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: afropeepGreen,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              isExpanded
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              color: afropeepGreen,
+                              size: 20,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+                    )
+                  else
+                    const SizedBox(height: 24),
+                ],
+              );
+            }),
           ],
-        ],
-      ),
-    );
-  }
+        ),
+      );
 }

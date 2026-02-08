@@ -8,14 +8,13 @@ import './google_login_events.dart';
 import './google_login_states.dart';
 
 class GoogleLoginBloc extends Bloc<GoogleLoginEvents, GoogleLoginStates> {
-  final GoogleLoginRepository _repository;
-
   GoogleLoginBloc({GoogleLoginRepository? repository})
       : _repository = repository ?? GoogleLoginRepositoryImpl(),
         super(GoogleLoginInitial()) {
     on<GoogleLoginRequested>(_onGoogleLoginRequested);
     on<GoogleLoginCancelled>(_onGoogleLoginCancelled);
   }
+  final GoogleLoginRepository _repository;
 
   Future<void> _onGoogleLoginRequested(
     GoogleLoginRequested event,

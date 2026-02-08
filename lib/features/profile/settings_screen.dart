@@ -1,19 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../common/bloc/user/user_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../common/routes/route_name.dart';
-import '../settings/safety_center_screen.dart';
+import '../settings/account_deletion_screen.dart';
 import '../settings/help_center_screen.dart';
 import '../settings/language_settings_screen.dart';
 import '../settings/location_settings_screen.dart';
-import '../settings/account_deletion_screen.dart';
 import '../settings/password_settings_screen.dart';
+import '../settings/safety_center_screen.dart';
 import 'privacy_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -30,280 +33,274 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static const Color textSecondary = Color(0xFF666666); // Medium gray
 
   @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
+  Widget build(BuildContext context) => Scaffold(
         backgroundColor: backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textPrimary),
-          onPressed: () => Navigator.pop(context),
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            'Settings',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
+          ),
+          centerTitle: true,
         ),
-        title: Text(
-          'Settings',
-          style: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Account Section
+              _buildSectionHeader('Account'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.person_outline,
+                  title: 'Edit Profile',
+                  subtitle: 'Update your photos and info',
+                  onTap: () {
+                    Navigator.pushNamed(context, RouteName.editProfileScreen);
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.lock_outline,
+                  title: 'Change Password',
+                  subtitle: 'Update your password',
+                  onTap: _showChangePasswordDialog,
+                ),
+              ]),
+
+              const SizedBox(height: 32),
+
+              // Privacy & Safety Section
+              _buildSectionHeader('Privacy & Safety'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.privacy_tip_outlined,
+                  title: 'Privacy Settings',
+                  subtitle: 'Control who can see your profile',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacySettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.block_outlined,
+                  title: 'Blocked Users',
+                  subtitle: 'Manage blocked accounts',
+                  onTap: () =>
+                      Navigator.pushNamed(context, RouteName.blockedUsers),
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.report_outlined,
+                  title: 'Safety Center',
+                  subtitle: 'Report issues and get help',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SafetyCenterScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ]),
+
+              const SizedBox(height: 32),
+
+              // App Settings Section
+              _buildSectionHeader('App Settings'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.notifications_outlined,
+                  title: 'Notifications',
+                  subtitle: 'Manage your notification preferences',
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    RouteName.notificationSettings,
+                  ),
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.location_on_outlined,
+                  title: 'Location',
+                  subtitle: 'Update your location settings',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LocationSettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.language_outlined,
+                  title: 'Language',
+                  subtitle: 'English (US)',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LanguageSettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ]),
+
+              const SizedBox(height: 32),
+
+              // Support Section
+              _buildSectionHeader('Support'),
+              const SizedBox(height: 16),
+
+              _buildSettingsCard([
+                _buildSettingsItem(
+                  icon: Icons.help_outline,
+                  title: 'Help Center',
+                  subtitle: 'Get help and support',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HelpCenterScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.feedback_outlined,
+                  title: 'Send Feedback',
+                  subtitle: 'Share your thoughts with us',
+                  onTap: _showFeedbackDialog,
+                ),
+                _buildDivider(),
+                _buildSettingsItem(
+                  icon: Icons.info_outline,
+                  title: 'About',
+                  subtitle: 'App version and info',
+                  onTap: _showAboutDialog,
+                ),
+              ]),
+
+              const SizedBox(height: 40),
+
+              // Sign Out Button - Robust solution with proper width constraints
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _showSignOutDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.red.shade700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(color: Colors.red.shade300, width: 2),
+                      ),
+                      elevation: 2,
+                      shadowColor: Colors.black.withOpacity(0.1),
+                    ),
+                    child: Text(
+                      'Sign Out',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red.shade700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Delete Account Button - Robust solution with proper width constraints
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _showDeleteAccountDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.red.shade700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(color: Colors.red.shade300, width: 2),
+                      ),
+                      elevation: 2,
+                      shadowColor: Colors.black.withOpacity(0.1),
+                    ),
+                    child: Text(
+                      'Delete Account',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red.shade700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+            ],
           ),
         ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Account Section
-            _buildSectionHeader('Account'),
-            const SizedBox(height: 16),
+      );
 
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.person_outline,
-                title: 'Edit Profile',
-                subtitle: 'Update your photos and info',
-                onTap: () {
-                  Navigator.pushNamed(context, RouteName.editProfileScreen);
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.lock_outline,
-                title: 'Change Password',
-                subtitle: 'Update your password',
-                onTap: () => _showChangePasswordDialog(),
-              ),
-            ]),
+  Widget _buildSectionHeader(String title) => Text(
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: textPrimary,
+        ),
+      );
 
-            const SizedBox(height: 32),
-
-            // Privacy & Safety Section
-            _buildSectionHeader('Privacy & Safety'),
-            const SizedBox(height: 16),
-
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.privacy_tip_outlined,
-                title: 'Privacy Settings',
-                subtitle: 'Control who can see your profile',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PrivacySettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.block_outlined,
-                title: 'Blocked Users',
-                subtitle: 'Manage blocked accounts',
-                onTap: () => Navigator.pushNamed(context, RouteName.blockedUsers),
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.report_outlined,
-                title: 'Safety Center',
-                subtitle: 'Report issues and get help',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SafetyCenterScreen(),
-                    ),
-                  );
-                },
-              ),
-            ]),
-
-            const SizedBox(height: 32),
-
-            // App Settings Section
-            _buildSectionHeader('App Settings'),
-            const SizedBox(height: 16),
-
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: 'Manage your notification preferences',
-                onTap: () => Navigator.pushNamed(context, RouteName.notificationSettings),
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.location_on_outlined,
-                title: 'Location',
-                subtitle: 'Update your location settings',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LocationSettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.language_outlined,
-                title: 'Language',
-                subtitle: 'English (US)',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LanguageSettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-            ]),
-
-            const SizedBox(height: 32),
-
-            // Support Section
-            _buildSectionHeader('Support'),
-            const SizedBox(height: 16),
-
-            _buildSettingsCard([
-              _buildSettingsItem(
-                icon: Icons.help_outline,
-                title: 'Help Center',
-                subtitle: 'Get help and support',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const HelpCenterScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.feedback_outlined,
-                title: 'Send Feedback',
-                subtitle: 'Share your thoughts with us',
-                onTap: () => _showFeedbackDialog(),
-              ),
-              _buildDivider(),
-              _buildSettingsItem(
-                icon: Icons.info_outline,
-                title: 'About',
-                subtitle: 'App version and info',
-                onTap: () => _showAboutDialog(),
-              ),
-            ]),
-
-            const SizedBox(height: 40),
-
-            // Sign Out Button - Robust solution with proper width constraints
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () => _showSignOutDialog(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.red.shade700,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: Colors.red.shade300, width: 2),
-                    ),
-                    elevation: 2,
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: Text(
-                    'Sign Out',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red.shade700,
-                    ),
-                  ),
-                ),
-              ),
+  Widget _buildSettingsCard(List<Widget> children) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: primaryColor.withOpacity(0.1),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-
-            const SizedBox(height: 16),
-
-            // Delete Account Button - Robust solution with proper width constraints
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () => _showDeleteAccountDialog(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.red.shade700,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                          color: Colors.red.shade300,
-                          width: 2),
-                    ),
-                    elevation: 2,
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: Text(
-                    'Delete Account',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red.shade700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 40),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: textPrimary,
-      ),
-    );
-  }
-
-  Widget _buildSettingsCard(List<Widget> children) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: primaryColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(children: children),
-    );
-  }
+        child: Column(children: children),
+      );
 
   Widget _buildSettingsItem({
     required IconData icon,
@@ -311,72 +308,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String subtitle,
     required VoidCallback onTap,
     Color? iconColor,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: (iconColor ?? primaryColor).withOpacity(0.1),
-                  shape: BoxShape.circle,
+  }) =>
+      Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: (iconColor ?? primaryColor).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: iconColor ?? primaryColor,
+                    size: 20,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor ?? primaryColor,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          color: textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: textSecondary,
                   size: 20,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: textSecondary,
-                size: 20,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
-  Widget _buildDivider() {
-    return Divider(
-      height: 1,
-      color: Colors.grey.shade200,
-      indent: 72,
-    );
-  }
+  Widget _buildDivider() => Divider(
+        height: 1,
+        color: Colors.grey.shade200,
+        indent: 72,
+      );
 
   void _showSignOutDialog() {
     showDialog(
@@ -404,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(width: 16),
             Text(
               'Sign Out',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
@@ -414,7 +408,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         content: Text(
           'Are you sure you want to sign out of your account?',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             color: textSecondary,
             height: 1.4,
@@ -436,7 +430,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: textSecondary,
@@ -448,7 +442,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 8),
             child: ElevatedButton(
-              onPressed: () => _performSignOut(),
+              onPressed: _performSignOut,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
                 foregroundColor: Colors.white,
@@ -457,13 +451,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 elevation: 2,
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 12), // Proper padding
+                  horizontal: 20,
+                  vertical: 12,
+                ), // Proper padding
                 minimumSize:
                     const Size(100, 44), // Minimum size to prevent cramping
               ),
               child: Text(
                 'Sign Out',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14, // Slightly smaller to fit better
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -487,7 +483,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: Text(
           'Delete Account',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.red.shade700,
@@ -500,7 +496,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Warning text with high contrast against cardColor
             Text(
               'This action cannot be undone. Deleting your account will:',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color:
@@ -514,14 +510,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               decoration: BoxDecoration(
                 color: Colors.red.shade50, // Light red background for emphasis
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200, width: 1),
+                border: Border.all(color: Colors.red.shade200),
               ),
               child: Text(
                 '• Remove all your photos and profile information\n'
                 '• Delete all your matches and conversations\n'
                 '• Cancel any active subscriptions\n'
                 '• Make your profile invisible to other users',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: Colors.red.shade800, // High contrast red for warnings
@@ -547,7 +543,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: textSecondary,
@@ -559,7 +555,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 8),
             child: ElevatedButton(
-              onPressed: () => _showDeleteConfirmation(),
+              onPressed: _showDeleteConfirmation,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
                 foregroundColor: Colors.white,
@@ -573,7 +569,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Delete',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -598,7 +594,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: Text(
           'Final Confirmation',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.red.shade700,
@@ -606,7 +602,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         content: Text(
           'Type "DELETE" to confirm account deletion:',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             color: textSecondary,
           ),
@@ -627,7 +623,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: textSecondary,
@@ -661,7 +657,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: Text(
                 'Confirm Delete',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 13, // Smaller to fit the longer text
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -701,14 +697,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(
+                const CircularProgressIndicator(
                   color: primaryColor, // MVP green
                   strokeWidth: 3,
                 ),
                 const SizedBox(height: 20),
                 Text(
                   'Signing out...',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: textPrimary,
@@ -720,16 +716,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       );
 
+      // Cancel subscriptions and clear user data BEFORE sign out
+      try {
+        final userBloc = context.read<UserBloc>();
+        userBloc.add(const UserDataUpdated(null));
+        userBloc.add(const UserListenStopped());
+      } catch (e) {
+        log('Error clearing user provider: $e');
+      }
+
       // Sign out from Firebase
       await _auth.signOut();
+
+      // Small delay to ensure subscriptions are fully canceled
+      await Future.delayed(const Duration(milliseconds: 100));
 
       // Close loading dialog
       if (mounted) Navigator.pop(context);
 
-      // Navigate to login screen
+      // Navigate to welcome screen to show all sign-in options (phone, Google, Apple)
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
-          '/login',
+          RouteName.welcomeScreen,
           (route) => false,
         );
       }
@@ -742,7 +750,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(
           content: Text(
             'Failed to sign out. Please try again.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
@@ -779,8 +787,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           borderRadius: BorderRadius.circular(16),
         ),
         title: Text(
-          'About NaijaSingles',
-          style: GoogleFonts.poppins(
+          'About Afropeep',
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: textPrimary,
@@ -792,7 +800,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Version 1.0.0',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: primaryColor,
@@ -800,8 +808,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'NaijaSingles is a dating app designed to connect Nigerian singles worldwide. Find meaningful connections, chat with matches, and discover love.',
-              style: GoogleFonts.poppins(
+              'Afropeep is a dating app designed to connect Nigerian singles worldwide. Find meaningful connections, chat with matches, and discover love.',
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
                 height: 1.5,
@@ -809,8 +817,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              '© 2024 NaijaSingles. All rights reserved.',
-              style: GoogleFonts.poppins(
+              '© 2024 Afropeep. All rights reserved.',
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: textSecondary,
               ),
@@ -822,7 +830,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Close',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: primaryColor,
@@ -833,5 +841,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
 }

@@ -1,21 +1,21 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:naijasingles/common/providers/user_provider.dart';
-import 'package:naijasingles/features/explore/screens/tribe_connect_screen.dart';
-import 'package:naijasingles/features/explore/widgets/modern_profile_card.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/common/data/repo/user_search_repo.dart';
-import 'package:naijasingles/common/constants/app_colors.dart';
+
+import '../../common/bloc/user/user_bloc.dart';
+import '../../common/constants/app_colors.dart';
+import '../../common/data/repo/user_search_repo.dart';
+import '../../models/user_model.dart';
+import 'screens/tribe_connect_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
-  final bool showBackButton;
-
   const ExploreScreen({
-    Key? key,
+    super.key,
     this.showBackButton = false,
-  }) : super(key: key);
+  });
+  final bool showBackButton;
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
@@ -42,9 +42,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Future<void> _loadCurrentUser() async {
     try {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final user = userProvider.currentUser;
-      
+      final user = context.read<UserBloc>().currentUser;
+
       if (user != null) {
         if (mounted && !_disposed) {
           setState(() {
@@ -83,7 +82,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       }
 
       final users = await UserSearchRepo.getUserList(_currentUser!);
-      
+
       if (mounted && !_disposed) {
         setState(() {
           _users = users;
@@ -110,7 +109,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(
+              const CircularProgressIndicator(
                 color: AppColors.primaryGreen,
               ),
               const SizedBox(height: 16),
@@ -157,7 +156,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                 ),
-                child: Text('Retry'),
+                child: const Text('Retry'),
               ),
             ],
           ),

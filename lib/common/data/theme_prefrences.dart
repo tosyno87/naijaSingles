@@ -6,15 +6,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemePreferences {
   static const themekey = 'pref_key';
 
-  setTheme(ThemeMode value) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  Future<void> setTheme(ThemeMode value) async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
     sharedPreferences.setString(themekey, value.name);
   }
 
-  getTheme() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  Future<ThemeMode> getTheme() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
     final savedTheme = sharedPreferences.getString(themekey);
-    log("savedtheme $savedTheme");
+    log('savedtheme $savedTheme');
     if (savedTheme != null) {
       switch (savedTheme) {
         case 'dark':

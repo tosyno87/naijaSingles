@@ -3,51 +3,48 @@ import 'package:google_fonts/google_fonts.dart';
 import '../screens/enhanced_photo_upload_screen.dart';
 
 class PhotoTypeIndicator extends StatelessWidget {
+  const PhotoTypeIndicator({
+    required this.type,
+    super.key,
+  });
   final PhotoType type;
 
-  const PhotoTypeIndicator({
-    super.key,
-    required this.type,
-  });
-
   // Theme colors
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color textDarkBrown = Color(0xFF3A1D0F);
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: _getTypeColor().withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            _getTypeIcon(),
-            size: 12,
-            color: Colors.white,
-          ),
-          SizedBox(width: 3),
-          Text(
-            _getTypeLabel(),
-            style: GoogleFonts.poppins(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: _getTypeColor().withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _getTypeIcon(),
+              size: 12,
               color: Colors.white,
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(width: 3),
+            Text(
+              _getTypeLabel(),
+              style: GoogleFonts.montserrat(
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Color _getTypeColor() {
     switch (type) {
       case PhotoType.closeUp:
-        return Color(0xFFFFD700); // Gold
+        return const Color(0xFFFFD700); // Gold
       case PhotoType.fullBody:
         return Colors.blue;
       case PhotoType.activity:
@@ -77,15 +74,15 @@ class PhotoTypeIndicator extends StatelessWidget {
   String _getTypeLabel() {
     switch (type) {
       case PhotoType.closeUp:
-        return "Face";
+        return 'Face';
       case PhotoType.fullBody:
-        return "Body";
+        return 'Body';
       case PhotoType.activity:
-        return "Activity";
+        return 'Activity';
       case PhotoType.social:
-        return "Social";
+        return 'Social';
       case PhotoType.lifestyle:
-        return "Life";
+        return 'Life';
     }
   }
 }

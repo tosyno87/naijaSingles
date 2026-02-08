@@ -1,15 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
-import 'package:naijasingles/models/user_model.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 
-import 'package:naijasingles/features/home/ui/tab/tabbar.dart';
-import 'package:naijasingles/features/payment/ui/products.dart';
-import 'package:naijasingles/common/constants/constants.dart';
+import '../../../features/home/ui/tab/tabbar.dart';
+import '../../../features/payment/ui/products.dart';
+import '../../../models/user_model.dart';
+import '../../constants/constants.dart';
 
 abstract class InAppPurchaseRepo {
   Future<List<ProductDetails>> getProductsDetailsById();
@@ -29,14 +29,14 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
         throw 'Not available';
       }
 
-      Set<String> kIds = Set.from(await _fetchPackageIds());
+      final Set<String> kIds = Set.from(await _fetchPackageIds());
       final ProductDetailsResponse response =
           await InAppPurchase.instance.queryProductDetails(kIds);
       if (response.notFoundIDs.isNotEmpty) {
-        log("Not found");
+        log('Not found');
         throw 'No product found';
       }
-      List<ProductDetails> products = response.productDetails;
+      final List<ProductDetails> products = response.productDetails;
       return products;
     } catch (e) {
       rethrow;
@@ -48,14 +48,14 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
     final PurchaseParam purchaseParam =
         PurchaseParam(productDetails: productDetails);
     await inApp.buyNonConsumable(purchaseParam: purchaseParam);
-    log("=============-----------isPurchaseSuccessfully");
+    log('=============-----------isPurchaseSuccessfully');
   }
 
   Future<List<String>> _fetchPackageIds() async {
-    List<String> packageId = [];
+    final List<String> packageId = [];
 
     await firebaseFireStoreInstance
-        .collection("Packages")
+        .collection('Packages')
         .where('status', isEqualTo: true)
         .get()
         .then((value) {
@@ -83,17 +83,23 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
 
   /// check if user has pruchased
   static PurchaseDetails hasPurchased(
-      String productId, List<PurchaseDetails> purchases) {
-    return purchases.firstWhere(
-      (purchase) => purchase.productID == productId,
-      //orElse: () => null
-    );
-  }
+    String productId,
+    List<PurchaseDetails> purchases,
+  ) =>
+      purchases.firstWhere(
+        (purchase) => purchase.productID == productId,
+        //orElse: () => null
+      );
 
   ///verifying opurhcase of user
-  static Future<void> verifyPuchase(String id, List<PurchaseDetails> purchases,
-      UserModel currentUser, Map items, BuildContext context) async {
-    PurchaseDetails purchase = hasPurchased(id, purchases);
+  static Future<void> verifyPuchase(
+    String id,
+    List<PurchaseDetails> purchases,
+    UserModel currentUser,
+    Map items,
+    BuildContext context,
+  ) async {
+    final PurchaseDetails purchase = hasPurchased(id, purchases);
     if (purchase.status == PurchaseStatus.purchased ||
         purchase.status == PurchaseStatus.restored) {
       log('===***${purchase.productID}');
@@ -104,19 +110,20 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
-          CupertinoPageRoute(builder: (context) {
-            return Tabbar(
+          CupertinoPageRoute(
+            builder: (context) => Tabbar(
               isPaymentSuccess: true,
               currentUserId: purchase.productID,
-            );
-          }),
+            ),
+          ),
         );
       }
     } else if (purchase.status == PurchaseStatus.error) {
       Navigator.pushReplacement(
         context,
         CupertinoPageRoute(
-            builder: (context) => Products(currentUser, false, items)),
+          builder: (context) => Products(currentUser, false, items),
+        ),
       );
     }
     return;
@@ -124,27 +131,27 @@ class InAppPurchaseRepoImpl extends InAppPurchaseRepo {
 
   String getInterval(ProductDetails product) {
     product as AppStoreProductDetails;
-    SKSubscriptionPeriodUnit periodUnit =
+    final SKSubscriptionPeriodUnit periodUnit =
         product.skProduct.subscriptionPeriod!.unit;
     if (SKSubscriptionPeriodUnit.month == periodUnit) {
-      return "Month(s)";
+      return 'Month(s)';
     } else if (SKSubscriptionPeriodUnit.week == periodUnit) {
-      return "Week(s)";
+      return 'Week(s)';
     } else {
-      return "Year";
+      return 'Year';
     }
   }
 
   String getIntervalAndroid(ProductDetails product) {
     product as GooglePlayProductDetails;
-    String? durCode = product.productDetails.subscriptionOfferDetails?.first
-        .pricingPhases.first.billingPeriod;
-    if (durCode == "M" || durCode == "m") {
-      return "Month(s)";
-    } else if (durCode == "Y" || durCode == "y") {
-      return "Year";
+    final String? durCode = product.productDetails.subscriptionOfferDetails
+        ?.first.pricingPhases.first.billingPeriod;
+    if (durCode == 'M' || durCode == 'm') {
+      return 'Month(s)';
+    } else if (durCode == 'Y' || durCode == 'y') {
+      return 'Year';
     } else {
-      return "Week(s)";
+      return 'Week(s)';
     }
   }
 }

@@ -2,10 +2,11 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/data/repo/user_repo.dart';
-import 'package:naijasingles/features/user/bloc/update_user_state.dart';
-import 'package:naijasingles/features/user/bloc/user_event.dart';
-import 'package:naijasingles/services/firestore_database.dart';
+
+import '../../../common/data/repo/user_repo.dart';
+import '../../../services/firestore_database.dart';
+import 'update_user_state.dart';
+import 'user_event.dart';
 
 class UserBloc extends Bloc<UserEvents, UserStates> {
   UserBloc() : super(UpdateUserInitial()) {
@@ -24,13 +25,14 @@ class UserBloc extends Bloc<UserEvents, UserStates> {
     on<UpdateUserProfilePictures>((event, emit) async {
       emit(UpdatingUser());
       try {
-        log("file is in bloc ${event.photo}");
-        var task = await FireStoreClass.uploadFile(
-            currentUser: event.currentUser,
-            checktype: event.checktype,
-            file: event.photo);
+        log('file is in bloc ${event.photo}');
+        final task = await FireStoreClass.uploadFile(
+          currentUser: event.currentUser,
+          checktype: event.checktype,
+          file: event.photo,
+        );
         final imageUrl = await task?.snapshot.ref.getDownloadURL();
-        log("from bloc $imageUrl");
+        log('from bloc $imageUrl');
 
         emit(UserProfilePictureUploaded(url: imageUrl));
       } on SocketException {

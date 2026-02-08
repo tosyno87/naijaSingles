@@ -16,7 +16,7 @@ void main() {
       'UserName': 'Test',
       'isBlocked': false,
       'location': {'address': '', 'latitude': 0, 'longitude': 0},
-      'Pictures': []
+      'Pictures': [],
     });
 
     final user = await UserMessagingRepo.getChatUserDetails(userId: '1');

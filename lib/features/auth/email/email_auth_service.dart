@@ -61,15 +61,18 @@ class EmailAuthService {
     required String name,
   }) async {
     try {
-      await _firestore.collection('users').doc(userId).set({
-        'userId': userId,
-        'email': email,
-        'name': name,
-        'createdAt': FieldValue.serverTimestamp(),
-        'isBlocked': false,
-        'isPremium': false,
-        'Pictures': [],
-      }, SetOptions(merge: true));
+      await _firestore.collection('users').doc(userId).set(
+        {
+          'userId': userId,
+          'email': email,
+          'name': name,
+          'createdAt': FieldValue.serverTimestamp(),
+          'isBlocked': false,
+          'isPremium': false,
+          'Pictures': [],
+        },
+        SetOptions(merge: true),
+      );
     } catch (e) {
       debugPrint('Error creating user document: $e');
       rethrow;

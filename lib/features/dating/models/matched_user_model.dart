@@ -3,35 +3,17 @@ import '../../../models/user_model.dart';
 
 /// Model representing a potential match for dating/friendship/networking
 class MatchedUser {
-  final String id;
-  final String name;
-  final int age;
-  final String location;
-  final String profileImage;
-  final String? tribe;
-  final String? profession;
-  final List<String> personality;
-  final String bio;
-  final List<String> interests;
-  final String? religion;
-  final String? education;
-  final String? lookingFor;
-  final DateTime? lastSeen;
-  final double? latitude;
-  final double? longitude;
-  final bool? isOnline;
-
   MatchedUser({
     required this.id,
     required this.name,
     required this.age,
     required this.location,
     required this.profileImage,
-    this.tribe,
-    this.profession,
     required this.personality,
     required this.bio,
     required this.interests,
+    this.tribe,
+    this.profession,
     this.religion,
     this.education,
     this.lookingFor,
@@ -50,7 +32,7 @@ class MatchedUser {
       name: data['name'] ?? 'Unknown',
       age: data['age'] ?? 0,
       location: data['living_in'] ?? data['location'] ?? 'Unknown',
-      profileImage: (data['imageUrl'] as List?)?.isNotEmpty == true
+      profileImage: (data['imageUrl'] as List?)?.isNotEmpty ?? false
           ? data['imageUrl'][0]
           : 'assets/images/placeholder_profile.jpg',
       tribe: data['tribe'],
@@ -69,51 +51,64 @@ class MatchedUser {
   }
 
   /// Create MatchedUser from UserModel
-  factory MatchedUser.fromUserModel(UserModel user) {
-    return MatchedUser(
-      id: user.id ?? '',
-      name: user.name ?? 'Unknown',
-      age: user.age ?? 0,
-      location: user.living_in ?? 'Unknown',
-      profileImage: (user.imageUrl?.isNotEmpty == true)
-          ? user.imageUrl![0]
-          : 'assets/images/placeholder_profile.jpg',
-      tribe: user.tribe,
-      profession: user.profession ?? user.job_title,
-      personality: [], // Would need to be added to UserModel
-      bio: user.bio ?? '',
-      interests: [], // Would need to be added to UserModel
-      religion: user.religion,
-      education: user.education,
-      lookingFor: user.lookingFor,
-      lastSeen: user.lastSeen,
-      latitude: user.latitude,
-      longitude: user.longitude,
-      isOnline: false, // Would need to be calculated
-    );
-  }
+  factory MatchedUser.fromUserModel(UserModel user) => MatchedUser(
+        id: user.id ?? '',
+        name: user.name ?? 'Unknown',
+        age: user.age ?? 0,
+        location: user.living_in ?? 'Unknown',
+        profileImage: (user.imageUrl?.isNotEmpty ?? false)
+            ? user.imageUrl![0]
+            : 'assets/images/placeholder_profile.jpg',
+        tribe: user.tribe,
+        profession: user.profession ?? user.job_title,
+        personality: [], // Would need to be added to UserModel
+        bio: user.bio ?? '',
+        interests: [], // Would need to be added to UserModel
+        religion: user.religion,
+        education: user.education,
+        lookingFor: user.lookingFor,
+        lastSeen: user.lastSeen,
+        latitude: user.latitude,
+        longitude: user.longitude,
+        isOnline: false, // Would need to be calculated
+      );
+  final String id;
+  final String name;
+  final int age;
+  final String location;
+  final String profileImage;
+  final String? tribe;
+  final String? profession;
+  final List<String> personality;
+  final String bio;
+  final List<String> interests;
+  final String? religion;
+  final String? education;
+  final String? lookingFor;
+  final DateTime? lastSeen;
+  final double? latitude;
+  final double? longitude;
+  final bool? isOnline;
 
   /// Convert to Map for Firestore
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'age': age,
-      'living_in': location,
-      'imageUrl': [profileImage],
-      'tribe': tribe,
-      'profession': profession,
-      'personality': personality,
-      'bio': bio,
-      'interests': interests,
-      'religion': religion,
-      'education': education,
-      'lookingFor': lookingFor,
-      'lastSeen': lastSeen != null ? Timestamp.fromDate(lastSeen!) : null,
-      'latitude': latitude,
-      'longitude': longitude,
-      'isOnline': isOnline,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'name': name,
+        'age': age,
+        'living_in': location,
+        'imageUrl': [profileImage],
+        'tribe': tribe,
+        'profession': profession,
+        'personality': personality,
+        'bio': bio,
+        'interests': interests,
+        'religion': religion,
+        'education': education,
+        'lookingFor': lookingFor,
+        'lastSeen': lastSeen != null ? Timestamp.fromDate(lastSeen!) : null,
+        'latitude': latitude,
+        'longitude': longitude,
+        'isOnline': isOnline,
+      };
 
   /// Create a copy with updated fields
   MatchedUser copyWith({
@@ -134,32 +129,30 @@ class MatchedUser {
     double? latitude,
     double? longitude,
     bool? isOnline,
-  }) {
-    return MatchedUser(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      age: age ?? this.age,
-      location: location ?? this.location,
-      profileImage: profileImage ?? this.profileImage,
-      tribe: tribe ?? this.tribe,
-      profession: profession ?? this.profession,
-      personality: personality ?? this.personality,
-      bio: bio ?? this.bio,
-      interests: interests ?? this.interests,
-      religion: religion ?? this.religion,
-      education: education ?? this.education,
-      lookingFor: lookingFor ?? this.lookingFor,
-      lastSeen: lastSeen ?? this.lastSeen,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      isOnline: isOnline ?? this.isOnline,
-    );
-  }
+  }) =>
+      MatchedUser(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        age: age ?? this.age,
+        location: location ?? this.location,
+        profileImage: profileImage ?? this.profileImage,
+        tribe: tribe ?? this.tribe,
+        profession: profession ?? this.profession,
+        personality: personality ?? this.personality,
+        bio: bio ?? this.bio,
+        interests: interests ?? this.interests,
+        religion: religion ?? this.religion,
+        education: education ?? this.education,
+        lookingFor: lookingFor ?? this.lookingFor,
+        lastSeen: lastSeen ?? this.lastSeen,
+        latitude: latitude ?? this.latitude,
+        longitude: longitude ?? this.longitude,
+        isOnline: isOnline ?? this.isOnline,
+      );
 
   @override
-  String toString() {
-    return 'MatchedUser(id: $id, name: $name, age: $age, location: $location, tribe: $tribe, profession: $profession)';
-  }
+  String toString() =>
+      'MatchedUser(id: $id, name: $name, age: $age, location: $location, tribe: $tribe, profession: $profession)';
 
   @override
   bool operator ==(Object other) {
@@ -170,4 +163,3 @@ class MatchedUser {
   @override
   int get hashCode => id.hashCode;
 }
-

@@ -1,7 +1,5 @@
-
 /// Service for validating cultural data fields
 class CulturalDataValidationService {
-  
   /// Validate nationality field
   static ValidationResult validateNationality(String? nationality) {
     if (nationality == null || nationality.trim().isEmpty) {
@@ -115,7 +113,8 @@ class CulturalDataValidationService {
     }
 
     // Check for duplicates
-    final uniqueLanguages = languages.map((e) => e.trim().toLowerCase()).toSet();
+    final uniqueLanguages =
+        languages.map((e) => e.trim().toLowerCase()).toSet();
     if (uniqueLanguages.length != languages.length) {
       return ValidationResult(
         isValid: false,
@@ -139,7 +138,6 @@ class CulturalDataValidationService {
     if (religion == null || religion.trim().isEmpty) {
       return ValidationResult(
         isValid: true, // Religion is optional
-        errorMessage: null,
       );
     }
 
@@ -174,7 +172,6 @@ class CulturalDataValidationService {
     if (occupation == null || occupation.trim().isEmpty) {
       return ValidationResult(
         isValid: true, // Occupation is optional
-        errorMessage: null,
       );
     }
 
@@ -240,93 +237,88 @@ class CulturalDataValidationService {
     List<String>? languages,
     String? religion,
     String? occupation,
-  }) {
-    return {
-      'nationality': nationality?.trim() ?? '',
-      'tribe': tribe?.trim() ?? '',
-      'languages': languages?.map((e) => e.trim()).where((e) => e.isNotEmpty).toList() ?? [],
-      'religion': religion?.trim() ?? '',
-      'occupation': occupation?.trim() ?? '',
-    };
-  }
+  }) =>
+      {
+        'nationality': nationality?.trim() ?? '',
+        'tribe': tribe?.trim() ?? '',
+        'languages': languages
+                ?.map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList() ??
+            [],
+        'religion': religion?.trim() ?? '',
+        'occupation': occupation?.trim() ?? '',
+      };
 
   /// Get common Nigerian tribes for validation
-  static List<String> getCommonNigerianTribes() {
-    return [
-      'Yoruba',
-      'Igbo',
-      'Hausa',
-      'Fulani',
-      'Edo',
-      'Ijaw',
-      'Kanuri',
-      'Ibibio',
-      'Tiv',
-      'Efik',
-      'Nupe',
-      'Urhobo',
-      'Igala',
-      'Igbira',
-      'Edo',
-      'Etsako',
-      'Esan',
-      'Owan',
-      'Akoko-Edo',
-      'Other',
-    ];
-  }
+  static List<String> getCommonNigerianTribes() => [
+        'Yoruba',
+        'Igbo',
+        'Hausa',
+        'Fulani',
+        'Edo',
+        'Ijaw',
+        'Kanuri',
+        'Ibibio',
+        'Tiv',
+        'Efik',
+        'Nupe',
+        'Urhobo',
+        'Igala',
+        'Igbira',
+        'Edo',
+        'Etsako',
+        'Esan',
+        'Owan',
+        'Akoko-Edo',
+        'Other',
+      ];
 
   /// Get common languages for validation
-  static List<String> getCommonLanguages() {
-    return [
-      'English',
-      'Yoruba',
-      'Igbo',
-      'Hausa',
-      'French',
-      'Portuguese',
-      'Spanish',
-      'Arabic',
-      'Pidgin',
-      'Other',
-    ];
-  }
+  static List<String> getCommonLanguages() => [
+        'English',
+        'Yoruba',
+        'Igbo',
+        'Hausa',
+        'French',
+        'Portuguese',
+        'Spanish',
+        'Arabic',
+        'Pidgin',
+        'Other',
+      ];
 
   /// Get common religions for validation
-  static List<String> getCommonReligions() {
-    return [
-      'Christianity',
-      'Islam',
-      'Traditional',
-      'Atheist',
-      'Agnostic',
-      'Other',
-    ];
-  }
+  static List<String> getCommonReligions() => [
+        'Christianity',
+        'Islam',
+        'Traditional',
+        'Atheist',
+        'Agnostic',
+        'Other',
+      ];
 }
 
 /// Result of a single field validation
 class ValidationResult {
-  final bool isValid;
-  final String? errorMessage;
-
   ValidationResult({
     required this.isValid,
     this.errorMessage,
   });
+  final bool isValid;
+  final String? errorMessage;
 }
 
 /// Result of cultural fields validation
 class CulturalValidationResult {
-  final bool isValid;
-  final List<String> errors;
-  final Map<String, ValidationResult> fieldResults;
-
   CulturalValidationResult({
     required this.isValid,
     required this.errors,
     required this.fieldResults,
   });
+  final bool isValid;
+  final List<String> errors;
+  final Map<String, ValidationResult> fieldResults;
 
   /// Get error message for a specific field
   String? getFieldError(String fieldName) {

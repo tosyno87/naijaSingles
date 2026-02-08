@@ -28,7 +28,7 @@ class SimpleDebug {
         final data = doc.data();
         debugPrint('👤 User: ${doc.id} - ${data['name'] ?? 'No name'}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Database connection error: $e');
     }
   }
@@ -52,18 +52,20 @@ class SimpleDebug {
 
       await batch.commit();
       debugPrint('✅ Cleared ${checkedUsers.docs.length} checked users');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error clearing swipe history: $e');
     }
   }
 
   /// Test like functionality
   static Future<void> testLikeCreation(
-      String fromUserId, String toUserId) async {
+    String fromUserId,
+    String toUserId,
+  ) async {
     try {
       debugPrint('💝 Testing like creation: $fromUserId → $toUserId');
 
-      final likeDocId = '${fromUserId}_likes_${toUserId}';
+      final likeDocId = '${fromUserId}_likes_$toUserId';
 
       await _firestore.collection('likes').doc(likeDocId).set({
         'from': fromUserId,
@@ -72,7 +74,7 @@ class SimpleDebug {
       });
 
       debugPrint('✅ Like created successfully');
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error creating like: $e');
     }
   }
@@ -105,7 +107,7 @@ class SimpleDebug {
       for (final doc in blockedUsers.docs) {
         debugPrint('   - ${doc.id}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error checking excluded users: $e');
     }
   }

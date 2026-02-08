@@ -9,25 +9,24 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:naijasingles/common/widgets/custom_button.dart';
-import 'package:naijasingles/config/app_config.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
-import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-import 'package:naijasingles/common/constants/adds.dart';
-import 'package:naijasingles/common/constants/colors.dart';
-import 'package:naijasingles/common/constants/constants.dart';
-import 'package:naijasingles/common/data/repo/in_app_purchase_repo.dart';
-import 'package:naijasingles/common/providers/theme_provider.dart';
-import 'package:naijasingles/common/utils/crousle_slider.dart';
-import 'package:naijasingles/common/utils/privacy_page.dart';
-import 'package:naijasingles/common/widgets/custom_snackbar.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
-import 'package:naijasingles/models/user_model.dart';
+import '../../../common/constants/adds.dart';
+import '../../../common/constants/colors.dart';
+import '../../../common/constants/constants.dart';
+import '../../../common/data/repo/in_app_purchase_repo.dart';
+import '../../../common/bloc/theme/theme_bloc.dart';
+import '../../../common/utils/crousle_slider.dart';
+import '../../../common/utils/privacy_page.dart';
+import '../../../common/widgets/custom_button.dart';
+import '../../../common/widgets/custom_snackbar.dart';
+import '../../../common/widgets/hookup_circularbar.dart';
+import '../../../config/app_config.dart';
+import '../../../models/user_model.dart';
 import 'in_app_purchase/buy_products/buyproducts_bloc.dart';
 import 'in_app_purchase/buy_products/buyproducts_events.dart';
 import 'in_app_purchase/get_products/getproducts_bloc.dart';
@@ -35,11 +34,15 @@ import 'in_app_purchase/get_products/getproducts_events.dart';
 import 'in_app_purchase/get_products/getproducts_states.dart';
 
 class Products extends StatefulWidget {
+  const Products(
+    this.currentUser,
+    this.isPaymentSuccess,
+    this.items, {
+    super.key,
+  });
   final bool? isPaymentSuccess;
   final UserModel? currentUser;
   final Map items;
-  const Products(this.currentUser, this.isPaymentSuccess, this.items,
-      {super.key});
 
   @override
   ProductsState createState() => ProductsState();
@@ -74,17 +77,17 @@ class ProductsState extends State<Products> {
         await Alert(
           context: context,
           type: AlertType.error,
-          title: "Failed".tr().toString(),
-          desc: "Oops !! something went wrong. Try Again".tr().toString(),
+          title: 'Failed'.tr().toString(),
+          desc: 'Oops !! something went wrong. Try Again'.tr().toString(),
           buttons: [
             DialogButton(
               child: Text(
-                "Retry".tr().toString(),
+                'Retry'.tr().toString(),
                 style: const TextStyle(color: Colors.white, fontSize: 20),
               ),
               onPressed: () => Navigator.pop(context),
               width: 120,
-            )
+            ),
           ],
         ).show();
       });
@@ -97,14 +100,14 @@ class ProductsState extends State<Products> {
     super.dispose();
   }
 
-  void _initialize() async {
+  Future<void> _initialize() async {
     isAvailable = await _iap.isAvailable();
-    debugPrint("available is $isAvailable");
+    debugPrint('available is $isAvailable');
     if (isAvailable) {
       /// removing all the pending puchases.
       if (Platform.isIOS) {
-        var paymentWrapper = SKPaymentQueueWrapper();
-        var transactions = await paymentWrapper.transactions();
+        final paymentWrapper = SKPaymentQueueWrapper();
+        final transactions = await paymentWrapper.transactions();
         for (final transaction in transactions) {
           debugPrint(transaction.transactionState.toString());
           await paymentWrapper
@@ -121,9 +124,13 @@ class ProductsState extends State<Products> {
         });
 
         for (final purchase in purchases) {
-          await InAppPurchaseRepoImpl.verifyPuchase(purchase.productID,
-                  purchases, widget.currentUser!, widget.items, context)
-              .whenComplete(() async {
+          await InAppPurchaseRepoImpl.verifyPuchase(
+            purchase.productID,
+            purchases,
+            widget.currentUser!,
+            widget.items,
+            context,
+          ).whenComplete(() async {
             await firebaseFireStoreInstance
                 .collection('users')
                 .doc(widget.currentUser!.id)
@@ -140,9 +147,9 @@ class ProductsState extends State<Products> {
             SnackBar(
               content: error != null
                   ? Text('$error')
-                  : Text("Oops !! something went wrong. Try Again"
-                      .tr()
-                      .toString()),
+                  : Text(
+                      'Oops !! something went wrong. Try Again'.tr().toString(),
+                    ),
             ),
           );
         },
@@ -155,7 +162,7 @@ class ProductsState extends State<Products> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return BlocBuilder<GetInAppProductsBloc, GetInAppProductsStates>(
       builder: (context, state) {
         if (state is GetInAppProductsLoadingState) {
@@ -163,7 +170,7 @@ class ProductsState extends State<Products> {
         } else if (state is GetInAppProductsFailedState) {
           return Scaffold(
             body: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Center(
                 child: Text(state.msg ?? ''),
               ),
@@ -174,22 +181,23 @@ class ProductsState extends State<Products> {
             backgroundColor: Theme.of(context).primaryColor,
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: themeProvider.isDarkMode
+              backgroundColor: isDarkMode
                   ? const Color(0xff252020)
                   : Colors.white,
               centerTitle: true,
               title: Text(
-                "Get our premium plans".tr().toString(),
+                'Get our premium plans'.tr().toString(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: primaryColor,
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               automaticallyImplyLeading: false,
               actions: [
                 IconButton(
-                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                  color: isDarkMode ? Colors.white : Colors.black,
                   icon: const Icon(
                     Icons.cancel,
                     size: 25,
@@ -203,7 +211,6 @@ class ProductsState extends State<Products> {
             key: _scaffoldKey,
             body: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   Padding(
@@ -211,7 +218,8 @@ class ProductsState extends State<Products> {
                     child: Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -222,9 +230,11 @@ class ProductsState extends State<Products> {
                               color: Colors.blue,
                             ),
                             title: Text(
-                              "Unlimited swipe.".tr().toString(),
+                              'Unlimited swipe.'.tr().toString(),
                               style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w400),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                           ListTile(
@@ -234,229 +244,241 @@ class ProductsState extends State<Products> {
                               color: Colors.green,
                             ),
                             title: Text(
-                              "Search users around".tr().toString(),
+                              'Search users around'.tr().toString(),
                               style: const TextStyle(
-
-                                  // Color(0xFF1A1A1A),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400),
+                                // Color(0xFF1A1A1A),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ).tr(
-                                args: ["${widget.items['paid_radius'] ?? ''}"]),
+                              args: ["${widget.items['paid_radius'] ?? ''}"],
+                            ),
                           ),
                           CarouselSlider(
                             adds: adds,
                           ),
-                          _isLoading
-                              ? SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.width * .8,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                primaryColor)),
+                          if (_isLoading)
+                            SizedBox(
+                              height: MediaQuery.of(context).size.width * .8,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    primaryColor,
                                   ),
-                                )
-                              : state.result.isNotEmpty
-                                  ? Stack(
-                                      alignment: Alignment.bottomCenter,
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: Transform.rotate(
-                                            angle: -pi / 2,
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  .16,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .8,
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      width: 2,
-                                                      color: themeProvider
-                                                              .isDarkMode
-                                                          ? const Color(
-                                                              0x33FFFFFF)
-                                                          : primaryColor)),
-                                              child: Center(
-                                                child: (CupertinoPicker(
-                                                    squeeze: 1.4,
-                                                    selectionOverlay:
-                                                        const CupertinoPickerDefaultSelectionOverlay(
-                                                      background:
-                                                          Colors.transparent,
-                                                    ),
-                                                    looping: true,
-                                                    magnification: 1.08,
-                                                    offAxisFraction: -.2,
-                                                    scrollController:
-                                                        FixedExtentScrollController(
-                                                            initialItem: 0),
-                                                    itemExtent: 100,
-                                                    onSelectedItemChanged:
-                                                        (value) {
-                                                      selectedProduct =
-                                                          state.result[value];
-                                                      setState(() {});
-                                                    },
-                                                    children: state.result
-                                                        .map((product) {
-                                                      var iosP;
-                                                      product
-                                                          as GooglePlayProductDetails;
-                                                      if (Platform.isIOS) {
-                                                        iosP = product
-                                                            as AppStoreProductDetails;
-                                                      }
-                                                      return Transform.rotate(
-                                                        angle: pi / 2,
-                                                        child: Center(
-                                                          child: Column(
-                                                            children: [
-                                                              productList(
-                                                                context:
-                                                                    context,
-                                                                product:
+                                ),
+                              ),
+                            )
+                          else
+                            state.result.isNotEmpty
+                                ? Stack(
+                                    alignment: Alignment.bottomCenter,
+                                    children: [
+                                      Align(
+                                        child: Transform.rotate(
+                                          angle: -pi / 2,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                .16,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                .8,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                width: 2,
+                                                color: isDarkMode
+                                                    ? const Color(
+                                                        0x33FFFFFF,
+                                                      )
+                                                    : primaryColor,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: CupertinoPicker(
+                                                squeeze: 1.4,
+                                                selectionOverlay:
+                                                    const CupertinoPickerDefaultSelectionOverlay(
+                                                  background:
+                                                      Colors.transparent,
+                                                ),
+                                                looping: true,
+                                                magnification: 1.08,
+                                                offAxisFraction: -.2,
+                                                scrollController:
+                                                    FixedExtentScrollController(),
+                                                itemExtent: 100,
+                                                onSelectedItemChanged: (value) {
+                                                  selectedProduct =
+                                                      state.result[value];
+                                                  setState(() {});
+                                                },
+                                                children:
+                                                    state.result.map((product) {
+                                                  var iosP;
+                                                  product
+                                                      as GooglePlayProductDetails;
+                                                  if (Platform.isIOS) {
+                                                    iosP = product
+                                                        as AppStoreProductDetails;
+                                                  }
+                                                  return Transform.rotate(
+                                                    angle: pi / 2,
+                                                    child: Center(
+                                                      child: Column(
+                                                        children: [
+                                                          productList(
+                                                            context: context,
+                                                            product: product,
+                                                            interval: Platform
+                                                                    .isIOS
+                                                                ? InAppPurchaseRepoImpl()
+                                                                    .getInterval(
                                                                     product,
-                                                                interval: Platform
-                                                                        .isIOS
-                                                                    ? InAppPurchaseRepoImpl()
-                                                                        .getInterval(
-                                                                            product)
-                                                                    : InAppPurchaseRepoImpl()
-                                                                        .getIntervalAndroid(
-                                                                            product),
-                                                                intervalCount: Platform
-                                                                        .isIOS
-                                                                    ? iosP
-                                                                        .skProduct
-                                                                        .subscriptionPeriod!
-                                                                        .numberOfUnits
-                                                                        .toString()
-                                                                    : product
-                                                                        .productDetails
-                                                                        .subscriptionOfferDetails!
-                                                                        .first
-                                                                        .pricingPhases
-                                                                        .first
-                                                                        .billingPeriod
-                                                                        .split(
-                                                                            "")[1],
-                                                                price: product
-                                                                    .price,
-                                                                onTap: () {
-                                                                  null;
-                                                                },
-                                                              ),
-                                                            ],
+                                                                  )
+                                                                : InAppPurchaseRepoImpl()
+                                                                    .getIntervalAndroid(
+                                                                    product,
+                                                                  ),
+                                                            intervalCount: Platform
+                                                                    .isIOS
+                                                                ? iosP
+                                                                    .skProduct
+                                                                    .subscriptionPeriod!
+                                                                    .numberOfUnits
+                                                                    .toString()
+                                                                : product
+                                                                    .productDetails
+                                                                    .subscriptionOfferDetails!
+                                                                    .first
+                                                                    .pricingPhases
+                                                                    .first
+                                                                    .billingPeriod
+                                                                    .split(
+                                                                    '',
+                                                                  )[1],
+                                                            price:
+                                                                product.price,
+                                                            onTap: () {
+                                                              null;
+                                                            },
                                                           ),
-                                                        ),
-                                                      );
-                                                    }).toList())),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
                                               ),
                                             ),
                                           ),
                                         ),
-                                        selectedProduct != null
-                                            ? Center(
-                                                child: ListTile(
-                                                  title: Text(
-                                                    selectedProduct!.title,
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  subtitle: Text(
-                                                    selectedProduct!
-                                                        .description,
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  trailing: Text(
-                                                      "${state.result.indexOf(selectedProduct!) + 1}/${state.result.length}"),
-                                                ),
-                                              )
-                                            : Center(
-                                                child: ListTile(
-                                                  title: Text(
-                                                    state.result[0].title,
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  subtitle: Text(
-                                                    state.result[0].description,
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  trailing: Text(
-                                                      "1/${state.result.length}"),
-                                                ),
-                                              )
-                                      ],
-                                    )
-                                  : SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.width *
-                                              .8,
-                                      child: Center(
-                                        child: Text("No active product found!!"
-                                            .tr()
-                                            .toString()),
                                       ),
-                                    )
+                                      if (selectedProduct != null)
+                                        Center(
+                                          child: ListTile(
+                                            title: Text(
+                                              selectedProduct!.title,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            subtitle: Text(
+                                              selectedProduct!.description,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            trailing: Text(
+                                              '${state.result.indexOf(selectedProduct!) + 1}/${state.result.length}',
+                                            ),
+                                          ),
+                                        )
+                                      else
+                                        Center(
+                                          child: ListTile(
+                                            title: Text(
+                                              state.result[0].title,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            subtitle: Text(
+                                              state.result[0].description,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            trailing: Text(
+                                              '1/${state.result.length}',
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  )
+                                : SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.width * .8,
+                                    child: Center(
+                                      child: Text(
+                                        'No active product found!!'
+                                            .tr()
+                                            .toString(),
+                                      ),
+                                    ),
+                                  ),
                         ],
                       ),
                     ),
                   ),
                   Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: selectedProduct != null
-                          ? CustomButton(
-                              text: "CONTINUE".tr().toString(),
-                              onTap: () async {
-                                BlocProvider.of<BuyConsumableInAppProductsBloc>(
-                                        context)
-                                    .add(RequestBuyConsumableProducts(
-                                        productDetails: selectedProduct!));
-                              },
-                              color: AppColors.textPrimary,
-                              active: true)
-                          : Padding(
-                              padding: const EdgeInsets.only(bottom: 40),
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: InkWell(
-                                    onTap: () {
-                                      CustomSnackbar.showSnackBarSimple(
-                                          "You must choose a subscription to continue."
-                                              .tr()
-                                              .toString(),
-                                          context);
-                                    },
-                                    child: Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.secondaryColor
-                                              .withValues(
-                                                  alpha: (.7 * 255).toDouble()),
-                                          shape: BoxShape.rectangle,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                .065,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                .75,
-                                        child: Center(
-                                            child: Text(
-                                          "CONTINUE".tr().toString(),
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: AppColors.textPrimary,
-                                              fontWeight: FontWeight.bold),
-                                        )))),
+                    padding: const EdgeInsets.only(top: 15),
+                    child: selectedProduct != null
+                        ? CustomButton(
+                            text: 'CONTINUE'.tr().toString(),
+                            onTap: () async {
+                              BlocProvider.of<BuyConsumableInAppProductsBloc>(
+                                context,
+                              ).add(
+                                RequestBuyConsumableProducts(
+                                  productDetails: selectedProduct!,
+                                ),
+                              );
+                            },
+                            color: AppColors.textPrimary,
+                            active: true,
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.only(bottom: 40),
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: InkWell(
+                                onTap: () {
+                                  CustomSnackbar.showSnackBarSimple(
+                                    'You must choose a subscription to continue.'
+                                        .tr()
+                                        .toString(),
+                                    context,
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondaryColor.withValues(
+                                      alpha: (.7 * 255).toDouble(),
+                                    ),
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  height:
+                                      MediaQuery.of(context).size.height * .065,
+                                  width:
+                                      MediaQuery.of(context).size.width * .75,
+                                  child: Center(
+                                    child: Text(
+                                      'CONTINUE'.tr().toString(),
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: AppColors.textPrimary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            )),
+                            ),
+                          ),
+                  ),
                   // Platform.isIOS
                   //     ? InkWell(
                   //         child: Container(
@@ -500,40 +522,40 @@ class ProductsState extends State<Products> {
                   //     : Container(),
 
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                         GestureDetector(
-                            child: Text(
-                              "Privacy Policy".tr().toString(),
-                              style: const TextStyle(color: Colors.blue),
+                          child: Text(
+                            'Privacy Policy'.tr().toString(),
+                            style: const TextStyle(color: Colors.blue),
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PrivacyPolicyPage(
+                                url: privacyUrl,
+                                tittle: 'Privacy Policy',
+                              ),
                             ),
-                            onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PrivacyPolicyPage(
-                                      url: privacyUrl,
-                                      tittle: "Privacy Policy",
-                                    ),
-                                  ),
-                                )),
+                          ),
+                        ),
                         GestureDetector(
-                            child: Text(
-                              "Terms & Conditions".tr().toString(),
-                              style: const TextStyle(color: Colors.blue),
+                          child: Text(
+                            'Terms & Conditions'.tr().toString(),
+                            style: const TextStyle(color: Colors.blue),
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PrivacyPolicyPage(
+                                url: termConditionUrl,
+                                tittle: 'Terms & Conditions',
+                              ),
                             ),
-                            onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PrivacyPolicyPage(
-                                      url: termConditionUrl,
-                                      tittle: "Terms & Conditions",
-                                    ),
-                                  ),
-                                )),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -544,7 +566,7 @@ class ProductsState extends State<Products> {
         }
         return Scaffold(
           body: Center(
-            child: Text("No product Found".tr().toString()),
+            child: Text('No product Found'.tr().toString()),
           ),
         );
       },
@@ -559,7 +581,7 @@ class ProductsState extends State<Products> {
     required ProductDetails product,
     required String price,
   }) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return AnimatedContainer(
       curve: Curves.easeIn,
       height: 100, //setting up dimention if product get selected
@@ -569,48 +591,57 @@ class ProductsState extends State<Products> {
           : MediaQuery.of(context).size.width * .22,
       decoration: selectedProduct == product
           ? BoxDecoration(
-              shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
               color: Theme.of(context)
                   .primaryColor
                   .withValues(alpha: (0.5 * 255).toDouble()),
-              border: Border.all(width: 2, color: primaryColor))
+              border: Border.all(width: 2, color: primaryColor),
+            )
           : null,
       duration: const Duration(milliseconds: 500),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           SizedBox(height: MediaQuery.of(context).size.height * .02),
-          Text(intervalCount,
-              style: TextStyle(
-                  color: selectedProduct !=
-                          product //setting up color if product get selected
-                      ? themeProvider.isDarkMode
-                          ? Colors.white
-                          : Colors.black
-                      : primaryColor,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold)),
-          Text(interval,
-              style: TextStyle(
-                  color: selectedProduct !=
-                          product //setting up color if product get selected
-                      ? themeProvider.isDarkMode
-                          ? Colors.white
-                          : Colors.black
-                      : primaryColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
-          Text(price,
-              style: TextStyle(
-                  color: selectedProduct !=
-                          product //setting up product if product get selected
-                      ? themeProvider.isDarkMode
-                          ? Colors.white
-                          : Colors.black
-                      : primaryColor,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            intervalCount,
+            style: TextStyle(
+              color: selectedProduct !=
+                      product //setting up color if product get selected
+                  ? isDarkMode
+                      ? Colors.white
+                      : Colors.black
+                  : primaryColor,
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            interval,
+            style: TextStyle(
+              color: selectedProduct !=
+                      product //setting up color if product get selected
+                  ? isDarkMode
+                      ? Colors.white
+                      : Colors.black
+                  : primaryColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
+          Text(
+            price,
+            style: TextStyle(
+              color: selectedProduct !=
+                      product //setting up product if product get selected
+                  ? isDarkMode
+                      ? Colors.white
+                      : Colors.black
+                  : primaryColor,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
         //      )),
       ),

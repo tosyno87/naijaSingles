@@ -27,7 +27,7 @@ class ChatService {
 
       // Find the thread that contains the other user
       for (var doc in querySnapshot.docs) {
-        List<dynamic> userIds = doc['userIds'];
+        final List<dynamic> userIds = doc['userIds'];
         if (userIds.contains(otherUserId)) {
           return doc.id;
         }
@@ -43,7 +43,9 @@ class ChatService {
 
   // Create a new chat thread between two users
   Future<String?> createChatThread(
-      String otherUserId, String otherUserName) async {
+    String otherUserId,
+    String otherUserName,
+  ) async {
     try {
       if (currentUserId == null) return null;
 
@@ -63,7 +65,8 @@ class ChatService {
       final isMatched = await areUsersMatched(currentUserId!, otherUserId);
       if (!isMatched) {
         throw Exception(
-            'You can only chat with users you\'ve matched with. Keep swiping to find more matches!');
+          'You can only chat with users you\'ve matched with. Keep swiping to find more matches!',
+        );
       }
 
       // Create a new thread document
@@ -76,7 +79,7 @@ class ChatService {
         final currentUserDoc =
             await _firestore.collection('users').doc(currentUserId).get();
         if (currentUserDoc.exists) {
-          final data = currentUserDoc.data() as Map<String, dynamic>?;
+          final data = currentUserDoc.data();
           if (data != null && data.containsKey('name')) {
             currentUserName = data['name'] as String? ?? 'User';
           }
@@ -92,25 +95,27 @@ class ChatService {
         'userIds': [currentUserId, otherUserId],
         'userNames': {
           currentUserId: currentUserName,
-          otherUserId: otherUserName
+          otherUserId: otherUserName,
         },
         'lastMessage': null,
-        'lastMessageText': "Say hi to $otherUserName!",
+        'lastMessageText': 'Say hi to $otherUserName!',
         'lastMessageSenderId': null,
         'lastUpdated': FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
-        'unreadCount': {currentUserId: 0, otherUserId: 0}
+        'unreadCount': {currentUserId: 0, otherUserId: 0},
       });
 
       return threadId;
     } on FirebaseException catch (e) {
       debugPrint(
-          'Firebase error creating chat thread: ${e.code} - ${e.message}');
+        'Firebase error creating chat thread: ${e.code} - ${e.message}',
+      );
 
       // Handle specific security rule violations
       if (e.code == 'permission-denied') {
         throw Exception(
-            'Unable to start conversation. Please try again later.');
+          'Unable to start conversation. Please try again later.',
+        );
       }
 
       throw Exception('Failed to create chat: ${e.message}');
@@ -137,7 +142,8 @@ class ChatService {
 
       if (text.length > 1000) {
         throw Exception(
-            'Message is too long. Please keep messages under 1000 characters.');
+          'Message is too long. Please keep messages under 1000 characters.',
+        );
       }
 
       // Reference to the messages subcollection
@@ -168,7 +174,7 @@ class ChatService {
         'senderId': currentUserId,
         'text': text.trim(),
         'timestamp': FieldValue.serverTimestamp(),
-        'read': false
+        'read': false,
       };
 
       // Add the message
@@ -196,10 +202,11 @@ class ChatService {
 
       // Handle specific security rule violations
       if (e.code == 'permission-denied') {
-        if (e.message?.contains('text.size()') == true) {
+        if (e.message?.contains('text.size()') ?? false) {
           throw Exception(
-              'Message is too long. Please keep messages under 1000 characters.');
-        } else if (e.message?.contains('isUserBlocked') == true) {
+            'Message is too long. Please keep messages under 1000 characters.',
+          );
+        } else if (e.message?.contains('isUserBlocked') ?? false) {
           throw Exception('This conversation is no longer available.');
         } else {
           throw Exception('Unable to send message. Please try again.');
@@ -256,26 +263,25 @@ class ChatService {
   }
 
   // Stream of messages for a specific thread
-  Stream<List<Message>> getMessagesStream(String threadId) {
-    return _chatThreadsCollection
-        .doc(threadId)
-        .collection('messages')
-        .orderBy('timestamp', descending: false)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Message(
-          id: doc.id,
-          senderId: data['senderId'] ?? '',
-          text: data['text'] ?? '',
-          timestamp:
-              (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-          isRead: data['read'] ?? false,
-        );
-      }).toList();
-    });
-  }
+  Stream<List<Message>> getMessagesStream(String threadId) =>
+      _chatThreadsCollection
+          .doc(threadId)
+          .collection('messages')
+          .orderBy('timestamp', descending: false)
+          .snapshots()
+          .map(
+            (snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              return Message(
+                id: doc.id,
+                senderId: data['senderId'] ?? '',
+                text: data['text'] ?? '',
+                timestamp: (data['timestamp'] as Timestamp?)?.toDate() ??
+                    DateTime.now(),
+                isRead: data['read'] ?? false,
+              );
+            }).toList(),
+          );
 
   // Stream of all chat threads for current user with enhanced error handling
   Stream<List<MessageThreadInfo>> getChatThreadsStream() {
@@ -323,7 +329,6 @@ class ChatService {
                   timestamp: (data['lastUpdated'] as Timestamp?)?.toDate() ??
                       DateTime.now(),
                   unread: unread,
-                  avatarUrl: null, // Will be fetched separately in the UI
                 );
               } catch (e) {
                 debugPrint('Error processing individual thread: $e');
@@ -437,18 +442,22 @@ class ChatService {
 
       final threadData = threadDoc.data() as Map<String, dynamic>;
       final userIds = List<String>.from(threadData['userIds'] ?? []);
-      
+
       if (userIds.length != 2) {
-        debugPrint('❌ Invalid chat thread: Expected 2 users, got ${userIds.length}');
+        debugPrint(
+          '❌ Invalid chat thread: Expected 2 users, got ${userIds.length}',
+        );
         return false;
       }
-      
+
       // Verify current user is part of this chat
       if (!userIds.contains(currentUserId)) {
-        debugPrint('❌ Permission denied: User $currentUserId not part of chat $threadId');
+        debugPrint(
+          '❌ Permission denied: User $currentUserId not part of chat $threadId',
+        );
         return false;
       }
-      
+
       final otherUserId = userIds.firstWhere((id) => id != currentUserId);
       debugPrint('🗑️ Deleting chat between $currentUserId and $otherUserId');
 
@@ -462,7 +471,9 @@ class ChatService {
       // Unmatch users - remove from both users' matches collections
       await _unmatchUsers(currentUserId!, otherUserId);
 
-      debugPrint('✅ Chat deleted and users unmatched: $currentUserId <-> $otherUserId');
+      debugPrint(
+        '✅ Chat deleted and users unmatched: $currentUserId <-> $otherUserId',
+      );
       return true;
     } catch (e) {
       debugPrint('❌ Error deleting chat thread: $e');
@@ -473,7 +484,8 @@ class ChatService {
   // Helper method to delete all messages in a thread
   Future<void> _deleteAllMessagesInThread(String threadId) async {
     try {
-      final messagesRef = _chatThreadsCollection.doc(threadId).collection('messages');
+      final messagesRef =
+          _chatThreadsCollection.doc(threadId).collection('messages');
       final messagesSnapshot = await messagesRef.get();
 
       if (messagesSnapshot.docs.isEmpty) {
@@ -484,19 +496,22 @@ class ChatService {
       // Delete messages in batches to avoid hitting Firestore limits
       const batchSize = 500;
       final docs = messagesSnapshot.docs;
-      
+
       for (int i = 0; i < docs.length; i += batchSize) {
         final batch = _firestore.batch();
-        final endIndex = (i + batchSize < docs.length) ? i + batchSize : docs.length;
-        
+        final endIndex =
+            (i + batchSize < docs.length) ? i + batchSize : docs.length;
+
         for (int j = i; j < endIndex; j++) {
           batch.delete(docs[j].reference);
         }
-        
+
         await batch.commit();
-        debugPrint('🗑️ Deleted ${endIndex - i} messages from thread $threadId');
+        debugPrint(
+          '🗑️ Deleted ${endIndex - i} messages from thread $threadId',
+        );
       }
-      
+
       debugPrint('✅ All messages deleted from thread $threadId');
     } catch (e) {
       debugPrint('❌ Error deleting messages: $e');
@@ -523,7 +538,10 @@ class ChatService {
   }
 
   // Remove from new matches collection
-  Future<void> _removeFromMatchesCollection(String userId1, String userId2) async {
+  Future<void> _removeFromMatchesCollection(
+    String userId1,
+    String userId2,
+  ) async {
     try {
       final matchesQuery = await _firestore
           .collection('matches')
@@ -543,7 +561,10 @@ class ChatService {
   }
 
   // Remove from legacy Matches collection
-  Future<void> _removeFromLegacyMatchesCollection(String userId1, String userId2) async {
+  Future<void> _removeFromLegacyMatchesCollection(
+    String userId1,
+    String userId2,
+  ) async {
     try {
       final legacyMatchesQuery = await _firestore
           .collection('Matches')
@@ -563,7 +584,10 @@ class ChatService {
   }
 
   // Remove from user subcollections
-  Future<void> _removeFromUserSubcollections(String userId1, String userId2) async {
+  Future<void> _removeFromUserSubcollections(
+    String userId1,
+    String userId2,
+  ) async {
     try {
       // Remove from user1's matches subcollection
       try {
@@ -575,9 +599,11 @@ class ChatService {
             .delete();
         debugPrint('🗑️ Removed $userId2 from $userId1 matches subcollection');
       } catch (e) {
-        debugPrint('⚠️ Could not remove from $userId1 matches subcollection: $e');
+        debugPrint(
+          '⚠️ Could not remove from $userId1 matches subcollection: $e',
+        );
       }
-      
+
       // Remove from user2's matches subcollection
       try {
         await _firestore
@@ -588,7 +614,9 @@ class ChatService {
             .delete();
         debugPrint('🗑️ Removed $userId1 from $userId2 matches subcollection');
       } catch (e) {
-        debugPrint('⚠️ Could not remove from $userId2 matches subcollection: $e');
+        debugPrint(
+          '⚠️ Could not remove from $userId2 matches subcollection: $e',
+        );
       }
     } catch (e) {
       debugPrint('❌ Error removing from user subcollections: $e');
@@ -610,7 +638,7 @@ class ChatService {
       } catch (e) {
         debugPrint('⚠️ Could not remove like $userId2 -> $userId1: $e');
       }
-      
+
       // Remove user1 from user2's LikedBy collection
       try {
         await _firestore

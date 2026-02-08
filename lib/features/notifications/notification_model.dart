@@ -3,14 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Model class for app notifications
 class AppNotification {
-  final String id;
-  final String title;
-  final String message;
-  final DateTime timestamp;
-  final String? avatarUrl; // optional
-  final String type; // 'like', 'match', 'message', 'invite', etc.
-  final bool isRead;
-  final String? actionId; // ID for the related item (profile, message, etc.)
+  // ID for the related item (profile, message, etc.)
 
   AppNotification({
     required this.id,
@@ -37,19 +30,25 @@ class AppNotification {
       actionId: data['actionId'],
     );
   }
+  final String id;
+  final String title;
+  final String message;
+  final DateTime timestamp;
+  final String? avatarUrl; // optional
+  final String type; // 'like', 'match', 'message', 'invite', etc.
+  final bool isRead;
+  final String? actionId;
 
   /// Convert to Firestore document
-  Map<String, dynamic> toFirestore() {
-    return {
-      'title': title,
-      'message': message,
-      'timestamp': Timestamp.fromDate(timestamp),
-      'type': type,
-      'avatarUrl': avatarUrl,
-      'isRead': isRead,
-      'actionId': actionId,
-    };
-  }
+  Map<String, dynamic> toFirestore() => {
+        'title': title,
+        'message': message,
+        'timestamp': Timestamp.fromDate(timestamp),
+        'type': type,
+        'avatarUrl': avatarUrl,
+        'isRead': isRead,
+        'actionId': actionId,
+      };
 
   /// Returns the appropriate icon for the notification type
   IconData get typeIcon {
@@ -120,16 +119,103 @@ class AppNotification {
     String? type,
     bool? isRead,
     String? actionId,
-  }) {
-    return AppNotification(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      message: message ?? this.message,
-      timestamp: timestamp ?? this.timestamp,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      type: type ?? this.type,
-      isRead: isRead ?? this.isRead,
-      actionId: actionId ?? this.actionId,
+  }) =>
+      AppNotification(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        message: message ?? this.message,
+        timestamp: timestamp ?? this.timestamp,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
+        type: type ?? this.type,
+        isRead: isRead ?? this.isRead,
+        actionId: actionId ?? this.actionId,
+      );
+}
+
+/// Notification settings model
+class AppNotificationSettings {
+  AppNotificationSettings({
+    required this.matchNotifications,
+    required this.messageNotifications,
+    required this.likeNotifications,
+    required this.superLikeNotifications,
+    required this.soundEnabled,
+    required this.vibrationEnabled,
+    required this.quietHoursEnabled,
+    required this.quietHoursStart,
+    required this.quietHoursEnd,
+  });
+
+  factory AppNotificationSettings.defaultSettings() => AppNotificationSettings(
+        matchNotifications: true,
+        messageNotifications: true,
+        likeNotifications: true,
+        superLikeNotifications: true,
+        soundEnabled: true,
+        vibrationEnabled: true,
+        quietHoursEnabled: false,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00',
+      );
+
+  factory AppNotificationSettings.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return AppNotificationSettings(
+      matchNotifications: data['matchNotifications'] ?? true,
+      messageNotifications: data['messageNotifications'] ?? true,
+      likeNotifications: data['likeNotifications'] ?? true,
+      superLikeNotifications: data['superLikeNotifications'] ?? true,
+      soundEnabled: data['soundEnabled'] ?? true,
+      vibrationEnabled: data['vibrationEnabled'] ?? true,
+      quietHoursEnabled: data['quietHoursEnabled'] ?? false,
+      quietHoursStart: data['quietHoursStart'] ?? '22:00',
+      quietHoursEnd: data['quietHoursEnd'] ?? '08:00',
     );
   }
+
+  final bool matchNotifications;
+  final bool messageNotifications;
+  final bool likeNotifications;
+  final bool superLikeNotifications;
+  final bool soundEnabled;
+  final bool vibrationEnabled;
+  final bool quietHoursEnabled;
+  final String quietHoursStart;
+  final String quietHoursEnd;
+
+  Map<String, dynamic> toFirestore() => {
+        'matchNotifications': matchNotifications,
+        'messageNotifications': messageNotifications,
+        'likeNotifications': likeNotifications,
+        'superLikeNotifications': superLikeNotifications,
+        'soundEnabled': soundEnabled,
+        'vibrationEnabled': vibrationEnabled,
+        'quietHoursEnabled': quietHoursEnabled,
+        'quietHoursStart': quietHoursStart,
+        'quietHoursEnd': quietHoursEnd,
+      };
+
+  AppNotificationSettings copyWith({
+    bool? matchNotifications,
+    bool? messageNotifications,
+    bool? likeNotifications,
+    bool? superLikeNotifications,
+    bool? soundEnabled,
+    bool? vibrationEnabled,
+    bool? quietHoursEnabled,
+    String? quietHoursStart,
+    String? quietHoursEnd,
+  }) =>
+      AppNotificationSettings(
+        matchNotifications: matchNotifications ?? this.matchNotifications,
+        messageNotifications: messageNotifications ?? this.messageNotifications,
+        likeNotifications: likeNotifications ?? this.likeNotifications,
+        superLikeNotifications:
+            superLikeNotifications ?? this.superLikeNotifications,
+        soundEnabled: soundEnabled ?? this.soundEnabled,
+        vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+        quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
+        quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+        quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+      );
 }

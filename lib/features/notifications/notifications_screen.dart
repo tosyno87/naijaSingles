@@ -1,67 +1,68 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'data/services/notification_service.dart';
 import 'notification_model.dart';
-import 'notification_service.dart';
 
-class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({Key? key}) : super(key: key);
+class NotificationsScreen extends StatelessWidget {
+  const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  Widget build(BuildContext context) {
+    final notificationService = NotificationService();
+
+    return StreamBuilder<List<AppNotification>>(
+      stream: notificationService.notificationsStream,
+      builder: (context, snapshot) {
+        final isLoading = snapshot.connectionState == ConnectionState.waiting;
+        final notifications = snapshot.data ?? [];
+
+        return _NotificationsContent(
+          notifications: notifications,
+          isLoading: isLoading,
+          notificationService: notificationService,
+        );
+      },
+    );
+  }
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  final NotificationService _notificationService = NotificationService();
-  late List<AppNotification> _notifications;
-  bool _isLoading = true;
+class _NotificationsContent extends StatelessWidget {
+  const _NotificationsContent({
+    required this.notifications,
+    required this.isLoading,
+    required this.notificationService,
+  });
 
-  @override
-  void initState() {
-    super.initState();
-    _loadNotifications();
+  final List<AppNotification> notifications;
+  final bool isLoading;
+  final NotificationService notificationService;
+
+  Future<void> _markAsRead(String id) async {
+    await notificationService.markAsRead(id);
   }
 
-  void _loadNotifications() {
-    // In a real app, this would be an async call to a backend service
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        _notifications = _notificationService.getAllNotifications();
-        _isLoading = false;
-      });
-    });
+  Future<void> _deleteNotification(String id) async {
+    await notificationService.deleteNotification(id);
   }
 
-  void _markAsRead(String id) {
-    setState(() {
-      _notificationService.markAsRead(id);
-      _notifications = _notificationService.getAllNotifications();
-    });
+  Future<void> _markAllAsRead() async {
+    await notificationService.markAllAsRead();
   }
 
-  void _deleteNotification(String id) {
-    setState(() {
-      _notificationService.deleteNotification(id);
-      _notifications = _notificationService.getAllNotifications();
-    });
-  }
-
-  void _markAllAsRead() {
-    setState(() {
-      _notificationService.markAllAsRead();
-      _notifications = _notificationService.getAllNotifications();
-    });
-  }
-
-  void _handleNotificationTap(AppNotification notification) {
+  void _handleNotificationTap(
+    BuildContext context,
+    AppNotification notification,
+  ) {
     // Mark as read when tapped
-    _markAsRead(notification.id);
+    unawaited(_markAsRead(notification.id));
 
     // In a real app, navigate to the appropriate screen based on notification type
     switch (notification.type) {
       case 'match':
       case 'like':
-        // Navigate to profile
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Navigating to profile: ${notification.actionId}'),
@@ -70,7 +71,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
         break;
       case 'message':
-        // Navigate to chat
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Navigating to chat: ${notification.actionId}'),
@@ -79,7 +79,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
         break;
       case 'invite':
-        // Navigate to group or event
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Navigating to invitation: ${notification.actionId}'),
@@ -88,7 +87,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         );
         break;
       default:
-        // Default action
         break;
     }
   }
@@ -108,7 +106,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         elevation: 0,
         title: Text(
           'Notifications',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.brown.shade800,
@@ -119,12 +117,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          if (!_isLoading && _notifications.isNotEmpty)
+          if (!isLoading && notifications.isNotEmpty)
             TextButton(
-              onPressed: _markAllAsRead,
+              onPressed: () => unawaited(_markAllAsRead()),
               child: Text(
                 'Mark all read',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: deepGreen,
@@ -133,106 +131,103 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
         ],
       ),
-      body: _isLoading
+      body: isLoading
           ? _buildLoadingState()
-          : _notifications.isEmpty
+          : notifications.isEmpty
               ? _buildEmptyState()
-              : _buildNotificationsList(),
+              : _buildNotificationsList(context),
     );
   }
 
-  Widget _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            color: Color(0xFF008037),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Loading notifications...',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey[700],
+  Widget _buildLoadingState() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              color: Color(0xFF008037),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.notifications_off_outlined,
-            size: 80,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No notifications yet',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'We\'ll notify you when something happens',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationsList() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _notifications.length,
-      itemBuilder: (context, index) {
-        final notification = _notifications[index];
-        return Dismissible(
-          key: Key(notification.id),
-          background: Container(
-            color: Colors.red,
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
-            child: const Icon(
-              Icons.delete,
-              color: Colors.white,
-            ),
-          ),
-          direction: DismissDirection.endToStart,
-          onDismissed: (direction) {
-            _deleteNotification(notification.id);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Notification removed'),
-                duration: const Duration(seconds: 2),
+            const SizedBox(height: 16),
+            Text(
+              'Loading notifications...',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                color: Colors.grey[700],
               ),
-            );
-          },
-          child: _buildNotificationItem(notification),
-        );
-      },
-    );
-  }
+            ),
+          ],
+        ),
+      );
 
-  Widget _buildNotificationItem(AppNotification notification) {
+  Widget _buildEmptyState() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.notifications_off_outlined,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No notifications yet',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'We\'ll notify you when something happens',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildNotificationsList(BuildContext context) => ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: notifications.length,
+        itemBuilder: (context, index) {
+          final notification = notifications[index];
+          return Dismissible(
+            key: Key(notification.id),
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              child: const Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+            ),
+            direction: DismissDirection.endToStart,
+            onDismissed: (direction) {
+              unawaited(_deleteNotification(notification.id));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Notification removed'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            child: _buildNotificationItem(context, notification),
+          );
+        },
+      );
+
+  Widget _buildNotificationItem(
+    BuildContext context,
+    AppNotification notification,
+  ) {
     final bool isRead = notification.isRead;
 
     return InkWell(
-      onTap: () => _handleNotificationTap(notification),
+      onTap: () => _handleNotificationTap(context, notification),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
@@ -240,7 +235,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           border: Border(
             bottom: BorderSide(
               color: Colors.grey.withValues(alpha: 0.2),
-              width: 1,
             ),
           ),
         ),
@@ -251,7 +245,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             if (notification.avatarUrl != null)
               CircleAvatar(
                 radius: 24,
-                backgroundImage: AssetImage(notification.avatarUrl!),
+                backgroundImage: notification.avatarUrl!.startsWith('http')
+                    ? NetworkImage(notification.avatarUrl!)
+                    : AssetImage(notification.avatarUrl!) as ImageProvider,
                 backgroundColor: Colors.grey[300],
               )
             else
@@ -278,7 +274,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 children: [
                   Text(
                     notification.title,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: isRead ? FontWeight.w500 : FontWeight.bold,
                       color: Colors.black87,
@@ -287,7 +283,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 4),
                   Text(
                     notification.message,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: isRead ? Colors.grey[600] : Colors.black87,
                     ),
@@ -297,7 +293,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 6),
                   Text(
                     notification.getRelativeTime(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
                       color: Colors.grey[500],
                     ),

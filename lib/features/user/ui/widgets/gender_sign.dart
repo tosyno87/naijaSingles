@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class GenderSign extends StatelessWidget {
+  const GenderSign({required this.gender, required this.iconColor, super.key});
   final String gender;
   final Color iconColor;
-  const GenderSign({super.key, required this.gender, required this.iconColor});
   Widget _userGenderIcon({required String gender, required Color iconColor}) {
     if (gender == 'men') {
       return FaIcon(
@@ -38,7 +38,6 @@ class GenderSign extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return _userGenderIcon(gender: gender, iconColor: iconColor);
-  }
+  Widget build(BuildContext context) =>
+      _userGenderIcon(gender: gender, iconColor: iconColor);
 }

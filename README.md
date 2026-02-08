@@ -1,6 +1,8 @@
-# NaijaSingles
+# AfroPeep
 
-NaijaSingles is a Flutter-based mobile dating application created for singles in Nigeria. The app lets users discover matches, chat, and meet new people nearby. It integrates Firebase, location services, and in-app purchases to provide a complete social experience.
+> **AfroPeep** (formerly NaijaSingles) is a Flutter-based dating and social networking app designed for Africans in the diaspora. The app combines traditional dating features with community-focused events to create a culturally relevant platform.
+
+**For AI Agents**: See [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md) for comprehensive project context and [`docs/README.md`](docs/README.md) for documentation navigation.
 
 ## Setup
 
@@ -102,14 +104,34 @@ The repository was recently restructured into feature-focused modules using the 
 
 These changes form the minimum viable product (MVP) after our refactoring effort.
 
+## Documentation
+
+Comprehensive documentation is organized in the `docs/` directory:
+
+- **[Project Context](PROJECT_CONTEXT.md)** - Essential context for AI agents and developers
+- **[Documentation Index](docs/README.md)** - Complete documentation navigation
+- **[Deployment Guide](docs/deployment/DEPLOYMENT_GUIDE.md)** - Deployment procedures
+- **[Security Guide](docs/guides/SECURITY_AND_SETUP_GUIDE.md)** - Security and setup
+- **[Testing Guides](docs/testing/)** - Testing procedures and guides
+
+### Quick Links
+
+- **Architecture**: [`docs/architecture/`](docs/architecture/)
+- **Guides**: [`docs/guides/`](docs/guides/)
+- **Features**: [`docs/features/`](docs/features/)
+- **Deployment**: [`docs/deployment/`](docs/deployment/)
+- **Testing**: [`docs/testing/`](docs/testing/)
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
 
 1. Fork the repository and create a feature branch.
-2. Make your changes and ensure `flutter analyze` and `flutter test` run without issues.
-3. Commit your work with clear messages and open a pull request describing your changes.
-4. Your code will be reviewed before merging.
+2. Review [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md) and [`.cursorrules`](.cursorrules) for coding standards.
+3. Make your changes and ensure `flutter analyze` and `flutter test` run without issues.
+4. Update relevant documentation in `docs/`.
+5. Commit your work with clear messages and open a pull request describing your changes.
+6. Your code will be reviewed before merging.
 
 ## License
 

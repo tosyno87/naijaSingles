@@ -23,13 +23,13 @@ class RouteName {
   // ===== ONBOARDING ROUTES =====
   static const String genderScreen = '/gender';
   static const String sexualorientationScreen = '/sexual_details';
-  static const String showGenderScreen = "/showgender";
+  static const String showGenderScreen = '/showgender';
   static const String userNameScreen = '/user_name';
   static const String userDobScreen = '/user_dob';
   static const String nationalityScreen = '/nationality';
   static const String universityScreen = '/user_university';
   static const String allowLocationScreen = '/allow_userLocation';
-  static const String searchLocationpage = "/search";
+  static const String searchLocationpage = '/search';
   static const String updateLocationScreen = '/updatelocation';
 
   // ===== DISCOVERY & MATCHING ROUTES =====

@@ -67,7 +67,7 @@ class _UserProfilePicState extends State<UserProfilePic>
 
   @override
   Widget build(BuildContext context) {
-    var userData =
+    final userData =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
@@ -91,52 +91,57 @@ class _UserProfilePicState extends State<UserProfilePic>
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
 
                       // Header section
-                      _fadeAnimation != null
-                          ? FadeTransition(
-                              opacity: _fadeAnimation!,
-                              child: _buildHeaderSection(),
-                            )
-                          : _buildHeaderSection(),
+                      if (_fadeAnimation != null)
+                        FadeTransition(
+                          opacity: _fadeAnimation!,
+                          child: _buildHeaderSection(),
+                        )
+                      else
+                        _buildHeaderSection(),
 
                       const SizedBox(height: 40),
 
                       // Main photo upload section
-                      _fadeAnimation != null
-                          ? FadeTransition(
-                              opacity: _fadeAnimation!,
-                              child: _buildMainPhotoSection(),
-                            )
-                          : _buildMainPhotoSection(),
+                      if (_fadeAnimation != null)
+                        FadeTransition(
+                          opacity: _fadeAnimation!,
+                          child: _buildMainPhotoSection(),
+                        )
+                      else
+                        _buildMainPhotoSection(),
 
                       const SizedBox(height: 24),
 
                       // Photo grid section
-                      _fadeAnimation != null
-                          ? FadeTransition(
-                              opacity: _fadeAnimation!,
-                              child: _buildPhotoGridSection(),
-                            )
-                          : _buildPhotoGridSection(),
+                      if (_fadeAnimation != null)
+                        FadeTransition(
+                          opacity: _fadeAnimation!,
+                          child: _buildPhotoGridSection(),
+                        )
+                      else
+                        _buildPhotoGridSection(),
 
                       const SizedBox(height: 24),
 
                       // Tips section
-                      _fadeAnimation != null
-                          ? FadeTransition(
-                              opacity: _fadeAnimation!,
-                              child: _buildTipsSection(),
-                            )
-                          : _buildTipsSection(),
+                      if (_fadeAnimation != null)
+                        FadeTransition(
+                          opacity: _fadeAnimation!,
+                          child: _buildTipsSection(),
+                        )
+                      else
+                        _buildTipsSection(),
 
                       const SizedBox(
-                          height: 100), // Space for the bottom labelLarge
+                        height: 100,
+                      ), // Space for the bottom labelLarge
                     ],
                   ),
                 ),
@@ -145,7 +150,7 @@ class _UserProfilePicState extends State<UserProfilePic>
 
             // Continue labelLarge fixed at the bottom
             Container(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -161,13 +166,15 @@ class _UserProfilePicState extends State<UserProfilePic>
                 child: ElevatedButton(
                   onPressed: canContinue
                       ? () {
-                          log("userdata is ${userData.toString()}");
+                          log('userdata is ${userData.toString()}');
                           Navigator.pushNamed(
-                              context, RouteName.allowLocationScreen,
-                              arguments: {
-                                'userData': userData,
-                                'profilePic': photos[selectedPhotoIndex]
-                              });
+                            context,
+                            RouteName.allowLocationScreen,
+                            arguments: {
+                              'userData': userData,
+                              'profilePic': photos[selectedPhotoIndex],
+                            },
+                          );
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -182,11 +189,11 @@ class _UserProfilePicState extends State<UserProfilePic>
                     ),
                   ),
                   child: Text(
-                    canContinue ? "CONTINUE" : "ADD AT LEAST 1 PHOTO",
+                    canContinue ? 'CONTINUE' : 'ADD AT LEAST 1 PHOTO',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
@@ -199,295 +206,287 @@ class _UserProfilePicState extends State<UserProfilePic>
   }
 
   // Header section with title and subtitle
-  Widget _buildHeaderSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Let them see you",
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          "Profiles with clear photos get more matches.",
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Main photo upload section
-  Widget _buildMainPhotoSection() {
-    return Center(
-      child: GestureDetector(
-        onTap: () => _pickImage(selectedPhotoIndex),
-        child: Container(
-          width: 280,
-          height: 350,
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(16),
-            border: photos[selectedPhotoIndex] != null
-                ? Border.all(
-                    color: Colors.transparent,
-                    width: 2,
-                  )
-                : null,
-            boxShadow: [
-              if (photos[selectedPhotoIndex] != null)
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 2),
-                ),
-            ],
-          ),
-          child: photos[selectedPhotoIndex] != null
-              ? Stack(
-                  children: [
-                    // Photo preview
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.file(
-                        photos[selectedPhotoIndex]!,
-                        width: 280,
-                        height: 350,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-
-                    // Edit labelLarge overlay
-                    Positioned(
-                      bottom: 12,
-                      right: 12,
-                      child: GestureDetector(
-                        onTap: () => _pickImage(selectedPhotoIndex),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: const Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              : Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // Container for dashed border
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: CustomPaint(
-                        painter: DashedBorderPainter(
-                          color: Colors.grey[300]!,
-                          strokeWidth: 2,
-                          gap: 5.0,
-                        ),
-                        size: const Size(280, 350),
-                      ),
-                    ),
-
-                    // Placeholder content
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.person_outline,
-                            size: 80,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF27AE60),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: const Icon(
-                              Icons.add_a_photo,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Tap to add photo",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
-    );
-  }
-
-  // Photo grid section
-  Widget _buildPhotoGridSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Your photos (${photoCount}/3)",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: List.generate(3, (index) {
-            return Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  if (photos[index] != null) {
-                    // Select this photo
-                    setState(() {
-                      selectedPhotoIndex = index;
-                    });
-                  } else {
-                    // Add new photo
-                    _pickImage(index);
-                  }
-                },
-                child: Container(
-                  height: 80,
-                  margin: EdgeInsets.only(right: index < 2 ? 8 : 0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color:
-                          selectedPhotoIndex == index && photos[index] != null
-                              ? const Color(0xFF27AE60)
-                              : Colors.grey[300]!,
-                      width:
-                          selectedPhotoIndex == index && photos[index] != null
-                              ? 2
-                              : 1,
-                    ),
-                  ),
-                  child: photos[index] != null
-                      ? Stack(
-                          children: [
-                            // Thumbnail
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(7),
-                              child: Image.file(
-                                photos[index]!,
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-
-                            // Selected indicator
-                            if (selectedPhotoIndex == index)
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF27AE60),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    size: 12,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        )
-                      : Center(
-                          child: Icon(
-                            Icons.add_photo_alternate_outlined,
-                            color: Colors.grey[400],
-                            size: 24,
-                          ),
-                        ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
-    );
-  }
-
-  // Tips section
-  Widget _buildTipsSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
+  Widget _buildHeaderSection() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.lightbulb_outline,
-            color: Color(0xFF27AE60),
-            size: 24,
+          const Text(
+            'Let them see you',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Tips for great photos:",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF27AE60),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "• Choose photos where your face is clearly visible\n"
-                  "• Avoid group shots as your main photo\n"
-                  "• Add at least one full-body photo\n"
-                  "• Show your interests and personality",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[800],
-                    height: 1.5,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 12),
+          Text(
+            'Profiles with clear photos get more matches.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w400,
             ),
           ),
         ],
-      ),
-    );
-  }
+      );
+
+  // Main photo upload section
+  Widget _buildMainPhotoSection() => Center(
+        child: GestureDetector(
+          onTap: () => _pickImage(selectedPhotoIndex),
+          child: Container(
+            width: 280,
+            height: 350,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(16),
+              border: photos[selectedPhotoIndex] != null
+                  ? Border.all(
+                      color: Colors.transparent,
+                      width: 2,
+                    )
+                  : null,
+              boxShadow: [
+                if (photos[selectedPhotoIndex] != null)
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+              ],
+            ),
+            child: photos[selectedPhotoIndex] != null
+                ? Stack(
+                    children: [
+                      // Photo preview
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.file(
+                          photos[selectedPhotoIndex]!,
+                          width: 280,
+                          height: 350,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+
+                      // Edit labelLarge overlay
+                      Positioned(
+                        bottom: 12,
+                        right: 12,
+                        child: GestureDetector(
+                          onTap: () => _pickImage(selectedPhotoIndex),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Container for dashed border
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: CustomPaint(
+                          painter: DashedBorderPainter(
+                            color: Colors.grey[300]!,
+                            strokeWidth: 2,
+                            gap: 5,
+                          ),
+                          size: const Size(280, 350),
+                        ),
+                      ),
+
+                      // Placeholder content
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.person_outline,
+                              size: 80,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF27AE60),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: const Icon(
+                                Icons.add_a_photo,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Tap to add photo',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      );
+
+  // Photo grid section
+  Widget _buildPhotoGridSection() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your photos ($photoCount/3)',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(
+              3,
+              (index) => Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    if (photos[index] != null) {
+                      // Select this photo
+                      setState(() {
+                        selectedPhotoIndex = index;
+                      });
+                    } else {
+                      // Add new photo
+                      _pickImage(index);
+                    }
+                  },
+                  child: Container(
+                    height: 80,
+                    margin: EdgeInsets.only(right: index < 2 ? 8 : 0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color:
+                            selectedPhotoIndex == index && photos[index] != null
+                                ? const Color(0xFF27AE60)
+                                : Colors.grey[300]!,
+                        width:
+                            selectedPhotoIndex == index && photos[index] != null
+                                ? 2
+                                : 1,
+                      ),
+                    ),
+                    child: photos[index] != null
+                        ? Stack(
+                            children: [
+                              // Thumbnail
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(7),
+                                child: Image.file(
+                                  photos[index]!,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+
+                              // Selected indicator
+                              if (selectedPhotoIndex == index)
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF27AE60),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 12,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          )
+                        : Center(
+                            child: Icon(
+                              Icons.add_photo_alternate_outlined,
+                              color: Colors.grey[400],
+                              size: 24,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+
+  // Tips section
+  Widget _buildTipsSection() => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE8F5E9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.lightbulb_outline,
+              color: Color(0xFF27AE60),
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Tips for great photos:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF27AE60),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '• Choose photos where your face is clearly visible\n'
+                    '• Avoid group shots as your main photo\n'
+                    '• Add at least one full-body photo\n'
+                    '• Show your interests and personality',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[800],
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
 
   // Method to pick an image
   Future<void> _pickImage(int index) async {
@@ -504,15 +503,14 @@ class _UserProfilePicState extends State<UserProfilePic>
 
 // Custom painter for dashed border
 class DashedBorderPainter extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-  final double gap;
-
   DashedBorderPainter({
     required this.color,
     required this.strokeWidth,
     required this.gap,
   });
+  final Color color;
+  final double strokeWidth;
+  final double gap;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -526,11 +524,19 @@ class DashedBorderPainter extends CustomPainter {
 
     // Draw right line
     _drawDashedLine(
-        canvas, paint, Offset(size.width, 0), Offset(size.width, size.height));
+      canvas,
+      paint,
+      Offset(size.width, 0),
+      Offset(size.width, size.height),
+    );
 
     // Draw bottom line
     _drawDashedLine(
-        canvas, paint, Offset(size.width, size.height), Offset(0, size.height));
+      canvas,
+      paint,
+      Offset(size.width, size.height),
+      Offset(0, size.height),
+    );
 
     // Draw left line
     _drawDashedLine(canvas, paint, Offset(0, size.height), const Offset(0, 0));

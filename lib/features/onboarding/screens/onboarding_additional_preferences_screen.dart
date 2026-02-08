@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/reusable_input_widgets.dart';
 
 class OnboardingAdditionalPreferencesScreen extends StatefulWidget {
+  const OnboardingAdditionalPreferencesScreen({super.key, this.onNext});
   final VoidCallback? onNext;
-
-  const OnboardingAdditionalPreferencesScreen({Key? key, this.onNext})
-      : super(key: key);
 
   @override
   State<OnboardingAdditionalPreferencesScreen> createState() =>
@@ -17,8 +16,8 @@ class OnboardingAdditionalPreferencesScreen extends StatefulWidget {
 
 class _OnboardingAdditionalPreferencesScreenState
     extends State<OnboardingAdditionalPreferencesScreen> {
-  late double _height;
-  late String _heightUnit;
+  double _height = 170;
+  String _heightUnit = 'cm';
   String _lookingFor = 'Dating';
   String _relationshipIntent = 'Not sure yet';
 
@@ -27,12 +26,12 @@ class _OnboardingAdditionalPreferencesScreenState
     {
       'label': 'Friendship',
       'value': 'Friendship',
-      'icon': Icons.people_outline
+      'icon': Icons.people_outline,
     },
     {
       'label': 'Networking',
       'value': 'Networking',
-      'icon': Icons.business_center_outlined
+      'icon': Icons.business_center_outlined,
     },
   ];
 
@@ -40,34 +39,35 @@ class _OnboardingAdditionalPreferencesScreenState
     {
       'label': 'Short-term fun',
       'value': 'Short-term',
-      'icon': Icons.flash_on_outlined
+      'icon': Icons.flash_on_outlined,
     },
     {
       'label': 'Long-term relationship',
       'value': 'Long-term',
-      'icon': Icons.favorite_border
+      'icon': Icons.favorite_border,
     },
     {
       'label': 'Casual dating',
       'value': 'Casual',
-      'icon': Icons.coffee_outlined
+      'icon': Icons.coffee_outlined,
     },
     {
       'label': 'Not sure yet',
       'value': 'Not sure yet',
-      'icon': Icons.help_outline
+      'icon': Icons.help_outline,
     },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    _height = controller.height;
-    _heightUnit = controller.heightUnit;
-    _lookingFor = controller.lookingFor;
-    _relationshipIntent = controller.relationshipIntent;
+    final data = context.read<OnboardingBloc>().state.data;
+    if (data != null) {
+      _height = data.height.toDouble();
+      _heightUnit = data.heightUnit;
+      _lookingFor = data.lookingFor;
+      _relationshipIntent = data.relationshipIntent;
+    }
   }
 
   @override
@@ -86,7 +86,7 @@ class _OnboardingAdditionalPreferencesScreenState
           // Header
           Text(
             'Tell us more about you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 32 : 28,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -95,7 +95,7 @@ class _OnboardingAdditionalPreferencesScreenState
           SizedBox(height: isTablet ? 12 : 8),
           Text(
             'Help us create better matches for you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 18 : 16,
               color: Colors.black54,
             ),
@@ -158,56 +158,56 @@ class _OnboardingAdditionalPreferencesScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _lookingFor,
-          onSelected: (value) {
-            setState(() {
-              _lookingFor = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      );
-    }).toList();
+    return _lookingForOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _lookingFor,
+              onSelected: (value) {
+                setState(() {
+                  _lookingFor = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: SelectionOption(
-          label: option['label'],
-          value: option['value'],
-          selectedValue: _relationshipIntent,
-          onSelected: (value) {
-            setState(() {
-              _relationshipIntent = value;
-            });
-          },
-          icon: option['icon'],
-        ),
-      );
-    }).toList();
+    return _relationshipIntentOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: SelectionOption(
+              label: option['label'],
+              value: option['value'],
+              selectedValue: _relationshipIntent,
+              onSelected: (value) {
+                setState(() {
+                  _relationshipIntent = value;
+                });
+              },
+              icon: option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   void _saveAndContinue() {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    context.read<OnboardingBloc>()
+      ..add(OnboardingHeightUpdated(_height, _heightUnit))
+      ..add(OnboardingLookingForUpdated(_lookingFor))
+      ..add(OnboardingRelationshipIntentUpdated(_relationshipIntent));
 
-    // Save all preferences
-    controller.setHeight(_height, _heightUnit);
-    controller.setLookingFor(_lookingFor);
-    controller.setRelationshipIntent(_relationshipIntent);
-
-    // Call the onNext callback to complete onboarding
     if (widget.onNext != null) {
       widget.onNext!();
     }

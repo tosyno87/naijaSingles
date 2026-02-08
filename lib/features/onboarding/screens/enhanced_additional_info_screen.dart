@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/afropeep_height_dropdown.dart';
 
 class EnhancedAdditionalInfoScreen extends StatefulWidget {
-  const EnhancedAdditionalInfoScreen({Key? key}) : super(key: key);
+  const EnhancedAdditionalInfoScreen({super.key});
 
   @override
   State<EnhancedAdditionalInfoScreen> createState() =>
@@ -16,7 +17,7 @@ class _EnhancedAdditionalInfoScreenState
     extends State<EnhancedAdditionalInfoScreen> {
   // Afropeep theme colors
   static const Color backgroundColor = Colors.white;
-  static const Color afropeepGreen = Color(0xFF007A33);
+  static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
   static const Color textLightBrown = Color(0xFF8B6C59);
@@ -40,7 +41,7 @@ class _EnhancedAdditionalInfoScreenState
   final TextEditingController _customLanguageController =
       TextEditingController();
 
-  // Platform purpose options - what brings users to NaijaSingles
+  // Platform purpose options - what brings users to Afropeep
   final List<Map<String, dynamic>> _platformPurposeOptions = [
     {
       'label': 'Dating & Romance',
@@ -130,37 +131,37 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'Business Development',
       'value': 'Business Development',
       'icon': Icons.trending_up,
-      'color': Colors.green.shade400
+      'color': Colors.green.shade400,
     },
     {
       'label': 'Career Mentorship',
       'value': 'Career Mentorship',
       'icon': Icons.school,
-      'color': Colors.blue.shade400
+      'color': Colors.blue.shade400,
     },
     {
       'label': 'Industry Connections',
       'value': 'Industry Connections',
       'icon': Icons.business,
-      'color': Colors.purple.shade400
+      'color': Colors.purple.shade400,
     },
     {
       'label': 'Startup Collaboration',
       'value': 'Startup Collaboration',
       'icon': Icons.lightbulb,
-      'color': Colors.orange.shade400
+      'color': Colors.orange.shade400,
     },
     {
       'label': 'Investment Opportunities',
       'value': 'Investment Opportunities',
       'icon': Icons.attach_money,
-      'color': Colors.teal.shade400
+      'color': Colors.teal.shade400,
     },
     {
       'label': 'Skill Exchange',
       'value': 'Skill Exchange',
       'icon': Icons.swap_horiz,
-      'color': Colors.indigo.shade400
+      'color': Colors.indigo.shade400,
     },
   ];
 
@@ -170,37 +171,37 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'Activity Partners',
       'value': 'Activity Partners',
       'icon': Icons.sports_soccer,
-      'color': Colors.green.shade400
+      'color': Colors.green.shade400,
     },
     {
       'label': 'Study Groups',
       'value': 'Study Groups',
       'icon': Icons.menu_book,
-      'color': Colors.blue.shade400
+      'color': Colors.blue.shade400,
     },
     {
       'label': 'Social Events',
       'value': 'Social Events',
       'icon': Icons.celebration,
-      'color': Colors.purple.shade400
+      'color': Colors.purple.shade400,
     },
     {
       'label': 'Travel Companions',
       'value': 'Travel Companions',
       'icon': Icons.flight,
-      'color': Colors.orange.shade400
+      'color': Colors.orange.shade400,
     },
     {
       'label': 'Hobby Groups',
       'value': 'Hobby Groups',
       'icon': Icons.palette,
-      'color': Colors.pink.shade400
+      'color': Colors.pink.shade400,
     },
     {
       'label': 'Support Network',
       'value': 'Support Network',
       'icon': Icons.group,
-      'color': Colors.teal.shade400
+      'color': Colors.teal.shade400,
     },
   ];
 
@@ -209,43 +210,43 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'High School',
       'value': 'High School',
       'icon': Icons.school,
-      'color': Colors.blue.shade400
+      'color': Colors.blue.shade400,
     },
     {
       'label': 'Some University',
       'value': 'Some University',
       'icon': Icons.school_outlined,
-      'color': Colors.green.shade400
+      'color': Colors.green.shade400,
     },
     {
       'label': 'Bachelor\'s Degree',
       'value': 'Bachelor\'s Degree',
       'icon': Icons.school,
-      'color': Colors.purple.shade400
+      'color': Colors.purple.shade400,
     },
     {
       'label': 'Master\'s Degree',
       'value': 'Master\'s Degree',
       'icon': Icons.school,
-      'color': Colors.orange.shade400
+      'color': Colors.orange.shade400,
     },
     {
       'label': 'PhD/Doctorate',
       'value': 'PhD/Doctorate',
       'icon': Icons.school,
-      'color': Colors.red.shade400
+      'color': Colors.red.shade400,
     },
     {
       'label': 'Professional Certification',
       'value': 'Professional Certification',
       'icon': Icons.work,
-      'color': Colors.indigo.shade400
+      'color': Colors.indigo.shade400,
     },
     {
       'label': 'Trade/Vocational School',
       'value': 'Trade/Vocational School',
       'icon': Icons.build,
-      'color': Colors.teal.shade400
+      'color': Colors.teal.shade400,
     },
   ];
 
@@ -254,37 +255,37 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'Christianity',
       'value': 'Christianity',
       'icon': Icons.church,
-      'color': Colors.blue.shade400
+      'color': Colors.blue.shade400,
     },
     {
       'label': 'Islam',
       'value': 'Islam',
       'icon': Icons.mosque,
-      'color': Colors.green.shade400
+      'color': Colors.green.shade400,
     },
     {
       'label': 'Traditional African Religion',
       'value': 'Traditional African Religion',
       'icon': Icons.nature_people,
-      'color': Colors.brown.shade400
+      'color': Colors.brown.shade400,
     },
     {
       'label': 'Other',
       'value': 'Other',
       'icon': Icons.more_horiz,
-      'color': Colors.grey.shade400
+      'color': Colors.grey.shade400,
     },
     {
       'label': 'Spiritual but not religious',
       'value': 'Spiritual but not religious',
       'icon': Icons.self_improvement,
-      'color': Colors.purple.shade400
+      'color': Colors.purple.shade400,
     },
     {
       'label': 'Not religious',
       'value': 'Not religious',
       'icon': Icons.remove_circle_outline,
-      'color': Colors.orange.shade400
+      'color': Colors.orange.shade400,
     },
   ];
 
@@ -294,31 +295,31 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'English',
       'value': 'English',
       'icon': Icons.language,
-      'color': Colors.blue.shade400
+      'color': Colors.blue.shade400,
     },
     {
       'label': 'Arabic',
       'value': 'Arabic',
       'icon': Icons.language,
-      'color': Colors.green.shade400
+      'color': Colors.green.shade400,
     },
     {
       'label': 'French',
       'value': 'French',
       'icon': Icons.language,
-      'color': Colors.purple.shade400
+      'color': Colors.purple.shade400,
     },
     {
       'label': 'Portuguese',
       'value': 'Portuguese',
       'icon': Icons.language,
-      'color': Colors.orange.shade400
+      'color': Colors.orange.shade400,
     },
     {
       'label': 'Swahili',
       'value': 'Swahili',
       'icon': Icons.language,
-      'color': Colors.teal.shade400
+      'color': Colors.teal.shade400,
     },
 
     // Other option - prominently placed
@@ -326,7 +327,7 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'Other (Type your language)',
       'value': 'Other',
       'icon': Icons.edit,
-      'color': Colors.grey.shade500
+      'color': Colors.grey.shade500,
     },
 
     // Popular African Languages
@@ -334,55 +335,55 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'Yoruba',
       'value': 'Yoruba',
       'icon': Icons.language,
-      'color': Colors.red.shade400
+      'color': Colors.red.shade400,
     },
     {
       'label': 'Igbo',
       'value': 'Igbo',
       'icon': Icons.language,
-      'color': Colors.indigo.shade400
+      'color': Colors.indigo.shade400,
     },
     {
       'label': 'Hausa',
       'value': 'Hausa',
       'icon': Icons.language,
-      'color': Colors.brown.shade400
+      'color': Colors.brown.shade400,
     },
     {
       'label': 'Amharic',
       'value': 'Amharic',
       'icon': Icons.language,
-      'color': Colors.deepOrange.shade400
+      'color': Colors.deepOrange.shade400,
     },
     {
       'label': 'Zulu',
       'value': 'Zulu',
       'icon': Icons.language,
-      'color': Colors.red.shade600
+      'color': Colors.red.shade600,
     },
     {
       'label': 'Xhosa',
       'value': 'Xhosa',
       'icon': Icons.language,
-      'color': Colors.purple.shade600
+      'color': Colors.purple.shade600,
     },
     {
       'label': 'Afrikaans',
       'value': 'Afrikaans',
       'icon': Icons.language,
-      'color': Colors.orange.shade600
+      'color': Colors.orange.shade600,
     },
     {
       'label': 'Somali',
       'value': 'Somali',
       'icon': Icons.language,
-      'color': Colors.blueGrey.shade400
+      'color': Colors.blueGrey.shade400,
     },
     {
       'label': 'Oromo',
       'value': 'Oromo',
       'icon': Icons.language,
-      'color': Colors.lightGreen.shade400
+      'color': Colors.lightGreen.shade400,
     },
   ];
 
@@ -391,25 +392,25 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'Never',
       'value': 'Never',
       'icon': Icons.block,
-      'color': Colors.red.shade400
+      'color': Colors.red.shade400,
     },
     {
       'label': 'Rarely',
       'value': 'Rarely',
       'icon': Icons.remove_circle_outline,
-      'color': Colors.orange.shade400
+      'color': Colors.orange.shade400,
     },
     {
       'label': 'Socially',
       'value': 'Socially',
       'icon': Icons.people,
-      'color': Colors.green.shade400
+      'color': Colors.green.shade400,
     },
     {
       'label': 'Regularly',
       'value': 'Regularly',
       'icon': Icons.local_bar,
-      'color': Colors.blue.shade400
+      'color': Colors.blue.shade400,
     },
   ];
 
@@ -418,46 +419,46 @@ class _EnhancedAdditionalInfoScreenState
       'label': 'Never',
       'value': 'Never',
       'icon': Icons.smoke_free,
-      'color': Colors.green.shade400
+      'color': Colors.green.shade400,
     },
     {
       'label': 'Rarely',
       'value': 'Rarely',
       'icon': Icons.remove_circle_outline,
-      'color': Colors.orange.shade400
+      'color': Colors.orange.shade400,
     },
     {
       'label': 'Socially',
       'value': 'Socially',
       'icon': Icons.people,
-      'color': Colors.yellow.shade600
+      'color': Colors.yellow.shade600,
     },
     {
       'label': 'Regularly',
       'value': 'Regularly',
       'icon': Icons.smoking_rooms,
-      'color': Colors.red.shade400
+      'color': Colors.red.shade400,
     },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    final data = context.read<OnboardingBloc>().state.data;
 
-    // Initialize from controller if available
-    if (controller.height > 0) {
-      _heightCm = controller.height.round();
-      String? ftIn = HeightData.getFtInFromCm(_heightCm);
+    if (data != null && data.height > 0) {
+      _heightCm = data.height.round();
+      final String? ftIn = HeightData.getFtInFromCm(_heightCm);
       if (ftIn != null) {
         _heightFtIn = ftIn;
       }
     }
 
+    if (data == null) return;
+
     // Map controller value to display value
     String displayValue;
-    switch (controller.lookingFor) {
+    switch (data.lookingFor) {
       case 'Dating':
         displayValue = 'Dating & Romance';
         break;
@@ -474,13 +475,13 @@ class _EnhancedAdditionalInfoScreenState
         displayValue = 'Dating & Romance';
     }
     _platformPurpose = displayValue;
-    _relationshipIntent = controller.relationshipIntent;
-    _education = controller.educationLevel;
-    _religion = controller.religion;
+    _relationshipIntent = data.relationshipIntent;
+    _education = data.education ?? '';
+    _religion = data.religion;
 
     // Handle primary language - check if it's in our predefined list
-    if (controller.spokenLanguages.isNotEmpty) {
-      final controllerLanguage = controller.spokenLanguages.first;
+    if (data.languages.isNotEmpty) {
+      final controllerLanguage = data.languages.first;
       final isInPredefinedList = _languageOptions
           .any((option) => option['value'] == controllerLanguage);
 
@@ -494,9 +495,9 @@ class _EnhancedAdditionalInfoScreenState
       }
     }
 
-    _occupation = controller.occupation;
-    _drinkingPreference = controller.drinkingPreference;
-    _smokingPreference = controller.smokingPreference;
+    _occupation = data.occupation ?? '';
+    _drinkingPreference = data.drinkingPreference;
+    _smokingPreference = data.smokingPreference;
   }
 
   int _getCompletedFieldsCount() {
@@ -514,11 +515,15 @@ class _EnhancedAdditionalInfoScreenState
 
     // Language field - check if primary language is selected and if "Other", check custom language
     if (_primaryLanguage.isNotEmpty &&
-        (_primaryLanguage != 'Other' || _customLanguage.isNotEmpty)) count++;
+        (_primaryLanguage != 'Other' || _customLanguage.isNotEmpty)) {
+      count++;
+    }
 
     // Religion only for dating users
     if ((_isDatingUser() || _platformPurpose == 'All of the Above') &&
-        _religion.isNotEmpty) count++;
+        _religion.isNotEmpty) {
+      count++;
+    }
 
     return count;
   }
@@ -530,28 +535,26 @@ class _EnhancedAdditionalInfoScreenState
     if (_isDatingUser()) total += 2; // Relationship Intent + Religion
     if (_isNetworkingUser()) total += 1; // Professional Focus
     if (_isFriendshipUser()) total += 1; // Social Interests
-    if (_platformPurpose == 'All of the Above')
+    if (_platformPurpose == 'All of the Above') {
       total += 2; // All conditional fields
+    }
 
     total += 1; // Languages always required
 
     return total;
   }
 
-  bool _isDatingUser() {
-    return _platformPurpose == 'Dating & Romance' ||
-        _platformPurpose == 'All of the Above';
-  }
+  bool _isDatingUser() =>
+      _platformPurpose == 'Dating & Romance' ||
+      _platformPurpose == 'All of the Above';
 
-  bool _isNetworkingUser() {
-    return _platformPurpose == 'Professional Networking' ||
-        _platformPurpose == 'All of the Above';
-  }
+  bool _isNetworkingUser() =>
+      _platformPurpose == 'Professional Networking' ||
+      _platformPurpose == 'All of the Above';
 
-  bool _isFriendshipUser() {
-    return _platformPurpose == 'Friendship & Social' ||
-        _platformPurpose == 'All of the Above';
-  }
+  bool _isFriendshipUser() =>
+      _platformPurpose == 'Friendship & Social' ||
+      _platformPurpose == 'All of the Above';
 
   String _getEducationSubtitle() {
     if (_isNetworkingUser()) {
@@ -597,6 +600,55 @@ class _EnhancedAdditionalInfoScreenState
           SizedBox(height: isTablet ? 32 : 24),
 
           // Info card explaining importance
+          // Optional step indicator - Industry best practice (progressive disclosure)
+          Container(
+            padding: EdgeInsets.all(isTablet ? 20 : 16),
+            decoration: BoxDecoration(
+              color: afropeepGreen.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: afropeepGreen.withOpacity(0.3),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: afropeepGreen,
+                  size: isTablet ? 24 : 20,
+                ),
+                SizedBox(width: isTablet ? 16 : 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'This step is optional',
+                        style: GoogleFonts.montserrat(
+                          fontSize: isTablet ? 16 : 14,
+                          fontWeight: FontWeight.w600,
+                          color: afropeepGreen,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'You can skip this and complete it later in your profile settings. Adding more details helps us find better matches!',
+                        style: GoogleFonts.montserrat(
+                          fontSize: isTablet ? 14 : 12,
+                          color: textDarkBrown,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: isTablet ? 32 : 24),
+
           _buildInfoCard(
             'Why we ask for this information',
             'These details help us find better matches and show you to people looking for the same things. Your information is private and secure.',
@@ -616,17 +668,19 @@ class _EnhancedAdditionalInfoScreenState
                 _heightFtIn = heightFtIn;
                 _heightCm = heightCm;
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              controller.setHeightFromDropdown(heightFtIn, heightCm);
+              context.read<OnboardingBloc>().add(
+                OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
+              );
             },
           ),
 
           SizedBox(height: isTablet ? 32 : 24),
 
-          // Platform Purpose Section - What brings you to NaijaSingles?
-          _buildSectionHeader('What brings you to NaijaSingles?',
-              'Help us understand how to serve you better'),
+          // Platform Purpose Section - What brings you to Afropeep?
+          _buildSectionHeader(
+            'What brings you to Afropeep?',
+            'Help us understand how to serve you better',
+          ),
           SizedBox(height: isTablet ? 16 : 12),
           _buildPlatformPurposeDropdown(),
 
@@ -635,8 +689,10 @@ class _EnhancedAdditionalInfoScreenState
             SizedBox(height: isTablet ? 32 : 24),
 
             // Relationship Intent Section
-            _buildSectionHeader('Relationship goals',
-                'What are you hoping to find romantically?'),
+            _buildSectionHeader(
+              'Relationship goals',
+              'What are you hoping to find romantically?',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _relationshipIntent,
@@ -646,9 +702,9 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _relationshipIntent = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setRelationshipIntent(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingRelationshipIntentUpdated(value),
+                );
               },
             ),
           ],
@@ -658,8 +714,10 @@ class _EnhancedAdditionalInfoScreenState
             SizedBox(height: isTablet ? 32 : 24),
 
             // Professional Focus Section
-            _buildSectionHeader('Professional Focus',
-                'What type of professional connections are you seeking?'),
+            _buildSectionHeader(
+              'Professional Focus',
+              'What type of professional connections are you seeking?',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _professionalFocus,
@@ -679,8 +737,10 @@ class _EnhancedAdditionalInfoScreenState
             SizedBox(height: isTablet ? 32 : 24),
 
             // Social Interests Section
-            _buildSectionHeader('Social Interests',
-                'What kind of friendships are you looking for?'),
+            _buildSectionHeader(
+              'Social Interests',
+              'What kind of friendships are you looking for?',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _socialInterests,
@@ -708,9 +768,9 @@ class _EnhancedAdditionalInfoScreenState
               setState(() {
                 _education = value;
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              controller.setEducation(value);
+              context.read<OnboardingBloc>().add(
+                OnboardingEducationUpdated(value),
+              );
             },
           ),
 
@@ -718,8 +778,10 @@ class _EnhancedAdditionalInfoScreenState
 
           // Religion Section - Show mainly for dating users, optional for others
           if (_isDatingUser() || _platformPurpose == 'All of the Above') ...[
-            _buildSectionHeader('Faith & Religion',
-                'Important for many Nigerian relationships'),
+            _buildSectionHeader(
+              'Faith & Religion',
+              'Important for many Nigerian relationships',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
             _buildGenericDropdown(
               value: _religion,
@@ -729,9 +791,9 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _religion = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setReligion(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingReligionUpdated(value),
+                );
               },
             ),
             SizedBox(height: isTablet ? 32 : 24),
@@ -739,10 +801,12 @@ class _EnhancedAdditionalInfoScreenState
 
           // Languages Section - Show for all users
           _buildSectionHeader(
-              'Languages', 'Primary language you speak fluently'),
+            'Languages',
+            'Primary language you speak fluently',
+          ),
           Text(
             _getLanguageSubtitle(),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 14 : 12,
               color: textLightBrown,
               fontStyle: FontStyle.italic,
@@ -762,12 +826,11 @@ class _EnhancedAdditionalInfoScreenState
                   _customLanguageController.clear();
                 }
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              // Update controller with selected language or custom language
               final languageToSave = value == 'Other' ? _customLanguage : value;
               if (languageToSave.isNotEmpty) {
-                controller.setSpokenLanguages([languageToSave]);
+                context.read<OnboardingBloc>().add(
+                  OnboardingLanguagesUpdated([languageToSave]),
+                );
               }
             },
           ),
@@ -785,7 +848,7 @@ class _EnhancedAdditionalInfoScreenState
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -793,7 +856,7 @@ class _EnhancedAdditionalInfoScreenState
                 controller: _customLanguageController,
                 decoration: InputDecoration(
                   hintText: 'Enter your language',
-                  hintStyle: GoogleFonts.poppins(
+                  hintStyle: GoogleFonts.montserrat(
                     fontSize: isTablet ? 15 : 13,
                     color: Colors.grey.shade600,
                   ),
@@ -803,7 +866,7 @@ class _EnhancedAdditionalInfoScreenState
                     vertical: isTablet ? 16 : 14,
                   ),
                   prefixIcon: Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     child: Icon(
                       Icons.edit,
                       color: afropeepGreen,
@@ -811,7 +874,7 @@ class _EnhancedAdditionalInfoScreenState
                     ),
                   ),
                 ),
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: isTablet ? 16 : 14,
                   fontWeight: FontWeight.w500,
                   color: textDarkBrown,
@@ -820,11 +883,10 @@ class _EnhancedAdditionalInfoScreenState
                   setState(() {
                     _customLanguage = value;
                   });
-                  final controller =
-                      Provider.of<OnboardingController>(context, listen: false);
-                  // Update controller with custom language
                   if (value.isNotEmpty) {
-                    controller.setSpokenLanguages([value]);
+                    context.read<OnboardingBloc>().add(
+                      OnboardingLanguagesUpdated([value]),
+                    );
                   }
                 },
               ),
@@ -836,19 +898,21 @@ class _EnhancedAdditionalInfoScreenState
           // Lifestyle Preferences - Show mainly for dating users
           if (_isDatingUser()) ...[
             _buildSectionHeader(
-                'Lifestyle', 'Optional but helps with compatibility'),
+              'Lifestyle',
+              'Optional but helps with compatibility',
+            ),
             SizedBox(height: isTablet ? 16 : 12),
 
             // Drinking
             Text(
               'Drinking',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: isTablet ? 16 : 14,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             _buildGenericDropdown(
               value: _drinkingPreference,
               options: _drinkingOptions,
@@ -857,24 +921,24 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _drinkingPreference = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setDrinkingPreference(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingDrinkingPreferenceUpdated(value),
+                );
               },
             ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Smoking
             Text(
               'Smoking',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: isTablet ? 16 : 14,
                 fontWeight: FontWeight.w600,
                 color: textDarkBrown,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             _buildGenericDropdown(
               value: _smokingPreference,
               options: _smokingOptions,
@@ -883,9 +947,9 @@ class _EnhancedAdditionalInfoScreenState
                 setState(() {
                   _smokingPreference = value;
                 });
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                controller.setSmokingPreference(value);
+                context.read<OnboardingBloc>().add(
+                  OnboardingSmokingPreferenceUpdated(value),
+                );
               },
             ),
 
@@ -894,8 +958,8 @@ class _EnhancedAdditionalInfoScreenState
 
           // Simple progress indicator
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 20),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: afropeepGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
@@ -903,15 +967,15 @@ class _EnhancedAdditionalInfoScreenState
             ),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline,
                   color: afropeepGreen,
                   size: 20,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
                   'Progress: $completedFields of $totalFields fields completed',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.montserrat(
                     fontSize: isTablet ? 14 : 12,
                     color: afropeepGreen,
                     fontWeight: FontWeight.w500,
@@ -925,121 +989,117 @@ class _EnhancedAdditionalInfoScreenState
     );
   }
 
-  Widget _buildHeader(bool isTablet, int completed, int total) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Tell us more about you',
-          style: GoogleFonts.poppins(
-            fontSize: isTablet ? 32 : 28,
-            fontWeight: FontWeight.bold,
-            color: textDarkBrown,
-          ),
-        ),
-        SizedBox(height: isTablet ? 8 : 6),
-        Text(
-          'Help us create better matches for you',
-          style: GoogleFonts.poppins(
-            fontSize: isTablet ? 18 : 16,
-            color: textLightBrown,
-          ),
-        ),
-        SizedBox(height: 16),
-
-        // Progress indicator
-        Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: afropeepGreen.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: afropeepGreen.withValues(alpha: 0.3),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  value: completed / total,
-                  backgroundColor: afropeepGreen.withValues(alpha: 0.2),
-                  valueColor: AlwaysStoppedAnimation(afropeepGreen),
-                  strokeWidth: 3,
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Profile completion: $completed of $total sections',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: afropeepGreen,
-                      ),
-                    ),
-                    Text(
-                      'Complete profiles get 3x more matches!',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: afropeepGreen,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoCard(String title, String description, IconData icon) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade200),
-      ),
-      child: Row(
+  Widget _buildHeader(bool isTablet, int completed, int total) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.blue.shade700, size: 20),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Text(
+            'Tell us more about you',
+            style: GoogleFonts.montserrat(
+              fontSize: isTablet ? 32 : 28,
+              fontWeight: FontWeight.bold,
+              color: textDarkBrown,
+            ),
+          ),
+          SizedBox(height: isTablet ? 8 : 6),
+          Text(
+            'Help us create better matches for you',
+            style: GoogleFonts.montserrat(
+              fontSize: isTablet ? 18 : 16,
+              color: textLightBrown,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Progress indicator
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: afropeepGreen.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: afropeepGreen.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue.shade800,
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    value: completed / total,
+                    backgroundColor: afropeepGreen.withValues(alpha: 0.2),
+                    valueColor: const AlwaysStoppedAnimation(afropeepGreen),
+                    strokeWidth: 3,
                   ),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.blue.shade700,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Profile completion: $completed of $total sections',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: afropeepGreen,
+                        ),
+                      ),
+                      Text(
+                        'Complete profiles get 3x more matches!',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          color: afropeepGreen,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
+      );
+
+  Widget _buildInfoCard(String title, String description, IconData icon) =>
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.blue.shade200),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: Colors.blue.shade700, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue.shade800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      color: Colors.blue.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
 
   List<Widget> _buildEnhancedOptions(
     List<Map<String, dynamic>> options,
@@ -1079,7 +1139,7 @@ class _EnhancedAdditionalInfoScreenState
             child: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: (option['color'] as Color).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
@@ -1097,7 +1157,7 @@ class _EnhancedAdditionalInfoScreenState
                     children: [
                       Text(
                         option['label'],
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: isTablet ? 16 : 14,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w500,
@@ -1105,10 +1165,10 @@ class _EnhancedAdditionalInfoScreenState
                         ),
                       ),
                       if (option['description'] != null) ...[
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
                           option['description'],
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.montserrat(
                             fontSize: isTablet ? 12 : 11,
                             color: isSelected ? afropeepGreen : textLightBrown,
                           ),
@@ -1148,7 +1208,7 @@ class _EnhancedAdditionalInfoScreenState
 
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(
+      constraints: const BoxConstraints(
         minHeight: 48,
         maxHeight: 72,
       ),
@@ -1160,7 +1220,7 @@ class _EnhancedAdditionalInfoScreenState
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -1169,17 +1229,17 @@ class _EnhancedAdditionalInfoScreenState
           value: validValue,
           isExpanded: true,
           hint: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Text(
               hint,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.montserrat(
                 fontSize: isTablet ? 15 : 13,
                 color: Colors.grey.shade600,
               ),
             ),
           ),
           icon: Padding(
-            padding: EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 12),
             child: Icon(
               Icons.keyboard_arrow_down,
               color: afropeepGreen,
@@ -1189,49 +1249,51 @@ class _EnhancedAdditionalInfoScreenState
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(12),
           menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
-          items: options.map((option) {
-            return DropdownMenuItem<String>(
-              value: option['value'],
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: isTablet ? 6 : 4,
-                ),
-                child: Row(
-                  children: [
-                    if (option['icon'] != null) ...[
-                      Container(
-                        padding: EdgeInsets.all(isTablet ? 6 : 4),
-                        decoration: BoxDecoration(
-                          color: (option['color'] ?? Colors.grey)
-                              .withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Icon(
-                          option['icon'],
-                          color: option['color'] ?? Colors.grey,
-                          size: isTablet ? 18 : 16,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                    ],
-                    Expanded(
-                      child: Text(
-                        option['label'],
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 16 : 14,
-                          fontWeight: FontWeight.w600,
-                          color: textDarkBrown,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+          items: options
+              .map(
+                (option) => DropdownMenuItem<String>(
+                  value: option['value'],
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: isTablet ? 6 : 4,
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        if (option['icon'] != null) ...[
+                          Container(
+                            padding: EdgeInsets.all(isTablet ? 6 : 4),
+                            decoration: BoxDecoration(
+                              color: (option['color'] ?? Colors.grey)
+                                  .withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Icon(
+                              option['icon'],
+                              color: option['color'] ?? Colors.grey,
+                              size: isTablet ? 18 : 16,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Expanded(
+                          child: Text(
+                            option['label'],
+                            style: GoogleFonts.montserrat(
+                              fontSize: isTablet ? 16 : 14,
+                              fontWeight: FontWeight.w600,
+                              color: textDarkBrown,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              )
+              .toList(),
           onChanged: (String? newValue) {
             if (newValue != null) {
               onChanged(newValue);
@@ -1251,7 +1313,7 @@ class _EnhancedAdditionalInfoScreenState
       children: [
         Text(
           title,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 22 : 18,
             fontWeight: FontWeight.w600,
             color: textDarkBrown,
@@ -1260,7 +1322,7 @@ class _EnhancedAdditionalInfoScreenState
         SizedBox(height: isTablet ? 6 : 4),
         Text(
           subtitle,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 14 : 12,
             color: textLightBrown,
           ),
@@ -1275,7 +1337,7 @@ class _EnhancedAdditionalInfoScreenState
 
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(
+      constraints: const BoxConstraints(
         minHeight: 48,
         maxHeight: 72,
       ),
@@ -1287,7 +1349,7 @@ class _EnhancedAdditionalInfoScreenState
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -1296,7 +1358,7 @@ class _EnhancedAdditionalInfoScreenState
           value: _platformPurpose,
           isExpanded: true,
           icon: Padding(
-            padding: EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 12),
             child: Icon(
               Icons.keyboard_arrow_down,
               color: afropeepGreen,
@@ -1306,55 +1368,54 @@ class _EnhancedAdditionalInfoScreenState
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(12),
           menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
-          items: _platformPurposeOptions.map((option) {
-            return DropdownMenuItem<String>(
-              value: option['value'],
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: isTablet ? 6 : 4,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(isTablet ? 6 : 4),
-                      decoration: BoxDecoration(
-                        color:
-                            (option['color'] as Color).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Icon(
-                        option['icon'],
-                        color: option['color'],
-                        size: isTablet ? 18 : 16,
-                      ),
+          items: _platformPurposeOptions
+              .map(
+                (option) => DropdownMenuItem<String>(
+                  value: option['value'],
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: isTablet ? 6 : 4,
                     ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        option['label'],
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 16 : 14,
-                          fontWeight: FontWeight.w600,
-                          color: textDarkBrown,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(isTablet ? 6 : 4),
+                          decoration: BoxDecoration(
+                            color: (option['color'] as Color)
+                                .withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            option['icon'],
+                            color: option['color'],
+                            size: isTablet ? 18 : 16,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            option['label'],
+                            style: GoogleFonts.montserrat(
+                              fontSize: isTablet ? 16 : 14,
+                              fontWeight: FontWeight.w600,
+                              color: textDarkBrown,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              )
+              .toList(),
           onChanged: (String? value) {
             if (value != null) {
               setState(() {
                 _platformPurpose = value;
               });
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              // Map display values back to controller values
               String controllerValue;
               switch (value) {
                 case 'Dating & Romance':
@@ -1372,7 +1433,9 @@ class _EnhancedAdditionalInfoScreenState
                 default:
                   controllerValue = 'Dating';
               }
-              controller.setLookingFor(controllerValue);
+              context.read<OnboardingBloc>().add(
+                OnboardingLookingForUpdated(controllerValue),
+              );
             }
           },
         ),
@@ -1422,7 +1485,7 @@ class _EnhancedAdditionalInfoScreenState
                 Expanded(
                   child: Text(
                     option['label'],
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: isTablet ? 15 : 13,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -1448,52 +1511,52 @@ class _EnhancedAdditionalInfoScreenState
     List<Map<String, dynamic>> options,
     String selectedValue,
     Function(String) onSelected,
-  ) {
-    return [
-      Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: options.map((option) {
-          final isSelected = selectedValue == option['value'];
+  ) =>
+      [
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: options.map((option) {
+            final isSelected = selectedValue == option['value'];
 
-          return GestureDetector(
-            onTap: () => onSelected(option['value']),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? afropeepGreen.withValues(alpha: 0.1)
-                    : cardBackground,
-                border: Border.all(
-                  color: isSelected ? afropeepGreen : Colors.grey.shade300,
-                  width: 1.5,
+            return GestureDetector(
+              onTap: () => onSelected(option['value']),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? afropeepGreen.withValues(alpha: 0.1)
+                      : cardBackground,
+                  border: Border.all(
+                    color: isSelected ? afropeepGreen : Colors.grey.shade300,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    option['icon'],
-                    size: 16,
-                    color: isSelected ? afropeepGreen : Colors.grey.shade600,
-                  ),
-                  SizedBox(width: 6),
-                  Text(
-                    option['label'],
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
-                      color: isSelected ? afropeepGreen : textDarkBrown,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      option['icon'],
+                      size: 16,
+                      color: isSelected ? afropeepGreen : Colors.grey.shade600,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      option['label'],
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected ? afropeepGreen : textDarkBrown,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }).toList(),
-      ),
-    ];
-  }
+            );
+          }).toList(),
+        ),
+      ];
 }

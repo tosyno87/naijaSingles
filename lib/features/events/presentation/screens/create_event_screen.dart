@@ -1,27 +1,31 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../common/routes/route_name.dart';
+import '../../../../common/utils/app_logger.dart';
+import '../../data/models/enhanced_event_model.dart';
+import '../../data/services/event_templates_service.dart';
 import '../bloc/event_creation_bloc.dart';
+import '../widgets/create_event_steps/advanced_settings_step.dart';
 import '../widgets/create_event_steps/basic_info_step.dart';
 import '../widgets/create_event_steps/cultural_heritage_step.dart';
 import '../widgets/create_event_steps/datetime_step.dart';
 import '../widgets/create_event_steps/location_step.dart';
-import '../widgets/create_event_steps/advanced_settings_step.dart';
 import '../widgets/create_event_steps/preview_step.dart';
-import '../../data/models/enhanced_event_model.dart';
-import '../../data/services/event_templates_service.dart';
 
 class CreateEventScreen extends StatefulWidget {
-  final EnhancedEventModel? existingEvent; // For editing existing events
-  final EventTemplate? template; // For template-based creation
+  // For template-based creation
 
   const CreateEventScreen({
-    Key? key,
+    super.key,
     this.existingEvent,
     this.template,
-  }) : super(key: key);
+  });
+  final EnhancedEventModel? existingEvent; // For editing existing events
+  final EventTemplate? template;
 
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -39,7 +43,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   final List<String> _stepTitles = [
     'Basic Info',
-    'Cultural Heritage',
+    'Event Details',
     'Date & Time',
     'Location',
     'Advanced Settings',
@@ -82,14 +86,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       final template = widget.template!;
       final templateData = template.defaultData;
       final now = DateTime.now();
-      
+
       _eventData = EventCreationData()
         ..name = templateData.name
         ..description = templateData.description
         ..category = templateData.category
         ..tags = List.from(templateData.tags)
         ..startDate = now.add(const Duration(days: 7)) // Default to next week
-        ..endDate = now.add(const Duration(days: 7)).add(template.suggestedDuration)
+        ..endDate =
+            now.add(const Duration(days: 7)).add(template.suggestedDuration)
         ..isFree = templateData.isFree
         ..ticketPrice = templateData.ticketPrice
         ..maxAttendees = templateData.maxAttendees;
@@ -98,201 +103,201 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
-      body: BlocListener<EventCreationBloc, EventCreationState>(
-        listener: _handleBlocState,
-        child: Column(
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: Colors.white,
+        appBar: _buildAppBar(),
+        body: BlocListener<EventCreationBloc, EventCreationState>(
+          listener: _handleBlocState,
+          child: Column(
+            children: [
+              _buildProgressIndicator(),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) =>
+                      setState(() => _currentStep = index),
+                  children: [
+                    BasicInfoStep(eventData: _eventData),
+                    CulturalHeritageStep(eventData: _eventData),
+                    DateTimeStep(eventData: _eventData),
+                    LocationStep(
+                      eventData: _eventData,
+                      onLocationChanged: () => setState(() {}),
+                    ),
+                    AdvancedSettingsStep(eventData: _eventData),
+                    PreviewStep(eventData: _eventData),
+                  ],
+                ),
+              ),
+              _buildNavigationButtons(),
+            ],
+          ),
+        ),
+      );
+
+  PreferredSizeWidget _buildAppBar() => AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Color(0xFF333333)),
+          onPressed: _handleBackPress,
+        ),
+        title: Row(
           children: [
-            _buildProgressIndicator(),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentStep = index),
-                children: [
-                  BasicInfoStep(eventData: _eventData),
-                  CulturalHeritageStep(eventData: _eventData),
-                  DateTimeStep(eventData: _eventData),
-                  LocationStep(eventData: _eventData),
-                  AdvancedSettingsStep(eventData: _eventData),
-                  PreviewStep(eventData: _eventData),
-                ],
+            Text(
+              _isEditing ? 'Edit Event' : 'Create Event',
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF333333),
               ),
             ),
-            _buildNavigationButtons(),
+            if (_hasUnsavedChanges) ...[
+              const SizedBox(width: 8),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
           ],
         ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.close, color: Color(0xFF333333)),
-        onPressed: _handleBackPress,
-      ),
-      title: Row(
-        children: [
-          Text(
-            _isEditing ? 'Edit Event' : 'Create Event',
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF333333),
-            ),
-          ),
-          if (_hasUnsavedChanges) ...[
-            const SizedBox(width: 8),
-            Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: Colors.orange,
-                shape: BoxShape.circle,
+        actions: [
+          if (_currentStep <
+              _stepTitles.length - 1) // Don't show on preview step
+            TextButton(
+              onPressed: _saveAsDraft,
+              child: Text(
+                'Save Draft',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF008037),
+                ),
               ),
             ),
-          ],
         ],
-      ),
-      actions: [
-        if (_currentStep < _stepTitles.length - 1) // Don't show on preview step
-          TextButton(
-            onPressed: _saveAsDraft,
-            child: Text(
-              'Save Draft',
+      );
+
+  Widget _buildProgressIndicator() => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              children: List.generate(_stepTitles.length, (index) {
+                final isActive = index == _currentStep;
+                final isCompleted = index < _currentStep;
+
+                return Expanded(
+                  child: Container(
+                    height: 4,
+                    margin: EdgeInsets.only(
+                      right: index < _stepTitles.length - 1 ? 8 : 0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isCompleted || isActive
+                          ? const Color(0xFF008037)
+                          : const Color(0xFFE0E0E0),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '${_currentStep + 1} of ${_stepTitles.length}: ${_stepTitles[_currentStep]}',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF008037),
+                color: const Color(0xFF666666),
               ),
             ),
-          ),
-      ],
-    );
-  }
+          ],
+        ),
+      );
 
-  Widget _buildProgressIndicator() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Row(
-            children: List.generate(_stepTitles.length, (index) {
-              final isActive = index == _currentStep;
-              final isCompleted = index < _currentStep;
-              
-              return Expanded(
-                child: Container(
-                  height: 4,
-                  margin: EdgeInsets.only(right: index < _stepTitles.length - 1 ? 8 : 0),
-                  decoration: BoxDecoration(
-                    color: isCompleted || isActive 
-                        ? const Color(0xFF008037) 
-                        : const Color(0xFFE0E0E0),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '${_currentStep + 1} of ${_stepTitles.length}: ${_stepTitles[_currentStep]}',
-            style: GoogleFonts.montserrat(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF666666),
+  Widget _buildNavigationButtons() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, -2),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavigationButtons() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          if (_currentStep > 0)
-            Expanded(
-              child: OutlinedButton(
-                onPressed: _previousStep,
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF008037)),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Previous',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF008037),
-                  ),
-                ),
-              ),
-            ),
-          if (_currentStep > 0) const SizedBox(width: 16),
-          Expanded(
-            child: BlocBuilder<EventCreationBloc, EventCreationState>(
-              builder: (context, state) {
-                final isLoading = state is EventCreationLoading;
-                final isDisabled = isLoading || _isSubmitting;
-                
-                return ElevatedButton(
-                  onPressed: isDisabled ? null : _handleNextStep,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF008037),
-                    foregroundColor: Colors.white,
+          ],
+        ),
+        child: Row(
+          children: [
+            if (_currentStep > 0)
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _previousStep,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF008037)),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: isDisabled
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                  child: Text(
+                    'Previous',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF008037),
+                    ),
+                  ),
+                ),
+              ),
+            if (_currentStep > 0) const SizedBox(width: 16),
+            Expanded(
+              child: BlocBuilder<EventCreationBloc, EventCreationState>(
+                builder: (context, state) {
+                  final isLoading = state is EventCreationLoading;
+                  final isCurrentStepValid = _isCurrentStepValid();
+                  final isDisabled =
+                      isLoading || _isSubmitting || !isCurrentStepValid;
+
+                  return ElevatedButton(
+                    onPressed: isDisabled ? null : _handleNextStep,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF008037),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: isDisabled
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                        : Text(
+                            _getNextButtonText(),
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        )
-                      : Text(
-                          _getNextButtonText(),
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 
   String _getNextButtonText() {
     if (_currentStep == _stepTitles.length - 1) {
@@ -303,8 +308,19 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void _handleNextStep() {
     // Prevent multiple rapid calls
-    if (_isSubmitting) return;
-    
+    if (_isSubmitting) {
+      AppLogger.debug('⚠️ _handleNextStep: Already submitting, ignoring');
+      return;
+    }
+
+    // Validate before proceeding
+    if (!_isCurrentStepValid()) {
+      AppLogger.debug('⚠️ _handleNextStep: Current step is not valid');
+      // Show error message (validation already handles this)
+      _validateCurrentStep(showErrors: true);
+      return;
+    }
+
     if (_currentStep < _stepTitles.length - 1) {
       _nextStep();
     } else {
@@ -313,13 +329,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void _nextStep() {
-    if (_validateCurrentStep()) {
-      setState(() => _currentStep++);
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+    // Double-check validation before advancing
+    if (!_validateCurrentStep(showErrors: true)) {
+      AppLogger.debug('⚠️ _nextStep: Validation failed, not advancing');
+      return;
     }
+
+    setState(() {
+      _currentStep++;
+    });
+
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _previousStep() {
@@ -330,18 +353,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  bool _validateCurrentStep() {
+  bool _validateCurrentStep({bool showErrors = true}) {
     switch (_currentStep) {
       case 0: // Basic Info
-        return _validateBasicInfo();
+        return _validateBasicInfo(showErrors: showErrors);
       case 1: // Cultural Heritage
-        return _validateCulturalHeritage();
+        return _validateCulturalHeritage(showErrors: showErrors);
       case 2: // Date & Time
-        return _validateDateTime();
+        return _validateDateTime(showErrors: showErrors);
       case 3: // Location
-        return _validateLocation();
+        return _validateLocation(showErrors: showErrors);
       case 4: // Advanced Settings
-        return _validateAdvancedSettings();
+        return _validateAdvancedSettings(showErrors: showErrors);
       case 5: // Preview
         return true;
       default:
@@ -349,72 +372,102 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  bool _validateBasicInfo() {
+  /// Check if current step is valid without showing errors (for button state)
+  bool _isCurrentStepValid() {
+    return _validateCurrentStep(showErrors: false);
+  }
+
+  bool _validateBasicInfo({bool showErrors = true}) {
     if (_eventData.name.trim().isEmpty) {
-      _showError('Please enter an event name');
+      if (showErrors) _showError('Please enter an event name');
       return false;
     }
     if (_eventData.description.trim().isEmpty) {
-      _showError('Please enter an event description');
+      if (showErrors) _showError('Please enter an event description');
       return false;
     }
     if (_eventData.category.trim().isEmpty) {
-      _showError('Please select an event category');
+      if (showErrors) _showError('Please select an event category');
       return false;
     }
     return true;
   }
 
-  bool _validateCulturalHeritage() {
-    if (_eventData.metadata['culturalHeritage'] == null || 
-        _eventData.metadata['culturalHeritage'].toString().trim().isEmpty) {
-      _showError('Please select a cultural heritage');
-      return false;
-    }
-    if (_eventData.metadata['ageGroup'] == null || 
-        _eventData.metadata['ageGroup'].toString().trim().isEmpty) {
-      _showError('Please select a target age group');
-      return false;
-    }
+  bool _validateCulturalHeritage({bool showErrors = true}) {
+    // Age group is now optional (like Facebook Events)
+    // No longer requiring cultural heritage or language requirements
     return true;
   }
 
-  bool _validateDateTime() {
+  bool _validateDateTime({bool showErrors = true}) {
     if (_eventData.startDate == null) {
-      _showError('Please select a start date and time');
+      if (showErrors) _showError('Please select a start date and time');
       return false;
     }
     if (_eventData.endDate == null) {
-      _showError('Please select an end date and time');
+      if (showErrors) _showError('Please select an end date and time');
       return false;
     }
-    if (_eventData.startDate!.isBefore(DateTime.now().add(const Duration(hours: 1)))) {
-      _showError('Event must start at least 1 hour from now');
+    if (_eventData.startDate!
+        .isBefore(DateTime.now().add(const Duration(hours: 1)))) {
+      if (showErrors) _showError('Event must start at least 1 hour from now');
       return false;
     }
     if (_eventData.endDate!.isBefore(_eventData.startDate!)) {
-      _showError('End date must be after start date');
+      if (showErrors) _showError('End date must be after start date');
       return false;
     }
     return true;
   }
 
-  bool _validateLocation() {
+  bool _validateLocation({bool showErrors = true}) {
     if (_eventData.location == null) {
-      _showError('Please select an event location');
+      if (showErrors) _showError('Please select an event location');
       return false;
     }
+
+    final location = _eventData.location!;
+
+    // Check all required fields
+    if (location.name == null || location.name!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a venue name');
+      return false;
+    }
+
+    if (location.address == null || location.address!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a street address');
+      return false;
+    }
+
+    if (location.city == null || location.city!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a city');
+      return false;
+    }
+
+    if (location.state == null || location.state!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a state');
+      return false;
+    }
+
+    if (location.country == null || location.country!.trim().isEmpty) {
+      if (showErrors) _showError('Please enter a country');
+      return false;
+    }
+
     return true;
   }
 
-  bool _validateAdvancedSettings() {
+  bool _validateAdvancedSettings({bool showErrors = true}) {
     // Advanced settings are optional, but validate if user has made changes
-    if (!_eventData.isFree && (_eventData.ticketPrice == null || _eventData.ticketPrice! <= 0)) {
-      _showError('Please enter a valid ticket price for paid events');
+    if (!_eventData.isFree &&
+        (_eventData.ticketPrice == null || _eventData.ticketPrice! <= 0)) {
+      if (showErrors)
+        _showError('Please enter a valid ticket price for paid events');
       return false;
     }
     if (_eventData.maxAttendees <= 0) {
-      _showError('Please enter a valid maximum number of attendees');
+      if (showErrors)
+        _showError('Please enter a valid maximum number of attendees');
       return false;
     }
     return true;
@@ -423,18 +476,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   void _submitEvent() {
     // Prevent multiple submissions
     if (_isSubmitting) return;
-    
+
     // Cancel any existing timer
     _debounceTimer?.cancel();
-    
+
     setState(() {
       _isSubmitting = true;
     });
-    
+
     // Add a small delay to prevent rapid successive calls
     _debounceTimer = Timer(const Duration(milliseconds: 100), () {
       final bloc = context.read<EventCreationBloc>();
-      
+
       if (_isEditing) {
         bloc.add(UpdateEventEvent(widget.existingEvent!.id, _eventData));
       } else {
@@ -461,7 +514,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-
   void _saveAsDraft() {
     final bloc = context.read<EventCreationBloc>();
     bloc.add(SaveEventAsDraftEvent(_eventData));
@@ -475,7 +527,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         _isSubmitting = false;
       });
     }
-    
+
     if (state is EventCreationSuccess) {
       _showSuccessDialog(state.message, state.eventId);
     } else if (state is EventCreationError) {
@@ -498,7 +550,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           children: [
             const Icon(Icons.check_circle, color: Color(0xFF008037), size: 28),
             const SizedBox(width: 12),
-            Expanded( // Prevent text overflow
+            Expanded(
+              // Prevent text overflow
               child: Text(
                 'Success!',
                 style: GoogleFonts.montserrat(
@@ -525,7 +578,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               children: [
                 // Close button
                 Expanded(
-                  flex: 1,
                   child: TextButton(
                     onPressed: () {
                       Navigator.of(context).pop(); // Close dialog
@@ -549,11 +601,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   flex: 2,
                   child: ElevatedButton(
                     onPressed: () {
-                      print('[DEBUG] View My Events button pressed');
+                      AppLogger.debug('[DEBUG] View My Events button pressed');
                       // Close the dialog first
                       Navigator.of(context).pop();
-                      print('[DEBUG] Dialog closed, navigating to My Events');
-                      
+                      AppLogger.debug(
+                          '[DEBUG] Dialog closed, navigating to My Events');
+
                       // Navigate to My Events page
                       _navigateToMyEvents();
                     },
@@ -600,32 +653,32 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  void _navigateToMyEvents() async {
-    print('[DEBUG] _navigateToMyEvents called');
-    
+  Future<void> _navigateToMyEvents() async {
+    AppLogger.debug('[DEBUG] _navigateToMyEvents called');
+
     // Get context references before async operations
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
+
     try {
-      print('[DEBUG] Attempting to navigate to My Events screen');
+      AppLogger.debug('[DEBUG] Attempting to navigate to My Events screen');
       // Replace the current create event screen with My Events screen
       // This ensures back button goes to the screen before create event
       await navigator.pushReplacementNamed(RouteName.myEvents);
-      print('[DEBUG] Navigation to My Events successful');
+      AppLogger.debug('[DEBUG] Navigation to My Events successful');
     } catch (e) {
-      print('[DEBUG] Navigation failed: $e, using fallback');
+      AppLogger.error('[DEBUG] Navigation failed', error: e);
       // Fallback navigation - go back to main navigation
       navigator.pushNamedAndRemoveUntil(
         RouteName.mainNavigation,
         (route) => false,
       );
     }
-    
+
     // Show success message after navigation
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        print('[DEBUG] Showing success snackbar');
+        AppLogger.debug('[DEBUG] Showing success snackbar');
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
@@ -637,7 +690,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -664,11 +716,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     if (_hasUnsavedChanges) {
       showDialog(
         context: context,
-        barrierDismissible: true,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
               Container(
@@ -711,7 +763,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 Navigator.of(context).pop(); // Close screen
               },
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -732,7 +785,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008037),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -752,5 +806,4 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       Navigator.of(context).pop();
     }
   }
-
 }

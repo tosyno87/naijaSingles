@@ -7,7 +7,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('African Diaspora Registration Flow', () {
-    testWidgets('Complete diaspora user registration with US phone number', (tester) async {
+    testWidgets('Complete diaspora user registration with US phone number',
+        (tester) async {
       // Launch the app
       app.main();
       await tester.pumpAndSettle();
@@ -16,7 +17,8 @@ void main() {
       await _testDiasporaRegistration(tester);
     });
 
-    testWidgets('Profile setup with African heritage selection', (tester) async {
+    testWidgets('Profile setup with African heritage selection',
+        (tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -24,7 +26,8 @@ void main() {
       await _testCulturalProfileSetup(tester);
     });
 
-    testWidgets('US location and African background integration', (tester) async {
+    testWidgets('US location and African background integration',
+        (tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -38,7 +41,7 @@ void main() {
 Future<void> _testDiasporaRegistration(WidgetTester tester) async {
   // Look for registration screen
   expect(find.text('Welcome to NaijaSingles'), findsOneWidget);
-  
+
   // Test US phone number input
   final phoneField = find.byType(TextFormField).first;
   await tester.enterText(phoneField, '+1 404 555 0123'); // Atlanta area code

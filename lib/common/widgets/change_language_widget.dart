@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/home/ui/tab/tabbar.dart';
+import '../bloc/language/language_bloc.dart';
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
 import '../constants/constants.dart';
-import '../providers/theme_provider.dart';
 
 class LanguageWidget extends StatefulWidget {
-  const LanguageWidget({Key? key}) : super(key: key);
+  const LanguageWidget({super.key});
 
   @override
   State<LanguageWidget> createState() => _LanguageWidgetState();
@@ -53,9 +54,9 @@ class _LanguageWidgetState extends State<LanguageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Padding(
-      padding: const EdgeInsets.all(15.0),
+      padding: const EdgeInsets.all(15),
       child: Card(
         child: StreamBuilder<DocumentSnapshot>(
           stream: firebaseFireStoreInstance
@@ -78,7 +79,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
 
             final List<String> languages = data.keys
                 .where((key) => data[key] == true)
-                .map((language) => capitalizeFirstLetter(language))
+                .map(capitalizeFirstLetter)
                 .toList();
 
             // Set initial selectedLanguage to the first language in the list
@@ -98,24 +99,22 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                 children: [
                   ListTile(
                     title: Text(
-                      "Change Language".tr().toString(),
+                      'Change Language'.tr().toString(),
                       style: TextStyle(
                         fontSize: 18,
-                        color: themeProvider.isDarkMode
+                        color: isDarkMode
                             ? Colors.white
                             : primaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     subtitle: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           DropdownButton<String>(
                             iconDisabledColor: primaryColor,
                             iconEnabledColor: primaryColor,
-                            iconSize: 24,
                             icon:
                                 const Icon(Icons.keyboard_arrow_down_outlined),
                             value: selectedLanguage,
@@ -131,14 +130,19 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'English',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('en', 'US'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('en', 'US'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar()));
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -147,14 +151,19 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'Spanish',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('es', 'ES'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('es', 'ES'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar()));
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -163,13 +172,18 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'German',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('de', 'DE'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('de', 'DE'),
+                                              context,
+                                            ),
+                                          );
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar()));
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -178,14 +192,21 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'Russian',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('ru', 'RU'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('ru', 'RU'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar(isPaymentSuccess: false)));
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(
+                                            isPaymentSuccess: false,
+                                          ),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -194,14 +215,19 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'French',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('fr', 'FR'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('fr', 'FR'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar()));
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
@@ -210,33 +236,41 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                     context,
                                     'Hindi',
                                     () {
-                                      EasyLocalization.of(context)!
-                                          .setLocale(const Locale('hi', 'IN'));
+                                      context.read<LanguageBloc>().add(
+                                            LanguageLocaleChanged(
+                                              const Locale('hi', 'IN'),
+                                              context,
+                                            ),
+                                          );
 
                                       Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Tabbar()));
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Tabbar(),
+                                        ),
+                                      );
                                     },
                                   );
                                   break;
                               }
                             },
-                            items: languages.map((language) {
-                              return DropdownMenuItem<String>(
-                                value: language,
-                                child: Text(
-                                  language.tr().toString(),
-                                  style: TextStyle(
-                                      color: themeProvider.isDarkMode
-                                          ? Colors.white70
-                                          : primaryColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              );
-                            }).toList(),
+                            items: languages
+                                .map(
+                                  (language) => DropdownMenuItem<String>(
+                                    value: language,
+                                    child: Text(
+                                      language.tr().toString(),
+                                      style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : primaryColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ],
                       ),
@@ -246,10 +280,11 @@ class _LanguageWidgetState extends State<LanguageWidget> {
               );
             } catch (e) {
               return Center(
-                  child: Text(
-                "Unable to load".tr().toString(),
-                style: TextStyle(color: primaryColor),
-              ));
+                child: Text(
+                  'Unable to load'.tr().toString(),
+                  style: const TextStyle(color: primaryColor),
+                ),
+              );
             }
           },
         ),
@@ -259,29 +294,33 @@ class _LanguageWidgetState extends State<LanguageWidget> {
 }
 
 void showChangeDialog(
-    BuildContext context, String language, VoidCallback onTap) {
+  BuildContext context,
+  String language,
+  VoidCallback onTap,
+) {
   showDialog(
     context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Change Language".tr().toString()),
-        content: Text(
-            'Do you want to change the language to $language?'.tr().toString()),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'.tr().toString(),
-                style: TextStyle(color: primaryColor)),
+    builder: (BuildContext context) => AlertDialog(
+      title: Text('Change Language'.tr().toString()),
+      content: Text(
+        'Do you want to change the language to $language?'.tr().toString(),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(
+            'No'.tr().toString(),
+            style: const TextStyle(color: primaryColor),
           ),
-          TextButton(
-            onPressed: onTap,
-            child: Text(
-              'Yes'.tr().toString(),
-              style: TextStyle(color: primaryColor),
-            ),
+        ),
+        TextButton(
+          onPressed: onTap,
+          child: Text(
+            'Yes'.tr().toString(),
+            style: const TextStyle(color: primaryColor),
           ),
-        ],
-      );
-    },
+        ),
+      ],
+    ),
   );
 }

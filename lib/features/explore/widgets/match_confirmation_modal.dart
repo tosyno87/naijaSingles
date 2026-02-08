@@ -1,24 +1,23 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:ui';
-import 'package:flutter/foundation.dart';
 
-import '../../messages/services/chat_service.dart';
 import '../../messages/chat_thread_screen.dart';
+import '../../messages/services/chat_service.dart';
 
 class MatchConfirmationModal extends StatefulWidget {
-  final String currentUserImageUrl;
-  final String matchedUserImageUrl;
-  final String matchedUserName;
-  final String matchedUserId;
-
   const MatchConfirmationModal({
-    Key? key,
     required this.currentUserImageUrl,
     required this.matchedUserImageUrl,
     required this.matchedUserName,
     required this.matchedUserId,
-  }) : super(key: key);
+    super.key,
+  });
+  final String currentUserImageUrl;
+  final String matchedUserImageUrl;
+  final String matchedUserName;
+  final String matchedUserId;
 
   @override
   State<MatchConfirmationModal> createState() => _MatchConfirmationModalState();
@@ -40,17 +39,17 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
       duration: const Duration(milliseconds: 800),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.elasticOut,
       ),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
+        curve: const Interval(0.4, 1, curve: Curves.easeIn),
       ),
     );
 
@@ -181,7 +180,7 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                   opacity: _fadeAnimation,
                   child: Text(
                     "💚 It's a Match!",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF4E2B1B),
@@ -196,8 +195,8 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: Text(
-                    "You and ${widget.matchedUserName} like each other",
-                    style: GoogleFonts.poppins(
+                    'You and ${widget.matchedUserName} like each other',
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       color: const Color(0xFF4E2B1B).withValues(alpha: 0.8),
                     ),
@@ -240,9 +239,10 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                 const SizedBox(height: 40),
 
                 // Action labelLarges
-                isWideScreen
-                    ? _buildHorizontalButtons()
-                    : _buildVerticalButtons(),
+                if (isWideScreen)
+                  _buildHorizontalButtons()
+                else
+                  _buildVerticalButtons(),
               ],
             ),
           ),
@@ -251,75 +251,108 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
     );
   }
 
-  Widget _buildProfileAvatar(String imageUrl) {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF008037).withValues(alpha: 0.4),
-            blurRadius: 12,
-            spreadRadius: 2,
+  Widget _buildProfileAvatar(String imageUrl) => Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF008037).withValues(alpha: 0.4),
+              blurRadius: 12,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: Colors.grey[300],
+              child: const Icon(
+                Icons.person,
+                size: 50,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Widget _buildHorizontalButtons() => Row(
+        children: [
+          // Keep Exploring labelLarge
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _isProcessing
+                  ? null
+                  : () {
+                      Navigator.pop(context);
+                    },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+                  width: 2,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Text(
+                'Keep Exploring',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Send Message labelLarge
+          Expanded(
+            child: ElevatedButton(
+              onPressed: _isProcessing ? null : _handleSendMessage,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF008037),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                disabledBackgroundColor: Colors.grey,
+              ),
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      'Send Message',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(50),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Container(
-            color: Colors.grey[300],
-            child: const Icon(
-              Icons.person,
-              size: 50,
-              color: Colors.grey,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+      );
 
-  Widget _buildHorizontalButtons() {
-    return Row(
-      children: [
-        // Keep Exploring labelLarge
-        Expanded(
-          child: OutlinedButton(
-            onPressed: _isProcessing
-                ? null
-                : () {
-                    Navigator.pop(context);
-                  },
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
-                width: 2,
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: Text(
-              'Keep Exploring',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(width: 16),
-
-        // Send Message labelLarge
-        Expanded(
-          child: ElevatedButton(
+  Widget _buildVerticalButtons() => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Send Message labelLarge
+          ElevatedButton(
             onPressed: _isProcessing ? null : _handleSendMessage,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF008037),
@@ -341,80 +374,41 @@ class _MatchConfirmationModalState extends State<MatchConfirmationModal>
                   )
                 : Text(
                     'Send Message',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
           ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildVerticalButtons() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Send Message labelLarge
-        ElevatedButton(
-          onPressed: _isProcessing ? null : _handleSendMessage,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF008037),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+          const SizedBox(height: 12),
+
+          // Keep Exploring labelLarge
+          OutlinedButton(
+            onPressed: _isProcessing
+                ? null
+                : () {
+                    Navigator.pop(context);
+                  },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(
+                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+                width: 2,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
-            disabledBackgroundColor: Colors.grey,
-          ),
-          child: _isProcessing
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                )
-              : Text(
-                  'Send Message',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Keep Exploring labelLarge
-        OutlinedButton(
-          onPressed: _isProcessing
-              ? null
-              : () {
-                  Navigator.pop(context);
-                },
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: _isProcessing ? Colors.grey : const Color(0xFF008037),
-              width: 2,
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+            child: Text(
+              'Keep Exploring',
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: _isProcessing ? Colors.grey : const Color(0xFF008037),
+              ),
             ),
           ),
-          child: Text(
-            'Keep Exploring',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: _isProcessing ? Colors.grey : const Color(0xFF008037),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 }

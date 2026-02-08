@@ -1,10 +1,4 @@
 class Message {
-  final String id;
-  final String senderId;
-  final String text;
-  final DateTime timestamp;
-  final bool isRead;
-
   Message({
     required this.id,
     required this.senderId,
@@ -12,9 +6,24 @@ class Message {
     required this.timestamp,
     required this.isRead,
   });
+  final String id;
+  final String senderId;
+  final String text;
+  final DateTime timestamp;
+  final bool isRead;
 }
 
 class MessageThreadInfo {
+  MessageThreadInfo({
+    required this.threadId,
+    required this.otherUserId,
+    required this.otherUserName,
+    required this.lastMessage,
+    required this.timestamp,
+    required this.unread,
+    this.lastMessageSenderId,
+    this.avatarUrl,
+  });
   final String threadId;
   final String otherUserId;
   final String otherUserName;
@@ -23,17 +32,6 @@ class MessageThreadInfo {
   final DateTime timestamp;
   final bool unread;
   final String? avatarUrl;
-
-  MessageThreadInfo({
-    required this.threadId,
-    required this.otherUserId,
-    required this.otherUserName,
-    required this.lastMessage,
-    this.lastMessageSenderId,
-    required this.timestamp,
-    required this.unread,
-    this.avatarUrl,
-  });
 
   // Helper method to format timestamp as relative time
   String getRelativeTime() {

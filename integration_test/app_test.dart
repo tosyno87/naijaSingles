@@ -11,7 +11,7 @@ void main() {
       print('🧪 Testing app launch...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 5));
+      await tester.pumpAndSettle(const Duration(seconds: 5));
 
       // App should load without errors
       expect(find.byType(MaterialApp), findsOneWidget);
@@ -23,7 +23,7 @@ void main() {
       print('🧪 Testing bio screen prompt selection...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Try to find bio-related elements
       // This is a simplified test - you'd navigate to the actual bio screen
@@ -41,7 +41,7 @@ void main() {
       print('🧪 Testing basic navigation...');
 
       app.main();
-      await tester.pumpAndSettle(Duration(seconds: 3));
+      await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Test basic navigation elements exist
       final scaffolds = find.byType(Scaffold);

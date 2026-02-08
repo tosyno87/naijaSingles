@@ -1,11 +1,12 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:developer';
 
 /// Industry-standard image optimization service
 /// Features:
@@ -17,9 +18,10 @@ import 'dart:developer';
 /// - Quality optimization
 /// - Size-based compression
 class ImageOptimizationService {
-  static final ImageOptimizationService _instance = ImageOptimizationService._internal();
   factory ImageOptimizationService() => _instance;
   ImageOptimizationService._internal();
+  static final ImageOptimizationService _instance =
+      ImageOptimizationService._internal();
 
   // Image quality settings
   static const int _profilePhotoQuality = 85;
@@ -77,8 +79,9 @@ class ImageOptimizationService {
         originalHeight: imageInfo.height,
       );
 
-      final compressedFile = await _compressImage(imageFile, compressionSettings);
-      
+      final compressedFile =
+          await _compressImage(imageFile, compressionSettings);
+
       log('✅ Image optimized for web: ${compressedFile.path}');
       return compressedFile;
     } catch (e) {
@@ -93,7 +96,8 @@ class ImageOptimizationService {
       log('🖼️ Generating thumbnail...');
 
       final tempDir = await getTemporaryDirectory();
-      final thumbnailPath = '${tempDir.path}/thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final thumbnailPath =
+          '${tempDir.path}/thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         imageFile.absolute.path,
@@ -101,8 +105,6 @@ class ImageOptimizationService {
         quality: _thumbnailQuality,
         minWidth: size,
         minHeight: size,
-        format: CompressFormat.jpeg,
-        keepExif: false,
       );
 
       if (compressedFile == null) {
@@ -118,10 +120,14 @@ class ImageOptimizationService {
   }
 
   /// Compress image with smart settings
-  Future<File> _compressImage(File imageFile, CompressionSettings settings) async {
+  Future<File> _compressImage(
+    File imageFile,
+    CompressionSettings settings,
+  ) async {
     try {
       final tempDir = await getTemporaryDirectory();
-      final compressedPath = '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.${settings.format.name}';
+      final compressedPath =
+          '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.${settings.format.name}';
 
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         imageFile.absolute.path,
@@ -131,8 +137,6 @@ class ImageOptimizationService {
         minHeight: settings.minHeight,
         format: settings.format,
         keepExif: settings.keepExif,
-        autoCorrectionAngle: true,
-        rotate: 0,
       );
 
       if (compressedFile == null) {
@@ -147,9 +151,8 @@ class ImageOptimizationService {
   }
 
   /// Generate thumbnail with specific settings
-  Future<File> _generateThumbnail(File imageFile) async {
-    return await generateThumbnail(imageFile, size: _maxThumbnailSize);
-  }
+  Future<File> _generateThumbnail(File imageFile) async =>
+      generateThumbnail(imageFile);
 
   /// Get compression settings based on image type and size
   CompressionSettings _getCompressionSettings({
@@ -216,7 +219,7 @@ class ImageOptimizationService {
     try {
       final bytes = await imageFile.readAsBytes();
       final image = img.decodeImage(bytes);
-      
+
       if (image == null) {
         throw Exception('Failed to decode image');
       }
@@ -241,9 +244,21 @@ class ImageOptimizationService {
 
     // Check for common image formats
     if (bytes[0] == 0xFF && bytes[1] == 0xD8) return ImageFormat.jpeg;
-    if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) return ImageFormat.png;
-    if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46) return ImageFormat.gif;
-    if (bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46) return ImageFormat.webp;
+    if (bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47) {
+      return ImageFormat.png;
+    }
+    if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46) {
+      return ImageFormat.gif;
+    }
+    if (bytes[0] == 0x52 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46 &&
+        bytes[3] == 0x46) {
+      return ImageFormat.webp;
+    }
 
     return ImageFormat.unknown;
   }
@@ -268,12 +283,18 @@ class ImageOptimizationService {
           optimizedFile = await optimizeForWeb(imageFile);
           break;
         case ImageType.fullSize:
-          optimizedFile = await _compressImage(imageFile, _getCompressionSettings(
-            imageType: imageType,
-            originalSize: await _getImageInfo(imageFile).then((info) => info.sizeInMB),
-            originalWidth: await _getImageInfo(imageFile).then((info) => info.width),
-            originalHeight: await _getImageInfo(imageFile).then((info) => info.height),
-          ));
+          optimizedFile = await _compressImage(
+            imageFile,
+            _getCompressionSettings(
+              imageType: imageType,
+              originalSize:
+                  await _getImageInfo(imageFile).then((info) => info.sizeInMB),
+              originalWidth:
+                  await _getImageInfo(imageFile).then((info) => info.width),
+              originalHeight:
+                  await _getImageInfo(imageFile).then((info) => info.height),
+            ),
+          );
           break;
         case ImageType.thumbnail:
           optimizedFile = await generateThumbnail(imageFile);
@@ -302,7 +323,7 @@ class ImageOptimizationService {
       log('🔄 Batch optimizing ${imageFiles.length} images...');
 
       final List<File> optimizedFiles = [];
-      
+
       for (int i = 0; i < imageFiles.length; i++) {
         try {
           File optimizedFile;
@@ -314,12 +335,18 @@ class ImageOptimizationService {
               optimizedFile = await optimizeForWeb(imageFiles[i]);
               break;
             case ImageType.fullSize:
-              optimizedFile = await _compressImage(imageFiles[i], _getCompressionSettings(
-                imageType: imageType,
-                originalSize: await _getImageInfo(imageFiles[i]).then((info) => info.sizeInMB),
-                originalWidth: await _getImageInfo(imageFiles[i]).then((info) => info.width),
-                originalHeight: await _getImageInfo(imageFiles[i]).then((info) => info.height),
-              ));
+              optimizedFile = await _compressImage(
+                imageFiles[i],
+                _getCompressionSettings(
+                  imageType: imageType,
+                  originalSize: await _getImageInfo(imageFiles[i])
+                      .then((info) => info.sizeInMB),
+                  originalWidth: await _getImageInfo(imageFiles[i])
+                      .then((info) => info.width),
+                  originalHeight: await _getImageInfo(imageFiles[i])
+                      .then((info) => info.height),
+                ),
+              );
               break;
             case ImageType.thumbnail:
               optimizedFile = await generateThumbnail(imageFiles[i]);
@@ -341,12 +368,17 @@ class ImageOptimizationService {
   }
 
   /// Get optimized image size info
-  Future<OptimizationResult> getOptimizationResult(File originalFile, File optimizedFile) async {
+  Future<OptimizationResult> getOptimizationResult(
+    File originalFile,
+    File optimizedFile,
+  ) async {
     try {
       final originalInfo = await _getImageInfo(originalFile);
       final optimizedInfo = await _getImageInfo(optimizedFile);
 
-      final sizeReduction = ((originalInfo.sizeInMB - optimizedInfo.sizeInMB) / originalInfo.sizeInMB) * 100;
+      final sizeReduction = ((originalInfo.sizeInMB - optimizedInfo.sizeInMB) /
+              originalInfo.sizeInMB) *
+          100;
 
       return OptimizationResult(
         originalSize: originalInfo.sizeInMB,
@@ -382,12 +414,6 @@ enum ImageFormat {
 
 /// Compression settings
 class CompressionSettings {
-  final int quality;
-  final int minWidth;
-  final int minHeight;
-  final CompressFormat format;
-  final bool keepExif;
-
   const CompressionSettings({
     required this.quality,
     required this.minWidth,
@@ -395,42 +421,37 @@ class CompressionSettings {
     required this.format,
     required this.keepExif,
   });
+  final int quality;
+  final int minWidth;
+  final int minHeight;
+  final CompressFormat format;
+  final bool keepExif;
 
   @override
-  String toString() {
-    return 'CompressionSettings(quality: $quality, minWidth: $minWidth, minHeight: $minHeight, format: $format)';
-  }
+  String toString() =>
+      'CompressionSettings(quality: $quality, minWidth: $minWidth, minHeight: $minHeight, format: $format)';
 }
 
 /// Image information
 class ImageInfo {
-  final int width;
-  final int height;
-  final double sizeInMB;
-  final ImageFormat format;
-
   const ImageInfo({
     required this.width,
     required this.height,
     required this.sizeInMB,
     required this.format,
   });
+  final int width;
+  final int height;
+  final double sizeInMB;
+  final ImageFormat format;
 
   @override
-  String toString() {
-    return 'ImageInfo(${width}x$height, ${sizeInMB.toStringAsFixed(2)}MB, $format)';
-  }
+  String toString() =>
+      'ImageInfo(${width}x$height, ${sizeInMB.toStringAsFixed(2)}MB, $format)';
 }
 
 /// Optimization result
 class OptimizationResult {
-  final double originalSize;
-  final double optimizedSize;
-  final double sizeReduction;
-  final String originalDimensions;
-  final String optimizedDimensions;
-  final double compressionRatio;
-
   const OptimizationResult({
     required this.originalSize,
     required this.optimizedSize,
@@ -439,9 +460,14 @@ class OptimizationResult {
     required this.optimizedDimensions,
     required this.compressionRatio,
   });
+  final double originalSize;
+  final double optimizedSize;
+  final double sizeReduction;
+  final String originalDimensions;
+  final String optimizedDimensions;
+  final double compressionRatio;
 
   @override
-  String toString() {
-    return 'OptimizationResult(${originalSize.toStringAsFixed(2)}MB -> ${optimizedSize.toStringAsFixed(2)}MB, ${sizeReduction.toStringAsFixed(1)}% reduction)';
-  }
+  String toString() =>
+      'OptimizationResult(${originalSize.toStringAsFixed(2)}MB -> ${optimizedSize.toStringAsFixed(2)}MB, ${sizeReduction.toStringAsFixed(1)}% reduction)';
 }

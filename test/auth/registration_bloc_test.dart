@@ -1,10 +1,10 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:naijasingles/features/auth/auth_status/bloc/registration/bloc/registration_bloc.dart';
 import 'package:naijasingles/common/data/repo/phone_auth_repo.dart';
+import 'package:naijasingles/features/auth/auth_status/bloc/registration/bloc/registration_bloc.dart';
 import 'package:naijasingles/models/user_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class MockPhoneAuthRepository extends Mock implements PhoneAuthRepository {}
 

@@ -4,6 +4,15 @@ import '../../../models/user_model.dart';
 
 /// Mode-specific action buttons for different relationship intents
 class ModeActionButtons extends StatelessWidget {
+  const ModeActionButtons({
+    required this.selectedMode,
+    super.key,
+    this.currentUser,
+    this.onSuperLike,
+    this.onPass,
+    this.onLike,
+    this.onModeSpecificAction,
+  });
   final String selectedMode;
   final UserModel? currentUser;
   final VoidCallback? onSuperLike;
@@ -11,42 +20,30 @@ class ModeActionButtons extends StatelessWidget {
   final VoidCallback? onLike;
   final VoidCallback? onModeSpecificAction;
 
-  const ModeActionButtons({
-    Key? key,
-    required this.selectedMode,
-    this.currentUser,
-    this.onSuperLike,
-    this.onPass,
-    this.onLike,
-    this.onModeSpecificAction,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        // Pass button (same for all modes)
-        _buildActionButton(
-          icon: Icons.close,
-          color: Colors.red,
-          onTap: onPass,
-          tooltip: 'Pass',
-        ),
-        
-        // Mode-specific primary action
-        _buildModeSpecificAction(),
-        
-        // Super like button (same for all modes)
-        _buildActionButton(
-          icon: Icons.star_rounded,
-          color: Colors.blue,
-          onTap: onSuperLike,
-          tooltip: 'Super Like',
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Pass button (same for all modes)
+          _buildActionButton(
+            icon: Icons.close,
+            color: Colors.red,
+            onTap: onPass,
+            tooltip: 'Pass',
+          ),
+
+          // Mode-specific primary action
+          _buildModeSpecificAction(),
+
+          // Super like button (same for all modes)
+          _buildActionButton(
+            icon: Icons.star_rounded,
+            color: Colors.blue,
+            onTap: onSuperLike,
+            tooltip: 'Super Like',
+          ),
+        ],
+      );
 
   Widget _buildModeSpecificAction() {
     switch (selectedMode) {
@@ -57,7 +54,7 @@ class ModeActionButtons extends StatelessWidget {
           onTap: onLike,
           tooltip: 'Like',
         );
-      
+
       case 'Friendship':
         return _buildActionButton(
           icon: Icons.people,
@@ -65,7 +62,7 @@ class ModeActionButtons extends StatelessWidget {
           onTap: onLike,
           tooltip: 'Connect',
         );
-      
+
       case 'Networking':
         return _buildActionButton(
           icon: Icons.handshake,
@@ -73,7 +70,7 @@ class ModeActionButtons extends StatelessWidget {
           onTap: onLike,
           tooltip: 'Network',
         );
-      
+
       default:
         return _buildActionButton(
           icon: Icons.favorite,
@@ -89,45 +86,43 @@ class ModeActionButtons extends StatelessWidget {
     required Color color,
     required VoidCallback? onTap,
     required String tooltip,
-  }) {
-    return Material(
-      elevation: 8,
-      shape: const CircleBorder(),
-      color: color,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: Container(
-          width: 60,
-          height: 60,
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 30,
+  }) =>
+      Material(
+        elevation: 8,
+        shape: const CircleBorder(),
+        color: color,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: SizedBox(
+            width: 60,
+            height: 60,
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 30,
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 /// Mode-specific action button with enhanced styling
 class EnhancedModeActionButton extends StatelessWidget {
+  const EnhancedModeActionButton({
+    required this.selectedMode,
+    super.key,
+    this.onTap,
+    this.isEnabled = true,
+  });
   final String selectedMode;
   final VoidCallback? onTap;
   final bool isEnabled;
 
-  const EnhancedModeActionButton({
-    Key? key,
-    required this.selectedMode,
-    this.onTap,
-    this.isEnabled = true,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final config = _getModeConfig();
-    
+
     return Material(
       elevation: isEnabled ? 8 : 2,
       shape: const CircleBorder(),
@@ -135,7 +130,7 @@ class EnhancedModeActionButton extends StatelessWidget {
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: isEnabled ? onTap : null,
-        child: Container(
+        child: SizedBox(
           width: 70,
           height: 70,
           child: Column(
@@ -170,21 +165,21 @@ class EnhancedModeActionButton extends StatelessWidget {
           color: Colors.pink,
           label: 'Like',
         );
-      
+
       case 'Friendship':
         return _ModeConfig(
           icon: Icons.people,
           color: Colors.green,
           label: 'Connect',
         );
-      
+
       case 'Networking':
         return _ModeConfig(
           icon: Icons.handshake,
           color: Colors.orange,
           label: 'Network',
         );
-      
+
       default:
         return _ModeConfig(
           icon: Icons.favorite,
@@ -196,73 +191,69 @@ class EnhancedModeActionButton extends StatelessWidget {
 }
 
 class _ModeConfig {
-  final IconData icon;
-  final Color color;
-  final String label;
-
   _ModeConfig({
     required this.icon,
     required this.color,
     required this.label,
   });
+  final IconData icon;
+  final Color color;
+  final String label;
 }
 
 /// Mode-specific action sheet for additional options
 class ModeActionSheet extends StatelessWidget {
+  const ModeActionSheet({
+    required this.selectedMode,
+    required this.user,
+    super.key,
+    this.onClose,
+  });
   final String selectedMode;
   final UserModel user;
   final VoidCallback? onClose;
 
-  const ModeActionSheet({
-    Key? key,
-    required this.selectedMode,
-    required this.user,
-    this.onClose,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          
-          // Mode-specific content
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Text(
-                  _getModeTitle(),
-                  style: GoogleFonts.montserrat(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF333333),
+
+            // Mode-specific content
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Text(
+                    _getModeTitle(),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF333333),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                ..._getModeSpecificActions(context),
-              ],
+                  const SizedBox(height: 20),
+                  ..._getModeSpecificActions(context),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 
   String _getModeTitle() {
     switch (selectedMode) {
@@ -300,7 +291,7 @@ class ModeActionSheet extends StatelessWidget {
             onTap: () => _handleDatingAction(context, 'interest'),
           ),
         ];
-      
+
       case 'Friendship':
         return [
           _buildActionTile(
@@ -322,7 +313,7 @@ class ModeActionSheet extends StatelessWidget {
             onTap: () => _handleFriendshipAction(context, 'friendship'),
           ),
         ];
-      
+
       case 'Networking':
         return [
           _buildActionTile(
@@ -344,7 +335,7 @@ class ModeActionSheet extends StatelessWidget {
             onTap: () => _handleNetworkingAction(context, 'collaborate'),
           ),
         ];
-      
+
       default:
         return [];
     }
@@ -355,27 +346,26 @@ class ModeActionSheet extends StatelessWidget {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: const Color(0xFF008037)),
-      title: Text(
-        title,
-        style: GoogleFonts.montserrat(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: const Color(0xFF333333),
+  }) =>
+      ListTile(
+        leading: Icon(icon, color: const Color(0xFF008037)),
+        title: Text(
+          title,
+          style: GoogleFonts.montserrat(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF333333),
+          ),
         ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: GoogleFonts.montserrat(
-          fontSize: 14,
-          color: const Color(0xFF666666),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: const Color(0xFF666666),
+          ),
         ),
-      ),
-      onTap: onTap,
-    );
-  }
+        onTap: onTap,
+      );
 
   void _handleDatingAction(BuildContext context, String action) {
     Navigator.pop(context);

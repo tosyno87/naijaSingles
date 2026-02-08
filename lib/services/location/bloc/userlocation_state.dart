@@ -12,22 +12,22 @@ class UserLocationInitial extends UserLocationStates {}
 class UserLocationLoading extends UserLocationStates {}
 
 class UserLocationSuccess extends UserLocationStates {
+  const UserLocationSuccess({
+    required this.latitude,
+    required this.longitude,
+    required this.formattedAddress,
+  });
   final double latitude;
   final double longitude;
   final String formattedAddress;
-
-  const UserLocationSuccess(
-      {required this.latitude,
-      required this.longitude,
-      required this.formattedAddress});
 
   @override
   List<Object> get props => [latitude, longitude, formattedAddress];
 }
 
 class UserLocationFailed extends UserLocationStates {
-  final String message;
   const UserLocationFailed({required this.message});
+  final String message;
 
   @override
   List<Object> get props => [message];

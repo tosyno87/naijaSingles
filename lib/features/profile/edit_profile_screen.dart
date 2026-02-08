@@ -1,21 +1,21 @@
+import 'dart:developer';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'dart:developer';
+
+import '../../common/constants/app_colors.dart';
 import '../onboarding/widgets/afropeep_height_dropdown.dart';
 
-// Color constants to match registration screens
-const Color primaryColor = Color(0xFF008037); // Deep green
-const Color textColor = Color(0xFF333333); // Dark text
+// Using centralized AppColors instead of local constants
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({Key? key}) : super(key: key);
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -59,7 +59,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Male',
     'Female',
     'Non-binary',
-    'Prefer not to say'
+    'Prefer not to say',
   ];
   final List<String> _interestedInOptions = ['Male', 'Female', 'Everyone'];
 
@@ -77,7 +77,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Nupe',
     'Urhobo',
     'Igala',
-    'Other'
+    'Other',
   ];
 
   // Image picker
@@ -88,10 +88,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // Define colors based on Afropeep MVP
-  final Color backgroundColor = Colors.white; // Clean white background
-  final Color primaryColor = const Color(0xFF008037); // Afropeep green
-  final Color textColor = Colors.black87;
+  // Using centralized AppColors
+  // backgroundColor = AppColors.backgroundColor
+  // primaryColor = AppColors.primaryGreen
+  // textColor = AppColors.textPrimary
   final Color errorColor = Colors.red.shade700;
 
   @override
@@ -119,19 +119,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (!mounted) return;
 
     // Count valid photos
-    int photoCount = _photos.where((photo) => photo != null).length;
+    final int photoCount = _photos.where((photo) => photo != null).length;
 
     // Check if all required fields are valid
-    bool isValid = _formKey.currentState?.validate() ?? false;
+    final bool isValid = _formKey.currentState?.validate() ?? false;
 
     // Check if user is 18+
-    bool isAdult = _age >= 18;
+    final bool isAdult = _age >= 18;
 
     // Check if bio is at least 20 characters (match registration requirement)
-    bool validBioLength = _bioController.text.trim().length >= 20;
+    final bool validBioLength = _bioController.text.trim().length >= 20;
 
     // Check if at least 3 photos are uploaded
-    bool hasEnoughPhotos = photoCount >= 3;
+    final bool hasEnoughPhotos = photoCount >= 3;
 
     setState(() {
       _formValid = isValid && isAdult && validBioLength && hasEnoughPhotos;
@@ -197,7 +197,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           setState(() {
             _heightCm = (userData['height'] as num).round();
             // Try to find matching ft/in value
-            String? ftIn = HeightData.getFtInFromCm(_heightCm);
+            final String? ftIn = HeightData.getFtInFromCm(_heightCm);
             if (ftIn != null) {
               _heightFtIn = ftIn;
             }
@@ -293,82 +293,81 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   // Show dialog to choose camera or gallery
-  Future<ImageSource?> _showImageSourceDialog() async {
-    return await showModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Select Image Source',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildImageSourceOption(
-                  icon: Icons.camera_alt,
-                  label: 'Camera',
-                  onTap: () => Navigator.pop(context, ImageSource.camera),
-                ),
-                _buildImageSourceOption(
-                  icon: Icons.photo_library,
-                  label: 'Gallery',
-                  onTap: () => Navigator.pop(context, ImageSource.gallery),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
+  Future<ImageSource?> _showImageSourceDialog() async =>
+      showModalBottomSheet<ImageSource>(
+        context: context,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-      ),
-    );
-  }
+        builder: (context) => Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Image Source',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildImageSourceOption(
+                    icon: Icons.camera_alt,
+                    label: 'Camera',
+                    onTap: () => Navigator.pop(context, ImageSource.camera),
+                  ),
+                  _buildImageSourceOption(
+                    icon: Icons.photo_library,
+                    label: 'Gallery',
+                    onTap: () => Navigator.pop(context, ImageSource.gallery),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      );
 
   // Build image source option labelLarge
   Widget _buildImageSourceOption({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 32, color: primaryColor),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                color: textColor,
-                fontWeight: FontWeight.w500,
+  }) =>
+      InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 32, color: AppColors.primaryGreen),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: GoogleFonts.montserrat(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   // Remove photo from a specific slot
   void _removePhoto(int index) {
@@ -391,30 +390,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-  Future<void> _showDeleteDialog(int index) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
+  Future<void> _showDeleteDialog(int index) async => showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => AlertDialog(
           title: Text(
             'Remove Photo',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w600,
-              color: textColor,
+              color: AppColors.textPrimary,
             ),
           ),
           content: Text(
             'Are you sure you want to remove this photo?',
-            style: GoogleFonts.poppins(
-              color: textColor,
+            style: GoogleFonts.montserrat(
+              color: AppColors.textPrimary,
             ),
           ),
           actions: <Widget>[
             TextButton(
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color: Colors.grey.shade700,
                 ),
               ),
@@ -425,7 +422,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextButton(
               child: Text(
                 'Remove',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   color: errorColor,
                   fontWeight: FontWeight.w600,
                 ),
@@ -439,10 +436,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
 
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
@@ -462,7 +457,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       // Upload photos if they are File objects
-      List<String> photoUrls = [];
+      final List<String> photoUrls = [];
 
       for (int i = 0; i < _photos.length; i++) {
         final photo = _photos[i];
@@ -521,7 +516,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await user.updateDisplayName(_nameController.text.trim());
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Profile updated successfully'),
           backgroundColor: Colors.green,
         ),
@@ -542,142 +537,140 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Widget _buildInterestedInSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Interested In',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: textColor,
+  Widget _buildInterestedInSelector() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Interested In',
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _interestedInOptions.map((option) {
-            final isSelected = _interestedIn == option;
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _interestedInOptions.map((option) {
+              final isSelected = _interestedIn == option;
 
-            return ChoiceChip(
-              label: Text(
-                option,
-                style: GoogleFonts.poppins(
-                  color: isSelected ? Colors.white : textColor,
-                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+              return ChoiceChip(
+                label: Text(
+                  option,
+                  style: GoogleFonts.montserrat(
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    fontWeight:
+                        isSelected ? FontWeight.w500 : FontWeight.normal,
+                  ),
                 ),
-              ),
-              selected: isSelected,
-              selectedColor: primaryColor,
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: isSelected ? primaryColor : Colors.grey.shade300,
+                selected: isSelected,
+                selectedColor: AppColors.primaryGreen,
+                backgroundColor: AppColors.backgroundColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: isSelected
+                        ? AppColors.primaryGreen
+                        : Colors.grey.shade300,
+                  ),
                 ),
-              ),
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() {
-                    _interestedIn = option;
-                    _validateForm(); // Add form validation trigger
-                  });
-                }
-              },
-              elevation: isSelected ? 2 : 0,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
+                onSelected: (selected) {
+                  if (selected) {
+                    setState(() {
+                      _interestedIn = option;
+                      _validateForm(); // Add form validation trigger
+                    });
+                  }
+                },
+                elevation: isSelected ? 2 : 0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              );
+            }).toList(),
+          ),
+        ],
+      );
 
-  Widget _buildDateOfBirthSelector() {
-    return InkWell(
-      onTap: () async {
-        final DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: _selectedDOB ??
-              DateTime.now().subtract(const Duration(days: 365 * 25)),
-          firstDate: DateTime(1950),
-          lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
-          builder: (context, child) {
-            return Theme(
+  Widget _buildDateOfBirthSelector() => InkWell(
+        onTap: () async {
+          final DateTime? picked = await showDatePicker(
+            context: context,
+            initialDate: _selectedDOB ??
+                DateTime.now().subtract(const Duration(days: 365 * 25)),
+            firstDate: DateTime(1950),
+            lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+            builder: (context, child) => Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
-                  primary: primaryColor,
-                  onPrimary: Colors.white,
-                  surface: Colors.white,
-                  onSurface: textColor,
+                colorScheme: const ColorScheme.light(
+                  primary: AppColors.primaryGreen,
+                  onSurface: AppColors.textPrimary,
                 ),
               ),
               child: child!,
-            );
-          },
-        );
+            ),
+          );
 
-        if (picked != null && picked != _selectedDOB) {
-          setState(() {
-            _selectedDOB = picked;
-            _calculateAge();
-            _validateForm();
-          });
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.calendar_today, color: primaryColor),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                _selectedDOB != null
-                    ? DateFormat('MMMM d, yyyy').format(_selectedDOB!)
-                    : 'Select your date of birth',
-                style: GoogleFonts.poppins(
-                  color:
-                      _selectedDOB != null ? textColor : Colors.grey.shade600,
-                ),
+          if (picked != null && picked != _selectedDOB) {
+            setState(() {
+              _selectedDOB = picked;
+              _calculateAge();
+              _validateForm();
+            });
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-            ),
-            if (_selectedDOB != null) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.calendar_today, color: AppColors.primaryGreen),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Text(
-                  '$_age years',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: primaryColor,
+                  _selectedDOB != null
+                      ? DateFormat('MMMM d, yyyy').format(_selectedDOB!)
+                      : 'Select your date of birth',
+                  style: GoogleFonts.montserrat(
+                    color: _selectedDOB != null
+                        ? AppColors.textPrimary
+                        : Colors.grey.shade600,
                   ),
                 ),
               ),
+              if (_selectedDOB != null) ...[
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$_age years',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryGreen,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _buildBioField() {
     const int maxLength = 500; // Match registration max length
@@ -688,16 +681,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           'About Me',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: textColor,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
 
         // Bio input container - match registration styling
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -711,15 +704,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           child: TextField(
             controller: _bioController,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: 16,
-              color: textColor,
+              color: AppColors.textPrimary,
             ),
             maxLines: 8, // Match registration max lines
             maxLength: maxLength,
             decoration: InputDecoration(
-              hintText: "Write your bio here...", // Match registration hint
-              hintStyle: GoogleFonts.poppins(
+              hintText: 'Write your bio here...', // Match registration hint
+              hintStyle: GoogleFonts.montserrat(
                 color: Colors.grey.shade400,
               ),
               border: OutlineInputBorder(
@@ -728,10 +721,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: primaryColor, width: 2),
+                borderSide:
+                    const BorderSide(color: AppColors.primaryGreen, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
-              counterText: "", // Hide default counter
+              counterText: '', // Hide default counter
             ),
             onChanged: (value) {
               setState(() {}); // Update character counter
@@ -747,17 +741,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Minimum 20 characters", // Match registration requirement
-              style: GoogleFonts.poppins(
+              'Minimum 20 characters', // Match registration requirement
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
-                color: currentLength >= 20 ? primaryColor : Colors.grey,
+                color:
+                    currentLength >= 20 ? AppColors.primaryGreen : Colors.grey,
               ),
             ),
             Text(
-              "$currentLength/$maxLength",
-              style: GoogleFonts.poppins(
+              '$currentLength/$maxLength',
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
-                color: currentLength >= 20 ? primaryColor : Colors.grey,
+                color:
+                    currentLength >= 20 ? AppColors.primaryGreen : Colors.grey,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -769,8 +765,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-              "Bio should be at least 20 characters",
-              style: GoogleFonts.poppins(
+              'Bio should be at least 20 characters',
+              style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: Colors.red,
               ),
@@ -788,104 +784,101 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     int maxLines = 1,
     int? maxLength,
     String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      maxLength: maxLength,
-      style: GoogleFonts.poppins(color: textColor),
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: GoogleFonts.poppins(color: Colors.grey.shade700),
-        helperText: helperText,
-        helperStyle: GoogleFonts.poppins(fontSize: 12),
-        prefixIcon: Icon(prefixIcon, color: primaryColor),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: primaryColor, width: 2),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      validator: validator,
-      onChanged: (_) => _validateForm(),
-    );
-  }
-
-  Widget _buildReadOnlyField(String value, IconData icon) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: primaryColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: primaryColor.withValues(alpha: 0.7),
-            size: 20,
+  }) =>
+      TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        maxLength: maxLength,
+        style: GoogleFonts.montserrat(color: AppColors.textPrimary),
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: GoogleFonts.montserrat(color: Colors.grey.shade700),
+          helperText: helperText,
+          helperStyle: GoogleFonts.montserrat(fontSize: 12),
+          prefixIcon: Icon(prefixIcon, color: AppColors.primaryGreen),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              value,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: textColor,
-                fontWeight: FontWeight.w500,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide:
+                const BorderSide(color: AppColors.primaryGreen, width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        validator: validator,
+        onChanged: (_) => _validateForm(),
+      );
+
+  Widget _buildReadOnlyField(String value, IconData icon) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.primaryGreen.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border:
+              Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: AppColors.primaryGreen.withValues(alpha: 0.7),
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                value,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.lock_outline,
-                  color: primaryColor,
-                  size: 12,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Set',
-                  style: GoogleFonts.poppins(
-                    fontSize: 10,
-                    color: primaryColor,
-                    fontWeight: FontWeight.w600,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.lock_outline,
+                    color: AppColors.primaryGreen,
+                    size: 12,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Text(
+                    'Set',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 10,
+                      color: AppColors.primaryGreen,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        title,
-        style: GoogleFonts.poppins(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: primaryColor,
+          ],
         ),
-      ),
-    );
-  }
+      );
+
+  Widget _buildSectionTitle(String title) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(
+          title,
+          style: GoogleFonts.montserrat(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryGreen,
+          ),
+        ),
+      );
 
   void _calculateAge() {
     if (_selectedDOB != null) {
@@ -902,286 +895,447 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Edit Profile',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        appBar: AppBar(
+          title: Text(
+            'Edit Profile',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: AppColors.primaryGreen,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
-        centerTitle: true,
-        backgroundColor: primaryColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      floatingActionButton: _formValid && !_isUploading
-          ? FloatingActionButton.extended(
-              onPressed: _saveProfile,
-              backgroundColor: primaryColor,
-              icon: const Icon(Icons.save, color: Colors.white),
-              label: Text(
-                'Save',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+        body: _isUploading
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(
+                        color: AppColors.primaryGreen),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Updating profile...',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Photos section
+                      _buildSectionTitle('Profile Photos (Min. 3)'),
+                      const SizedBox(height: 8),
+                      _buildPhotoGrid(),
+
+                      // Photo count warning if needed
+                      if (_photos.where((p) => p != null).length < 3)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            'Please upload at least 3 photos',
+                            style: GoogleFonts.montserrat(
+                              color: errorColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+
+                      // Basic info section
+                      _buildSectionTitle('Basic Information'),
+                      const SizedBox(height: 16),
+
+                      // Name field
+                      _buildTextField(
+                        controller: _nameController,
+                        labelText: 'Full Name',
+                        prefixIcon: Icons.person,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Bio field - Custom implementation to match registration
+                      _buildBioField(),
+                      const SizedBox(height: 16),
+
+                      // Gender selection - only editable during onboarding
+                      _buildSectionTitle('Gender'),
+                      const SizedBox(height: 8),
+                      if (_hasCompletedOnboarding)
+                        _buildReadOnlyField(
+                          _selectedGender,
+                          Icons.person_outline,
+                        )
+                      else
+                        _buildGenderSelector(),
+                      const SizedBox(height: 24),
+
+                      // Date of Birth - only editable during onboarding
+                      _buildSectionTitle('Date of Birth'),
+                      const SizedBox(height: 8),
+                      if (_hasCompletedOnboarding)
+                        _buildReadOnlyField(
+                          _selectedDOB != null
+                              ? '${_selectedDOB!.day}/${_selectedDOB!.month}/${_selectedDOB!.year} ($_age years old)'
+                              : 'Not set',
+                          Icons.cake_outlined,
+                        )
+                      else
+                        _buildDateOfBirthSelector(),
+                      const SizedBox(height: 24),
+
+                      // Tribe selection - only editable during onboarding
+                      _buildSectionTitle('Tribe/Ethnicity (Optional)'),
+                      const SizedBox(height: 8),
+                      if (_hasCompletedOnboarding)
+                        _buildReadOnlyField(
+                          _selectedTribe == 'Other'
+                              ? _otherTribeController.text.isNotEmpty
+                                  ? _otherTribeController.text
+                                  : 'Other'
+                              : _selectedTribe ?? 'Not specified',
+                          Icons.people_outline,
+                        )
+                      else
+                        _buildTribeSelector(),
+                      const SizedBox(height: 24),
+
+                      // Height section
+                      _buildSectionTitle('Height'),
+                      const SizedBox(height: 16),
+                      AfropeepHeightDropdown(
+                        initialHeightFtIn: _heightFtIn,
+                        initialHeightCm: _heightCm,
+                        onChanged: (heightFtIn, heightCm) {
+                          setState(() {
+                            _heightFtIn = heightFtIn;
+                            _heightCm = heightCm;
+                            _validateForm(); // Add form validation trigger
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Preferences section
+                      _buildSectionTitle('Preferences'),
+                      const SizedBox(height: 16),
+
+                      // Interested in
+                      _buildInterestedInSelector(),
+                      const SizedBox(height: 16),
+
+                      // Age range
+                      _buildAgeRangeSelector(),
+                      const SizedBox(height: 32),
+
+                      // Save button with better visibility and feedback
+                      Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _formValid
+                                  ? AppColors.primaryGreen
+                                      .withValues(alpha: 0.3)
+                                  : Colors.grey.withValues(alpha: 0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: _formValid ? _saveProfile : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _formValid
+                                ? AppColors.primaryGreen
+                                : Colors.grey.shade400,
+                            disabledBackgroundColor: Colors.grey.shade400,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0, // Using custom shadow instead
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _formValid ? Icons.save : Icons.lock,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _formValid
+                                    ? 'Save Profile'
+                                    : 'Complete Required Fields',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Form validation status
+                      if (!_formValid) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.orange.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: Colors.orange.shade700,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Complete these requirements to save:',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.orange.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              _buildValidationRequirements(),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
               ),
-            )
-          : null,
-      body: _isUploading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: primaryColor),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Updating profile...',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: textColor,
-                    ),
+      );
+
+  Widget _buildPhotoGrid() => GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+        ),
+        itemCount: 5, // Maximum 5 photos
+        itemBuilder: (context, index) {
+          final photo = _photos[index];
+
+          return GestureDetector(
+            onTap: () => _pickImage(index),
+            onLongPress: photo != null ? () => _showDeleteDialog(index) : null,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-            )
-          : Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Photos section
-                    _buildSectionTitle('Profile Photos (Min. 3)'),
-                    const SizedBox(height: 8),
-                    _buildPhotoGrid(),
-
-                    // Photo count warning if needed
-                    if (_photos.where((p) => p != null).length < 3)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          'Please upload at least 3 photos',
-                          style: GoogleFonts.poppins(
-                            color: errorColor,
+              child: photo == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_photo_alternate,
+                          size: 32,
+                          color: AppColors.primaryGreen.withValues(alpha: 0.7),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Add Photo',
+                          style: GoogleFonts.montserrat(
                             fontSize: 12,
+                            color:
+                                AppColors.primaryGreen.withValues(alpha: 0.7),
                           ),
                         ),
-                      ),
-                    const SizedBox(height: 24),
-
-                    // Basic info section
-                    _buildSectionTitle('Basic Information'),
-                    const SizedBox(height: 16),
-
-                    // Name field
-                    _buildTextField(
-                      controller: _nameController,
-                      labelText: 'Full Name',
-                      prefixIcon: Icons.person,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Bio field - Custom implementation to match registration
-                    _buildBioField(),
-                    const SizedBox(height: 16),
-
-                    // Gender selection - only editable during onboarding
-                    _buildSectionTitle('Gender'),
-                    const SizedBox(height: 8),
-                    _hasCompletedOnboarding
-                        ? _buildReadOnlyField(
-                            _selectedGender, Icons.person_outline)
-                        : _buildGenderSelector(),
-                    const SizedBox(height: 24),
-
-                    // Date of Birth - only editable during onboarding
-                    _buildSectionTitle('Date of Birth'),
-                    const SizedBox(height: 8),
-                    _hasCompletedOnboarding
-                        ? _buildReadOnlyField(
-                            _selectedDOB != null
-                                ? '${_selectedDOB!.day}/${_selectedDOB!.month}/${_selectedDOB!.year} ($_age years old)'
-                                : 'Not set',
-                            Icons.cake_outlined)
-                        : _buildDateOfBirthSelector(),
-                    const SizedBox(height: 24),
-
-                    // Tribe selection - only editable during onboarding
-                    _buildSectionTitle('Tribe/Ethnicity (Optional)'),
-                    const SizedBox(height: 8),
-                    _hasCompletedOnboarding
-                        ? _buildReadOnlyField(
-                            _selectedTribe == 'Other'
-                                ? _otherTribeController.text.isNotEmpty
-                                    ? _otherTribeController.text
-                                    : 'Other'
-                                : _selectedTribe ?? 'Not specified',
-                            Icons.people_outline)
-                        : _buildTribeSelector(),
-                    const SizedBox(height: 24),
-
-                    // Height section
-                    _buildSectionTitle('Height'),
-                    const SizedBox(height: 16),
-                    AfropeepHeightDropdown(
-                      initialHeightFtIn: _heightFtIn,
-                      initialHeightCm: _heightCm,
-                      onChanged: (heightFtIn, heightCm) {
-                        setState(() {
-                          _heightFtIn = heightFtIn;
-                          _heightCm = heightCm;
-                          _validateForm(); // Add form validation trigger
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Preferences section
-                    _buildSectionTitle('Preferences'),
-                    const SizedBox(height: 16),
-
-                    // Interested in
-                    _buildInterestedInSelector(),
-                    const SizedBox(height: 16),
-
-                    // Age range
-                    _buildAgeRangeSelector(),
-                    const SizedBox(height: 32),
-
-                    // Save button with better visibility and feedback
-                    Container(
-                      width: double.infinity,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _formValid 
-                                ? primaryColor.withValues(alpha: 0.3)
-                                : Colors.grey.withValues(alpha: 0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _formValid ? _saveProfile : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _formValid ? primaryColor : Colors.grey.shade400,
-                          disabledBackgroundColor: Colors.grey.shade400,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0, // Using custom shadow instead
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _formValid ? Icons.save : Icons.lock,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _formValid ? 'Save Profile' : 'Complete Required Fields',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    
-                    // Form validation status
-                    if (!_formValid) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.1),
+                      ],
+                    )
+                  : Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.orange.withValues(alpha: 0.3),
+                          child: photo is File
+                              ? Image.file(
+                                  photo,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.network(
+                                  photo,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return ColoredBox(
+                                      color: Colors.grey.shade100,
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                          color: AppColors.primaryGreen,
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    log('Error loading image: $error');
+                                    return ColoredBox(
+                                      color: Colors.grey.shade200,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.error_outline,
+                                            color: Colors.grey.shade500,
+                                            size: 24,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Failed to load',
+                                            style: GoogleFonts.montserrat(
+                                              fontSize: 10,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 24,
+                                minHeight: 24,
+                              ),
+                              padding: EdgeInsets.zero,
+                              onPressed: () => _removePhoto(index),
+                            ),
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.info_outline,
-                                  color: Colors.orange.shade700,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Complete these requirements to save:',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.orange.shade700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            _buildValidationRequirements(),
-                          ],
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 32),
-                  ],
-                ),
+                      ],
+                    ),
+            ),
+          );
+        },
+      );
+
+  Widget _buildGenderSelector() => Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: _genders.map((gender) {
+          final isSelected = _selectedGender == gender;
+
+          return ChoiceChip(
+            label: Text(
+              gender,
+              style: GoogleFonts.montserrat(
+                color: isSelected ? Colors.white : AppColors.textPrimary,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
               ),
             ),
-    );
-  }
+            selected: isSelected,
+            selectedColor: AppColors.primaryGreen,
+            backgroundColor: AppColors.backgroundColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                color:
+                    isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
+              ),
+            ),
+            onSelected: (selected) {
+              if (selected) {
+                setState(() {
+                  _selectedGender = gender;
+                  _validateForm();
+                });
+              }
+            },
+            elevation: isSelected ? 2 : 0,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          );
+        }).toList(),
+      );
 
-  Widget _buildPhotoGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: 5, // Maximum 5 photos
-      itemBuilder: (context, index) {
-        final photo = _photos[index];
-
-        return GestureDetector(
-          onTap: () => _pickImage(index),
-          onLongPress: photo != null ? () => _showDeleteDialog(index) : null,
-          child: Container(
+  Widget _buildTribeSelector() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DecoratedBox(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.grey.shade300,
-                width: 1,
-              ),
+              border: Border.all(color: Colors.grey.shade300),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -1190,383 +1344,228 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
-            child: photo == null
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_photo_alternate,
-                        size: 32,
-                        color: primaryColor.withValues(alpha: 0.7),
+            child: DropdownButtonFormField<String>(
+              initialValue: _selectedTribe,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                hintText: 'Select your tribe/ethnicity (optional)',
+                hintStyle: GoogleFonts.montserrat(color: Colors.grey.shade600),
+                prefixIcon:
+                    const Icon(Icons.people, color: AppColors.primaryGreen),
+              ),
+              items: _tribes
+                  .map(
+                    (tribe) => DropdownMenuItem<String>(
+                      value: tribe,
+                      child: Text(
+                        tribe,
+                        style: GoogleFonts.montserrat(
+                            color: AppColors.textPrimary),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Add Photo',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: primaryColor.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
+                    ),
                   )
-                : Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: photo is File
-                            ? Image.file(
-                                photo,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.network(
-                                photo,
-                                fit: BoxFit.cover,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Container(
-                                    color: Colors.grey.shade100,
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
-                                        color: primaryColor,
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  log('Error loading image: $error');
-                                  return Container(
-                                    color: Colors.grey.shade200,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.error_outline,
-                                          color: Colors.grey.shade500,
-                                          size: 24,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Failed to load',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 10,
-                                            color: Colors.grey.shade600,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 24,
-                              minHeight: 24,
-                            ),
-                            padding: EdgeInsets.zero,
-                            onPressed: () => _removePhoto(index),
-                          ),
-                        ),
-                      ),
-                    ],
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedTribe = value;
+                  _validateForm();
+                });
+              },
+              validator: (value) {
+                // Tribe is now optional - no validation required
+                return null;
+              },
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: AppColors.primaryGreen),
+              dropdownColor: Colors.white,
+              style: GoogleFonts.montserrat(
+                  fontSize: 16, color: AppColors.textPrimary),
+            ),
+          ),
+          if (_selectedTribe == 'Other') ...[
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _otherTribeController,
+              decoration: InputDecoration(
+                labelText: 'Specify your tribe/ethnicity',
+                labelStyle: GoogleFonts.montserrat(color: Colors.grey.shade700),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+              style: GoogleFonts.montserrat(),
+              validator: (value) {
+                // Tribe is now optional - no validation required even for "Other"
+                return null;
+              },
+              onChanged: (_) => _validateForm(),
+            ),
+          ],
+        ],
+      );
+
+  Widget _buildAgeRangeSelector() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Age Range',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryGreen,
                   ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildGenderSelector() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: _genders.map((gender) {
-        final isSelected = _selectedGender == gender;
-
-        return ChoiceChip(
-          label: Text(
-            gender,
-            style: GoogleFonts.poppins(
-              color: isSelected ? Colors.white : textColor,
-              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-            ),
-          ),
-          selected: isSelected,
-          selectedColor: primaryColor,
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: isSelected ? primaryColor : Colors.grey.shade300,
-            ),
-          ),
-          onSelected: (selected) {
-            if (selected) {
-              setState(() {
-                _selectedGender = gender;
-                _validateForm();
-              });
-            }
-          },
-          elevation: isSelected ? 2 : 0,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildTribeSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+                ),
               ),
             ],
           ),
-          child: DropdownButtonFormField<String>(
-            value: _selectedTribe,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              hintText: 'Select your tribe/ethnicity (optional)',
-              hintStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-              prefixIcon: Icon(Icons.people, color: primaryColor),
-            ),
-            items: _tribes.map((tribe) {
-              return DropdownMenuItem<String>(
-                value: tribe,
-                child: Text(
-                  tribe,
-                  style: GoogleFonts.poppins(color: textColor),
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedTribe = value;
-                _validateForm();
-              });
-            },
-            validator: (value) {
-              // Tribe is now optional - no validation required
-              return null;
-            },
-            icon: Icon(Icons.arrow_drop_down, color: primaryColor),
-            dropdownColor: Colors.white,
-            style: GoogleFonts.poppins(fontSize: 16, color: textColor),
-          ),
-        ),
-        if (_selectedTribe == 'Other') ...[
           const SizedBox(height: 16),
-          TextFormField(
-            controller: _otherTribeController,
-            decoration: InputDecoration(
-              labelText: 'Specify your tribe/ethnicity',
-              labelStyle: GoogleFonts.poppins(color: Colors.grey.shade700),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+          SliderTheme(
+            data: SliderThemeData(
+              activeTrackColor: AppColors.primaryGreen,
+              inactiveTrackColor: Colors.grey.shade300,
+              thumbColor: Colors.white,
+              thumbShape: const RoundSliderThumbShape(
+                enabledThumbRadius: 8,
+                elevation: 4,
               ),
-              filled: true,
-              fillColor: Colors.white,
+              overlayColor: AppColors.primaryGreen.withValues(alpha: 0.2),
+              trackHeight: 4,
+              rangeThumbShape: const RoundRangeSliderThumbShape(
+                enabledThumbRadius: 8,
+                elevation: 4,
+              ),
+              rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
+              rangeValueIndicatorShape:
+                  const PaddleRangeSliderValueIndicatorShape(),
+              valueIndicatorColor: AppColors.primaryGreen,
+              valueIndicatorTextStyle: GoogleFonts.montserrat(
+                color: Colors.white,
+                fontSize: 12,
+              ),
+              showValueIndicator: ShowValueIndicator.onDrag,
             ),
-            style: GoogleFonts.poppins(),
-            validator: (value) {
-              // Tribe is now optional - no validation required even for "Other"
-              return null;
-            },
-            onChanged: (_) => _validateForm(),
+            child: RangeSlider(
+              values: _ageRange,
+              min: 18,
+              max: 70,
+              divisions: 52,
+              labels: RangeLabels(
+                '${_ageRange.start.round()}',
+                '${_ageRange.end.round()}',
+              ),
+              onChanged: (values) {
+                setState(() {
+                  _ageRange = values;
+                  _validateForm(); // Add form validation trigger
+                });
+              },
+            ),
           ),
         ],
-      ],
+      );
+
+  Widget _buildValidationRequirements() {
+    final List<Widget> requirements = [];
+
+    // Check photo count
+    final int photoCount = _photos.where((photo) => photo != null).length;
+    if (photoCount < 3) {
+      requirements.add(
+        _buildRequirementItem(
+          'Upload at least 3 photos',
+          Icons.photo_camera,
+          photoCount >= 3,
+        ),
+      );
+    }
+
+    // Check bio length
+    final bool validBioLength = _bioController.text.trim().length >= 20;
+    if (!validBioLength) {
+      requirements.add(
+        _buildRequirementItem(
+          'Write a bio (minimum 20 characters)',
+          Icons.description,
+          validBioLength,
+        ),
+      );
+    }
+
+    // Check age
+    final bool isAdult = _age >= 18;
+    if (!isAdult) {
+      requirements.add(
+        _buildRequirementItem(
+          'You must be 18+ years old',
+          Icons.cake,
+          isAdult,
+        ),
+      );
+    }
+
+    // Check form validation
+    final bool formValid = _formKey.currentState?.validate() ?? false;
+    if (!formValid) {
+      requirements.add(
+        _buildRequirementItem(
+          'Complete all required fields',
+          Icons.check_circle,
+          formValid,
+        ),
+      );
+    }
+
+    return Column(
+      children: requirements,
     );
   }
 
-  Widget _buildAgeRangeSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildRequirementItem(String text, IconData icon, bool isCompleted) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
           children: [
-            Text(
-              'Age Range',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: textColor,
-              ),
+            Icon(
+              isCompleted ? Icons.check_circle : icon,
+              color: isCompleted ? Colors.green : Colors.orange.shade700,
+              size: 16,
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
+            const SizedBox(width: 8),
+            Expanded(
               child: Text(
-                '${_ageRange.start.round()} - ${_ageRange.end.round()} years',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: primaryColor,
+                text,
+                style: GoogleFonts.montserrat(
+                  fontSize: 13,
+                  color: isCompleted
+                      ? Colors.green.shade700
+                      : Colors.orange.shade700,
+                  fontWeight: isCompleted ? FontWeight.w500 : FontWeight.normal,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: primaryColor,
-            inactiveTrackColor: Colors.grey.shade300,
-            thumbColor: Colors.white,
-            thumbShape: const RoundSliderThumbShape(
-              enabledThumbRadius: 8,
-              elevation: 4,
-            ),
-            overlayColor: primaryColor.withValues(alpha: 0.2),
-            trackHeight: 4,
-            rangeThumbShape: const RoundRangeSliderThumbShape(
-              enabledThumbRadius: 8,
-              elevation: 4,
-            ),
-            rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
-            rangeValueIndicatorShape:
-                const PaddleRangeSliderValueIndicatorShape(),
-            valueIndicatorColor: primaryColor,
-            valueIndicatorTextStyle: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 12,
-            ),
-            showValueIndicator: ShowValueIndicator.always,
-          ),
-          child: RangeSlider(
-            values: _ageRange,
-            min: 18,
-            max: 70,
-            divisions: 52,
-            labels: RangeLabels(
-              '${_ageRange.start.round()}',
-              '${_ageRange.end.round()}',
-            ),
-            onChanged: (values) {
-              setState(() {
-                _ageRange = values;
-                _validateForm(); // Add form validation trigger
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildValidationRequirements() {
-    List<Widget> requirements = [];
-    
-    // Check photo count
-    int photoCount = _photos.where((photo) => photo != null).length;
-    if (photoCount < 3) {
-      requirements.add(_buildRequirementItem(
-        'Upload at least 3 photos',
-        Icons.photo_camera,
-        photoCount >= 3,
-      ));
-    }
-    
-    // Check bio length
-    bool validBioLength = _bioController.text.trim().length >= 20;
-    if (!validBioLength) {
-      requirements.add(_buildRequirementItem(
-        'Write a bio (minimum 20 characters)',
-        Icons.description,
-        validBioLength,
-      ));
-    }
-    
-    // Check age
-    bool isAdult = _age >= 18;
-    if (!isAdult) {
-      requirements.add(_buildRequirementItem(
-        'You must be 18+ years old',
-        Icons.cake,
-        isAdult,
-      ));
-    }
-    
-    // Check form validation
-    bool formValid = _formKey.currentState?.validate() ?? false;
-    if (!formValid) {
-      requirements.add(_buildRequirementItem(
-        'Complete all required fields',
-        Icons.check_circle,
-        formValid,
-      ));
-    }
-    
-    return Column(
-      children: requirements,
-    );
-  }
-  
-  Widget _buildRequirementItem(String text, IconData icon, bool isCompleted) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Icon(
-            isCompleted ? Icons.check_circle : icon,
-            color: isCompleted ? Colors.green : Colors.orange.shade700,
-            size: 16,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: isCompleted ? Colors.green.shade700 : Colors.orange.shade700,
-                fontWeight: isCompleted ? FontWeight.w500 : FontWeight.normal,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+      );
 }

@@ -3,13 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../common/constants/constants.dart';
 
 class DiaryEntry {
-  final String id;
-  final String userId;
-  final String content;
-  final Timestamp timestamp;
-  final String userName;
-  final String? userImage;
-
   DiaryEntry({
     required this.id,
     required this.userId,
@@ -19,16 +12,20 @@ class DiaryEntry {
     required this.userImage,
   });
 
-  factory DiaryEntry.fromDocument(DocumentSnapshot doc) {
-    return DiaryEntry(
-      id: doc.id,
-      userId: doc['userId'] as String,
-      content: doc['content'] as String,
-      timestamp: doc['timestamp'] as Timestamp,
-      userName: doc['userName'] as String? ?? '',
-      userImage: doc['userImage'] as String?,
-    );
-  }
+  factory DiaryEntry.fromDocument(DocumentSnapshot doc) => DiaryEntry(
+        id: doc.id,
+        userId: doc['userId'] as String,
+        content: doc['content'] as String,
+        timestamp: doc['timestamp'] as Timestamp,
+        userName: doc['userName'] as String? ?? '',
+        userImage: doc['userImage'] as String?,
+      );
+  final String id;
+  final String userId;
+  final String content;
+  final Timestamp timestamp;
+  final String userName;
+  final String? userImage;
 }
 
 class DiaryRepository {
@@ -50,11 +47,11 @@ class DiaryRepository {
     });
   }
 
-  Stream<List<DiaryEntry>> entriesStream() {
-    return diaryRef.orderBy('timestamp', descending: true).snapshots().map(
-        (snapshot) => snapshot.docs
-            .where((doc) => doc.data() != null)
-            .map((doc) => DiaryEntry.fromDocument(doc))
-            .toList());
-  }
+  Stream<List<DiaryEntry>> entriesStream() =>
+      diaryRef.orderBy('timestamp', descending: true).snapshots().map(
+            (snapshot) => snapshot.docs
+                .where((doc) => doc.data() != null)
+                .map(DiaryEntry.fromDocument)
+                .toList(),
+          );
 }

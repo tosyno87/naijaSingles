@@ -4,12 +4,12 @@ import '../../../../common/routes/route_name.dart';
 import '../../data/services/event_templates_service.dart';
 
 class EventTemplateSelectionScreen extends StatelessWidget {
-  const EventTemplateSelectionScreen({Key? key}) : super(key: key);
+  const EventTemplateSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final templates = EventTemplatesService.getAfrocentricTemplates();
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -57,7 +57,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Templates Grid
             Expanded(
               child: Padding(
@@ -77,7 +77,7 @@ class EventTemplateSelectionScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Create from scratch button
             Padding(
               padding: const EdgeInsets.all(20),
@@ -113,99 +113,98 @@ class EventTemplateSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTemplateCard(BuildContext context, EventTemplate template) {
-    return GestureDetector(
-      onTap: () => _navigateToCreateEvent(context, template),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // Icon and color header
-            Container(
-              height: 80,
-              decoration: BoxDecoration(
-                color: Color(template.color).withOpacity(0.1),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
+  Widget _buildTemplateCard(BuildContext context, EventTemplate template) =>
+      GestureDetector(
+        onTap: () => _navigateToCreateEvent(context, template),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              child: Center(
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Color(template.color),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      template.icon,
-                      style: const TextStyle(fontSize: 24),
-                    ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Icon and color header
+              Container(
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Color(template.color).withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
                   ),
                 ),
-              ),
-            ),
-            
-            // Content
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      template.name,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF333333),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                child: Center(
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Color(template.color),
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      template.category,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 12,
-                        color: Color(template.color),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Expanded(
+                    child: Center(
                       child: Text(
-                        template.description,
+                        template.icon,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        template.name,
                         style: GoogleFonts.montserrat(
-                          fontSize: 12,
-                          color: const Color(0xFF666666),
-                          height: 1.3,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF333333),
                         ),
-                        maxLines: 3,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        template.category,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          color: Color(template.color),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: Text(
+                          template.description,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            color: const Color(0xFF666666),
+                            height: 1.3,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   void _navigateToCreateEvent(BuildContext context, EventTemplate? template) {
     Navigator.pushReplacementNamed(

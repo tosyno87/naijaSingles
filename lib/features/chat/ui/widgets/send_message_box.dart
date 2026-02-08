@@ -5,8 +5,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/common/widgets/hookup_circularbar.dart';
-import 'package:naijasingles/features/match/ui/widget/matches_card.dart';
+import '../../../../common/widgets/hookup_circularbar.dart';
+import '../../../match/ui/widget/matches_card.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
@@ -22,14 +22,15 @@ import 'generate_layout.dart';
 bool shouldUploadImage(XFile? image) => image != null;
 
 class MessageBox extends StatefulWidget {
+  const MessageBox({
+    required this.sender,
+    required this.chatId,
+    required this.second,
+    super.key,
+  });
   final UserModel sender;
   final String chatId;
   final UserModel second;
-  const MessageBox(
-      {super.key,
-      required this.sender,
-      required this.chatId,
-      required this.second});
 
   @override
   State<MessageBox> createState() => _MessageBoxState();
@@ -50,11 +51,10 @@ class _MessageBoxState extends State<MessageBox> {
 
   final ScrollController _scrollController = ScrollController();
 
-  List<Widget> generateSenderLayout(DocumentSnapshot documentSnapshot) {
-    return <Widget>[
-      Expanded(child: Layout(documentSnapshot: documentSnapshot)),
-    ];
-  }
+  List<Widget> generateSenderLayout(DocumentSnapshot documentSnapshot) =>
+      <Widget>[
+        Expanded(child: Layout(documentSnapshot: documentSnapshot)),
+      ];
 
   List<Widget> generateReceiverLayout(DocumentSnapshot documentSnapshot) {
     if (!documentSnapshot.get('isRead')) {
@@ -65,10 +65,18 @@ class _MessageBoxState extends State<MessageBox> {
         'isRead': true,
       });
       return ChatMessageRead.messagesIsRead(
-          documentSnapshot, widget.second, widget.sender, context);
+        documentSnapshot,
+        widget.second,
+        widget.sender,
+        context,
+      );
     }
     return ChatMessageRead.messagesIsRead(
-        documentSnapshot, widget.second, widget.sender, context);
+      documentSnapshot,
+      widget.second,
+      widget.sender,
+      context,
+    );
   }
 
   @override
@@ -76,14 +84,14 @@ class _MessageBoxState extends State<MessageBox> {
     super.initState();
 
     chatReference =
-        db.collection("chats").doc(widget.chatId).collection('messages');
+        db.collection('chats').doc(widget.chatId).collection('messages');
     checkBlock();
     _scrollController.addListener(_scrollListener);
     _loadInitialMessages();
   }
 
   String? blockedBy;
-  checkBlock() {
+  void checkBlock() {
     chatReference.doc('blocked').snapshots().listen((onData) {
       if (true) {
         // (onData.data != null) {
@@ -117,7 +125,7 @@ class _MessageBoxState extends State<MessageBox> {
   }
 
   void _loadInitialMessages() {
-    Stream<QuerySnapshot> snapshotStream =
+    final Stream<QuerySnapshot> snapshotStream =
         PaginationRepo.listenForMessages(perpage, chatReference);
     snapshotStream.listen((snapshot) {
       if (mounted) {
@@ -132,12 +140,15 @@ class _MessageBoxState extends State<MessageBox> {
     });
   }
 
-  void _loadMoreMessages() async {
+  Future<void> _loadMoreMessages() async {
     setState(() {
       _isLoadingMore = true;
     });
     final snapshot = await PaginationRepo.getMoreMessages(
-        perpage, lastVisibleDocument, chatReference);
+      perpage,
+      lastVisibleDocument,
+      chatReference,
+    );
     setState(() {
       messages.addAll(snapshot.docs);
       _hasMoreMessages = snapshot.docs.length == perpage;
@@ -148,177 +159,182 @@ class _MessageBoxState extends State<MessageBox> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        body: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(50.0),
-            topRight: Radius.circular(50.0),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          backgroundColor: Theme.of(context).primaryColor,
+          body: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(50),
+              topRight: Radius.circular(50),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50)),
-                color: Theme.of(context).primaryColor),
-            padding: const EdgeInsets.all(5),
-            child: CupertinoScrollbar(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Expanded(
-                    child: ListView.builder(
-                      reverse: true,
-                      controller: _scrollController,
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        final documentSnapshot = messages[index];
-                        if (index == messages.length - 1) {
-                          return Column(
-                            children: [
-                              generateMessages(documentSnapshot),
-                              if (_isLoadingMore)
-                                const SizedBox(
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
+                ),
+                color: Theme.of(context).primaryColor,
+              ),
+              padding: const EdgeInsets.all(5),
+              child: CupertinoScrollbar(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Expanded(
+                      child: ListView.builder(
+                        reverse: true,
+                        controller: _scrollController,
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          final documentSnapshot = messages[index];
+                          if (index == messages.length - 1) {
+                            return Column(
+                              children: [
+                                generateMessages(documentSnapshot),
+                                if (_isLoadingMore)
+                                  const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: Hookup4uBar()),
-                            ],
-                          );
-                        } else {
-                          return generateMessages(documentSnapshot);
-                        }
-                      },
+                                    child: Hookup4uBar(),
+                                  ),
+                              ],
+                            );
+                          } else {
+                            return generateMessages(documentSnapshot);
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  if (messages.isEmpty && !isBlocked) _buildPromptSuggestions(),
-                  const Divider(height: 1.0),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    decoration: const BoxDecoration(color: Colors.transparent),
-                    child: isBlocked
-                        ? blockedBy == widget.sender.id
-                            ? Text("you blocked this user!".tr().toString())
-                            : Text("${widget.second.name} blocked you!"
-                                .tr()
-                                .toString())
-                        : _buildTextComposer(),
-                  ),
-                ],
+                    if (messages.isEmpty && !isBlocked)
+                      _buildPromptSuggestions(),
+                    const Divider(height: 1),
+                    Container(
+                      alignment: Alignment.bottomCenter,
+                      decoration:
+                          const BoxDecoration(color: Colors.transparent),
+                      child: isBlocked
+                          ? blockedBy == widget.sender.id
+                              ? Text('you blocked this user!'.tr().toString())
+                              : Text(
+                                  '${widget.second.name} blocked you!'
+                                      .tr()
+                                      .toString(),
+                                )
+                          : _buildTextComposer(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
-  generateMessages(QueryDocumentSnapshot<Object?> snapshot) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: snapshot.get('type') == "Call"
-            ? [
-                Text(snapshot.get('time') != null
-                    ? "${snapshot.get('text')} : ${DateFormat.yMMMd('en_US').add_jm().format(snapshot.get('time').toDate())} by ${snapshot.get('sender_id') == widget.sender.id ? "You" : "${widget.second.name}"}"
-                    : "")
-              ]
-            : snapshot.get('sender_id') != widget.sender.id
-                ? generateReceiverLayout(snapshot)
-                : generateSenderLayout(snapshot),
-      ),
-    );
-  }
-
-  Widget _buildPromptSuggestions() {
-    return Container(
-      alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+  Container generateMessages(QueryDocumentSnapshot<Object?> snapshot) =>
+      Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
-          children: prompts
-              .map(
-                (p) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: ActionChip(
-                    label: Text(p),
-                    onPressed: () {
-                      _sendText(p);
-                    },
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: snapshot.get('type') == 'Call'
+              ? [
+                  Text(
+                    snapshot.get('time') != null
+                        ? "${snapshot.get('text')} : ${DateFormat.yMMMd('en_US').add_jm().format(snapshot.get('time').toDate())} by ${snapshot.get('sender_id') == widget.sender.id ? "You" : "${widget.second.name}"}"
+                        : '',
                   ),
-                ),
-              )
-              .toList(),
+                ]
+              : snapshot.get('sender_id') != widget.sender.id
+                  ? generateReceiverLayout(snapshot)
+                  : generateSenderLayout(snapshot),
         ),
-      ),
-    );
-  }
+      );
 
-  Widget _buildTextComposer() {
-    return IconTheme(
+  Widget _buildPromptSuggestions() => Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: prompts
+                .map(
+                  (p) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ActionChip(
+                      label: Text(p),
+                      onPressed: () {
+                        _sendText(p);
+                      },
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      );
+
+  Widget _buildTextComposer() => IconTheme(
         data: IconThemeData(
-            color: _isWritting ? primaryColor : AppColors.secondaryColor),
+          color: _isWritting ? primaryColor : AppColors.secondaryColor,
+        ),
         child: Card(
           elevation: 10,
           margin: const EdgeInsets.all(0),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(40.0),
+            borderRadius: BorderRadius.circular(40),
           ),
           child: Container(
             decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                border: Border.all(color: AppColors.secondaryColor, width: 1),
-                borderRadius: BorderRadius.circular(40)),
-            margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+              color: Theme.of(context).primaryColor,
+              border: Border.all(color: AppColors.secondaryColor),
+              borderRadius: BorderRadius.circular(40),
+            ),
+            margin: const EdgeInsets.symmetric(),
             child: Row(
-              mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 IconButton(
-                    icon: Icon(
-                      Icons.photo_camera,
-                      color: primaryColor,
-                    ),
-                    onPressed: () async {
-                      ImagePicker imagePicker = ImagePicker();
+                  icon: const Icon(
+                    Icons.photo_camera,
+                    color: primaryColor,
+                  ),
+                  onPressed: () async {
+                    final ImagePicker imagePicker = ImagePicker();
 
-                      final picked = await imagePicker.pickImage(
-                          source: ImageSource.gallery);
-                      if (picked == null) return;
+                    final picked = await imagePicker.pickImage(
+                      source: ImageSource.gallery,
+                    );
+                    if (picked == null) return;
 
-                      int timestamp = DateTime.now().millisecondsSinceEpoch;
-                      Reference storageReference = FirebaseStorage.instance
-                          .ref()
-                          .child('chats/${widget.chatId}/img_$timestamp.jpg');
-                      UploadTask uploadTask =
-                          storageReference.putFile(File(picked.path));
-                      CustomToast.showToast('sending...'.tr().toString());
-                      await uploadTask.then((p0) async {
-                        String fileUrl =
-                            await storageReference.getDownloadURL();
-                        UserMessagingRepo.sendImage(
-                            'photo',
-                            fileUrl,
-                            chatReference,
-                            widget.chatId,
-                            widget.sender.id,
-                            widget.second.id);
+                    final int timestamp = DateTime.now().millisecondsSinceEpoch;
+                    final Reference storageReference = FirebaseStorage.instance
+                        .ref()
+                        .child('chats/${widget.chatId}/img_$timestamp.jpg');
+                    final UploadTask uploadTask =
+                        storageReference.putFile(File(picked.path));
+                    CustomToast.showToast('sending...'.tr().toString());
+                    await uploadTask.then((p0) async {
+                      final String fileUrl =
+                          await storageReference.getDownloadURL();
+                      UserMessagingRepo.sendImage(
+                        'photo',
+                        fileUrl,
+                        chatReference,
+                        widget.chatId,
+                        widget.sender.id,
+                        widget.second.id,
+                      );
 
-                        CustomToast.showToast('sent');
-                      });
-                    }),
+                      CustomToast.showToast('sent');
+                    });
+                  },
+                ),
                 Flexible(
-                  flex: 1,
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: TextField(
                       controller: _textController,
                       maxLines: 4,
                       minLines: 1,
-                      autofocus: false,
                       keyboardType: TextInputType.multiline,
                       onChanged: (String messageText) {
                         setState(() {
@@ -326,41 +342,45 @@ class _MessageBoxState extends State<MessageBox> {
                         });
                       },
                       decoration: InputDecoration.collapsed(
-                          hintStyle: const TextStyle(color: Colors.grey),
-                          hintText: "Send a message...".tr().toString()),
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        hintText: 'Send a message...'.tr().toString(),
+                      ),
                     ),
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
                   child: getDefaultSendButton(),
                 ),
               ],
             ),
           ),
-        ));
-  }
-
-  Widget getDefaultSendButton() {
-    return IconButton(
-      icon: Transform.rotate(
-        angle: -pi / 9,
-        child: const Icon(
-          Icons.send,
-          size: 25,
         ),
-      ),
-      color: primaryColor,
-      onPressed: _isWritting
-          ? () => _sendText(_textController.text.trimRight())
-          : null,
-    );
-  }
+      );
+
+  Widget getDefaultSendButton() => IconButton(
+        icon: Transform.rotate(
+          angle: -pi / 9,
+          child: const Icon(
+            Icons.send,
+            size: 25,
+          ),
+        ),
+        color: primaryColor,
+        onPressed: _isWritting
+            ? () => _sendText(_textController.text.trimRight())
+            : null,
+      );
 
   Future _sendText(String text) async {
     _textController.clear();
-    UserMessagingRepo.addTexttoDb(chatReference, text, widget.chatId,
-        widget.sender.id!, widget.second.id);
+    UserMessagingRepo.addTexttoDb(
+      chatReference,
+      text,
+      widget.chatId,
+      widget.sender.id!,
+      widget.second.id,
+    );
     setState(() {
       _isWritting = false;
     });

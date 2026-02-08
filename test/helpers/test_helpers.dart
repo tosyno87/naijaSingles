@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Test helper class for common test utilities
 class TestHelpers {
   /// Create a test MaterialApp wrapper
-  static Widget createTestApp(Widget child) {
-    return MaterialApp(
-      home: child,
-    );
-  }
+  static Widget createTestApp(Widget child) => MaterialApp(
+        home: child,
+      );
 
-  /// Create a test MaterialApp with Provider wrapper
-  static Widget createTestAppWithProvider<T extends ChangeNotifier>(
-    T provider,
+  /// Create a test MaterialApp with BlocProvider wrapper
+  static Widget createTestAppWithBloc<B extends BlocBase<Object>>(
+    B bloc,
     Widget child,
-  ) {
-    return MaterialApp(
-      home: ChangeNotifierProvider<T>(
-        create: (_) => provider,
-        child: child,
-      ),
-    );
-  }
+  ) =>
+      MaterialApp(
+        home: BlocProvider<B>.value(
+          value: bloc,
+          child: child,
+        ),
+      );
 
   /// Mock Firebase initialization for tests
   static void mockFirebaseForTests() {

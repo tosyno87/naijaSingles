@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
-import '../user/controllers/onboarding_controller.dart';
+import '../../../common/constants/app_colors.dart';
+import '../../../common/utils/app_logger.dart';
+import 'bloc/onboarding_bloc.dart';
+import 'bloc/onboarding_data.dart';
 import 'shared_styles.dart';
 
 /// First step of onboarding focusing on cultural roots.
@@ -11,14 +14,13 @@ import 'shared_styles.dart';
 /// This screen collects information about the user's tribe,
 /// languages spoken, and their intent for using the app.
 class OnboardingStepARoots extends StatefulWidget {
+  const OnboardingStepARoots({
+    required this.onNext,
+    super.key,
+    this.backgroundColor = AppColors.backgroundColor,
+  });
   final VoidCallback onNext;
   final Color backgroundColor;
-
-  OnboardingStepARoots({
-    Key? key,
-    required this.onNext,
-    this.backgroundColor = OnboardingStyles.backgroundColor,
-  }) : super(key: key);
 
   @override
   State<OnboardingStepARoots> createState() => _OnboardingStepARootsState();
@@ -62,7 +64,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     'Tutsi',
     'Akan',
     'Baganda',
-    'Other'
+    'Other',
   ];
 
   // List of languages for dropdown
@@ -83,7 +85,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     'Somali',
     'Portuguese',
     'Spanish',
-    'Other'
+    'Other',
   ];
 
   // Intent options with icons, titles and descriptions
@@ -114,25 +116,22 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
 
     // Add listener to text controller to rebuild UI when text changes
     _tribeController.addListener(() {
-      print("Tribe text changed: '${_tribeController.text}'");
+      AppLogger.debug("Tribe text changed: '${_tribeController.text}'");
       setState(() {});
     });
 
-    // Initialize text controller with existing value if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
-      if (controller.tribe != null && controller.tribe!.isNotEmpty) {
-        print("Setting initial tribe: '${controller.tribe}'");
-        _tribeController.text = controller.tribe!;
+      final data = context.read<OnboardingBloc>().state.data;
+      if (data != null && data.tribe.isNotEmpty) {
+        AppLogger.debug("Setting initial tribe: '${data.tribe}'");
+        _tribeController.text = data.tribe;
 
-        // Check if the tribe is in our dropdown list
-        if (_africanTribes.contains(controller.tribe)) {
+        if (_africanTribes.contains(data.tribe)) {
           setState(() {
-            _selectedTribe = controller.tribe;
+            _selectedTribe = data.tribe;
             _isCustomTribe = false;
           });
-        } else if (controller.tribe != null) {
+        } else {
           // If not in the list, set to "Other" and enable custom entry
           setState(() {
             _selectedTribe = 'Other';
@@ -152,7 +151,9 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data ?? OnboardingData();
 
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
@@ -177,7 +178,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     ),
                     child: Text(
                       'Step 1 of 3',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: deepGreen,
@@ -195,7 +196,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                 children: [
                   Text(
                     'Your Cultural Roots',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.brown.shade800,
@@ -205,7 +206,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   const SizedBox(height: 12),
                   Text(
                     'Tell us about your cultural background to help us connect you with like-minded people.',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.montserrat(
                       fontSize: 15,
                       color: Colors.brown.shade600,
                     ),
@@ -239,7 +240,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     // Dropdown for tribe selection
                     DropdownButtonFormField<String>(
                       key: _tribeFieldKey,
-                      value: _selectedTribe,
+                      initialValue: _selectedTribe,
                       onChanged: (value) {
                         if (value == 'Other') {
                           setState(() {
@@ -250,29 +251,31 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           });
                         } else {
                           setState(() {
-                            _selectedTribe = value!;
+                            _selectedTribe = value;
                             _isCustomTribe = false;
-                            _tribeController.text = value;
-                            controller.updateTribe(value);
+                            _tribeController.text = value ?? '';
+                            context.read<OnboardingBloc>().add(OnboardingTribeUpdated(value ?? ''));
                           });
                         }
                       },
-                      items: _africanTribes.map((tribe) {
-                        return DropdownMenuItem(
-                          value: tribe,
-                          child: Text(
-                            tribe,
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                      items: _africanTribes
+                          .map(
+                            (tribe) => DropdownMenuItem(
+                              value: tribe,
+                              child: Text(
+                                tribe,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                      }).toList(),
+                          )
+                          .toList(),
                       decoration: InputDecoration(
                         labelText: 'Tribe or Ethnic Group',
-                        labelStyle: GoogleFonts.poppins(
+                        labelStyle: GoogleFonts.montserrat(
                           color: deepGreen,
                           fontSize: 16,
                         ),
@@ -296,13 +299,13 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           vertical: 14,
                         ),
                       ),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
                       dropdownColor: Colors.white,
-                      icon: Icon(Icons.arrow_drop_down, color: deepGreen),
+                      icon: const Icon(Icons.arrow_drop_down, color: deepGreen),
                       isExpanded: true,
                     ),
 
@@ -313,12 +316,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                         controller: _tribeController,
                         decoration: InputDecoration(
                           labelText: 'Enter your tribe',
-                          labelStyle: GoogleFonts.poppins(
+                          labelStyle: GoogleFonts.montserrat(
                             color: deepGreen,
                             fontSize: 16,
                           ),
                           hintText: 'Type your tribe or ethnic group',
-                          hintStyle: GoogleFonts.poppins(
+                          hintStyle: GoogleFonts.montserrat(
                             color: Colors.grey[600],
                             fontSize: 14,
                           ),
@@ -342,13 +345,13 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             vertical: 14,
                           ),
                         ),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
                         ),
                         onChanged: (value) {
-                          controller.updateTribe(value.trim());
+                          context.read<OnboardingBloc>().add(OnboardingTribeUpdated(value.trim()));
                         },
                       ),
                     ],
@@ -359,7 +362,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     const SizedBox(height: 8),
                     Text(
                       'Select all languages that you speak',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 14,
                         color: Colors.grey[700],
                       ),
@@ -367,33 +370,37 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     const SizedBox(height: 12),
 
                     // Display selected languages as chips
-                    if (controller.languages.isNotEmpty) ...[
+                    if (data.languages.isNotEmpty) ...[
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: controller.languages.map((language) {
-                          return Chip(
-                            label: Text(
-                              language,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                        children: data.languages
+                            .map(
+                              (language) => Chip(
+                                label: Text(
+                                  language,
+                                  style: GoogleFonts.montserrat(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                backgroundColor: deepGreen,
+                                deleteIconColor: Colors.white,
+                                onDeleted: () {
+                                  setState(() {
+                                    final List<String> updatedLanguages = [
+                                      ...data.languages,
+                                    ];
+                                    updatedLanguages.remove(language);
+                                    context.read<OnboardingBloc>().add(
+                                      OnboardingLanguagesUpdated(updatedLanguages),
+                                    );
+                                  });
+                                },
                               ),
-                            ),
-                            backgroundColor: deepGreen,
-                            deleteIconColor: Colors.white,
-                            onDeleted: () {
-                              setState(() {
-                                List<String> updatedLanguages = [
-                                  ...controller.languages
-                                ];
-                                updatedLanguages.remove(language);
-                                controller.updateLanguages(updatedLanguages);
-                              });
-                            },
-                          );
-                        }).toList(),
+                            )
+                            .toList(),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -401,10 +408,10 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     // Dropdown for language selection
                     DropdownButtonFormField<String>(
                       key: _languagesKey,
-                      value: _selectedLanguage,
+                      initialValue: _selectedLanguage,
                       hint: Text(
                         'Select a language',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.montserrat(
                           color: Colors.grey[600],
                           fontSize: 14,
                         ),
@@ -421,12 +428,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             _isCustomLanguage = false;
 
                             // Add to languages list if not already there
-                            if (!controller.languages.contains(value)) {
-                              List<String> updatedLanguages = [
-                                ...controller.languages
+                            if (!data.languages.contains(value)) {
+                              final List<String> updatedLanguages = [
+                                ...data.languages,
                               ];
                               updatedLanguages.add(value);
-                              controller.updateLanguages(updatedLanguages);
+                              context.read<OnboardingBloc>().add(OnboardingLanguagesUpdated(updatedLanguages));
 
                               // Reset dropdown after selection
                               _selectedLanguage = null;
@@ -434,22 +441,24 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           });
                         }
                       },
-                      items: _availableLanguages.map((language) {
-                        return DropdownMenuItem(
-                          value: language,
-                          child: Text(
-                            language,
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                      items: _availableLanguages
+                          .map(
+                            (language) => DropdownMenuItem(
+                              value: language,
+                              child: Text(
+                                language,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                      }).toList(),
+                          )
+                          .toList(),
                       decoration: InputDecoration(
                         labelText: 'Add Language',
-                        labelStyle: GoogleFonts.poppins(
+                        labelStyle: GoogleFonts.montserrat(
                           color: deepGreen,
                           fontSize: 16,
                         ),
@@ -473,13 +482,13 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                           vertical: 14,
                         ),
                       ),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
                       dropdownColor: Colors.white,
-                      icon: Icon(Icons.arrow_drop_down, color: deepGreen),
+                      icon: const Icon(Icons.arrow_drop_down, color: deepGreen),
                       isExpanded: true,
                     ),
 
@@ -493,12 +502,12 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               controller: _customLanguageController,
                               decoration: InputDecoration(
                                 labelText: 'Enter language',
-                                labelStyle: GoogleFonts.poppins(
+                                labelStyle: GoogleFonts.montserrat(
                                   color: deepGreen,
                                   fontSize: 16,
                                 ),
                                 hintText: 'Type a language you speak',
-                                hintStyle: GoogleFonts.poppins(
+                                hintStyle: GoogleFonts.montserrat(
                                   color: Colors.grey[600],
                                   fontSize: 14,
                                 ),
@@ -517,14 +526,16 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: const BorderSide(
-                                      color: deepGreen, width: 2),
+                                    color: deepGreen,
+                                    width: 2,
+                                  ),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 14,
                                 ),
                               ),
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black87,
@@ -539,14 +550,15 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                               if (customLanguage.isNotEmpty) {
                                 setState(() {
                                   // Add custom language to the list
-                                  if (!controller.languages
+                                  if (!data.languages
                                       .contains(customLanguage)) {
-                                    List<String> updatedLanguages = [
-                                      ...controller.languages
+                                    final List<String> updatedLanguages = [
+                                      ...data.languages,
                                     ];
                                     updatedLanguages.add(customLanguage);
-                                    controller
-                                        .updateLanguages(updatedLanguages);
+                                    context.read<OnboardingBloc>().add(
+                                      OnboardingLanguagesUpdated(updatedLanguages),
+                                    );
                                   }
 
                                   // Reset custom language state
@@ -566,7 +578,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                             ),
                             child: Text(
                               'Add',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.montserrat(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -600,12 +612,14 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   children: [
                     _buildSectionTitle('What are you looking for?'),
                     const SizedBox(height: 16),
-                    ..._intentOptions.map((option) => _buildIntentOption(
-                          option: option,
-                          isSelected: controller.intent == option['value'],
-                          onTap: () => controller.updateIntent(option['value']),
-                          deepGreen: deepGreen,
-                        )),
+                    ..._intentOptions.map(
+                      (option) => _buildIntentOption(
+                        option: option,
+                        isSelected: data.intent == option['value'],
+                        onTap: () => context.read<OnboardingBloc>().add(OnboardingIntentUpdated(option['value'])),
+                        deepGreen: deepGreen,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -619,7 +633,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                   height: 56,
                   child: ElevatedButton(
                     key: _continueButtonKey,
-                    onPressed: _isStepValid(controller)
+                    onPressed: _isStepValid(data)
                         ? () {
                             HapticFeedback.mediumImpact();
                             widget.onNext();
@@ -636,7 +650,7 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
                     ),
                     child: Text(
                       'Continue',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -650,19 +664,19 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
         ),
       ),
     );
+      },
+    );
   }
 
   /// Builds a section title with consistent styling
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-      ),
-    );
-  }
+  Widget _buildSectionTitle(String title) => Text(
+        title,
+        style: GoogleFonts.montserrat(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      );
 
   /// Builds an intent option card with icon, title and description
   Widget _buildIntentOption({
@@ -670,97 +684,95 @@ class _OnboardingStepARootsState extends State<OnboardingStepARoots> {
     required bool isSelected,
     required VoidCallback onTap,
     required Color deepGreen,
-  }) {
-    return Semantics(
-      button: true,
-      label: '${option['title']} option',
-      hint: option['description'],
-      selected: isSelected,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            onTap();
-            HapticFeedback.selectionClick();
-          },
-          borderRadius: BorderRadius.circular(12),
-          splashColor: deepGreen.withValues(alpha: 0.1),
-          highlightColor: deepGreen.withValues(alpha: 0.05),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 90),
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color:
-                  isSelected ? deepGreen.withValues(alpha: 0.1) : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected ? deepGreen : Colors.grey[300]!,
-                width: isSelected ? 2 : 1,
+  }) =>
+      Semantics(
+        button: true,
+        label: '${option['title']} option',
+        hint: option['description'],
+        selected: isSelected,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              onTap();
+              HapticFeedback.selectionClick();
+            },
+            borderRadius: BorderRadius.circular(12),
+            splashColor: deepGreen.withValues(alpha: 0.1),
+            highlightColor: deepGreen.withValues(alpha: 0.05),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 90),
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? deepGreen.withValues(alpha: 0.1)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? deepGreen : Colors.grey[300]!,
+                  width: isSelected ? 2 : 1,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isSelected ? deepGreen : Colors.grey.shade100,
-                    shape: BoxShape.circle,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? deepGreen : Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      option['icon'],
+                      color: isSelected ? Colors.white : Colors.grey.shade600,
+                      size: 24,
+                    ),
                   ),
-                  child: Icon(
-                    option['icon'],
-                    color: isSelected ? Colors.white : Colors.grey.shade600,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        option['title'],
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? deepGreen : Colors.black87,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          option['title'],
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected ? deepGreen : Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        option['description'],
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.grey.shade700,
+                        const SizedBox(height: 4),
+                        Text(
+                          option['description'],
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (isSelected)
-                  Icon(
-                    Icons.check_circle,
-                    color: deepGreen,
-                    size: 24,
-                  ),
-              ],
+                  if (isSelected)
+                    Icon(
+                      Icons.check_circle,
+                      color: deepGreen,
+                      size: 24,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) {
-    // For tribe, check if a dropdown option is selected or custom tribe is entered
+  bool _isStepValid(OnboardingData data) {
     bool isTribeValid = _selectedTribe != null;
     if (_selectedTribe == 'Other') {
       isTribeValid = _tribeController.text.trim().isNotEmpty;
     }
-
     return isTribeValid &&
-        controller.languages.isNotEmpty &&
-        controller.intent != null;
+        data.languages.isNotEmpty &&
+        data.intent != null;
   }
 }

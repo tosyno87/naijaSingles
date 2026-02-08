@@ -1,16 +1,14 @@
-import 'package:naijasingles/common/utils/distance.dart' as distance;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naijasingles/models/user_model.dart';
-import 'package:naijasingles/features/match/services/likes_service.dart';
-import 'package:naijasingles/services/optimized_match_service.dart';
-import 'package:naijasingles/services/cached_user_service.dart';
-import 'package:naijasingles/services/paginated_user_service.dart';
-import 'package:naijasingles/services/unified_discovery_service.dart';
 
+import '../../../models/user_model.dart';
+import '../../../services/cached_user_service.dart';
+import '../../../features/match/data/services/match_service.dart';
+import '../../../services/paginated_user_service.dart';
+import '../../../features/discovery/data/services/discovery_service.dart';
 import '../../constants/constants.dart';
+import '../../utils/distance.dart' as distance;
 
 class UserSearchRepo {
   static FirebaseFirestore db = firebaseFireStoreInstance;
@@ -20,8 +18,7 @@ class UserSearchRepo {
   // static final LikesService _likesService = LikesService(); // Removed - using unified service
 
   // New optimized services
-  static final OptimizedMatchService _optimizedMatchService =
-      OptimizedMatchService();
+  static final MatchService _matchService = MatchService();
   static final CachedUserService _cachedUserService = CachedUserService();
   // static final PaginatedUserService _paginatedUserService = PaginatedUserService(); // Removed - using unified service
 
@@ -35,8 +32,8 @@ class UserSearchRepo {
   static Map likedMap = {};
   static Map disLikedMap = {};
 
-  static getAccessItems() async {
-    db.collection("Item_access").snapshots().listen((doc) {
+  static Future<void> getAccessItems() async {
+    db.collection('Item_access').snapshots().listen((doc) {
       if (doc.docs.isNotEmpty) {
         items = doc.docs[0].data();
         // log(doc.docs[0].data().toString());
@@ -61,97 +58,110 @@ class UserSearchRepo {
   }
 
   static Future<void> leftSwipe(
-      UserModel currentUser, UserModel selectedUser) async {
+    UserModel currentUser,
+    UserModel selectedUser,
+  ) async {
     await docRef
         .doc(currentUser.id)
-        .collection("CheckedUser")
+        .collection('CheckedUser')
         .doc(selectedUser.id)
-        .set({
-      'DislikedUser': selectedUser.id,
-      'timestamp': DateTime.now(),
-    }, SetOptions(merge: true));
+        .set(
+      {
+        'DislikedUser': selectedUser.id,
+        'timestamp': DateTime.now(),
+      },
+      SetOptions(merge: true),
+    );
   }
 
   static Future<String?> rightSwipe(
-      UserModel currentUser, UserModel selectedUser) async {
+    UserModel currentUser,
+    UserModel selectedUser,
+  ) async {
     try {
       debugPrint(
-          '🚀 Optimized right swipe: ${currentUser.name} → ${selectedUser.name}');
+        '🚀 Optimized right swipe: ${currentUser.name} → ${selectedUser.name}',
+      );
 
       // Use optimized match service (2-3 Firestore reads max)
       final currentUserId = currentUser.id;
       final selectedUserId = selectedUser.id;
 
       if (currentUserId != null && selectedUserId != null) {
-        final result = await _optimizedMatchService.handleLike(
-            currentUserId, selectedUserId);
+        // Use MatchService which internally uses optimized LikesService
+        final matchId = await _matchService.handleLike(selectedUserId);
 
-        if (result.isSuccess) {
-          if (result.isMatch) {
-            debugPrint("🎉 Match created! Match ID: ${result.matchId}");
-            return result.matchId;
-          } else {
-            debugPrint("💌 Like saved, waiting for mutual like");
-          }
+        if (matchId != null) {
+          debugPrint('🎉 Match created! Match ID: $matchId');
+          return matchId;
         } else {
-          debugPrint("❌ Error in optimized match service: ${result.error}");
-          // Fall back to legacy system
-          return await _legacyRightSwipe(currentUser, selectedUser);
+          debugPrint('💌 Like saved, waiting for mutual like');
         }
       }
 
       // Update CheckedUser collection for swipe tracking
       await docRef
           .doc(currentUser.id)
-          .collection("CheckedUser")
+          .collection('CheckedUser')
           .doc(selectedUser.id)
-          .set({
-        'LikedUser': selectedUser.id,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+          .set(
+        {
+          'LikedUser': selectedUser.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       return null; // No match created
     } catch (e) {
       debugPrint('❌ Error in optimized rightSwipe: $e');
       // Fallback to legacy behavior if optimized system fails
-      return await _legacyRightSwipe(currentUser, selectedUser);
+      return _legacyRightSwipe(currentUser, selectedUser);
     }
   }
 
   /// Legacy right swipe implementation as fallback
   static Future<String?> _legacyRightSwipe(
-      UserModel currentUser, UserModel selectedUser) async {
+    UserModel currentUser,
+    UserModel selectedUser,
+  ) async {
     try {
       likedByList = await getLikedByList(currentUser);
-      if ((likedByList.contains(selectedUser.id) ||
-          (selectedUser.isBot ?? false))) {
-        debugPrint("Legacy match creation for backward compatibility");
+      if (likedByList.contains(selectedUser.id) ||
+          (selectedUser.isBot ?? false)) {
+        debugPrint('Legacy match creation for backward compatibility');
         await docRef
             .doc(currentUser.id)
-            .collection("Matches")
+            .collection('Matches')
             .doc(selectedUser.id)
-            .set({
-          'Matches': selectedUser.id,
-          'isRead': false,
-          'userName': selectedUser.name ?? 'Unknown',
-          'pictureUrl': selectedUser.imageUrl?.isNotEmpty == true
-              ? selectedUser.imageUrl![0]
-              : '',
-          'timestamp': FieldValue.serverTimestamp()
-        }, SetOptions(merge: true));
+            .set(
+          {
+            'Matches': selectedUser.id,
+            'isRead': false,
+            'userName': selectedUser.name ?? 'Unknown',
+            'pictureUrl': selectedUser.imageUrl?.isNotEmpty ?? false
+                ? selectedUser.imageUrl![0]
+                : '',
+            'timestamp': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
         await docRef
             .doc(selectedUser.id)
-            .collection("Matches")
+            .collection('Matches')
             .doc(currentUser.id)
-            .set({
-          'Matches': currentUser.id,
-          'userName': currentUser.name ?? 'Unknown',
-          'pictureUrl': currentUser.imageUrl?.isNotEmpty == true
-              ? currentUser.imageUrl![0]
-              : '',
-          'isRead': false,
-          'timestamp': FieldValue.serverTimestamp()
-        }, SetOptions(merge: true));
+            .set(
+          {
+            'Matches': currentUser.id,
+            'userName': currentUser.name ?? 'Unknown',
+            'pictureUrl': currentUser.imageUrl?.isNotEmpty ?? false
+                ? currentUser.imageUrl![0]
+                : '',
+            'isRead': false,
+            'timestamp': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
 
         // Return a legacy match indicator
         return 'legacy_match';
@@ -160,22 +170,28 @@ class UserSearchRepo {
       // Update legacy CheckedUser collection
       await docRef
           .doc(currentUser.id)
-          .collection("CheckedUser")
+          .collection('CheckedUser')
           .doc(selectedUser.id)
-          .set({
-        'LikedUser': selectedUser.id,
-        'timestamp': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+          .set(
+        {
+          'LikedUser': selectedUser.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       // Update legacy LikedBy collection
       await docRef
           .doc(selectedUser.id)
-          .collection("LikedBy")
+          .collection('LikedBy')
           .doc(currentUser.id)
-          .set({
-        'LikedBy': currentUser.id,
-        'timestamp': FieldValue.serverTimestamp()
-      }, SetOptions(merge: true));
+          .set(
+        {
+          'LikedBy': currentUser.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       return null; // No match created
     } catch (e) {
@@ -213,11 +229,10 @@ class UserSearchRepo {
         debugPrint('🎯 Filtering by intent: $intentFilter');
       }
 
-      // Use unified discovery service for better performance and consistency
-      final users = await UnifiedDiscoveryService.getUsersForDiscovery(
+      // Use consolidated discovery service for better performance and consistency
+      final users = await DiscoveryService.getUsersForDiscovery(
         currentUser,
         intentFilter: intentFilter,
-        forceRefresh: forceRefresh,
       );
 
       debugPrint('✅ Retrieved ${users.length} users from unified service');
@@ -225,7 +240,7 @@ class UserSearchRepo {
     } catch (e) {
       debugPrint('❌ Error in unified getUserList: $e');
       // Fallback to legacy method
-      return await _legacyGetUserList(currentUser, intentFilter: intentFilter);
+      return _legacyGetUserList(currentUser, intentFilter: intentFilter);
     }
   }
 
@@ -260,7 +275,7 @@ class UserSearchRepo {
     UserModel currentUser, {
     String? intentFilter, // Add intent filter parameter
   }) async {
-    List<String> checkedUserIds = [];
+    final List<String> checkedUserIds = [];
 
     try {
       debugPrint('⚠️ Using legacy getUserList as fallback');
@@ -293,20 +308,24 @@ class UserSearchRepo {
       debugPrint('Query returned ${querySnapshot.docs.length} documents');
 
       if (querySnapshot.docs.isEmpty) {
-        debugPrint("no more data");
+        debugPrint('no more data');
         return [];
       }
 
-      List<UserModel> userList = [];
+      final List<UserModel> userList = [];
 
       for (var doc in querySnapshot.docs) {
         try {
           debugPrint('Processing document: ${doc.id}');
-          UserModel temp = UserModel.fromDocument(doc);
+          final UserModel temp = UserModel.fromDocument(doc);
           debugPrint('Created UserModel for: ${temp.name}');
 
-          var distance = calculateDistance(currentUser.latitude,
-              currentUser.longitude, temp.latitude, temp.longitude);
+          final distance = calculateDistance(
+            currentUser.latitude,
+            currentUser.longitude,
+            temp.latitude,
+            temp.longitude,
+          );
           temp.distanceBW = distance.round();
 
           if (checkedUserIds.contains(temp.id)) {
@@ -318,7 +337,9 @@ class UserSearchRepo {
           if (intentFilter != null && intentFilter.isNotEmpty) {
             final userIntent = temp.lookingFor ?? 'Dating';
             if (userIntent != intentFilter) {
-              debugPrint('Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)');
+              debugPrint(
+                'Filtered out user: ${temp.name} (intent: $userIntent, looking for: $intentFilter)',
+              );
               continue;
             }
           }
@@ -326,11 +347,14 @@ class UserSearchRepo {
           if (distance <= currentUser.maxDistance! &&
               temp.id != currentUser.id &&
               !temp.isBlocked!) {
-            debugPrint("Adding user: ${temp.name} (intent: ${temp.lookingFor})");
+            debugPrint(
+              'Adding user: ${temp.name} (intent: ${temp.lookingFor})',
+            );
             userList.add(temp);
           } else {
             debugPrint(
-                'Filtered out user: ${temp.name} (distance: $distance, maxDistance: ${currentUser.maxDistance}, blocked: ${temp.isBlocked})');
+              'Filtered out user: ${temp.name} (distance: $distance, maxDistance: ${currentUser.maxDistance}, blocked: ${temp.isBlocked})',
+            );
           }
         } catch (e) {
           debugPrint('Error processing document ${doc.id}: $e');
@@ -348,8 +372,8 @@ class UserSearchRepo {
 
   static Future<List<String>> getLikedByList(UserModel currentUser) async {
     final snapshot =
-        await docRef.doc(currentUser.id).collection("LikedBy").get();
-    List<String> likedByList = [];
+        await docRef.doc(currentUser.id).collection('LikedBy').get();
+    final List<String> likedByList = [];
     if (snapshot.docs.isNotEmpty) {
       for (final doc in snapshot.docs) {
         likedByList.add(doc.data()['LikedBy']);
@@ -358,7 +382,6 @@ class UserSearchRepo {
     return likedByList;
   }
 
-  static double calculateDistance(lat1, lon1, lat2, lon2) {
-    return distance.calculateDistance(lat1, lon1, lat2, lon2);
-  }
+  static double calculateDistance(lat1, lon1, lat2, lon2) =>
+      distance.calculateDistance(lat1, lon1, lat2, lon2);
 }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 import '../widgets/afropeep_height_dropdown.dart';
 
 class AdditionalInfoOnboardingScreen extends StatefulWidget {
-  const AdditionalInfoOnboardingScreen({Key? key}) : super(key: key);
+  const AdditionalInfoOnboardingScreen({super.key});
 
   @override
   State<AdditionalInfoOnboardingScreen> createState() =>
@@ -24,12 +25,12 @@ class _AdditionalInfoOnboardingScreenState
     {
       'label': 'Friendship',
       'value': 'Friendship',
-      'icon': Icons.people_outline
+      'icon': Icons.people_outline,
     },
     {
       'label': 'Networking',
       'value': 'Networking',
-      'icon': Icons.business_center_outlined
+      'icon': Icons.business_center_outlined,
     },
   ];
 
@@ -37,43 +38,43 @@ class _AdditionalInfoOnboardingScreenState
     {
       'label': 'Short-term fun',
       'value': 'Short-term',
-      'icon': Icons.flash_on_outlined
+      'icon': Icons.flash_on_outlined,
     },
     {
       'label': 'Long-term relationship',
       'value': 'Long-term',
-      'icon': Icons.favorite_border
+      'icon': Icons.favorite_border,
     },
     {
       'label': 'Casual dating',
       'value': 'Casual',
-      'icon': Icons.coffee_outlined
+      'icon': Icons.coffee_outlined,
     },
     {
       'label': 'Not sure yet',
       'value': 'Not sure yet',
-      'icon': Icons.help_outline
+      'icon': Icons.help_outline,
     },
   ];
 
   @override
   void initState() {
     super.initState();
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
+    final data = context.read<OnboardingBloc>().state.data;
 
-    // Initialize height from controller if available
-    if (controller.height > 0) {
-      _heightCm = controller.height.round();
+    if (data != null && data.height > 0) {
+      _heightCm = data.height.round();
       // Try to find matching ft/in value
-      String? ftIn = HeightData.getFtInFromCm(_heightCm);
+      final String? ftIn = HeightData.getFtInFromCm(_heightCm);
       if (ftIn != null) {
         _heightFtIn = ftIn;
       }
     }
 
-    _lookingFor = controller.lookingFor;
-    _relationshipIntent = controller.relationshipIntent;
+    if (data != null) {
+      _lookingFor = data.lookingFor;
+      _relationshipIntent = data.relationshipIntent;
+    }
   }
 
   @override
@@ -89,7 +90,7 @@ class _AdditionalInfoOnboardingScreenState
           // Header
           Text(
             'Tell us more about you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 32 : 28,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -98,7 +99,7 @@ class _AdditionalInfoOnboardingScreenState
           SizedBox(height: isTablet ? 12 : 8),
           Text(
             'Help us create better matches for you',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.montserrat(
               fontSize: isTablet ? 18 : 16,
               color: Colors.black54,
             ),
@@ -108,7 +109,9 @@ class _AdditionalInfoOnboardingScreenState
 
           // Height Section
           _buildSectionHeader(
-              'Height', 'Your height helps with better matching'),
+            'Height',
+            'Your height helps with better matching',
+          ),
           SizedBox(height: isTablet ? 20 : 16),
           AfropeepHeightDropdown(
             initialHeightFtIn: _heightFtIn,
@@ -118,10 +121,9 @@ class _AdditionalInfoOnboardingScreenState
                 _heightFtIn = heightFtIn;
                 _heightCm = heightCm;
               });
-              // Save to controller
-              final controller =
-                  Provider.of<OnboardingController>(context, listen: false);
-              controller.setHeightFromDropdown(heightFtIn, heightCm);
+              context.read<OnboardingBloc>().add(
+                OnboardingHeightFromDropdownUpdated(heightFtIn, heightCm),
+              );
             },
           ),
 
@@ -129,7 +131,9 @@ class _AdditionalInfoOnboardingScreenState
 
           // Looking For Section
           _buildSectionHeader(
-              'I\'m looking for', 'What brings you to NaijaSingles?'),
+            'I\'m looking for',
+            'What brings you to NaijaSingles?',
+          ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildLookingForOptions(),
 
@@ -137,7 +141,9 @@ class _AdditionalInfoOnboardingScreenState
 
           // Relationship Intent Section
           _buildSectionHeader(
-              'Relationship goals', 'What are you hoping to find?'),
+            'Relationship goals',
+            'What are you hoping to find?',
+          ),
           SizedBox(height: isTablet ? 20 : 16),
           ..._buildRelationshipIntentOptions(),
 
@@ -156,7 +162,7 @@ class _AdditionalInfoOnboardingScreenState
       children: [
         Text(
           title,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 22 : 18,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -165,7 +171,7 @@ class _AdditionalInfoOnboardingScreenState
         SizedBox(height: isTablet ? 8 : 4),
         Text(
           subtitle,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.montserrat(
             fontSize: isTablet ? 16 : 14,
             color: Colors.black54,
           ),
@@ -178,52 +184,54 @@ class _AdditionalInfoOnboardingScreenState
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _lookingForOptions.map((option) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: _buildSelectionOption(
-          option['label'],
-          option['value'],
-          _lookingFor,
-          (value) {
-            setState(() {
-              _lookingFor = value;
-            });
-            // Save to controller
-            final controller =
-                Provider.of<OnboardingController>(context, listen: false);
-            controller.setLookingFor(value);
-          },
-          option['icon'],
-        ),
-      );
-    }).toList();
+    return _lookingForOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: _buildSelectionOption(
+              option['label'],
+              option['value'],
+              _lookingFor,
+              (value) {
+                setState(() {
+                  _lookingFor = value;
+                });
+                context.read<OnboardingBloc>().add(
+                  OnboardingLookingForUpdated(value),
+                );
+              },
+              option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   List<Widget> _buildRelationshipIntentOptions() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    return _relationshipIntentOptions.map((option) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
-        child: _buildSelectionOption(
-          option['label'],
-          option['value'],
-          _relationshipIntent,
-          (value) {
-            setState(() {
-              _relationshipIntent = value;
-            });
-            // Save to controller
-            final controller =
-                Provider.of<OnboardingController>(context, listen: false);
-            controller.setRelationshipIntent(value);
-          },
-          option['icon'],
-        ),
-      );
-    }).toList();
+    return _relationshipIntentOptions
+        .map(
+          (option) => Padding(
+            padding: EdgeInsets.only(bottom: isTablet ? 16 : 12),
+            child: _buildSelectionOption(
+              option['label'],
+              option['value'],
+              _relationshipIntent,
+              (value) {
+                setState(() {
+                  _relationshipIntent = value;
+                });
+                context.read<OnboardingBloc>().add(
+                  OnboardingRelationshipIntentUpdated(value),
+                );
+              },
+              option['icon'],
+            ),
+          ),
+        )
+        .toList();
   }
 
   Widget _buildSelectionOption(
@@ -274,7 +282,7 @@ class _AdditionalInfoOnboardingScreenState
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.montserrat(
                   fontSize: isTablet ? 18 : 16,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color: isSelected ? const Color(0xFF008037) : Colors.black87,

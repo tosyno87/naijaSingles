@@ -7,7 +7,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('African Diaspora Messaging Flow', () {
-    testWidgets('Cross-cultural messaging between African ethnicities', (tester) async {
+    testWidgets('Cross-cultural messaging between African ethnicities',
+        (tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -44,7 +45,7 @@ Future<void> _testCrossCulturalMessaging(WidgetTester tester) async {
 
   // Look for existing conversations or create new match
   final conversationList = find.byType(ListTile);
-  
+
   if (conversationList.evaluate().isNotEmpty) {
     // Tap on first conversation
     await tester.tap(conversationList.first);
@@ -225,7 +226,7 @@ Future<void> _sendMessage(WidgetTester tester, String message) async {
 Future<void> _testCulturalGreetings(WidgetTester tester) async {
   final greetings = [
     'Sannu! (Hello in Hausa)',
-    'Ndewo! (Hello in Igbo)', 
+    'Ndewo! (Hello in Igbo)',
     'Bawo! (Hello in Yoruba)',
     'Habari! (Hello in Swahili)',
     'Selam! (Hello in Amharic)',
@@ -257,13 +258,13 @@ Future<void> _createTestMatch(WidgetTester tester) async {
   // This would typically involve going through the matching flow
   // For integration testing, we might need to mock this
   print('Creating test match for messaging flow...');
-  
+
   // Navigate back to home to create a match
   final homeTab = find.text('Home');
   if (homeTab.evaluate().isNotEmpty) {
     await tester.tap(homeTab);
     await tester.pumpAndSettle();
-    
+
     // Simulate a swipe right to create a match
     final swipeCard = find.byType(Card).first;
     if (swipeCard.evaluate().isNotEmpty) {

@@ -2,7 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:naijasingles/features/home/bloc/swipebloc_bloc.dart';
-import 'package:naijasingles/features/match/services/match_service.dart';
+import 'package:naijasingles/features/match/data/services/match_service.dart';
 import 'package:naijasingles/models/user_model.dart';
 
 import '../helpers/firebase_test_setup.dart';

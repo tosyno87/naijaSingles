@@ -39,6 +39,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   bool _confirmDeletion = false;
   bool _understandConsequences = false;
   bool _isPhoneUser = false;
+  bool _isEmailUser = false;
 
   // Phone re-auth for account deletion (when requires-recent-login)
   String? _verificationIdForReauth;
@@ -77,15 +78,20 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     if (user != null) {
       final providerData = user.providerData;
       final isPhone = providerData.any((info) => info.providerId == 'phone');
-      log('📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone');
+      final isEmail =
+          providerData.any((info) => info.providerId == 'password');
+      log(
+          '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail');
 
-      if (_isPhoneUser != isPhone) {
+      if (_isPhoneUser != isPhone || _isEmailUser != isEmail) {
         setState(() {
           _isPhoneUser = isPhone;
+          _isEmailUser = isEmail;
         });
-        log('📱 Updated _isPhoneUser to: $_isPhoneUser');
+        log('📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser');
       } else {
-        _isPhoneUser = isPhone; // Set it even if no state change needed
+        _isPhoneUser = isPhone;
+        _isEmailUser = isEmail;
       }
     } else {
       log('⚠️ No current user found in _checkAuthProvider');
@@ -129,11 +135,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               _buildDeletionReasonSection(),
               const SizedBox(height: 24),
 
-              // Password/Phone Confirmation (based on auth provider)
+              // Password/Phone/Other Confirmation (based on auth provider)
               if (_isPhoneUser)
                 _buildPhoneConfirmationSection()
+              else if (_isEmailUser)
+                _buildPasswordConfirmationSection()
               else
-                _buildPasswordConfirmationSection(),
+                _buildOtherProviderSection(),
               const SizedBox(height: 24),
 
               // Confirmation Checkboxes
@@ -456,6 +464,80 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       );
 
+  Widget _buildOtherProviderSection() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.login, color: primaryColor, size: 22),
+                const SizedBox(width: 8),
+                Text(
+                  'Signed in with Google or another provider',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'For security, sign out and sign back in, then return to this screen to delete your account.',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await _auth.signOut();
+                  if (mounted) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      RouteName.welcomeScreen,
+                      (route) => false,
+                    );
+                  }
+                },
+                icon: const Icon(Icons.logout, size: 20),
+                label: Text(
+                  'Sign out and return to sign-in',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: primaryColor,
+                  side: BorderSide(color: primaryColor),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
   Widget _buildConfirmationSection() => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -542,9 +624,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       );
 
   Widget _buildDeleteButton() {
-    // For phone users, don't require password
-    // For email users, require password
-    final passwordValid = _isPhoneUser || _passwordController.text.isNotEmpty;
+    // Phone and "other" (e.g. Google) users don't need password; email users do
+    final isOtherProvider = !_isPhoneUser && !_isEmailUser;
+    final passwordValid = _isPhoneUser ||
+        isOtherProvider ||
+        _passwordController.text.isNotEmpty;
 
     final canDelete =
         passwordValid && _understandConsequences && _confirmDeletion;
@@ -663,13 +747,14 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         throw Exception('No user logged in');
       }
 
-      // Check auth provider and re-authenticate accordingly
+      // Check auth provider and re-authenticate accordingly.
+      // Only treat as email user if they signed in with password; Google/OAuth users
+      // must use the "other" flow (sign out and sign back in) for re-auth.
       final providerData = user.providerData;
       final isPhoneUser =
           providerData.any((info) => info.providerId == 'phone');
       final isEmailUser =
-          providerData.any((info) => info.providerId == 'password') ||
-              user.email != null;
+          providerData.any((info) => info.providerId == 'password');
 
       log('📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser');
 
@@ -783,8 +868,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           if (e.code == 'requires-recent-login') {
             errorMessage =
                 'For security, please sign out and sign back in, then try again.';
-          } else if (e.code == 'wrong-password') {
-            errorMessage = 'Incorrect password. Please try again.';
+          } else if (e.code == 'wrong-password' ||
+              e.code == 'invalid-credential') {
+            errorMessage =
+                'Incorrect password or expired session. Please try again.';
           } else {
             errorMessage = 'Error: ${e.message ?? e.code}';
           }

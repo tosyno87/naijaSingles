@@ -10,6 +10,7 @@ import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/utils/account_deletion_scope.dart';
 import '../../common/utils/app_logger.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../debug/quick_analysis.dart';
@@ -170,16 +171,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
 
     // User is authenticated but no profile data found - redirect to onboarding
-    // This means they started sign-up but didn't complete it
+    // (or to welcome if account deletion is in progress - doc removed before signOut)
     _hasCheckedRegistration = true;
-    developer.log(
-        '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
-
-    if (mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        RouteName.onboarding,
-        (route) => false,
-      );
+    if (AccountDeletionScope.inProgress) {
+      developer.log(
+          '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)');
+      AccountDeletionScope.inProgress = false;
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          RouteName.welcomeScreen,
+          (route) => false,
+        );
+      }
+    } else {
+      developer.log(
+          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          RouteName.onboarding,
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -264,17 +276,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         );
       }
 
-      // Authenticated but no user data - redirect to onboarding to complete profile
-      developer.log(
-          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
-      Future.microtask(() {
-        if (mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            RouteName.onboarding,
-            (route) => false,
-          );
-        }
-      });
+      // Authenticated but no user data - redirect to onboarding or welcome (if deletion in progress)
+      if (AccountDeletionScope.inProgress) {
+        developer.log(
+            '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)');
+        AccountDeletionScope.inProgress = false;
+        Future.microtask(() {
+          if (mounted) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              RouteName.welcomeScreen,
+              (route) => false,
+            );
+          }
+        });
+      } else {
+        developer.log(
+            '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+        Future.microtask(() {
+          if (mounted) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              RouteName.onboarding,
+              (route) => false,
+            );
+          }
+        });
+      }
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: Center(

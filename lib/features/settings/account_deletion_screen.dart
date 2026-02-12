@@ -8,6 +8,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/utils/account_deletion_scope.dart';
 
 class AccountDeletionScreen extends StatefulWidget {
   const AccountDeletionScreen({super.key});
@@ -676,6 +677,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       // while user is still authenticated, then delete Auth user, then sign out and show success.
       if (isPhoneUser) {
         log('📱 Phone user - cleanup then delete');
+        AccountDeletionScope.inProgress = true;
         try {
           await _cleanupUserData(user);
           _logDeletionAndSignOut(user, authProvider: 'phone');
@@ -686,27 +688,36 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         } catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
             log('⚠️ Requires recent login - showing phone re-auth');
+            AccountDeletionScope.inProgress = false;
             setState(() => _isDeleting = false);
             if (mounted) _showPhoneReauthDialog(user);
             return;
           }
+          AccountDeletionScope.inProgress = false;
           rethrow;
         }
       } else if (isEmailUser && user.email != null) {
         log('📧 Email user - reauth, cleanup, then delete');
-        final credential = EmailAuthProvider.credential(
-          email: user.email!,
-          password: _passwordController.text,
-        );
-        await user.reauthenticateWithCredential(credential);
-        await _cleanupUserData(user);
-        _logDeletionAndSignOut(user, authProvider: 'email');
-        await user.delete();
-        await _auth.signOut();
-        if (mounted) _showDeletionSuccessDialog();
-        return;
+        AccountDeletionScope.inProgress = true;
+        try {
+          final credential = EmailAuthProvider.credential(
+            email: user.email!,
+            password: _passwordController.text,
+          );
+          await user.reauthenticateWithCredential(credential);
+          await _cleanupUserData(user);
+          _logDeletionAndSignOut(user, authProvider: 'email');
+          await user.delete();
+          await _auth.signOut();
+          if (mounted) _showDeletionSuccessDialog();
+          return;
+        } catch (_) {
+          AccountDeletionScope.inProgress = false;
+          rethrow;
+        }
       } else {
         log('🔐 Other auth provider - cleanup then delete');
+        AccountDeletionScope.inProgress = true;
         try {
           await _cleanupUserData(user);
           _logDeletionAndSignOut(user, authProvider: 'other');
@@ -716,6 +727,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           return;
         } catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
+            AccountDeletionScope.inProgress = false;
             setState(() => _isDeleting = false);
             if (mounted) {
               _showSnackBar(
@@ -752,10 +764,12 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             }
             return;
           }
+          AccountDeletionScope.inProgress = false;
           rethrow;
         }
       }
     } catch (e) {
+      AccountDeletionScope.inProgress = false;
       log('❌ Error deleting account: $e');
       log('❌ Error type: ${e.runtimeType}');
       if (e is FirebaseAuthException) {
@@ -965,6 +979,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   /// After re-auth: cleanup Firestore/Storage, log, delete Auth user, sign out, show success.
   Future<void> _performDeletionAfterReauth(User user) async {
+    AccountDeletionScope.inProgress = true;
     try {
       log('🧹 Cleaning up user data after re-auth...');
       await _cleanupUserData(user);
@@ -975,6 +990,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       if (mounted) _showDeletionSuccessDialog();
     } catch (e) {
       log('❌ Error in _performDeletionAfterReauth: $e');
+      AccountDeletionScope.inProgress = false;
       setState(() => _isDeleting = false);
       if (mounted) _showSnackBar('Failed to complete deletion. Please try again.');
     }
@@ -1085,6 +1101,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
+                AccountDeletionScope.inProgress = false;
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   RouteName.welcomeScreen,
                   (route) => false,

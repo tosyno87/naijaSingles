@@ -481,15 +481,18 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.login, color: primaryColor, size: 22),
                 const SizedBox(width: 8),
-                Text(
-                  'Signed in with Google or another provider',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: textPrimary,
+                Expanded(
+                  child: Text(
+                    'Signed in with Google or another provider',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: textPrimary,
+                    ),
                   ),
                 ),
               ],

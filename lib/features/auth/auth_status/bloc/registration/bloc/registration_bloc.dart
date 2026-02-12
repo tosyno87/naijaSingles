@@ -85,14 +85,23 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               // Prevent duplicate account: block if this phone is already used by another account
               final phone = user.phoneNumber?.trim();
               if (phone != null && phone.isNotEmpty) {
-                final existingUserId = await phoneAuthRepository
-                    .findUserIdByPhoneNumber(phone);
-                if (existingUserId != null && existingUserId != user.uid) {
-                  log('❌ Phone number already registered to another account: $existingUserId');
-                  await phoneAuthRepository.signOut();
+                try {
+                  final existingUserId = await phoneAuthRepository
+                      .findUserIdByPhoneNumber(phone);
+                  if (existingUserId != null && existingUserId != user.uid) {
+                    log('❌ Phone number already registered to another account: $existingUserId');
+                    await phoneAuthRepository.signOut();
+                    emit(const RegistrationFailed(
+                      message:
+                          'This phone number is already registered. Please sign in instead.',
+                    ));
+                    return;
+                  }
+                } catch (_) {
+                  // Fail closed: do not allow registration when we cannot verify phone
+                  log('❌ Cannot verify phone (e.g. Firestore unavailable) - blocking registration');
                   emit(const RegistrationFailed(
-                    message:
-                        'This phone number is already registered. Please sign in instead.',
+                    message: 'Unable to verify phone. Please try again.',
                   ));
                   return;
                 }

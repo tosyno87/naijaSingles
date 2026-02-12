@@ -70,5 +70,68 @@ void main() {
         NewRegistration(token: 't', user: firebaseUser),
       ],
     );
+
+    blocTest<RegistrationBloc, RegistrationStates>(
+      'emits [Loading, RegistrationFailed] and does not emit NewRegistration when phone already used by another account',
+      build: () {
+        when(() => firebaseUser.uid).thenReturn('current-uid');
+        when(() => firebaseUser.phoneNumber).thenReturn('+12179044453');
+        when(() => firebaseUser.displayName).thenReturn('name');
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => repo.userDetails(any())).thenAnswer((_) async => false);
+        when(() => repo.findUserIdByPhoneNumber(any()))
+            .thenAnswer((_) async => 'other-uid');
+        when(() => repo.signOut()).thenAnswer((_) async => {});
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const CheckRegistration(token: 't')),
+      expect: () => [
+        RegistrationLoading(),
+        const RegistrationFailed(
+          message:
+              'This phone number is already registered. Please sign in instead.',
+        ),
+      ],
+    );
+
+    blocTest<RegistrationBloc, RegistrationStates>(
+      'calls signOut when phone already used by another account',
+      build: () {
+        when(() => firebaseUser.uid).thenReturn('current-uid');
+        when(() => firebaseUser.phoneNumber).thenReturn('+12179044453');
+        when(() => firebaseUser.displayName).thenReturn('name');
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => repo.userDetails(any())).thenAnswer((_) async => false);
+        when(() => repo.findUserIdByPhoneNumber(any()))
+            .thenAnswer((_) async => 'other-uid');
+        when(() => repo.signOut()).thenAnswer((_) async => {});
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const CheckRegistration(token: 't')),
+      verify: (_) {
+        verify(() => repo.signOut()).called(1);
+      },
+    );
+
+    blocTest<RegistrationBloc, RegistrationStates>(
+      'fails closed: emits RegistrationFailed when findUserIdByPhoneNumber throws',
+      build: () {
+        when(() => firebaseUser.uid).thenReturn('current-uid');
+        when(() => firebaseUser.phoneNumber).thenReturn('+12179044453');
+        when(() => firebaseUser.displayName).thenReturn('name');
+        when(() => repo.getCurrentUser()).thenAnswer((_) async => firebaseUser);
+        when(() => repo.userDetails(any())).thenAnswer((_) async => false);
+        when(() => repo.findUserIdByPhoneNumber(any()))
+            .thenThrow(Exception('Firestore unavailable'));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const CheckRegistration(token: 't')),
+      expect: () => [
+        RegistrationLoading(),
+        const RegistrationFailed(
+          message: 'Unable to verify phone. Please try again.',
+        ),
+      ],
+    );
   });
 }

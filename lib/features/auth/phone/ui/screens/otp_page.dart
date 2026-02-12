@@ -16,6 +16,7 @@ import '../../../../../common/bloc/user/user_bloc.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../../../../common/widgets/hookup_circularbar.dart';
+import '../../../auth_status/bloc/authstatus_bloc.dart';
 import '../../../auth_status/bloc/registration/bloc/registration_bloc.dart';
 import '../../bloc/phone_auth_bloc.dart';
 import '../widgets/timer_widget.dart';
@@ -314,19 +315,19 @@ class _OtpPageState extends State<OtpPage> {
                           log('═══════════════════════════════════════════════════════');
                           log('');
 
-                          // CRITICAL: If this is a sign-up flow (not login), ALWAYS send to onboarding
-                          // Even if user exists, they should complete onboarding during sign-up
+                          // Sign-up flow with a number already registered = prevent duplicate account
                           if (!widget.isLogin) {
-                            log('⚠️ Sign-up flow detected - redirecting to onboarding regardless of registration status');
+                            log('❌ Sign-up with already-registered number - block duplicate account');
                             if (!_hasNavigated && mounted) {
                               _hasNavigated = true;
-                              log('✅ Navigating to onboarding for sign-up flow');
+                              CustomSnackbar.showSnackBarSimple(
+                                'This phone number is already registered. Please sign in instead.',
+                                context,
+                              );
+                              context.read<AuthstatusBloc>().add(LogoutEvent());
                               Future.microtask(() {
                                 if (mounted) {
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                    RouteName.onboarding,
-                                    (route) => false,
-                                  );
+                                  Navigator.pop(context);
                                 }
                               });
                             }

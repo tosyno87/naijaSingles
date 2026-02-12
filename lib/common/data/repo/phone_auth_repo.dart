@@ -185,6 +185,34 @@ class PhoneAuthRepository {
     return UserModel.fromDocument(result.docs.first);
   }
 
+  /// Returns the userId (document id) if an active user already has this phone number, null otherwise.
+  /// Used to prevent duplicate account creation with the same phone number.
+  Future<String?> findUserIdByPhoneNumber(String phoneNumber) async {
+    if (phoneNumber.trim().isEmpty) return null;
+    try {
+      final normalized = phoneNumber
+          .replaceAll(' ', '')
+          .replaceAll('-', '')
+          .replaceAll('(', '')
+          .replaceAll(')', '')
+          .trim();
+      final snapshot = await firebaseFireStoreInstance
+          .collection('users')
+          .where('phoneNumber', isEqualTo: normalized)
+          .limit(1)
+          .get();
+      if (snapshot.docs.isEmpty) return null;
+      final doc = snapshot.docs.first;
+      // Optionally skip soft-deleted accounts if we add accountDeleted field later
+      final data = doc.data();
+      if (data['accountDeleted'] == true) return null;
+      return doc.id;
+    } catch (e) {
+      log('❌ Error finding user by phone: $e');
+      return null;
+    }
+  }
+
   Future<bool> userDetails(String userId) async {
     try {
       // Try direct document access first (faster and more reliable)

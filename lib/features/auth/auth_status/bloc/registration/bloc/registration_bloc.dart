@@ -82,6 +82,21 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
           } else {
             log('📝 User not found in database - new registration');
             if (user.displayName != null || user.phoneNumber != null) {
+              // Prevent duplicate account: block if this phone is already used by another account
+              final phone = user.phoneNumber?.trim();
+              if (phone != null && phone.isNotEmpty) {
+                final existingUserId = await phoneAuthRepository
+                    .findUserIdByPhoneNumber(phone);
+                if (existingUserId != null && existingUserId != user.uid) {
+                  log('❌ Phone number already registered to another account: $existingUserId');
+                  await phoneAuthRepository.signOut();
+                  emit(const RegistrationFailed(
+                    message:
+                        'This phone number is already registered. Please sign in instead.',
+                  ));
+                  return;
+                }
+              }
               emit(NewRegistration(token: event.token, user: user));
             } else {
               emit(const RegistrationFailed(

@@ -47,6 +47,16 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "phoneNumber",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "age",
           "order": "ASCENDING"
         },

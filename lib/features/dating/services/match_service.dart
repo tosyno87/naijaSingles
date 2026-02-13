@@ -3,7 +3,7 @@ import '../models/matched_user_model.dart';
 
 /// Service for managing match-related operations including personalized matching,
 /// category-based filtering, and match scoring algorithms.
-class MatchService {
+class DatingRecommendationService {
   /// Sample data for all potential matches - in production this would come from Firestore
   static final List<MatchedUser> _allPotentialMatches = [
     MatchedUser(
@@ -351,4 +351,38 @@ class MatchService {
               totalMatches,
     };
   }
+}
+
+/// Deprecated compatibility wrapper.
+/// Prefer using `DatingRecommendationService` to avoid naming conflicts with
+/// the primary Firebase-backed `features/match/data/services/match_service.dart`.
+@Deprecated(
+  'Use DatingRecommendationService. This service is local recommendation-only.',
+)
+class MatchService {
+  static List<MatchedUser> getPersonalizedMatches(
+    OnboardingData data, {
+    int limit = 5,
+  }) =>
+      DatingRecommendationService.getPersonalizedMatches(data, limit: limit);
+
+  static List<MatchedUser> getMatchesByCategory(
+    String category,
+    OnboardingData data, {
+    int limit = 5,
+  }) =>
+      DatingRecommendationService.getMatchesByCategory(
+        category,
+        data,
+        limit: limit,
+      );
+
+  static List<String> getAvailableCategories() =>
+      DatingRecommendationService.getAvailableCategories();
+
+  static double calculateMatchScore(MatchedUser user1, MatchedUser user2) =>
+      DatingRecommendationService.calculateMatchScore(user1, user2);
+
+  static Map<String, dynamic> getMatchStatistics() =>
+      DatingRecommendationService.getMatchStatistics();
 }

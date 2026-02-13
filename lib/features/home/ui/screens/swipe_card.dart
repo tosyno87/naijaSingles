@@ -10,6 +10,7 @@ import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/image_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../models/user_model.dart';
+import '../../bloc/searchuser_bloc.dart';
 import '../../../dating/screens/user_detail_screen.dart';
 import '../../../user/ui/widgets/card_level.dart';
 import '../../../user/ui/widgets/gender_sign.dart';
@@ -97,14 +98,30 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                   "There's no one new around you.".tr().toString(),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.montserrat(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black54,
+                    color: isDarkMode ? Colors.white : Colors.black54,
                     fontStyle: FontStyle.normal,
                     letterSpacing: 1,
                     decoration: TextDecoration.none,
                     fontSize: 20,
                   ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Try expanding your distance or refreshing discovery.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    color: isDarkMode ? Colors.white70 : Colors.black45,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton(
+                  onPressed: () {
+                    context.read<SearchUserBloc>().add(
+                          LoadUserEvent(currentUser: widget.currentUser),
+                        );
+                  },
+                  child: const Text('Refresh'),
                 ),
               ],
             ),

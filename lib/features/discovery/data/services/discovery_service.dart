@@ -11,13 +11,14 @@ import '../../../../models/user_model.dart';
 import '../../../../services/mode_specific_filtering_service.dart';
 import '../../../../services/privacy_migration_service.dart';
 import '../../../../services/user_privacy_service.dart';
+import 'discovery_filtering.dart';
 import 'smart_match_service.dart';
 
 /// Consolidated discovery service that combines:
 /// - Privacy-aware discovery (from DiscoveryService)
 /// - Comprehensive filtering (from UnifiedDiscoveryService)
 /// - Real-time streams (from RealtimeDiscoveryService)
-/// 
+///
 /// This is the single source of truth for user discovery functionality.
 class DiscoveryService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -55,8 +56,7 @@ class DiscoveryService {
 
       if (isMigrated) {
         debugPrint('🔒 Using privacy-aware discovery');
-        final users =
-            await PrivacyAwareUserSearchRepo.getUserList(currentUser);
+        final users = await PrivacyAwareUserSearchRepo.getUserList(currentUser);
         debugPrint(
           '🔒 Privacy-aware discovery returned: ${users.length} users',
         );
@@ -375,7 +375,8 @@ class DiscoveryService {
 
       // Apply smart matching with mode-specific compatibility
       if (userList.isNotEmpty) {
-        userList = await _applySmartMatching(currentUser, userList, intentFilter);
+        userList =
+            await _applySmartMatching(currentUser, userList, intentFilter);
       }
 
       debugPrint('🎯 Final result: ${userList.length} discoverable users');
@@ -392,11 +393,16 @@ class DiscoveryService {
     String? intentFilter,
   ) {
     Query query = _usersCollection;
-
-    // TEMPORARILY DISABLED: Gender filtering (field names might be wrong)
-    debugPrint(
-      '🔍 TEMPORARILY DISABLING GENDER FILTERING - field names might be wrong',
-    );
+    final normalizedPreference =
+        DiscoveryFiltering.normalizeGender(currentUser.showGender);
+    if (DiscoveryFiltering.isEveryonePreference(normalizedPreference)) {
+      debugPrint(
+          '🔍 Gender preference is everyone - skipping gender query filter');
+    } else {
+      debugPrint(
+        '🔍 Applying gender filter in-memory for compatibility: $normalizedPreference',
+      );
+    }
 
     // Filter by age range - CRITICAL FOR DISCOVERY
     if (currentUser.ageRangeMin != null && currentUser.ageRangeMax != null) {
@@ -443,6 +449,10 @@ class DiscoveryService {
 
   /// Apply additional filters that can't be done in Firestore query
   static bool _passesAdditionalFilters(UserModel user, UserModel currentUser) {
+    if (!DiscoveryFiltering.matchesGenderPreference(user, currentUser)) {
+      return false;
+    }
+
     // Skip blocked users
     if (user.isBlocked ?? false) {
       return false;
@@ -513,10 +523,6 @@ class DiscoveryService {
       final Query query = _firestore
           .collection('users')
           .where('id', isNotEqualTo: currentUser.id) // Exclude current user
-          .where(
-            'userGender',
-            isEqualTo: currentUser.showGender,
-          ) // Gender preference
           .limit(20); // Limit for performance
 
       return query.snapshots().asyncMap((snapshot) async {
@@ -538,6 +544,11 @@ class DiscoveryService {
 
             // Create user model
             final user = UserModel.fromDocument(doc);
+
+            if (!DiscoveryFiltering.matchesGenderPreference(
+                user, currentUser)) {
+              continue;
+            }
 
             // Calculate distance if coordinates available
             if (user.latitude != null &&
@@ -596,7 +607,6 @@ class DiscoveryService {
       Query query = _firestore
           .collection('users')
           .where('id', isNotEqualTo: currentUser.id)
-          .where('userGender', isEqualTo: currentUser.showGender)
           .orderBy('lastvisited', descending: true)
           .limit(pageSize);
 
@@ -620,6 +630,11 @@ class DiscoveryService {
             }
 
             final user = UserModel.fromDocument(doc);
+
+            if (!DiscoveryFiltering.matchesGenderPreference(
+                user, currentUser)) {
+              continue;
+            }
 
             // Calculate distance
             if (user.latitude != null &&
@@ -676,7 +691,6 @@ class DiscoveryService {
       final Query query = _firestore
           .collection('users')
           .where('id', isNotEqualTo: currentUser.id)
-          .where('userGender', isEqualTo: currentUser.showGender)
           .limit(50); // Limit for performance
 
       return query.snapshots().asyncMap((snapshot) async {
@@ -694,6 +708,11 @@ class DiscoveryService {
             }
 
             final user = UserModel.fromDocument(doc);
+
+            if (!DiscoveryFiltering.matchesGenderPreference(
+                user, currentUser)) {
+              continue;
+            }
 
             // Calculate distance
             if (user.latitude != null &&

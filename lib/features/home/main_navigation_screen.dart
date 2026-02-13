@@ -12,6 +12,7 @@ import '../../common/constants/constants.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/utils/account_deletion_scope.dart';
 import '../../common/utils/app_logger.dart';
+import '../../common/utils/profile_completion_guard.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../debug/quick_analysis.dart';
 import '../../models/user_model.dart';
@@ -118,8 +119,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       // Check if user data is loaded (use BLoC)
       final currentUserFromBloc = userBloc.currentUser;
       if (currentUserFromBloc != null &&
-          currentUserFromBloc.name != null &&
-          currentUserFromBloc.name!.isNotEmpty) {
+          ProfileCompletionGuard.isUserComplete(currentUserFromBloc)) {
         developer.log('✅ User data loaded, showing main navigation');
         if (mounted) {
           setState(() {
@@ -149,11 +149,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
         if (doc.exists) {
           final data = doc.data();
-          if (data != null &&
-              data['name'] != null &&
-              data['name'].toString().isNotEmpty) {
-            developer.log(
-                '✅ User data found in Firestore, updating UserBloc...');
+          if (data != null && ProfileCompletionGuard.isDocumentComplete(data)) {
+            developer
+                .log('✅ User data found in Firestore, updating UserBloc...');
             final userModel = UserModel.fromDocument(doc);
             userBloc.add(UserDataUpdated(userModel));
 
@@ -211,8 +209,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Show loading screen while checking registration - prevent any content flash
     if (!_hasCheckedRegistration ||
         currentUser == null ||
-        currentUser.name == null ||
-        (currentUser.name?.isEmpty ?? false)) {
+        !ProfileCompletionGuard.isUserComplete(currentUser)) {
       // If we haven't checked yet or user doesn't exist, show loading
       // This prevents the wrong screen from appearing
       if (!_hasCheckedRegistration) {

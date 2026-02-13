@@ -33,14 +33,6 @@ class _MatchDialogPageState extends State<MatchDialogPage> {
         CachedNetworkImageProvider(widget.currentUser.imageUrl?.first ?? '');
     matchedUserImage =
         CachedNetworkImageProvider(widget.matchedUser.imageUrl?.first ?? '');
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      Future.delayed(const Duration(milliseconds: 3000), () {
-        context
-            .read<SearchUserBloc>()
-            .add(LoadUserEvent(currentUser: widget.currentUser));
-        Navigator.pop(context);
-      });
-    });
   }
 
   @override

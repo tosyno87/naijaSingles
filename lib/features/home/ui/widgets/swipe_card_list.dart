@@ -88,14 +88,32 @@ class _SwipeCardListState extends State<SwipeCardList> {
                           "There's no one new around you.".tr().toString(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.black54,
+                            color: isDarkMode ? Colors.white : Colors.black54,
                             fontStyle: FontStyle.normal,
                             letterSpacing: 1,
                             decoration: TextDecoration.none,
                             fontSize: 20,
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Try expanding your distance or refreshing discovery.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white70 : Colors.black45,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        OutlinedButton(
+                          onPressed: () {
+                            context.read<SearchUserBloc>().add(
+                                  LoadUserEvent(
+                                    currentUser: widget.controller.currentUser,
+                                  ),
+                                );
+                          },
+                          child: const Text('Refresh'),
                         ),
                       ],
                     ),

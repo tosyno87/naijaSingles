@@ -6,6 +6,7 @@ import '../../utils/app_logger.dart';
 
 abstract class GoogleLoginRepository {
   Future<User?> signInWithGoogle();
+  Future<AuthCredential?> getGoogleReauthCredential();
 }
 
 class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
@@ -55,6 +56,29 @@ class GoogleLoginRepositoryImpl implements GoogleLoginRepository {
         }
       }
       // Rethrow the error for the BLoC to handle
+      rethrow;
+    }
+  }
+
+  @override
+  Future<AuthCredential?> getGoogleReauthCredential() async {
+    try {
+      // For re-authentication we only need a fresh credential.
+      // Do not sign out first, and do not sign in to Firebase here.
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        return null;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      return GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+    } catch (e) {
+      AppLogger.error('Google re-auth credential error', error: e);
       rethrow;
     }
   }

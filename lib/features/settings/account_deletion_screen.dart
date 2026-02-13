@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../common/data/repo/googlelogin_repo.dart';
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
 import '../../common/utils/account_deletion_scope.dart';
@@ -20,6 +21,7 @@ class AccountDeletionScreen extends StatefulWidget {
 class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleLoginRepository _googleLoginRepository = GoogleLoginRepositoryImpl();
   final _passwordController = TextEditingController();
   final _reasonController = TextEditingController();
 
@@ -40,6 +42,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   bool _understandConsequences = false;
   bool _isPhoneUser = false;
   bool _isEmailUser = false;
+  bool _isGoogleUser = false;
 
   // Phone re-auth for account deletion (when requires-recent-login)
   String? _verificationIdForReauth;
@@ -80,18 +83,25 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       final isPhone = providerData.any((info) => info.providerId == 'phone');
       final isEmail =
           providerData.any((info) => info.providerId == 'password');
+      final isGoogle =
+          providerData.any((info) => info.providerId == 'google.com');
       log(
-          '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail');
+          '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail, isGoogle=$isGoogle');
 
-      if (_isPhoneUser != isPhone || _isEmailUser != isEmail) {
+      if (_isPhoneUser != isPhone ||
+          _isEmailUser != isEmail ||
+          _isGoogleUser != isGoogle) {
         setState(() {
           _isPhoneUser = isPhone;
           _isEmailUser = isEmail;
+          _isGoogleUser = isGoogle;
         });
-        log('📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser');
+        log(
+            '📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser, _isGoogleUser: $_isGoogleUser');
       } else {
         _isPhoneUser = isPhone;
         _isEmailUser = isEmail;
+        _isGoogleUser = isGoogle;
       }
     } else {
       log('⚠️ No current user found in _checkAuthProvider');
@@ -499,7 +509,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'For security, sign out and sign back in, then return to this screen to delete your account.',
+              _isGoogleUser
+                  ? 'If you signed in a while ago, we may ask you to confirm with Google before deleting.'
+                  : 'For security, sign out and sign back in, then return to this screen to delete your account.',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
@@ -521,7 +533,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                 },
                 icon: const Icon(Icons.logout, size: 20),
                 label: Text(
-                  'Sign out and return to sign-in',
+                  _isGoogleUser
+                      ? 'Sign out (fallback)'
+                      : 'Sign out and return to sign-in',
                   style: GoogleFonts.montserrat(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -758,8 +772,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           providerData.any((info) => info.providerId == 'phone');
       final isEmailUser =
           providerData.any((info) => info.providerId == 'password');
+      final isGoogleUser =
+          providerData.any((info) => info.providerId == 'google.com');
 
-      log('📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser');
+      log(
+          '📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser');
 
       // Re-authenticate based on auth provider. Order is critical: cleanup Firestore/Storage
       // while user is still authenticated, then delete Auth user, then sign out and show success.
@@ -815,6 +832,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           return;
         } catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
+            if (isGoogleUser) {
+              await _handleGoogleReauthAndRetryDelete(user);
+              return;
+            }
+
             AccountDeletionScope.inProgress = false;
             setState(() => _isDeleting = false);
             if (mounted) {
@@ -1068,12 +1090,15 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   }
 
   /// After re-auth: cleanup Firestore/Storage, log, delete Auth user, sign out, show success.
-  Future<void> _performDeletionAfterReauth(User user) async {
+  Future<void> _performDeletionAfterReauth(
+    User user, {
+    String authProvider = 'phone',
+  }) async {
     AccountDeletionScope.inProgress = true;
     try {
       log('🧹 Cleaning up user data after re-auth...');
       await _cleanupUserData(user);
-      _logDeletionAndSignOut(user, authProvider: 'phone');
+      _logDeletionAndSignOut(user, authProvider: authProvider);
       log('🔥 Deleting Firebase Auth user...');
       await user.delete();
       await _auth.signOut();
@@ -1083,6 +1108,34 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       AccountDeletionScope.inProgress = false;
       setState(() => _isDeleting = false);
       if (mounted) _showSnackBar('Failed to complete deletion. Please try again.');
+    }
+  }
+
+  Future<void> _handleGoogleReauthAndRetryDelete(User user) async {
+    try {
+      if (mounted) {
+        _showSnackBar('Re-verifying your account with Google...');
+      }
+
+      final credential = await _googleLoginRepository.getGoogleReauthCredential();
+      if (credential == null) {
+        AccountDeletionScope.inProgress = false;
+        if (mounted) {
+          setState(() => _isDeleting = false);
+          _showSnackBar('Re-verification cancelled.');
+        }
+        return;
+      }
+
+      await user.reauthenticateWithCredential(credential);
+      await _performDeletionAfterReauth(user, authProvider: 'google');
+    } catch (e) {
+      AccountDeletionScope.inProgress = false;
+      if (mounted) {
+        setState(() => _isDeleting = false);
+        _showSnackBar('Google re-verification failed. Please try again.');
+      }
+      log('❌ Google re-auth and retry failed: $e');
     }
   }
 

@@ -4,9 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../common/data/repo/googlelogin_repo.dart';
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/utils/account_deletion_scope.dart';
 
 class AccountDeletionScreen extends StatefulWidget {
   const AccountDeletionScreen({super.key});
@@ -18,6 +21,7 @@ class AccountDeletionScreen extends StatefulWidget {
 class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleLoginRepository _googleLoginRepository = GoogleLoginRepositoryImpl();
   final _passwordController = TextEditingController();
   final _reasonController = TextEditingController();
 
@@ -37,6 +41,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   bool _confirmDeletion = false;
   bool _understandConsequences = false;
   bool _isPhoneUser = false;
+  bool _isEmailUser = false;
+  bool _isGoogleUser = false;
+
+  // Phone re-auth for account deletion (when requires-recent-login)
+  String? _verificationIdForReauth;
+  final TextEditingController _reauthOtpController = TextEditingController();
+  bool _isSendingReauthCode = false;
 
   final List<String> _deletionReasons = [
     'Found someone special',
@@ -52,6 +63,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   void dispose() {
     _passwordController.dispose();
     _reasonController.dispose();
+    _reauthOtpController.dispose();
     super.dispose();
   }
 
@@ -69,15 +81,27 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
     if (user != null) {
       final providerData = user.providerData;
       final isPhone = providerData.any((info) => info.providerId == 'phone');
-      log('📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone');
+      final isEmail =
+          providerData.any((info) => info.providerId == 'password');
+      final isGoogle =
+          providerData.any((info) => info.providerId == 'google.com');
+      log(
+          '📱 User auth provider check: providerData=${providerData.map((p) => p.providerId).toList()}, isPhone=$isPhone, isEmail=$isEmail, isGoogle=$isGoogle');
 
-      if (_isPhoneUser != isPhone) {
+      if (_isPhoneUser != isPhone ||
+          _isEmailUser != isEmail ||
+          _isGoogleUser != isGoogle) {
         setState(() {
           _isPhoneUser = isPhone;
+          _isEmailUser = isEmail;
+          _isGoogleUser = isGoogle;
         });
-        log('📱 Updated _isPhoneUser to: $_isPhoneUser');
+        log(
+            '📱 Updated _isPhoneUser: $_isPhoneUser, _isEmailUser: $_isEmailUser, _isGoogleUser: $_isGoogleUser');
       } else {
-        _isPhoneUser = isPhone; // Set it even if no state change needed
+        _isPhoneUser = isPhone;
+        _isEmailUser = isEmail;
+        _isGoogleUser = isGoogle;
       }
     } else {
       log('⚠️ No current user found in _checkAuthProvider');
@@ -121,11 +145,13 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
               _buildDeletionReasonSection(),
               const SizedBox(height: 24),
 
-              // Password/Phone Confirmation (based on auth provider)
+              // Password/Phone/Other Confirmation (based on auth provider)
               if (_isPhoneUser)
                 _buildPhoneConfirmationSection()
+              else if (_isEmailUser)
+                _buildPasswordConfirmationSection()
               else
-                _buildPasswordConfirmationSection(),
+                _buildOtherProviderSection(),
               const SizedBox(height: 24),
 
               // Confirmation Checkboxes
@@ -448,6 +474,87 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         ),
       );
 
+  Widget _buildOtherProviderSection() => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.login, color: primaryColor, size: 22),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Signed in with Google or another provider',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _isGoogleUser
+                  ? 'If you signed in a while ago, we may ask you to confirm with Google before deleting.'
+                  : 'For security, sign out and sign back in, then return to this screen to delete your account.',
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await _auth.signOut();
+                  if (mounted) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      RouteName.welcomeScreen,
+                      (route) => false,
+                    );
+                  }
+                },
+                icon: const Icon(Icons.logout, size: 20),
+                label: Text(
+                  _isGoogleUser
+                      ? 'Sign out (fallback)'
+                      : 'Sign out and return to sign-in',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: primaryColor,
+                  side: BorderSide(color: primaryColor),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
   Widget _buildConfirmationSection() => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -534,9 +641,11 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
       );
 
   Widget _buildDeleteButton() {
-    // For phone users, don't require password
-    // For email users, require password
-    final passwordValid = _isPhoneUser || _passwordController.text.isNotEmpty;
+    // Phone and "other" (e.g. Google) users don't need password; email users do
+    final isOtherProvider = !_isPhoneUser && !_isEmailUser;
+    final passwordValid = _isPhoneUser ||
+        isOtherProvider ||
+        _passwordController.text.isNotEmpty;
 
     final canDelete =
         passwordValid && _understandConsequences && _confirmDeletion;
@@ -655,201 +764,122 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         throw Exception('No user logged in');
       }
 
-      // Check auth provider and re-authenticate accordingly
+      // Check auth provider and re-authenticate accordingly.
+      // Only treat as email user if they signed in with password; Google/OAuth users
+      // must use the "other" flow (sign out and sign back in) for re-auth.
       final providerData = user.providerData;
       final isPhoneUser =
           providerData.any((info) => info.providerId == 'phone');
       final isEmailUser =
-          providerData.any((info) => info.providerId == 'password') ||
-              user.email != null;
+          providerData.any((info) => info.providerId == 'password');
+      final isGoogleUser =
+          providerData.any((info) => info.providerId == 'google.com');
 
-      log('📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser');
+      log(
+          '📱 Delete account: isPhoneUser=$isPhoneUser, isEmailUser=$isEmailUser, isGoogleUser=$isGoogleUser');
 
-      // Re-authenticate based on auth provider
+      // Re-authenticate based on auth provider. Order is critical: cleanup Firestore/Storage
+      // while user is still authenticated, then delete Auth user, then sign out and show success.
       if (isPhoneUser) {
-        // For phone users, we can't use email/password reauth
-        // Try direct deletion first (works if user logged in recently)
-        // If fails, will need phone reauth flow
-        log('📱 Phone user - attempting direct deletion');
+        log('📱 Phone user - cleanup then delete');
+        AccountDeletionScope.inProgress = true;
         try {
+          await _cleanupUserData(user);
+          _logDeletionAndSignOut(user, authProvider: 'phone');
           await user.delete();
-          log('✅ Direct deletion successful for phone user');
+          await _auth.signOut();
+          if (mounted) _showDeletionSuccessDialog();
+          return;
         } catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
-            log('⚠️ Requires recent login - need phone reauth');
-            throw Exception(
-                'Please sign out and sign back in to delete your account, or contact support.');
+            log('⚠️ Requires recent login - showing phone re-auth');
+            AccountDeletionScope.inProgress = false;
+            setState(() => _isDeleting = false);
+            if (mounted) _showPhoneReauthDialog(user);
+            return;
           }
+          AccountDeletionScope.inProgress = false;
           rethrow;
         }
       } else if (isEmailUser && user.email != null) {
-        // For email users, use password reauth
-        log('📧 Email user - using password reauth');
-        final credential = EmailAuthProvider.credential(
-          email: user.email!,
-          password: _passwordController.text,
-        );
-        await user.reauthenticateWithCredential(credential);
-        await user.delete();
-      } else {
-        // For other providers (Google, Facebook), try direct deletion
-        log('🔐 Other auth provider - attempting direct deletion');
+        log('📧 Email user - reauth, cleanup, then delete');
+        AccountDeletionScope.inProgress = true;
         try {
+          final credential = EmailAuthProvider.credential(
+            email: user.email!,
+            password: _passwordController.text,
+          );
+          await user.reauthenticateWithCredential(credential);
+          await _cleanupUserData(user);
+          _logDeletionAndSignOut(user, authProvider: 'email');
           await user.delete();
+          await _auth.signOut();
+          if (mounted) _showDeletionSuccessDialog();
+          return;
+        } catch (_) {
+          AccountDeletionScope.inProgress = false;
+          rethrow;
+        }
+      } else {
+        log('🔐 Other auth provider - cleanup then delete');
+        AccountDeletionScope.inProgress = true;
+        try {
+          await _cleanupUserData(user);
+          _logDeletionAndSignOut(user, authProvider: 'other');
+          await user.delete();
+          await _auth.signOut();
+          if (mounted) _showDeletionSuccessDialog();
+          return;
         } catch (e) {
           if (e is FirebaseAuthException && e.code == 'requires-recent-login') {
-            throw Exception(
-                'Please sign out and sign back in to delete your account.');
+            if (isGoogleUser) {
+              await _handleGoogleReauthAndRetryDelete(user);
+              return;
+            }
+
+            AccountDeletionScope.inProgress = false;
+            setState(() => _isDeleting = false);
+            if (mounted) {
+              _showSnackBar(
+                'For security, please sign out and sign back in, then return to Delete Account to try again.',
+              );
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Re-authentication required'),
+                  content: const Text(
+                    'Sign out now, then sign back in and go to Delete Account to complete deletion.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        await _auth.signOut();
+                        if (mounted) {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            RouteName.welcomeScreen,
+                            (route) => false,
+                          );
+                        }
+                      },
+                      child: const Text('Sign out'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return;
           }
+          AccountDeletionScope.inProgress = false;
           rethrow;
         }
       }
-
-      // Cleanup user data from Firestore BEFORE deleting auth user
-      // This ensures we have a valid user object for cleanup
-      log('🧹 Cleaning up user data...');
-      try {
-        await _cleanupUserData(user);
-        log('✅ User data cleanup completed');
-      } catch (cleanupError) {
-        log('⚠️ Error during cleanup (non-fatal): $cleanupError');
-        // Continue with deletion even if cleanup fails partially
-      }
-
-      // Store deletion request in Firestore for audit/logging
-      try {
-        await _firestore.collection('accountDeletions').add({
-          'userId': user.uid,
-          'email': user.email,
-          'phoneNumber': user.phoneNumber,
-          'authProvider':
-              isPhoneUser ? 'phone' : (isEmailUser ? 'email' : 'other'),
-          'reason': _selectedReason,
-          'customReason':
-              _selectedReason == 'Other' ? _reasonController.text : null,
-          'requestedAt': FieldValue.serverTimestamp(),
-          'status': 'completed',
-          'deletedAt': FieldValue.serverTimestamp(),
-        });
-      } catch (e) {
-        log('⚠️ Could not log deletion request: $e');
-        // Don't fail deletion if logging fails
-      }
-
-      // Sign out user
-      await _auth.signOut();
-
-      // Show success dialog - account is immediately deleted
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            backgroundColor: cardColor,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 8,
-            contentPadding: const EdgeInsets.all(24),
-            title: Column(
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: errorColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.delete_forever,
-                      color: errorColor, size: 40),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Account Deleted',
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Your account has been permanently deleted. All your data, matches, messages, and photos have been removed from our servers.',
-                  style: GoogleFonts.montserrat(
-                    color: textSecondary,
-                    fontSize: 16,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: errorColor.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: errorColor.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.warning_amber_rounded,
-                          color: errorColor, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'This action cannot be undone. You will need to create a new account to use the app again.',
-                          style: GoogleFonts.montserrat(
-                            color: textSecondary,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to welcome screen (not login, since account is deleted)
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      RouteName.welcomeScreen,
-                      (route) => false,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Got it',
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-            actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-          ),
-        );
-      }
     } catch (e) {
+      AccountDeletionScope.inProgress = false;
       log('❌ Error deleting account: $e');
       log('❌ Error type: ${e.runtimeType}');
       if (e is FirebaseAuthException) {
@@ -863,8 +893,10 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
           if (e.code == 'requires-recent-login') {
             errorMessage =
                 'For security, please sign out and sign back in, then try again.';
-          } else if (e.code == 'wrong-password') {
-            errorMessage = 'Incorrect password. Please try again.';
+          } else if (e.code == 'wrong-password' ||
+              e.code == 'invalid-credential') {
+            errorMessage =
+                'Incorrect password or expired session. Please try again.';
           } else {
             errorMessage = 'Error: ${e.message ?? e.code}';
           }
@@ -888,6 +920,353 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
         );
       }
     }
+  }
+
+  /// Shows dialog to re-authenticate phone user (send OTP then verify).
+  void _showPhoneReauthDialog(User user) {
+    final phone = user.phoneNumber ?? '';
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Re-authentication required',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+            color: textPrimary,
+          ),
+        ),
+        content: Text(
+          'For security, we need to verify your phone number before deleting your account. We\'ll send a code to $phone.',
+          style: GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: GoogleFonts.montserrat(color: textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: _isSendingReauthCode
+                ? null
+                : () async {
+                    Navigator.pop(ctx);
+                    await _sendReauthCode(user);
+                  },
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+            child: _isSendingReauthCode
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : Text('Send code', style: GoogleFonts.montserrat(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sendReauthCode(User user) async {
+    final phone = user.phoneNumber?.trim();
+    if (phone == null || phone.isEmpty) {
+      if (mounted) _showSnackBar('Phone number not found. Please sign out and sign back in.');
+      return;
+    }
+    setState(() => _isSendingReauthCode = true);
+    try {
+      await PhoneAuthRepository().verifyPhone(
+        phoneNumber: phone,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          if (!mounted) return;
+          setState(() => _isSendingReauthCode = false);
+          try {
+            await user.reauthenticateWithCredential(credential);
+            await _performDeletionAfterReauth(user);
+          } catch (e) {
+            log('❌ Re-auth verificationCompleted error: $e');
+            if (mounted) _showSnackBar('Verification failed. Please try again.');
+          }
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          if (!mounted) return;
+          setState(() {
+            _isSendingReauthCode = false;
+            _verificationIdForReauth = verificationId;
+          });
+          _showReauthOtpDialog(user);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          log('❌ Re-auth verification failed: ${e.code} ${e.message}');
+          if (mounted) {
+            setState(() => _isSendingReauthCode = false);
+            _showSnackBar('Failed to send code: ${e.message ?? e.code}');
+          }
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } catch (e) {
+      log('❌ Send reauth code error: $e');
+      if (mounted) {
+        setState(() => _isSendingReauthCode = false);
+        _showSnackBar('Failed to send code. Please try again.');
+      }
+    }
+  }
+
+  void _showReauthOtpDialog(User user) {
+    _reauthOtpController.clear();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Enter verification code',
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, color: textPrimary),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Enter the 6-digit code sent to ${user.phoneNumber}',
+              style: GoogleFonts.montserrat(color: textSecondary, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            PinCodeTextField(
+              appContext: context,
+              length: 6,
+              controller: _reauthOtpController,
+              keyboardType: TextInputType.number,
+              pinTheme: PinTheme(
+                shape: PinCodeFieldShape.box,
+                borderRadius: BorderRadius.circular(8),
+                fieldHeight: 48,
+                fieldWidth: 36,
+                activeColor: primaryColor,
+                inactiveColor: textLight,
+                selectedColor: primaryColor,
+              ),
+              onChanged: (_) {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: GoogleFonts.montserrat(color: textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final code = _reauthOtpController.text.trim();
+              final vid = _verificationIdForReauth;
+              if (code.length != 6 || vid == null) {
+                if (mounted) _showSnackBar('Please enter the 6-digit code.');
+                return;
+              }
+              Navigator.pop(ctx);
+              setState(() => _isDeleting = true);
+              try {
+                final credential = PhoneAuthProvider.credential(
+                  verificationId: vid,
+                  smsCode: code,
+                );
+                await user.reauthenticateWithCredential(credential);
+                await _performDeletionAfterReauth(user);
+              } catch (e) {
+                log('❌ Re-auth OTP error: $e');
+                setState(() => _isDeleting = false);
+                if (mounted) _showSnackBar('Invalid or expired code. Please try again.');
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+            child: Text('Verify and delete', style: GoogleFonts.montserrat(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// After re-auth: cleanup Firestore/Storage, log, delete Auth user, sign out, show success.
+  Future<void> _performDeletionAfterReauth(
+    User user, {
+    String authProvider = 'phone',
+  }) async {
+    AccountDeletionScope.inProgress = true;
+    try {
+      log('🧹 Cleaning up user data after re-auth...');
+      await _cleanupUserData(user);
+      _logDeletionAndSignOut(user, authProvider: authProvider);
+      log('🔥 Deleting Firebase Auth user...');
+      await user.delete();
+      await _auth.signOut();
+      if (mounted) _showDeletionSuccessDialog();
+    } catch (e) {
+      log('❌ Error in _performDeletionAfterReauth: $e');
+      AccountDeletionScope.inProgress = false;
+      setState(() => _isDeleting = false);
+      if (mounted) _showSnackBar('Failed to complete deletion. Please try again.');
+    }
+  }
+
+  Future<void> _handleGoogleReauthAndRetryDelete(User user) async {
+    try {
+      if (mounted) {
+        _showSnackBar('Re-verifying your account with Google...');
+      }
+
+      final credential = await _googleLoginRepository.getGoogleReauthCredential();
+      if (credential == null) {
+        AccountDeletionScope.inProgress = false;
+        if (mounted) {
+          setState(() => _isDeleting = false);
+          _showSnackBar('Re-verification cancelled.');
+        }
+        return;
+      }
+
+      await user.reauthenticateWithCredential(credential);
+      await _performDeletionAfterReauth(user, authProvider: 'google');
+    } catch (e) {
+      AccountDeletionScope.inProgress = false;
+      if (mounted) {
+        setState(() => _isDeleting = false);
+        _showSnackBar('Google re-verification failed. Please try again.');
+      }
+      log('❌ Google re-auth and retry failed: $e');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
+        backgroundColor: errorColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  void _logDeletionAndSignOut(User user, {String? authProvider}) {
+    try {
+      _firestore.collection('accountDeletions').add({
+        'userId': user.uid,
+        'email': user.email,
+        'phoneNumber': user.phoneNumber,
+        'authProvider': authProvider ?? 'unknown',
+        'reason': _selectedReason,
+        'customReason': _selectedReason == 'Other' ? _reasonController.text : null,
+        'requestedAt': FieldValue.serverTimestamp(),
+        'status': 'completed',
+        'deletedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      log('⚠️ Could not log deletion request: $e');
+    }
+  }
+
+  void _showDeletionSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        contentPadding: const EdgeInsets.all(24),
+        title: Column(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: errorColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.delete_forever, color: errorColor, size: 40),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Account Deleted',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: textPrimary,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Your account has been permanently deleted. All your data, matches, messages, and photos have been removed from our servers.',
+              style: GoogleFonts.montserrat(
+                color: textSecondary,
+                fontSize: 16,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: errorColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: errorColor.withOpacity(0.2)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: errorColor, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This action cannot be undone. You will need to create a new account to use the app again.',
+                      style: GoogleFonts.montserrat(
+                        color: textSecondary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                AccountDeletionScope.inProgress = false;
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  RouteName.welcomeScreen,
+                  (route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              child: Text(
+                'Got it',
+                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      ),
+    );
   }
 
   Future<void> _cleanupUserData(User user) async {
@@ -953,7 +1332,7 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Note: For security, you may need to sign out and sign back in before deleting if you haven\'t signed in recently.',
+                      'If you signed in a while ago, we\'ll send a verification code to your phone before deleting.',
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         color: textSecondary,

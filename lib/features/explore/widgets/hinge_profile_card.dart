@@ -86,24 +86,9 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
   }
 
   List<String> _extractPhotos(dynamic imageUrl) {
-    // Debug: Log what we're receiving
-    debugPrint(
-        '🔍 HingeProfileCard._extractPhotos - imageUrl type: ${imageUrl.runtimeType}');
-    debugPrint(
-        '🔍 HingeProfileCard._extractPhotos - imageUrl value: $imageUrl');
-
-    if (imageUrl == null) {
-      debugPrint('❌ imageUrl is null');
-      return [];
-    }
-    if (imageUrl is! List) {
-      debugPrint('❌ imageUrl is not a List, it is: ${imageUrl.runtimeType}');
-      return [];
-    }
-    if (imageUrl.isEmpty) {
-      debugPrint('❌ imageUrl list is empty');
-      return [];
-    }
+    if (imageUrl == null) return [];
+    if (imageUrl is! List) return [];
+    if (imageUrl.isEmpty) return [];
 
     final photos = imageUrl
         .map((e) => e?.toString() ?? '')
@@ -111,8 +96,38 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         .toList()
         .cast<String>();
 
-    debugPrint('✅ Extracted ${photos.length} photos: $photos');
     return photos;
+  }
+
+  Widget _buildSinglePhotoPlaceholder(double height) {
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.person, size: 64, color: Colors.grey[400]),
+              const SizedBox(height: 8),
+              Text(
+                'Photo unavailable',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildPhotoPlaceholder() {
@@ -151,6 +166,14 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
     );
   }
 
+  /// URLs that require network but often fail (e.g. in simulator) or are test placeholders.
+  static bool _isPlaceholderOrUnreliableUrl(String url) {
+    final u = url.toLowerCase();
+    return u.contains('via.placeholder.com') ||
+        u.contains('placeholder.com') ||
+        u.contains('placehold.it');
+  }
+
   Widget _buildPhotoSection(List<String> photos) {
     final screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
@@ -165,7 +188,7 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
         itemCount: photos.length,
         itemBuilder: (context, index) {
           final photoUrl = photos[index];
-          debugPrint('🖼️ Loading photo $index: $photoUrl');
+          final usePlaceholder = _isPlaceholderOrUnreliableUrl(photoUrl);
 
           return ClipRRect(
             borderRadius: const BorderRadius.vertical(
@@ -173,56 +196,39 @@ class _HingeProfileCardState extends State<HingeProfileCard> {
             ),
             child: Stack(
               children: [
-                Image.network(
-                  photoUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      color: Colors.grey[200],
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            Color(0xFF008037),
+                if (usePlaceholder)
+                  _buildSinglePhotoPlaceholder(screenHeight * 0.5)
+                else
+                  Image.network(
+                    photoUrl,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFF008037),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    debugPrint(
-                        '❌ Error loading photo $index ($photoUrl): $error');
-                    return Container(
-                      color: Colors.grey[200],
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.broken_image,
-                              size: 60,
-                              color: Colors.grey[400],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Failed to load',
-                              style: GoogleFonts.montserrat(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      if (kDebugMode) {
+                        debugPrint(
+                            '❌ Error loading photo $index ($photoUrl): $error');
+                      }
+                      return _buildSinglePhotoPlaceholder(screenHeight * 0.5);
+                    },
+                  ),
                 // Photo indicator dots
                 if (photos.length > 1)
                   Positioned(

@@ -17,6 +17,30 @@ jobs:
       uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       with:
         fetch-depth: 0  # Shallow clones should be disabled for better analysis
+
+    - name: Resolve diff range for filename guard
+      id: diff-range
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+        else
+          BASE_SHA="${{ github.event.before }}"
+        fi
+        HEAD_SHA="${{ github.sha }}"
+
+        if [[ -z "${BASE_SHA}" || "${BASE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+          BASE_SHA="$(git rev-list --max-count=1 HEAD^ || true)"
+        fi
+
+        echo "base_sha=${BASE_SHA}" >> "$GITHUB_OUTPUT"
+        echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
+
+    - name: Guard against duplicate-suffix filenames
+      shell: bash
+      run: |
+        chmod +x scripts/check_duplicate_suffix_files.sh
+        scripts/check_duplicate_suffix_files.sh "${{ steps.diff-range.outputs.base_sha }}" "${{ steps.diff-range.outputs.head_sha }}"
       
     - name: Setup Flutter
       uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e

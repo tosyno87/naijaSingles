@@ -14,6 +14,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../../common/bloc/user/user_bloc.dart';
 import '../../../../../common/routes/route_name.dart';
+import '../../../../../common/utils/profile_completion_guard.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
 import '../../../../../common/widgets/hookup_circularbar.dart';
 import '../../../auth_status/bloc/authstatus_bloc.dart';
@@ -334,10 +335,10 @@ class _OtpPageState extends State<OtpPage> {
                             return;
                           }
 
-                          // Double-check that user actually has a name (fully registered)
-                          if (state.user.name == null ||
-                              state.user.name!.isEmpty) {
-                            log('⚠️ User marked as registered but has no name - treating as new registration');
+                          // Double-check that user actually has a complete profile
+                          if (!ProfileCompletionGuard.isUserComplete(
+                              state.user)) {
+                            log('⚠️ User marked as registered but profile is incomplete - treating as new registration');
                             if (!_hasNavigated && mounted) {
                               _hasNavigated = true;
                               log('✅ Redirecting to onboarding for incomplete profile');
@@ -355,7 +356,9 @@ class _OtpPageState extends State<OtpPage> {
 
                           // Only proceed to main navigation if this is a LOGIN flow AND user has complete profile
                           _hasNavigated = true;
-                          context.read<UserBloc>().add(UserDataUpdated(state.user));
+                          context
+                              .read<UserBloc>()
+                              .add(UserDataUpdated(state.user));
 
                           // Small delay to ensure all state is properly set
                           Future.microtask(() {

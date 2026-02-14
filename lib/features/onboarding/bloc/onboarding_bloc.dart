@@ -60,6 +60,18 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
 
   final OnboardingRepository repository;
   final UserBloc userBloc;
+  static const int _maxProfilePhotos = 9;
+
+  List<File?> _compactPhotos(List<File?> photos) {
+    final nonNull = photos.whereType<File>().toList();
+    if (nonNull.length >= _maxProfilePhotos) {
+      return nonNull.take(_maxProfilePhotos).toList();
+    }
+    return [
+      ...nonNull,
+      ...List<File?>.filled(_maxProfilePhotos - nonNull.length, null),
+    ];
+  }
 
   void _onFullNameUpdated(
     OnboardingFullNameUpdated e,
@@ -67,7 +79,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(data.copyWith(fullName: e.fullName, userName: e.fullName)));
+    emit(OnboardingLoaded(
+        data.copyWith(fullName: e.fullName, userName: e.fullName)));
   }
 
   void _onDateOfBirthUpdated(
@@ -79,13 +92,15 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     emit(OnboardingLoaded(data.copyWith(dateOfBirth: e.dateOfBirth)));
   }
 
-  void _onGenderUpdated(OnboardingGenderUpdated e, Emitter<OnboardingState> emit) {
+  void _onGenderUpdated(
+      OnboardingGenderUpdated e, Emitter<OnboardingState> emit) {
     final data = _data(emit);
     if (data == null) return;
     emit(OnboardingLoaded(data.copyWith(gender: e.gender)));
   }
 
-  void _onTribeUpdated(OnboardingTribeUpdated e, Emitter<OnboardingState> emit) {
+  void _onTribeUpdated(
+      OnboardingTribeUpdated e, Emitter<OnboardingState> emit) {
     final data = _data(emit);
     if (data == null) return;
     emit(OnboardingLoaded(data.copyWith(tribe: e.tribe)));
@@ -128,7 +143,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(data.copyWith(genres: e.genres, interests: e.genres)));
+    emit(
+        OnboardingLoaded(data.copyWith(genres: e.genres, interests: e.genres)));
   }
 
   void _onLanguagesUpdated(
@@ -236,7 +252,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(data.copyWith(height: e.heightCm.toDouble(), heightUnit: 'cm')));
+    emit(OnboardingLoaded(
+        data.copyWith(height: e.heightCm.toDouble(), heightUnit: 'cm')));
   }
 
   void _onLookingForUpdated(
@@ -254,7 +271,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(data.copyWith(relationshipIntent: e.relationshipIntent)));
+    emit(OnboardingLoaded(
+        data.copyWith(relationshipIntent: e.relationshipIntent)));
   }
 
   void _onEducationUpdated(
@@ -343,7 +361,22 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       );
 
       if (croppedImage != null) {
-        emit(OnboardingLoaded(data.copyWithPhotoAt(e.index, croppedImage)));
+        final photos = _compactPhotos(List<File?>.from(data.profilePhotos));
+        final canReplaceAtIndex =
+            e.index >= 0 && e.index < photos.length && photos[e.index] != null;
+
+        if (canReplaceAtIndex) {
+          photos[e.index] = croppedImage;
+        } else {
+          final firstEmpty = photos.indexWhere((photo) => photo == null);
+          if (firstEmpty != -1) {
+            photos[firstEmpty] = croppedImage;
+          } else {
+            photos[photos.length - 1] = croppedImage;
+          }
+        }
+
+        emit(OnboardingLoaded(data.copyWith(profilePhotos: photos)));
       }
     } on Object catch (err) {
       log('❌ Error picking photo: $err', error: err);
@@ -378,11 +411,14 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
 
       if (!context.mounted) return;
 
-      final photos = List<File?>.from(data.profilePhotos);
-      for (var i = 0; i < cropped.length && i < photos.length; i++) {
-        photos[i] = cropped[i];
+      final photos = _compactPhotos(List<File?>.from(data.profilePhotos));
+      for (final image in cropped) {
+        final firstEmpty = photos.indexWhere((photo) => photo == null);
+        if (firstEmpty == -1) break;
+        photos[firstEmpty] = image;
       }
-      emit(OnboardingLoaded(data.copyWith(profilePhotos: photos)));
+      emit(OnboardingLoaded(
+          data.copyWith(profilePhotos: _compactPhotos(photos))));
     } on Object catch (err) {
       log('❌ Bulk photo selection: $err');
     }
@@ -394,7 +430,15 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) {
     final data = _data(emit);
     if (data == null) return;
-    emit(OnboardingLoaded(data.copyWithPhotoAt(e.index, null)));
+    final photos = _compactPhotos(List<File?>.from(data.profilePhotos));
+    if (e.index < 0 || e.index >= photos.length || photos[e.index] == null) {
+      return;
+    }
+
+    photos.removeAt(e.index);
+    photos.add(null);
+    emit(
+        OnboardingLoaded(data.copyWith(profilePhotos: _compactPhotos(photos))));
   }
 
   void _onProfilePhotosReordered(
@@ -404,7 +448,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     final data = _data(emit);
     if (data == null) return;
 
-    final photos = List<File?>.from(data.profilePhotos);
+    final photos = _compactPhotos(List<File?>.from(data.profilePhotos));
     if (e.fromIndex < 0 ||
         e.fromIndex >= photos.length ||
         e.toIndex < 0 ||
@@ -412,7 +456,8 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
 
     final photo = photos.removeAt(e.fromIndex);
     photos.insert(e.toIndex, photo);
-    emit(OnboardingLoaded(data.copyWith(profilePhotos: photos)));
+    emit(
+        OnboardingLoaded(data.copyWith(profilePhotos: _compactPhotos(photos))));
   }
 
   Future<void> _onSaveUserData(

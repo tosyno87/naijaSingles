@@ -57,7 +57,6 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
   }
 
   Widget _buildContent(BuildContext context, List<File?> uploadedPhotos) {
-
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -227,11 +226,23 @@ class _EnhancedPhotoUploadScreenState extends State<EnhancedPhotoUploadScreen> {
 
   Future<void> _showAddPhotoOptions(int index) async {
     final bloc = context.read<OnboardingBloc>();
-    final photos = bloc.state.data?.profilePhotos ?? <File?>[];
+    final photos =
+        bloc.state.data?.profilePhotos ?? List<File?>.filled(9, null);
+    final firstEmpty = photos.indexWhere((photo) => photo == null);
 
     // If clicking on existing photo, show options
     if (index < photos.length && photos[index] != null) {
       _showPhotoOptionsBottomSheet(index);
+      return;
+    }
+
+    // Prevent scattered uploads: users must fill from left to right.
+    if (firstEmpty != -1 && index != firstEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please add photos from left to right.'),
+        ),
+      );
       return;
     }
 

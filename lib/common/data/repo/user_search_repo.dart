@@ -94,8 +94,6 @@ class UserSearchRepo {
         if (matchId != null) {
           debugPrint('🎉 Match created! Match ID: $matchId');
           return matchId;
-        } else {
-          debugPrint('💌 Like saved, waiting for mutual like');
         }
       }
 

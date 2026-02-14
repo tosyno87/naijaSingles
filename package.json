@@ -1,5 +1,12 @@
 {
+  "scripts": {
+    "test:rules": "firebase emulators:exec --only firestore,storage \"node scripts/test_firebase_rules.mjs\""
+  },
   "dependencies": {
     "firebase-admin": "^13.4.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase": "^12.9.0"
   }
 }

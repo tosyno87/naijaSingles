@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../common/constants/app_colors.dart';
-import '../../services/industry_notification_service.dart';
+import '../../features/notifications/data/services/notification_service.dart';
 import 'modern_notifications_screen.dart';
 
 /// Modern notification badge with industry-standard features
@@ -35,8 +35,7 @@ class ModernNotificationBadge extends StatefulWidget {
 
 class _ModernNotificationBadgeState extends State<ModernNotificationBadge>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService =
-      IndustryNotificationService();
+  final NotificationService _notificationService = NotificationService();
 
   int _unreadCount = 0;
   bool _hasNewNotifications = false;
@@ -236,8 +235,7 @@ class FloatingNotificationBadge extends StatefulWidget {
 }
 
 class _FloatingNotificationBadgeState extends State<FloatingNotificationBadge> {
-  final IndustryNotificationService _notificationService =
-      IndustryNotificationService();
+  final NotificationService _notificationService = NotificationService();
   int _unreadCount = 0;
 
   @override

@@ -3,11 +3,10 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/street_view_provider.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/bloc/streetview/streetview_bloc.dart';
 import '../../../../models/user_model.dart';
 import '../../../match/bloc/match_user_bloc.dart';
 
@@ -35,10 +34,11 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final streetviewProvider = Provider.of<StreetViewProvider>(context);
-    String selectedOption = streetviewProvider.streetMode;
-    final provider = Provider.of<StreetViewProvider>(context, listen: false);
+    final themeBloc = context.watch<ThemeBloc>();
+    final isDarkMode = themeBloc.isDarkMode;
+    final streetViewBloc = context.watch<StreetViewBloc>();
+    String selectedOption =
+        streetViewBloc.currentStreetMode ?? 'None';
     return BlocListener<MatchUserBloc, MatchUserState>(
       listener: (context, state) {
         if (state is MatchUserLoadedState) {
@@ -65,7 +65,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                   child: Text(
                     'Street View Settings'.tr().toString(),
                     style: TextStyle(
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : primaryColor,
                       fontSize: 18,
@@ -84,6 +84,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                           color: primaryColor,
                         ),
                   onTap: () {
+                    final streetViewBloc = context.read<StreetViewBloc>();
                     showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) => StatefulBuilder(
@@ -257,19 +258,31 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                 onPressed: () {
                                   switch (selectedOption) {
                                     case 'None':
-                                      provider.toggleView(selectedOption, []);
+                                      streetViewBloc.add(
+                                            StreetViewModeChanged(
+                                              selectedOption,
+                                              [],
+                                            ),
+                                          );
                                       Navigator.of(dialogContext).pop();
                                       break;
                                     case 'Everyone':
-                                      provider.toggleView(selectedOption, []);
+                                      streetViewBloc.add(
+                                            StreetViewModeChanged(
+                                              selectedOption,
+                                              [],
+                                            ),
+                                          );
                                       Navigator.of(dialogContext).pop();
                                       break;
 
                                     case 'My Matches':
-                                      provider.toggleView(
-                                        selectedOption,
-                                        userIds,
-                                      );
+                                      streetViewBloc.add(
+                                            StreetViewModeChanged(
+                                              selectedOption,
+                                              userIds,
+                                            ),
+                                          );
                                       Navigator.of(dialogContext).pop();
                                       break;
                                   }
@@ -284,10 +297,12 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                 selectedUserIds.isNotEmpty)
                               TextButton(
                                 onPressed: () {
-                                  provider.toggleView(
-                                    selectedOption,
-                                    selectedUserIds,
-                                  );
+                                  streetViewBloc.add(
+                                        StreetViewModeChanged(
+                                          selectedOption,
+                                          selectedUserIds,
+                                        ),
+                                      );
                                   setState(() {
                                     showUserList = false;
                                   });

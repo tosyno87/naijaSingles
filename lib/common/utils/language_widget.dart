@@ -3,11 +3,12 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/language/language_bloc.dart';
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
 import '../constants/constants.dart';
-import '../providers/theme_provider.dart';
 import '../routes/route_name.dart';
 
 class LanguageSelectionDropdown extends StatefulWidget {
@@ -56,7 +57,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Padding(
       padding: const EdgeInsets.only(left: 25, right: 25),
       child: Card(
@@ -119,7 +120,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                       'Change Language'.tr().toString(),
                       style: TextStyle(
                         fontSize: 16,
-                        color: themeProvider.isDarkMode
+                        color: isDarkMode
                             ? Colors.white
                             : Colors.pink,
                         fontWeight: FontWeight.w500,
@@ -188,7 +189,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                               child: Text(
                                 language.tr().toString(),
                                 style: TextStyle(
-                                  color: themeProvider.isDarkMode
+                                  color: isDarkMode
                                       ? Colors.white70
                                       : Colors.pink,
                                   fontSize: 14,
@@ -217,7 +218,9 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
   }
 }
 
-void _refreshPage(BuildContext context, {required String lCode, cCode}) {
-  EasyLocalization.of(context)!.setLocale(Locale(lCode, cCode));
+void _refreshPage(BuildContext context, {required String lCode, required String cCode}) {
+  context.read<LanguageBloc>().add(
+        LanguageLocaleChanged(Locale(lCode, cCode), context),
+      );
   Navigator.pushReplacementNamed(context, RouteName.welcomeScreen);
 }

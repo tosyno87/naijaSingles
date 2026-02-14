@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../../../services/unified_group_service.dart';
+import '../data/services/unified_group_service.dart';
 
 /// Comprehensive Member Management Screen
 /// Provides full control over group members with modern UI

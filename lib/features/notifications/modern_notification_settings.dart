@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../common/constants/app_colors.dart';
-import '../../services/industry_notification_service.dart';
+import '../../features/notifications/data/services/notification_service.dart';
+import 'notification_model.dart';
 
 /// Modern notification settings screen with industry-standard features
 /// Features:
@@ -23,10 +24,9 @@ class ModernNotificationSettings extends StatefulWidget {
 
 class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     with TickerProviderStateMixin {
-  final IndustryNotificationService _notificationService =
-      IndustryNotificationService();
+  final NotificationService _notificationService = NotificationService();
 
-  NotificationSettings? _settings;
+  AppNotificationSettings? _settings;
   bool _isLoading = true;
   bool _isSaving = false;
 
@@ -58,14 +58,14 @@ class _ModernNotificationSettingsState extends State<ModernNotificationSettings>
     await Future.delayed(const Duration(milliseconds: 500));
 
     setState(() {
-      _settings = NotificationSettings.defaultSettings();
+      _settings = AppNotificationSettings.defaultSettings();
       _isLoading = false;
     });
 
     _animationController.forward();
   }
 
-  Future<void> _updateSetting(NotificationSettings newSettings) async {
+  Future<void> _updateSetting(AppNotificationSettings newSettings) async {
     setState(() => _isSaving = true);
 
     try {

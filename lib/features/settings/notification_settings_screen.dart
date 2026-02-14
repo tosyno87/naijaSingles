@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
+import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/colors.dart';
-import '../../common/providers/theme_provider.dart';
-import '../../common/providers/user_provider.dart';
+import '../../common/bloc/user/user_bloc.dart';
 import '../../services/settings_service.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
@@ -29,8 +29,7 @@ class _NotificationSettingsScreenState
   }
 
   void _initializeData() {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    _currentUserId = userProvider.currentUser?.id;
+    _currentUserId = context.read<UserBloc>().currentUser?.id;
     if (_currentUserId != null) {
       _loadNotificationSettings();
     }
@@ -157,8 +156,7 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,

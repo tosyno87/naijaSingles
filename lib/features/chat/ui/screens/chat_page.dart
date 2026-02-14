@@ -6,14 +6,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
 // Calling functionality temporarily disabled
 // // Calling functionality removed
 import '../../../../common/data/repo/user_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
+import '../../../../common/bloc/theme/theme_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../common/utils/custom_toast.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../models/user_model.dart';
@@ -99,7 +99,7 @@ class ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Theme.of(context).primaryColor,
@@ -133,7 +133,7 @@ class ChatPageState extends State<ChatPage> {
                       children: [
                         Icon(
                           Icons.flag_outlined,
-                          color: themeProvider.isDarkMode
+                          color: isDarkMode
                               ? Colors.white
                               : primaryColor,
                           size: 20,
@@ -157,7 +157,7 @@ class ChatPageState extends State<ChatPage> {
                     children: [
                       Icon(
                         Icons.block_outlined,
-                        color: themeProvider.isDarkMode
+                        color: isDarkMode
                             ? Colors.white
                             : primaryColor,
                         size: 20,
@@ -346,7 +346,7 @@ class ChatPageState extends State<ChatPage> {
                     children: [
                       Icon(
                         Icons.cancel_outlined,
-                        color: themeProvider.isDarkMode
+                        color: isDarkMode
                             ? Colors.white
                             : primaryColor,
                         size: 20,

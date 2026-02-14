@@ -8,12 +8,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../common/utils/welcome_dialog.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 import '../../../../services/firestore_database.dart';
@@ -297,10 +296,7 @@ class _SearchLocationState extends State<SearchLocation>
                             listener: (context, registrationState) {
                               if (registrationState is RegistrationSuccess) {
                                 log('userregistrationsuccess');
-                                Provider.of<UserProvider>(
-                                  context,
-                                  listen: false,
-                                ).currentUser = registrationState.user;
+                                context.read<UserBloc>().add(UserDataUpdated(registrationState.user));
                                 showWelcomDialog(context);
                               }
                             },

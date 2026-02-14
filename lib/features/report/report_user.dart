@@ -1,10 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:provider/provider.dart';
-
-import '../../common/providers/theme_provider.dart';
+import '../../common/bloc/theme/theme_bloc.dart';
 import '../../models/user_model.dart';
 import 'bloc/report_bloc.dart';
 import 'bloc/report_events.dart';
@@ -52,14 +51,14 @@ class ReportUserState extends State<ReportUser> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return !isFeedbackDialog
         ? CupertinoAlertDialog(
             title: Column(
               children: <Widget>[
                 Icon(
                   Icons.security,
-                  color: themeProvider.isDarkMode ? Colors.white : primaryColor,
+                  color: isDarkMode ? Colors.white : primaryColor,
                   size: 35,
                 ),
                 Padding(
@@ -93,7 +92,7 @@ class ReportUserState extends State<ReportUser> {
                   leading: Icon(
                     Icons.sentiment_dissatisfied_outlined,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : primaryColor,
+                        isDarkMode ? Colors.white : primaryColor,
                   ),
                 ),
               ),
@@ -108,7 +107,7 @@ class ReportUserState extends State<ReportUser> {
                   leading: Icon(
                     Icons.chat_bubble_outline,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : primaryColor,
+                        isDarkMode ? Colors.white : primaryColor,
                   ),
                 ),
               ),
@@ -121,7 +120,7 @@ class ReportUserState extends State<ReportUser> {
                   leading: Icon(
                     Icons.report_problem_outlined,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : primaryColor,
+                        isDarkMode ? Colors.white : primaryColor,
                   ),
                 ),
               ),
@@ -136,7 +135,7 @@ class ReportUserState extends State<ReportUser> {
                   leading: Icon(
                     Icons.flag_outlined,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : primaryColor,
+                        isDarkMode ? Colors.white : primaryColor,
                   ),
                 ),
               ),
@@ -151,7 +150,7 @@ class ReportUserState extends State<ReportUser> {
                   leading: Icon(
                     Icons.image_outlined,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : primaryColor,
+                        isDarkMode ? Colors.white : primaryColor,
                   ),
                 ),
               ),
@@ -163,7 +162,7 @@ class ReportUserState extends State<ReportUser> {
                   leading: Icon(
                     Icons.feedback_outlined,
                     color:
-                        themeProvider.isDarkMode ? Colors.white : primaryColor,
+                        isDarkMode ? Colors.white : primaryColor,
                   ),
                   onTap: () => changeToDescription(
                     titleValue: 'Other'.tr().toString(),
@@ -188,7 +187,7 @@ class ReportUserState extends State<ReportUser> {
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
                 color:
-                    themeProvider.isDarkMode ? Colors.white70 : Colors.black87,
+                    isDarkMode ? Colors.white70 : Colors.black87,
               ),
             ),
             actions: [
@@ -273,7 +272,7 @@ class ReportUserState extends State<ReportUser> {
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           decoration: TextDecoration.none,
-                                          color: themeProvider.isDarkMode
+                                          color: isDarkMode
                                               ? Colors.black
                                               : Colors.black,
                                           fontSize: 20,
@@ -289,7 +288,7 @@ class ReportUserState extends State<ReportUser> {
                         child: Text(
                           'Submit'.tr().toString(),
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.pink,
                           ),
@@ -302,7 +301,7 @@ class ReportUserState extends State<ReportUser> {
                         child: Text(
                           'Cancel'.tr().toString(),
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.pink,
                           ),

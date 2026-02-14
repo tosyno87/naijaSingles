@@ -8,11 +8,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 // Removed no_user.dart import - file deleted
 // import 'package:naijasingles/features/explore/premium_map.dart';
 // Removed street view import - feature deleted
-import 'package:provider/provider.dart';
 
+import '../../common/bloc/theme/theme_bloc.dart';
 import '../../common/constants/colors.dart';
 import '../../common/data/repo/user_location_repo.dart';
-import '../../common/providers/theme_provider.dart';
 import '../../models/user_model.dart';
 import 'bloc/explore_map_bloc.dart';
 
@@ -79,7 +78,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
 
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
@@ -131,7 +130,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                   'Error to load data.'.tr().toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: themeProvider.isDarkMode
+                    color: isDarkMode
                         ? Colors.white
                         : Colors.black54,
                     fontStyle: FontStyle.normal,

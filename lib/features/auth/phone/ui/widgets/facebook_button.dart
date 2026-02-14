@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../../common/constants/colors.dart';
-import '../../../../../common/providers/theme_provider.dart';
 
 class FaceBookButton extends StatelessWidget {
   const FaceBookButton({required this.onTap, super.key});
@@ -10,7 +10,7 @@ class FaceBookButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       child: Material(
@@ -23,7 +23,7 @@ class FaceBookButton extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
-                gradient: !themeProvider.isDarkMode
+                gradient: !isDarkMode
                     ? LinearGradient(
                         begin: Alignment.topRight,
                         end: Alignment.bottomLeft,

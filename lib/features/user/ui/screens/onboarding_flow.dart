@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../common/constants/colors.dart';
 import '../../../../common/routes/route_name.dart';
-import '../../controllers/onboarding_controller.dart';
+import '../../../onboarding/bloc/onboarding_bloc.dart';
+import '../../../onboarding/bloc/onboarding_data.dart';
 
 /// A multi-step onboarding flow with cultural focus for NaijaSingles app.
 ///
 /// This widget provides a 3-screen onboarding experience using PageView
-/// with a shared OnboardingController to maintain state across screens.
+/// with OnboardingBloc to maintain state across screens.
 class OnboardingFlow extends StatefulWidget {
   const OnboardingFlow({super.key});
 
@@ -38,10 +39,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         curve: Curves.easeInOut,
       );
     } else {
-      // On the last page, complete onboarding
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
-
+      // On the last page, complete onboarding - navigate to next screen
       // Save data and navigate to the next screen in the app flow
       Navigator.pushReplacementNamed(
         context,
@@ -52,8 +50,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data ?? OnboardingData();
+        return _buildContent(context, data);
+      },
+    );
+  }
 
+  Widget _buildContent(BuildContext context, OnboardingData data) {
     return Scaffold(
       backgroundColor: afrocentricBackground,
       body: SafeArea(
@@ -93,13 +98,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 },
                 children: [
                   // Screen 1: Cultural Identity
-                  _buildCulturalIdentityScreen(controller),
+                  _buildCulturalIdentityScreen(data),
 
                   // Screen 2: Relationship Intent
-                  _buildRelationshipIntentScreen(controller),
+                  _buildRelationshipIntentScreen(data),
 
                   // Screen 3: Lifestyle & Values
-                  _buildLifestyleValuesScreen(controller),
+                  _buildLifestyleValuesScreen(data),
                 ],
               ),
             ),
@@ -132,7 +137,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
                   // Next/Finish labelLarge
                   ElevatedButton(
-                    onPressed: _isCurrentPageValid(controller) ? onNext : null,
+                    onPressed: _isCurrentPageValid(data) ? onNext : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       padding: const EdgeInsets.symmetric(
@@ -161,29 +166,26 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   /// Check if the current page has valid data to proceed
-  bool _isCurrentPageValid(OnboardingController controller) {
+  bool _isCurrentPageValid(OnboardingData data) {
     switch (_currentPage) {
       case 0:
-        // Cultural identity validation
-        return controller.tribe != null ||
-            controller.languages.isNotEmpty ||
-            controller.nationality != null;
+        return data.tribe.isNotEmpty ||
+            data.languages.isNotEmpty ||
+            data.nationality != null;
       case 1:
-        // Relationship intent validation
-        return controller.intent != null;
+        return data.intent != null;
       case 2:
-        // Lifestyle and values validation
-        return controller.genres.isNotEmpty ||
-            controller.fashionStyle != null ||
-            controller.weekendVibe != null ||
-            controller.values.isNotEmpty;
+        return data.genres.isNotEmpty ||
+            data.fashionStyle != null ||
+            data.weekendVibe != null ||
+            data.values.isNotEmpty;
       default:
         return false;
     }
   }
 
   /// Build the cultural identity screen (Page 1)
-  Widget _buildCulturalIdentityScreen(OnboardingController controller) =>
+  Widget _buildCulturalIdentityScreen(OnboardingData data) =>
       SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
@@ -211,7 +213,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             // Tribe selection
             _buildInputLabel('Tribe or Ethnic Group'),
             _buildDropdownField<String>(
-              value: controller.tribe,
+              value: data.tribe.isNotEmpty ? data.tribe : null,
               items: const [
                 'Yoruba',
                 'Igbo',
@@ -224,7 +226,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 'Other',
               ],
               onChanged: (value) {
-                if (value != null) controller.updateTribe(value);
+                if (value != null) {
+                  context.read<OnboardingBloc>().add(
+                        OnboardingTribeUpdated(value),
+                      );
+                }
               },
               hint: 'Select your tribe',
             ),
@@ -248,17 +254,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   .map(
                     (language) => _buildSelectionChip(
                       label: language,
-                      isSelected: controller.languages.contains(language),
+                      isSelected: data.languages.contains(language),
                       onSelected: (selected) {
-                        final List<String> updatedLanguages = [
-                          ...controller.languages,
-                        ];
+                        final updatedLanguages = [...data.languages];
                         if (selected) {
                           updatedLanguages.add(language);
                         } else {
                           updatedLanguages.remove(language);
                         }
-                        controller.updateLanguages(updatedLanguages);
+                        context.read<OnboardingBloc>().add(
+                              OnboardingLanguagesUpdated(updatedLanguages),
+                            );
                       },
                     ),
                   )
@@ -269,7 +275,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             // Nationality selection
             _buildInputLabel('Nationality'),
             _buildDropdownField<String>(
-              value: controller.nationality,
+              value: data.nationality,
               items: const [
                 'Nigerian',
                 'Nigerian Diaspora',
@@ -278,8 +284,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               ],
               onChanged: (value) {
                 if (value != null) {
-                  final bool isDiaspora = value == 'Nigerian Diaspora';
-                  controller.updateNationality(value, isDiaspora);
+                  context.read<OnboardingBloc>().add(
+                        OnboardingNationalityUpdated(value),
+                      );
                 }
               },
               hint: 'Select your nationality',
@@ -290,7 +297,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       );
 
   /// Build the relationship intent screen (Page 2)
-  Widget _buildRelationshipIntentScreen(OnboardingController controller) =>
+  Widget _buildRelationshipIntentScreen(OnboardingData data) =>
       SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
@@ -317,7 +324,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
             // Intent selection cards
             _buildIntentCard(
-              controller: controller,
+              data: data,
               title: 'Dating',
               description: 'I want to find a romantic partner',
               icon: Icons.favorite,
@@ -326,7 +333,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             const SizedBox(height: 16),
 
             _buildIntentCard(
-              controller: controller,
+              data: data,
               title: 'Friendship',
               description: 'I want to make new friends',
               icon: Icons.people,
@@ -335,7 +342,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             const SizedBox(height: 16),
 
             _buildIntentCard(
-              controller: controller,
+              data: data,
               title: 'Community',
               description: 'I want to connect with my cultural community',
               icon: Icons.diversity_3,
@@ -347,7 +354,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       );
 
   /// Build the lifestyle and values screen (Page 3)
-  Widget _buildLifestyleValuesScreen(OnboardingController controller) =>
+  Widget _buildLifestyleValuesScreen(OnboardingData data) =>
       SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
@@ -391,17 +398,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   .map(
                     (genre) => _buildSelectionChip(
                       label: genre,
-                      isSelected: controller.genres.contains(genre),
+                      isSelected: data.genres.contains(genre),
                       onSelected: (selected) {
-                        final List<String> updatedGenres = [
-                          ...controller.genres
-                        ];
+                        final updatedGenres = [...data.genres];
                         if (selected) {
                           updatedGenres.add(genre);
                         } else {
                           updatedGenres.remove(genre);
                         }
-                        controller.updateGenres(updatedGenres);
+                        context.read<OnboardingBloc>().add(
+                              OnboardingGenresUpdated(updatedGenres),
+                            );
                       },
                     ),
                   )
@@ -412,7 +419,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             // Fashion style
             _buildInputLabel('Your Fashion Style'),
             _buildDropdownField<String>(
-              value: controller.fashionStyle,
+              value: data.fashionStyle,
               items: const [
                 'Traditional',
                 'Modern African',
@@ -423,7 +430,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 'Other',
               ],
               onChanged: (value) {
-                if (value != null) controller.updateFashionStyle(value);
+                if (value != null) {
+                  context.read<OnboardingBloc>().add(
+                        OnboardingFashionStyleUpdated(value),
+                      );
+                }
               },
               hint: 'Select your style',
             ),
@@ -432,7 +443,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             // Weekend vibe
             _buildInputLabel('Your Ideal Weekend'),
             _buildDropdownField<String>(
-              value: controller.weekendVibe,
+              value: data.weekendVibe,
               items: const [
                 'Outdoor adventures',
                 'Cultural events',
@@ -443,7 +454,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 'Sports & fitness',
               ],
               onChanged: (value) {
-                if (value != null) controller.updateWeekendVibe(value);
+                if (value != null) {
+                  context.read<OnboardingBloc>().add(
+                        OnboardingWeekendVibeUpdated(value),
+                      );
+                }
               },
               hint: 'Select your weekend vibe',
             ),
@@ -467,17 +482,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   .map(
                     (value) => _buildSelectionChip(
                       label: value,
-                      isSelected: controller.values.contains(value),
+                      isSelected: data.values.contains(value),
                       onSelected: (selected) {
-                        final List<String> updatedValues = [
-                          ...controller.values
-                        ];
+                        final updatedValues = [...data.values];
                         if (selected) {
                           updatedValues.add(value);
                         } else {
                           updatedValues.remove(value);
                         }
-                        controller.updateValues(updatedValues);
+                        context.read<OnboardingBloc>().add(
+                              OnboardingValuesUpdated(updatedValues),
+                            );
                       },
                     ),
                   )
@@ -558,16 +573,18 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   /// Build an intent selection card
   Widget _buildIntentCard({
-    required OnboardingController controller,
+    required OnboardingData data,
     required String title,
     required String description,
     required IconData icon,
     required String intentValue,
   }) {
-    final isSelected = controller.intent == intentValue;
+    final isSelected = data.intent == intentValue;
 
     return GestureDetector(
-      onTap: () => controller.updateIntent(intentValue),
+      onTap: () => context.read<OnboardingBloc>().add(
+            OnboardingIntentUpdated(intentValue),
+          ),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

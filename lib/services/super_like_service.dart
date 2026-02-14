@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-import 'optimized_match_service.dart';
+import '../features/match/data/services/likes_service.dart';
+import '../features/match/data/services/match_service.dart';
 import 'performance_monitor.dart';
 
 /// Super like service that provides premium highlighting and instant notifications
@@ -15,15 +16,14 @@ class SuperLikeService {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final OptimizedMatchService _matchService = OptimizedMatchService();
+  final MatchService _matchService = MatchService();
+  final LikesService _likesService = LikesService();
 
   // Collection references
   CollectionReference get _usersCollection => _firestore.collection('users');
   CollectionReference get _superLikesCollection =>
       _firestore.collection('superLikes');
   CollectionReference get _likesCollection => _firestore.collection('likes');
-  CollectionReference get _matchesCollection =>
-      _firestore.collection('matches');
 
   /// Send a super like to another user
   Future<SuperLikeResult> sendSuperLike({
@@ -243,19 +243,19 @@ class SuperLikeService {
 
           if (isLike) {
             // Create match since both users liked each other
-            final matchResult = await _matchService.handleLike(
-              respondingUserId,
-              superLike.fromUserId,
+            // Note: MatchService.handleLike requires currentUserId, so we need to use LikesService directly
+            final matchId = await _matchService.createMatch(
+              otherUserId: superLike.fromUserId,
             );
 
-            if (matchResult.isSuccess && matchResult.isMatch) {
+            if (matchId != null) {
               debugPrint(
-                '🎉 Super like resulted in match: ${matchResult.matchId}',
+                '🎉 Super like resulted in match: $matchId',
               );
 
               return SuperLikeResponse.success(
                 isMatch: true,
-                matchId: matchResult.matchId,
+                matchId: matchId,
               );
             } else {
               // Just record the like
@@ -372,13 +372,9 @@ class SuperLikeService {
           await _likesCollection.doc('${toUserId}_likes_$fromUserId').get();
 
       if (reverseLikeDoc.exists) {
-        // Create match
-        final matchResult =
-            await _matchService.handleLike(fromUserId, toUserId);
-
-        if (matchResult.isSuccess && matchResult.isMatch) {
-          return matchResult.matchId;
-        }
+        // Create match using LikesService directly (needs both user IDs)
+        final matchId = await _likesService.handleLike(fromUserId, toUserId);
+        return matchId;
       }
 
       return null;

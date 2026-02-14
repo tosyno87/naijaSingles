@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
 import '../../../common/constants/app_colors.dart';
+import '../bloc/onboarding_bloc.dart';
 
 class EnhancedInterestsScreen extends StatefulWidget {
   const EnhancedInterestsScreen({super.key});
@@ -152,13 +153,10 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
 
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
+      final data = context.read<OnboardingBloc>().state.data;
 
-      if (controller.interests.isNotEmpty) {
-        setState(() {
-          _selectedInterests = List.from(controller.interests);
-        });
+      if (data != null && data.interests.isNotEmpty) {
+        setState(() => _selectedInterests = List.from(data.interests));
       }
     });
   }
@@ -167,13 +165,14 @@ class _EnhancedInterestsScreenState extends State<EnhancedInterestsScreen> {
     setState(() {
       if (_selectedInterests.contains(interest)) {
         _selectedInterests.remove(interest);
-        Provider.of<OnboardingController>(context, listen: false)
-            .removeInterest(interest);
+        context.read<OnboardingBloc>().add(
+              OnboardingInterestRemoved(interest),
+            );
       } else {
-        // No limit - users can select as many interests as they want
         _selectedInterests.add(interest);
-        Provider.of<OnboardingController>(context, listen: false)
-            .addInterest(interest);
+        context.read<OnboardingBloc>().add(
+              OnboardingInterestAdded(interest),
+            );
       }
     });
   }

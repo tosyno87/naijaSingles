@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/constants/constants.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../models/chat_model.dart';
 import '../../../../models/user_model.dart';
 import '../screens/chat_page.dart';
@@ -28,16 +28,16 @@ class SingleChatTile extends StatelessWidget {
     final db = firebaseFireStoreInstance;
     final chatReference =
         db.collection('chats').doc(chatId).collection('messages');
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Container(
       margin: const EdgeInsets.only(top: 5, bottom: 5, right: 10, left: 10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       decoration: BoxDecoration(
         color: chat.senderId != currentUser.id && !chat.isRead
-            ? themeProvider.isDarkMode
+            ? isDarkMode
                 ? Theme.of(context).scaffoldBackgroundColor
                 : primaryColor.withValues(alpha: (.1 * 255).toDouble())
-            : themeProvider.isDarkMode
+            : isDarkMode
                 ? Theme.of(context)
                     .scaffoldBackgroundColor
                     .withValues(alpha: (0.60 * 255).toDouble())
@@ -77,7 +77,7 @@ class SingleChatTile extends StatelessWidget {
                           ? 'Photo'
                           : chat.text!.replaceAll('\n', ' '),
                       style: TextStyle(
-                        color: themeProvider.isDarkMode
+                        color: isDarkMode
                             ? Colors.white
                             : Colors.blueGrey,
                         fontSize: 15,
@@ -90,7 +90,7 @@ class SingleChatTile extends StatelessWidget {
                       ? Text(
                           'You blocked this contact'.tr().toString(),
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.blueGrey,
                             fontSize: 15,
@@ -101,7 +101,7 @@ class SingleChatTile extends StatelessWidget {
                       : Text(
                           'This contact has blocked you'.tr().toString(),
                           style: TextStyle(
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : Colors.blueGrey,
                             fontSize: 15,

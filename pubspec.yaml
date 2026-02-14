@@ -55,7 +55,6 @@ dependencies:
   flutter_flushbar: ^0.0.2       # Kept at 0.0.2
   google_sign_in: ^6.1.6
   animated_text_kit: ^4.2.2     # Added for rotating greetings
-  swipe_cards: ^2.0.0+1          # Added for Explore screen
   flutter_image_compress: ^2.4.0 # Updated to latest
   flutter_swiper_null_safety: ^1.0.2 # Kept at 1.0.2
   fluttertoast: ^8.2.12          # Updated to latest
@@ -80,7 +79,6 @@ dependencies:
   permission_handler: ^12.0.1
   flutter_secure_storage: ^9.2.2
   pin_code_fields: ^8.0.1        # Kept at 8.0.1
-  provider: ^6.1.5               # Updated to latest
   share_plus: ^11.0.0           # Updated to latest
   shared_preferences: ^2.5.3     # Updated to latest
   shimmer: ^3.0.0                # Kept at 3.0.0

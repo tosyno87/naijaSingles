@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../../../services/group_chat_service.dart';
+import '../data/services/group_chat_service.dart';
 
 /// Group chat screen for displaying and managing group conversations
 class GroupChatScreen extends StatefulWidget {

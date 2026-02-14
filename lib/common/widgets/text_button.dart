@@ -1,10 +1,10 @@
 // ignore: file_names
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
-import '../providers/theme_provider.dart';
 
 class TextButtonWidget extends StatelessWidget {
   const TextButtonWidget({
@@ -19,7 +19,7 @@ class TextButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Padding(
       padding: const EdgeInsets.all(8),
       child: InkWell(
@@ -34,7 +34,7 @@ class TextButtonWidget extends StatelessWidget {
                   child: Text(
                     text.tr().toString(),
                     style: TextStyle(
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : primaryColor,
                       fontSize: 18,

@@ -7,11 +7,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:provider/provider.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/constants/colors.dart';
-import '../../../../common/providers/theme_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/app_exit.dart';
 import '../../../../models/user_model.dart';
@@ -67,12 +67,11 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
 
     if (widget.isPaymentSuccess != null && widget.isPaymentSuccess!) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final themeProvider =
-            Provider.of<ThemeProvider>(context, listen: false);
+        final isDarkMode = context.read<ThemeBloc>().isDarkMode;
         showDialog(
           context: context,
           builder: (BuildContext context) => AlertDialog(
-            backgroundColor: themeProvider.isDarkMode
+            backgroundColor: isDarkMode
                 ? const Color(0xFF2C2C2E)
                 : Colors.white,
             shape: RoundedRectangleBorder(
@@ -89,7 +88,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
             actions: [
@@ -204,7 +203,7 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
 
     return PopScope(
       canPop: false,
@@ -231,8 +230,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               automaticallyImplyLeading: false,
               title: TabBar(
                 labelColor:
-                    themeProvider.isDarkMode ? Colors.white : primaryColor,
-                unselectedLabelColor: themeProvider.isDarkMode
+                    isDarkMode ? Colors.white : primaryColor,
+                unselectedLabelColor: isDarkMode
                     ? Colors.grey[400]
                     : Colors.grey[600],
                 indicatorColor: primaryColor,

@@ -4,12 +4,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../common/bloc/theme/theme_bloc.dart';
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../../../common/constants/colors.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
-import '../../../../common/providers/theme_provider.dart';
-import '../../../../common/providers/user_provider.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 
@@ -31,7 +31,8 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeBloc = context.watch<ThemeBloc>();
+    final isDarkMode = themeBloc.isDarkMode;
     return AlertDialog(
       titlePadding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
       title: RichText(
@@ -51,7 +52,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
           ],
           style: TextStyle(
             fontFamily: 'Gellix',
-            color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
+            color: isDarkMode ? Colors.white : Colors.black87,
             fontSize: 18,
           ),
         ),
@@ -173,14 +174,14 @@ Future<void> deleteUserAndNavigateToLogin(
         'Account deleted Successfully'.tr().toString(),
         context,
       );
-      // Navigate to welcome screen to show all sign-in options
+      final userBloc = context.read<UserBloc>();
       Navigator.pushNamedAndRemoveUntil(
         context,
         RouteName.welcomeScreen,
         (route) => false,
       ).then((value) {
-        // Update user provider
-        Provider.of<UserProvider>(context, listen: false).currentUser = null;
+        userBloc.add(const UserDataUpdated(null));
+        userBloc.add(const UserListenStopped());
       });
     }
   } catch (e) {

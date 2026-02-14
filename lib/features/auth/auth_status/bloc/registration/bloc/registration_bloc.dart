@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../common/data/repo/phone_auth_repo.dart';
+import '../../../../../../common/utils/profile_completion_guard.dart';
 import '../../../../../../services/secure_storage_service.dart';
 
 import '../../../../../../models/user_model.dart';
@@ -58,14 +59,14 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
               final usr = await phoneAuthRepository.getRegisterUser();
               log('👤 Retrieved user data: ${usr.name ?? "no name"}');
 
-              // Only consider user registered if they have a name (completed onboarding)
-              if (usr.name != null && usr.name!.isNotEmpty) {
+              // Only consider user registered if profile is sufficiently complete
+              if (ProfileCompletionGuard.isUserComplete(usr)) {
                 log('✅ User already registered with complete profile: ${usr.name}');
                 emit(AlreadyRegistered(user: usr));
               } else {
-                // User document exists but profile incomplete (no name) - treat as new registration
+                // User document exists but profile is incomplete - treat as new registration
                 // This ensures users complete onboarding even if document exists
-                log('⚠️ User document exists but has no name - treating as new registration');
+                log('⚠️ User document exists but profile is incomplete - treating as new registration');
                 log('⚠️ Redirecting to onboarding to complete profile');
                 emit(NewRegistration(token: event.token, user: user));
               }
@@ -82,6 +83,30 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
           } else {
             log('📝 User not found in database - new registration');
             if (user.displayName != null || user.phoneNumber != null) {
+              // Prevent duplicate account: block if this phone is already used by another account
+              final phone = user.phoneNumber?.trim();
+              if (phone != null && phone.isNotEmpty) {
+                try {
+                  final existingUserId =
+                      await phoneAuthRepository.findUserIdByPhoneNumber(phone);
+                  if (existingUserId != null && existingUserId != user.uid) {
+                    log('❌ Phone number already registered to another account: $existingUserId');
+                    await phoneAuthRepository.signOut();
+                    emit(const RegistrationFailed(
+                      message:
+                          'This phone number is already registered. Please sign in instead.',
+                    ));
+                    return;
+                  }
+                } catch (_) {
+                  // Fail closed: do not allow registration when we cannot verify phone
+                  log('❌ Cannot verify phone (e.g. Firestore unavailable) - blocking registration');
+                  emit(const RegistrationFailed(
+                    message: 'Unable to verify phone. Please try again.',
+                  ));
+                  return;
+                }
+              }
               emit(NewRegistration(token: event.token, user: user));
             } else {
               emit(const RegistrationFailed(

@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:provider/provider.dart';
 
+import '../bloc/theme/theme_bloc.dart';
 import '../constants/colors.dart';
-import '../providers/theme_provider.dart';
 import 'crop_image.dart';
 
 abstract class UploadMedia {
@@ -158,7 +158,7 @@ class _SelectMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
@@ -199,7 +199,7 @@ class _SelectMedia extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : Colors.black87,
                     ),
@@ -217,7 +217,7 @@ class _SelectMedia extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: themeProvider.isDarkMode
+                      color: isDarkMode
                           ? Colors.white
                           : Colors.black87,
                     ),

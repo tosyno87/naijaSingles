@@ -3,12 +3,11 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../common/constants/colors.dart';
-import '../../../../../common/providers/street_view_provider.dart';
-import '../../../../../common/providers/theme_provider.dart';
+import '../../../../../common/bloc/streetview/streetview_bloc.dart';
+import '../../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../../common/routes/route_name.dart';
 import '../../../../../common/widgets/change_language_widget.dart';
 import '../../../../../common/widgets/custom_snackbar.dart';
@@ -132,7 +131,7 @@ class SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = context.watch<ThemeBloc>().isDarkMode;
     log(widget.currentUser.toString());
     log('my phone number is ${widget.currentUser.phoneNumber.toString()}');
     return BlocListener<UserfilterBloc, UserfilterState>(
@@ -206,7 +205,7 @@ class SettingPageState extends State<SettingPage> {
                       child: Text(
                         'Account settings'.tr().toString(),
                         style: TextStyle(
-                          color: themeProvider.isDarkMode
+                          color: isDarkMode
                               ? Colors.white
                               : primaryColor,
                           fontSize: 18,
@@ -266,7 +265,7 @@ class SettingPageState extends State<SettingPage> {
                       child: Text(
                         'Discovery settings'.tr().toString(),
                         style: TextStyle(
-                          color: themeProvider.isDarkMode
+                          color: isDarkMode
                               ? Colors.white
                               : primaryColor,
                           fontSize: 18,
@@ -291,7 +290,7 @@ class SettingPageState extends State<SettingPage> {
                             .tr()
                             .toString(),
                         style: TextStyle(
-                          color: themeProvider.isDarkMode
+                          color: isDarkMode
                               ? AppColors.secondaryColor
                               : Colors.black54,
                         ),
@@ -326,9 +325,9 @@ class SettingPageState extends State<SettingPage> {
                     const LanguageWidget(),
 
                     // for streetview setting of users
-                    ChangeNotifierProvider(
+                    BlocProvider<StreetViewBloc>(
                       create: (context) =>
-                          StreetViewProvider(widget.currentUser.id!),
+                          StreetViewBloc(widget.currentUser.id!),
                       child: StreetViewButtonWigdet(
                         currentUser: widget.currentUser,
                       ),
@@ -361,7 +360,7 @@ class SettingPageState extends State<SettingPage> {
                           child: Image.asset(
                             'asset/hookup4u-Logo-BP.png',
                             fit: BoxFit.contain,
-                            color: themeProvider.isDarkMode
+                            color: isDarkMode
                                 ? Colors.white
                                 : primaryColor,
                           ),

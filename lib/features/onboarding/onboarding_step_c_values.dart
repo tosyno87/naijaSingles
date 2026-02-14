@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/constants/app_colors.dart';
 
-import '../user/controllers/onboarding_controller.dart';
+import 'bloc/onboarding_bloc.dart';
+import 'bloc/onboarding_data.dart';
 import 'shared_styles.dart';
 
 /// Third step of onboarding focusing on personal values.
@@ -84,7 +85,9 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data ?? OnboardingData();
 
     // Deep green color for selected elements
     const Color deepGreen = Color(0xFF008037);
@@ -191,7 +194,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                               } else {
                                 updatedValues.remove(value['id']);
                               }
-                              controller.updateValues(updatedValues);
+                              context.read<OnboardingBloc>().add(OnboardingValuesUpdated(updatedValues));
                               HapticFeedback.selectionClick();
                             },
                             deepGreen: deepGreen,
@@ -241,22 +244,23 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                         spacing: 8,
                         runSpacing: 12,
                         children: _dealbreakers.map((dealbreaker) {
-                          final isSelected = controller.dealbreakers
+                          final isSelected = data.dealbreakers
                               .contains(dealbreaker['id']);
                           return _buildValueCheckbox(
                             label: dealbreaker['label'],
                             isSelected: isSelected,
                             onChanged: (selected) {
                               final List<String> updatedDealbreakers = [
-                                ...controller.dealbreakers,
+                                ...data.dealbreakers,
                               ];
                               if (selected) {
                                 updatedDealbreakers.add(dealbreaker['id']);
                               } else {
                                 updatedDealbreakers.remove(dealbreaker['id']);
                               }
-                              controller
-                                  .updateDealbreakers(updatedDealbreakers);
+                              context.read<OnboardingBloc>().add(
+                                OnboardingDealbreakersUpdated(updatedDealbreakers),
+                              );
                               HapticFeedback.selectionClick();
                             },
                             deepGreen: deepGreen,
@@ -342,7 +346,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
                     height: 56,
                     child: ElevatedButton(
                       key: _finishButtonKey,
-                      onPressed: _isStepValid(controller)
+                      onPressed: _isStepValid(data)
                           ? () {
                               HapticFeedback.mediumImpact();
                               // Navigate to Dating Homepage instead of calling finishOnboarding
@@ -390,6 +394,8 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
           ),
         ),
       ),
+    );
+      },
     );
   }
 
@@ -482,8 +488,7 @@ class _OnboardingStepCValuesState extends State<OnboardingStepCValues>
       );
 
   /// Validates if all required fields are filled
-  bool _isStepValid(OnboardingController controller) {
-    // Require at least 3 values
-    return controller.values.length >= 3;
+  bool _isStepValid(OnboardingData data) {
+    return data.values.length >= 3;
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/constants/app_colors.dart';
-import '../../../services/group_chat_service.dart';
+import '../data/services/group_chat_service.dart';
 import 'create_group_screen.dart';
 import 'group_chat_screen.dart';
 

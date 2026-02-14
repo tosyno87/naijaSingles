@@ -11,22 +11,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-
+import 'common/bloc/language/language_bloc.dart';
+import 'common/bloc/streetview/streetview_bloc.dart';
+import 'common/bloc/theme/theme_bloc.dart';
+import 'common/bloc/user/user_bloc.dart';
 import 'common/constants/theme.dart';
 import 'common/data/repo/phone_auth_repo.dart';
-import 'common/providers/theme_provider.dart';
-import 'common/providers/user_provider.dart';
 import 'common/routes/route_name.dart';
 import 'common/routes/router.dart';
 import 'common/utils/observer.dart';
 import 'config/secure_config.dart';
 import 'features/auth/auth_status/bloc/authstatus_bloc.dart';
 import 'features/events/data/services/seed_events_service.dart';
-import 'features/user/controllers/onboarding_controller.dart';
+import 'features/onboarding/bloc/onboarding_bloc.dart';
+import 'features/onboarding/data/repositories/onboarding_repository.dart';
 // import 'debug/auto_login_service.dart'; // Uncomment if needed for testing
 import 'firebase_options.dart';
-import 'services/enhanced_notification_service.dart';
+import 'features/notifications/data/services/notification_service.dart';
 import 'services/secure_storage_service.dart';
 import 'services/crashlytics_service.dart';
 
@@ -91,13 +92,13 @@ Future<void> main() async {
       // Continue anyway - app should work without Crashlytics
     }
 
-    // Initialize Enhanced Notification Service
-    await EnhancedNotificationService.initialize();
-    log('🔔 Enhanced Notification Service initialized');
+    // Initialize Notification Service
+    await NotificationService.initialize();
+    log('🔔 Notification Service initialized');
 
     // Initialize seed events if database is empty (only if user is authenticated)
     // Events seeding requires authentication per Firestore security rules
-    // This will be handled after user login in UserProvider or similar
+    // This will be handled after user login in UserBloc or similar
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
@@ -233,13 +234,21 @@ Future<void> main() async {
                 phoneAuthRepository: PhoneAuthRepository(),
               ),
             ),
+            BlocProvider<UserBloc>(
+              create: (context) => UserBloc(),
+            ),
+            BlocProvider<ThemeBloc>(
+              create: (context) => ThemeBloc(),
+            ),
+            BlocProvider<LanguageBloc>(
+              create: (context) => LanguageBloc(),
+            ),
           ],
-          child: MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (_) => ThemeProvider()),
-              ChangeNotifierProvider(create: (_) => UserProvider()),
-              ChangeNotifierProvider(create: (_) => OnboardingController()),
-            ],
+          child: BlocProvider<OnboardingBloc>(
+            create: (context) => OnboardingBloc(
+              repository: OnboardingRepository(),
+              userBloc: context.read<UserBloc>(),
+            ),
             child: const MyApp(),
           ),
         ),
@@ -258,34 +267,40 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set navigator key for notification service
-    EnhancedNotificationService.setNavigatorKey(navigatorKey);
+    NotificationService.setNavigatorKey(navigatorKey);
 
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) => MaterialApp(
-        navigatorKey: navigatorKey, // Add navigator key
-        title: 'Afropeep',
-        debugShowCheckedModeBanner: false,
-        theme:
-            themeProvider.isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        initialRoute: RouteName
-            .welcomeScreen, // Direct to WelcomeScreen - no splash flash
-        onGenerateRoute: AppRouter.generateRoute,
-        // Add safety check for Navigator during hot reload
-        builder: (context, child) {
-          // Ensure Navigator has proper state during hot reload
-          if (child == null) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-          return child;
-        },
-      ),
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        // Get theme mode from BLoC state
+        final isDarkMode = themeState is ThemeLoaded
+            ? themeState.isDarkMode
+            : false; // Default to light mode if not loaded
+
+        return MaterialApp(
+          navigatorKey: navigatorKey, // Add navigator key
+          title: 'Afropeep',
+          debugShowCheckedModeBanner: false,
+          theme: isDarkMode ? MyThemes.darkTheme : MyThemes.lightTheme,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          initialRoute: RouteName
+              .welcomeScreen, // Direct to WelcomeScreen - no splash flash
+          onGenerateRoute: AppRouter.generateRoute,
+          // Add safety check for Navigator during hot reload
+          builder: (context, child) {
+            // Ensure Navigator has proper state during hot reload
+            if (child == null) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            return child;
+          },
+        );
+      },
     );
   }
 }

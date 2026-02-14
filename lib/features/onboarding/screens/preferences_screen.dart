@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 
 class PreferencesScreen extends StatefulWidget {
   const PreferencesScreen({super.key});
@@ -175,14 +176,13 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
       );
 
   void _savePreferences() {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-
-    // Save preferences to controller
-    controller.setInterestedIn(_selectedInterestedIn);
-    controller.setAgeRange([_ageRange.start.round(), _ageRange.end.round()]);
-
-    // Navigate to next screen or complete onboarding
+    context.read<OnboardingBloc>()
+      ..add(OnboardingInterestedInUpdated(_selectedInterestedIn))
+      ..add(
+        OnboardingAgeRangeUpdated(
+          [_ageRange.start.round(), _ageRange.end.round()],
+        ),
+      );
     Navigator.pop(context);
   }
 }

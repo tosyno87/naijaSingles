@@ -4,13 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
-import '../../common/providers/user_provider.dart';
 import '../../common/routes/route_name.dart';
+import '../../common/utils/account_deletion_scope.dart';
 import '../../common/utils/app_logger.dart';
+import '../../common/utils/profile_completion_guard.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../debug/quick_analysis.dart';
 import '../../models/user_model.dart';
@@ -97,7 +99,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     developer.log('✅ User is authenticated: ${currentUser.uid}');
 
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userBloc = context.read<UserBloc>();
 
     // Set a maximum timeout to prevent infinite loading
     const maxWaitTime = Duration(seconds: 3);
@@ -105,8 +107,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     // Force reload user data from Firestore (in case we just completed onboarding)
     try {
-      await userProvider.listenCurrentUserdetails();
-    } catch (e) {
+      userBloc.add(const UserListenStarted());
+    } on Object catch (e) {
       developer.log('⚠️ Error reloading user data: $e');
     }
 
@@ -114,10 +116,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     while (DateTime.now().difference(startTime) < maxWaitTime) {
       if (!mounted) return;
 
-      // Check if user data is loaded
-      if (userProvider.currentUser != null &&
-          userProvider.currentUser?.name != null &&
-          userProvider.currentUser!.name!.isNotEmpty) {
+      // Check if user data is loaded (use BLoC)
+      final currentUserFromBloc = userBloc.currentUser;
+      if (currentUserFromBloc != null &&
+          ProfileCompletionGuard.isUserComplete(currentUserFromBloc)) {
         developer.log('✅ User data loaded, showing main navigation');
         if (mounted) {
           setState(() {
@@ -147,13 +149,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
         if (doc.exists) {
           final data = doc.data();
-          if (data != null &&
-              data['name'] != null &&
-              data['name'].toString().isNotEmpty) {
-            developer.log(
-                '✅ User data found in Firestore, updating UserProvider...');
+          if (data != null && ProfileCompletionGuard.isDocumentComplete(data)) {
+            developer
+                .log('✅ User data found in Firestore, updating UserBloc...');
             final userModel = UserModel.fromDocument(doc);
-            userProvider.currentUser = userModel;
+            userBloc.add(UserDataUpdated(userModel));
 
             if (mounted) {
               setState(() {
@@ -169,16 +169,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
 
     // User is authenticated but no profile data found - redirect to onboarding
-    // This means they started sign-up but didn't complete it
+    // (or to welcome if account deletion is in progress - doc removed before signOut)
     _hasCheckedRegistration = true;
-    developer.log(
-        '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
-
-    if (mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        RouteName.onboarding,
-        (route) => false,
-      );
+    if (AccountDeletionScope.inProgress) {
+      developer.log(
+          '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)');
+      AccountDeletionScope.inProgress = false;
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          RouteName.welcomeScreen,
+          (route) => false,
+        );
+      }
+    } else {
+      developer.log(
+          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          RouteName.onboarding,
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -192,13 +203,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
+    final userBloc = context.watch<UserBloc>();
+    final currentUser = userBloc.currentUser;
 
     // Show loading screen while checking registration - prevent any content flash
     if (!_hasCheckedRegistration ||
-        userProvider.currentUser == null ||
-        userProvider.currentUser?.name == null ||
-        (userProvider.currentUser?.name?.isEmpty ?? false)) {
+        currentUser == null ||
+        !ProfileCompletionGuard.isUserComplete(currentUser)) {
       // If we haven't checked yet or user doesn't exist, show loading
       // This prevents the wrong screen from appearing
       if (!_hasCheckedRegistration) {
@@ -262,17 +273,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         );
       }
 
-      // Authenticated but no user data - redirect to onboarding to complete profile
-      developer.log(
-          '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
-      Future.microtask(() {
-        if (mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            RouteName.onboarding,
-            (route) => false,
-          );
-        }
-      });
+      // Authenticated but no user data - redirect to onboarding or welcome (if deletion in progress)
+      if (AccountDeletionScope.inProgress) {
+        developer.log(
+            '⚠️ Account deletion in progress - redirecting to welcome (not onboarding)');
+        AccountDeletionScope.inProgress = false;
+        Future.microtask(() {
+          if (mounted) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              RouteName.welcomeScreen,
+              (route) => false,
+            );
+          }
+        });
+      } else {
+        developer.log(
+            '⚠️ Authenticated user has incomplete profile - redirecting to onboarding');
+        Future.microtask(() {
+          if (mounted) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              RouteName.onboarding,
+              (route) => false,
+            );
+          }
+        });
+      }
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: Center(

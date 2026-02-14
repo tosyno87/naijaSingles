@@ -161,16 +161,23 @@ class PhoneAuthRepository {
     }
   }
 
+  /// Normalizes phone to digits-only so "+2348012345678" and "2348012345678" match.
+  static String _normalizePhoneToDigits(String phoneNumber) {
+    return phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+  }
+
   Future<UserModel> registration({
     required Map<String, dynamic> userData,
   }) async {
     final User? user = auth.currentUser;
+    final rawPhone = user!.phoneNumber ?? '';
+    final phoneDigits = _normalizePhoneToDigits(rawPhone);
 
     userData.addAll({
-      'userId': user!.uid,
+      'userId': user.uid,
       'isBlocked': false,
       'isPremium': false,
-      'phoneNumber': user.phoneNumber,
+      'phoneNumber': phoneDigits.isNotEmpty ? phoneDigits : rawPhone,
       'Pictures': [], // Initialize empty Pictures array
     });
 
@@ -183,6 +190,42 @@ class PhoneAuthRepository {
         .where('userId', isEqualTo: user.uid)
         .get();
     return UserModel.fromDocument(result.docs.first);
+  }
+
+  /// Returns the userId (document id) if an active user already has this phone number, null otherwise.
+  /// Used to prevent duplicate account creation with the same phone number.
+  /// Compares using digits-only so "+234..." and "234..." are treated the same; queries both
+  /// digits-only and E.164 format for backward compatibility with existing documents.
+  Future<String?> findUserIdByPhoneNumber(String phoneNumber) async {
+    final digits = _normalizePhoneToDigits(phoneNumber);
+    if (digits.isEmpty) return null;
+    try {
+      // Query digits-only (new format) and E.164 (legacy) so we match all stored formats.
+      final snapshotDigits = await firebaseFireStoreInstance
+          .collection('users')
+          .where('phoneNumber', isEqualTo: digits)
+          .limit(1)
+          .get();
+      if (snapshotDigits.docs.isNotEmpty) {
+        final doc = snapshotDigits.docs.first;
+        final data = doc.data();
+        if (data['accountDeleted'] == true) return null;
+        return doc.id;
+      }
+      final snapshotE164 = await firebaseFireStoreInstance
+          .collection('users')
+          .where('phoneNumber', isEqualTo: '+$digits')
+          .limit(1)
+          .get();
+      if (snapshotE164.docs.isEmpty) return null;
+      final doc = snapshotE164.docs.first;
+      final data = doc.data();
+      if (data['accountDeleted'] == true) return null;
+      return doc.id;
+    } catch (e) {
+      log('❌ Error finding user by phone: $e');
+      rethrow;
+    }
   }
 
   Future<bool> userDetails(String userId) async {

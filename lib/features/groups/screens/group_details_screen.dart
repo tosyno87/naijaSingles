@@ -7,7 +7,7 @@ import '../../../common/constants/app_colors.dart';
 import '../../../models/group_join_exception.dart';
 import '../../../services/group_notification_service.dart';
 import '../../../services/group_unread_service.dart';
-import '../../../services/unified_group_service.dart';
+import '../data/services/unified_group_service.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/full_screen_image_viewer.dart';
 import '../../../widgets/group_info_modal.dart';

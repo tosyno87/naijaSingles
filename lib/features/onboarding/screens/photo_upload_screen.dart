@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-import '../../../features/user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   const PhotoUploadScreen({super.key});
@@ -25,9 +26,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   Future<void> _pickImage(ImageSource source, int index) async {
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    await controller.pickProfilePhoto(source, index, context);
+    context.read<OnboardingBloc>().add(
+      OnboardingProfilePhotoPicked(source, index, context),
+    );
     if (mounted) {
       setState(() {});
     }
@@ -135,8 +136,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       );
 
   Widget _buildPhotoItem(int index) {
-    final controller = Provider.of<OnboardingController>(context);
-    final photo = controller.profilePhotos[index];
+    final data = context.read<OnboardingBloc>().state.data;
+    final photo = data?.profilePhotos.elementAtOrNull(index);
     final bool isRequired = index < 3; // First 3 photos are required
 
     return GestureDetector(
@@ -198,7 +199,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               right: 8,
               child: GestureDetector(
                 onTap: () {
-                  controller.removeProfilePhoto(index);
+                  context.read<OnboardingBloc>().add(
+                    OnboardingProfilePhotoRemoved(index),
+                  );
                   setState(() {});
                 },
                 child: Container(
@@ -222,12 +225,14 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OnboardingController>(context);
-    final int uploadedCount =
-        controller.profilePhotos.where((photo) => photo != null).length;
-    final bool hasMinimumPhotos = uploadedCount >= 3;
+    return BlocBuilder<OnboardingBloc, OnboardingState>(
+      builder: (context, state) {
+        final data = state.data;
+        final int uploadedCount =
+            (data?.profilePhotos.where((photo) => photo != null).length ?? 0);
+        final bool hasMinimumPhotos = uploadedCount >= 3;
 
-    return SingleChildScrollView(
+        return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,6 +348,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           ),
         ],
       ),
+    );
+      },
     );
   }
 

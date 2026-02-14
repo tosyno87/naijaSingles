@@ -65,6 +65,8 @@ class RouteName {
   static const String loginScreen = '/login';
   static const String tabScreen = '/tabbar';
   static const String datingHomePage = '/dating';
+
+  /// Legacy onboarding route alias. Redirects to [onboarding].
   static const String onboardingFlow = '/onboarding_flow';
   static const String mvpOnboarding = '/mvp_onboarding';
   static const String home = '/home';

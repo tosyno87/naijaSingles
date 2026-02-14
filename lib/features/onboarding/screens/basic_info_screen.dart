@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
-import '../../../common/utils/app_logger.dart';
 import '../../../common/widgets/custom_snackbar.dart';
-import '../../user/controllers/onboarding_controller.dart';
+import '../bloc/onboarding_bloc.dart';
 
 class BasicInfoScreen extends StatefulWidget {
   const BasicInfoScreen({super.key});
@@ -41,20 +40,17 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
+      final data = context.read<OnboardingBloc>().state.data;
 
-      if (controller.fullName.isNotEmpty) {
-        _nameController.text = controller.fullName;
-      }
+      if (data != null) {
+        if (data.fullName.isNotEmpty) _nameController.text = data.fullName;
 
-      if (controller.dateOfBirth != null) {
-        _selectedDate = controller.dateOfBirth;
-        _formatDateIntoController();
-      }
+        if (data.dateOfBirth != null) {
+          _selectedDate = data.dateOfBirth;
+          _formatDateIntoController();
+        }
 
-      if (controller.gender.isNotEmpty) {
-        _selectedGender = controller.gender;
+        if (data.gender.isNotEmpty) _selectedGender = data.gender;
       }
     });
   }
@@ -118,9 +114,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           context,
         );
       } else {
-        // Save to controller
-        Provider.of<OnboardingController>(context, listen: false)
-            .setDateOfBirth(picked);
+        context.read<OnboardingBloc>().add(
+              OnboardingDateOfBirthUpdated(picked),
+            );
       }
     }
   }
@@ -130,14 +126,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       _selectedGender = gender;
     });
 
-    // Save to controller
-    final controller =
-        Provider.of<OnboardingController>(context, listen: false);
-    AppLogger.debug('🔍 BasicInfoScreen: Setting gender to "$gender"');
-    AppLogger.debug('🔍 Controller instance: ${controller.hashCode}');
-    controller.setGender(gender);
-    AppLogger.debug(
-        '🔍 Controller gender after setting: "${controller.gender}"');
+    context.read<OnboardingBloc>().add(OnboardingGenderUpdated(gender));
   }
 
   @override
@@ -185,15 +174,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                 ),
               ),
               onChanged: (value) {
-                final controller =
-                    Provider.of<OnboardingController>(context, listen: false);
-                AppLogger.debug('🔍 BasicInfoScreen: Setting name to "$value"');
-                AppLogger.debug(
-                    '🔍 Controller instance: ${controller.hashCode}');
-                controller.setFullName(value);
-                AppLogger.debug(
-                  '🔍 Controller name after setting: "${controller.fullName}"',
-                );
+                context.read<OnboardingBloc>().add(
+                      OnboardingFullNameUpdated(value),
+                    );
               },
             ),
 
@@ -251,12 +234,14 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,
-                child: Text(
-                  'Age: ${Provider.of<OnboardingController>(context).age}',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: afropeepGreen,
+                child: BlocBuilder<OnboardingBloc, OnboardingState>(
+                  builder: (context, state) => Text(
+                    'Age: ${state.data?.age ?? 0}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: afropeepGreen,
+                    ),
                   ),
                 ),
               ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../../user/controllers/onboarding_controller.dart';
+
+import '../bloc/onboarding_bloc.dart';
 
 class TribeSelectionScreen extends StatefulWidget {
   const TribeSelectionScreen({super.key});
@@ -100,29 +101,23 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
 
     // Initialize with existing data if available
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
+      final data = context.read<OnboardingBloc>().state.data;
 
-      // Load nationality
-      if (controller.nationality != null &&
-          controller.nationality!.isNotEmpty) {
-        setState(() {
-          _selectedNationality = controller.nationality;
-        });
-      }
+      if (data != null) {
+        if (data.nationality != null && data.nationality!.isNotEmpty) {
+          setState(() => _selectedNationality = data.nationality);
+        }
 
-      // Load tribe (optional)
-      if (controller.tribe.isNotEmpty) {
-        if (_mainTribes.contains(controller.tribe)) {
-          setState(() {
-            _selectedTribe = controller.tribe;
-          });
-        } else {
-          setState(() {
-            _selectedTribe = 'Other';
-            _otherTribeController.text = controller.tribe;
-            _showOtherField = true;
-          });
+        if (data.tribe.isNotEmpty) {
+          if (_mainTribes.contains(data.tribe)) {
+            setState(() => _selectedTribe = data.tribe);
+          } else {
+            setState(() {
+              _selectedTribe = 'Other';
+              _otherTribeController.text = data.tribe;
+              _showOtherField = true;
+            });
+          }
         }
       }
     });
@@ -135,14 +130,11 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
   }
 
   void _selectNationality(String? nationality) {
-    setState(() {
-      _selectedNationality = nationality;
-    });
+    setState(() => _selectedNationality = nationality);
     if (nationality != null) {
-      final controller =
-          Provider.of<OnboardingController>(context, listen: false);
-      final isDiaspora = nationality == 'African Diaspora';
-      controller.updateNationality(nationality, isDiaspora);
+      context.read<OnboardingBloc>().add(
+            OnboardingNationalityUpdated(nationality),
+          );
     }
   }
 
@@ -151,12 +143,8 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
       _selectedTribe = tribe;
       _showOtherField = tribe == 'Other';
 
-      if (tribe != 'Other') {
-        // Save to controller if not "Other"
-        if (tribe != null) {
-          Provider.of<OnboardingController>(context, listen: false)
-              .setTribe(tribe);
-        }
+      if (tribe != 'Other' && tribe != null) {
+        context.read<OnboardingBloc>().add(OnboardingTribeUpdated(tribe));
       }
     });
   }
@@ -335,8 +323,9 @@ class _TribeSelectionScreenState extends State<TribeSelectionScreen> {
                 ),
                 onChanged: (value) {
                   if (value.trim().isNotEmpty) {
-                    Provider.of<OnboardingController>(context, listen: false)
-                        .setTribe(value.trim());
+                    context.read<OnboardingBloc>().add(
+                          OnboardingTribeUpdated(value.trim()),
+                        );
                   }
                 },
               ),

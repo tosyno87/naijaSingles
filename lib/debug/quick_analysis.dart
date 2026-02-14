@@ -43,7 +43,7 @@ class QuickAnalysis {
       }
 
       debugPrint('=' * 50);
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error during analysis: $e');
     }
   }
@@ -62,7 +62,7 @@ class QuickAnalysis {
       } else {
         debugPrint('❌ Cleanup failed: ${result.error}');
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error during cleanup: $e');
     }
   }

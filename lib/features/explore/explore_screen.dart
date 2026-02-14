@@ -1,12 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
+import '../../common/bloc/user/user_bloc.dart';
 import '../../common/constants/app_colors.dart';
 import '../../common/data/repo/user_search_repo.dart';
-import '../../common/providers/user_provider.dart';
 import '../../models/user_model.dart';
 import 'screens/tribe_connect_screen.dart';
 
@@ -42,8 +42,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Future<void> _loadCurrentUser() async {
     try {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final user = userProvider.currentUser;
+      final user = context.read<UserBloc>().currentUser;
 
       if (user != null) {
         if (mounted && !_disposed) {

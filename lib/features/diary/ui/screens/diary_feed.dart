@@ -1,9 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../common/providers/user_provider.dart';
+import '../../../../common/bloc/user/user_bloc.dart';
 import '../../bloc/diary_bloc.dart';
 import '../../data/diary_repository.dart';
 
@@ -25,7 +24,7 @@ class _DiaryFeedScreenState extends State<DiaryFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).currentUser!;
+    final user = context.watch<UserBloc>().currentUser!;
     return Scaffold(
       appBar: AppBar(
         title: Text('Diary Feed'.tr()),

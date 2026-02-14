@@ -40,7 +40,6 @@ import '../../features/settings/language_settings_screen.dart';
 import '../../features/settings/location_settings_screen.dart';
 import '../../features/settings/notification_settings_screen.dart';
 import '../../features/settings/safety_center_screen.dart';
-import '../../features/user/ui/screens/onboarding_flow.dart';
 import '../../features/user/ui/screens/show_gender.dart';
 import '../../features/user/ui/screens/update_user_location.dart';
 import '../../features/user/ui/screens/user_dob.dart';
@@ -262,7 +261,9 @@ abstract class AppRouter {
     RouteName.nationalityScreen: (context) => UserNationality(
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
         ),
-    RouteName.onboardingFlow: (context) => const OnboardingFlow(),
+    // Keep legacy route alias for backward compatibility, but route all users
+    // through the same canonical onboarding experience.
+    RouteName.onboardingFlow: (context) => const OnboardingMain(),
     RouteName.exploreScreen: (context) =>
         const ExploreScreen(), // No back button by default
     RouteName.groupsScreen: (context) => const GroupsScreen(),

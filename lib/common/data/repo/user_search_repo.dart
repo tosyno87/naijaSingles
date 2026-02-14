@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../../../models/user_model.dart';
 import '../../../services/cached_user_service.dart';
-import '../../../services/optimized_match_service.dart';
+import '../../../features/match/data/services/match_service.dart';
 import '../../../services/paginated_user_service.dart';
-import '../../../services/unified_discovery_service.dart';
+import '../../../features/discovery/data/services/discovery_service.dart';
 import '../../constants/constants.dart';
 import '../../utils/distance.dart' as distance;
 
@@ -18,8 +18,7 @@ class UserSearchRepo {
   // static final LikesService _likesService = LikesService(); // Removed - using unified service
 
   // New optimized services
-  static final OptimizedMatchService _optimizedMatchService =
-      OptimizedMatchService();
+  static final MatchService _matchService = MatchService();
   static final CachedUserService _cachedUserService = CachedUserService();
   // static final PaginatedUserService _paginatedUserService = PaginatedUserService(); // Removed - using unified service
 
@@ -89,22 +88,12 @@ class UserSearchRepo {
       final selectedUserId = selectedUser.id;
 
       if (currentUserId != null && selectedUserId != null) {
-        final result = await _optimizedMatchService.handleLike(
-          currentUserId,
-          selectedUserId,
-        );
+        // Use MatchService which internally uses optimized LikesService
+        final matchId = await _matchService.handleLike(selectedUserId);
 
-        if (result.isSuccess) {
-          if (result.isMatch) {
-            debugPrint('🎉 Match created! Match ID: ${result.matchId}');
-            return result.matchId;
-          } else {
-            debugPrint('💌 Like saved, waiting for mutual like');
-          }
-        } else {
-          debugPrint('❌ Error in optimized match service: ${result.error}');
-          // Fall back to legacy system
-          return await _legacyRightSwipe(currentUser, selectedUser);
+        if (matchId != null) {
+          debugPrint('🎉 Match created! Match ID: $matchId');
+          return matchId;
         }
       }
 
@@ -238,11 +227,10 @@ class UserSearchRepo {
         debugPrint('🎯 Filtering by intent: $intentFilter');
       }
 
-      // Use unified discovery service for better performance and consistency
-      final users = await UnifiedDiscoveryService.getUsersForDiscovery(
+      // Use consolidated discovery service for better performance and consistency
+      final users = await DiscoveryService.getUsersForDiscovery(
         currentUser,
         intentFilter: intentFilter,
-        forceRefresh: forceRefresh,
       );
 
       debugPrint('✅ Retrieved ${users.length} users from unified service');

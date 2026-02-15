@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test:rules": "npx firebase emulators:exec --only firestore,storage \"node scripts/test_firebase_rules.mjs\""
+    "test:rules": "npx firebase-tools emulators:exec --only firestore,storage \"node scripts/test_firebase_rules.mjs\""
   },
   "dependencies": {
     "firebase-admin": "^13.4.0"

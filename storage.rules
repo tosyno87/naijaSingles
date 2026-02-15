@@ -1,31 +1,60 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isImageUpload() {
+      return request.resource != null &&
+             request.resource.contentType.matches('image/.*');
+    }
+
+    function isReasonableImageSize() {
+      // 10 MB max per image upload.
+      return request.resource != null && request.resource.size < 10 * 1024 * 1024;
+    }
+
     // Allow authenticated users to manage their own profile photos and view others' photos
     match /profile_photos/{userId}/{allPaths=**} {
       // Allow users to read and write their own photos
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow write: if isSignedIn() &&
+                   request.auth.uid == userId &&
+                   isImageUpload() &&
+                   isReasonableImageSize();
       
       // Allow any authenticated user to read photos
-      allow read: if request.auth != null;
+      allow read: if isSignedIn();
     }
     
     // For users directory structure
     match /users/{userId}/{allPaths=**} {
       // Allow users to read and write their own photos
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow write: if isSignedIn() &&
+                   request.auth.uid == userId &&
+                   isImageUpload() &&
+                   isReasonableImageSize();
       
       // Allow any authenticated user to read photos
-      allow read: if request.auth != null;
+      allow read: if isSignedIn();
     }
     
-    // Event images - allow authenticated users to upload and read
+    // Event images (owner-scoped path): event_images/{ownerId}/{...}
+    match /event_images/{ownerId}/{allPaths=**} {
+      // Only the owner can upload/update/delete under their event image path.
+      allow write: if isSignedIn() &&
+                   request.auth.uid == ownerId &&
+                   isImageUpload() &&
+                   isReasonableImageSize();
+
+      // Any authenticated user can read published event media.
+      allow read: if isSignedIn();
+    }
+
+    // Legacy event image paths (without owner prefix) remain read-only.
     match /event_images/{allPaths=**} {
-      // Allow authenticated users to upload event images
-      allow write: if request.auth != null;
-      
-      // Allow any authenticated user to read event images
-      allow read: if request.auth != null;
+      allow read: if isSignedIn();
+      allow write: if false;
     }
     
     // Deny everything else

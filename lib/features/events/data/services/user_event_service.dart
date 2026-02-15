@@ -396,9 +396,9 @@ class UserEventService {
         log('✅ User authenticated: ${currentUser.uid}',
             name: 'UserEventService');
 
-        // Create unique filename
+        // Use owner-scoped path to enforce least-privilege storage rules.
         final fileName =
-            'event_images/${DateTime.now().millisecondsSinceEpoch}_${imagePath.split('/').last}';
+            'event_images/${currentUser.uid}/${DateTime.now().millisecondsSinceEpoch}_${imagePath.split('/').last}';
         log('📝 Target file path: $fileName', name: 'UserEventService');
         final ref = _storage.ref().child(fileName);
 

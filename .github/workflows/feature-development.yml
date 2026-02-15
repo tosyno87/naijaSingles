@@ -49,6 +49,12 @@ jobs:
       - name: Install root npm dependencies
         run: npm install
         
+      - name: Setup Java 21 for Firebase emulators
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+        
       - name: Run Firebase rules regression tests
         run: npm run test:rules
         

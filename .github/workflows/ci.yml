@@ -48,7 +48,7 @@ jobs:
         node-version: '20'
         
     - name: Install root npm dependencies
-      run: npm ci
+      run: npm install
       
     - name: Run Firebase rules regression tests
       run: npm run test:rules

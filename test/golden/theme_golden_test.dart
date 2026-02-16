@@ -2,82 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:naijasingles/common/constants/app_colors.dart';
+import 'package:naijasingles/common/constants/theme.dart';
 
 /// Golden tests for the AfroPeep design system.
 ///
-/// Visual tests render a standard widget swatch under light and dark themes
-/// so accidental color / contrast regressions are caught automatically.
+/// These tests call [MyThemes.buildLightTheme] / [MyThemes.buildDarkTheme]
+/// with a plain [TextTheme] (no GoogleFonts) so we validate the *exact same*
+/// production factory methods — colors, brightness, inputDecoration, appBar,
+/// buttons, card/divider colors — without triggering font downloads.
 ///
 /// Generate baselines:
 ///   flutter test --update-goldens test/golden/
 ///
 /// Subsequent CI runs compare against those baselines.
-///
-/// NOTE: Themes are built from AppColors tokens directly (no GoogleFonts) to
-/// avoid test-environment font download issues. The color tokens and brightness
-/// are identical to production; only the font family differs.
-
-/// Light theme mirroring production AppColors tokens.
-ThemeData _testLightTheme() => ThemeData(
-      brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.backgroundColor,
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.primaryGreen,
-        secondary: AppColors.accentGreen,
-        surface: AppColors.surfaceColor,
-        error: AppColors.error,
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: AppColors.textOnPrimary,
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryGreen,
-          side: const BorderSide(color: AppColors.primaryGreen, width: 2),
-        ),
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.backgroundColor,
-        foregroundColor: AppColors.textPrimary,
-      ),
-      dividerColor: AppColors.divider,
-      cardColor: AppColors.cardColor,
-    );
-
-/// Dark theme mirroring production AppColors dark tokens.
-ThemeData _testDarkTheme() => ThemeData(
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.darkBackground,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryGreenLight,
-        secondary: AppColors.accentGreen,
-        surface: AppColors.darkSurface,
-        error: AppColors.error,
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: AppColors.textOnPrimary,
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryGreenLight,
-          side: const BorderSide(color: AppColors.primaryGreenLight, width: 2),
-        ),
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.darkSurface,
-        foregroundColor: AppColors.darkTextPrimary,
-      ),
-      dividerColor: AppColors.darkDivider,
-      cardColor: AppColors.darkCard,
-    );
 
 void main() {
+  // ─── Build production themes with system fonts for testing ────────
+  // These call the SAME factory methods used by production code.
+  // The only difference is the TextTheme (system font vs Montserrat).
+  late ThemeData testLight;
+  late ThemeData testDark;
+
+  setUpAll(() {
+    const lightText = TextTheme(
+      displayLarge: TextStyle(
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.bold,
+      ),
+      bodyLarge: TextStyle(color: AppColors.textPrimary),
+      bodyMedium: TextStyle(color: AppColors.textSecondary),
+    );
+    const darkText = TextTheme(
+      displayLarge: TextStyle(
+        color: AppColors.darkTextPrimary,
+        fontWeight: FontWeight.bold,
+      ),
+      bodyLarge: TextStyle(color: AppColors.darkTextPrimary),
+      bodyMedium: TextStyle(color: AppColors.darkTextSecondary),
+    );
+
+    testLight = MyThemes.buildLightTheme(lightText);
+    testDark = MyThemes.buildDarkTheme(darkText);
+  });
+
   // ─── Visual golden tests ─────────────────────────────────────────
   group('Design system – golden swatch', () {
     Widget themed(ThemeData theme, Widget child) => MaterialApp(
@@ -193,7 +160,7 @@ void main() {
         );
 
     testWidgets('Light theme swatch', (tester) async {
-      await tester.pumpWidget(themed(_testLightTheme(), buildSwatch()));
+      await tester.pumpWidget(themed(testLight, buildSwatch()));
       await expectLater(
         find.byType(MaterialApp),
         matchesGoldenFile('goldens/light_theme_swatch.png'),
@@ -201,7 +168,7 @@ void main() {
     });
 
     testWidgets('Dark theme swatch', (tester) async {
-      await tester.pumpWidget(themed(_testDarkTheme(), buildSwatch()));
+      await tester.pumpWidget(themed(testDark, buildSwatch()));
       await expectLater(
         find.byType(MaterialApp),
         matchesGoldenFile('goldens/dark_theme_swatch.png'),
@@ -209,12 +176,75 @@ void main() {
     });
   });
 
-  // ─── Unit assertions on color tokens ─────────────────────────────
-  // NOTE: These tests validate AppColors directly (no GoogleFonts dependency).
-  // MyThemes is NOT accessed here because its GoogleFonts.montserratTextTheme()
-  // call fails in test environments without bundled font assets.
-  group('Design system – color token assertions', () {
-    test('AppColors dark tokens are properly defined', () {
+  // ─── Unit assertions on production theme factories ────────────────
+  // These call buildLightTheme / buildDarkTheme (the SAME code path as
+  // production) with a plain TextTheme to avoid GoogleFonts font loading.
+  group('Design system – production theme factory assertions', () {
+    test('buildLightTheme produces Brightness.light', () {
+      expect(testLight.brightness, Brightness.light);
+    });
+
+    test('buildDarkTheme produces Brightness.dark', () {
+      expect(testDark.brightness, Brightness.dark);
+    });
+
+    test('Light scaffold background matches AppColors.backgroundColor', () {
+      expect(testLight.scaffoldBackgroundColor, AppColors.backgroundColor);
+    });
+
+    test('Dark scaffold background matches AppColors.darkBackground', () {
+      expect(testDark.scaffoldBackgroundColor, AppColors.darkBackground);
+    });
+
+    test('Dark background differs from light background', () {
+      expect(
+        testDark.scaffoldBackgroundColor,
+        isNot(equals(testLight.scaffoldBackgroundColor)),
+      );
+    });
+
+    test('Light colorScheme.primary is AppColors.primaryGreen', () {
+      expect(testLight.colorScheme.primary, AppColors.primaryGreen);
+    });
+
+    test('Dark colorScheme.primary is AppColors.primaryGreenLight', () {
+      expect(testDark.colorScheme.primary, AppColors.primaryGreenLight);
+    });
+
+    test('Light and dark colorScheme primaries differ', () {
+      expect(
+        testLight.colorScheme.primary,
+        isNot(equals(testDark.colorScheme.primary)),
+      );
+    });
+
+    test('Dark card color matches AppColors.darkCard', () {
+      expect(testDark.cardColor, AppColors.darkCard);
+    });
+
+    test('Light card color matches AppColors.cardColor', () {
+      expect(testLight.cardColor, AppColors.cardColor);
+    });
+
+    test('Dark divider matches AppColors.darkDivider', () {
+      expect(testDark.dividerColor, AppColors.darkDivider);
+    });
+
+    test('Light appBar background matches AppColors.backgroundColor', () {
+      expect(
+        testLight.appBarTheme.backgroundColor,
+        AppColors.backgroundColor,
+      );
+    });
+
+    test('Dark appBar background matches AppColors.darkSurface', () {
+      expect(testDark.appBarTheme.backgroundColor, AppColors.darkSurface);
+    });
+  });
+
+  // ─── AppColors token sanity checks ────────────────────────────────
+  group('Design system – AppColors token values', () {
+    test('Dark tokens have correct hex values', () {
       expect(AppColors.darkBackground, const Color(0xFF121212));
       expect(AppColors.darkSurface, const Color(0xFF1E1E1E));
       expect(AppColors.darkCard, const Color(0xFF2C2C2C));
@@ -222,50 +252,16 @@ void main() {
       expect(AppColors.darkTextSecondary, const Color(0xFFA0A0A0));
     });
 
-    test('AppColors light tokens are properly defined', () {
+    test('Light tokens have correct values', () {
       expect(AppColors.backgroundColor, Colors.white);
       expect(AppColors.surfaceColor, Colors.white);
       expect(AppColors.cardColor, Colors.white);
       expect(AppColors.primaryGreen, const Color(0xFF008037));
     });
 
-    test('Dark background differs from light background', () {
-      expect(AppColors.darkBackground, isNot(equals(AppColors.backgroundColor)));
-    });
-
-    test('Dark text is readable on dark background', () {
-      // Dark text primary (0xFFE0E0E0) on dark background (0xFF121212)
-      // yields high contrast — just verify they're different.
-      expect(
-        AppColors.darkTextPrimary,
-        isNot(equals(AppColors.darkBackground)),
-      );
-    });
-
-    test('Light text is readable on light background', () {
-      // Text primary (0xFF2D2D2D) on white background — high contrast.
-      expect(AppColors.textPrimary, isNot(equals(AppColors.backgroundColor)));
-    });
-
     test('Nav colors are defined', () {
       expect(AppColors.navSelected, AppColors.primaryGreen);
       expect(AppColors.navUnselected, const Color(0xFF666666));
-    });
-
-    test('Test light theme matches AppColors tokens', () {
-      final theme = _testLightTheme();
-      expect(theme.brightness, Brightness.light);
-      expect(theme.scaffoldBackgroundColor, AppColors.backgroundColor);
-      expect(theme.cardColor, AppColors.cardColor);
-      expect(theme.colorScheme.primary, AppColors.primaryGreen);
-    });
-
-    test('Test dark theme matches AppColors tokens', () {
-      final theme = _testDarkTheme();
-      expect(theme.brightness, Brightness.dark);
-      expect(theme.scaffoldBackgroundColor, AppColors.darkBackground);
-      expect(theme.cardColor, AppColors.darkCard);
-      expect(theme.colorScheme.primary, AppColors.primaryGreenLight);
     });
   });
 }

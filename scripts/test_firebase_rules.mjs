@@ -1332,6 +1332,572 @@ async function run() {
     await assertFails(getDoc(doc(userBDb, 'security_logs/slog_a')));
     pass('security_logs: non-reporter cannot read log');
 
+    // ──────────────────────────────────────────────────────────────────────────
+    // Groups domain tests.
+    // Collections: unifiedGroups (+ messages), groups (legacy), groupChats
+    //   (+ messages), groupInvitations, user_group_notifications,
+    //   group_unread_counts, group_reports, Item_access
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Seed group documents.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+
+      // unifiedGroups
+      await setDoc(doc(db, 'unifiedGroups/ug1'), {
+        creatorId: 'userA',
+        adminIds: ['userA'],
+        memberIds: ['userA', 'userB'],
+        name: 'Diaspora Connect',
+      });
+      await setDoc(doc(db, 'unifiedGroups/ug1/messages/gm1'), {
+        senderId: 'userA',
+        text: 'Welcome!',
+        read: false,
+      });
+
+      // Legacy groups
+      await setDoc(doc(db, 'groups/g1'), {
+        creatorId: 'userA',
+        adminIds: ['userA'],
+        memberIds: ['userA', 'userB'],
+        isPublic: true,
+        name: 'Lagos Meetup',
+        memberCount: 2,
+      });
+
+      // groupChats
+      await setDoc(doc(db, 'groupChats/gc1'), {
+        creatorId: 'userA',
+        adminIds: ['userA'],
+        memberIds: ['userA', 'userB'],
+        name: 'Chat Group',
+        memberCount: 2,
+      });
+      await setDoc(doc(db, 'groupChats/gc1/messages/gcm1'), {
+        senderId: 'userA',
+        text: 'Group message',
+      });
+
+      // groupInvitations
+      await setDoc(doc(db, 'groupInvitations/inv1'), {
+        groupId: 'ug1',
+        invitedUserId: 'userB',
+        invitedByUserId: 'userA',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      });
+      await setDoc(doc(db, 'groupInvitations/inv_accepted'), {
+        groupId: 'ug1',
+        invitedUserId: 'userB',
+        invitedByUserId: 'userA',
+        status: 'accepted',
+        createdAt: new Date().toISOString(),
+      });
+
+      // user_group_notifications
+      await setDoc(doc(db, 'user_group_notifications/ugn_a'), {
+        userId: 'userA',
+        groupId: 'ug1',
+        isMuted: false,
+        updatedAt: new Date().toISOString(),
+      });
+
+      // group_unread_counts
+      await setDoc(doc(db, 'group_unread_counts/guc_a'), {
+        userId: 'userA',
+        groupId: 'ug1',
+        count: 3,
+        updatedAt: new Date().toISOString(),
+      });
+
+      // group_reports
+      await setDoc(doc(db, 'group_reports/gr_a'), {
+        groupId: 'ug1',
+        reporterId: 'userB',
+        reason: 'Spam content',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      });
+
+      // Item_access
+      await setDoc(doc(db, 'Item_access/config1'), {
+        feature: 'premium',
+        enabled: true,
+      });
+    });
+
+    // ── unifiedGroups collection ────────────────────────────────────────────
+
+    // Read: any authenticated user.
+    await assertSucceeds(getDoc(doc(userADb, 'unifiedGroups/ug1')));
+    pass('unifiedGroups: authenticated user can read group');
+
+    await assertSucceeds(getDoc(doc(otherUserDb, 'unifiedGroups/ug1')));
+    pass('unifiedGroups: non-member can read group');
+
+    await assertFails(getDoc(doc(unauthDb, 'unifiedGroups/ug1')));
+    pass('unifiedGroups: unauthenticated cannot read group');
+
+    // Create: creatorId must match auth.uid.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'unifiedGroups/ug_new'), {
+        creatorId: 'userB',
+        adminIds: ['userB'],
+        memberIds: ['userB'],
+        name: 'New Group',
+      }),
+    );
+    pass('unifiedGroups: user can create group with own creatorId');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'unifiedGroups/ug_spoof'), {
+        creatorId: 'userA',
+        adminIds: ['userA'],
+        memberIds: ['userA'],
+        name: 'Spoofed',
+      }),
+    );
+    pass('unifiedGroups: cannot create group with spoofed creatorId');
+
+    // Update: admin can update.
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'unifiedGroups/ug1'), { name: 'Updated Name' }),
+    );
+    pass('unifiedGroups: admin can update group');
+
+    // Update: non-admin/non-member cannot update arbitrary fields.
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'unifiedGroups/ug1'), { name: 'Hacked' }),
+    );
+    pass('unifiedGroups: non-admin cannot update group');
+
+    // Delete: only creator.
+    await assertFails(
+      deleteDoc(doc(userBDb, 'unifiedGroups/ug1')),
+    );
+    pass('unifiedGroups: non-creator cannot delete group');
+
+    // ── unifiedGroups messages subcollection ────────────────────────────────
+
+    // Read: members only.
+    await assertSucceeds(
+      getDoc(doc(userADb, 'unifiedGroups/ug1/messages/gm1')),
+    );
+    pass('unifiedGroups/messages: member can read messages');
+
+    await assertFails(
+      getDoc(doc(otherUserDb, 'unifiedGroups/ug1/messages/gm1')),
+    );
+    pass('unifiedGroups/messages: non-member cannot read messages');
+
+    // Create: member with matching senderId.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'unifiedGroups/ug1/messages/gm2'), {
+        senderId: 'userB',
+        text: 'Hello group!',
+      }),
+    );
+    pass('unifiedGroups/messages: member can create message with own senderId');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'unifiedGroups/ug1/messages/gm_spoof'), {
+        senderId: 'userA',
+        text: 'Spoofed',
+      }),
+    );
+    pass('unifiedGroups/messages: member cannot create message with spoofed senderId');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'unifiedGroups/ug1/messages/gm_intruder'), {
+        senderId: 'otherUser',
+        text: 'Intruder',
+      }),
+    );
+    pass('unifiedGroups/messages: non-member cannot create message');
+
+    // Update: member can update read/readBy only.
+    await assertSucceeds(
+      updateDoc(doc(userBDb, 'unifiedGroups/ug1/messages/gm1'), {
+        read: true,
+        readBy: ['userB'],
+      }),
+    );
+    pass('unifiedGroups/messages: member can update read status');
+
+    await assertFails(
+      updateDoc(doc(userBDb, 'unifiedGroups/ug1/messages/gm1'), {
+        text: 'Tampered',
+      }),
+    );
+    pass('unifiedGroups/messages: member cannot update message text');
+
+    // Delete: sender only.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'unifiedGroups/ug1/messages/gm_del'), {
+        senderId: 'userA',
+        text: 'Delete me',
+      });
+    });
+
+    await assertFails(
+      userBDb.doc('unifiedGroups/ug1/messages/gm_del').delete(),
+    );
+    pass('unifiedGroups/messages: non-sender cannot delete message');
+
+    await assertSucceeds(
+      userADb.doc('unifiedGroups/ug1/messages/gm_del').delete(),
+    );
+    pass('unifiedGroups/messages: sender can delete own message');
+
+    // ── groups (legacy) collection ──────────────────────────────────────────
+
+    // Read: any authenticated user (the open read rule overrides).
+    await assertSucceeds(getDoc(doc(otherUserDb, 'groups/g1')));
+    pass('groups (legacy): any authenticated user can read');
+
+    await assertFails(getDoc(doc(unauthDb, 'groups/g1')));
+    pass('groups (legacy): unauthenticated cannot read');
+
+    // Create: creatorId must match.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'groups/g_new'), {
+        creatorId: 'userB',
+        adminIds: ['userB'],
+        memberIds: ['userB'],
+        isPublic: true,
+        name: 'New Legacy Group',
+        memberCount: 1,
+      }),
+    );
+    pass('groups (legacy): user can create group');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'groups/g_spoof'), {
+        creatorId: 'userA',
+        adminIds: ['userA'],
+        memberIds: ['userA'],
+        isPublic: true,
+        name: 'Spoofed',
+        memberCount: 1,
+      }),
+    );
+    pass('groups (legacy): cannot create with spoofed creatorId');
+
+    // Delete: creator only.
+    await assertFails(
+      deleteDoc(doc(userBDb, 'groups/g1')),
+    );
+    pass('groups (legacy): non-creator cannot delete group');
+
+    // ── groupChats collection ───────────────────────────────────────────────
+
+    // Read: any authenticated user.
+    await assertSucceeds(getDoc(doc(otherUserDb, 'groupChats/gc1')));
+    pass('groupChats: any authenticated user can read');
+
+    // Create: creatorId must match.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'groupChats/gc_new'), {
+        creatorId: 'userB',
+        adminIds: ['userB'],
+        memberIds: ['userB'],
+        name: 'New Chat Group',
+        memberCount: 1,
+      }),
+    );
+    pass('groupChats: user can create group chat');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'groupChats/gc_spoof'), {
+        creatorId: 'userA',
+        adminIds: ['userA'],
+        memberIds: ['userA'],
+        name: 'Spoofed',
+        memberCount: 1,
+      }),
+    );
+    pass('groupChats: cannot create with spoofed creatorId');
+
+    // Delete: creator only.
+    await assertFails(
+      deleteDoc(doc(userBDb, 'groupChats/gc1')),
+    );
+    pass('groupChats: non-creator cannot delete group chat');
+
+    // ── groupChats messages subcollection ────────────────────────────────────
+
+    await assertSucceeds(
+      getDoc(doc(userADb, 'groupChats/gc1/messages/gcm1')),
+    );
+    pass('groupChats/messages: member can read messages');
+
+    await assertFails(
+      getDoc(doc(otherUserDb, 'groupChats/gc1/messages/gcm1')),
+    );
+    pass('groupChats/messages: non-member cannot read messages');
+
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'groupChats/gc1/messages/gcm2'), {
+        senderId: 'userB',
+        text: 'Hi from group chat!',
+      }),
+    );
+    pass('groupChats/messages: member can create message with own senderId');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'groupChats/gc1/messages/gcm_spoof'), {
+        senderId: 'userA',
+        text: 'Spoofed',
+      }),
+    );
+    pass('groupChats/messages: member cannot create with spoofed senderId');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'groupChats/gc1/messages/gcm_intruder'), {
+        senderId: 'otherUser',
+        text: 'Intruder',
+      }),
+    );
+    pass('groupChats/messages: non-member cannot create message');
+
+    // Delete: sender only.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'groupChats/gc1/messages/gcm_del'), {
+        senderId: 'userA',
+        text: 'Delete me',
+      });
+    });
+
+    await assertFails(
+      userBDb.doc('groupChats/gc1/messages/gcm_del').delete(),
+    );
+    pass('groupChats/messages: non-sender cannot delete message');
+
+    await assertSucceeds(
+      userADb.doc('groupChats/gc1/messages/gcm_del').delete(),
+    );
+    pass('groupChats/messages: sender can delete own message');
+
+    // ── groupInvitations collection ─────────────────────────────────────────
+
+    // Read: invitee or inviter.
+    await assertSucceeds(getDoc(doc(userBDb, 'groupInvitations/inv1')));
+    pass('groupInvitations: invitee can read invitation');
+
+    await assertSucceeds(getDoc(doc(userADb, 'groupInvitations/inv1')));
+    pass('groupInvitations: inviter can read invitation');
+
+    await assertFails(getDoc(doc(otherUserDb, 'groupInvitations/inv1')));
+    pass('groupInvitations: unrelated user cannot read invitation');
+
+    // Create: invitedByUserId must match, required fields, status must be pending.
+    await assertSucceeds(
+      setDoc(doc(userADb, 'groupInvitations/inv_new'), {
+        groupId: 'ug1',
+        invitedUserId: 'otherUser',
+        invitedByUserId: 'userA',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('groupInvitations: inviter can create valid invitation');
+
+    await assertFails(
+      setDoc(doc(userADb, 'groupInvitations/inv_spoof'), {
+        groupId: 'ug1',
+        invitedUserId: 'otherUser',
+        invitedByUserId: 'userB',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('groupInvitations: cannot create with spoofed invitedByUserId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'groupInvitations/inv_bad_status'), {
+        groupId: 'ug1',
+        invitedUserId: 'otherUser',
+        invitedByUserId: 'userA',
+        status: 'accepted',
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('groupInvitations: create rejected with non-pending status');
+
+    await assertFails(
+      setDoc(doc(userADb, 'groupInvitations/inv_nofields'), {
+        groupId: 'ug1',
+        invitedByUserId: 'userA',
+        status: 'pending',
+      }),
+    );
+    pass('groupInvitations: create rejected without required fields');
+
+    // Update: invitee only, only status fields, existing status must be pending.
+    await assertSucceeds(
+      updateDoc(doc(userBDb, 'groupInvitations/inv1'), {
+        status: 'accepted',
+        acceptedAt: new Date().toISOString(),
+      }),
+    );
+    pass('groupInvitations: invitee can accept pending invitation');
+
+    await assertFails(
+      updateDoc(doc(userADb, 'groupInvitations/inv1'), {
+        status: 'declined',
+      }),
+    );
+    pass('groupInvitations: inviter cannot update invitation');
+
+    // Already-accepted invitation cannot be updated again.
+    await assertFails(
+      updateDoc(doc(userBDb, 'groupInvitations/inv_accepted'), {
+        status: 'declined',
+      }),
+    );
+    pass('groupInvitations: cannot update already-accepted invitation');
+
+    // Delete: inviter only.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'groupInvitations/inv_del'), {
+        groupId: 'ug1',
+        invitedUserId: 'userB',
+        invitedByUserId: 'userA',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      });
+    });
+
+    await assertFails(
+      deleteDoc(doc(userBDb, 'groupInvitations/inv_del')),
+    );
+    pass('groupInvitations: invitee cannot delete invitation');
+
+    await assertSucceeds(
+      deleteDoc(doc(userADb, 'groupInvitations/inv_del')),
+    );
+    pass('groupInvitations: inviter can delete invitation');
+
+    // ── user_group_notifications collection ─────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'user_group_notifications/ugn_a')));
+    pass('user_group_notifications: owner can read own preferences');
+
+    await assertFails(getDoc(doc(userBDb, 'user_group_notifications/ugn_a')));
+    pass('user_group_notifications: non-owner cannot read preferences');
+
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'user_group_notifications/ugn_b'), {
+        userId: 'userB',
+        groupId: 'ug1',
+        isMuted: true,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+    pass('user_group_notifications: user can create own notification pref');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'user_group_notifications/ugn_spoof'), {
+        userId: 'userA',
+        groupId: 'ug1',
+        isMuted: true,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+    pass('user_group_notifications: cannot create with spoofed userId');
+
+    // ── group_unread_counts collection ──────────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'group_unread_counts/guc_a')));
+    pass('group_unread_counts: owner can read own unread count');
+
+    await assertFails(getDoc(doc(userBDb, 'group_unread_counts/guc_a')));
+    pass('group_unread_counts: non-owner cannot read unread count');
+
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'group_unread_counts/guc_b'), {
+        userId: 'userB',
+        groupId: 'ug1',
+        count: 0,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+    pass('group_unread_counts: user can create own unread count record');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'group_unread_counts/guc_spoof'), {
+        userId: 'userA',
+        groupId: 'ug1',
+        count: 0,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+    pass('group_unread_counts: cannot create with spoofed userId');
+
+    // ── group_reports collection ────────────────────────────────────────────
+
+    // Create: reporterId must match, required fields, status must be pending.
+    await assertSucceeds(
+      setDoc(doc(userADb, 'group_reports/gr_new'), {
+        groupId: 'ug1',
+        reporterId: 'userA',
+        reason: 'Offensive content',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('group_reports: user can create report with own reporterId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'group_reports/gr_spoof'), {
+        groupId: 'ug1',
+        reporterId: 'userB',
+        reason: 'Spoofed',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('group_reports: cannot create with spoofed reporterId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'group_reports/gr_bad_status'), {
+        groupId: 'ug1',
+        reporterId: 'userA',
+        reason: 'Test',
+        status: 'resolved',
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('group_reports: create rejected with non-pending status');
+
+    // Read: reporter can read own report.
+    await assertSucceeds(getDoc(doc(userBDb, 'group_reports/gr_a')));
+    pass('group_reports: reporter can read own report');
+
+    await assertFails(getDoc(doc(otherUserDb, 'group_reports/gr_a')));
+    pass('group_reports: unrelated user cannot read report');
+
+    // Group admin/creator can read reports for their group.
+    await assertSucceeds(getDoc(doc(userADb, 'group_reports/gr_a')));
+    pass('group_reports: group admin can read report for their group');
+
+    // ── Item_access collection ──────────────────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'Item_access/config1')));
+    pass('Item_access: authenticated user can read config');
+
+    await assertFails(getDoc(doc(unauthDb, 'Item_access/config1')));
+    pass('Item_access: unauthenticated cannot read config');
+
+    await assertFails(
+      setDoc(doc(userADb, 'Item_access/config_new'), { feature: 'hack' }),
+    );
+    pass('Item_access: users cannot write to config (read-only)');
+
     // ── catch-all rule ──────────────────────────────────────────────────────
 
     await assertFails(

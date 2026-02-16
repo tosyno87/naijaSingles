@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/app_config.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 
 class BlockByAdmin extends StatefulWidget {
   const BlockByAdmin({super.key});
@@ -42,12 +42,12 @@ class _BlockByAdminState extends State<BlockByAdmin> {
                     const Icon(
                       Icons.lock_outlined,
                       size: 80,
-                      color: primaryColor,
+                      color: AppColors.primaryGreen,
                     ),
                     Text(
                       'Oops'.tr().toString(),
                       style: const TextStyle(
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -58,7 +58,7 @@ class _BlockByAdminState extends State<BlockByAdmin> {
               const SizedBox(height: 20),
               Text(
                 "Sorry, you can't access the application!".tr().toString(),
-                style: const TextStyle(color: primaryColor, fontSize: 22),
+                style: const TextStyle(color: AppColors.primaryGreen, fontSize: 22),
               ),
               const SizedBox(height: 12),
               Text(

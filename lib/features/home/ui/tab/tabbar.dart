@@ -11,7 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/app_exit.dart';
 import '../../../../models/user_model.dart';
@@ -230,11 +230,11 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               automaticallyImplyLeading: false,
               title: TabBar(
                 labelColor:
-                    isDarkMode ? Colors.white : primaryColor,
+                    isDarkMode ? Colors.white : AppColors.primaryGreen,
                 unselectedLabelColor: isDarkMode
                     ? Colors.grey[400]
                     : Colors.grey[600],
-                indicatorColor: primaryColor,
+                indicatorColor: AppColors.primaryGreen,
                 indicatorWeight: 3,
                 labelStyle: const TextStyle(
                   fontSize: 14,

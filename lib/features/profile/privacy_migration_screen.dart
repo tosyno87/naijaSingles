@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../common/constants/colors.dart';
+import '../../common/constants/app_colors.dart';
 import '../../services/privacy_migration_service.dart';
 import 'privacy_settings_screen.dart';
 
@@ -82,7 +82,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       SnackBar(
         content:
             Text(message, style: GoogleFonts.montserrat(color: Colors.white)),
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -110,7 +110,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         backgroundColor: colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -118,7 +118,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
           style: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
       ),
@@ -149,21 +149,21 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    primaryColor.withValues(alpha: 0.1),
-                    primaryColor.withValues(alpha: 0.05),
+                    AppColors.primaryGreen.withValues(alpha: 0.1),
+                    AppColors.primaryGreen.withValues(alpha: 0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
               ),
               child: Column(
                 children: [
                   const Icon(
                     Icons.security_update_good,
                     size: 48,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -171,7 +171,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: textPrimary,
+                      color: AppColors.textPrimary,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -180,7 +180,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     'We\'ve upgraded our privacy system to give you better control over your personal information.',
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
-                      color: textSecondary,
+                      color: AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -241,7 +241,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               child: ElevatedButton(
                 onPressed: _isMigrating ? null : _startMigration,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
+                  backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -290,7 +290,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                 'Skip for Now',
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
-                  color: textSecondary,
+                  color: AppColors.textSecondary,
                 ),
               ),
             ),
@@ -308,7 +308,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
             const Icon(
               Icons.check_circle_outline,
               size: 80,
-              color: primaryColor,
+              color: AppColors.primaryGreen,
             ),
             const SizedBox(height: 24),
             Text(
@@ -316,7 +316,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               style: GoogleFonts.montserrat(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: textPrimary,
+                color: AppColors.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -325,7 +325,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               'Your profile has been updated with enhanced privacy protection. You can now control what information others can see about you.',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: textSecondary,
+                color: AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -343,7 +343,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
+                  backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -368,7 +368,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
         style: GoogleFonts.montserrat(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: textPrimary,
+          color: AppColors.textPrimary,
         ),
       );
 
@@ -376,7 +376,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: cardColor,
+          color: AppColors.cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -391,12 +391,12 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
             ),
@@ -410,7 +410,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: textPrimary,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -418,7 +418,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                     description,
                     style: GoogleFonts.montserrat(
                       fontSize: 14,
-                      color: textSecondary,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -431,7 +431,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
   Widget _buildInfoCard(String title, List<String> points) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: cardColor,
+          color: AppColors.cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -448,7 +448,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
               title,
               style: GoogleFonts.montserrat(
                 fontSize: 16,
-                color: textPrimary,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -463,7 +463,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                       width: 6,
                       height: 6,
                       decoration: const BoxDecoration(
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -473,7 +473,7 @@ class _PrivacyMigrationScreenState extends State<PrivacyMigrationScreen> {
                         point,
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
-                          color: textSecondary,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ),

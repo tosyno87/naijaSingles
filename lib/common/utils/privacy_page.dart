@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../bloc/theme/theme_bloc.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
   const PrivacyPolicyPage({required this.url, required this.tittle, super.key});
@@ -76,7 +76,7 @@ class PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
             if (loadingPercentage < 100)
               LinearProgressIndicator(
                 value: loadingPercentage / 100.0,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
               ),
           ],
         ),

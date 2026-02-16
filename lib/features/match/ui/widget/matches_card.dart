@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../../common/widgets/image_widget.dart';
@@ -45,7 +45,7 @@ class _MatchesState extends State<Matches> {
                 Text(
                   'New Matches'.tr().toString(),
                   style: const TextStyle(
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
@@ -126,7 +126,7 @@ class _MatchesState extends State<Matches> {
                                       borderRadius: BorderRadius.circular(15),
                                       border: Border.all(
                                         width: 2,
-                                        color: primaryColor,
+                                        color: AppColors.primaryGreen,
                                       ),
                                     ),
                                     child: ClipRRect(

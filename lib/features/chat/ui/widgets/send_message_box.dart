@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 import '../../../match/ui/widget/matches_card.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';
@@ -275,7 +275,7 @@ class _MessageBoxState extends State<MessageBox> {
 
   Widget _buildTextComposer() => IconTheme(
         data: IconThemeData(
-          color: _isWritting ? primaryColor : AppColors.secondaryColor,
+          color: _isWritting ? AppColors.primaryGreen : AppColors.secondaryColor,
         ),
         child: Card(
           elevation: 10,
@@ -295,7 +295,7 @@ class _MessageBoxState extends State<MessageBox> {
                 IconButton(
                   icon: const Icon(
                     Icons.photo_camera,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                   ),
                   onPressed: () async {
                     final ImagePicker imagePicker = ImagePicker();
@@ -366,7 +366,7 @@ class _MessageBoxState extends State<MessageBox> {
             size: 25,
           ),
         ),
-        color: primaryColor,
+        color: AppColors.primaryGreen,
         onPressed: _isWritting
             ? () => _sendText(_textController.text.trimRight())
             : null,

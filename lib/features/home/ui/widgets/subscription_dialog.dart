@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 
 import '../../../../models/user_model.dart';
 import '../../../payment/ui/products.dart';
@@ -24,7 +24,7 @@ Future<void> showSubscriptionDialog({
           children: [
             Text(
               'Subscription Required'.tr().toString(),
-              style: const TextStyle(fontSize: 18, color: primaryColor),
+              style: const TextStyle(fontSize: 18, color: AppColors.primaryGreen),
             ),
             const SizedBox(height: 10),
             Text(
@@ -43,7 +43,7 @@ Future<void> showSubscriptionDialog({
                   },
                   child: Text(
                     'No'.tr().toString(),
-                    style: const TextStyle(color: primaryColor),
+                    style: const TextStyle(color: AppColors.primaryGreen),
                   ),
                 ),
                 TextButton(
@@ -60,7 +60,7 @@ Future<void> showSubscriptionDialog({
                   },
                   child: Text(
                     'Yes'.tr().toString(),
-                    style: const TextStyle(color: primaryColor),
+                    style: const TextStyle(color: AppColors.primaryGreen),
                   ),
                 ),
               ],

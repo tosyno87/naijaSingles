@@ -1,3 +1,10 @@
+// ⚠️ DEPRECATED: Use the canonical version at
+// lib/features/groups/screens/group_details_screen.dart
+// This file uses the legacy GroupModel/GroupService. The canonical version
+// uses UnifiedGroup/UnifiedGroupService with richer features (notifications,
+// reporting, member invites, etc.).
+// TODO: Migrate callers (groups_screen.dart) to the canonical version,
+// then delete this file.
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -5,6 +12,7 @@ import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../models/group_model.dart';
 import '../../data/services/group_service.dart';
 
+@Deprecated('Use GroupDetailsScreen from groups/screens/ instead')
 class GroupDetailsScreen extends StatefulWidget {
   const GroupDetailsScreen({
     required this.group,

@@ -10,7 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 // Removed street view import - feature deleted
 
 import '../../common/bloc/theme/theme_bloc.dart';
-import '../../common/constants/colors.dart';
+import '../../common/constants/app_colors.dart';
 import '../../common/data/repo/user_location_repo.dart';
 import '../../models/user_model.dart';
 import 'bloc/explore_map_bloc.dart';
@@ -106,7 +106,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                             height: 25,
                             width: 25,
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(primaryColor),
+                              valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
                             ),
                           ),
                           Text(
@@ -152,14 +152,14 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                           Icon(
                             Icons.location_off,
                             size: 64,
-                            color: primaryColor,
+                            color: AppColors.primaryGreen,
                           ),
                           SizedBox(height: 16),
                           Text(
                             'No users found in this area',
                             style: TextStyle(
                               fontSize: 18,
-                              color: textPrimary,
+                              color: AppColors.textPrimary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -168,7 +168,7 @@ class _ExploreMapWidgetState extends State<ExploreMapWidget>
                             'Try expanding your search radius',
                             style: TextStyle(
                               fontSize: 14,
-                              color: textSecondary,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],

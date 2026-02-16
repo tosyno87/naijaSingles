@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/custom_toast.dart';
 import '../../../../common/widgets/image_widget.dart';
@@ -54,7 +54,7 @@ class Layout extends StatelessWidget {
                                     )
                                   : const Icon(
                                       Icons.done_all,
-                                      color: primaryColor,
+                                      color: AppColors.primaryGreen,
                                       size: 15,
                                     ),
                             ),
@@ -112,7 +112,7 @@ class Layout extends StatelessWidget {
                       color: isDarkMode
                           ? AppColors.secondaryColor
                               .withValues(alpha: (.5 * 255).toDouble())
-                          : primaryColor.withValues(
+                          : AppColors.primaryGreen.withValues(
                               alpha: (.1 * 255).toDouble(),
                             ),
                       borderRadius: BorderRadius.circular(15),
@@ -160,7 +160,7 @@ class Layout extends StatelessWidget {
                             else
                               const Icon(
                                 Icons.done_all,
-                                color: primaryColor,
+                                color: AppColors.primaryGreen,
                                 size: 15,
                               ),
                           ],

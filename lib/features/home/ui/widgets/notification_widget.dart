@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class NotificatioWidget extends StatelessWidget {
   const NotificatioWidget({super.key});
@@ -11,7 +11,7 @@ class NotificatioWidget extends StatelessWidget {
         title: Text(
           'App settings'.tr().toString(),
           style: const TextStyle(
-            color: primaryColor,
+            color: AppColors.primaryGreen,
             fontSize: 18,
             fontWeight: FontWeight.w500,
           ),
@@ -33,7 +33,7 @@ class NotificatioWidget extends StatelessWidget {
                         'Notifications'.tr().toString(),
                         style: const TextStyle(
                           fontSize: 18,
-                          color: primaryColor,
+                          color: AppColors.primaryGreen,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -47,7 +47,7 @@ class NotificatioWidget extends StatelessWidget {
                 const Icon(
                   Icons.edit_notifications_outlined,
                   size: 20,
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                 ),
               ],
             ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 
 class DistanceWidget extends StatefulWidget {
@@ -33,7 +33,7 @@ class _DistanceWidgetState extends State<DistanceWidget> {
             'Maximum distance'.tr().toString(),
             style: TextStyle(
               fontSize: 18,
-              color: isDarkMode ? Colors.white : primaryColor,
+              color: isDarkMode ? Colors.white : AppColors.primaryGreen,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -46,7 +46,7 @@ class _DistanceWidgetState extends State<DistanceWidget> {
             inactiveColor: AppColors.secondaryColor,
             min: 1,
             max: widget.max,
-            activeColor: isDarkMode ? Colors.white : primaryColor,
+            activeColor: isDarkMode ? Colors.white : AppColors.primaryGreen,
             onChanged: (val) {
               widget.changeValues.addAll({'maximum_distance': val.round()});
               setState(() {

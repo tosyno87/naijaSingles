@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 
 Future<bool> onWillPop(BuildContext context) async =>
     await showDialog(
@@ -14,14 +14,14 @@ Future<bool> onWillPop(BuildContext context) async =>
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'No'.tr().toString(),
-              style: const TextStyle(color: primaryColor),
+              style: const TextStyle(color: AppColors.primaryGreen),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
               'Yes'.tr().toString(),
-              style: const TextStyle(color: primaryColor),
+              style: const TextStyle(color: AppColors.primaryGreen),
             ),
           ),
         ],

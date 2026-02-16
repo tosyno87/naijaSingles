@@ -1,3 +1,8 @@
+// ⚠️ DEPRECATED: Use ModernNotificationsScreen from
+// modern_notifications_screen.dart instead.
+// This is the original basic implementation. The modern version has
+// skeleton loading, filtering, pull-to-refresh, and better UX.
+// TODO: Migrate callers to ModernNotificationsScreen, then delete this file.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -6,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'data/services/notification_service.dart';
 import 'notification_model.dart';
 
+@Deprecated('Use ModernNotificationsScreen from modern_notifications_screen.dart')
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 
 class CustomToast {
   static void showToast(
@@ -12,7 +12,7 @@ class CustomToast {
       msg: msg,
       toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.BOTTOM,
-      backgroundColor: primaryColor,
+      backgroundColor: AppColors.primaryGreen,
       textColor: Colors.white,
       fontSize: 16,
     );

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/theme/theme_bloc.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 
 class TextButtonWidget extends StatelessWidget {
   const TextButtonWidget({
@@ -36,7 +36,7 @@ class TextButtonWidget extends StatelessWidget {
                     style: TextStyle(
                       color: isDarkMode
                           ? Colors.white
-                          : primaryColor,
+                          : AppColors.primaryGreen,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
@@ -45,7 +45,7 @@ class TextButtonWidget extends StatelessWidget {
                 Icon(
                   icon,
                   size: 24,
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                 ),
               ],
             ),

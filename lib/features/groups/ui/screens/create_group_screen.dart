@@ -1,3 +1,9 @@
+// ⚠️ DEPRECATED: Use the canonical version at
+// lib/features/group_chat/screens/create_group_screen.dart
+// This file uses the legacy GroupService. The canonical version uses
+// UnifiedGroupService with image upload, validation, and tag input.
+// TODO: Migrate callers (groups_screen.dart) to the canonical version,
+// then delete this file.
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../common/constants/app_colors.dart';
@@ -5,6 +11,7 @@ import '../../../../common/widgets/custom_3d_icons.dart';
 import '../../../../models/group_model.dart';
 import '../../data/services/group_service.dart';
 
+@Deprecated('Use CreateGroupScreen from group_chat/screens/ instead')
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({super.key});
 

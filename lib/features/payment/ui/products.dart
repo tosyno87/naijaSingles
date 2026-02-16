@@ -16,7 +16,7 @@ import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../../common/constants/adds.dart';
-import '../../../common/constants/colors.dart';
+import '../../../common/constants/app_colors.dart';
 import '../../../common/constants/constants.dart';
 import '../../../common/data/repo/in_app_purchase_repo.dart';
 import '../../../common/bloc/theme/theme_bloc.dart';
@@ -189,7 +189,7 @@ class ProductsState extends State<Products> {
                 'Get our premium plans'.tr().toString(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
@@ -263,7 +263,7 @@ class ProductsState extends State<Products> {
                               child: const Center(
                                 child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    primaryColor,
+                                    AppColors.primaryGreen,
                                   ),
                                 ),
                               ),
@@ -292,7 +292,7 @@ class ProductsState extends State<Products> {
                                                     ? const Color(
                                                         0x33FFFFFF,
                                                       )
-                                                    : primaryColor,
+                                                    : AppColors.primaryGreen,
                                               ),
                                             ),
                                             child: Center(
@@ -489,10 +489,10 @@ class ProductsState extends State<Products> {
                   //                     begin: Alignment.topRight,
                   //                     end: Alignment.bottomLeft,
                   //                     colors: [
-                  //                       primaryColor.withValues(alpha: .5),
-                  //                       primaryColor.withValues(alpha: .8),
-                  //                       primaryColor,
-                  //                       primaryColor
+                  //                       AppColors.primaryGreen.withValues(alpha: .5),
+                  //                       AppColors.primaryGreen.withValues(alpha: .8),
+                  //                       AppColors.primaryGreen,
+                  //                       AppColors.primaryGreen
                   // ])),
                   //             height: MediaQuery.of(context).size.height * .055,
                   //             width: MediaQuery.of(context).size.width * .55,
@@ -592,10 +592,9 @@ class ProductsState extends State<Products> {
       decoration: selectedProduct == product
           ? BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context)
-                  .primaryColor
+              color: AppColors.primaryGreen
                   .withValues(alpha: (0.5 * 255).toDouble()),
-              border: Border.all(width: 2, color: primaryColor),
+              border: Border.all(width: 2, color: AppColors.primaryGreen),
             )
           : null,
       duration: const Duration(milliseconds: 500),
@@ -611,7 +610,7 @@ class ProductsState extends State<Products> {
                   ? isDarkMode
                       ? Colors.white
                       : Colors.black
-                  : primaryColor,
+                  : AppColors.primaryGreen,
               fontSize: 25,
               fontWeight: FontWeight.bold,
             ),
@@ -624,7 +623,7 @@ class ProductsState extends State<Products> {
                   ? isDarkMode
                       ? Colors.white
                       : Colors.black
-                  : primaryColor,
+                  : AppColors.primaryGreen,
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),
@@ -637,7 +636,7 @@ class ProductsState extends State<Products> {
                   ? isDarkMode
                       ? Colors.white
                       : Colors.black
-                  : primaryColor,
+                  : AppColors.primaryGreen,
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),

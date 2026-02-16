@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../common/constants/colors.dart';
+import '../../../common/constants/app_colors.dart';
 import '../../../models/user_model.dart';
 import '../bloc/match_bloc.dart';
 
@@ -113,8 +113,8 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    primaryColor.withValues(alpha: 0.9),
-                    primaryColor.withValues(alpha: 0.8),
+                    AppColors.primaryGreen.withValues(alpha: 0.9),
+                    AppColors.primaryGreen.withValues(alpha: 0.8),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -258,7 +258,7 @@ class _MatchNotificationDialogState extends State<MatchNotificationDialog>
                           onPressed: _goToChat,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            foregroundColor: primaryColor,
+                            foregroundColor: AppColors.primaryGreen,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),

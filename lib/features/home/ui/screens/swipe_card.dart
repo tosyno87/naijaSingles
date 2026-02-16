@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/widgets/image_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,7 +89,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                       child: Image.asset(
                         'asset/hookup4u-Logo-BP.png',
                         fit: BoxFit.contain,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                   ),
@@ -299,7 +299,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                 },
                                 icon: const Icon(
                                   Icons.arrow_upward,
-                                  color: primaryColor,
+                                  color: AppColors.primaryGreen,
                                 ),
                               ),
                             ),

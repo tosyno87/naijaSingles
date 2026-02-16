@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/bloc/streetview/streetview_bloc.dart';
 import '../../../../models/user_model.dart';
@@ -67,7 +67,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                     style: TextStyle(
                       color: isDarkMode
                           ? Colors.white
-                          : primaryColor,
+                          : AppColors.primaryGreen,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
@@ -77,11 +77,11 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                   child: selectedOption == 'None'
                       ? const Icon(
                           Icons.location_off_outlined,
-                          color: primaryColor,
+                          color: AppColors.primaryGreen,
                         )
                       : const Icon(
                           Icons.location_on_outlined,
-                          color: primaryColor,
+                          color: AppColors.primaryGreen,
                         ),
                   onTap: () {
                     final streetViewBloc = context.read<StreetViewBloc>();
@@ -134,7 +134,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                         children: <Widget>[
                                           for (UserModel user in matchedUsers)
                                             CheckboxListTile(
-                                              activeColor: primaryColor,
+                                              activeColor: AppColors.primaryGreen,
                                               title: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
@@ -176,7 +176,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                         'Everyone'.tr().toString(),
                                       ),
                                       value: 'Everyone',
-                                      activeColor: primaryColor,
+                                      activeColor: AppColors.primaryGreen,
                                       groupValue: selectedOption,
                                       onChanged: (String? value) {
                                         setState1(() {
@@ -190,7 +190,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                       title: Text(
                                         'My Matches'.tr().toString(),
                                       ),
-                                      activeColor: primaryColor,
+                                      activeColor: AppColors.primaryGreen,
                                       value: 'My Matches',
                                       groupValue: selectedOption,
                                       onChanged: (String? value) {
@@ -211,7 +211,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                             .tr()
                                             .toString(),
                                       ),
-                                      activeColor: primaryColor,
+                                      activeColor: AppColors.primaryGreen,
                                       value: 'Only',
                                       groupValue: selectedOption,
                                       onChanged: (String? value) {
@@ -223,7 +223,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                     ),
                                     RadioListTile<String>(
                                       title: Text('Nobody'.tr().toString()),
-                                      activeColor: primaryColor,
+                                      activeColor: AppColors.primaryGreen,
                                       value: 'None',
                                       groupValue: selectedOption,
                                       onChanged: (String? value) {
@@ -289,7 +289,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                 },
                                 child: Text(
                                   'Apply'.tr().toString(),
-                                  style: const TextStyle(color: primaryColor),
+                                  style: const TextStyle(color: AppColors.primaryGreen),
                                 ),
                               )
                             else if (selectedOption == 'Only' &&
@@ -310,7 +310,7 @@ class _StreetViewButtonWigdetState extends State<StreetViewButtonWigdet> {
                                 },
                                 child: Text(
                                   'Apply'.tr().toString(),
-                                  style: const TextStyle(color: primaryColor),
+                                  style: const TextStyle(color: AppColors.primaryGreen),
                                 ),
                               ),
                           ],

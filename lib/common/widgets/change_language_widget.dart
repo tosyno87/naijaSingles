@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/home/ui/tab/tabbar.dart';
 import '../bloc/language/language_bloc.dart';
 import '../bloc/theme/theme_bloc.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 import '../constants/constants.dart';
 
 class LanguageWidget extends StatefulWidget {
@@ -104,7 +104,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                         fontSize: 18,
                         color: isDarkMode
                             ? Colors.white
-                            : primaryColor,
+                            : AppColors.primaryGreen,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -113,8 +113,8 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                       child: Row(
                         children: [
                           DropdownButton<String>(
-                            iconDisabledColor: primaryColor,
-                            iconEnabledColor: primaryColor,
+                            iconDisabledColor: AppColors.primaryGreen,
+                            iconEnabledColor: AppColors.primaryGreen,
                             icon:
                                 const Icon(Icons.keyboard_arrow_down_outlined),
                             value: selectedLanguage,
@@ -263,7 +263,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
                                       style: TextStyle(
                                         color: isDarkMode
                                             ? Colors.white70
-                                            : primaryColor,
+                                            : AppColors.primaryGreen,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -282,7 +282,7 @@ class _LanguageWidgetState extends State<LanguageWidget> {
               return Center(
                 child: Text(
                   'Unable to load'.tr().toString(),
-                  style: const TextStyle(color: primaryColor),
+                  style: const TextStyle(color: AppColors.primaryGreen),
                 ),
               );
             }
@@ -310,14 +310,14 @@ void showChangeDialog(
           onPressed: () => Navigator.of(context).pop(false),
           child: Text(
             'No'.tr().toString(),
-            style: const TextStyle(color: primaryColor),
+            style: const TextStyle(color: AppColors.primaryGreen),
           ),
         ),
         TextButton(
           onPressed: onTap,
           child: Text(
             'Yes'.tr().toString(),
-            style: const TextStyle(color: primaryColor),
+            style: const TextStyle(color: AppColors.primaryGreen),
           ),
         ),
       ],

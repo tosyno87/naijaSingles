@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 import '../routes/route_name.dart';
 
 Future showWelcomDialog(context) async {
@@ -26,7 +26,7 @@ Future showWelcomDialog(context) async {
               Image.asset(
                 'asset/auth/verified.jpg',
                 height: 60,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 colorBlendMode: BlendMode.color,
               ),
               Text(

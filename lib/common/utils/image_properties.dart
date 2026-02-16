@@ -15,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../models/user_model.dart';
 import '../bloc/theme/theme_bloc.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 import '../constants/constants.dart';
 
 class ImageProperties {
@@ -131,7 +131,7 @@ class ImageProperties {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Crop',
-            toolbarColor: primaryColor,
+            toolbarColor: AppColors.primaryGreen,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: true,

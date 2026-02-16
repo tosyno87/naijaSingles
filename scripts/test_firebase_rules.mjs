@@ -415,6 +415,12 @@ async function run() {
         matchedAt: new Date().toISOString(),
       });
 
+      // Legacy Likes collection (capital L) - fully disabled
+      await setDoc(doc(db, 'Likes/legacy_like_ab'), {
+        from: 'userA',
+        to: 'userB',
+      });
+
       // Legacy top-level Matches collection
       await setDoc(doc(db, 'Matches/legacy_match_ab'), {
         users: ['userA', 'userB'],
@@ -501,6 +507,16 @@ async function run() {
       updateDoc(doc(userBDb, 'likes/like_ab'), { mutual: true }),
     );
     pass('likes: receiver can update the like (e.g. mutual flag)');
+
+    await assertFails(
+      updateDoc(doc(userBDb, 'likes/like_ab'), { from: 'userB' }),
+    );
+    pass('likes: participant cannot mutate the from field');
+
+    await assertFails(
+      updateDoc(doc(userADb, 'likes/like_ab'), { to: 'otherUser' }),
+    );
+    pass('likes: participant cannot mutate the to field');
 
     await assertFails(
       updateDoc(doc(otherUserDb, 'likes/like_ab'), { mutual: true }),
@@ -615,6 +631,16 @@ async function run() {
       deleteDoc(doc(userADb, 'matches/match_del')),
     );
     pass('matches: participant can delete (unmatch)');
+
+    // ── Legacy Likes collection (fully disabled) ──────────────────────────
+
+    await assertFails(getDoc(doc(userADb, 'Likes/legacy_like_ab')));
+    pass('Likes (legacy): reads are fully blocked');
+
+    await assertFails(
+      setDoc(doc(userADb, 'Likes/legacy_new'), { from: 'userA', to: 'userB' }),
+    );
+    pass('Likes (legacy): writes are fully blocked');
 
     // ── Legacy top-level Matches collection ─────────────────────────────────
 

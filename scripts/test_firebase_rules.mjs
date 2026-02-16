@@ -6,7 +6,7 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const projectId = 'naijasingles-rules-tests';
 
@@ -391,6 +391,403 @@ async function run() {
       }),
     );
     pass('Non-participant cannot write typing status');
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Discovery & matching domain tests.
+    // Collections: likes, matches, superLikes, swipeHistory,
+    //              superLikeUsage, undoUsage, Likes (legacy), Matches (legacy)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Seed existing documents for read/update/delete tests.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+
+      // likes collection
+      await setDoc(doc(db, 'likes/like_ab'), {
+        from: 'userA',
+        to: 'userB',
+        timestamp: new Date().toISOString(),
+      });
+
+      // matches collection
+      await setDoc(doc(db, 'matches/match_ab'), {
+        users: ['userA', 'userB'],
+        matchedAt: new Date().toISOString(),
+      });
+
+      // Legacy top-level Matches collection
+      await setDoc(doc(db, 'Matches/legacy_match_ab'), {
+        users: ['userA', 'userB'],
+      });
+
+      // superLikes collection
+      await setDoc(doc(db, 'superLikes/sl_ab'), {
+        fromUserId: 'userA',
+        toUserId: 'userB',
+        timestamp: new Date().toISOString(),
+      });
+
+      // swipeHistory collection
+      await setDoc(doc(db, 'swipeHistory/swipe_a1'), {
+        userId: 'userA',
+        targetUserId: 'userB',
+        direction: 'right',
+        timestamp: new Date().toISOString(),
+      });
+
+      // superLikeUsage collection
+      await setDoc(doc(db, 'superLikeUsage/slu_a'), {
+        userId: 'userA',
+        count: 1,
+      });
+
+      // undoUsage collection
+      await setDoc(doc(db, 'undoUsage/uu_a'), {
+        userId: 'userA',
+        count: 2,
+      });
+    });
+
+    // ── likes collection ────────────────────────────────────────────────────
+
+    // Create: requires ['from', 'to', 'timestamp'] and auth.
+    await assertSucceeds(
+      setDoc(doc(userADb, 'likes/like_ac'), {
+        from: 'userA',
+        to: 'otherUser',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('likes: authenticated user can create a like with required fields');
+
+    await assertFails(
+      setDoc(doc(userADb, 'likes/like_bad'), {
+        from: 'userA',
+        to: 'otherUser',
+      }),
+    );
+    pass('likes: create rejected without timestamp field');
+
+    await assertFails(
+      setDoc(doc(unauthDb, 'likes/like_unauth'), {
+        from: 'anon',
+        to: 'userA',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('likes: unauthenticated user cannot create a like');
+
+    // Read: only sender (from) or receiver (to) can read.
+    await assertSucceeds(getDoc(doc(userADb, 'likes/like_ab')));
+    pass('likes: sender can read their own like');
+
+    await assertSucceeds(getDoc(doc(userBDb, 'likes/like_ab')));
+    pass('likes: receiver can read a like sent to them');
+
+    await assertFails(getDoc(doc(otherUserDb, 'likes/like_ab')));
+    pass('likes: unrelated user cannot read the like');
+
+    // Update: only involved parties (from or to).
+    await assertSucceeds(
+      updateDoc(doc(userBDb, 'likes/like_ab'), { mutual: true }),
+    );
+    pass('likes: receiver can update the like (e.g. mutual flag)');
+
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'likes/like_ab'), { mutual: true }),
+    );
+    pass('likes: unrelated user cannot update the like');
+
+    // Delete: only the sender (from) can delete.
+    await assertFails(
+      deleteDoc(doc(userBDb, 'likes/like_ab')),
+    );
+    pass('likes: receiver cannot delete the like');
+
+    await assertFails(
+      deleteDoc(doc(otherUserDb, 'likes/like_ab')),
+    );
+    pass('likes: unrelated user cannot delete the like');
+
+    // Seed a disposable like for sender-delete test.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'likes/like_del'), {
+        from: 'userA',
+        to: 'userB',
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    await assertSucceeds(
+      deleteDoc(doc(userADb, 'likes/like_del')),
+    );
+    pass('likes: sender can delete their own like');
+
+    // ── matches collection ──────────────────────────────────────────────────
+
+    // Create: requires ['users', 'matchedAt'], users.size() == 2, auth.
+    await assertSucceeds(
+      setDoc(doc(userADb, 'matches/match_ac'), {
+        users: ['userA', 'otherUser'],
+        matchedAt: new Date().toISOString(),
+      }),
+    );
+    pass('matches: participant can create a match with 2 users and matchedAt');
+
+    await assertFails(
+      setDoc(doc(userADb, 'matches/match_triple'), {
+        users: ['userA', 'userB', 'otherUser'],
+        matchedAt: new Date().toISOString(),
+      }),
+    );
+    pass('matches: create rejected with more than 2 users');
+
+    await assertFails(
+      setDoc(doc(userADb, 'matches/match_nots'), {
+        users: ['userA', 'userB'],
+      }),
+    );
+    pass('matches: create rejected without matchedAt field');
+
+    // NOTE: The matches create rule is intentionally permissive -- any
+    // authenticated user can create a structurally valid match. Match
+    // verification (ensuring both users consented) is handled at the
+    // application level, not in Firestore rules. This avoids complex
+    // cross-document lookups in rules that would hurt performance.
+    await assertSucceeds(
+      setDoc(doc(otherUserDb, 'matches/match_proxy'), {
+        users: ['userA', 'userB'],
+        matchedAt: new Date().toISOString(),
+      }),
+    );
+    pass('matches: any auth user can create structurally valid match (app-level verification)');
+
+    await assertFails(
+      setDoc(doc(unauthDb, 'matches/match_unauth'), {
+        users: ['userA', 'userB'],
+        matchedAt: new Date().toISOString(),
+      }),
+    );
+    pass('matches: unauthenticated user cannot create a match');
+
+    // Read: only users in the match.
+    await assertSucceeds(getDoc(doc(userADb, 'matches/match_ab')));
+    pass('matches: participant (userA) can read their match');
+
+    await assertSucceeds(getDoc(doc(userBDb, 'matches/match_ab')));
+    pass('matches: participant (userB) can read their match');
+
+    await assertFails(getDoc(doc(otherUserDb, 'matches/match_ab')));
+    pass('matches: non-participant cannot read the match');
+
+    // Update: only participants.
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'matches/match_ab'), { lastInteraction: 'now' }),
+    );
+    pass('matches: participant can update their match');
+
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'matches/match_ab'), { lastInteraction: 'now' }),
+    );
+    pass('matches: non-participant cannot update the match');
+
+    // Delete: only participants.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'matches/match_del'), {
+        users: ['userA', 'userB'],
+        matchedAt: new Date().toISOString(),
+      });
+    });
+
+    await assertFails(
+      deleteDoc(doc(otherUserDb, 'matches/match_del')),
+    );
+    pass('matches: non-participant cannot delete the match');
+
+    await assertSucceeds(
+      deleteDoc(doc(userADb, 'matches/match_del')),
+    );
+    pass('matches: participant can delete (unmatch)');
+
+    // ── Legacy top-level Matches collection ─────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'Matches/legacy_match_ab')));
+    pass('Matches (legacy): participant can read');
+
+    await assertFails(getDoc(doc(otherUserDb, 'Matches/legacy_match_ab')));
+    pass('Matches (legacy): non-participant cannot read');
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'Matches/legacy_match_ac'), {
+        users: ['userA', 'otherUser'],
+      }),
+    );
+    pass('Matches (legacy): participant can create');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'Matches/legacy_match_spoof'), {
+        users: ['userA', 'userB'],
+      }),
+    );
+    pass('Matches (legacy): non-participant cannot create');
+
+    // ── superLikes collection ───────────────────────────────────────────────
+
+    // Create: fromUserId must match auth.uid, requires ['fromUserId', 'toUserId', 'timestamp'].
+    await assertSucceeds(
+      setDoc(doc(userADb, 'superLikes/sl_ac'), {
+        fromUserId: 'userA',
+        toUserId: 'otherUser',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('superLikes: sender can create with valid fromUserId and required fields');
+
+    await assertFails(
+      setDoc(doc(userADb, 'superLikes/sl_spoof'), {
+        fromUserId: 'userB',
+        toUserId: 'otherUser',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('superLikes: cannot create with spoofed fromUserId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'superLikes/sl_bad'), {
+        fromUserId: 'userA',
+        toUserId: 'userB',
+      }),
+    );
+    pass('superLikes: create rejected without timestamp');
+
+    // Read: sender or receiver.
+    await assertSucceeds(getDoc(doc(userADb, 'superLikes/sl_ab')));
+    pass('superLikes: sender can read their super like');
+
+    await assertSucceeds(getDoc(doc(userBDb, 'superLikes/sl_ab')));
+    pass('superLikes: receiver can read a super like sent to them');
+
+    await assertFails(getDoc(doc(otherUserDb, 'superLikes/sl_ab')));
+    pass('superLikes: unrelated user cannot read the super like');
+
+    // Update: sender can update status, receiver can respond.
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'superLikes/sl_ab'), { status: 'cancelled' }),
+    );
+    pass('superLikes: sender can update their super like (status change)');
+
+    await assertSucceeds(
+      updateDoc(doc(userBDb, 'superLikes/sl_ab'), { responded: true }),
+    );
+    pass('superLikes: receiver can update the super like (respond)');
+
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'superLikes/sl_ab'), { status: 'hacked' }),
+    );
+    pass('superLikes: unrelated user cannot update the super like');
+
+    // ── swipeHistory collection ─────────────────────────────────────────────
+
+    // Create: userId must match auth.uid, requires ['userId', 'targetUserId', 'direction', 'timestamp'].
+    await assertSucceeds(
+      setDoc(doc(userADb, 'swipeHistory/swipe_a2'), {
+        userId: 'userA',
+        targetUserId: 'otherUser',
+        direction: 'left',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('swipeHistory: user can create their own swipe record');
+
+    await assertFails(
+      setDoc(doc(userADb, 'swipeHistory/swipe_spoof'), {
+        userId: 'userB',
+        targetUserId: 'otherUser',
+        direction: 'right',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('swipeHistory: cannot create swipe with spoofed userId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'swipeHistory/swipe_bad'), {
+        userId: 'userA',
+        targetUserId: 'userB',
+      }),
+    );
+    pass('swipeHistory: create rejected without direction and timestamp');
+
+    // Read: owner only.
+    await assertSucceeds(getDoc(doc(userADb, 'swipeHistory/swipe_a1')));
+    pass('swipeHistory: owner can read their own swipe record');
+
+    await assertFails(getDoc(doc(userBDb, 'swipeHistory/swipe_a1')));
+    pass('swipeHistory: other user cannot read swipe history');
+
+    // Update: owner only (for undo).
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'swipeHistory/swipe_a1'), { undone: true }),
+    );
+    pass('swipeHistory: owner can update their swipe (undo operation)');
+
+    await assertFails(
+      updateDoc(doc(userBDb, 'swipeHistory/swipe_a1'), { undone: true }),
+    );
+    pass('swipeHistory: other user cannot update swipe history');
+
+    // ── superLikeUsage collection ───────────────────────────────────────────
+
+    // Create: any authenticated user.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'superLikeUsage/slu_b'), {
+        userId: 'userB',
+        count: 0,
+      }),
+    );
+    pass('superLikeUsage: authenticated user can create usage record');
+
+    await assertFails(
+      setDoc(doc(unauthDb, 'superLikeUsage/slu_anon'), {
+        userId: 'anon',
+        count: 0,
+      }),
+    );
+    pass('superLikeUsage: unauthenticated user cannot create usage record');
+
+    // Read: owner only.
+    await assertSucceeds(getDoc(doc(userADb, 'superLikeUsage/slu_a')));
+    pass('superLikeUsage: owner can read their own usage');
+
+    await assertFails(getDoc(doc(userBDb, 'superLikeUsage/slu_a')));
+    pass('superLikeUsage: other user cannot read usage record');
+
+    // ── undoUsage collection ────────────────────────────────────────────────
+
+    // Create: any authenticated user.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'undoUsage/uu_b'), {
+        userId: 'userB',
+        count: 0,
+      }),
+    );
+    pass('undoUsage: authenticated user can create usage record');
+
+    await assertFails(
+      setDoc(doc(unauthDb, 'undoUsage/uu_anon'), {
+        userId: 'anon',
+        count: 0,
+      }),
+    );
+    pass('undoUsage: unauthenticated user cannot create usage record');
+
+    // Read: owner only.
+    await assertSucceeds(getDoc(doc(userADb, 'undoUsage/uu_a')));
+    pass('undoUsage: owner can read their own usage');
+
+    await assertFails(getDoc(doc(userBDb, 'undoUsage/uu_a')));
+    pass('undoUsage: other user cannot read usage record');
 
     // Storage owner path tests.
     const ownerStorage = testEnv.authenticatedContext('owner1').storage();

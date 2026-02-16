@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class SwipeButtons extends StatelessWidget {
   const SwipeButtons({

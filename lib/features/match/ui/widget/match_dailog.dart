@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/bloc/searchuser_bloc.dart';
 
@@ -50,7 +50,7 @@ class MAtchState extends State<MatchedPage> {
                 "It's a match\n With ${widget.name} ".tr().toString(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                   fontSize: 30,
                   fontWeight: FontWeight.w600,
                   decoration: TextDecoration.none,

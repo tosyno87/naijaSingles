@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/custom_snackbar.dart';

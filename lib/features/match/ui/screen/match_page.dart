@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 import '../../../blockUser/screen/block_userlist.dart';
 import '../../../chat/ui/widgets/recent_chats.dart';
@@ -85,7 +85,7 @@ class MatchScreenState extends State<MatchScreen> {
                   child: Column(
                     children: [
                       TabBar(
-                        labelColor: primaryColor,
+                        labelColor: AppColors.primaryGreen,
                         indicatorColor: AppColors.secondaryColor,
                         indicatorWeight: 1,
                         unselectedLabelColor: AppColors.secondaryColor,

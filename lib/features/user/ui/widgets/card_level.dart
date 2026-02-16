@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 
 const _labelAngle = math.pi / 2 * 0.2;
 
@@ -16,7 +16,7 @@ class CardLabel extends StatelessWidget {
   });
 
   factory CardLabel.right() => CardLabel._(
-        color: primaryColor,
+        color: AppColors.primaryGreen,
         label: 'LIKE'.tr().toString(),
         angle: -_labelAngle,
         alignment: Alignment.topLeft,
@@ -30,14 +30,14 @@ class CardLabel extends StatelessWidget {
       );
 
   factory CardLabel.up() => CardLabel._(
-        color: primaryColor,
+        color: AppColors.primaryGreen,
         label: 'UP'.tr().toString(),
         angle: _labelAngle,
         alignment: const Alignment(0, 0.5),
       );
 
   factory CardLabel.down() => CardLabel._(
-        color: primaryColor,
+        color: AppColors.primaryGreen,
         label: 'DOWN'.tr().toString(),
         angle: -_labelAngle,
         alignment: const Alignment(0, -0.75),

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../common/constants/colors.dart'; // Import MVP colors
+import '../../common/constants/app_colors.dart'; // Import MVP colors
 import '../../models/user_model.dart'; // Import UserModel
 import '../../services/settings_service.dart'; // Import settings service for blocking
 import '../dating/screens/user_detail_screen.dart'; // Import for profile viewing
@@ -107,13 +107,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     return Scaffold(
       backgroundColor: colorScheme.background, // Use MVP background color
       appBar: AppBar(
-        backgroundColor: cardColor, // Use MVP card color
+        backgroundColor: AppColors.cardColor, // Use MVP card color
         elevation: 1,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios,
-            color: primaryColor,
+            color: AppColors.primaryGreen,
           ), // Use MVP primary color
           onPressed: () => Navigator.pop(context),
         ),
@@ -145,7 +145,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                         // Use Montserrat for MVP
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: textPrimary, // Use MVP text color
+                        color: AppColors.textPrimary, // Use MVP text color
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -153,7 +153,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                       'Tap to view profile',
                       style: GoogleFonts.montserrat(
                         fontSize: 11,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                   ],
@@ -164,11 +164,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline, color: primaryColor),
+            icon: const Icon(Icons.info_outline, color: AppColors.primaryGreen),
             onPressed: _showUserProfile,
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: primaryColor),
+            icon: const Icon(Icons.more_vert, color: AppColors.primaryGreen),
             onSelected: (value) {
               switch (value) {
                 case 'block':
@@ -263,7 +263,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                           style: GoogleFonts.montserrat(
                             // Use Montserrat for MVP
                             fontSize: 14,
-                            color: primaryColor, // Use MVP primary color
+                            color: AppColors.primaryGreen, // Use MVP primary color
                           ),
                         ),
                       ],
@@ -371,7 +371,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: _hasText ? primaryColor : Colors.grey[300],
+                      color: _hasText ? AppColors.primaryGreen : Colors.grey[300],
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -449,7 +449,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: isMe ? primaryColor : Colors.white,
+                  color: isMe ? AppColors.primaryGreen : Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(20),
                     topRight: const Radius.circular(20),
@@ -666,13 +666,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const CircularProgressIndicator(color: primaryColor),
+                const CircularProgressIndicator(color: AppColors.primaryGreen),
                 const SizedBox(height: 16),
                 Text(
                   'Loading profile...',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
-                    color: textPrimary,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -762,12 +762,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: (color ?? primaryColor).withValues(alpha: 0.1),
+                color: (color ?? AppColors.primaryGreen).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: color ?? primaryColor,
+                color: color ?? AppColors.primaryGreen,
                 size: 28,
               ),
             ),
@@ -776,7 +776,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               label,
               style: GoogleFonts.montserrat(
                 fontSize: 12,
-                color: color ?? primaryColor,
+                color: color ?? AppColors.primaryGreen,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -941,13 +941,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           'Report ${widget.userName}?',
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
-            color: textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
         content: Text(
           'Help us keep the community safe by reporting inappropriate behavior.',
           style: GoogleFonts.montserrat(
-            color: textSecondary,
+            color: AppColors.textSecondary,
             height: 1.4,
           ),
         ),
@@ -990,13 +990,13 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           'Clear Chat History?',
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
-            color: textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
         content: Text(
           'This will delete all messages in this conversation. This action cannot be undone.',
           style: GoogleFonts.montserrat(
-            color: textSecondary,
+            color: AppColors.textSecondary,
             height: 1.4,
           ),
         ),
@@ -1037,7 +1037,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
           message,
           style: GoogleFonts.montserrat(color: Colors.white),
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -1087,12 +1087,12 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
               height: 50,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const CircularProgressIndicator(
                 strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
               ),
             ),
             const SizedBox(height: 20),

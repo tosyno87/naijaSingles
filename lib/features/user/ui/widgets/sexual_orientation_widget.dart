@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 
 class FirebasesexualDataWidget extends StatelessWidget {
   const FirebasesexualDataWidget({required this.data, super.key});

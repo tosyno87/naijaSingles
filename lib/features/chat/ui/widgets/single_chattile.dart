@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../models/chat_model.dart';
 import '../../../../models/user_model.dart';
@@ -36,7 +36,7 @@ class SingleChatTile extends StatelessWidget {
         color: chat.senderId != currentUser.id && !chat.isRead
             ? isDarkMode
                 ? Theme.of(context).scaffoldBackgroundColor
-                : primaryColor.withValues(alpha: (.1 * 255).toDouble())
+                : AppColors.primaryGreen.withValues(alpha: (.1 * 255).toDouble())
             : isDarkMode
                 ? Theme.of(context)
                     .scaffoldBackgroundColor
@@ -142,7 +142,7 @@ class SingleChatTile extends StatelessWidget {
                             width: 45,
                             height: 18,
                             decoration: BoxDecoration(
-                              color: primaryColor,
+                              color: AppColors.primaryGreen,
                               borderRadius: BorderRadius.circular(30),
                             ),
                             alignment: Alignment.center,
@@ -166,7 +166,7 @@ class SingleChatTile extends StatelessWidget {
                                 )
                               : const Icon(
                                   Icons.done_all,
-                                  color: primaryColor,
+                                  color: AppColors.primaryGreen,
                                   size: 15,
                                 )
                         else

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../models/user_model.dart';
 import '../../../home/controllers/home_controller.dart';
@@ -38,7 +38,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
           widget.stackController?.dispose();
           return const Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(primaryColor),
+              valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
             ),
           );
         }
@@ -79,7 +79,7 @@ class _SwipeCardListState extends State<SwipeCardList> {
                               child: Image.asset(
                                 'asset/hookup4u-Logo-BP.png',
                                 fit: BoxFit.contain,
-                                color: primaryColor,
+                                color: AppColors.primaryGreen,
                               ),
                             ),
                           ),

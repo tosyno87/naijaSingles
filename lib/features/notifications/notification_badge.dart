@@ -1,3 +1,6 @@
+// ⚠️ DEPRECATED: Use ModernNotificationBadge (or AppBarNotificationBadge /
+// BottomNavNotificationBadge) from modern_notification_badge.dart instead.
+// TODO: Remove this file once no callers remain.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,6 +10,7 @@ import 'data/services/notification_service.dart';
 import 'notifications_screen.dart';
 
 /// A widget that displays a notification icon with a badge for unread notifications
+@Deprecated('Use ModernNotificationBadge from modern_notification_badge.dart')
 class NotificationBadge extends StatelessWidget {
   const NotificationBadge({
     super.key,

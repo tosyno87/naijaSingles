@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../models/user_model.dart';
@@ -50,8 +50,8 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
   @override
   Widget build(BuildContext context) => Card(
         child: ExpansionTile(
-          iconColor: primaryColor,
-          textColor: primaryColor,
+          iconColor: AppColors.primaryGreen,
+          textColor: AppColors.primaryGreen,
           key: UniqueKey(),
           leading: Text(
             'Current location :'.tr().toString(),
@@ -75,7 +75,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                 children: <Widget>[
                   const Icon(
                     Icons.location_on,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                     size: 20,
                   ),
                   InkWell(
@@ -83,7 +83,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                       'Change location'.tr().toString(),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -179,7 +179,7 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
               ),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(primaryColor),
+                  backgroundColor: WidgetStateProperty.all<Color>(AppColors.primaryGreen),
                 ),
                 child: Text(
                   'Confirm'.tr().toString(),
@@ -222,8 +222,8 @@ class _UpdateAddressWidgetState extends State<UpdateAddressWidget> {
                                     Image.asset(
                                       'asset/auth/verified.jpg',
                                       height: 60,
-                                      color: primaryColor,
-                                      colorBlendMode: BlendMode.color,
+color: AppColors.primaryGreen,
+                                    colorBlendMode: BlendMode.color,
                                     ),
                                     Text(
                                       'location\nchanged'.tr().toString(),

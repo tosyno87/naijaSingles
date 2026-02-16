@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
 
@@ -63,7 +63,7 @@ Future<Map<String, dynamic>?> showLocationDialog(
                           onPressed: () => Navigator.pop(context),
                           child: Text(
                             'No'.tr().toString(),
-                            style: const TextStyle(color: primaryColor),
+                            style: const TextStyle(color: AppColors.primaryGreen),
                           ),
                         ),
                         TextButton(
@@ -82,7 +82,7 @@ Future<Map<String, dynamic>?> showLocationDialog(
                           },
                           child: Text(
                             'Yes'.tr().toString(),
-                            style: const TextStyle(color: primaryColor),
+                            style: const TextStyle(color: AppColors.primaryGreen),
                           ),
                         ),
                       ],

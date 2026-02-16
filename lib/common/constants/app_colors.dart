@@ -103,6 +103,15 @@ class AppColors {
   static const Color iconBackgroundColor =
       Color(0xFFDFF5E2); // Light green for icon background
 
+  // 🌙 DARK MODE COLORS
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color darkSurface = Color(0xFF1E1E1E);
+  static const Color darkCard = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFE0E0E0);
+  static const Color darkTextSecondary = Color(0xFFA0A0A0);
+  static const Color darkBorder = Color(0xFF3A3A3A);
+  static const Color darkDivider = Color(0xFF3A3A3A);
+
   // 📱 NAVIGATION COLORS - Afrocentric Theme
   static const Color navSelected = Color(0xFF008037); // Green for active
   static const Color navUnselected = Color(0xFF666666); // Grey for inactive

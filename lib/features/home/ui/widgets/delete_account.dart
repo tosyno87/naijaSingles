@@ -8,7 +8,7 @@ import '../../../../common/widgets/custom_snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/facebooklogin_repo.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
@@ -72,7 +72,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                     },
                     child: Text(
                       'No'.tr().toString(),
-                      style: const TextStyle(color: primaryColor),
+                      style: const TextStyle(color: AppColors.primaryGreen),
                     ),
                   ),
                   TextButton(
@@ -83,7 +83,7 @@ class _DeleteAccountWidgetState extends State<DeleteAccountWidget> {
                     },
                     child: Text(
                       'Yes'.tr().toString(),
-                      style: const TextStyle(color: primaryColor),
+                      style: const TextStyle(color: AppColors.primaryGreen),
                     ),
                   ),
                 ],

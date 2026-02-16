@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 import '../bloc/theme/theme_bloc.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 import 'crop_image.dart';
 
 abstract class UploadMedia {
@@ -192,7 +192,7 @@ class _SelectMedia extends StatelessWidget {
                   },
                   icon: const Icon(
                     FontAwesomeIcons.cameraRetro,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                   ),
                   label: Text(
                     'Camera'.tr().toString(),
@@ -210,7 +210,7 @@ class _SelectMedia extends StatelessWidget {
                       getContentFromSource(context, ImageSource.gallery),
                   icon: const Icon(
                     FontAwesomeIcons.images,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                   ),
                   label: Text(
                     'Gallery'.tr().toString(),

@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/data/repo/pagination_repo.dart';
 import '../../../../common/data/repo/user_messaging_repo.dart';

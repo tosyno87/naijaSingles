@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/user/user_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../services/secure_storage_service.dart';
@@ -47,7 +47,7 @@ void showLogoutDialog(BuildContext context) {
           onPressed: () => Navigator.of(context).pop(false),
           child: Text(
             'No'.tr().toString(),
-            style: const TextStyle(color: primaryColor),
+            style: const TextStyle(color: AppColors.primaryGreen),
           ),
         ),
         TextButton(
@@ -69,7 +69,7 @@ void showLogoutDialog(BuildContext context) {
           },
           child: Text(
             'Yes'.tr().toString(),
-            style: const TextStyle(color: primaryColor),
+            style: const TextStyle(color: AppColors.primaryGreen),
           ),
         ),
       ],

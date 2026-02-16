@@ -7,7 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/constants/constants.dart';
 // Calling functionality temporarily disabled
 // // Calling functionality removed
@@ -135,7 +135,7 @@ class ChatPageState extends State<ChatPage> {
                           Icons.flag_outlined,
                           color: isDarkMode
                               ? Colors.white
-                              : primaryColor,
+                              : AppColors.primaryGreen,
                           size: 20,
                         ),
                         const SizedBox(
@@ -159,7 +159,7 @@ class ChatPageState extends State<ChatPage> {
                         Icons.block_outlined,
                         color: isDarkMode
                             ? Colors.white
-                            : primaryColor,
+                            : AppColors.primaryGreen,
                         size: 20,
                       ),
                       const SizedBox(
@@ -197,7 +197,7 @@ class ChatPageState extends State<ChatPage> {
                               onPressed: () => Navigator.of(context).pop(false),
                               child: Text(
                                 'No'.tr().toString(),
-                                style: const TextStyle(color: primaryColor),
+                                style: const TextStyle(color: AppColors.primaryGreen),
                               ),
                             ),
                             TextButton(
@@ -261,7 +261,7 @@ class ChatPageState extends State<ChatPage> {
                               },
                               child: Text(
                                 'Yes'.tr().toString(),
-                                style: const TextStyle(color: primaryColor),
+                                style: const TextStyle(color: AppColors.primaryGreen),
                               ),
                             ),
                           ],
@@ -283,7 +283,7 @@ class ChatPageState extends State<ChatPage> {
                           'Unmatch'.tr().toString(),
                           style: const TextStyle(
                             fontSize: 18,
-                            color: primaryColor,
+                            color: AppColors.primaryGreen,
                           ),
                         ),
                         content: Text(
@@ -299,7 +299,7 @@ class ChatPageState extends State<ChatPage> {
                             onPressed: () => Navigator.of(context).pop(false),
                             child: Text(
                               'No'.tr().toString(),
-                              style: const TextStyle(color: primaryColor),
+                              style: const TextStyle(color: AppColors.primaryGreen),
                             ),
                           ),
                           TextButton(
@@ -335,7 +335,7 @@ class ChatPageState extends State<ChatPage> {
                             },
                             child: Text(
                               'Yes'.tr().toString(),
-                              style: const TextStyle(color: primaryColor),
+                              style: const TextStyle(color: AppColors.primaryGreen),
                             ),
                           ),
                         ],
@@ -348,7 +348,7 @@ class ChatPageState extends State<ChatPage> {
                         Icons.cancel_outlined,
                         color: isDarkMode
                             ? Colors.white
-                            : primaryColor,
+                            : AppColors.primaryGreen,
                         size: 20,
                       ),
                       const SizedBox(

@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/data/repo/user_location_repo.dart';
 import '../../../../common/widgets/custom_button.dart';
 import '../../../../common/widgets/hookup_circularbar.dart';
@@ -143,7 +143,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                               },
                               child: Text(
                                 'No'.tr().toString(),
-                                style: const TextStyle(color: primaryColor),
+                                style: const TextStyle(color: AppColors.primaryGreen),
                               ),
                             ),
                             TextButton(
@@ -167,7 +167,7 @@ class UpdateLocationState extends State<UpdateLocation> {
                               },
                               child: Text(
                                 'Yes'.tr().toString(),
-                                style: const TextStyle(color: primaryColor),
+                                style: const TextStyle(color: AppColors.primaryGreen),
                               ),
                             ),
                           ],

@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../common/constants/colors.dart';
+import '../../common/constants/app_colors.dart';
 import '../../models/user_model.dart';
 import '../payment/ui/products.dart';
 
@@ -75,7 +75,7 @@ class PremiumDialog extends StatelessWidget {
                     const Icon(
                       Icons.error_outline,
                       size: 50,
-                      color: primaryColor,
+                      color: AppColors.primaryGreen,
                     ),
                     Text(
                       'This feature requires a subscription. Do you want to subscribe to our plan?'
@@ -93,7 +93,7 @@ class PremiumDialog extends StatelessWidget {
                       child: Icon(
                         Icons.lock_outline,
                         size: 120,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                     ElevatedButton(
@@ -108,7 +108,7 @@ class PremiumDialog extends StatelessWidget {
                       },
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
-                          primaryColor.withValues(
+                          AppColors.primaryGreen.withValues(
                               alpha: (0.9 * 255).toDouble()),
                         ),
                       ),

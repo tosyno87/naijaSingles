@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 
 class Hookup4uBar extends StatelessWidget {
   const Hookup4uBar({super.key});
@@ -8,7 +8,7 @@ class Hookup4uBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Center(
         child: CircularProgressIndicator(
-          color: primaryColor,
+          color: AppColors.primaryGreen,
         ),
       );
 }

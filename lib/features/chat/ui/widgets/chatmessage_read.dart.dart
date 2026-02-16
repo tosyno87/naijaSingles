@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/custom_toast.dart';
 import '../../../../common/widgets/image_widget.dart';

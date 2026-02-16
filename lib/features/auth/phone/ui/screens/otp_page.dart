@@ -532,7 +532,7 @@ class _OtpPageState extends State<OtpPage> {
                             _hasNavigated = true;
                             Navigator.pushReplacementNamed(
                               context,
-                              RouteName.tabScreen,
+                              RouteName.mainNavigation,
                             );
                           }
                         } else if (state is PhoneAuthError) {

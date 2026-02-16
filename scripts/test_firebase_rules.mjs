@@ -789,6 +789,561 @@ async function run() {
     await assertFails(getDoc(doc(userBDb, 'undoUsage/uu_a')));
     pass('undoUsage: other user cannot read usage record');
 
+    // ──────────────────────────────────────────────────────────────────────────
+    // Events domain tests.
+    // Collections: events, eventRSVPs, userEvents, user_rsvps,
+    //              event_attendees, event_moderation
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Seed events and related documents.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+
+      await setDoc(doc(db, 'events/evt_published'), {
+        name: 'Afro Night',
+        description: 'Live music event',
+        startDate: '2026-03-01',
+        endDate: '2026-03-02',
+        createdByUserId: 'userA',
+        status: 'published',
+      });
+
+      await setDoc(doc(db, 'events/evt_draft'), {
+        name: 'Draft Event',
+        description: 'Not published yet',
+        startDate: '2026-04-01',
+        endDate: '2026-04-02',
+        createdByUserId: 'userA',
+        status: 'draft',
+      });
+
+      await setDoc(doc(db, 'eventRSVPs/rsvp_a'), {
+        userId: 'userA',
+        eventId: 'evt_published',
+        status: 'going',
+        timestamp: new Date().toISOString(),
+      });
+
+      await setDoc(doc(db, 'userEvents/userA'), { count: 1 });
+      await setDoc(doc(db, 'userEvents/userA/events/evt_published'), { name: 'Afro Night' });
+
+      await setDoc(doc(db, 'user_rsvps/userA'), { count: 1 });
+      await setDoc(doc(db, 'user_rsvps/userA/events/evt_published'), { status: 'going' });
+
+      await setDoc(doc(db, 'event_attendees/evt_published/attendees/userB'), {
+        status: 'going',
+      });
+
+      await setDoc(doc(db, 'event_moderation/evt_published'), {
+        status: 'approved',
+      });
+    });
+
+    // ── events collection ───────────────────────────────────────────────────
+
+    // Read: any authenticated user.
+    await assertSucceeds(getDoc(doc(userADb, 'events/evt_published')));
+    pass('events: authenticated user can read published event');
+
+    await assertSucceeds(getDoc(doc(otherUserDb, 'events/evt_published')));
+    pass('events: non-creator can read event');
+
+    await assertFails(getDoc(doc(unauthDb, 'events/evt_published')));
+    pass('events: unauthenticated user cannot read event');
+
+    // Create: createdByUserId must match auth.uid, required fields + validation.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'events/evt_new'), {
+        name: 'New Event',
+        description: 'A new event',
+        startDate: '2026-05-01',
+        endDate: '2026-05-02',
+        createdByUserId: 'userB',
+        status: 'draft',
+      }),
+    );
+    pass('events: user can create event with own createdByUserId');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'events/evt_spoof'), {
+        name: 'Spoofed',
+        description: 'Spoofed event',
+        startDate: '2026-05-01',
+        endDate: '2026-05-02',
+        createdByUserId: 'userA',
+        status: 'draft',
+      }),
+    );
+    pass('events: cannot create event with spoofed createdByUserId');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'events/evt_noname'), {
+        name: '',
+        description: 'Missing name',
+        startDate: '2026-05-01',
+        endDate: '2026-05-02',
+        createdByUserId: 'userB',
+        status: 'draft',
+      }),
+    );
+    pass('events: create rejected with empty name');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'events/evt_nofields'), {
+        name: 'Partial',
+        createdByUserId: 'userB',
+      }),
+    );
+    pass('events: create rejected without required fields');
+
+    // Update: only creator, cannot change createdByUserId.
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'events/evt_published'), {
+        description: 'Updated description',
+      }),
+    );
+    pass('events: creator can update their event');
+
+    await assertFails(
+      updateDoc(doc(userBDb, 'events/evt_published'), {
+        description: 'Hacked',
+      }),
+    );
+    pass('events: non-creator cannot update event');
+
+    await assertFails(
+      updateDoc(doc(userADb, 'events/evt_published'), {
+        createdByUserId: 'userB',
+      }),
+    );
+    pass('events: creator cannot change createdByUserId');
+
+    // Delete: only creator.
+    await assertFails(
+      deleteDoc(doc(userBDb, 'events/evt_draft')),
+    );
+    pass('events: non-creator cannot delete event');
+
+    await assertSucceeds(
+      deleteDoc(doc(userADb, 'events/evt_draft')),
+    );
+    pass('events: creator can delete their event');
+
+    // ── eventRSVPs collection ───────────────────────────────────────────────
+
+    // Read: RSVP owner or event creator.
+    await assertSucceeds(getDoc(doc(userADb, 'eventRSVPs/rsvp_a')));
+    pass('eventRSVPs: RSVP owner can read their RSVP');
+
+    // Event creator (userA created evt_published) can also read.
+    // (Already tested implicitly since userA is both RSVP owner and event creator.)
+
+    await assertFails(getDoc(doc(otherUserDb, 'eventRSVPs/rsvp_a')));
+    pass('eventRSVPs: unrelated user cannot read RSVP');
+
+    // Create: userId must match auth, event must exist and be published, required fields.
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'eventRSVPs/rsvp_b'), {
+        userId: 'userB',
+        eventId: 'evt_published',
+        status: 'going',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('eventRSVPs: user can RSVP to a published event');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'eventRSVPs/rsvp_spoof'), {
+        userId: 'userA',
+        eventId: 'evt_published',
+        status: 'going',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('eventRSVPs: cannot RSVP with spoofed userId');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'eventRSVPs/rsvp_nofields'), {
+        userId: 'userB',
+        eventId: 'evt_published',
+      }),
+    );
+    pass('eventRSVPs: create rejected without required fields');
+
+    // Update: owner only, cannot change userId or eventId.
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'eventRSVPs/rsvp_a'), {
+        status: 'maybe',
+      }),
+    );
+    pass('eventRSVPs: owner can update RSVP status');
+
+    await assertFails(
+      updateDoc(doc(userADb, 'eventRSVPs/rsvp_a'), {
+        userId: 'userB',
+      }),
+    );
+    pass('eventRSVPs: cannot change userId on update');
+
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'eventRSVPs/rsvp_a'), {
+        status: 'not going',
+      }),
+    );
+    pass('eventRSVPs: non-owner cannot update RSVP');
+
+    // Delete: owner only.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'eventRSVPs/rsvp_del'), {
+        userId: 'userA',
+        eventId: 'evt_published',
+        status: 'going',
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    await assertFails(
+      deleteDoc(doc(otherUserDb, 'eventRSVPs/rsvp_del')),
+    );
+    pass('eventRSVPs: non-owner cannot delete RSVP');
+
+    await assertSucceeds(
+      deleteDoc(doc(userADb, 'eventRSVPs/rsvp_del')),
+    );
+    pass('eventRSVPs: owner can delete their RSVP');
+
+    // ── userEvents collection ───────────────────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'userEvents/userA')));
+    pass('userEvents: owner can read own events');
+
+    await assertFails(getDoc(doc(userBDb, 'userEvents/userA')));
+    pass('userEvents: non-owner cannot read events');
+
+    await assertSucceeds(getDoc(doc(userADb, 'userEvents/userA/events/evt_published')));
+    pass('userEvents: owner can read own events subcollection');
+
+    await assertFails(getDoc(doc(userBDb, 'userEvents/userA/events/evt_published')));
+    pass('userEvents: non-owner cannot read events subcollection');
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'userEvents/userA/events/evt_new'), { name: 'New' }),
+    );
+    pass('userEvents: owner can write to own events subcollection');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'userEvents/userA/events/evt_hack'), { name: 'Hack' }),
+    );
+    pass('userEvents: non-owner cannot write to events subcollection');
+
+    // ── user_rsvps collection ───────────────────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'user_rsvps/userA')));
+    pass('user_rsvps: owner can read own RSVPs');
+
+    await assertFails(getDoc(doc(userBDb, 'user_rsvps/userA')));
+    pass('user_rsvps: non-owner cannot read RSVPs');
+
+    await assertSucceeds(getDoc(doc(userADb, 'user_rsvps/userA/events/evt_published')));
+    pass('user_rsvps: owner can read own RSVP events subcollection');
+
+    await assertFails(getDoc(doc(userBDb, 'user_rsvps/userA/events/evt_published')));
+    pass('user_rsvps: non-owner cannot read RSVP events subcollection');
+
+    // ── event_attendees collection ──────────────────────────────────────────
+
+    // Attendee can read/write own attendance.
+    await assertSucceeds(
+      getDoc(doc(userBDb, 'event_attendees/evt_published/attendees/userB')),
+    );
+    pass('event_attendees: attendee can read own attendance');
+
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'event_attendees/evt_published/attendees/userB'), {
+        status: 'not going',
+      }),
+    );
+    pass('event_attendees: attendee can write own attendance');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'event_attendees/evt_published/attendees/userB'), {
+        status: 'hacked',
+      }),
+    );
+    pass('event_attendees: non-attendee cannot write another attendance');
+
+    // Event creator can read attendees.
+    await assertSucceeds(
+      getDoc(doc(userADb, 'event_attendees/evt_published/attendees/userB')),
+    );
+    pass('event_attendees: event creator can read attendees');
+
+    // ── event_moderation collection ─────────────────────────────────────────
+
+    // Event creator can read moderation status.
+    await assertSucceeds(
+      getDoc(doc(userADb, 'event_moderation/evt_published')),
+    );
+    pass('event_moderation: event creator can read moderation status');
+
+    await assertFails(
+      getDoc(doc(otherUserDb, 'event_moderation/evt_published')),
+    );
+    pass('event_moderation: non-creator cannot read moderation status');
+
+    // Any authenticated user can create/update (system-level).
+    await assertSucceeds(
+      setDoc(doc(userBDb, 'event_moderation/evt_mod_new'), {
+        status: 'pending',
+      }),
+    );
+    pass('event_moderation: authenticated user can create moderation record');
+
+    await assertFails(
+      setDoc(doc(unauthDb, 'event_moderation/evt_mod_unauth'), {
+        status: 'pending',
+      }),
+    );
+    pass('event_moderation: unauthenticated user cannot create moderation record');
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Remaining collections: reports, feedback, chats (legacy),
+    //   notificationSettings, userSettings, accountDeletions, security_logs
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Seed remaining documents.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+
+      await setDoc(doc(db, 'reports/report_a'), {
+        reporterId: 'userA',
+        reportedUserId: 'userB',
+        reason: 'Spam',
+        timestamp: new Date().toISOString(),
+      });
+
+      await setDoc(doc(db, 'feedback/fb_a'), {
+        userId: 'userA',
+        message: 'Great app!',
+      });
+
+      await setDoc(doc(db, 'chats/chat_ab'), {
+        users: ['userA', 'userB'],
+        lastMessage: 'Hey',
+      });
+
+      await setDoc(doc(db, 'notificationSettings/userA'), {
+        pushEnabled: true,
+      });
+
+      await setDoc(doc(db, 'userSettings/userA'), {
+        theme: 'dark',
+      });
+
+      await setDoc(doc(db, 'accountDeletions/del_a'), {
+        userId: 'userA',
+        reason: 'Moving on',
+      });
+
+      await setDoc(doc(db, 'security_logs/slog_a'), {
+        reporterId: 'userA',
+        action: 'reported_user',
+      });
+    });
+
+    // ── reports collection ──────────────────────────────────────────────────
+
+    // Create: reporterId must match auth, required fields, reason non-empty.
+    await assertSucceeds(
+      setDoc(doc(userADb, 'reports/report_new'), {
+        reporterId: 'userA',
+        reportedUserId: 'otherUser',
+        reason: 'Inappropriate',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('reports: user can create report with own reporterId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'reports/report_spoof'), {
+        reporterId: 'userB',
+        reportedUserId: 'otherUser',
+        reason: 'Spoofed',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('reports: cannot create report with spoofed reporterId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'reports/report_empty'), {
+        reporterId: 'userA',
+        reportedUserId: 'otherUser',
+        reason: '',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('reports: create rejected with empty reason');
+
+    await assertFails(
+      setDoc(doc(userADb, 'reports/report_nofields'), {
+        reporterId: 'userA',
+        reason: 'Missing fields',
+      }),
+    );
+    pass('reports: create rejected without required fields');
+
+    // Read: reporter only.
+    await assertSucceeds(getDoc(doc(userADb, 'reports/report_a')));
+    pass('reports: reporter can read their own report');
+
+    await assertFails(getDoc(doc(userBDb, 'reports/report_a')));
+    pass('reports: other user cannot read report');
+
+    // ── feedback collection ─────────────────────────────────────────────────
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'feedback/fb_new'), {
+        userId: 'userA',
+        message: 'Love it!',
+      }),
+    );
+    pass('feedback: user can create own feedback');
+
+    await assertFails(
+      setDoc(doc(userADb, 'feedback/fb_spoof'), {
+        userId: 'userB',
+        message: 'Spoofed feedback',
+      }),
+    );
+    pass('feedback: cannot create feedback with spoofed userId');
+
+    await assertSucceeds(getDoc(doc(userADb, 'feedback/fb_a')));
+    pass('feedback: user can read own feedback');
+
+    await assertFails(getDoc(doc(userBDb, 'feedback/fb_a')));
+    pass('feedback: other user cannot read feedback');
+
+    // ── chats (legacy) collection ───────────────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'chats/chat_ab')));
+    pass('chats (legacy): participant can read chat');
+
+    await assertFails(getDoc(doc(otherUserDb, 'chats/chat_ab')));
+    pass('chats (legacy): non-participant cannot read chat');
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'chats/chat_new'), {
+        users: ['userA', 'otherUser'],
+        lastMessage: '',
+      }),
+    );
+    pass('chats (legacy): participant can create chat');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'chats/chat_spoof'), {
+        users: ['userA', 'userB'],
+        lastMessage: '',
+      }),
+    );
+    pass('chats (legacy): non-participant cannot create chat');
+
+    // ── notificationSettings collection ─────────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'notificationSettings/userA')));
+    pass('notificationSettings: owner can read own settings');
+
+    await assertFails(getDoc(doc(userBDb, 'notificationSettings/userA')));
+    pass('notificationSettings: non-owner cannot read settings');
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'notificationSettings/userA'), { pushEnabled: false }),
+    );
+    pass('notificationSettings: owner can write own settings');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'notificationSettings/userA'), { pushEnabled: false }),
+    );
+    pass('notificationSettings: non-owner cannot write settings');
+
+    // ── userSettings collection ─────────────────────────────────────────────
+
+    await assertSucceeds(getDoc(doc(userADb, 'userSettings/userA')));
+    pass('userSettings: owner can read own settings');
+
+    await assertFails(getDoc(doc(userBDb, 'userSettings/userA')));
+    pass('userSettings: non-owner cannot read settings');
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'userSettings/userA'), { theme: 'light' }),
+    );
+    pass('userSettings: owner can write own settings');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'userSettings/userA'), { theme: 'hacked' }),
+    );
+    pass('userSettings: non-owner cannot write settings');
+
+    // ── accountDeletions collection ─────────────────────────────────────────
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'accountDeletions/del_new'), {
+        userId: 'userA',
+        reason: 'Testing',
+      }),
+    );
+    pass('accountDeletions: user can create own deletion record');
+
+    await assertFails(
+      setDoc(doc(userADb, 'accountDeletions/del_spoof'), {
+        userId: 'userB',
+        reason: 'Spoofed',
+      }),
+    );
+    pass('accountDeletions: cannot create deletion with spoofed userId');
+
+    await assertSucceeds(getDoc(doc(userADb, 'accountDeletions/del_a')));
+    pass('accountDeletions: user can read own deletion record');
+
+    await assertFails(getDoc(doc(userBDb, 'accountDeletions/del_a')));
+    pass('accountDeletions: other user cannot read deletion record');
+
+    // ── security_logs collection ────────────────────────────────────────────
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'security_logs/slog_new'), {
+        reporterId: 'userA',
+        action: 'flagged_content',
+      }),
+    );
+    pass('security_logs: authenticated user can create log');
+
+    await assertFails(
+      setDoc(doc(unauthDb, 'security_logs/slog_unauth'), {
+        reporterId: 'anon',
+        action: 'hack',
+      }),
+    );
+    pass('security_logs: unauthenticated user cannot create log');
+
+    await assertSucceeds(getDoc(doc(userADb, 'security_logs/slog_a')));
+    pass('security_logs: reporter can read own log');
+
+    await assertFails(getDoc(doc(userBDb, 'security_logs/slog_a')));
+    pass('security_logs: non-reporter cannot read log');
+
+    // ── catch-all rule ──────────────────────────────────────────────────────
+
+    await assertFails(
+      setDoc(doc(userADb, 'nonexistent_collection/doc1'), { data: 'test' }),
+    );
+    pass('catch-all: writes to undefined collections are blocked');
+
+    await assertFails(
+      getDoc(doc(userADb, 'nonexistent_collection/doc1')),
+    );
+    pass('catch-all: reads from undefined collections are blocked');
+
     // Storage owner path tests.
     const ownerStorage = testEnv.authenticatedContext('owner1').storage();
     await assertSucceeds(

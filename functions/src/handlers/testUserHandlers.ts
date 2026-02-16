@@ -75,14 +75,22 @@ export class TestUserHandlers {
     timeoutSeconds: 540, // Max timeout (9 minutes) for large batches
   }).https.onRequest(async (req: functions.https.Request, res: functions.Response): Promise<void> => {
       try {
-        // 1. Authentication check
+        // 1. Authentication check — fail closed if no secret is configured.
         const authHeader = req.headers.authorization;
-        // Read from Firebase Functions config (set via firebase functions:config:set)
-        // Falls back to environment variable, then default dev secret
         const adminSecret = functions.config().admin?.secret || 
-                           process.env.ADMIN_SECRET || 
-                           'dev-secret-change-in-production';
+                           process.env.ADMIN_SECRET;
         
+        if (!adminSecret) {
+          functions.logger.error(
+            'ADMIN_SECRET is not configured. Set it via: firebase functions:config:set admin.secret="YOUR_SECRET"',
+          );
+          res.status(503).json({
+            success: false,
+            message: 'Service unavailable. Admin secret is not configured.',
+          });
+          return;
+        }
+
         if (!authHeader || authHeader !== `Bearer ${adminSecret}`) {
           res.status(401).json({
             success: false,

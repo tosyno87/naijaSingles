@@ -450,7 +450,7 @@ async function run() {
 
     // ── likes collection ────────────────────────────────────────────────────
 
-    // Create: requires ['from', 'to', 'timestamp'] and auth.
+    // Create: from must match auth.uid, requires ['from', 'to', 'timestamp'].
     await assertSucceeds(
       setDoc(doc(userADb, 'likes/like_ac'), {
         from: 'userA',
@@ -458,7 +458,16 @@ async function run() {
         timestamp: new Date().toISOString(),
       }),
     );
-    pass('likes: authenticated user can create a like with required fields');
+    pass('likes: user can create a like with from matching auth.uid');
+
+    await assertFails(
+      setDoc(doc(userADb, 'likes/like_forged'), {
+        from: 'userB',
+        to: 'otherUser',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('likes: cannot create a like with forged from field');
 
     await assertFails(
       setDoc(doc(userADb, 'likes/like_bad'), {
@@ -550,18 +559,14 @@ async function run() {
     );
     pass('matches: create rejected without matchedAt field');
 
-    // NOTE: The matches create rule is intentionally permissive -- any
-    // authenticated user can create a structurally valid match. Match
-    // verification (ensuring both users consented) is handled at the
-    // application level, not in Firestore rules. This avoids complex
-    // cross-document lookups in rules that would hurt performance.
-    await assertSucceeds(
-      setDoc(doc(otherUserDb, 'matches/match_proxy'), {
+    // Matches create now requires auth.uid in users array (ownership check).
+    await assertFails(
+      setDoc(doc(otherUserDb, 'matches/match_forged'), {
         users: ['userA', 'userB'],
         matchedAt: new Date().toISOString(),
       }),
     );
-    pass('matches: any auth user can create structurally valid match (app-level verification)');
+    pass('matches: non-participant cannot create a match between other users');
 
     await assertFails(
       setDoc(doc(unauthDb, 'matches/match_unauth'), {
@@ -739,14 +744,22 @@ async function run() {
 
     // ── superLikeUsage collection ───────────────────────────────────────────
 
-    // Create: any authenticated user.
+    // Create: userId must match auth.uid.
     await assertSucceeds(
       setDoc(doc(userBDb, 'superLikeUsage/slu_b'), {
         userId: 'userB',
         count: 0,
       }),
     );
-    pass('superLikeUsage: authenticated user can create usage record');
+    pass('superLikeUsage: user can create own usage record');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'superLikeUsage/slu_spoof'), {
+        userId: 'userA',
+        count: 0,
+      }),
+    );
+    pass('superLikeUsage: cannot create usage record with spoofed userId');
 
     await assertFails(
       setDoc(doc(unauthDb, 'superLikeUsage/slu_anon'), {
@@ -765,14 +778,22 @@ async function run() {
 
     // ── undoUsage collection ────────────────────────────────────────────────
 
-    // Create: any authenticated user.
+    // Create: userId must match auth.uid.
     await assertSucceeds(
       setDoc(doc(userBDb, 'undoUsage/uu_b'), {
         userId: 'userB',
         count: 0,
       }),
     );
-    pass('undoUsage: authenticated user can create usage record');
+    pass('undoUsage: user can create own usage record');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'undoUsage/uu_spoof'), {
+        userId: 'userA',
+        count: 0,
+      }),
+    );
+    pass('undoUsage: cannot create usage record with spoofed userId');
 
     await assertFails(
       setDoc(doc(unauthDb, 'undoUsage/uu_anon'), {
@@ -1092,13 +1113,13 @@ async function run() {
     );
     pass('event_moderation: non-creator cannot read moderation status');
 
-    // Any authenticated user can create/update (system-level).
-    await assertSucceeds(
+    // Client-side writes blocked (Admin SDK / Cloud Functions only).
+    await assertFails(
       setDoc(doc(userBDb, 'event_moderation/evt_mod_new'), {
         status: 'pending',
       }),
     );
-    pass('event_moderation: authenticated user can create moderation record');
+    pass('event_moderation: client SDK cannot create moderation record');
 
     await assertFails(
       setDoc(doc(unauthDb, 'event_moderation/evt_mod_unauth'), {
@@ -1310,13 +1331,14 @@ async function run() {
 
     // ── security_logs collection ────────────────────────────────────────────
 
-    await assertSucceeds(
+    // Client-side writes blocked (Admin SDK / Cloud Functions only).
+    await assertFails(
       setDoc(doc(userADb, 'security_logs/slog_new'), {
         reporterId: 'userA',
         action: 'flagged_content',
       }),
     );
-    pass('security_logs: authenticated user can create log');
+    pass('security_logs: client SDK cannot create log');
 
     await assertFails(
       setDoc(doc(unauthDb, 'security_logs/slog_unauth'), {

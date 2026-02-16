@@ -31,6 +31,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+// ⚠️ DEPRECATED: Use MainNavigationScreen from
+// lib/features/home/main_navigation_screen.dart for standard navigation.
+// Tabbar is kept temporarily because change_language_widget.dart and
+// in_app_purchase_repo.dart depend on isPaymentSuccess / currentUserId params.
+// TODO: Move payment-success dialog to a service or overlay, then migrate all
+// remaining callers to MainNavigationScreen and delete this file.
+@Deprecated('Use MainNavigationScreen from home/main_navigation_screen.dart')
 class Tabbar extends StatefulWidget {
   const Tabbar({super.key, this.isPaymentSuccess, this.currentUserId});
   final bool? isPaymentSuccess;

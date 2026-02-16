@@ -11,7 +11,7 @@ Future showWelcomDialog(context) async {
     builder: (ctx) {
       Future.delayed(const Duration(seconds: 3), () {
         Navigator.pop(ctx);
-        Navigator.pushNamed(context, RouteName.tabScreen);
+        Navigator.pushNamed(context, RouteName.mainNavigation);
       });
       return Center(
         child: Container(

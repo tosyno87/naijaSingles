@@ -6,7 +6,7 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const projectId = 'naijasingles-rules-tests';
 
@@ -149,6 +149,248 @@ async function run() {
 
     await assertFails(getDoc(doc(userBDb, 'notificationLogs/log_user_a')));
     pass('User cannot read another user notification log document');
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Chat thread, message, and typing indicator tests.
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Seed a chat thread between userA and userB (bypassing rules).
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'chatThreads/thread_ab'), {
+        userIds: ['userA', 'userB'],
+        createdAt: new Date().toISOString(),
+        lastMessage: '',
+      });
+      await setDoc(doc(db, 'chatThreads/thread_ab/messages/msg1'), {
+        senderId: 'userA',
+        text: 'Hello!',
+        timestamp: new Date().toISOString(),
+        read: false,
+      });
+      await setDoc(doc(db, 'chatThreads/thread_ab/typing/userA'), {
+        isTyping: false,
+      });
+    });
+
+    // --- chatThreads read access ---
+    await assertSucceeds(getDoc(doc(userADb, 'chatThreads/thread_ab')));
+    pass('Chat participant (userA) can read the thread');
+
+    await assertSucceeds(getDoc(doc(userBDb, 'chatThreads/thread_ab')));
+    pass('Chat participant (userB) can read the thread');
+
+    await assertFails(getDoc(doc(otherUserDb, 'chatThreads/thread_ab')));
+    pass('Non-participant cannot read the chat thread');
+
+    const unauthDb = testEnv.unauthenticatedContext().firestore();
+    await assertFails(getDoc(doc(unauthDb, 'chatThreads/thread_ab')));
+    pass('Unauthenticated user cannot read the chat thread');
+
+    // --- chatThreads create ---
+    await assertSucceeds(
+      setDoc(doc(userADb, 'chatThreads/thread_ac'), {
+        userIds: ['userA', 'otherUser'],
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('Participant can create a valid chat thread with 2 userIds');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'chatThreads/thread_spoof'), {
+        userIds: ['userA', 'userB'],
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('Cannot create a thread if not included in userIds');
+
+    await assertFails(
+      setDoc(doc(userADb, 'chatThreads/thread_triple'), {
+        userIds: ['userA', 'userB', 'otherUser'],
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    pass('Cannot create a thread with more than 2 userIds');
+
+    await assertFails(
+      setDoc(doc(userADb, 'chatThreads/thread_bad'), {
+        userIds: ['userA', 'userB'],
+      }),
+    );
+    pass('Cannot create a thread without required createdAt field');
+
+    // --- chatThreads update ---
+    await assertSucceeds(
+      updateDoc(doc(userADb, 'chatThreads/thread_ab'), {
+        lastMessage: 'Updated message',
+      }),
+    );
+    pass('Participant can update chat thread (e.g. lastMessage)');
+
+    await assertFails(
+      updateDoc(doc(userADb, 'chatThreads/thread_ab'), {
+        userIds: ['userA', 'otherUser'],
+      }),
+    );
+    pass('Participant cannot change userIds on update');
+
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'chatThreads/thread_ab'), {
+        lastMessage: 'hacked',
+      }),
+    );
+    pass('Non-participant cannot update chat thread');
+
+    // --- chatThreads delete ---
+    // Create a disposable thread to delete.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'chatThreads/thread_del'), {
+        userIds: ['userA', 'userB'],
+        createdAt: new Date().toISOString(),
+      });
+    });
+
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'chatThreads/thread_del'), {
+        lastMessage: 'bye',
+      }),
+    );
+    pass('Non-participant cannot delete chat thread (verified via denied update)');
+
+    // --- messages read ---
+    await assertSucceeds(
+      getDoc(doc(userADb, 'chatThreads/thread_ab/messages/msg1')),
+    );
+    pass('Thread participant can read messages');
+
+    await assertFails(
+      getDoc(doc(otherUserDb, 'chatThreads/thread_ab/messages/msg1')),
+    );
+    pass('Non-participant cannot read messages');
+
+    // --- messages create ---
+    await assertSucceeds(
+      setDoc(doc(userADb, 'chatThreads/thread_ab/messages/msg2'), {
+        senderId: 'userA',
+        text: 'How are you?',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('Participant can create a valid message with correct senderId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'chatThreads/thread_ab/messages/msg_spoof'), {
+        senderId: 'userB',
+        text: 'Spoofed message',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('Participant cannot create a message with a spoofed senderId');
+
+    await assertFails(
+      setDoc(doc(userADb, 'chatThreads/thread_ab/messages/msg_empty'), {
+        senderId: 'userA',
+        text: '',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('Cannot create a message with empty text');
+
+    await assertFails(
+      setDoc(doc(userADb, 'chatThreads/thread_ab/messages/msg_long'), {
+        senderId: 'userA',
+        text: 'x'.repeat(1001),
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('Cannot create a message exceeding 1000 characters');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'chatThreads/thread_ab/messages/msg_intruder'), {
+        senderId: 'otherUser',
+        text: 'Intruder message',
+        timestamp: new Date().toISOString(),
+      }),
+    );
+    pass('Non-participant cannot create a message in the thread');
+
+    // --- messages update (read status only) ---
+    await assertSucceeds(
+      updateDoc(doc(userBDb, 'chatThreads/thread_ab/messages/msg1'), {
+        read: true,
+      }),
+    );
+    pass('Participant can update message read status');
+
+    await assertFails(
+      updateDoc(doc(userBDb, 'chatThreads/thread_ab/messages/msg1'), {
+        text: 'Tampered text',
+      }),
+    );
+    pass('Participant cannot update message text (only read status allowed)');
+
+    await assertFails(
+      updateDoc(doc(otherUserDb, 'chatThreads/thread_ab/messages/msg1'), {
+        read: true,
+      }),
+    );
+    pass('Non-participant cannot update message read status');
+
+    // --- messages delete ---
+    // Seed a message from userA to test deletion.
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore();
+      await setDoc(doc(db, 'chatThreads/thread_ab/messages/msg_del'), {
+        senderId: 'userA',
+        text: 'Temporary',
+        timestamp: new Date().toISOString(),
+        read: false,
+      });
+    });
+
+    await assertFails(
+      userBDb.doc('chatThreads/thread_ab/messages/msg_del').delete(),
+    );
+    pass('Receiver cannot delete the sender message');
+
+    // NOTE: assertSucceeds for sender delete uses the compat API .delete()
+    await assertSucceeds(
+      userADb.doc('chatThreads/thread_ab/messages/msg_del').delete(),
+    );
+    pass('Sender can delete their own message');
+
+    // --- typing indicators ---
+    await assertSucceeds(
+      getDoc(doc(userADb, 'chatThreads/thread_ab/typing/userA')),
+    );
+    pass('Participant can read typing status');
+
+    await assertFails(
+      getDoc(doc(otherUserDb, 'chatThreads/thread_ab/typing/userA')),
+    );
+    pass('Non-participant cannot read typing status');
+
+    await assertSucceeds(
+      setDoc(doc(userADb, 'chatThreads/thread_ab/typing/userA'), {
+        isTyping: true,
+      }),
+    );
+    pass('Participant can write their own typing status');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'chatThreads/thread_ab/typing/userA'), {
+        isTyping: true,
+      }),
+    );
+    pass('Participant cannot write someone else typing status');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'chatThreads/thread_ab/typing/otherUser'), {
+        isTyping: true,
+      }),
+    );
+    pass('Non-participant cannot write typing status');
 
     // Storage owner path tests.
     const ownerStorage = testEnv.authenticatedContext('owner1').storage();

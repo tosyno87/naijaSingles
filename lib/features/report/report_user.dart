@@ -66,7 +66,7 @@ class ReportUserState extends State<ReportUser> {
                   child: Text(
                     'Report User'.tr().toString(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 20, fontFamily: 'Gellix'),
+                    style: const TextStyle(fontSize: 20, fontFamily: 'Montserrat'),
                   ),
                 ),
               ],
@@ -76,7 +76,7 @@ class ReportUserState extends State<ReportUser> {
                   .tr()
                   .toString(),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 15, fontFamily: 'Gellix'),
+              style: const TextStyle(fontSize: 15, fontFamily: 'Montserrat'),
             ),
             actions:
                 // !other ?

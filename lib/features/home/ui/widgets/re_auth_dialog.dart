@@ -51,7 +51,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
             ),
           ],
           style: TextStyle(
-            fontFamily: 'Gellix',
+            fontFamily: 'Montserrat',
             color: isDarkMode ? Colors.white : Colors.black87,
             fontSize: 18,
           ),

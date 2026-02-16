@@ -397,20 +397,8 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
                 lastDate: DateTime.now().add(const Duration(days: 365)),
                 builder: (context, child) => Theme(
                   data: Theme.of(context).copyWith(
-                    colorScheme: const ColorScheme.light(
-                      primary: Color(0xFF008037),
-                      onSurface: Color(0xFF333333),
-                    ),
-                    textTheme: Theme.of(context).textTheme.copyWith(
-                          bodyLarge: GoogleFonts.montserrat(
-                            color: const Color(0xFF333333),
-                          ),
-                          bodyMedium: GoogleFonts.montserrat(
-                            color: const Color(0xFF333333),
-                          ),
-                        ),
-                    dialogTheme: const DialogThemeData(
-                      backgroundColor: AppColors.backgroundColor,
+                    colorScheme: Theme.of(context).colorScheme.copyWith(
+                      primary: AppColors.primaryGreen,
                     ),
                   ),
                   child: child!,

@@ -33,7 +33,7 @@ class CustomSnackbar {
           behavior: SnackBarBehavior.floating,
           content: Text(
             msg,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Gellix'),
+            style: const TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
           ),
           action: SnackBarAction(
             label: 'DISMISS',

@@ -44,6 +44,17 @@ async function run() {
         name: 'Deleted',
         isDeleted: true,
       });
+      await setDoc(doc(db, 'users/userA/notifications/n1'), {
+        title: 'Welcome',
+      });
+      await setDoc(doc(db, 'notifications/existing_user_a'), {
+        userId: 'userA',
+        title: 'Ping',
+      });
+      await setDoc(doc(db, 'notificationLogs/log_user_a'), {
+        userId: 'userA',
+        action: 'delivered',
+      });
     });
 
     // Firestore profile visibility tests.
@@ -76,6 +87,68 @@ async function run() {
       }),
     );
     pass('Other users cannot spoof someone else in legacy LikedBy');
+
+    // User notifications subcollection ownership tests.
+    const userADb = testEnv.authenticatedContext('userA').firestore();
+    const userBDb = testEnv.authenticatedContext('userB').firestore();
+    await assertSucceeds(getDoc(doc(userADb, 'users/userA/notifications/n1')));
+    pass('Notification owner can read user notifications subcollection');
+
+    await assertFails(getDoc(doc(userBDb, 'users/userA/notifications/n1')));
+    pass('Non-owner cannot read another user notifications subcollection');
+
+    // Top-level notifications ownership tests.
+    await assertSucceeds(
+      setDoc(doc(userADb, 'notifications/new_user_a'), {
+        userId: 'userA',
+        title: 'Self notification',
+      }),
+    );
+    pass('User can create top-level notification for self');
+
+    await assertFails(
+      setDoc(doc(userBDb, 'notifications/spoof_user_a'), {
+        userId: 'userA',
+        title: 'Spoofed notification',
+      }),
+    );
+    pass('User cannot create top-level notification for another user');
+
+    // Legacy user match mirror ownership tests.
+    await assertSucceeds(
+      setDoc(doc(userADb, 'users/userA/Matches/userB'), {
+        Matches: 'userB',
+      }),
+    );
+    pass('Matched user can create own legacy mirror match');
+
+    await assertFails(
+      setDoc(doc(otherUserDb, 'users/userA/Matches/userB'), {
+        Matches: 'userB',
+      }),
+    );
+    pass('Unrelated user cannot write another user legacy mirror match');
+
+    await assertFails(
+      setDoc(doc(userADb, 'users/userA/Matches/userB'), {
+        Matches: 'userC',
+      }),
+    );
+    pass('Legacy mirror match rejects mismatched payload data');
+
+    // Notification logs are client-write blocked.
+    await assertFails(
+      setDoc(doc(userADb, 'notificationLogs/client_write_attempt'), {
+        userId: 'userA',
+      }),
+    );
+    pass('Client cannot create notification log documents');
+
+    await assertSucceeds(getDoc(doc(userADb, 'notificationLogs/log_user_a')));
+    pass('User can read own notification log document');
+
+    await assertFails(getDoc(doc(userBDb, 'notificationLogs/log_user_a')));
+    pass('User cannot read another user notification log document');
 
     // Storage owner path tests.
     const ownerStorage = testEnv.authenticatedContext('owner1').storage();

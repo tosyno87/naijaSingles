@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../bloc/events_bloc.dart';
 import 'advanced_search_dialog.dart';
 
@@ -630,8 +631,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF008037),
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: AppColors.primaryGreen,
           ),
         ),
         child: child!,
@@ -654,8 +655,8 @@ class _AdvancedFilterDialogState extends State<AdvancedFilterDialog> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF008037),
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: AppColors.primaryGreen,
           ),
         ),
         child: child!,

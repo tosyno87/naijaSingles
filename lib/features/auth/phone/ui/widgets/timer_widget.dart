@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../common/constants/colors.dart';
+import '../../../../../common/constants/app_colors.dart';
 import '../../../../../common/bloc/theme/theme_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -86,7 +86,7 @@ class TimerWidgetState extends State<TimerWidget> {
                       ).toString()
                     : 'Resend'.tr().toString(),
                 style: const TextStyle(
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),

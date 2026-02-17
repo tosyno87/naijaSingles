@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 import 'custom_toast.dart';
 
 class NoInternetPage extends StatelessWidget {
@@ -9,7 +9,7 @@ class NoInternetPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          backgroundColor: primaryColor,
+          backgroundColor: AppColors.primaryGreen,
           automaticallyImplyLeading: false,
           title: const Text('No internet'),
           centerTitle: true,
@@ -21,7 +21,7 @@ class NoInternetPage extends StatelessWidget {
             children: [
               const Icon(
                 Icons.signal_wifi_connected_no_internet_4,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 80,
               ),
               const SizedBox(height: 16),
@@ -50,7 +50,7 @@ class NoInternetPage extends StatelessWidget {
                     CustomToast.showToast('No Internet, try again');
                   },
                   style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(primaryColor),
+                    backgroundColor: WidgetStateProperty.all(AppColors.primaryGreen),
                     shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),

@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/language/language_bloc.dart';
 import '../bloc/theme/theme_bloc.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 import '../constants/constants.dart';
 import '../routes/route_name.dart';
 
@@ -127,8 +127,8 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
                       ),
                     ),
                     DropdownButton<String>(
-                      iconDisabledColor: primaryColor,
-                      iconEnabledColor: primaryColor,
+                      iconDisabledColor: AppColors.primaryGreen,
+                      iconEnabledColor: AppColors.primaryGreen,
                       icon: const Icon(Icons.keyboard_arrow_down_outlined),
                       value: selectedLanguage,
                       hint: const Text('Select a language'),
@@ -207,7 +207,7 @@ class _LanguageSelectionDropdownState extends State<LanguageSelectionDropdown> {
               return Center(
                 child: Text(
                   'Unable to load'.tr().toString(),
-                  style: const TextStyle(color: primaryColor),
+                  style: const TextStyle(color: AppColors.primaryGreen),
                 ),
               );
             }

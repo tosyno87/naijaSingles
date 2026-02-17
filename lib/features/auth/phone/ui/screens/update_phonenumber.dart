@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../common/constants/colors.dart';
+import '../../../../../common/constants/app_colors.dart';
 import '../../../../../models/user_model.dart';
 import 'phone_number.dart';
 
@@ -73,7 +73,7 @@ class UpdateNumber extends StatelessWidget {
                     currentUser.phoneNumber!.isNotEmpty
                         ? Icons.done
                         : Icons.add_call,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                   ),
                 ),
               ),
@@ -104,7 +104,7 @@ class UpdateNumber extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: primaryColor,
+                            color: AppColors.primaryGreen,
                           ),
                         ),
                       ),

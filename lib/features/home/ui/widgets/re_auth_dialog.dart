@@ -3,12 +3,13 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/bloc/user/user_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/data/repo/phone_auth_repo.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
@@ -42,7 +43,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
             TextSpan(
               text: widget.auth.currentUser?.phoneNumber,
               style: const TextStyle(
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
                 textBaseline: TextBaseline.alphabetic,
@@ -50,8 +51,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
               ),
             ),
           ],
-          style: TextStyle(
-            fontFamily: 'Gellix',
+          style: GoogleFonts.montserrat(
             color: isDarkMode ? Colors.white : Colors.black87,
             fontSize: 18,
           ),
@@ -69,7 +69,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
           fieldHeight: 50,
           fieldWidth: 35,
           inactiveFillColor: Colors.white,
-          inactiveColor: primaryColor,
+          inactiveColor: AppColors.primaryGreen,
           selectedColor: Colors.green,
           selectedFillColor: Colors.white,
           activeFillColor: Colors.white,
@@ -91,7 +91,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
           },
           child: const Text(
             'Cancel',
-            style: TextStyle(color: primaryColor),
+            style: TextStyle(color: AppColors.primaryGreen),
           ),
         ),
         TextButton(
@@ -116,7 +116,7 @@ class _ReAuthDialogState extends State<ReAuthDialog> {
           },
           child: Text(
             'Submit'.tr().toString(),
-            style: const TextStyle(color: primaryColor),
+            style: const TextStyle(color: AppColors.primaryGreen),
           ),
         ),
       ],

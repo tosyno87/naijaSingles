@@ -41,6 +41,23 @@ jobs:
       run: |
         chmod +x scripts/check_duplicate_suffix_files.sh
         scripts/check_duplicate_suffix_files.sh "${{ steps.diff-range.outputs.base_sha }}" "${{ steps.diff-range.outputs.head_sha }}"
+
+    - name: Setup Node.js for Firebase rules tests
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install root npm dependencies
+      run: npm install
+      
+    - name: Setup Java 21 for Firebase emulators
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+      
+    - name: Run Firebase rules regression tests
+      run: npm run test:rules
       
     - name: Setup Flutter
       uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e

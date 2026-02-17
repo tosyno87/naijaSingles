@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
-import '../../common/constants/colors.dart';
+import '../../common/constants/app_colors.dart';
 import '../../common/bloc/user/user_bloc.dart';
 import '../../services/settings_service.dart';
 
@@ -105,7 +105,7 @@ class _NotificationSettingsScreenState
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: primaryColor,
+            primary: AppColors.primaryGreen,
           ),
         ),
         child: child!,
@@ -209,7 +209,7 @@ class _NotificationSettingsScreenState
             ElevatedButton(
               onPressed: _loadNotificationSettings,
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
+                backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
               ),
               child: Text(
@@ -231,14 +231,14 @@ class _NotificationSettingsScreenState
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.notifications_active,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
@@ -247,7 +247,7 @@ class _NotificationSettingsScreenState
                       'Control when and how you receive notifications from Afropeep.',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                   ),
@@ -429,11 +429,11 @@ class _NotificationSettingsScreenState
           ),
           secondary: Icon(
             icon,
-            color: primaryColor,
+            color: AppColors.primaryGreen,
           ),
           value: value,
           onChanged: onChanged,
-          activeThumbColor: primaryColor,
+          activeThumbColor: AppColors.primaryGreen,
         ),
       );
 
@@ -465,7 +465,7 @@ class _NotificationSettingsScreenState
                 _formatTimeDisplay(time),
                 style: GoogleFonts.montserrat(
                   fontSize: 16,
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                   fontWeight: FontWeight.w500,
                 ),
               ),

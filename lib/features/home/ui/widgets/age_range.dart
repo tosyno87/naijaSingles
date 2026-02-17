@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 
 class AgeRangeWidget extends StatefulWidget {
@@ -31,7 +31,7 @@ class _AgeRangeWidgetState extends State<AgeRangeWidget> {
             'Age range'.tr().toString(),
             style: TextStyle(
               fontSize: 18,
-              color: isDarkMode ? Colors.white : primaryColor,
+              color: isDarkMode ? Colors.white : AppColors.primaryGreen,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -48,7 +48,7 @@ class _AgeRangeWidgetState extends State<AgeRangeWidget> {
             min: 18,
             max: 100,
             divisions: 25,
-            activeColor: isDarkMode ? Colors.white : primaryColor,
+            activeColor: isDarkMode ? Colors.white : AppColors.primaryGreen,
             labels: RangeLabels(
               widget.currentUser.ageRange!['min'].toString(),
               widget.currentUser.ageRange!['max'].toString(),

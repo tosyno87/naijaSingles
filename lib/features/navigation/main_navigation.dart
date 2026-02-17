@@ -1,3 +1,7 @@
+// ⚠️ DEPRECATED: This is dead code — no callers exist.
+// Use MainNavigationScreen from lib/features/home/main_navigation_screen.dart
+// which is the canonical 4-tab navigation (Connect/Discover/Messages/Profile).
+// TODO: Delete this file once confirmed no callers remain.
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -5,6 +9,7 @@ import '../explore/explore_screen.dart';
 import '../messages/messages_screen.dart';
 import '../profile/profile_screen.dart';
 
+@Deprecated('Use MainNavigationScreen from home/main_navigation_screen.dart')
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 

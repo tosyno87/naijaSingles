@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 import '../../../payment/ui/products.dart';
 
@@ -29,7 +29,7 @@ class PremiumSwipePage extends StatelessWidget {
                     const Icon(
                       Icons.error_outline,
                       size: 50,
-                      color: primaryColor,
+                      color: AppColors.primaryGreen,
                     ),
                     Text(
                       'you have already used the maximum number of free available swipes for 24 hrs.'
@@ -47,7 +47,7 @@ class PremiumSwipePage extends StatelessWidget {
                       child: Icon(
                         Icons.lock_outline,
                         size: 120,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
                     Text(
@@ -56,7 +56,7 @@ class PremiumSwipePage extends StatelessWidget {
                           .toString(),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),

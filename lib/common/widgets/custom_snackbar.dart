@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomSnackbar {
   // ignore: avoid_types_as_parameter_names, non_constant_identifier_names
@@ -33,7 +34,7 @@ class CustomSnackbar {
           behavior: SnackBarBehavior.floating,
           content: Text(
             msg,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Gellix'),
+            style: GoogleFonts.montserrat(color: Colors.white),
           ),
           action: SnackBarAction(
             label: 'DISMISS',

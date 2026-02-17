@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import '../constants/adds.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 
 class CarouselSlider extends StatefulWidget {
   const CarouselSlider({required this.adds, super.key});
@@ -70,12 +70,12 @@ class _CarouselSliderState extends State<CarouselSlider> {
                   alignment: Alignment.bottomCenter,
                   builder: DotSwiperPaginationBuilder(
                     color: AppColors.secondaryColor,
-                    activeColor: primaryColor,
+                    activeColor: AppColors.primaryGreen,
                   ),
                 ),
                 control: const SwiperControl(
                   size: 20,
-                  color: primaryColor,
+                  color: AppColors.primaryGreen,
                   disableColor: AppColors.secondaryColor,
                 ),
                 loop: false,

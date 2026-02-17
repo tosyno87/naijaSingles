@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../common/constants/colors.dart';
+import '../../../common/constants/app_colors.dart';
 import '../../../common/constants/constants.dart';
 import '../../../common/bloc/theme/theme_bloc.dart';
 import '../../../common/utils/custom_toast.dart';
@@ -64,7 +64,7 @@ class _BlockedUserState extends State<BlockedUser> {
         if (state is BlockUserLoadingState) {
           return const Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(primaryColor),
+              valueColor: AlwaysStoppedAnimation(AppColors.primaryGreen),
             ),
           );
         }
@@ -194,7 +194,7 @@ class _BlockedUserState extends State<BlockedUser> {
                                       child: Text(
                                         'No'.tr().toString(),
                                         style: const TextStyle(
-                                            color: primaryColor),
+                                            color: AppColors.primaryGreen),
                                       ),
                                     ),
                                     TextButton(
@@ -237,7 +237,7 @@ class _BlockedUserState extends State<BlockedUser> {
                                       child: Text(
                                         'Yes'.tr().toString(),
                                         style: const TextStyle(
-                                            color: primaryColor),
+                                            color: AppColors.primaryGreen),
                                       ),
                                     ),
                                   ],

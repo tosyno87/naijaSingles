@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../../common/constants/colors.dart';
+import '../../../../../common/constants/app_colors.dart';
 import '../../../../../common/bloc/streetview/streetview_bloc.dart';
 import '../../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../../common/routes/route_name.dart';
@@ -63,14 +63,14 @@ class SettingPageState extends State<SettingPage> {
                   },
                   child: Text(
                     'Close'.tr().toString(),
-                    style: const TextStyle(color: primaryColor),
+                    style: const TextStyle(color: AppColors.primaryGreen),
                   ),
                 ),
                 BlocBuilder<UserfilterBloc, UserfilterState>(
                   builder: (context, state) {
                     if (state is UpdatingUserFilter) {
                       return const CircularProgressIndicator(
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       );
                     }
                     return TextButton(
@@ -86,7 +86,7 @@ class SettingPageState extends State<SettingPage> {
                       },
                       child: Text(
                         'Save'.tr().toString(),
-                        style: const TextStyle(color: primaryColor),
+                        style: const TextStyle(color: AppColors.primaryGreen),
                       ),
                     );
                   },
@@ -164,7 +164,7 @@ class SettingPageState extends State<SettingPage> {
           }
         },
         child: Scaffold(
-          // backgroundColor: primaryColor,
+          // backgroundColor: AppColors.primaryGreen,
           appBar: AppBar(
             centerTitle: false,
             title: Text(
@@ -207,7 +207,7 @@ class SettingPageState extends State<SettingPage> {
                         style: TextStyle(
                           color: isDarkMode
                               ? Colors.white
-                              : primaryColor,
+                              : AppColors.primaryGreen,
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
@@ -239,7 +239,7 @@ class SettingPageState extends State<SettingPage> {
                                 ),
                                 const Icon(
                                   Icons.arrow_forward_ios,
-                                  color: primaryColor,
+                                  color: AppColors.primaryGreen,
                                   size: 15,
                                 ),
                               ],
@@ -267,7 +267,7 @@ class SettingPageState extends State<SettingPage> {
                         style: TextStyle(
                           color: isDarkMode
                               ? Colors.white
-                              : primaryColor,
+                              : AppColors.primaryGreen,
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
@@ -362,7 +362,7 @@ class SettingPageState extends State<SettingPage> {
                             fit: BoxFit.contain,
                             color: isDarkMode
                                 ? Colors.white
-                                : primaryColor,
+                                : AppColors.primaryGreen,
                           ),
                         ),
                       ),

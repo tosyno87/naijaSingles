@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../profile/privacy_migration_screen.dart';
 
 class PrivacyMigrationPrompt extends StatelessWidget {
@@ -20,14 +20,14 @@ class PrivacyMigrationPrompt extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              primaryColor.withValues(alpha: 0.1),
-              primaryColor.withValues(alpha: 0.05),
+              AppColors.primaryGreen.withValues(alpha: 0.1),
+              AppColors.primaryGreen.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -45,12 +45,12 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.2),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.security_update_good,
-                    color: primaryColor,
+                    color: AppColors.primaryGreen,
                     size: 24,
                   ),
                 ),
@@ -64,7 +64,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                         style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: textPrimary,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -72,7 +72,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                         'Get better control over your profile visibility',
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
-                          color: textSecondary,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -115,7 +115,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                       'Maybe Later',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
-                        color: textSecondary,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -137,7 +137,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
+                      backgroundColor: AppColors.primaryGreen,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -164,7 +164,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
           Icon(
             icon,
             size: 16,
-            color: primaryColor,
+            color: AppColors.primaryGreen,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -172,7 +172,7 @@ class PrivacyMigrationPrompt extends StatelessWidget {
               text,
               style: GoogleFonts.montserrat(
                 fontSize: 13,
-                color: textSecondary,
+                color: AppColors.textSecondary,
               ),
             ),
           ),
@@ -195,15 +195,15 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: primaryColor.withValues(alpha: 0.1),
+            color: AppColors.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+            border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               const Icon(
                 Icons.security_update_good,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -216,14 +216,14 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: textPrimary,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     Text(
                       'Tap to upgrade your privacy settings',
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
-                        color: textSecondary,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -231,7 +231,7 @@ class CompactPrivacyMigrationPrompt extends StatelessWidget {
               ),
               const Icon(
                 Icons.arrow_forward_ios,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 16,
               ),
             ],

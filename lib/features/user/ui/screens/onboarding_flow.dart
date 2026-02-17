@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../onboarding/bloc/onboarding_bloc.dart';
 import '../../../onboarding/bloc/onboarding_data.dart';
@@ -76,7 +76,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       decoration: BoxDecoration(
                         color: _currentPage >= index
-                            ? primaryColor
+                            ? AppColors.primaryGreen
                             : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(2),
                       ),
@@ -139,7 +139,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   ElevatedButton(
                     onPressed: _isCurrentPageValid(data) ? onNext : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
+                      backgroundColor: AppColors.primaryGreen,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
                         vertical: 12,
@@ -558,15 +558,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         selected: isSelected,
         onSelected: onSelected,
         backgroundColor: Colors.white,
-        selectedColor: primaryColor.withValues(alpha: 0.2),
-        checkmarkColor: primaryColor,
+        selectedColor: AppColors.primaryGreen.withValues(alpha: 0.2),
+        checkmarkColor: AppColors.primaryGreen,
         labelStyle: TextStyle(
-          color: isSelected ? primaryColor : Colors.black87,
+          color: isSelected ? AppColors.primaryGreen : Colors.black87,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: isSelected ? primaryColor : Colors.grey.shade300,
+            color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
           ),
         ),
       );
@@ -589,10 +589,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color:
-              isSelected ? primaryColor.withValues(alpha: 0.1) : Colors.white,
+              isSelected ? AppColors.primaryGreen.withValues(alpha: 0.1) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? primaryColor : Colors.grey.shade300,
+            color: isSelected ? AppColors.primaryGreen : Colors.grey.shade300,
             width: isSelected ? 2.0 : 1.0,
           ),
         ),
@@ -601,7 +601,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? primaryColor : Colors.grey.shade100,
+                color: isSelected ? AppColors.primaryGreen : Colors.grey.shade100,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -620,7 +620,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? primaryColor : Colors.black87,
+                      color: isSelected ? AppColors.primaryGreen : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -637,7 +637,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             if (isSelected)
               const Icon(
                 Icons.check_circle,
-                color: primaryColor,
+                color: AppColors.primaryGreen,
                 size: 24,
               ),
           ],

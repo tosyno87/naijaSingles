@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../models/user_model.dart';
 
 class ShowmeWidget extends StatefulWidget {
@@ -33,13 +33,13 @@ class _ShowmeWidgetState extends State<ShowmeWidget> {
               'Show me'.tr().toString(),
               style: TextStyle(
                 fontSize: 18,
-                color: isDarkMode ? Colors.white : primaryColor,
+                color: isDarkMode ? Colors.white : AppColors.primaryGreen,
                 fontWeight: FontWeight.w500,
               ),
             ),
             ListTile(
               title: DropdownButton(
-                iconEnabledColor: primaryColor,
+                iconEnabledColor: AppColors.primaryGreen,
                 iconDisabledColor: AppColors.secondaryColor,
                 icon: const Icon(Icons.keyboard_arrow_down_outlined),
                 isExpanded: true,

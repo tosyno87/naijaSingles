@@ -9,7 +9,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import '../../../../common/bloc/theme/theme_bloc.dart';
 import '../../../../common/bloc/user/user_bloc.dart' as common_user;
 import '../../../../common/constants/adds.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/crousle_slider.dart';
 import '../../../../common/utils/upload_media.dart';
@@ -128,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
-                                color: primaryColor,
+                                color: AppColors.primaryGreen,
                                 child: IconButton(
                                   alignment: Alignment.center,
                                   icon: const Icon(
@@ -220,7 +220,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: FloatingActionButton(
                                   heroTag: UniqueKey(),
                                   splashColor: AppColors.secondaryColor,
-                                  backgroundColor: primaryColor,
+                                  backgroundColor: AppColors.primaryGreen,
                                   child: const Icon(
                                     Icons.add_a_photo,
                                     color: Colors.white,

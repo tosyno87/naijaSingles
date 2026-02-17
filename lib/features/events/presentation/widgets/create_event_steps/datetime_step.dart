@@ -416,9 +416,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
       lastDate: lastDate,
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF008037),
-            onSurface: Color(0xFF333333),
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: AppColors.primaryGreen,
           ),
         ),
         child: child!,
@@ -442,9 +441,8 @@ class _DateTimeStepState extends State<DateTimeStep> {
       initialTime: initialTime,
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF008037),
-            onSurface: Color(0xFF333333),
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: AppColors.primaryGreen,
           ),
         ),
         child: child!,

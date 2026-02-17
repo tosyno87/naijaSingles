@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:swipable_stack/swipable_stack.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/widgets/image_widget.dart';
 import '../../../../models/user_model.dart';
@@ -93,13 +93,13 @@ class _InfoState extends State<Info> {
                             alignment: Alignment.bottomCenter,
                             builder: DotSwiperPaginationBuilder(
                               activeSize: 13,
-                              color: textSecondary,
-                              activeColor: primaryColor,
+                              color: AppColors.textSecondary,
+                              activeColor: AppColors.primaryGreen,
                             ),
                           ),
                           control: const SwiperControl(
-                            color: primaryColor,
-                            disableColor: textSecondary,
+                            color: AppColors.primaryGreen,
+                            disableColor: AppColors.textSecondary,
                           ),
                           loop: false,
                         ),
@@ -134,7 +134,7 @@ class _InfoState extends State<Info> {
                                     false)
                                   GenderSign(
                                     gender: widget.user.userGender!,
-                                    iconColor: primaryColor,
+                                    iconColor: AppColors.primaryGreen,
                                   )
                                 else
                                   const SizedBox.shrink(),
@@ -146,7 +146,7 @@ class _InfoState extends State<Info> {
                               },
                               icon: const Icon(
                                 Icons.arrow_downward,
-                                color: primaryColor,
+                                color: AppColors.primaryGreen,
                               ),
                             ),
                           ),
@@ -155,7 +155,7 @@ class _InfoState extends State<Info> {
                               dense: true,
                               leading: Image.asset(
                                 'asset/gender.png',
-                                color: primaryColor,
+                                color: AppColors.primaryGreen,
                                 height: 24,
                               ),
                               title: FirebasesexualDataWidget(
@@ -169,11 +169,11 @@ class _InfoState extends State<Info> {
                             ListTile(
                               dense: true,
                               leading:
-                                  const Icon(Icons.work, color: primaryColor),
+                                  const Icon(Icons.work, color: AppColors.primaryGreen),
                               title: Text(
                                 "${widget.user.editInfo!['job_title'].toString().trim()} ${widget.user.editInfo!['company'] != null ? 'at ${widget.user.editInfo!['company'].toString().trim()}' : ''}",
                                 style: const TextStyle(
-                                  color: textSecondary,
+                                  color: AppColors.textSecondary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -185,13 +185,13 @@ class _InfoState extends State<Info> {
                             ListTile(
                               dense: true,
                               leading:
-                                  const Icon(Icons.stars, color: primaryColor),
+                                  const Icon(Icons.stars, color: AppColors.primaryGreen),
                               title: Text(
                                 widget.user.editInfo!['university']
                                     .toString()
                                     .trim(),
                                 style: const TextStyle(
-                                  color: textSecondary,
+                                  color: AppColors.textSecondary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -203,11 +203,11 @@ class _InfoState extends State<Info> {
                             ListTile(
                               dense: true,
                               leading:
-                                  const Icon(Icons.home, color: primaryColor),
+                                  const Icon(Icons.home, color: AppColors.primaryGreen),
                               title: const Text(
                                 'Living in ',
                                 style: TextStyle(
-                                  color: textSecondary,
+                                  color: AppColors.textSecondary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -226,7 +226,7 @@ class _InfoState extends State<Info> {
                               dense: true,
                               leading: const Icon(
                                 Icons.location_on,
-                                color: primaryColor,
+                                color: AppColors.primaryGreen,
                               ),
                               title: Text(
                                 widget.user.editInfo!['DistanceVisible'] != null
@@ -243,7 +243,7 @@ class _InfoState extends State<Info> {
                                         ],
                                       ).toString(),
                                 style: const TextStyle(
-                                  color: textSecondary,
+                                  color: AppColors.textSecondary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -265,7 +265,7 @@ class _InfoState extends State<Info> {
                       child: Text(
                         widget.user.editInfo!['about'].toString().trim(),
                         style: const TextStyle(
-                          color: textSecondary,
+                          color: AppColors.textSecondary,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -302,7 +302,7 @@ class _InfoState extends State<Info> {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: textSecondary,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ),
@@ -347,7 +347,7 @@ class _InfoState extends State<Info> {
                       },
                       icon: const Icon(
                         Icons.edit,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     )
                   : FloatingButton(
@@ -368,7 +368,7 @@ class _InfoState extends State<Info> {
                       },
                       icon: const Icon(
                         Icons.message,
-                        color: primaryColor,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
           ],

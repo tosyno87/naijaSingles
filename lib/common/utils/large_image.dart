@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/colors.dart';
+import '../constants/app_colors.dart';
 import '../widgets/image_widget.dart';
 
 class LargeImage extends StatelessWidget {
@@ -44,7 +44,7 @@ class LargeImage extends StatelessWidget {
                     ),
                     FloatingActionButton(
                       heroTag: 'large_image_back_fab',
-                      backgroundColor: primaryColor,
+                      backgroundColor: AppColors.primaryGreen,
                       child: const Icon(Icons.arrow_back),
                       onPressed: () => Navigator.pop(context),
                     ),

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
-import '../../common/constants/colors.dart';
+import '../../common/constants/app_colors.dart';
 import '../../common/constants/constants.dart';
 import '../../common/data/repo/pagination_repo.dart';
 import '../../common/data/repo/user_search_repo.dart';
@@ -169,7 +169,7 @@ class NotificationsState extends State<Notifications> {
                             color: !doc.get('isRead')
                                 ? isDarkMode
                                     ? Theme.of(context).scaffoldBackgroundColor
-                                    : primaryColor.withValues(
+                                    : AppColors.primaryGreen.withValues(
                                         alpha: (.15 * 255).toDouble(),
                                       )
                                 : isDarkMode
@@ -210,7 +210,7 @@ class NotificationsState extends State<Notifications> {
                                       width: 50,
                                       height: 20,
                                       decoration: BoxDecoration(
-                                        color: primaryColor,
+                                        color: AppColors.primaryGreen,
                                         borderRadius: BorderRadius.circular(30),
                                       ),
                                       alignment: Alignment.center,
@@ -236,7 +236,7 @@ class NotificationsState extends State<Notifications> {
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      primaryColor,
+                                      AppColors.primaryGreen,
                                     ),
                                   ),
                                 ),

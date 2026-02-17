@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
-import '../../../common/constants/colors.dart';
+import '../../../common/constants/app_colors.dart';
 import '../../../common/widgets/hookup_circularbar.dart';
 
 class PaymentDetails extends StatelessWidget {
@@ -52,7 +52,7 @@ class PaymentDetails extends StatelessWidget {
                       child: Text(
                         'Payment Summary:'.tr().toString(),
                         style: const TextStyle(
-                          color: primaryColor,
+                          color: AppColors.primaryGreen,
                           fontWeight: FontWeight.bold,
                           fontSize: 23,
                         ),
@@ -79,7 +79,7 @@ class PaymentDetails extends StatelessWidget {
                                 label: Text(
                                   'Plan'.tr().toString(),
                                   style: const TextStyle(
-                                    //   color: primaryColor,
+                                    //   color: AppColors.primaryGreen,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -90,7 +90,7 @@ class PaymentDetails extends StatelessWidget {
                                   'Details'.tr().toString(),
                                   style: const TextStyle(
                                     fontSize: 15,
-                                    // color: primaryColor,
+                                    // color: AppColors.primaryGreen,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -132,7 +132,7 @@ class PaymentDetails extends StatelessWidget {
                                       index.productID,
                                       style: const TextStyle(
                                         fontSize: 15,
-                                        // color: primaryColor,
+                                        // color: AppColors.primaryGreen,
                                       ),
                                     ),
                                   ),
@@ -157,7 +157,7 @@ class PaymentDetails extends StatelessWidget {
                                       ).toLocal().toString(),
                                       style: const TextStyle(
                                         fontSize: 15,
-                                        // color: primaryColor,
+                                        // color: AppColors.primaryGreen,
                                       ),
                                     ),
                                   ),
@@ -207,7 +207,7 @@ class PaymentDetails extends StatelessWidget {
                   width: 250,
                   child: InkWell(
                     child: Card(
-                      color: primaryColor,
+                      color: AppColors.primaryGreen,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),

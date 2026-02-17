@@ -11,7 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../../common/bloc/theme/theme_bloc.dart';
-import '../../../../common/constants/colors.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/routes/route_name.dart';
 import '../../../../common/utils/app_exit.dart';
 import '../../../../models/user_model.dart';
@@ -31,6 +31,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+// ⚠️ DEPRECATED: Use MainNavigationScreen from
+// lib/features/home/main_navigation_screen.dart for standard navigation.
+// Tabbar is kept temporarily because change_language_widget.dart and
+// in_app_purchase_repo.dart depend on isPaymentSuccess / currentUserId params.
+// TODO: Move payment-success dialog to a service or overlay, then migrate all
+// remaining callers to MainNavigationScreen and delete this file.
+@Deprecated('Use MainNavigationScreen from home/main_navigation_screen.dart')
 class Tabbar extends StatefulWidget {
   const Tabbar({super.key, this.isPaymentSuccess, this.currentUserId});
   final bool? isPaymentSuccess;
@@ -230,11 +237,11 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
               automaticallyImplyLeading: false,
               title: TabBar(
                 labelColor:
-                    isDarkMode ? Colors.white : primaryColor,
+                    isDarkMode ? Colors.white : AppColors.primaryGreen,
                 unselectedLabelColor: isDarkMode
                     ? Colors.grey[400]
                     : Colors.grey[600],
-                indicatorColor: primaryColor,
+                indicatorColor: AppColors.primaryGreen,
                 indicatorWeight: 3,
                 labelStyle: const TextStyle(
                   fontSize: 14,

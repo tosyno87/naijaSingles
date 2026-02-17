@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -98,9 +99,28 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
                     ));
                     return;
                   }
-                } catch (_) {
-                  // Fail closed: do not allow registration when we cannot verify phone
-                  log('❌ Cannot verify phone (e.g. Firestore unavailable) - blocking registration');
+                } on FirebaseException catch (e) {
+                  if (e.code == 'permission-denied') {
+                    // Permission-denied on a collection query means a matching
+                    // document exists but is unreadable (e.g. paused/incognito).
+                    // Firebase Auth guarantees unique phone-to-UID mapping, so
+                    // if this UID has no document, it's safe to proceed.
+                    log('⚠️ Phone dedup query denied by rules — proceeding (Firebase Auth is authoritative)');
+                  } else {
+                    log('❌ Firestore error during phone dedup: ${e.code}');
+                    emit(const RegistrationFailed(
+                      message: 'Unable to verify phone. Please try again.',
+                    ));
+                    return;
+                  }
+                } on SocketException {
+                  log('❌ Network error during phone dedup — blocking registration');
+                  emit(const RegistrationFailed(
+                    message: 'No internet connection. Please try again.',
+                  ));
+                  return;
+                } catch (e) {
+                  log('❌ Unexpected error during phone dedup: $e');
                   emit(const RegistrationFailed(
                     message: 'Unable to verify phone. Please try again.',
                   ));

@@ -105,21 +105,30 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
           if (otherUserId.isEmpty) continue;
 
-          // Get other user's data
-          final otherUserDoc =
-              await _firestore.collection('users').doc(otherUserId).get();
+          // Try to fetch the other user's profile. If the read is denied
+          // (e.g., paused/incognito user blocked by Firestore rules), fall
+          // back to cached data from the chat thread document so threads
+          // remain visible.
           String otherUserName = 'User';
           String? avatarUrl;
+          try {
+            final otherUserDoc =
+                await _firestore.collection('users').doc(otherUserId).get();
 
-          if (otherUserDoc.exists) {
-            final userData = otherUserDoc.data();
-            otherUserName = userData?['name'] ?? 'User';
+            if (otherUserDoc.exists) {
+              final userData = otherUserDoc.data();
+              otherUserName = userData?['name'] ?? 'User';
 
-            // Get first photo as avatar
-            final photos = userData?['photos'] as List<dynamic>?;
-            if (photos != null && photos.isNotEmpty) {
-              avatarUrl = photos.first as String?;
+              final photos = userData?['photos'] as List<dynamic>?;
+              if (photos != null && photos.isNotEmpty) {
+                avatarUrl = photos.first as String?;
+              }
             }
+          } on Exception catch (_) {
+            // Profile read denied (paused/incognito). Use the cached name
+            // stored on the chat thread document at match-creation time.
+            final userNames = data['userNames'] as Map<String, dynamic>?;
+            otherUserName = userNames?[otherUserId] as String? ?? 'User';
           }
 
           // Get unread count for current user

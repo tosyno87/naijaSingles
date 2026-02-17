@@ -1,3 +1,4 @@
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,7 +10,7 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
   AccountStatusBloc({AccountStatusService? service})
       : _service = service ?? AccountStatusService(),
         super(const AccountStatusInitial()) {
-    on<LoadAccountStatus>(_onLoad);
+    on<LoadAccountStatus>(_onLoad, transformer: restartable());
     on<PauseAccount>(_onPause);
     on<EnableIncognito>(_onIncognito);
     on<ReactivateAccount>(_onReactivate);
@@ -18,8 +19,8 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
   final AccountStatusService _service;
 
   /// Subscribes to a real-time Firestore stream via [emit.forEach].
-  /// The stream is automatically canceled when a new [LoadAccountStatus]
-  /// event arrives (bloc_concurrency default = sequential) or the bloc closes.
+  /// Uses [restartable] transformer so that a new [LoadAccountStatus]
+  /// event cancels the prior long-lived stream handler before starting fresh.
   Future<void> _onLoad(
     LoadAccountStatus event,
     Emitter<AccountStatusState> emit,
@@ -28,7 +29,7 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
     try {
       await emit.forEach<String>(
         _service.watchAccountStatus(event.userId),
-        onData: (status) => AccountStatusLoaded(status),
+        onData: AccountStatusLoaded.new,
         onError: (error, _) =>
             AccountStatusError('Failed to load status: $error'),
       );

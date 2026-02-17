@@ -324,24 +324,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      // The body will switch between screens based on the selected index
-      body: Stack(
+      // Column: banner takes layout space above content so pages shift down.
+      body: Column(
         children: [
-          // Main content
-          IndexedStack(
-            index: _validSelectedIndex,
-            children: _pages,
-          ),
+          // Account status banner (paused / incognito).
+          // Returns SizedBox.shrink() when status is active, so zero height.
+          const AccountStatusBanner(),
 
-          // Account status banner (paused / incognito)
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AccountStatusBanner(),
-          ),
+          // Main content fills remaining space.
+          Expanded(
+            child: Stack(
+              children: [
+                IndexedStack(
+                  index: _validSelectedIndex,
+                  children: _pages,
+                ),
 
-          // Background task indicator
+                // Background task indicator
           if (_backgroundTasksRunning)
             Positioned(
               top: MediaQuery.of(context).padding.top + 8,
@@ -398,6 +397,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 onPressed: () => _runUserAnalysis(context),
               ),
             ),
+              ],
+            ),
+          ),
         ],
       ),
 

@@ -7,14 +7,14 @@ service cloud.firestore {
                // Owner always reads own profile document.
                request.auth.uid == userId ||
                (
-                 // Non-owners can read only active/public profiles.
-                 // Paused and incognito users are hidden from discovery.
+                 // Non-owners can read active/public profiles.
+                 // Paused/incognito filtering is enforced app-side in discovery
+                 // queries; rules must NOT block these reads because existing
+                 // match partners need profile access for chat thread rendering.
                  resource.data.isProfilePrivate != true &&
                  resource.data.isDeleted != true &&
                  resource.data.accountStatus != 'deleted' &&
-                 resource.data.accountStatus != 'banned' &&
-                 resource.data.accountStatus != 'paused' &&
-                 resource.data.accountStatus != 'incognito'
+                 resource.data.accountStatus != 'banned'
                )
              );
     }

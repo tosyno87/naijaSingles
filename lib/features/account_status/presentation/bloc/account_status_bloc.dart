@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,16 +16,16 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
   }
 
   final AccountStatusService _service;
-  StreamSubscription<String>? _statusSub;
 
+  /// Subscribes to a real-time Firestore stream via [emit.forEach].
+  /// The stream is automatically canceled when a new [LoadAccountStatus]
+  /// event arrives (bloc_concurrency default = sequential) or the bloc closes.
   Future<void> _onLoad(
     LoadAccountStatus event,
     Emitter<AccountStatusState> emit,
   ) async {
     emit(const AccountStatusLoading());
     try {
-      // Start a real-time stream so the UI stays in sync.
-      await _statusSub?.cancel();
       await emit.forEach<String>(
         _service.watchAccountStatus(event.userId),
         onData: (status) => AccountStatusLoaded(status),
@@ -50,7 +48,6 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
         userId: event.userId,
         reason: event.reason,
       );
-      // Stream will emit the new status automatically.
     } on Exception catch (e) {
       debugPrint('AccountStatusBloc pause error: $e');
       emit(AccountStatusError('Failed to pause account: $e'));
@@ -84,11 +81,5 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
       debugPrint('AccountStatusBloc reactivate error: $e');
       emit(AccountStatusError('Failed to reactivate account: $e'));
     }
-  }
-
-  @override
-  Future<void> close() async {
-    await _statusSub?.cancel();
-    return super.close();
   }
 }

@@ -453,6 +453,11 @@ class DiscoveryService {
       return false;
     }
 
+    // Skip users who are not discoverable (paused, incognito, deleted, banned)
+    if (!user.isDiscoverable) {
+      return false;
+    }
+
     // Skip blocked users
     if (user.isBlocked ?? false) {
       return false;

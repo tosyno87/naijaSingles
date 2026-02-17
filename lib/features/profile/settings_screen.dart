@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/user/user_bloc.dart';
+import '../../common/constants/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../common/routes/route_name.dart';
+import '../account_status/presentation/screens/account_status_screen.dart';
+import '../account_status/presentation/bloc/account_status_bloc.dart';
 import '../settings/account_deletion_screen.dart';
 import '../settings/help_center_screen.dart';
 import '../settings/language_settings_screen.dart';
@@ -232,6 +235,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         fontWeight: FontWeight.w600,
                         color: Colors.red.shade700,
                       ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Take a Break / Pause Account — non-destructive alternative
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider(
+                            create: (_) => AccountStatusBloc(),
+                            child: const AccountStatusScreen(),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.pause_circle_outline, size: 22),
+                    label: Text(
+                      'Take a Break',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primaryGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: const BorderSide(
+                          color: AppColors.primaryGreen,
+                          width: 2,
+                        ),
+                      ),
+                      elevation: 2,
+                      shadowColor: Colors.black.withOpacity(0.1),
                     ),
                   ),
                 ),

@@ -16,6 +16,7 @@ import '../../common/utils/profile_completion_guard.dart';
 import '../../common/widgets/custom_3d_icons.dart';
 import '../../debug/quick_analysis.dart';
 import '../../models/user_model.dart';
+import '../account_status/presentation/widgets/account_status_banner.dart';
 import '../communities/ui/screens/discover_page_v2.dart';
 import '../explore/explore_screen.dart';
 import '../messages/messages_screen.dart';
@@ -330,6 +331,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           IndexedStack(
             index: _validSelectedIndex,
             children: _pages,
+          ),
+
+          // Account status banner (paused / incognito)
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AccountStatusBanner(),
           ),
 
           // Background task indicator

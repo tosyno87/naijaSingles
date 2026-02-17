@@ -8,10 +8,13 @@ service cloud.firestore {
                request.auth.uid == userId ||
                (
                  // Non-owners can read only active/public profiles.
+                 // Paused and incognito users are hidden from discovery.
                  resource.data.isProfilePrivate != true &&
                  resource.data.isDeleted != true &&
                  resource.data.accountStatus != 'deleted' &&
-                 resource.data.accountStatus != 'banned'
+                 resource.data.accountStatus != 'banned' &&
+                 resource.data.accountStatus != 'paused' &&
+                 resource.data.accountStatus != 'incognito'
                )
              );
     }

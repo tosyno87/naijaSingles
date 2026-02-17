@@ -859,8 +859,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Text(
               'Afropeep is a community platform built for Africans in the diaspora. '
               'Connect with your people through friendships, shared culture, events, '
-              'and meaningful relationships — dating is just one of the ways we bring '
-              'our community together.',
+              'and meaningful relationships.',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,

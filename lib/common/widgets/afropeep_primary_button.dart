@@ -5,7 +5,7 @@ import '../constants/app_colors.dart';
 /// Button variant for styling
 enum AuthButtonVariant { primary, secondary }
 
-/// Modern dating app style primary button widget
+/// Afropeep-branded primary button widget
 /// Reusable button for authentication and action screens
 class AfropeepPrimaryButton extends StatelessWidget {
   const AfropeepPrimaryButton({

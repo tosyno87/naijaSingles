@@ -16,8 +16,8 @@ class Homepage extends StatefulWidget {
   final Map items;
   final bool isPurchased;
 
-  // NOTE: This is the main dating interface. Do not add profile counters or pagination indicators
-  // as they are not typical in dating apps and can create user anxiety
+  // NOTE: This is the main discovery interface. Do not add profile counters or
+  // pagination indicators as they can create user anxiety
 
   @override
   State<Homepage> createState() => _HomepageState();

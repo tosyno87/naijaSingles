@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../common/bloc/theme/theme_bloc.dart';
 import '../../models/user_model.dart';
@@ -66,7 +67,7 @@ class ReportUserState extends State<ReportUser> {
                   child: Text(
                     'Report User'.tr().toString(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 20, fontFamily: 'Montserrat'),
+                    style: GoogleFonts.montserrat(fontSize: 20),
                   ),
                 ),
               ],
@@ -76,7 +77,7 @@ class ReportUserState extends State<ReportUser> {
                   .tr()
                   .toString(),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 15, fontFamily: 'Montserrat'),
+              style: GoogleFonts.montserrat(fontSize: 15),
             ),
             actions:
                 // !other ?

@@ -114,65 +114,195 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   Widget _buildFAQTab() {
-    final faqs = [
+    final faqSections = [
       {
-        'question': 'How do I create a profile?',
-        'answer':
-            'To create your profile, tap on the profile icon and fill in your basic information, add photos, and write a bio that represents you.',
+        'category': 'Getting Started',
+        'icon': Icons.rocket_launch,
+        'items': [
+          {
+            'question': 'How do I create a profile?',
+            'answer':
+                'Tap on the Profile tab and fill in your basic information, add photos, and write a bio that represents you. A complete profile helps you connect with the right people.',
+          },
+          {
+            'question': 'What can I do on Afropeep?',
+            'answer':
+                'Afropeep is a community platform for Africans in the diaspora. You can discover and connect with new people, join communities, attend events, and build meaningful relationships.',
+          },
+        ],
       },
       {
-        'question': 'How does matching work?',
-        'answer':
-            'Our matching system shows you potential matches based on your location, age preferences, and interests. Swipe right to like someone or left to pass.',
+        'category': 'Discover & Connect',
+        'icon': Icons.explore,
+        'items': [
+          {
+            'question': 'How does the Discover screen work?',
+            'answer':
+                'The Discover screen shows you profiles based on your location, preferences, and interests. Swipe right to like someone or left to pass. When two people like each other, it\'s a match!',
+          },
+          {
+            'question': 'Can I change my location or distance preferences?',
+            'answer':
+                'Yes! Go to Settings > Location to update your location. You can also adjust your distance range and other preferences to refine who appears in your Discover feed.',
+          },
+          {
+            'question': 'What is a Super Like?',
+            'answer':
+                'A Super Like lets someone know you\'re especially interested. It stands out from a regular like and can help you get noticed.',
+          },
+        ],
       },
       {
-        'question': 'How do I start a conversation?',
-        'answer':
-            'Once you match with someone, you can start chatting! Go to your Messages tab and tap on their profile to begin the conversation.',
+        'category': 'Communities',
+        'icon': Icons.groups,
+        'items': [
+          {
+            'question': 'What are Communities?',
+            'answer':
+                'Communities are groups where you can connect with people who share your interests, culture, or location. Join existing communities or create your own to bring people together.',
+          },
+          {
+            'question': 'How do I join or create a Community?',
+            'answer':
+                'Go to the Communities tab to browse and join existing groups. To create your own, tap the "+" button and set a name, description, and guidelines for your community.',
+          },
+          {
+            'question': 'Can I leave a Community?',
+            'answer':
+                'Yes. Open the community, tap the settings or menu icon, and select "Leave Community." You can rejoin at any time.',
+          },
+        ],
       },
       {
-        'question': 'Can I change my location?',
-        'answer':
-            'Yes! Go to Settings > Location to update your location settings. You can also enable location services for more accurate matching.',
+        'category': 'Events',
+        'icon': Icons.event,
+        'items': [
+          {
+            'question': 'How do I find events near me?',
+            'answer':
+                'Go to the Events tab to browse upcoming events. You can filter by location, date, and category to find events that interest you.',
+          },
+          {
+            'question': 'How do I RSVP to an event?',
+            'answer':
+                'Tap on any event to view its details, then tap "RSVP" to confirm your attendance. You\'ll receive a reminder as the event date approaches.',
+          },
+          {
+            'question': 'Can I create my own event?',
+            'answer':
+                'Yes! Tap the "+" button on the Events tab to create an event. Add a title, description, date, location, and optional cover image to share with the community.',
+          },
+        ],
       },
       {
-        'question': 'How do I report someone?',
-        'answer':
-            'If someone is behaving inappropriately, go to their profile and tap the report button. We take all reports seriously and will investigate.',
+        'category': 'Messages & Notifications',
+        'icon': Icons.chat_bubble,
+        'items': [
+          {
+            'question': 'How do I start a conversation?',
+            'answer':
+                'Once you match with someone, go to your Messages tab and tap on their profile to begin chatting. Be respectful and genuine!',
+          },
+          {
+            'question': 'How do I change my notification settings?',
+            'answer':
+                'Go to Settings > Notifications to choose which notifications you receive — matches, messages, community updates, event reminders, and more.',
+          },
+          {
+            'question': 'Can I mute a conversation?',
+            'answer':
+                'Yes. Open the conversation, tap the menu icon, and select "Mute." You\'ll still receive messages but won\'t get push notifications for that thread.',
+          },
+        ],
       },
       {
-        'question': 'How do I block someone?',
-        'answer':
-            'To block someone, go to their profile and tap the block button. Blocked users won\'t be able to see your profile or message you.',
+        'category': 'Account & Privacy',
+        'icon': Icons.shield,
+        'items': [
+          {
+            'question': 'How do I pause or hide my profile?',
+            'answer':
+                'Go to Settings > Take a Break. You can pause your account or go incognito. Your profile won\'t appear in Discover, but your existing matches and chats stay intact. Reactivate anytime.',
+          },
+          {
+            'question': 'How do I delete my account?',
+            'answer':
+                'Go to Settings > Delete Account. Please note that this action is permanent and cannot be undone. Consider pausing your account first if you just need a break.',
+          },
+          {
+            'question': 'Is my personal information safe?',
+            'answer':
+                'Yes. We use encryption to protect your data and never share your personal information with third parties. You control what\'s visible on your profile.',
+          },
+        ],
       },
       {
-        'question': 'How do I delete my account?',
-        'answer':
-            'Go to Settings > Account > Delete Account. Please note that this action is permanent and cannot be undone.',
-      },
-      {
-        'question': 'Is my personal information safe?',
-        'answer':
-            'Yes, we take your privacy seriously. We use encryption to protect your data and never share your personal information with third parties.',
-      },
-      {
-        'question': 'How do I change my notification settings?',
-        'answer':
-            'Go to Settings > Notifications to customize which notifications you receive and when you receive them.',
-      },
-      {
-        'question': 'What should I do if I encounter a bug?',
-        'answer':
-            'If you find a bug, please report it through Settings > Send Feedback. Include as much detail as possible to help us fix it quickly.',
+        'category': 'Safety & Reporting',
+        'icon': Icons.security,
+        'items': [
+          {
+            'question': 'How do I report someone?',
+            'answer':
+                'Go to the person\'s profile and tap the report button. You can also report inappropriate content in communities or events. We investigate all reports seriously.',
+          },
+          {
+            'question': 'How do I block someone?',
+            'answer':
+                'Go to their profile and tap the block button. Blocked users won\'t be able to see your profile or message you.',
+          },
+          {
+            'question': 'What should I do if I encounter a bug?',
+            'answer':
+                'Report it through Settings > Send Feedback. Include as much detail as possible (what you were doing, what happened) to help us fix it quickly.',
+          },
+        ],
       },
     ];
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: faqs.length,
-      itemBuilder: (context, index) => _buildFAQItem(faqs[index]),
+      itemCount: faqSections.length,
+      itemBuilder: (context, index) {
+        final section = faqSections[index];
+        final items = section['items'] as List<Map<String, String>>;
+        return _buildFAQSection(
+          category: section['category'] as String,
+          icon: section['icon'] as IconData,
+          items: items,
+        );
+      },
     );
   }
+
+  Widget _buildFAQSection({
+    required String category,
+    required IconData icon,
+    required List<Map<String, String>> items,
+  }) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8, top: 8),
+            child: Row(
+              children: [
+                Icon(icon, color: primaryColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  category,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ...items.map(_buildFAQItem),
+          const SizedBox(height: 8),
+        ],
+      );
 
   Widget _buildFAQItem(Map<String, String> faq) => Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -413,51 +543,87 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   Widget _buildGuidesTab() {
     final guides = [
       {
-        'icon': Icons.person_add,
+        'icon': Icons.rocket_launch,
         'title': 'Getting Started',
-        'description': 'Learn how to set up your profile and start matching',
+        'description': 'Set up your profile and explore Afropeep',
         'steps': [
           'Create your account with email or phone',
           'Add your best photos (at least 3)',
-          'Write an engaging bio',
-          'Set your preferences',
-          'Start swiping and matching!',
+          'Write an engaging bio that shows your personality',
+          'Set your preferences for discovery',
+          'Explore Discover, Communities, and Events',
         ],
       },
       {
-        'icon': Icons.favorite,
-        'title': 'Making Great Matches',
-        'description': 'Tips for finding meaningful connections',
+        'icon': Icons.explore,
+        'title': 'Making Meaningful Connections',
+        'description': 'Tips for connecting with the right people',
         'steps': [
           'Be authentic in your profile',
           'Use recent, clear photos',
           'Write a genuine bio',
-          'Be respectful in conversations',
-          'Take time to read profiles',
+          'Be respectful in all conversations',
+          'Take time to read profiles before swiping',
+        ],
+      },
+      {
+        'icon': Icons.groups,
+        'title': 'Communities',
+        'description': 'Find your tribe and build lasting connections',
+        'steps': [
+          'Browse communities by interest, culture, or location',
+          'Join communities that resonate with you',
+          'Introduce yourself and participate in discussions',
+          'Create your own community around a shared interest',
+          'Invite friends and grow your network',
+        ],
+      },
+      {
+        'icon': Icons.event,
+        'title': 'Events',
+        'description': 'Discover and attend events in the diaspora',
+        'steps': [
+          'Browse upcoming events in the Events tab',
+          'Filter by location, date, or category',
+          'RSVP to events you want to attend',
+          'Create your own event and invite the community',
+          'Check in and connect with attendees',
         ],
       },
       {
         'icon': Icons.chat,
-        'title': 'Starting Conversations',
-        'description': 'How to break the ice and keep conversations flowing',
+        'title': 'Messaging',
+        'description': 'Stay in touch with your connections',
         'steps': [
-          'Read their profile for conversation starters',
-          'Ask open-ended questions',
-          'Share something about yourself',
-          'Be genuine and show interest',
-          'Suggest meeting in person when ready',
+          'Open Messages to see all your conversations',
+          'Tap a match to start or continue chatting',
+          'Use photos and expressive messages',
+          'Be genuine, respectful, and show interest',
+          'Manage notifications in Settings if needed',
+        ],
+      },
+      {
+        'icon': Icons.settings,
+        'title': 'Account Management',
+        'description': 'Control your profile, privacy, and visibility',
+        'steps': [
+          'Edit your profile anytime from the Profile tab',
+          'Adjust discovery preferences in Settings',
+          'Pause your account or go incognito for a break',
+          'Manage blocked users in Settings > Blocked Users',
+          'Delete your account permanently in Settings if needed',
         ],
       },
       {
         'icon': Icons.security,
         'title': 'Staying Safe',
-        'description': 'Important safety tips for online dating',
+        'description': 'Important safety tips for the community',
         'steps': [
-          'Meet in public places first',
-          'Tell someone your plans',
-          'Trust your instincts',
-          'Keep personal info private initially',
-          'Report inappropriate behavior',
+          'Keep personal info private until you feel comfortable',
+          'Meet in public places when connecting in person',
+          'Tell someone you trust about your plans',
+          'Trust your instincts — if something feels off, step back',
+          'Report inappropriate behavior in profiles, chats, or communities',
         ],
       },
     ];

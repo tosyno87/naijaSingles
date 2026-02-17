@@ -158,11 +158,19 @@ service cloud.firestore {
       allow create: if request.auth != null && 
                      request.resource.data.from == request.auth.uid &&
                      request.resource.data.keys().hasAll(['from', 'to', 'timestamp']);
-      
-      // Users can read likes where they are involved (from or to)
-      allow read: if request.auth != null && 
-                   (request.auth.uid == resource.data.from || 
-                    request.auth.uid == resource.data.to);
+
+      // Allow direct get lookups when current user is part of deterministic likeId
+      // format: {from}_likes_{to}
+      allow get: if request.auth != null &&
+                 (likeId.matches('^' + request.auth.uid + '_likes_.+$') ||
+                  likeId.matches('^.+_likes_' + request.auth.uid + '$') ||
+                  (request.auth.uid == resource.data.from ||
+                   request.auth.uid == resource.data.to));
+
+      // List/query reads remain scoped to likes involving current user
+      allow list: if request.auth != null &&
+                  (request.auth.uid == resource.data.from ||
+                   request.auth.uid == resource.data.to);
       
       // Users can update likes where they are involved (for mutual likes).
       // Core identity fields (from, to) are immutable after creation.

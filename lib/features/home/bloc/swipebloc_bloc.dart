@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/data/repo/user_search_repo.dart';
 import '../../../models/user_model.dart';
-import '../../match/data/services/match_service.dart';
 
 part 'swipebloc_event.dart';
 part 'swipebloc_state.dart';
@@ -13,13 +12,11 @@ part 'swipebloc_state.dart';
 class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
   SwipeBloc({
     Future<void> Function(UserModel, UserModel)? leftSwipe,
-    Future<void> Function(UserModel, UserModel)? rightSwipe,
+    Future<String?> Function(UserModel, UserModel)? rightSwipe,
     Future<List<UserModel>> Function(UserModel)? getUserList,
-    MatchService? matchService,
   })  : leftSwipe = leftSwipe ?? UserSearchRepo.leftSwipe,
         rightSwipe = rightSwipe ?? UserSearchRepo.rightSwipe,
         getUserList = getUserList ?? UserSearchRepo.getUserList,
-        _matchService = matchService ?? MatchService(),
         super(SwipeblocInitial()) {
     on<LeftSwipeEvent>((event, emit) async {
       try {
@@ -38,26 +35,13 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
 
     on<RightSwipeEvent>((event, emit) async {
       try {
-        // Check if this will create a match
-        final selectedUserId = event.selectedUser.id;
-        bool hasAlreadyLiked = false;
-
-        if (selectedUserId != null) {
-          hasAlreadyLiked = await _matchService.hasUserLiked(selectedUserId);
-        }
-
-        await this.rightSwipe(event.currentUser, event.selectedUser);
+        final matchId =
+            await this.rightSwipe(event.currentUser, event.selectedUser);
 
         final List<UserModel> userList =
             await this.getUserList(event.currentUser);
 
-        // Check if a match was created by looking for mutual likes
-        final usersWhoLikedMe = await _matchService.getUsersWhoLikedMe();
-        final isMatch = selectedUserId != null &&
-            usersWhoLikedMe.contains(selectedUserId) &&
-            !hasAlreadyLiked;
-
-        if (isMatch) {
+        if (matchId != null) {
           // Emit match state
           emit(
             SwipeMatchCreatedState(
@@ -78,7 +62,6 @@ class SwipeBloc extends Bloc<SwipeblocEvent, SwipeblocState> {
     });
   }
   final Future<void> Function(UserModel, UserModel) leftSwipe;
-  final Future<void> Function(UserModel, UserModel) rightSwipe;
+  final Future<String?> Function(UserModel, UserModel) rightSwipe;
   final Future<List<UserModel>> Function(UserModel) getUserList;
-  final MatchService _matchService;
 }

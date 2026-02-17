@@ -108,41 +108,64 @@ class LikesService {
         );
       }
 
-      // Check if toUser has already liked fromUser and if match exists (concurrent queries)
+      // Check if toUser has already liked fromUser.
+      // Primary path uses deterministic like document ID for O(1) lookup.
       final reverseLikeDocId = '${toUserId}_likes_$fromUserId';
       final reverseLikeRef = _likesCollection.doc(reverseLikeDocId);
 
-      // Optimized query to check if match already exists
-      final existingMatchQuery = _matchesCollection
-          .where('users', arrayContains: fromUserId)
-          .limit(50); // Reasonable limit
-
-      // Execute queries concurrently (2 reads)
-      final results = await Future.wait([
-        reverseLikeRef.get(),
-        existingMatchQuery.get(),
-      ]);
-
-      final reverseLikeDoc = results[0] as DocumentSnapshot;
-      final existingMatchSnapshot = results[1] as QuerySnapshot;
-
-      // Check for existing match
-      for (final doc in existingMatchSnapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        final users = List<String>.from(data['users'] ?? []);
-
-        if (users.contains(fromUserId) && users.contains(toUserId)) {
-          debugPrint('🔍 Found existing match: ${doc.id}');
-          return MutualLikeCheckResult(
-            isMutualLike: false,
-            isExistingMatch: true,
-            matchId: doc.id,
-          );
+      bool isMutualLike = false;
+      try {
+        final reverseLikeDoc = await reverseLikeRef.get();
+        isMutualLike = reverseLikeDoc.exists;
+      } on FirebaseException catch (e) {
+        if (e.code == 'permission-denied') {
+          // Fallback query if direct doc read is blocked by stricter rules.
+          // This keeps behavior resilient while still scoped to this user pair.
+          final reverseLikeQuery = await _likesCollection
+              .where('to', isEqualTo: fromUserId)
+              .where('from', isEqualTo: toUserId)
+              .limit(1)
+              .get();
+          isMutualLike = reverseLikeQuery.docs.isNotEmpty;
+        } else {
+          rethrow;
         }
       }
 
-      // Check for mutual like
-      final isMutualLike = reverseLikeDoc.exists;
+      // Check if match already exists.
+      // If rules deny this read, continue with mutual-like result so swipes still work.
+      QuerySnapshot? existingMatchSnapshot;
+      try {
+        existingMatchSnapshot = await _matchesCollection
+            .where('users', arrayContains: fromUserId)
+            .limit(50)
+            .get();
+      } on FirebaseException catch (e) {
+        if (e.code == 'permission-denied') {
+          debugPrint(
+            '⚠️ Permission denied checking existing matches; continuing with like check only',
+          );
+        } else {
+          rethrow;
+        }
+      }
+
+      // Check for existing match
+      if (existingMatchSnapshot != null) {
+        for (final doc in existingMatchSnapshot.docs) {
+          final data = doc.data() as Map<String, dynamic>;
+          final users = List<String>.from(data['users'] ?? []);
+
+          if (users.contains(fromUserId) && users.contains(toUserId)) {
+            debugPrint('🔍 Found existing match: ${doc.id}');
+            return MutualLikeCheckResult(
+              isMutualLike: false,
+              isExistingMatch: true,
+              matchId: doc.id,
+            );
+          }
+        }
+      }
 
       // Cache the result
       _recentLikeChecks[cacheKey] = isMutualLike;

@@ -151,6 +151,9 @@ class PrivacyAwareUserSearchRepo {
           }
 
           // Apply other filters
+          if (!user.isDiscoverable) {
+            continue;
+          }
           if (user.isBlocked ?? false) {
             continue;
           }

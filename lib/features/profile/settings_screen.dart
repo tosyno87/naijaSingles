@@ -857,7 +857,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Afropeep is a dating app designed to connect Nigerian singles worldwide. Find meaningful connections, chat with matches, and discover love.',
+              'Afropeep is a community platform built for Africans in the diaspora. '
+              'Connect with your people through friendships, shared culture, events, '
+              'and meaningful relationships — dating is just one of the ways we bring '
+              'our community together.',
               style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: textSecondary,
@@ -866,7 +869,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              '© 2024 Afropeep. All rights reserved.',
+              '© 2025 Afropeep. All rights reserved.',
               style: GoogleFonts.montserrat(
                 fontSize: 12,
                 color: textSecondary,

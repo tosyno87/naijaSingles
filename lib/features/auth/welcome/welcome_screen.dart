@@ -218,7 +218,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           builder: (context, child) => Opacity(
                             opacity: _textOpacity.value,
                             child: Text(
-                              'Welcome to Afropeep, your journey to meaningful connections starts here.',
+                              'Welcome to Afropeep — community, culture, and connection for Africans everywhere.',
                               textAlign: TextAlign.center,
                               style: GoogleFonts.montserrat(
                                 fontSize: 16,
@@ -383,7 +383,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
       );
 
-  // Modern dating app style button widget
+  // Afropeep-branded button widget
   Widget _buildAfropeepButton({
     required String text,
     required VoidCallback onPressed,

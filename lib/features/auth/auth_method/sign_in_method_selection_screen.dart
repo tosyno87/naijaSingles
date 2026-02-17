@@ -26,7 +26,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
       ),
     );
 
-    // Define colors for modern dating app style
+    // Define colors for Afropeep brand style
     const Color backgroundColor = Colors.white;
     const Color primaryColor = AppColors.primaryGreen; // #008037
     const Color googleBlue = Color(0xFF4285F4); // Google blue

@@ -19,8 +19,8 @@ import '../../../user/ui/widgets/user_info.dart';
 // import 'MatchedAnimation.dart';
 
 class UsersList extends StatefulWidget {
-  // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they are not typical in dating apps
-  // and can create pressure or anxiety for users
+  // NOTE: Do not add profile counters (e.g., "1 of 5 profiles") as they create
+  // pressure or anxiety for users
 
   const UsersList({
     required this.users,

@@ -1,6 +1,7 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../common/constants/app_colors.dart';
 import '../../../services/contact_invitation_service.dart';
@@ -38,6 +39,7 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   final List<Contact> _selectedContacts = [];
   bool _isLoading = false;
   bool _showEmailOption = false;
+  bool _permissionDenied = false;
 
   @override
   void initState() {
@@ -58,20 +60,35 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   Future<void> _loadContacts() async {
     setState(() {
       _isLoading = true;
+      _permissionDenied = false;
     });
 
     try {
       final contacts = await _contactService.getPhoneContacts();
-      setState(() {
-        _contacts = contacts;
-        _filteredContacts = contacts;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+
+      if (contacts.isEmpty && mounted) {
+        final granted = await _contactService.isContactPermissionGranted();
+        if (!granted) {
+          setState(() {
+            _permissionDenied = true;
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+
       if (mounted) {
+        setState(() {
+          _contacts = contacts;
+          _filteredContacts = contacts;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error loading contacts: $e'),
@@ -182,6 +199,99 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
       );
     }
   }
+
+  Widget _buildPermissionDeniedState() => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.lock_outline, size: 64, color: Colors.grey[400]),
+              const SizedBox(height: 16),
+              Text(
+                'Contact access required',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'To invite friends to this group, please allow '
+                'Afropeep to access your contacts.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Colors.grey[500],
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await openAppSettings();
+                  if (mounted) {
+                    await _loadContacts();
+                  }
+                },
+                icon: const Icon(Icons.settings),
+                label: Text(
+                  'Open Settings',
+                  style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: _loadContacts,
+                child: Text(
+                  'Try again',
+                  style: GoogleFonts.montserrat(
+                    color: AppColors.primaryGreen,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Widget _buildEmptyContactsState() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.contacts_outlined, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'No contacts found',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Your device has no contacts to display.\n'
+              'Use the email option above to invite members.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      );
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -316,37 +426,11 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : _filteredContacts.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.contacts_outlined,
-                                size: 64,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No contacts found',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Grant contact permission to add members',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 14,
-                                  color: Colors.grey[500],
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
+                  : _permissionDenied
+                      ? _buildPermissionDeniedState()
+                      : _filteredContacts.isEmpty
+                          ? _buildEmptyContactsState()
+                          : ListView.builder(
                           itemCount: _filteredContacts.length,
                           itemBuilder: (context, index) {
                             final contact = _filteredContacts[index];

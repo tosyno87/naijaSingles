@@ -81,7 +81,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
         });
       }
 
-      final users = await UserSearchRepo.getUserList(_currentUser!);
+      final users = await UserSearchRepo.getUserList(
+        _currentUser!,
+        intentFilter: _currentUser!.lookingFor,
+      );
 
       if (mounted && !_disposed) {
         setState(() {

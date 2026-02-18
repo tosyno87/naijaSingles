@@ -450,7 +450,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'We typically respond to emails within 24-48 hours during business days (Monday to Friday, 9 AM - 6 PM WAT).',
+                    'We typically respond to emails within 24-48 hours during business days (Monday to Friday, 9 AM – 6 PM EST).',
                     style: GoogleFonts.montserrat(
                       fontSize: 14,
                       color: textSecondary,

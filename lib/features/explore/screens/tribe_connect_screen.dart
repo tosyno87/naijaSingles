@@ -255,7 +255,7 @@ class _TribeConnectScreenState extends State<TribeConnectScreen> {
   void _showConnectConfirmation(UserModel user) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Connection request sent to ${user.name}! 💕'),
+        content: Text('Liked ${user.name}! 💕'),
         backgroundColor: AppColors.primaryGreen,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,

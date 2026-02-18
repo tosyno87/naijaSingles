@@ -446,7 +446,6 @@ class _ConnectionModeWidgetState extends State<_ConnectionModeWidget> {
                   onChanged: (value) {
                     if (value == null) return;
                     setState(() => _selected = value);
-                    widget.currentUser.lookingFor = value;
                     widget.changeValues['lookingFor'] = value;
                   },
                 ),

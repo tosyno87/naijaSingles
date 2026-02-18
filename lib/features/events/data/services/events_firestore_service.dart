@@ -105,7 +105,9 @@ class EventsFirestoreService {
     }
   }
 
-  /// RSVP to an event
+  /// RSVP to an event.
+  /// Delegates to [updateRSVP] if an RSVP already exists to prevent
+  /// count drift from duplicate create calls.
   Future<void> rsvpToEvent({
     required String userId,
     required String eventId,
@@ -114,9 +116,19 @@ class EventsFirestoreService {
     String? notes,
   }) async {
     try {
+      final existing = await getUserRSVP(userId, eventId);
+      if (existing != null) {
+        await updateRSVP(
+          userId: userId,
+          eventId: eventId,
+          oldStatus: existing.status,
+          newStatus: status,
+        );
+        return;
+      }
+
       final batch = _firestore.batch();
 
-      // Create RSVP model
       final rsvp = RSVPModel(
         id: '${userId}_$eventId',
         userId: userId,
@@ -346,23 +358,33 @@ class EventsFirestoreService {
     }
   }
 
-  /// Delete old events (cleanup job)
+  /// Delete old events (cleanup job).
+  /// Processes in chunks of 400 to stay within Firestore's 500-op batch limit.
   Future<void> deleteOldEvents({int daysOld = 30}) async {
     try {
       final cutoffDate = DateTime.now().subtract(Duration(days: daysOld));
+      const batchLimit = 400;
+      var totalDeleted = 0;
 
-      final querySnapshot = await _eventsCollection
-          .where('endDate', isLessThan: cutoffDate)
-          .get();
+      QuerySnapshot querySnapshot;
+      do {
+        querySnapshot = await _eventsCollection
+            .where('endDate', isLessThan: cutoffDate)
+            .limit(batchLimit)
+            .get();
 
-      final batch = _firestore.batch();
-      for (final doc in querySnapshot.docs) {
-        batch.delete(doc.reference);
-      }
+        if (querySnapshot.docs.isEmpty) break;
 
-      await batch.commit();
+        final batch = _firestore.batch();
+        for (final doc in querySnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+        totalDeleted += querySnapshot.docs.length;
+      } while (querySnapshot.docs.length == batchLimit);
+
       log(
-        'Deleted ${querySnapshot.docs.length} old events',
+        'Deleted $totalDeleted old events',
         name: 'EventsFirestoreService',
       );
     } catch (e) {

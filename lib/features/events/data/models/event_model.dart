@@ -85,8 +85,8 @@ class EventModel extends Equatable {
         externalId: json['externalId'] ?? '',
         name: json['name'] ?? '',
         description: json['description'] ?? '',
-        startDate: _parseDateTime(json['startDate']),
-        endDate: _parseDateTime(json['endDate']),
+        startDate: parseDateTime(json['startDate']),
+        endDate: parseDateTime(json['endDate']),
         imageUrl: imageUrl,
         location: EventLocation.fromJson(json['location'] ?? {}),
         ticketUrl: json['ticketUrl'],
@@ -96,8 +96,8 @@ class EventModel extends Equatable {
         tags: List<String>.from(json['tags'] ?? []),
         attendeeCount: json['attendeeCount'] ?? 0,
         rsvpCount: json['rsvpCount'] ?? 0,
-        createdAt: _parseDateTime(json['createdAt']),
-        updatedAt: _parseDateTime(json['updatedAt']),
+        createdAt: parseDateTime(json['createdAt']),
+        updatedAt: parseDateTime(json['updatedAt']),
         status: _parseEventStatus(json['status']),
         isPublic: json['isPublic'] ?? true,
         createdByUserId: json['createdByUserId'] ?? 'unknown',
@@ -175,8 +175,9 @@ class EventModel extends Equatable {
     return EventStatus.published;
   }
 
-  // Helper method to safely parse DateTime from Firestore
-  static DateTime _parseDateTime(dateValue) {
+  /// Safely parses various date representations from Firestore.
+  /// Shared by both EventModel and EnhancedEventModel.
+  static DateTime parseDateTime(dynamic dateValue) {
     if (dateValue == null) return DateTime.now();
 
     // Handle Timestamp objects (Firestore native)
@@ -229,8 +230,8 @@ class EventModel extends Equatable {
         'externalId': externalId,
         'name': name,
         'description': description,
-        'startDate': startDate,
-        'endDate': endDate,
+        'startDate': Timestamp.fromDate(startDate),
+        'endDate': Timestamp.fromDate(endDate),
         'imageUrl': imageUrl,
         'location': location.toJson(),
         'ticketUrl': ticketUrl,
@@ -240,8 +241,8 @@ class EventModel extends Equatable {
         'tags': tags,
         'attendeeCount': attendeeCount,
         'rsvpCount': rsvpCount,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'updatedAt': Timestamp.fromDate(updatedAt),
         'status': status.toString().split('.').last,
         'isPublic': isPublic,
         'createdByUserId': createdByUserId,

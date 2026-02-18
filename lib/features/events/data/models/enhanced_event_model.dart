@@ -108,8 +108,8 @@ class EnhancedEventModel extends Equatable {
         externalId: json['externalId'],
         name: json['name'] ?? '',
         description: json['description'] ?? '',
-        startDate: (json['startDate'] as Timestamp).toDate(),
-        endDate: (json['endDate'] as Timestamp).toDate(),
+        startDate: event_model.EventModel.parseDateTime(json['startDate']),
+        endDate: event_model.EventModel.parseDateTime(json['endDate']),
         imageUrls: (json['imageUrls'] as List<dynamic>?)
                 ?.map((e) => e.toString())
                 .where((url) => url.isNotEmpty)
@@ -124,15 +124,15 @@ class EnhancedEventModel extends Equatable {
         attendeeCount: json['attendeeCount'] ?? 0,
         rsvpCount: json['rsvpCount'] ?? 0,
         maxAttendees: json['maxAttendees'] ?? 100,
-        createdAt: (json['createdAt'] as Timestamp).toDate(),
-        updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+        createdAt: event_model.EventModel.parseDateTime(json['createdAt']),
+        updatedAt: event_model.EventModel.parseDateTime(json['updatedAt']),
         createdByUserId: json['createdByUserId'],
         isUserGenerated: json['isUserGenerated'] ?? false,
         eventType: _parseEventType(json['eventType']),
         status: _parseEventStatus(json['status']),
         isPromoted: json['isPromoted'] ?? false,
         promotionExpiry: json['promotionExpiry'] != null
-            ? (json['promotionExpiry'] as Timestamp).toDate()
+            ? event_model.EventModel.parseDateTime(json['promotionExpiry'])
             : null,
         metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
       );

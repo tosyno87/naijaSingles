@@ -112,21 +112,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               onPressed: _shareEvent,
             ),
           ),
-          Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.favorite_border,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: _toggleFavorite,
-            ),
-          ),
         ],
         flexibleSpace: FlexibleSpaceBar(
           background: Stack(
@@ -299,8 +284,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             _buildEventDescription(),
             const SizedBox(height: 24),
             _buildEventAttendees(),
-            const SizedBox(height: 24),
-            _buildSimilarEvents(),
             const SizedBox(height: 100), // Space for bottom bar
           ],
         ),
@@ -317,15 +300,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               label: 'Going',
             ),
             _buildStatItem(
-              icon: Icons.visibility,
-              value: '${widget.event.attendeeCount + 50}', // Mock view count
-              label: 'Views',
-            ),
-            _buildStatItem(
-              icon: Icons.share,
-              value:
-                  '${(widget.event.rsvpCount * 0.3).round()}', // Mock share count
-              label: 'Shares',
+              icon: Icons.group,
+              value: '${widget.event.attendeeCount}',
+              label: 'Interested',
             ),
           ],
         ),
@@ -605,81 +582,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       );
 
-  Widget _buildSimilarEvents() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Similar Events',
-              style: GoogleFonts.montserrat(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF333333),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 120,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 5, // Mock similar events
-                itemBuilder: (context, index) => Container(
-                  width: 200,
-                  margin: EdgeInsets.only(right: index == 4 ? 0 : 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Similar Event ${index + 1}',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF333333),
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Tomorrow, 7:00 PM',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            color: const Color(0xFF666666),
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          'FREE',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF4CAF50),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-
   Widget _buildBottomActionBar() => BlocBuilder<RSVPBloc, RSVPState>(
         builder: (context, state) {
           bool isGoing = false;
@@ -816,23 +718,6 @@ ${widget.event.ticketUrl ?? 'More details in NaijaSingles app!'}
 ''';
 
     Share.share(text);
-  }
-
-  void _toggleFavorite() {
-    // TODO: Implement favorite functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Favorite feature coming soon!',
-          style: GoogleFonts.montserrat(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF008037),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
   }
 
   Future<void> _openMaps() async {

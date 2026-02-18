@@ -194,7 +194,7 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
             onConnect: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Connection request sent!'),
+                  content: Text('Liked! 💕'),
                   backgroundColor: Color(0xFF008037),
                 ),
               );
@@ -215,7 +215,7 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
             onConnect: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Connection request sent!'),
+                  content: Text('Liked! 💕'),
                   backgroundColor: Color(0xFF008037),
                 ),
               );
@@ -236,7 +236,7 @@ class _CulturalLearningScreenState extends State<CulturalLearningScreen>
             onConnect: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Connection request sent!'),
+                  content: Text('Liked! 💕'),
                   backgroundColor: Color(0xFF008037),
                 ),
               );

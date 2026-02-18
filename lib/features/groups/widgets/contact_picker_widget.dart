@@ -58,6 +58,10 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   }
 
   Future<void> _loadContacts() async {
+    if (_isLoading) {
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _permissionDenied = false;
@@ -201,10 +205,10 @@ class _ContactPickerWidgetState extends State<ContactPickerWidget> {
   }
 
   Widget _buildPermissionDeniedState() => Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.lock_outline, size: 64, color: Colors.grey[400]),
               const SizedBox(height: 16),

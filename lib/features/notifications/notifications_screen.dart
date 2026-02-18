@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../common/constants/app_colors.dart';
 import 'data/services/notification_service.dart';
 import 'notification_model.dart';
 
@@ -99,16 +100,13 @@ class _NotificationsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Background color for the app
-    const Color backgroundColor = Colors.white;
-
     // Deep green color for accents
     const Color deepGreen = Color(0xFF008037);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         title: Text(
           'Notifications',

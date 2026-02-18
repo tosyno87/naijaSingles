@@ -79,8 +79,8 @@ class TabbarState extends State<Tabbar> with WidgetsBindingObserver {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             backgroundColor: isDarkMode
-                ? const Color(0xFF2C2C2E)
-                : Colors.white,
+                ? AppColors.darkCard
+                : AppColors.backgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),

@@ -8,6 +8,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../common/constants/app_colors.dart';
+
 class LocationSettingsScreen extends StatefulWidget {
   const LocationSettingsScreen({super.key});
 
@@ -20,7 +22,6 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // New Afropeep theme colors
-  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Colors.white; // White cards with shadows
   static const Color successColor = Color(0xFF4CAF50); // Green for success
@@ -180,9 +181,9 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: textPrimary),

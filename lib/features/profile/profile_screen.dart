@@ -6,7 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../common/routes/route_name.dart';
+import '../../common/constants/app_colors.dart';
+import '../../common/routes/route_name.dart';
 
 import 'edit_profile_screen.dart';
 import 'privacy_settings_screen.dart';
@@ -29,7 +30,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final PageController _photoPageController = PageController();
 
   // Simplified color scheme
-  static const Color backgroundColor = Colors.white;
   static const Color primaryColor = Color(0xFF008037);
   static const Color cardColor = Color(0xFFFFFBF5);
   static final Color textPrimary = Colors.brown.shade800;
@@ -106,9 +106,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           automaticallyImplyLeading: false,
           title: Text(

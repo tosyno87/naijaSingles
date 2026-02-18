@@ -437,8 +437,8 @@ class UserModel {
   final String? drinkingStatus;
   final String? smokingStatus;
   final DateTime? lastSeen;
-  final String?
-      lookingFor; // What the user is looking for: Dating, Friendship, Networking
+  String?
+      lookingFor; // What the user is looking for: Dating, Friendship, Networking, Mixed
 
   // Cultural fields
   final String? nationality;

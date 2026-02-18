@@ -26,6 +26,9 @@ class ModeSpecificFilteringService {
         case 'Networking':
           filteredQuery = _applyNetworkingFilters(filteredQuery, currentUser);
           break;
+        case 'Mixed':
+          debugPrint('🌍 Mixed mode — no mode-specific query filters applied');
+          break;
         default:
           debugPrint('⚠️ Unknown mode: $mode, using default filters');
       }
@@ -90,94 +93,18 @@ class ModeSpecificFilteringService {
     return query;
   }
 
-  /// Apply friendship-specific filters
+  /// Apply friendship-specific filters.
+  /// Age range is already applied by _buildOptimizedQuery; adding it again
+  /// would trigger a Firestore duplicate-condition assertion.
   static Query _applyFriendshipFilters(Query query, UserModel currentUser) {
-    debugPrint('🤝 Applying friendship-specific filters');
-
-    // Age range is more flexible for friendship
-    if (currentUser.ageRangeMin != null && currentUser.ageRangeMax != null) {
-      // Expand age range for friendship (add 5 years on each side)
-      final minAge = (currentUser.ageRangeMin! - 5).clamp(18, 100);
-      final maxAge = (currentUser.ageRangeMax! + 5).clamp(18, 100);
-
-      query = query
-          .where('age', isGreaterThanOrEqualTo: minAge)
-          .where('age', isLessThanOrEqualTo: maxAge);
-
-      debugPrint('🤝 Friendship age filter: $minAge-$maxAge');
-    }
-
-    // Location is less important for friendship
-    if (currentUser.maxDistance != null) {
-      // Expand max distance for friendship
-      final friendshipMaxDistance = (currentUser.maxDistance! * 1.5).round();
-      query = query.where(
-        'maxDistance',
-        isGreaterThanOrEqualTo: friendshipMaxDistance,
-      );
-      debugPrint(
-        '🤝 Friendship distance filter: ${(friendshipMaxDistance * 0.621371).round()} miles',
-      );
-    }
-
-    // Filter for users looking for friendship
-    query =
-        query.where('lookingFor', whereIn: ['Friendship', 'Friends', 'Social']);
-
-    // Filter for users with social interests
-    query = query.where('hasSocialInterests', isEqualTo: true);
-
-    // Filter for users open to group activities
-    query = query.where('openToGroupActivities', isEqualTo: true);
-
+    debugPrint('🤝 Applying friendship-specific filters (age handled by base query)');
     return query;
   }
 
-  /// Apply networking-specific filters
+  /// Apply networking-specific filters.
+  /// Age range is already applied by _buildOptimizedQuery.
   static Query _applyNetworkingFilters(Query query, UserModel currentUser) {
-    debugPrint('💼 Applying networking-specific filters');
-
-    // Age range is flexible for networking (career-focused)
-    if (currentUser.ageRangeMin != null && currentUser.ageRangeMax != null) {
-      // Expand age range for networking (add 10 years on each side)
-      final minAge = (currentUser.ageRangeMin! - 10).clamp(18, 100);
-      final maxAge = (currentUser.ageRangeMax! + 10).clamp(18, 100);
-
-      query = query
-          .where('age', isGreaterThanOrEqualTo: minAge)
-          .where('age', isLessThanOrEqualTo: maxAge);
-
-      debugPrint('💼 Networking age filter: $minAge-$maxAge');
-    }
-
-    // Location is important for networking (business meetings)
-    if (currentUser.maxDistance != null) {
-      // Keep original distance for networking
-      query = query.where(
-        'maxDistance',
-        isGreaterThanOrEqualTo: currentUser.maxDistance,
-      );
-      debugPrint(
-        '💼 Networking distance filter: ${(currentUser.maxDistance! * 0.621371).round()} miles',
-      );
-    }
-
-    // Filter for users looking for networking
-    query = query.where(
-      'lookingFor',
-      whereIn: ['Networking', 'Business', 'Professional'],
-    );
-
-    // Filter for users with professional profiles
-    query = query.where('hasProfessionalProfile', isEqualTo: true);
-
-    // Filter for users with job information
-    query = query.where('job_title', isNotEqualTo: null);
-    query = query.where('job_title', isNotEqualTo: '');
-
-    // Filter for users open to professional connections
-    query = query.where('openToProfessionalConnections', isEqualTo: true);
-
+    debugPrint('💼 Applying networking-specific filters (age handled by base query)');
     return query;
   }
 
@@ -223,6 +150,23 @@ class ModeSpecificFilteringService {
           'activityLevel': 'medium',
         };
 
+      case 'Mixed':
+        return {
+          'ageRange': {
+            'min': currentUser.ageRangeMin,
+            'max': currentUser.ageRangeMax,
+          },
+          'maxDistance': currentUser.maxDistance,
+          'lookingFor': [
+            'Dating',
+            'Friendship',
+            'Networking',
+            'Mixed',
+          ],
+          'profileType': 'general',
+          'activityLevel': 'medium',
+        };
+
       default:
         return {
           'ageRange': {
@@ -230,16 +174,25 @@ class ModeSpecificFilteringService {
             'max': currentUser.ageRangeMax,
           },
           'maxDistance': currentUser.maxDistance,
-          'lookingFor': ['Dating'],
+          'lookingFor': [
+            'Dating',
+            'Friendship',
+            'Networking',
+            'Mixed',
+          ],
           'profileType': 'general',
           'activityLevel': 'medium',
         };
     }
   }
 
-  /// Validate if a user matches mode-specific criteria
+  /// Validate if a user matches mode-specific criteria.
+  /// 'Mixed' users pass all modes; a 'Mixed' mode accepts everyone.
   static bool validateModeMatch(UserModel user, String mode) {
     try {
+      if (mode == 'Mixed') return true;
+      if (user.lookingFor == 'Mixed') return true;
+
       switch (mode) {
         case 'Dating':
           return _validateDatingMatch(user);
@@ -248,41 +201,34 @@ class ModeSpecificFilteringService {
         case 'Networking':
           return _validateNetworkingMatch(user);
         default:
-          return true; // Default to valid
+          return true;
       }
     } catch (e) {
       debugPrint('❌ Error validating mode match: $e');
-      return true; // Default to valid on error
+      return true;
     }
   }
 
   static bool _validateDatingMatch(UserModel user) {
-    // Check if user has dating-relevant information
-    final bioCheck = user.bio?.isNotEmpty ?? false;
     final imageCheck = user.imageUrl != null && user.imageUrl!.isNotEmpty;
-    final lookingForCheck = user.lookingFor == 'Dating' ||
-        user.lookingFor == 'Romance' ||
-        user.lookingFor == 'Relationship';
-
-    return bioCheck && imageCheck && lookingForCheck;
+    final lookingForCheck = user.lookingFor == null ||
+        user.lookingFor == 'Dating' ||
+        user.lookingFor == 'Mixed';
+    return imageCheck && lookingForCheck;
   }
 
   static bool _validateFriendshipMatch(UserModel user) {
-    // Check if user has social interests
-    return user.bio?.isNotEmpty ??
-        false &&
-            (user.lookingFor == 'Friendship' ||
-                user.lookingFor == 'Friends' ||
-                user.lookingFor == 'Social');
+    final lookingForCheck = user.lookingFor == null ||
+        user.lookingFor == 'Friendship' ||
+        user.lookingFor == 'Mixed';
+    return lookingForCheck;
   }
 
   static bool _validateNetworkingMatch(UserModel user) {
-    // Check if user has professional information
-    return (user.job_title?.isNotEmpty ?? false) &&
-        (user.company?.isNotEmpty ?? false) &&
-        (user.lookingFor == 'Networking' ||
-            user.lookingFor == 'Business' ||
-            user.lookingFor == 'Professional');
+    final lookingForCheck = user.lookingFor == null ||
+        user.lookingFor == 'Networking' ||
+        user.lookingFor == 'Mixed';
+    return lookingForCheck;
   }
 
   /// Get mode-specific search suggestions
@@ -313,6 +259,15 @@ class ModeSpecificFilteringService {
           'Business partnerships',
           'Industry networking',
           'Skill sharing',
+        ];
+
+      case 'Mixed':
+        return [
+          'Explore all connections',
+          'Meet new people',
+          'Friends, dating, or networking',
+          'Open to anything',
+          'Discover your community',
         ];
 
       default:

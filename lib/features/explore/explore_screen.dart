@@ -81,7 +81,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
         });
       }
 
-      final users = await UserSearchRepo.getUserList(_currentUser!);
+      final users = await UserSearchRepo.getUserList(
+        _currentUser!,
+        intentFilter: _currentUser!.lookingFor,
+      );
 
       if (mounted && !_disposed) {
         setState(() {
@@ -194,6 +197,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return TribeConnectScreen(
       currentUser: _currentUser!,
       users: _users,
+      onFiltersApplied: _loadUsers,
     );
   }
 }

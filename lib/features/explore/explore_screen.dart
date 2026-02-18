@@ -197,6 +197,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return TribeConnectScreen(
       currentUser: _currentUser!,
       users: _users,
+      onFiltersApplied: _loadUsers,
     );
   }
 }

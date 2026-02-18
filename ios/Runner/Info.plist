@@ -85,6 +85,8 @@
 	<string>This app needs photo library access to select photos for your profile pictures.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This app needs permission to save photos to your photo library.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This app needs access to your contacts to invite friends to groups and communities.</string>
 	<key>UIStatusBarHidden</key>
 	<false/>
 	</dict>

@@ -47,7 +47,7 @@ class ContactInvitationService {
     }
   }
 
-  /// Get phone contacts with proper error handling
+  /// Get phone contacts with proper error handling.
   Future<List<Contact>> getPhoneContacts() async {
     try {
       dev.log('📞 Getting phone contacts');
@@ -69,6 +69,18 @@ class ContactInvitationService {
       dev.log('❌ Error getting contacts: $e');
       return [];
     }
+  }
+
+  /// Check whether contact permission is currently granted without requesting.
+  Future<bool> isContactPermissionGranted() async {
+    final status = await Permission.contacts.status;
+    return status.isGranted;
+  }
+
+  /// Whether the user has permanently denied contact access.
+  Future<bool> isContactPermissionPermanentlyDenied() async {
+    final status = await Permission.contacts.status;
+    return status.isPermanentlyDenied;
   }
 
   /// Search contacts by name or phone

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../common/constants/app_colors.dart';
+
 class AfropeepHeightDropdown extends StatefulWidget {
   const AfropeepHeightDropdown({
     required this.onChanged,
@@ -46,7 +48,6 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
   ];
 
   // Afropeep colors
-  static const Color backgroundColor = Colors.white;
   static const Color primaryGreen = Color(0xFF008037);
   static const Color textGray = Color(0xFF666666);
   static const Color textDark = Color(0xFF333333);
@@ -80,7 +81,7 @@ class _AfropeepHeightDropdownState extends State<AfropeepHeightDropdown> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

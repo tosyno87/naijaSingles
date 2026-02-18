@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../common/constants/app_colors.dart';
 import '../../../models/user_model.dart';
 import '../widgets/mode_specific_profile_sections.dart';
 
@@ -23,7 +24,6 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   final PageController _photoPageController = PageController();
 
   // MVP theme colors
-  static const Color backgroundColor = Colors.white;
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
@@ -41,7 +41,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
         widget.user.imageUrl?.cast<String>() ?? <String>[]; // Fix type casting
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       extendBodyBehindAppBar: true, // Allow content behind app bar
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -102,7 +102,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           SliverToBoxAdapter(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: backgroundColor,
+                color: AppColors.backgroundColor,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(24),
                 ),

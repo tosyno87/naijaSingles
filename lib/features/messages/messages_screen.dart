@@ -12,6 +12,7 @@ import '../explore/explore_screen.dart'; // Import ExploreScreen directly
 import 'chat_thread_screen.dart';
 import 'message_model.dart';
 import 'services/chat_service.dart';
+import '../../common/constants/app_colors.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -26,7 +27,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/delete
@@ -37,9 +37,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           automaticallyImplyLeading: false, // Hide back button on main screen

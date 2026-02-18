@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../common/constants/app_colors.dart';
 import '../bloc/onboarding_bloc.dart';
 import '../bloc/onboarding_data.dart';
 
@@ -16,7 +17,6 @@ class ProfilePreviewScreen extends StatefulWidget {
 
 class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
   // Theme colors
-  static const Color backgroundColor = Colors.white;
   static const Color afropeepGreen = Color(0xFF008037); // MVP green
   static const Color cardBackground = Color(0xFFF7E8DA);
   static const Color textDarkBrown = Color(0xFF3A1D0F);
@@ -34,7 +34,7 @@ class _ProfilePreviewScreenState extends State<ProfilePreviewScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,

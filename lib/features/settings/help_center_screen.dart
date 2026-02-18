@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../common/constants/app_colors.dart';
+
 class HelpCenterScreen extends StatefulWidget {
   const HelpCenterScreen({super.key});
 
@@ -13,7 +15,6 @@ class HelpCenterScreen extends StatefulWidget {
 
 class _HelpCenterScreenState extends State<HelpCenterScreen> {
   // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static final Color textPrimary = Colors.brown.shade800;
@@ -25,9 +26,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios, color: textPrimary),

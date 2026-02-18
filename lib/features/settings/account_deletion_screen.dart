@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../common/constants/app_colors.dart';
 import '../../common/data/repo/googlelogin_repo.dart';
 import '../../common/data/repo/phone_auth_repo.dart';
 import '../../common/routes/route_name.dart';
@@ -26,7 +27,6 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
   final _reasonController = TextEditingController();
 
   // Afropeep MVP Color Scheme
-  static const Color backgroundColor = Colors.white; // MVP white background
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFFF5A5F); // Red for errors/danger
@@ -110,9 +110,9 @@ class _AccountDeletionScreenState extends State<AccountDeletionScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios, color: textPrimary),

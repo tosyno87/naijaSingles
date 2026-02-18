@@ -27,7 +27,6 @@ class SignInMethodSelectionScreen extends StatelessWidget {
     );
 
     // Define colors for Afropeep brand style
-    const Color backgroundColor = Colors.white;
     const Color primaryColor = AppColors.primaryGreen; // #008037
     const Color googleBlue = Color(0xFF4285F4); // Google blue
     const Color appleBlack = Color(0xFF000000); // Apple black
@@ -35,7 +34,7 @@ class SignInMethodSelectionScreen extends StatelessWidget {
     const Color textSecondary = AppColors.textSecondary;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

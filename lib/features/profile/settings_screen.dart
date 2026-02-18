@@ -29,7 +29,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // New Afropeep theme colors
-  static const Color backgroundColor = Colors.white; // Clean white
   static const Color primaryColor = Color(0xFF008037); // Deep green
   static const Color cardColor = Colors.white; // White cards with shadows
   static const Color textPrimary = Color(0xFF3E1F0D); // Deep brown
@@ -37,9 +36,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: textPrimary),

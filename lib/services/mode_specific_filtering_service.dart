@@ -93,41 +93,18 @@ class ModeSpecificFilteringService {
     return query;
   }
 
-  /// Apply friendship-specific filters
+  /// Apply friendship-specific filters.
+  /// Age range is already applied by _buildOptimizedQuery; adding it again
+  /// would trigger a Firestore duplicate-condition assertion.
   static Query _applyFriendshipFilters(Query query, UserModel currentUser) {
-    debugPrint('🤝 Applying friendship-specific filters');
-
-    // Age range is more flexible for friendship
-    if (currentUser.ageRangeMin != null && currentUser.ageRangeMax != null) {
-      final minAge = (currentUser.ageRangeMin! - 5).clamp(18, 100);
-      final maxAge = (currentUser.ageRangeMax! + 5).clamp(18, 100);
-
-      query = query
-          .where('age', isGreaterThanOrEqualTo: minAge)
-          .where('age', isLessThanOrEqualTo: maxAge);
-
-      debugPrint('🤝 Friendship age filter: $minAge-$maxAge');
-    }
-
+    debugPrint('🤝 Applying friendship-specific filters (age handled by base query)');
     return query;
   }
 
-  /// Apply networking-specific filters
+  /// Apply networking-specific filters.
+  /// Age range is already applied by _buildOptimizedQuery.
   static Query _applyNetworkingFilters(Query query, UserModel currentUser) {
-    debugPrint('💼 Applying networking-specific filters');
-
-    // Age range is flexible for networking (career-focused)
-    if (currentUser.ageRangeMin != null && currentUser.ageRangeMax != null) {
-      final minAge = (currentUser.ageRangeMin! - 10).clamp(18, 100);
-      final maxAge = (currentUser.ageRangeMax! + 10).clamp(18, 100);
-
-      query = query
-          .where('age', isGreaterThanOrEqualTo: minAge)
-          .where('age', isLessThanOrEqualTo: maxAge);
-
-      debugPrint('💼 Networking age filter: $minAge-$maxAge');
-    }
-
+    debugPrint('💼 Applying networking-specific filters (age handled by base query)');
     return query;
   }
 

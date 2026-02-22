@@ -274,7 +274,7 @@ class NotificationService {
 
     // Show local notification for foreground messages
     await _showLocalNotification(
-      title: notification.title ?? 'NaijaSingles',
+      title: notification.title ?? 'Afropeep',
       body: notification.body ?? '',
       data: data,
     );
@@ -597,7 +597,7 @@ class NotificationService {
   static Future<void> sendTestNotification() async {
     await _showLocalNotification(
       title: '🧪 Test Notification',
-      body: 'This is a test notification from NaijaSingles',
+      body: 'This is a test notification from Afropeep',
       data: {'type': 'test'},
     );
   }

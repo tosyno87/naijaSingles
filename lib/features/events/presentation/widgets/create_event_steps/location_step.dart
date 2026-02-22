@@ -136,16 +136,16 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // NaijaSingles green hint
+                    .withOpacity(0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
-                  AppColors.backgroundColor, // NaijaSingles cream background
+                  AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -153,7 +153,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -195,16 +195,16 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // NaijaSingles green hint
+                    .withOpacity(0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
-                  AppColors.backgroundColor, // NaijaSingles cream background
+                  AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -212,7 +212,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -254,16 +254,16 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // NaijaSingles green hint
+                    .withOpacity(0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
-                  AppColors.backgroundColor, // NaijaSingles cream background
+                  AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -271,7 +271,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -313,16 +313,16 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // NaijaSingles green hint
+                    .withOpacity(0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
-                  AppColors.backgroundColor, // NaijaSingles cream background
+                  AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -330,7 +330,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -366,16 +366,16 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // NaijaSingles green hint
+                    .withOpacity(0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
-                  AppColors.backgroundColor, // NaijaSingles cream background
+                  AppColors.backgroundColor, // Afropeep cream background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -383,7 +383,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // NaijaSingles green border
+                      .withOpacity(0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),

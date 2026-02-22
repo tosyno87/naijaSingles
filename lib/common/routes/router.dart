@@ -307,7 +307,7 @@ abstract class AppRouter {
         return EventDetailsScreen(
           event: EventModel(
             id: arguments.id,
-            externalId: arguments.externalId,
+            externalId: arguments.externalId ?? arguments.id,
             name: arguments.name,
             description: arguments.description,
             startDate: arguments.startDate,

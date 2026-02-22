@@ -313,7 +313,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   color: Colors.grey[50],
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.primaryGreen.withOpacity(0.3),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
@@ -321,7 +321,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     Icon(
                       Icons.contacts_outlined,
                       size: 48,
-                      color: AppColors.primaryGreen.withOpacity(0.7),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.7),
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -371,10 +371,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.primaryGreen.withOpacity(0.3),
+                          color: AppColors.primaryGreen.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(

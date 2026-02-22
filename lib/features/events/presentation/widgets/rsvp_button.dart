@@ -336,7 +336,7 @@ class _RSVPButtonState extends State<RSVPButton>
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.grey[50],
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,
@@ -391,9 +391,9 @@ class _RSVPButtonState extends State<RSVPButton>
       case RSVPStatus.going:
         return const Color(0xFF4CAF50);
       case RSVPStatus.interested:
-        return const Color(0xFFFF9800).withOpacity(0.1);
+        return const Color(0xFFFF9800).withValues(alpha: 0.1);
       case RSVPStatus.notGoing:
-        return const Color(0xFFF44336).withOpacity(0.1);
+        return const Color(0xFFF44336).withValues(alpha: 0.1);
       case RSVPStatus.none:
         return const Color(0xFF008037);
     }

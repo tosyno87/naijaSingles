@@ -346,9 +346,9 @@ class _LocationScreenState extends State<LocationScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: afropeepGreen.withOpacity(0.1),
+                  color: afropeepGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                  border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -396,9 +396,9 @@ class _LocationScreenState extends State<LocationScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: afropeepGreen.withOpacity(0.1),
+                color: afropeepGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: afropeepGreen.withOpacity(0.3)),
+                border: Border.all(color: afropeepGreen.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [

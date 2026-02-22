@@ -64,7 +64,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -312,7 +312,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -357,7 +357,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -369,7 +369,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -429,9 +429,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.05),
+                color: primaryColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: primaryColor.withOpacity(0.2)),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
               ),
               child: Column(
                 children: [
@@ -481,7 +481,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -493,7 +493,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: primaryColor, size: 28),
@@ -643,7 +643,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -654,7 +654,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(guide['icon'], color: primaryColor, size: 24),

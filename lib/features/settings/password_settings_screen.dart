@@ -104,7 +104,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -116,7 +116,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -156,7 +156,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -230,7 +230,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -320,7 +320,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -438,9 +438,9 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
   Widget _buildPasswordRequirementsSection() => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.05),
+          color: primaryColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: primaryColor.withOpacity(0.2)),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +469,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: successColor.withOpacity(0.1),
+                color: successColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -545,7 +545,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: successColor.withOpacity(0.1),
+                    color: successColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.check_circle,
@@ -578,10 +578,10 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.05),
+                    color: primaryColor.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: primaryColor.withOpacity(0.2),
+                      color: primaryColor.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(

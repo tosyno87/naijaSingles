@@ -33,7 +33,7 @@ class LanguageExchangeCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -52,8 +52,8 @@ class LanguageExchangeCard extends StatelessWidget {
                 ),
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF008037).withOpacity(0.1),
-                    const Color(0xFF4CAF50).withOpacity(0.05),
+                    const Color(0xFF008037).withValues(alpha: 0.1),
+                    const Color(0xFF4CAF50).withValues(alpha: 0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -133,7 +133,7 @@ class LanguageExchangeCard extends StatelessWidget {
                       CircleAvatar(
                         radius: 20,
                         backgroundColor:
-                            const Color(0xFF008037).withOpacity(0.1),
+                            const Color(0xFF008037).withValues(alpha: 0.1),
                         child: Text(
                           userName[0].toUpperCase(),
                           style: GoogleFonts.montserrat(
@@ -184,7 +184,7 @@ class LanguageExchangeCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: _getProficiencyColor(proficiency)
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -223,7 +223,7 @@ class LanguageExchangeCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Colors.blue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -254,7 +254,7 @@ class LanguageExchangeCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(

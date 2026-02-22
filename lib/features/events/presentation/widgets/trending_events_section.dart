@@ -228,7 +228,7 @@ class TrendingEventsSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withOpacity(0.1),
+                color: const Color(0xFF008037).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(

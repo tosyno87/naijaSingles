@@ -34,7 +34,7 @@ class MessageBubble extends StatelessWidget {
             if (!isCurrentUser) ...[
               CircleAvatar(
                 radius: 16,
-                backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
+                backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.2),
                 child: Text(
                   senderName.isNotEmpty ? senderName[0].toUpperCase() : '?',
                   style: GoogleFonts.montserrat(
@@ -64,7 +64,7 @@ class MessageBubble extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -98,7 +98,7 @@ class MessageBubble extends StatelessWidget {
                       style: GoogleFonts.montserrat(
                         fontSize: 10,
                         color: isCurrentUser
-                            ? Colors.white.withOpacity(0.7)
+                            ? Colors.white.withValues(alpha: 0.7)
                             : Colors.grey[600],
                       ),
                     ),
@@ -110,7 +110,7 @@ class MessageBubble extends StatelessWidget {
               const SizedBox(width: 8),
               CircleAvatar(
                 radius: 16,
-                backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
+                backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.2),
                 child: Text(
                   (FirebaseAuth.instance.currentUser?.displayName ?? 'You')
                           .isNotEmpty

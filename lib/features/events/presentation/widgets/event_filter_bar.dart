@@ -133,7 +133,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF008037).withOpacity(0.3),
+                      color: const Color(0xFF008037).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -163,7 +163,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF008037).withOpacity(0.1)
+                ? const Color(0xFF008037).withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
@@ -310,7 +310,7 @@ class _EventFilterBarState extends State<EventFilterBar> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF008037).withOpacity(0.1),
+                    color: const Color(0xFF008037).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: const Color(0xFF008037)),
                   ),

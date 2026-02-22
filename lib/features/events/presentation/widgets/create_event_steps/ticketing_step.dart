@@ -151,7 +151,7 @@ class _TicketingStepState extends State<TicketingStep> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF008037).withOpacity(0.3),
+                  color: const Color(0xFF008037).withValues(alpha: 0.3),
                   width: 1.5,
                 ),
               ),
@@ -341,7 +341,7 @@ class _TicketingStepState extends State<TicketingStep> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF008037).withOpacity(0.1)
+                ? const Color(0xFF008037).withValues(alpha: 0.1)
                 : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
@@ -470,10 +470,10 @@ class _TicketingStepState extends State<TicketingStep> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF008037).withOpacity(0.1),
+          color: const Color(0xFF008037).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: const Color(0xFF008037).withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -516,10 +516,10 @@ class _TicketingStepState extends State<TicketingStep> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF008037).withOpacity(0.1),
+          color: const Color(0xFF008037).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: const Color(0xFF008037).withValues(alpha: 0.3),
           ),
         ),
         child: Column(

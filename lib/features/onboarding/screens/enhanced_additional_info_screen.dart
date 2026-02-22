@@ -603,10 +603,10 @@ class _EnhancedAdditionalInfoScreenState
           Container(
             padding: EdgeInsets.all(isTablet ? 20 : 16),
             decoration: BoxDecoration(
-              color: afropeepGreen.withOpacity(0.1),
+              color: afropeepGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: afropeepGreen.withOpacity(0.3),
+                color: afropeepGreen.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),

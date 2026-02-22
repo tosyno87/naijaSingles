@@ -136,7 +136,7 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // Afropeep green hint
+                    .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
@@ -145,7 +145,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -153,7 +153,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -195,7 +195,7 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // Afropeep green hint
+                    .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
@@ -204,7 +204,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -212,7 +212,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -254,7 +254,7 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // Afropeep green hint
+                    .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
@@ -263,7 +263,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -271,7 +271,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -313,7 +313,7 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // Afropeep green hint
+                    .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
@@ -322,7 +322,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -330,7 +330,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -366,7 +366,7 @@ class _LocationStepState extends State<LocationStep> {
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 16,
                 color: const Color(0xFF008037)
-                    .withOpacity(0.7), // Afropeep green hint
+                    .withValues(alpha: 0.7), // Afropeep green hint
               ),
               filled: true,
               fillColor:
@@ -375,7 +375,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -383,7 +383,7 @@ class _LocationStepState extends State<LocationStep> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -408,10 +408,10 @@ class _LocationStepState extends State<LocationStep> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF008037).withOpacity(0.1),
+        color: const Color(0xFF008037).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF008037).withOpacity(0.3),
+          color: const Color(0xFF008037).withValues(alpha: 0.3),
         ),
       ),
       child: Column(

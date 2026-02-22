@@ -91,7 +91,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(20),
           ),
           child: IconButton(
@@ -103,7 +103,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(20),
             ),
             child: IconButton(
@@ -125,7 +125,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.8),
+                      Colors.black.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
@@ -179,8 +179,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: widget.event.isFree
-                                ? Colors.grey.withOpacity(0.8)
-                                : const Color(0xFFEF476F).withOpacity(0.9),
+                                ? Colors.grey.withValues(alpha: 0.8)
+                                : const Color(0xFFEF476F).withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -251,7 +251,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             Icon(
               _getCategoryIcon(),
               size: 80,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
             const SizedBox(height: 16),
             Text(
@@ -259,7 +259,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -347,7 +347,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -358,7 +358,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF008037).withOpacity(0.1),
+                color: const Color(0xFF008037).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -402,7 +402,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -420,7 +420,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF008037).withOpacity(0.1),
+                      color: const Color(0xFF008037).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -492,7 +492,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -595,7 +595,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -611,7 +611,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -717,7 +717,7 @@ ${widget.event.ticketUrl ?? 'More details in the Afropeep app!'}
 #Afropeep #AfrocentricEvents #${widget.event.category.replaceAll(' ', '')}
 ''';
 
-    Share.share(text);
+    SharePlus.instance.share(ShareParams(text: text));
   }
 
   Future<void> _openMaps() async {

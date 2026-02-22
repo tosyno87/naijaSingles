@@ -54,7 +54,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -70,7 +70,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                 color: Colors.white, // White background
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: const Color(0xFF008037).withOpacity(0.1),
+                  color: const Color(0xFF008037).withValues(alpha: 0.1),
                 ),
               ),
               child: Column(
@@ -141,7 +141,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -177,7 +177,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF008037).withOpacity(0.3),
+                      color: const Color(0xFF008037).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -206,7 +206,7 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                       decoration: BoxDecoration(
                         color: index == 0
                             ? Colors.white
-                            : Colors.white.withOpacity(0.5),
+                            : Colors.white.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -271,10 +271,10 @@ class _ModernProfileCardState extends State<ModernProfileCard>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFF008037).withOpacity(0.1),
+            color: const Color(0xFF008037).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: const Color(0xFF008037).withOpacity(0.3),
+              color: const Color(0xFF008037).withValues(alpha: 0.3),
             ),
           ),
           child: Text(
@@ -290,10 +290,10 @@ class _ModernProfileCardState extends State<ModernProfileCard>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFF008037).withOpacity(0.1),
+            color: const Color(0xFF008037).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: const Color(0xFF008037).withOpacity(0.3),
+              color: const Color(0xFF008037).withValues(alpha: 0.3),
             ),
           ),
           child: Text(
@@ -338,11 +338,11 @@ class _ModernProfileCardState extends State<ModernProfileCard>
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF008037).withOpacity(0.2),
+                  color: const Color(0xFF008037).withValues(alpha: 0.2),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

@@ -141,10 +141,10 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF008037).withOpacity(0.1),
+          color: const Color(0xFF008037).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(0xFF008037).withOpacity(0.3),
+            color: const Color(0xFF008037).withValues(alpha: 0.3),
           ),
         ),
         child: Text(
@@ -208,13 +208,13 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.3),
+                color: color.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
             ],
             border: Border.all(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               width: 2,
             ),
           ),
@@ -233,7 +233,7 @@ class _HorizontalProfileViewerState extends State<HorizontalProfileViewer> {
             Icon(
               Icons.favorite_border,
               size: 80,
-              color: const Color(0xFF008037).withOpacity(0.3),
+              color: const Color(0xFF008037).withValues(alpha: 0.3),
             ),
             const SizedBox(height: 24),
             const Text(

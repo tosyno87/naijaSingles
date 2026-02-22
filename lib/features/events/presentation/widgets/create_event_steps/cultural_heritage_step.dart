@@ -100,7 +100,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
               color: AppColors.backgroundColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF008037).withOpacity(0.3),
+                color: const Color(0xFF008037).withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
@@ -111,7 +111,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                   'Select age group (optional)',
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
-                    color: const Color(0xFF008037).withOpacity(0.7),
+                    color: const Color(0xFF008037).withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -202,21 +202,21 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
                   'e.g., "Traditional attire encouraged", "Smart casual", "Formal wear required"',
               hintStyle: GoogleFonts.montserrat(
                 fontSize: 14,
-                color: const Color(0xFF008037).withOpacity(0.6),
+                color: const Color(0xFF008037).withValues(alpha: 0.6),
               ),
               filled: true,
               fillColor: AppColors.backgroundColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037).withOpacity(0.3),
+                  color: const Color(0xFF008037).withValues(alpha: 0.3),
                   width: 1.5,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: const Color(0xFF008037).withOpacity(0.3),
+                  color: const Color(0xFF008037).withValues(alpha: 0.3),
                   width: 1.5,
                 ),
               ),
@@ -228,7 +228,7 @@ class _CulturalHeritageStepState extends State<CulturalHeritageStep> {
               contentPadding: const EdgeInsets.all(16),
               counterStyle: GoogleFonts.montserrat(
                 fontSize: 12,
-                color: const Color(0xFF008037).withOpacity(0.7),
+                color: const Color(0xFF008037).withValues(alpha: 0.7),
               ),
             ),
           ),

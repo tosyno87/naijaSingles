@@ -236,7 +236,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: primaryColor.withOpacity(0.2)),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -244,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Icon(
               Icons.add_a_photo_outlined,
               size: 48,
-              color: primaryColor.withOpacity(0.6),
+              color: primaryColor.withValues(alpha: 0.6),
             ),
             const SizedBox(height: 8),
             Text(
@@ -282,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       .shade100, // Background for images that don't fill container
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -316,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -349,7 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -378,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -524,10 +524,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.1),
+                          color: primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                           border:
-                              Border.all(color: primaryColor.withOpacity(0.3)),
+                              Border.all(color: primaryColor.withValues(alpha: 0.3)),
                         ),
                         child: Text(
                           interest.toString(),
@@ -648,7 +648,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.1),
+          color: primaryColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -748,7 +748,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(
                 Icons.add_a_photo_outlined,
                 size: 48,
-                color: primaryColor.withOpacity(0.6),
+                color: primaryColor.withValues(alpha: 0.6),
               ),
               const SizedBox(height: 8),
               Text(
@@ -804,7 +804,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         decoration: BoxDecoration(
                           color: dotIndex == _currentPhotoIndex
                               ? Colors.white
-                              : Colors.white.withOpacity(0.5),
+                              : Colors.white.withValues(alpha: 0.5),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -860,10 +860,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: primaryColor.withOpacity(0.3),
+                        color: primaryColor.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -887,10 +887,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: primaryColor.withOpacity(0.3),
+                        color: primaryColor.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -1077,10 +1077,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.1),
+                        color: primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: primaryColor.withOpacity(0.3),
+                          color: primaryColor.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(

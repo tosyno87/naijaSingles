@@ -344,9 +344,9 @@ class SettingPageState extends State<SettingPage> {
                     TextButtonWidget(
                       text: 'Invite your friends',
                       onTap: () async {
-                        await Share.share(
-                          'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
-                        );
+                        await SharePlus.instance.share(ShareParams(
+                          text: 'check out my website https://deligence.com', //Replace with your dynamic link and msg for invite users
+                        ));
                       },
                       icon: Icons.share_outlined,
                     ),

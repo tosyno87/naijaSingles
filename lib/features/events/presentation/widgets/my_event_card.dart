@@ -38,7 +38,7 @@ class MyEventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -235,7 +235,7 @@ class MyEventCard extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        const Color(0xFF008037).withOpacity(0.1),
+                        const Color(0xFF008037).withValues(alpha: 0.1),
                         AppColors.backgroundColor,
                       ],
                     ),
@@ -251,7 +251,7 @@ class MyEventCard extends StatelessWidget {
                         Icon(
                           Icons.event_outlined,
                           size: 56,
-                          color: const Color(0xFF008037).withOpacity(0.7),
+                          color: const Color(0xFF008037).withValues(alpha: 0.7),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -288,7 +288,7 @@ class MyEventCard extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.3),
+                      Colors.black.withValues(alpha: 0.3),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -314,7 +314,7 @@ class MyEventCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -340,31 +340,31 @@ class MyEventCard extends StatelessWidget {
 
     switch (event.status) {
       case EventStatus.draft:
-        backgroundColor = Colors.grey.withOpacity(0.9);
+        backgroundColor = Colors.grey.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'DRAFT';
         icon = Icons.edit;
         break;
       case EventStatus.underReview:
-        backgroundColor = Colors.orange.withOpacity(0.9);
+        backgroundColor = Colors.orange.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'UNDER REVIEW';
         icon = Icons.schedule;
         break;
       case EventStatus.published:
-        backgroundColor = const Color(0xFF008037).withOpacity(0.9);
+        backgroundColor = const Color(0xFF008037).withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'PUBLISHED';
         icon = Icons.check_circle;
         break;
       case EventStatus.cancelled:
-        backgroundColor = Colors.red.withOpacity(0.9);
+        backgroundColor = Colors.red.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'CANCELLED';
         icon = Icons.cancel;
         break;
       case EventStatus.completed:
-        backgroundColor = Colors.blue.withOpacity(0.9);
+        backgroundColor = Colors.blue.withValues(alpha: 0.9);
         textColor = Colors.white;
         text = 'COMPLETED';
         icon = Icons.event_available;
@@ -407,7 +407,7 @@ class MyEventCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF008037).withOpacity(0.1),
+                  color: const Color(0xFF008037).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -425,7 +425,7 @@ class MyEventCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
+                    color: Colors.purple.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(

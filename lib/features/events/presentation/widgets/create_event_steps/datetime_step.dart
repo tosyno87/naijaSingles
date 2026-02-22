@@ -239,7 +239,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -261,7 +261,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         color: selectedDate != null
                             ? const Color(0xFF333333)
                             : const Color(0xFF008037)
-                                .withOpacity(0.7), // Afropeep green hint
+                                .withValues(alpha: 0.7), // Afropeep green hint
                       ),
                     ),
                   ),
@@ -300,7 +300,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF008037)
-                      .withOpacity(0.3), // Afropeep green border
+                      .withValues(alpha: 0.3), // Afropeep green border
                   width: 1.5,
                 ),
               ),
@@ -322,7 +322,7 @@ class _DateTimeStepState extends State<DateTimeStep> {
                         color: selectedTime != null
                             ? const Color(0xFF333333)
                             : const Color(0xFF008037)
-                                .withOpacity(0.7), // Afropeep green hint
+                                .withValues(alpha: 0.7), // Afropeep green hint
                       ),
                     ),
                   ),
@@ -356,10 +356,10 @@ class _DateTimeStepState extends State<DateTimeStep> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF008037).withOpacity(0.1),
+        color: const Color(0xFF008037).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF008037).withOpacity(0.3),
+          color: const Color(0xFF008037).withValues(alpha: 0.3),
         ),
       ),
       child: Row(

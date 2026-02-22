@@ -266,7 +266,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         '${widget.users[itemIndex].distanceBW!.toStringAsFixed(1)} miles away',
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withOpacity(0.9),
+                                          color: Colors.white.withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -276,7 +276,7 @@ class UsersListState extends State<UsersList> with WidgetsBindingObserver {
                                       Text(
                                         widget.users[itemIndex].address!,
                                         style: GoogleFonts.montserrat(
-                                          color: Colors.white.withOpacity(0.9),
+                                          color: Colors.white.withValues(alpha: 0.9),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                         ),

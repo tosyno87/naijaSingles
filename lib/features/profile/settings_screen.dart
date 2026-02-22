@@ -225,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
-                      shadowColor: Colors.black.withOpacity(0.1),
+                      shadowColor: Colors.black.withValues(alpha: 0.1),
                     ),
                     child: Text(
                       'Sign Out',
@@ -279,7 +279,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       elevation: 2,
-                      shadowColor: Colors.black.withOpacity(0.1),
+                      shadowColor: Colors.black.withValues(alpha: 0.1),
                     ),
                   ),
                 ),
@@ -303,7 +303,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         side: BorderSide(color: Colors.red.shade300, width: 2),
                       ),
                       elevation: 2,
-                      shadowColor: Colors.black.withOpacity(0.1),
+                      shadowColor: Colors.black.withValues(alpha: 0.1),
                     ),
                     child: Text(
                       'Delete Account',
@@ -337,11 +337,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           color: cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: primaryColor.withOpacity(0.1),
+            color: primaryColor.withValues(alpha: 0.1),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -370,7 +370,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: (iconColor ?? primaryColor).withOpacity(0.1),
+                    color: (iconColor ?? primaryColor).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -736,7 +736,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),

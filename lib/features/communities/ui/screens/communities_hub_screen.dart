@@ -109,13 +109,13 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
               ],
               border: Border.all(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
               ),
             ),
             child: Column(
@@ -126,8 +126,8 @@ class _CommunitiesHubScreenState extends State<CommunitiesHubScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        color.withOpacity(0.1),
-                        color.withOpacity(0.05),
+                        color.withValues(alpha: 0.1),
+                        color.withValues(alpha: 0.05),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,

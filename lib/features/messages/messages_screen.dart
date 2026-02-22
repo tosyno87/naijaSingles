@@ -474,7 +474,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                       Icon(
                                         Icons.info_outline,
                                         size: 16,
-                                        color: primaryColor.withOpacity(0.7),
+                                        color: primaryColor.withValues(alpha: 0.7),
                                       ),
                                     ],
                                   ),
@@ -555,7 +555,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.1),
+                color: errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -592,10 +592,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: errorColor.withOpacity(0.05),
+                color: errorColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: errorColor.withOpacity(0.2),
+                  color: errorColor.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -635,7 +635,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: textSecondary.withOpacity(0.3)),
+                      side: BorderSide(color: textSecondary.withValues(alpha: 0.3)),
                     ),
                   ),
                   child: Text(
@@ -705,7 +705,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Center(
@@ -834,7 +834,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Center(

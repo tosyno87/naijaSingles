@@ -364,9 +364,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             borderRadius: BorderRadius.circular(1),
             gradient: LinearGradient(
               colors: [
-                AppColors.primaryGreen.withOpacity(0.1),
-                AppColors.primaryGreen.withOpacity(0.3),
-                AppColors.primaryGreen.withOpacity(0.1),
+                AppColors.primaryGreen.withValues(alpha: 0.1),
+                AppColors.primaryGreen.withValues(alpha: 0.3),
+                AppColors.primaryGreen.withValues(alpha: 0.1),
               ],
             ),
           ),
@@ -412,7 +412,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryGreen.withOpacity(0.25),
+              color: AppColors.primaryGreen.withValues(alpha: 0.25),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -452,7 +452,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.backgroundColor.withOpacity(0.5), // Light cream fill
+          color: AppColors.backgroundColor.withValues(alpha: 0.5), // Light cream fill
           borderRadius: BorderRadius.circular(28),
           border: Border.all(
             color: AppColors.primaryGreen,

@@ -96,10 +96,10 @@ class GroupInfoModal extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withOpacity(0.1),
+              color: AppColors.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppColors.primaryGreen.withOpacity(0.3),
+                color: AppColors.primaryGreen.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
@@ -296,10 +296,10 @@ class GroupInfoModal extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppColors.primaryGreen.withOpacity(0.3),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
@@ -425,9 +425,9 @@ class GroupInfoModal extends StatelessWidget {
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
